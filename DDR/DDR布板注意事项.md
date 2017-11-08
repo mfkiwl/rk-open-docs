@@ -43,30 +43,39 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 总的要求适用于所有平台，各款主控的特殊要求，后面单独列出
 
 **1、DQ的交换，不能超出该组byte，只能在byte内部进行交换。有些主控有特殊要求，byte内部都不能交换，见具体主控的特殊要求**
+
 原因：因为DDR协议，每组byte的DQ信号，总是与该组的DQS信号同步。如果DQ被换到另一组byte，会导致DQS同步信号用错。
 
 **2、用到2个CS上的bank、column数量不同的DDR颗粒，需要跟软件确认是否支持**
+
 原因：不同的bank、column数量需要有2个CS的ddr_config来选择，而我们的ddr_config和控制器，都是采用一个寄存器来控制2个CS，因此要求2个CS的column必须一样。
 某些主控有对1-2个不同column的配置有支持，还有些是DDR颗粒不同的bank或column刚好可以找到一个ddr_config配置项可以用，要看column不同的情况。所以，具体情况还请找软件确认。
 
 **3、如果颗粒只有一个CS，只能接在主控的CS0上**
+
 原因：控制器的设计限制
 
 **4、如果只用一个通道，只支持通道0**
+
 原因：代码写死，否则代码变复杂
 
 **5、如果颗粒2个CS的容量不同，则容量小的应该放在主控的CS1上**
+
 原因：软件设定的前提，否则要改软件，软件变复杂，而且有的芯片本身不支持
 
 **6、所有平台，不支持大于2个CS的颗粒**
+
 LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 
 **7、如果颗粒只有一个ODT（像LPDDR3），应该连到ODT0上**
+
 原因：控制器的设计限制
 
 **8、6Gb、12Gb的使用比较特殊（8Gb、4Gb、2Gb没有这条限制）**
+
 目前只支持一个通道上的2个CS都是6Gb或者2个CS都是12Gb的，不支持6Gb、12Gb与8Gb、4Gb、2Gb混合在2个CS中使用。
 比如：
+
 | CS0  | CS1  | 支持情况                  |
 | ---- | ---- | --------------------- |
 | 6Gb  | 6Gb  | 支持                    |
@@ -85,18 +94,23 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 ----
 #  RK33399特殊要求
 **1、 CS2是CS0的复制信号，CS3是CS1的复制信号，其行为与被复制信号完全一样**
+
 因此对于DDR3，LPDDR3，实际只能使用2个CS。CS2，CS3主要是给LPDDR4使用的，因为LPDDR4颗粒一个channel是16bit，当要让主控达到32bit、2CS时，就需要用到4根CS信号。
 
 **2、CLK走线必须比该通道任意一组DQS都长，ddr PHY的要求**
+
 原因：没有要求长多少，只说要长一点
 
 **3、LPDDR3的D0-D15必须和主控完全一一对应的连接**
+
 原因：因为有用到LPDDR3的CA training，数据会按顺序输出到D0-D15，所以这些信号不能对调，必须一一对应的连接
 
 **4、LPDDR3的D16、D24这2根数据线也必须和主控完全一一对应连接**
+
 原因：cadence方案的training有用到DQ Calibration，而DQ Calibration LPDDR3一定是从D0、D8、D16、D24吐出数据，其他数据线不一定有数据吐出，所以额外还需要D16、D24要一一对应。（D0、D8在前一条规则已经要求了）。
 
 **5、注意主控一个通道与LPDDR4颗粒2个通道的组成关系**
+
 由于LPDDR4颗粒是16bit一个channel，而我们主控是32bit一个channel，所以需要用颗粒的2个channel来组成主控的一个channel。
 其中尤其要注意的是，颗粒的4个channel有2个channel的ZQ是共用的。我们要求必须把没有共用一个ZQ的颗粒channel拿来组成32bit连到主控的一个通道。也就是不能把共用一个ZQ的两个颗粒channel拿来组成为32bit连到主控同一通道上。
 如下图，不能把Channel A和Channel D拿来组成一个32bit连到主控。
@@ -109,6 +123,7 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 **7、接LPDDR4时，主控端的DDR0_ODT0/1，DDR1_ODT0/1悬空，不用连到LPDDR4颗粒。而颗粒端的ODT_CA_X默认通过电阻上拉到VDDQ**
 
 **8、LPDDR4所有数据线（DQ）都不能对调，不管组内，还是组间**
+
 也就是DDRx_D0-D15必须一一对应的连接到一个LPDDR4颗粒通道的D0-D15；DDRx_D16-D31必须一一对应的连接到另一个LPDDR4颗粒通道的D0-D15；
 原因：对单个LPDDR4 channel来说（16bit），MRR功能需要用到DQ[0：7]；CA training功能需要用到DQS0、DQ[0:6]、DQ[8:13]；RD DQ Calibration用到DQ[0:15]和DMI[1:0]。所以，所有数据线都不能对调。
 额外说明：假设原来DDRx_D0-D15是连到LPDDR4颗粒的channel A，DDRx_D16-D31是连到LPDDR4颗粒的channel C。
@@ -119,4 +134,5 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 ----
 # RK3288、RK3188、PX3、RK3066特殊要求
 **1、外接LPDDR2或LPDDR3时，DDR0的DQ0-DQ7应该一一对应的连接到DRAM的DQ0-DQ7**
+
 除此之外，其他byte内的DQ可以随便调整顺序，包括DDR1的DQ0-DQ7也可以随便调整顺序。
