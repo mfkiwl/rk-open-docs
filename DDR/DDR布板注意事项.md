@@ -2,9 +2,9 @@
 **Rockchip**
 # **DDR布板注意事项**
 
-发布版本:1.0
+发布版本:1.1
 
-日期:2017.11.02
+日期:2017.11.09
 
 Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
@@ -14,18 +14,19 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ------
 **产品版本**
-| **芯片名称** | **内核版本** |
-| -------- | -------- |
-| 所有芯片     | 所有内核版本   |
+| **芯片名称**                                                                | **内核版本**   |
+| --------------------------------------------------------------------------- | -------------- |
+| 所有芯片(包括28系列、29系列、30系列、31系列、32系列、33系列、PX系列、1108A) | 所有内核版本   |
 
 **读者对象**
 本文档（本指南）主要适用于以下工程师：
 硬件工程师
 
 **修订记录**
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017.11.02 | V1.0   | HCY    |          |
+| **日期**   | **版本** | **作者** | **修改说明**   |
+| ---------- | -------- | -------- | -------------- |
+| 2017.11.02 | V1.0     | HCY      |                |
+| 2017.11.09 | V1.1     | Wayne    | 更改某些表述   |
 
 --------------------
 [TOC]
@@ -76,20 +77,22 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 目前只支持一个通道上的2个CS都是6Gb或者2个CS都是12Gb的，不支持6Gb、12Gb与8Gb、4Gb、2Gb混合在2个CS中使用。
 比如：
 
-| CS0  | CS1  | 支持情况                  |
-| ---- | ---- | --------------------- |
-| 6Gb  | 6Gb  | 支持                    |
-| 12Gb | 12Gb | 支持                    |
+| CS0  | CS1  | 支持情况                                |
+| ---- | ---- | --------------------------------------- |
+| 6Gb  | 6Gb  | 支持                                    |
+| 12Gb | 12Gb | 支持                                    |
 | 6Gb  | 12Gb | 不支持  违反要求3，并且这样组合也不支持 |
-| 12Gb | 6Gb  | 不支持，  这种组合也不支持        |
-| 8Gb  | 6Gb  | 不支持  8Gb和6Gb混合在2个CS中  |
-| 12Gb | 8Gb  | 不支持  12Gb和8Gb混合在2个CS中 |
-| 6Gb  | 4Gb  | 不支持  6Gb和4Gb混合在2个CS中  |
-| 12Gb | 4Gb  | 不支持  12Gb和4Gb混合在2个CS中 |
+| 12Gb | 6Gb  | 不支持，  这种组合也不支持              |
+| 8Gb  | 6Gb  | 不支持  8Gb和6Gb混合在2个CS中           |
+| 12Gb | 8Gb  | 不支持  12Gb和8Gb混合在2个CS中          |
+| 6Gb  | 4Gb  | 不支持  6Gb和4Gb混合在2个CS中           |
+| 12Gb | 4Gb  | 不支持  12Gb和4Gb混合在2个CS中          |
 
 **9、颗粒的RZQ不能共用**
 
 一块板子上贴多颗颗粒或者一个颗粒上有多个RZQ pin（如dual die的LPDDR3）的话，必须每个RZQ pin单独接一个240ohm的电阻。
+
+**10、DDR4目前连接方式暂无特殊要求**
 
 ----
 #  RK33399特殊要求
@@ -111,28 +114,32 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 
 **5、注意主控一个通道与LPDDR4颗粒2个通道的组成关系**
 
-由于LPDDR4颗粒是16bit一个channel，而我们主控是32bit一个channel，所以需要用颗粒的2个channel来组成主控的一个channel。
-其中尤其要注意的是，颗粒的4个channel有2个channel的ZQ是共用的。我们要求必须把没有共用一个ZQ的颗粒channel拿来组成32bit连到主控的一个通道。也就是不能把共用一个ZQ的两个颗粒channel拿来组成为32bit连到主控同一通道上。
-如下图，不能把Channel A和Channel D拿来组成一个32bit连到主控。
-也不能把Channel B和Channel C拿来组成一个32bit。这2组channel都是公用一个ZQ的。
+​    a. LPDDR4 366/272球封装均为64bit带宽，每16bit为一个channel，RK3399为32bit一个channel，所以RK3399每个通道挂2*channel的LPDDR4
+
+​    b. LPDDR4 366/272颗粒每2个channel共用一个ZQ。
+
+​    c. 设计要求不共用ZQ的channel组合成一个32bit连接到RK3399。如下图，不能把Channel A和Channel D拿来组合。也不能把Channel B和Channel C拿来组合。这2组Channel都是共用一个ZQ的。
+
 ![LPDDR4_ZQ](DDR布板注意事项/LPDDR4_ZQ.png)
 目前通过Micron、Samsung、Hynix三家颗粒的Channel A\B\C\D定义来看，采用颗粒的Channel A + Channel C组成一个32bit，和Channel B + Channel D组成一个32bit，这种方法，能做到三家颗粒都可以避免ZQ共用的问题。所以，改版后的LPDDR4都采用这种方式的连线。
 
 **6、LPDDR4的RZQ要通过240电阻接VDDQ，而不是GND，这点要注意，RK3399主控端没有变，还是一样RZQ通过240电阻接GND**
 
-**7、接LPDDR4时，主控端的DDR0_ODT0/1，DDR1_ODT0/1悬空，不用连到LPDDR4颗粒。而颗粒端的ODT_CA_X默认通过电阻上拉到VDDQ**
+**7、接LPDDR4时，主控端的DDR0_ODT0/1，DDR1_ODT0/1悬空，不用连到LPDDR4颗粒。而颗粒端的ODT_CA_X默认通过10K电阻上拉到VDDQ，暂时预留DNP的下拉电阻**
 
 **8、LPDDR4所有数据线（DQ）都不能对调，不管组内，还是组间**
 
-也就是DDRx_D0-D15必须一一对应的连接到一个LPDDR4颗粒通道的D0-D15；DDRx_D16-D31必须一一对应的连接到另一个LPDDR4颗粒通道的D0-D15；
-原因：对单个LPDDR4 channel来说（16bit），MRR功能需要用到DQ[0：7]；CA training功能需要用到DQS0、DQ[0:6]、DQ[8:13]；RD DQ Calibration用到DQ[0:15]和DMI[1:0]。所以，所有数据线都不能对调。
-额外说明：假设原来DDRx_D0-D15是连到LPDDR4颗粒的channel A，DDRx_D16-D31是连到LPDDR4颗粒的channel C。
-如果你想的是调换成：
-假设原来DDRx_D0-D15是连到LPDDR4颗粒的channel C，DDRx_D16-D31是连到LPDDR4颗粒的channel A。
-这种方式的对调，是可以的。只是这种对调，要参考前面第6点的要求。不是现在第9点讨论的内容。
+​    即DDRx_D0-D15必须一一对应的连接到一个LPDDR4颗粒通道的D0-D15；DDRx_D16-D31必须一一对应的连接到另一个LPDDR4颗粒通道的D0-D15；原因：
+
+​    对单个LPDDR4 channel来说（16bit），MRR功能需要用到DQ[0：7]；CA training功能需要用到DQS0、DQ[0:6]、DQ[8:13]；RD DQ Calibration用到DQ[0:15]和DMI[1:0]。所以，所有数据线都不能对调。
+
+​    额外说明：
+
+​    假设原来DDRx_D0-D15是连到LPDDR4颗粒的channel A，DDRx_D16-D31是连到LPDDR4颗粒的channel C。
+如果希望将A/C通道的互连关系对调，即DDRx_D0-D15连到LPDDR4颗粒的channel C，DDRx_D16-D31连到LPDDR4颗粒的channel A。则这种对调方式，是允许的。但需要满足上面第5点的要求，保证LPDDR4上共用ZQ的通道不组合成32bit。
 
 ----
 # RK3288、RK3188、PX3、RK3066特殊要求
 **1、外接LPDDR2或LPDDR3时，DDR0的DQ0-DQ7应该一一对应的连接到DRAM的DQ0-DQ7**
 
-除此之外，其他byte内的DQ可以随便调整顺序，包括DDR1的DQ0-DQ7也可以随便调整顺序。
+除此之外，其他byte内的DQ可以在遵守“总的要求1”的前提下随便调整顺序，即使是双通道的RK3288，通道1中的DQ0-DQ7也可以调整顺序。
