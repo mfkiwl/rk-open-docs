@@ -1,3 +1,5 @@
+# Streamline使用说明
+
 发布版本：1.0
 
 作者邮箱：cmc@rock-chips.com
@@ -8,24 +10,54 @@
 
 ------
 
+**前言**
 
+**概述**
+
+**产品版本**
+
+| **芯片名称** | **内核版本** |
+| -------- | -------- |
+| 全系列      | 4.4      |
+
+**读者对象**
+
+本文档（本指南）主要适用于以下工程师：
+
+技术支持工程师
+
+软件开发工程师
+
+
+
+**修订记录**
+
+| **日期**     | **版本** | **作者** | **修改说明** |
+| ---------- | ------ | ------ | -------- |
+| 2017-12-25 | V1.0   | 陈谋春    |          |
+
+---
+
+[TOC]
+
+---
 
 ## 1. 介绍
 
-​   streamline是ds5提供的一个性能分析工具，通过抓取cpu和gpu的内部硬件计数器和kernel的一些软件tracepoint来实现性能分析，功能比较强大。
+​   Streamline是DS5提供的一个性能分析工具，通过抓取cpu和gpu的内部硬件计数器和Kernel的一些软件tracepoint来实现性能分析，功能比较强大。
 
 ## 2. 抓取数据
 
 - 准备工具
 
-  1. 首先需要下载ds5，一些新的cpu和gpu可能需要较新的ds5才能支持，我目前用的是5.26版本。ds5是需要license的，不过可以先申请一个30天的全功能试用license，下载安装和申请license的流程就不在这里介绍了。
+  1. 首先需要下载ds5，一些新的cpu和gpu可能需要较新的DS5才能支持，我目前用的是5.26版本。DS5是需要license的，不过可以先申请一个30天的全功能试用license，下载安装和申请license的流程就不在这里介绍了。
   2. 设备端需要和host建立连接，目前支持两种连接方式：adb和网络
   3. 需要设备端的root权限，不然没法在设备端运行gatord
   4. 需要和固件匹配的符号表，方便后续的分析
 
 - gatord
 
-  设备端需要运行一个守护进程来和host端做交互，早期版本的mali驱动或ds5版本还需要重新编译kernel的gpu驱动来启用gatord，不过目前新版本的ds5已经没有这个问题了。
+  设备端需要运行一个守护进程来和host端做交互，早期版本的mali驱动或ds5版本还需要重新编译Kernel的gpu驱动来启用gatord，不过目前新版本的ds5已经没有这个问题了。
 
   ```shell
   $ adb push /path/to/ds5/sw/streamline/bin/$ARCH/gatord /data/local/
@@ -35,7 +67,7 @@
 
 - 建立连接
 
-  gatord跑起来之后就可以在host端打开streamline，在左上角点击<img src="./button_con.jpg"></img>按钮，会弹出如下对话框：
+  gatord跑起来之后就可以在host端打开Streamline，在左上角点击<img src="./button_con.jpg"></img>按钮，会弹出如下对话框：
 
   <img src="./dialog_con.jpg"></img>
 
@@ -43,7 +75,7 @@
 
 - 配置计数器
 
-  streamline支持的计数器和设备相关，在连接完成后，可以点击<img src="./button_cfg.jpg"></img>按钮，会弹出对话框，列出所有支持的计数器：
+  Streamline支持的计数器和设备相关，在连接完成后，可以点击<img src="./button_cfg.jpg"></img>按钮，会弹出对话框，列出所有支持的计数器：
 
   <img src="./dialog_counter.jpg"></img>
 
@@ -55,7 +87,7 @@
 
 ## 3. 分析结果
 
-streamline相对于传统的profile工具的优势在于：丰富的硬件计数器支持，可以很方便的看到cache，bus和gpu内部状态。
+Streamline相对于传统的profile工具的优势在于：丰富的硬件计数器支持，可以很方便的看到cache，bus和gpu内部状态。
 
 - 加载符号表
 

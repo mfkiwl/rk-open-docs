@@ -1,3 +1,5 @@
+# **Perf使用说明**
+
 发布版本：1.0
 
 作者邮箱：cmc@rock-chips.com
@@ -8,15 +10,45 @@
 
 ***
 
+**前言**
 
+**概述**
+
+**产品版本**
+
+| **芯片名称** | **内核版本** |
+| -------- | -------- |
+| 全系列      | 4.4      |
+
+**读者对象**
+
+本文档（本指南）主要适用于以下工程师：
+
+技术支持工程师
+
+软件开发工程师
+
+
+
+**修订记录**
+
+| **日期**     | **版本** | **作者** | **修改说明** |
+| ---------- | ------ | ------ | -------- |
+| 2017-12-25 | V1.0   | 陈谋春    |          |
+
+---
+
+[TOC]
+
+---
 
 ## 1 介绍
 
-​   perf是从Linux 2.6开始引入的一个profiling工具，通过访问包括pmu在内的软硬件性能计数器来分析性能，支持多架构，是目前kernel的主要性能检测手段，和kernel代码一起发布，所以兼容性良好。
+​   Perf是从Linux 2.6开始引入的一个profiling工具，通过访问包括pmu在内的软硬件性能计数器来分析性能，支持多架构，是目前Kernel的主要性能检测手段，和Kernel代码一起发布，所以兼容性良好。
 
 ## 2 功能
 
-​   性能瓶颈如果要分类的话，大致可以分为几个大类：cpu／gpu／mem／storage，其中gpu用perf没法探测（这个目前比较好用的工具就只有ds5），storage只能用tracepoint来统计。总的说来，perf还是侧重于分析cpu的性能，其他功能都不是很好用。
+​   性能瓶颈如果要分类的话，大致可以分为几个大类：cpu／gpu／mem／storage，其中gpu用Perf没法探测（这个目前比较好用的工具就只有DS5），storage只能用tracepoint来统计。总的说来，Perf还是侧重于分析cpu的性能，其他功能都不是很好用。
 
 ```shell
 $ perf
@@ -59,9 +91,9 @@ $ perf
 
 ##### 3.1 准备工作
 
-1. 首先按google或芯片厂商的指导，构建一个完整的android和kernel的编译环境（如果不关心kernel可以忽略）, 这样分析的时候符号表才能匹配上。
+1. 首先按Google或芯片厂商的指导，构建一个完整的Android和Kernel的编译环境（如果不关心Kernel可以忽略）, 这样分析的时候符号表才能匹配上。
 
-2. 编译perf
+2. 编译Perf
 
 ```shell
 ~$ . build/envsetup.sh
@@ -80,13 +112,13 @@ $ perf
 
    a. 平台native代码，这部分代码在编译的过程中会自动生成符号表，不需要我们干预
 
-​   b. 平台java代码，对于art虚拟机来说（老版本的dalvik就不说了）最终的编译结果是oat文件，这也是正规的elf文件，但是默认是不带debug信息。而新版本的android也提供了自动生成java符号表的工具：
+​   b. 平台java代码，对于art虚拟机来说（老版本的dalvik就不说了）最终的编译结果是oat文件，这也是正规的elf文件，但是默认是不带debug信息。而新版本的Android也提供了自动生成java符号表的工具：
 
   ```shell
 bash art/tools/symbolize.sh
   ```
 
-​   c. 第三方apk，如果是来自开源社区，则可以通过修改makefile和套用android提供的java符号表工具来生成符号表文件，然后拷贝到android的符号表目录，==注意路径必须要和设备上的完全一致==，可以通过showmap来获取设备上的路径。
+​   c. 第三方apk，如果是来自开源社区，则可以通过修改makefile和套用Android提供的java符号表工具来生成符号表文件，然后拷贝到Android的符号表目录，==注意路径必须要和设备上的完全一致==，可以通过showmap来获取设备上的路径。
 
   ```shell
 ~$ adb shell showmap apk_pid
@@ -96,19 +128,19 @@ bash art/tools/symbolize.sh
 
   如果是商业的apk，基本上已经做过混淆和strip，除非开发商能配合，不然就没招。
 
-4. 稍微新一点的android都开起了kernel的指针保护，这也会影响perf的record，所以需要临时关闭保护：
+4. 稍微新一点的Android都开起了Kernel的指针保护，这也会影响Perf的record，所以需要临时关闭保护：
 
   ```shell
   ~$ adb shell echo 0 > /proc/sys/kernel/kptr_restrict
   ```
 
-5. 为了方便分析，一般会把record的数据pull到host端，在host端做分析，所以需要在设备端也安装一下perf工具，ubuntu下安装命令如下：
+5. 为了方便分析，一般会把record的数据pull到host端，在host端做分析，所以需要在设备端也安装一下Perf工具，ubuntu下安装命令如下：
 
 ```shell
 ~$ sudo apt-get install linux-tools-common
 ```
 
-6. 目前大部分的android平台默认perf功能都是打开的，所以一般不需要重新配置kernel，如果碰到perf被关闭的情况，可以打开下面几个配置
+6. 目前大部分的Android平台默认Perf功能都是打开的，所以一般不需要重新配置Kernel，如果碰到Perf被关闭的情况，可以打开下面几个配置
 
 ```shell
 CONFIG_PERF_EVENTS=y
@@ -154,13 +186,13 @@ List of pre-defined events (to be used in -e):
   branch-load-misses                                 [Hardware cache event]
 ```
 
-实际上android移植的perf还不完整，tracepoint的事件还不支持，例如：block事件，所以如果想要抓去一些内核子系统的性能信息就无法满足。android 7.0开始已经去掉了perf工具，替代它的是simpleperf[^1]工具，对tracepoint的支持比原来的好很多。
+实际上Android移植的Perf还不完整，tracepoint的事件还不支持，例如：block事件，所以如果想要抓去一些内核子系统的性能信息就无法满足。Android 7.0开始已经去掉了Perf工具，替代它的是Simpleperf[^1]工具，对tracepoint的支持比原来的好很多。
 
-[^1]: 后面也会简单介绍一些simpleperf
+[^1]: 后面也会简单介绍一些Simpleperf
 
 ##### 3.3 获取系统热点进程
 
-perf中的top工具可以列出当前cpu的热点，还可以附加kernel的符号表让信息可方便分析。命令如下：
+Perf中的top工具可以列出当前cpu的热点，还可以附加Kernel的符号表让信息可方便分析。命令如下：
 
 ```shell
 $ adb shell mkdir -p /data/local/symbols
@@ -191,11 +223,11 @@ perf stat用于获取进程某个时间段内的pmu统计信息，命令如下�
  # ./perf stat -p 1415
 ```
 
-ctrl+c退出，或发信号让perf进程退出都可以看到统计结果，例如：
+ctrl+c退出，或发信号让Perf进程退出都可以看到统计结果，例如：
 
 <img src="./stat.jpg"></img>
 
-一些明显的异常值会被标注为红色，例如上图是浏览器跑fishtank时候抓的统计信息，可以看到分支预测的失败率非常高，结合perf的热点分析工具可以进一步缩小范围找到分支预测失败的原因。
+一些明显的异常值会被标注为红色，例如上图是浏览器跑fishtank时候抓的统计信息，可以看到分支预测的失败率非常高，结合Perf的热点分析工具可以进一步缩小范围找到分支预测失败的原因。
 
 ##### 3.5 收集进程的profile数据
 
@@ -244,9 +276,9 @@ perf script --vmlinux=<kernel_folder>/vmlinux --symfs $ANDROID_PRODUCT_OUT/symbo
 
 
 
-## 在Linux平台使用
+## 4 在Linux平台使用
 
-arm版本的linux发行版很多都没有提供perf的包，所以需要自己手动编译一个perf，由于perf依赖的elfutils/binutils/zlib，所以实际上需要交叉编译四个东西。
+arm版本的linux发行版很多都没有提供Perf的包，所以需要自己手动编译一个Perf，由于Perf依赖的elfutils/binutils/zlib，所以实际上需要交叉编译四个东西。
 
 首先编译zlib，[源码地址](http://zlib.net/zlib-1.2.11.tar.gz "zlib")
 
@@ -290,7 +322,7 @@ $ ../configure --target=aarch64-linux-gnu --host=aarch64-linux-gnu --prefix=/hom
 $ make && make install
 ```
 
-编译perf，perf是kernel一起发布的，所以直接下载一个kernel就有了，但是交叉编译的话，需要改一些东西：
+编译Perf，Perf是Kernel一起发布的，所以直接下载一个Kernel就有了，但是交叉编译的话，需要改一些东西：
 
 修改Makefile.perf，在前面加入：
 
@@ -308,11 +340,11 @@ $ cd /path/to/kernel/tools/perf
 $ make -f Makefile.perf perf ARCH=arm64 CROSS_COMPILE=/home/cmc/workspace/linaro/toolchain/armlinux/aarch64/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- -j8
 ```
 
-理论上在arm的linux发行版上直接编译perf应该也是可以的，但是我没有试过。用法的话和android是一样的，这里就不叙说了。
+理论上在arm的linux发行版上直接编译Perf应该也是可以的，但是我没有试过。用法的话和Android是一样的，这里就不叙说了。
 
-## Simpleperf使用
+## 5 Simpleperf使用
 
-android 7.0开始提供了一个更完整的perf版本simpleperf：
+Android 7.0开始提供了一个更完整的Perf版本Simpleperf：
 
 ```shell
 $ source build/envsetup.sh
@@ -320,21 +352,21 @@ $ lunch
 $ mmma system/extras/simpleperf
 ```
 
-simpleperf相对之前google移植的perf有以下改进
+Simpleperf相对之前google移植的Perf有以下改进
 
 - 支持剖析apk中兼容的共享库，从 .gnu_debugdata 段读取符号表和调试信息
 - 提供更方便分析的脚本
-- 纯静态，所以和android版本无关，只要指令集兼容都能跑
+- 纯静态，所以和Android版本无关，只要指令集兼容都能跑
 
-ndk r13开始就提供了simpleperf工具，所以也可以直接下载编译好的工具：
+ndk r13开始就提供了Simpleperf工具，所以也可以直接下载编译好的工具：
 
 ```shell
 $ git clone https://aosp.tuna.tsinghua.edu.cn/platform/prebuilts/simpleperf
 ```
 
-用法上和perf是类似的，命令基本通用，可以直接参考上面perf的命令。
+用法上和Perf是类似的，命令基本通用，可以直接参考上面Perf的命令。
 
-simpleperf更多信息， 特别是调试java程序的方法，请参考[官方手册](https://android.googlesource.com/platform/system/extras/+/master/simpleperf/doc/README.md "simpleperf")
+Simpleperf更多信息， 特别是调试java程序的方法，请参考[官方手册](https://android.googlesource.com/platform/system/extras/+/master/simpleperf/doc/README.md "simpleperf")
 
 
 

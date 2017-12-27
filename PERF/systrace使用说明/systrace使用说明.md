@@ -1,3 +1,5 @@
+# **Systrace使用说明**
+
 发布版本：1.0
 
 作者邮箱：cmc@rock-chips.com
@@ -6,13 +8,43 @@
 
 文件密级：公开资料
 
-------
+---
+
+**前言**
+
+**概述**
+
+**产品版本**
+
+| **芯片名称** | **内核版本** |
+| -------- | -------- |
+| 全系列      | 4.4      |
+
+**读者对象**
+
+本文档（本指南）主要适用于以下工程师：
+
+技术支持工程师
+
+软件开发工程师
 
 
+
+**修订记录**
+
+| **日期**     | **版本** | **作者** | **修改说明** |
+| ---------- | ------ | ------ | -------- |
+| 2017-12-25 | V1.0   | 陈谋春    |          |
+
+---
+
+[TOC]
+
+---
 
 ### 1. 介绍
 
-​    systrace是目前android上最主要的性能调试手段，有以下优点：
+​    Systrace是目前Android上最主要的性能调试手段，有以下优点：
 
 - 完全免费，安装和使用都比较简便
 - 由于不需要在设备端运行监控程序，所以不需要root权限[^1]
@@ -20,32 +52,32 @@
 
 ​    同时也有一些缺点：
 
-- 基于tracepoint，所以只会收集你加过trace的函数信息，android在大部分模块的重要函数里都加了trace了，所以大部分情况下还是够用，同时android也提供了几个函数方便添加自己的trace。
+- 基于tracepoint，所以只会收集你加过trace的函数信息，Android在大部分模块的重要函数里都加了trace了，所以大部分情况下还是够用，同时Android也提供了几个函数方便添加自己的trace。
 - 看不到pmu计数器的信息，也看不到gpu和memory的信息（理论上内核驱动如果定时收集这些信息并加到trace里，systrace应该也能看到）
 
 ### 2. 用法
 
-​    为了更方便介绍systrace，我这里举一个实际的性能分析例子：fishtank在1000只鱼的情况下帧率很低
+​    为了更方便介绍Systrace，我这里举一个实际的性能分析例子：fishtank在1000只鱼的情况下帧率很低
 
 #### 准备工作
 
 ​    获取systrace有三种方式：
 
-1. 下载[android_sdk_tool](https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip "sdk-tools-linux")
+1. 下载[Android_Sdk_Tool](https://dl.google.com/Android/repository/sdk-tools-linux-3859397.zip "sdk-tools-linux")
 
    路径：/path_to_sdk/platform-tools/systrace
 
-2. 下载[android studio](https://dl.google.com/dl/android/studio/ide-zips/3.0.0.18/android-studio-ide-171.4408382-linux.zip "android_studio_ide_linux")
+2. 下载[Android Studio](https://dl.google.com/dl/android/studio/ide-zips/3.0.0.18/android-studio-ide-171.4408382-linux.zip "android_studio_ide_linux")
 
    提供了图形化抓取功能，实际上也是嗲用sdk里的systrace
 
-3. 直接用android源码里的
+3. 直接用Android源码里的
 
    路径：/path_to_android/external/chromium-trace
 
 #### 抓取数据
 
-​    systrace的命令格式：
+​    Systrace的命令格式：
 
 ```shell
 $ cd external/chromium-trace/
@@ -117,7 +149,7 @@ Options:
                         e.g. --ftrace-categories=cat1,cat2,cat3
 ```
 
-systrace支持的atrace类别有：
+Systrace支持的atrace类别有：
 
 ```shell
 $ adb root 
@@ -156,7 +188,7 @@ NOTE: more categories may be available with adb root
 
 Note: ==有些事件需要设备的root权限才能操作，所以最好先切到root权限==
 
-除了支持android在ftrace基础上扩展的atrace，systrace也是支持kernel原生的ftrace的，还支持单独抓取某个kernel函数，当然前提是这个函数本身有tracepoint，具体可以参见上面的命令帮助信息。还可以直接用trace文件做输入，这种离线分析功能应该在分析android引导过程的时候比较有用。
+除了支持Android在ftrace基础上扩展的atrace，Systrace也是支持kernel原生的ftrace的，还支持单独抓取某个kernel函数，当然前提是这个函数本身有tracepoint，具体可以参见上面的命令帮助信息。还可以直接用trace文件做输入，这种离线分析功能应该在分析Android引导过程的时候比较有用。
 
 在抓取前要先大致确定这个场景涉及到哪些模块，再回到我们这次要分析的场景是：浏览器跑fishtank中开启1000只鱼的时候帧率很低；第一时间能想到的模块有：gfx webview sched freq load workq disk
 
@@ -177,7 +209,7 @@ $ python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq 
 
 <img src="./view_1.jpg"></img>
 
-左列是抓取的线程名或trace名，既然是绘制问题，我们第一个要看肯定是绘制的线程，android 5.0以前是在ui线程做绘制的，以后的版本都是在render线程做绘制，所以我们先拉到render线程，可以看到如下：
+左列是抓取的线程名或trace名，既然是绘制问题，我们第一个要看肯定是绘制的线程，Android 5.0以前是在ui线程做绘制的，以后的版本都是在render线程做绘制，所以我们先拉到render线程，可以看到如下：
 
 <img src="./view_2.jpg"></img>
 
