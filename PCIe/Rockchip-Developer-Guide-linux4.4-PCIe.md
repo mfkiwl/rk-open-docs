@@ -54,13 +54,27 @@
 
 此配置设置PCIe设备所使用的lane数量，默认不需要调整，软件可以自己探测并关闭不需要的lane以节省功耗。
 
-3.  ```  max-link-speed = <1>;```
+3.  ```max-link-speed = <1>;```
 
 此配置设置PCIe的速度登记，1表示gen1，2表示gen2。RK3399限制不超过gen2。另，此配置默认是写在dtsi，也就是说默认限制为gen1；原因是gen2的TX测试指标无法达到标准，所以不推荐客户开启gen2模式，以免引起不必要的链路异常。
 
-4.  `status = <okay>;`
+4.  ```status = <okay>;```
 
 此配置需要在pcie0和和pcie_phy节点同时使能。默认不使能的原因是如果没有外设，pcie在初始化时有一个较大的检测延时，会额外增加不必要的开机时间。故，有需要PCIe的项目自行开启。
+
+5.  ```vpcie3v3-supply = <&vdd_pcie3v3>;```
+
+
+此配置是可选项，用于配置PCIe外设的3V3供电。如果板级针对PCIe外设的3V3需要控制使能，则如范例所示定义一组对应的regulator，regulator的配置请参考Documentation/devicetree/bindings/regulator/。
+
+6.   ```vpcie1v8-supply = <&vdd_pcie1v8>;```
+
+请参考第五点。
+
+7.   ```vpcie0v9-supply = <&vdd_pcie1v8>;```
+
+请参考第五点。
+
 
 # menuconfig配置
 
