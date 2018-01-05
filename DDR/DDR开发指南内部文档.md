@@ -414,15 +414,23 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
   lpddr4_ca_odt，表示LPDDR4颗粒端的CA ODT
 
-## 如何调整DQ、DQS、CA、CLK的skew--补充
+## 如何调整DQ、DQS、CA、CLK的de-skew--补充
 
 除了对外开放的文档《DDR开发指南》中对应章节讲到的内容，内部资料补充如下信息：
 
-要调整loader中的skew，需要借助工具，目前只有RK322xh、RK3328支持。工具路径在
+要调整loader中的de-skew，需要借助工具，目前只有RK322xh、RK3328支持。工具路径在
 
 \\\10.10.10.164\Kitkat_Repository\rk3228h\SDK_IMAGE\loader\修改3228H DDR参数工具_V1.04.7z
 
-机器都能开机，就不需要调整loader中的skew，直接去调整kernel中的skew
+机器都能开机，就不需要调整loader中的de-skew，直接去调整kernel中的de-skew
+
+
+
+内部存放“deskew自动扫描工具”的路径在
+
+\\\10.10.10.164\Common_Repository\DDR相关工具\deskew自动扫描工具
+
+请按照《3228H deskew自动扫描工具使用说明.pdf》来做
 
 ## 所有平台DDR已经实现的feature
 

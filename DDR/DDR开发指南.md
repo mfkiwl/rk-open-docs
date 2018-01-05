@@ -846,9 +846,9 @@ auto power-down状态，测到的CKE状态，是CKE保持低电平将近7.8us（
 
 注意：CKE为低电平时间一定要小于7.8us（DDR3、DDR4）或3.9us(LPDDR2、LPDDR3、LPDDR4）才是auto power-down，如果时间大于7.8us，就是自刷新，不要混淆。
 
-## 如何调整DQ、DQS、CA、CLK的skew
+## 如何调整DQ、DQS、CA、CLK的de-skew
 
-要调整kernel中的skew，目前也只有RK322xh、RK3328支持。需要改对应的dts文件
+要调整kernel中的de-skew，目前也只有RK322xh、RK3328支持。需要改对应的dts文件
 
 芯片：RK322xh、RK3328
 
@@ -862,4 +862,6 @@ arch/arm64/boot/dts/rk322xh-dram-2layer-timing.dtsi
 
 修改：
 
-根据“3228h_ddr_scan_eye.sh”工具自动扫出来的结果，选择mid值，修改到对应dts定义中。
+根据发布的“deskew自动扫描工具”扫出来的结果，选择mid值，修改到对应dts定义中。
+
+“deskew自动扫描工具”的使用请按照《3228H deskew自动扫描工具使用说明.pdf》来做
