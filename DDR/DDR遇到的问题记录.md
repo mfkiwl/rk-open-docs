@@ -2,11 +2,13 @@
 **Rockchip**
 # **DDR遇到的问题记录**
 
-发布版本:1.1
+发布版本：1.1
 
-日期:2017.11.29
+作者邮箱：hcy@rock-chips.com
 
-Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
+日期：2017.11.29
+
+文件密级：内部资料
 
 ---------
 # 前言
