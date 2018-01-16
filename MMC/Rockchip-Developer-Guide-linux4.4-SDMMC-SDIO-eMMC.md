@@ -222,7 +222,7 @@ eMMC 普通模式50M，eMMC HS200最大支持150M；
 
 1.  SD卡
 
-![sd-1](./sd-1.png)
+![sd-1](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/sd-1.png)
 
 从左到右依次是：
 
@@ -252,11 +252,11 @@ DATA2
 
 2.  SDIO
 
-![sdio-3](./sdio-3.png)
+![sdio-3](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/sdio-3.png)
 
-![sdio-1](./sdio-1.png)
+![sdio-1](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/sdio-1.png)
 
-![sdio-2](./sdio-2.png)
+![sdio-2](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/sdio-2.png)
 
 
 
@@ -282,11 +282,11 @@ WIFI_REG_ON: 正常工作时为3.3v，WiFi关闭时为0v；
 
 3.  eMMC
 
-![emmc-1](./emmc-1.png)
+![emmc-1](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/emmc-1.png)
 
  eMMC有效电压的组合：
 
-![emmc-2](./emmc-2.png)
+![emmc-2](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/emmc-2.png)
 
 
 
@@ -308,11 +308,11 @@ VCC_IO 对应 VCCQ；
 
 简单说一下识别SD卡的方式：主控发出48clk并携带48bit的数据发给SD卡，而SD卡要回应给主控48clk加48bit的数据；如下图：
 
-![wave-1](./wave-1.png)
+![wave-1](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/wave-1.png)
 
 
 
-![wave-2](./wave-2.png)
+![wave-2](Rockchip-Developer-Guide-linux4.4-SDMMC-SDIO-eMMC/wave-2.png)
 
 
 
