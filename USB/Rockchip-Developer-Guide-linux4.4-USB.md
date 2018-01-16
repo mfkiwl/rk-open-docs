@@ -312,17 +312,17 @@ USB模块的配置及保存和其它内核模块的配置方法一样：
 
 导入默认配置：
 
-```c
+```sh
 make ARCH=arm64 rockchip_defconfig
 ```
 
 
 选择Kernel配置：
-```c
+```sh
 make ARCH=arm64 menuconfig
 ```
 保存default配置：
-```c
+```sh
 make ARCH=arm64 savedefconfig
 ```
 保存default配置，然后用defconfig替换rockchip_defconfig。
@@ -1023,6 +1023,61 @@ drivers/usb/host/xhci*
 
 USB3.0 OTG控制器核心驱动使用Upstream版 IP厂商开源代码，包括XHCI和DWC3两个部分，目前已经完善核心驱动，开发并upstream了核心驱动的引导代码，主要实现引导XHCI+DWC3_Gadget控制器初始化，OTG各种模式之间的切换、runtime suspend 相关的初始化等功能。具体实现可查看引导代码drivers/usb/dwc3/dwc3-rockchip.c 。
 
+dwc3-rockchip在sys/kernel/debug/目录下建了几个节点，用于调试和配置：
+
+```sh
+rk3399_box:/sys/kernel/debug/usb@fe800000 # ls
+host_testmode     rk_usb_force_mode
+```
+
+接口功能：
+
+**host_testmode:** Enables USB2/USB3 HOST Test Modes (U2: J, K SE0 NAK, Test_packet,Force Enable; U3: Compliance mode)
+
+For example， set testmodes for RK3399 board USB:
+
+1. set Test packet for Type-C0 USB2 HOST:
+
+```sh
+echo test_packet > /sys/kernel/debug/usb@fe800000/host_testmode
+```
+
+2. set compliance mode for Type-C0 USB3 HOST normal orientation:
+
+```sh
+echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
+```
+
+3. set compliance mode for Type-C0 USB3 HOST flip orientation:
+
+```sh
+echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
+```
+
+4. check the testmode status:
+```sh
+cat /sys/kernel/debug/usb@fe800000/host_testmode
+```
+
+The log maybe like this:
+U2: test_packet     /* means that U2 in test mode */
+U3: compliance mode /* means that U3 in test mode */
+
+**rk_usb_force_mode:** force dr_mode of DWC3 controller (the dr_mode of DTS must be "otg" and extcon of DTS must be config to null.
+
+For example， set force mode for RK3399 board USB:
+1. Force host mode:
+```sh
+echo host > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
+```
+2. Force peripheral mode:
+```sh
+echo peripheral > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
+```
+3. Force otg mode:
+```sh
+echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
+```
 drivers/usb/dwc3 目录下的文件主要包括厂商引导驱动，Host Device通用DWC3控制器驱动和Device驱动，其中文件名带厂商名字的为产商引导驱动，RK驱动文件名为dwc3-rockchip.c，core.c是DWC3控制器核心驱动，负责加载XHCI驱动初始化XHCI控制器、加载Device驱动和初始化DWC3 Device控制器，gadget.c是DWC3 Device驱动文件，主要实现控制器相关的Device初始化、中断处理和数据传输等功能。
 
 重要的接口实现函数：
@@ -1040,7 +1095,7 @@ static const struct usb_gadget_ops dwc3_gadget_ops = {
 
 DWC3 在sys/kernel/debug目录下增加了几个调试接口，主要针对device，debug接口如下：
 
-```c
+```sh
 rk3399_box:/sys/kernel/debug/fe800000.dwc3 # ls
 ep0in  ep1in  ep2in  ep3in  ep4in  ep5in  ep6in      mode    testmode
 ep0out ep1out ep2out ep3out ep4out ep5out link_state regdump
@@ -1053,31 +1108,31 @@ rx_fifo_queue          transfer_type    tx_request_queue
 
 接口功能：
 
-ep*in/out: Directory of EP debug files
+**ep*in/out:** Directory of EP debug files
 
-mode: dr_mode read or store
+**mode:** dr_mode read or store
 
-link_state: Link state read or store
+**link_state:** Link state read or store
 
-regdump: Dump registers of DWC3
+**regdump:** Dump registers of DWC3
 
-descriptor_fetch_queue: Dump the available DescFetchQ space of EP
+**descriptor_fetch_queue:** Dump the available DescFetchQ space of EP
 
-rx_info_queue: Dump the available RXInfoQ space of EP
+**rx_info_queue:** Dump the available RXInfoQ space of EP
 
-trb_ring: Dump the TRB pool of EP
+**trb_ring:** Dump the TRB pool of EP
 
-event_queue: Dump the avaliable EventQ space of EP
+**event_queue:** Dump the avaliable EventQ space of EP
 
-rx_request_queue: Dump the avaliable RxReqQ space of EP
+**rx_request_queue:** Dump the avaliable RxReqQ space of EP
 
-tx_fifo_queue: Dump the avaliable TxFIFO space of EP
+**tx_fifo_queue:** Dump the avaliable TxFIFO space of EP
 
-rx_fifo_queue: Dump the avaliable RxFIFO  space of EP
+**rx_fifo_queue:** Dump the avaliable RxFIFO  space of EP
 
-transfer_type: Print the Transfer Type of EP
+**transfer_type:** Print the Transfer Type of EP
 
-tx_request_queue: Dump the abaliable TxReqQ space of EP
+**tx_request_queue:** Dump the abaliable TxReqQ space of EP
 
 drivers/usb/host目录下文件名含有“xhci“的为XHCI控制器相关驱动，其中xhci-plat.c是注册驱动的初始化文件，xhci.c是控制器基础文件，实现USB core层HCD接口和USB传输控制的相关操作，xhci-ring.c是控制器数据结构TRB以及传输机制相关的文件，实现具体的传输功能，xhci-hub.c是控制器自带的USB3.0 root Hub驱动。
 
@@ -1154,6 +1209,43 @@ USB2.0 OTG使用的是Synopsys 方案，即使用DWC2控制器同时实现Host�
 
 目前使用两种驱动版本，一个是upstream 版，驱动在dwc2目录下，主要从upstream开源项目更新代码，另一个是内部版，驱动在dwc_otg_310目录下，由RK内部自行维护，还未upstream。
 
+DWC2驱动没有切换dr_mode的节点，但是RK的USB2.0 PHY驱动在sys/devices/platform/下建立了一个otg_mode节点用于切换：
+
+```sh
+rk3399_box:/sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450 # ls
+driver driver_override modalias of_node otg_mode phy power subsystem uevent
+```
+
+接口功能：
+
+**otg_mode:** Show & store the current value of otg mode for otg port
+
+For example, set force mode for RK3399 board USB:
+1. Force host mode
+```sh
+echo host > /sys/devices/platform/<u2phy dev name>/otg_mode
+```
+2. Force peripheral mode
+```sh
+echo peripheral > /sys/devices/platform/<u2phy dev name>/otg_mode
+```
+3. Force otg mode
+```sh
+echo otg > /sys/devices/platform/<u2phy dev name>/otg_mode
+```
+Legacy Usage:
+1. Force host mode
+```sh
+echo 1 > /sys/devices/platform/<u2phy dev name>/otg_mode
+```
+2. Force peripheral mode
+```sh
+echo 2 > /sys/devices/platform/<u2phy dev name>/otg_mode
+```
+3. Force otg mode
+```sh
+echo 0 > /sys/devices/platform/<u2phy dev name>/otg_mode
+```
 drivers/usb/dwc2目录下的文件可以分成三类，一类是文件名包含“hcd”的Host相关驱动，负责Host初始化、Host中断处理和Host数据传输操作，一类是Device相关文件gadget.c，负责Device初始化、中断处理、数据传输的工作，其余的文件是控制器core层和引导驱动，包括通用接口、通用中断处理和控制器初始化等功能。
 
 重要的接口实现函数：
@@ -1198,7 +1290,7 @@ static const struct usb_gadget_ops dwc2_hsotg_gadget_ops = {
 
 Upstream版DWC2驱动在sys/kernel/debug/目录下增加了debug接口：
 
-```c
+```sh
 rk3328_box:/sys/kernel/debug/ff580000.usb # ls
 ep0   ep2out ep4out ep6out ep8in  ep9in  fifo    state
 ep1in ep3in  ep5in  ep7in  ep8out ep9out regdump testmode
@@ -1206,15 +1298,15 @@ ep1in ep3in  ep5in  ep7in  ep8out ep9out regdump testmode
 
 接口功能：
 
-ep*in/out: Shows the state of the given endpoint (one is registered for each available).
+**ep*in/out:** Shows the state of the given endpoint (one is registered for each available).
 
-fifo: Show the FIFO information for the overall fifo and all the periodic transmission FIFOs.
+**fifo:** Show the FIFO information for the overall fifo and all the periodic transmission FIFOs.
 
-state: shows the overall state of the hardware and some general information about each of the endpoints available to the system.
+**state:** shows the overall state of the hardware and some general information about each of the endpoints available to the system.
 
-regdump: Gets register values of core.
+**regdump:** Gets register values of core.
 
-testmode: Modify the current usb test mode.
+**testmode:** Modify the current usb test mode.
 
 drivers/usb/dwc_otg_310目录下有多个dwc_otg开头的文件，分成三类，一类是文件名包含“hcd”的host相关驱动文件，主要负责Host初始化、Host中断处理和Host数据传输相关操作，一类是文件名包含“pcd”的Device相关驱动，主要负责Device初始化、Device中断处理和Device数据传输相关操作，还有一类是Host Device通用驱动，主要包括通用属性配置、通用中断处理、通用控制器接口、控制器初始化以及“usbdev”开头的PHY相关的设置文件。
 
@@ -1269,7 +1361,7 @@ static const struct dwc_otg_pcd_function_ops fops = {
 
 内部版的DWC2驱动在sys/devices/platform目录下实现了多个可配置属性，也可用于调试
 
-```c
+```sh
 rk3328_box:/sys/devices/platform/ff580000.usb # ls
 busconnected  fr_interval gsnpsid   modalias       regoffset     uevent
 buspower      gadget      guid      mode           regvalue      usb5
@@ -1286,71 +1378,71 @@ debuglevel ff580000.usb    op_state       unbind version
 
 接口功能：
 
-busconnected: Gets or sets the Core Control Status Register.
+**busconnected:** Gets or sets the Core Control Status Register.
 
-fr_interval: On read, shows the value of HFIR Frame Interval. On write, dynamically reload HFIR register during runtime. The application can write a value to this register only after the Port Enable bit of the Host Port Control and Status register (HPRT.PrtEnaPort) has been set.
+**fr_interval:** On read, shows the value of HFIR Frame Interval. On write, dynamically reload HFIR register during runtime. The application can write a value to this register only after the Port Enable bit of the Host Port Control and Status register (HPRT.PrtEnaPort) has been set.
 
-gsnpsid: Gets the value of the Synopsys ID Regester.
+**gsnpsid:** Gets the value of the Synopsys ID Regester.
 
-regoffset: Sets the register offset for the next Register Access.
+**regoffset:** Sets the register offset for the next Register Access.
 
-buspower:  Gets or sets the Power State of the bus (0 - Off or 1 - On).
+**buspower:**  Gets or sets the Power State of the bus (0 - Off or 1 - On).
 
-guid: Gets or sets the value of the User ID Register.
+**guid:** Gets or sets the value of the User ID Register.
 
-regvalue: Gets or sets the value of the register at the offset in the regoffset attribute.
+**regvalue:** Gets or sets the value of the register at the offset in the regoffset attribute.
 
-bussuspend: Suspends the USB bus.
+**bussuspend:** Suspends the USB bus.
 
-ggpio: Gets the value in the lower 16-bits of the General Purpose IO Register or sets the upper 16 bits.
+**ggpio:** Gets the value in the lower 16-bits of the General Purpose IO Register or sets the upper 16 bits.
 
-gusbcfg: Gets or sets the Core USB Configuration Register.
+**gusbcfg:** Gets or sets the Core USB Configuration Register.
 
-mode_ch_tim_en: This bit is used to enable or disable the host core to wait for 200 PHY clock cycles at the end of Resume to change the opmode signal to the PHY to 00 after Suspend or LPM. 
+**mode_ch_tim_en:** This bit is used to enable or disable the host core to wait for 200 PHY clock cycles at the end of Resume to change the opmode signal to the PHY to 00 after Suspend or LPM. 
 
-remote_wakeup: On read, shows the status of Remote Wakeup. On write, initiates a remote wakeup of the host. When bit 0 is 1 and Remote Wakeup is enabled, the Remote Wakeup signalling bit in the Device Control Register is set for 1 milli-second.
+**remote_wakeup:** On read, shows the status of Remote Wakeup. On write, initiates a remote wakeup of the host. When bit 0 is 1 and Remote Wakeup is enabled, the Remote Wakeup signalling bit in the Device Control Register is set for 1 milli-second.
 
-wr_reg_test: Displays the time required to write the GNPTXFSIZ register many times (the output shows the number of times the register is written).
+**wr_reg_test:** Displays the time required to write the GNPTXFSIZ register many times (the output shows the number of times the register is written).
 
-devspeed: Gets or sets the device speed setting in the DCFG register.
+**devspeed:** Gets or sets the device speed setting in the DCFG register.
 
-gnptxfsiz: Gets or sets the non-periodic Transmit Size Register.
+**gnptxfsiz:** Gets or sets the non-periodic Transmit Size Register.
 
-spramdump: Dumps the contents of core registers.
+**spramdump:** Dumps the contents of core registers.
 
-disconnect_us: On read, shows the status of disconnect_device_us. On write, sets disconnect_us which causes soft disconnect for 100us. Applicable only for device mode of operation.
+**disconnect_us:** On read, shows the status of disconnect_device_us. On write, sets disconnect_us which causes soft disconnect for 100us. Applicable only for device mode of operation.
 
-gotgctl: Gets or sets the Core Control Status Register.
+**gotgctl:** Gets or sets the Core Control Status Register.
 
-hcddump: Dumps the current HCD state.
+**hcddump:** Dumps the current HCD state.
 
-gpvndctl: Gets or sets the PHY Vendor Control Register.
+**gpvndctl:** Gets or sets the PHY Vendor Control Register.
 
-hprt0: Gets or sets the value in the Host Port Control and Status Register.
+**hprt0:** Gets or sets the value in the Host Port Control and Status Register.
 
-rd_reg_test: Displays the time required to read the GNPTXFSIZ register many times (the output shows the number of times the register is read).
+**rd_reg_test:** Displays the time required to read the GNPTXFSIZ register many times (the output shows the number of times the register is read).
 
-test_sq: Gets or sets the usage of usb controler test_sq attribute.
+**test_sq:** Gets or sets the usage of usb controler test_sq attribute.
 
-enumspeed: Gets the device enumeration Speed.
+**enumspeed:** Gets the device enumeration Speed.
 
-grxfsiz: Gets or sets the Receive FIFO Size Register.
+**grxfsiz:** Gets or sets the Receive FIFO Size Register.
 
-hptxfsiz: Gets the value of the Host Periodic Transmit FIFO.
+**hptxfsiz:** Gets the value of the Host Periodic Transmit FIFO.
 
-regdump: Dumps the contents of core registers.
+**regdump:** Dumps the contents of core registers.
 
-wc_otg_conn_en: Enable or disable connect to PC in device mode.
+**wc_otg_conn_en:** Enable or disable connect to PC in device mode.
 
-force_usb_mode: Force work mode of core (0 - Normal, 1 - Host, 2 - Device).
+**force_usb_mode:** Force work mode of core (0 - Normal, 1 - Host, 2 - Device).
 
-vbus_status: Gets the Voltage of VBUS.
+**vbus_status:** Gets the Voltage of VBUS.
 
-debuglevel: Gets or sets the driver Debug Level.
+**debuglevel:** Gets or sets the driver Debug Level.
 
-op_state: Gets or sets the operational State, during transations (a_host>>a_peripherial and b_device=>b_host) this may not match the core but allows the software to determine transitions.
+**op_state:** Gets or sets the operational State, during transations (a_host>>a_peripherial and b_device=>b_host) this may not match the core but allows the software to determine transitions.
 
-version: Gets the Driver Version.
+**version:** Gets the Driver Version.
 
 #### 5.2.3 USB2.0 HOST drivers
 
@@ -1411,20 +1503,20 @@ static const struct hc_driver ehci_hc_driver = {
 
 EHCI驱动在sys/kernel/debug目录下增加了几个debug接口（需要在内核编译的config文件中增加CONFIG_DYNAMIC_DEBUG），具体接口如下：
 
-```c
+```sh
 rk3399_box:/sys/kernel/debug/fe380000.usb # ls
 async bandwidth periodic registers
 ```
 
 接口功能：
 
-async: Dump a snapshot of the Async Schedule.
+**async:** Dump a snapshot of the Async Schedule.
 
-bandwidth: Dump the HS Bandwidth Table.
+**bandwidth:** Dump the HS Bandwidth Table.
 
-periodic: Dump a snapshot of the Periodic Schedule.
+**periodic:** Dump a snapshot of the Periodic Schedule.
 
-registers: Dump Capability Registers, Interrupt Params and Operational Registers.
+**registers:** Dump Capability Registers, Interrupt Params and Operational Registers.
 
 OHCI控制器使用的也是Upstream版驱动，host目录下文件名包含“ohci”的是OHCI控制器相关文件，其中文件名包含厂商名字的为厂商引导文件，与EHCI一样，RK使用ohci-platform.c进行驱动加载和初始化。类似的，ohci-hcd.c实现USB core层的HCD控制器接口，ohci-mem.c和ohci-q.c是传输数据结构和传输调度相关代码，ohci-hub.c是OHCI控制器root hub驱动代码。
 
@@ -1472,18 +1564,18 @@ static const struct hc_driver ohci_hc_driver = {
 
 OHCI驱动在sys/kernel/debug/usb/目录增加了几个debug接口，具体如下：
 
-```c
+```sh
 rk3399_box:/sys/kernel/debug/usb/ohci/fe3a0000.usb # ls
 async periodic registers
 ```
 
 接口功能:
 
-async: Display Control and Bulk Lists together, for simplicity
+**async:** Display Control and Bulk Lists together, for simplicity
 
-periodic: Dump a snapshot of the Periodic Schedule (and load)
+**periodic:** Dump a snapshot of the Periodic Schedule (and load)
 
-registers: Dump driver info, then registers in Spec order and other registers mostly affect Frame Timings
+**registers:** Dump driver info, then registers in Spec order and other registers mostly affect Frame Timings
 
 ---
 ## 6 Android Gadget配置
@@ -1568,47 +1660,30 @@ on property:sys.usb.config=mtp,adb && property:sys.usb.configfs=1
 
 setprop sys.usb.controller用来使能Gadget对应的USB控制器，RK3399有两个OTG控制器，都可以支持USB Gadget功能，但由于当前USB Gadget driver内核架构只支持一个USB控制器，所以需要根据实际的产品需求来配置使能对应的USB控制器，如RK3399 Android SDK，默认使能Type-C 0 port的USB Gadget功能：
 
+```sh
 setprop sys.usb.controller "fe800000.usb"
+```
 
 如果要使能Type-C 1 port的USB Gadget 功能，则修改为init.rk30board.usb.rc的sys.usb.controller为fe900000.usb，参考修改如下：
 
+```sh
 setprop sys.usb.controller "fe900000.usb"
+```
 
 内核提供了设备节点来查看USB Gadget的关键配置信息，在根目录如下：
 
+```sh
 root@rk3399:/ # cd config/usb_gadget/g1/
+
 root@rk3399:/config/usb_gadget/g1 # ls
-
-UDC
-
-bDeviceClass
-
-bDeviceProtocol
-
-bDeviceSubClass
-
-bMaxPacketSize0
-
-bcdDevice
-
-bcdUSB
-
-configs
-
-functions
-
-idProduct
-
-idVendor
-
-os_desc
-
-strings
+UDC          bDeviceProtocol bMaxPacketSize0 bcdUSB  functions idVendor strings
+bDeviceClass bDeviceSubClass bcdDevice       configs idProduct os_desc
+```
 
 大部分节点的功能，可以直观地看出来，这里就不再赘述。
 
 “UDC”可以确认当前Gadget对应的usb controller, 也可以用于手动选择对应的usb controller。如默认使用Type-C 0 USB Controller，要切换为使用Type-C 1 USB Controller，则手动执行如下的命令：
-```c
+```sh
 echo none > config/usb_gadget/g1/UDC
 echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 ```
@@ -1840,7 +1915,7 @@ Android层支持不完善，如U盘在kernel挂载完成/dev/block/sda节点后�
 
 U盘枚举出现/dev/block/sda后仍然无法使用，一般是vold.fstab中U盘的mount路径有问题，如果vold.fstab代码如下(系统起来后可直接cat/system/etc/vold.fstab 查看)：
 
-```c
+```sh
 dev_mount udisk /mnt/udisk 1 /devices/platform/usb20_HOST/usb2
 ```
 
