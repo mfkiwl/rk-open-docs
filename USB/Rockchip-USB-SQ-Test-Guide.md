@@ -39,9 +39,10 @@ Rockchip SOCs通常内置多个USB控制器，不同控制器之间互相独立�
 技术支持工程师
 
 **修订记录**
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017.12.12 | V1.0   | 吴良峰    |          |
+| **日期**     | **版本** | **作者** | **修改说明**              |
+| ---------- | ------ | ------ | --------------------- |
+| 2017.12.12 | V1.0   | 吴良峰    |                       |
+| 2018.3.7   | V1.1   | 吴良峰    | 增加rk3399 Type-C反面测试命令 |
 
 --------------------
 [TOC]
@@ -578,9 +579,17 @@ Android平台支持两种不同的测试命令，一种是io命令写寄存器�
 
 比如，**rk3399**平台的USB3 Host Tx测试命令如下：
 
-`USB3 Host0：echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+**rk3399 Type-C USB正面连接的测试命令：**
 
-`USB3 Host1：echo test_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
+Type-C0 USB：`echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+
+Type-C1 USB：`echo test_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
+
+**rk3399 Type-C USB反面连接的测试命令：**
+
+Type-C0 USB flip：`echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+
+Type-C1 USB flip：`echo test_flip_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
 
 **2).  Chrome平台USB 3.0 Host Tx测试命令**
 
@@ -644,9 +653,17 @@ USB 3.0 Host Tx测试过程中，示波器的自动化测试软件的设置与US
 
   如rk3399平台的USB3 Host Tx测试命令如下：
 
-  `USB3 Host0：echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+  **rk3399 Type-C USB正面连接的测试命令：**
 
-  `USB3 Host1：echo test_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
+  Type-C0 USB：`echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+
+  Type-C1 USB：`echo test_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
+
+  **rk3399 Type-C USB反面连接的测试命令：**
+
+  Type-C0 USB flip：`echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+
+  Type-C1 USB flip：`echo test_flip_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
 
 
 - 连接测试夹具与待测试的USB 3.0 Host port，则USB 3.0控制器会自动进入测试模式。
