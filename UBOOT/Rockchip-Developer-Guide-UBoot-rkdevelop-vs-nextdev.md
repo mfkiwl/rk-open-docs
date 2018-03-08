@@ -115,7 +115,7 @@
 
 ​	目前各芯片平台的基础代码都已经合并到官方的分支里，可以满足客户自己下载源代码进行编译下载、开源的需求。我们的工程师还会继续开展各芯片平台的upstream工作。
 
-#### 3.5 SPL/TPL支持
+#### 3.5 Pre-loader支持
 
 ```
 Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
@@ -123,11 +123,22 @@ Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 
 ​	上述是使用rkdevelop分支时整个系统的启动流程：Pre-loader负责加载Trust和U-Boot，然后U-Boot负责加载kernel。我们可以把上述的Pre-loader称为为一级loader，U-Boot称为二级loader。在Rockchip平台上Pre-loader是不开源的，仅提供bin文件对外使用。
 
-​	如果客户的产品有代码全开源的需求怎么办？next-dev分支的U-Boot支持SPL/TPL作为Pre-loader引导系统的功能，它可以负载加载Trust和U-Boot。SPL/TLP本身就是U-Boot自身提供的一个功能，只是在rkdevelop没有被使用。
+​	如果客户的产品有代码全开源的需求怎么办？next-dev分支的U-Boot支持SPL/TPL作为Pre-loader引导系统的功能，它可以负载加载Trust和U-Boot。SPL/TPL本身就是U-Boot自身提供的一个功能，只是在rkdevelop没有被使用。
 
-​	目前next-dev上各芯片平台都支持两种启动方式：SPL/TPL和Rockchip loader。
+	其中TPL主要功能是DDR初始化, SPL主要功能是加载和引导trust/U-Boot两个模块.
 
-#### 3.6. 支持的固件类型
+	rkdevelop仅支持Rockchip miniloader作为pre-loader；
+​	next-dev上各芯片平台都支持两种启动方式：SPL/TPL和Rockchip miniloader。
+
+#### 3.6. 分区支持
+
+1. rkdevelop仅支持rk格式parameter.txt分区, 不支持其他分区；
+	rkdevelop同时解析parameter.txt的CMDLINE信息
+
+2. next-dev支持GPT分区和rk parameter分区；
+	为了保持GPT与rkparameter一致性, next-dev推荐使用kernel dts的bootargs来自定义cmdline, 不使用parameter的CMDLINE.
+
+#### 3.7. 支持的固件类型
 
 **从固件打包格式上看：**
 
@@ -139,24 +150,18 @@ Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 
 rkdevelop支持上述1. 2. 两种命令启动固件，但是两种功能的代码被杂糅在一起，耦合性太大。next-dev上进行了二者的剥离，它们是两个独立的启动命令。
 
-**从分区表上看：**
-
-1. next-dev支持parameter.txt分区表；
-
-2. next-dev支持GPT分区表，rkdevelop不支持；
-
 **从固件boot途径看：**
 
-1. next-dev支持netboot和pxe boot（基于net）；
+1. next-dev支持tftpboot和pxe boot（基于net）；
 2. next-dev支持linux的Distro Boot（Linux Distribution的EFI boot）；
-3. next-dev支持Android AVB校验和A/B分区；
+3. next-dev支持AOSP固件(Android AVB校验和A/B分区)；
 
-#### 3.7 文件系统
+#### 3.8 文件系统
 
 1. next-dev文件系统支持，rkdevelop不支持文件系统；
 2. next-dev支持fat、ext2/4文件系统；
 
-#### 3.8. rkbin仓库
+#### 3.9 rkbin仓库
 
 rkdevelop的U-Boot工程里存放了许多bin文件和脚本工具。存放路径如下：
 
@@ -171,3 +176,23 @@ tools/trust_merger.c
 ```
 
 在next-dev分支上，U-Boot工程里不再存放这些bin文件和脚本工具，这些统一放到“rkbin”仓库里，因此用户需要再单独下载一个rkbin仓库配合next-dev使用。编译uboot.img的时候编译脚本会从rkbin仓库里索引对应平台的bin文件和工具，然后编译打包它们。最终和rkdevelop分支一样，也还是会在U-Boot工程下生成相关的uboot.img、trust.img、loader等固件。
+
+#### 3.10 Secure Boot
+
+rkdevelop分支支持rk secure boot, next-dev不支持；
+next-dev分支支持AVB(Android), FIT签名校验, rkdevelop不支持；
+
+#### 3.11 Rockusb和烧写
+
+rkdevelop支持所有的Rockusb命令, next-dev支持的WL命令和所需的信息交互命令,
+next-dev不支持ul, write pba, write vendor storage等命令；
+之前的固件烧写主要由usbplug+miniloader组成, usbplug负责用ul命令烧写miniloader,然后重启(或直接进入这个步骤)进入miniloader, 在此环境完成剩余固件烧写；
+新的烧写过程可以一次性在usbplug阶段完成, 省去重启步骤, 包括写vendor storage在内, 都直接在usbplug完成, 不需要miniloader辅助.
+
+#### 3.12 存储介质烧写地址
+
+旧的方式:
+NAND: IDB存放在在特别的boot分区,系统阶段不可见, 后续的数据按parameter定义的地址按实际物理地址存放；
+EMMC: 由于没有使用boot分区, 而是使用normal分区,所以在软件上(driver或partition层)保留了前面4MB(0x2000 block)作为 idb loader数据；后续的数据按parameter定义的地址加上4MB后写到eMMC;
+新的方式:
+EMMC和NAND均按实际的物理可用空间提供block接口, 烧写过程rockusb可直接通过WL命令烧写所有空间.
