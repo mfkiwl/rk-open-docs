@@ -3,6 +3,7 @@
 发布版本：1.0
 
 作者邮箱：chenjh@rock-chips.com
+          Kever Yang <kever.yang@rock-chips.com>
 
 日期：2018.02
 
@@ -24,11 +25,22 @@
 
 软件开发工程师
 
-**产品版本**
+**各芯片feature支持状态**
 
-| **芯片名称**            | **U-Boot分支** |
-| ------------------- | :----------- |
-| RK3126C/RK3326/PX30 | next-dev     |
+| **芯片名称**            | **Distro Boot** |**RKIMG Boot** |**SPL/TPL** |**Trust(SPL)** |**AVB** |
+| ------------------- | :------------- | :------------- | :----------- | :----------- | :----------- |
+| RV1108 	| Y     | N | Y | N | N |
+| RK3036 	| Y     | N | N | N | N |
+| RK3126C 	| Y     | Y | N | N | N |
+| RK3128 	| Y     | Y | N | N | N |
+| RK3229 	| Y     | N | Y | Y | Y |
+| RK3288 	| Y     | N | Y | N | N |
+| RK3308 	| -     | - | - | - | - |
+| RK3326/PX30	| Y     | Y | N | N | Y |
+| RK3328 	| Y     | N | Y | Y | N |
+| RK3368/PX5 	| Y     | N | Y | Y | N |
+| RK3399 	| Y     | N | Y | Y | N |
+
 
 **修订记录**
 
@@ -44,25 +56,37 @@
 
 ## 1. U-Boot next-dev简介
 
-next-dev是Rockchip从U-Boot官方的v2017.09正式版本中切出来进行开发的版本。目前在该平台上已经支持的芯片包括：RV1108/RK3188/RK3036/RK3066/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3326/RK3368/RK3399/部分PX系列芯片。
+next-dev是Rockchip从U-Boot官方的v2017.09正式版本中切出来进行开发的版本。目前在该平台上已经支持RK所有主流在售芯片。
 
 目前支持的功能主要有：
 
-- 支持Android平台的固件启动；
+- 支持RK Android平台的固件启动；
 
-- 支持Rockchip loader和SPL/TPL引导；
+- 支持最新Android AOSP(如GVA)固件启动；
 
-- 支持RockUSB 和 Google Fastboot两种方式烧写；
+- 支持Linux Distro固件启动；
+
+- 支持Rockchip miniloader和SPL/TPL两种pre-loader引导；
 
 - 支持LVDS、EDP、MIPI、HDMI等显示设备；
 
-- 支持Emmc、Nand Flash、SPI NOR flash 等存储设备；
+- 支持Emmc、Nand Flash、SPI NOR flash、SD卡、 U盘等存储设备启动；
+
+- 支持FAT, EXT2, EXT4文件系统；
+
+- 支持GPT, RK parameter分区格式；
 
 - 支持开机logo显示、充电动画显示，低电管理、电源管理；
 
 - 支持I2C、PMIC、CHARGE、GUAGE、USB、GPIO、PWM、GMAC、EMMC、NAND、中断等驱动；
 
-- 使用kernel的dtb；
+- 支持RockUSB 和 Google Fastboot两种USB gadget烧写EMMC；
+
+- 支持Mass storage, ethernet, HID等USB设备；
+
+- 支持使用kernel的dtb；
+
+- 支持dtbo功能；
 
 U-Boot的doc目录下提供了很丰富的README文档，它们向开发者介绍了U-Boot里各个功能模块的概念、设计理念、实现方法等，建议读者好好利用这些文档提高开发效率。
 
@@ -96,7 +120,7 @@ U-Boot的doc目录下提供了很丰富的README文档，它们向开发者介�
 
 ### 2.2 board架构文件
 
-由于每个项目硬件上的设计不同，所以会存在不同的board驱动文件。
+由于每个项目硬件上的设计不同，Upstream U-Boot的设计是每块板子一份board实体,所以会存在不同的board驱动文件, 参考RK3288的板子可以明显看出这个结构, Rockchip为了简化板级支持, 引入支持kernel dtb的feature, 在U-Boot阶段共用eMMC dts和驱动, 而在PMIC/regulator, Display, IOMUX等存在板级差异的模块直接使用kernel dtb,使U-Boot可以一颗芯片共用一个evb配置.
 
 **头文件：**
 
@@ -493,7 +517,14 @@ int irq_set_irq_type(int irq, unsigned int type);
 
 ### 5.2 clock支持
 
-[ TODO ]
+驱动代码位于drivers/clk/rockchip目录, 每颗芯片有一份独立的驱动.
+驱动probe时会调用rkclk_init()函数对CPU和通用BUS进行初始化, 其他模块的clock如eMMC, I2C等在各自的驱动初始化时调用clk_get_by_indel()或者clk_get_by_name()获取clk句柄, 然后调用clk_set_rate()进行设置.
+
+U-Boot只提供了已使用设备的clock驱动, 没有提供整个SoC完整的clock驱动, 所以如果新增驱动需要先确认clock驱动中是否有相应接口.
+
+[TODO]
+assigned-clocks
+CPU clock init
 
 ### 5.3 GPIO驱动
 
@@ -814,9 +845,24 @@ if (ret != 1) {
 }
 ```
 
-## 6. Fastboot
+## 6. USB download
 
-[ TODO ]
+### 6.1 rockusb
+
+命令行手动启用rockusb, 进入Windows烧写工具对应的Loader模式, eMMC:
+```c
+rockusb 0 mmc 0
+```
+RKNAND:
+```c
+rockusb 0 rknand 0
+```
+### 6.2 Fastboot
+
+Fastboot 默认使用Google adb的VID/PID, 命令行手动启动fastboot:
+```c
+fastboot usb 0
+```
 
 ## 7. 固件加载
 
@@ -897,15 +943,96 @@ U-Boot负责加载ramdisk、dtb、kernel到内存中，具体的加载地址可�
 
 ## 8. SPL和TPL
 
-[ TODO ] http://opensource.rock-chips.com/wiki_Boot_option
+SPL和TPL的介绍可以参考下面两份文档.
+doc/README.TPL
+doc/README.SPL
 
-## 9. 固件打包工具
+在Rockchip的方案中, TPL和SPL都是由Bootrom加载和引导的,具体引导流程, 相关固件的生成方法和存放位置可参考如下链接内容:
+http://opensource.rock-chips.com/wiki_Boot_option
 
-### 9.1 trust_merger工具
+TPL功能是DDR初始化, 代码运行在IRAM中,完成后返回Bootrom；
+SPL在没有TPL的情况下需要初始化DDR, 然后加载Trust(可选)和U-Boot, 并引导进入下一级.
 
-trust_merger用于打包bl30、bl31 bin、bl32 bin等文件，生成烧写工具需要的TrustImage格式固件。
+SPL+TPL的组合实现rockchip ddr.bin+miniloader完全一致的功能, 可相互替换.
 
-#### 9.1.1 trust的打包和解包
+## 9. U-Boot和kernel DTB支持
+
+### 9.1 设计出发点:
+
+按照U-Boot的最新架构, 每个驱动代码本身需要依赖dts, 因此每一块板子都有一份对应的dts.
+
+为了降低U-Boot在不同项目的维护量, 实现一颗芯片在同一类系统中能共用一份U-Boot, 而不是每一块板子都需要独立的dts编译成不同的U-Boot固件, 在U-Boot中增加支持使用kernel dtb, 复用其中的display, pmic/regulator, pinctrl等硬件相关信息,
+
+因为u-boot本身有一份dts, 再加上kernel的dts, 原有的fdt用法会有冲突.
+同时由于kernel的dts还需要提供给kernel使用, 所以不能把u-boot dts中部分dts节点overlay到kernel dts上传给kernel, 综合u-boot后续发展方向是使用live dt, 决定启动Live dt.
+
+
+### 9.2 关于live dt:
+
+live dt功能是在v2017.07版本合并的, 提交记录如下:
+
+https://lists.denx.de/pipermail/u-boot/2017-January/278610.html
+
+live dt的原理,是在初始化阶段直接扫描整个dtb, 把所有设备节点转换成struct
+device_node节点链表, 后续的bind和驱动访问dts都通过这个device_node或ofnode(device_node的封装)进行, 而不再访问原有dtb.
+
+更多详细信息请参考: doc/driver-model/livetree.txt
+
+### 9.3 fdt代码转换为支持live dt的代码
+
+ofnode类型(include/dm/ofnode.h)是两种dt都支持的一种封装格式, 使用live dt时使用device_node来访问dt结点, 使用fdt时使用offset访问dt节点.
+需要同时支持两种类型的驱动,请使用ofnode类型.
+```
+ 47  * @np: Pointer to device node, used for live tree
+ 48  * @of_offset: Pointer into flat device tree, used for flat tree. Note that this
+ 49  *      is not a really a pointer to a node: it is an offset value. See above.
+ 50  */
+
+ 51 typedef union ofnode_union {
+ 52         const struct device_node *np;   /* will be used for future live tree */
+ 53         long of_offset;
+ 54 } ofnode;
+```
+
+"dev_", "ofnode_"开头的函数为支持两种dt访问方式,
+根据程序当前使用dt类型来调用对应接口；
+
+"of_"开头的函数是只支持live dt的接口；
+
+"fdtdec_", "fdt_"开头的函数是只支持fdt的接口；
+
+驱动程序做转换的时候可以参考标题包含"live dt"的提交.
+
+
+### 9.4 支持kernel dtb的实现:
+
+kernel的dtb支持, 是加在board_init的开头, 此时u-boot的dts已经扫描完成, 可以通过增加代码实现mmc/nand的读操作来读取kernel dtb, kernel的dtb读进来后, 进行live dt建表, 并bind所有设备, 最后更新gd->fdt_blob指针指向kernel dtb.
+
+请注意该功能启用后, 大部分设备修改U-Boot的dts是无效的, 需要修改kernel的dts.
+
+通过查找.config是否包含CONFIG_USING_KERNEL_DTB确认是否已启用kernel dtb.
+
+该功能依赖live dt, 读dtb依赖rk格式固件或rk android固件, 所以Android以外的平台未启用.
+
+### 9.5 关于U-Boot dts
+
+U-Boot的根目录有个dts/文件夹, 编译完成后会生产dt.dtb和dt-spl.dtb两个DTB, dt.dtb是config的CONFIG_DEFAULT_DEVICE_TREE指定的dts编译得到的dtb拷贝过来的, 而dt-spl.dtb是把dt.dtb中带"u-boot,dm-pre-reloc"节点的设备的设备过滤出来, 并且去掉CONFIG_OF_SPL_REMOVE_PROPS选项中所有的property, 这样可以得到一个用于SPL的最简dtb.
+
+dt-spl.dtb一般仅包含dmc, uart, mmc, nand, grf, cru等节点, 即串口, DDR和存储设备控制器及其依赖的CRU/GRF.
+
+u-boot.bin默认打包的是dt.dtb, 在CONFIG_USING_KERNEL_DTB使能后, 默认打包的是dt-spl.dtb, 因为其他设备驱动将使用kernel中的dts.
+
+U-Boot中所有芯片级dtsi请和kernel保持完全一致, 板级dts视情况简化得到一个evb的即可, 因为kernel的dts全套下来可能有几十个, 没必要全部引进到u-boot.
+
+U-Boot 特有的节点, 如uart, emmc的alias等,请全部加到独立的rkxx-u-boot.dtsi里面, 不要破坏原有dtsi.
+
+## 10. U-Boot相关工具
+
+### 10.1 trust_merger工具
+
+trust_merger用于64bit SoC打包bl30、bl31 bin、bl32 bin等文件，生成烧写工具需要的TrustImage格式固件。
+
+#### 10.1.1 trust的打包和解包
 
 **打包命令：**
 
@@ -921,7 +1048,7 @@ trust_merger用于打包bl30、bl31 bin、bl32 bin等文件，生成烧写工具
 ./tools/trust_merger --unpack <trust.img>
 ```
 
-#### 9.1.2 工具参数
+#### 10.1.2 工具参数
 
 以3368的配置文件为例：
 
@@ -945,11 +1072,11 @@ SEC=0						----不存在BL31 bin
 PATH=trust.img [OUTPUT]		----输出固件名字
 ```
 
-### 9.2 boot_merger工具
+### 10.2 boot_merger工具
 
 boot_merger用于打包loader、ddr bin、usb plug bin等文件，生成烧写工具需要的loader格式的固件。
 
-#### 9.2.1 Loader的打包和解包
+#### 10.2.1 Loader的打包和解包
 
 **打包命令：**
 
@@ -965,7 +1092,7 @@ boot_merger用于打包loader、ddr bin、usb plug bin等文件，生成烧写�
 ./tools/boot_merger --unpack <loader.bin>
 ```
 
-#### 9.2.2 工具参数
+#### 10.2.2 工具参数
 
 以3288的配置文件为例：
 
@@ -991,7 +1118,7 @@ FlashBoot=u-boot.bin
 PATH=RK3288Loader_UBOOT.bin
 ```
 
-### 9.3 resource_tool工具
+### 10.3 resource_tool工具
 
 resource_tool用于打包任意资源文件，最终生成resource.img镜像。
 
@@ -1007,18 +1134,193 @@ resource_tool用于打包任意资源文件，最终生成resource.img镜像。
 ./tools/resource_tool --unpack --image=<resource.img>
 ```
 
-### 9.4 patman
+### 10.4 loaderimage
 
-[ TODO ]
+loaderimage工具用于打包rockchip miniloader所需固件, 含uboot.img和32bit的trust.img
+用法:
+```
+loaderimage [--pack|--unpack] [--uboot|--trustos] file_in file_out [load_addr]
+loaderimage --pack --trustos ${RKBIN}/${TOS} ./trust.img
+loaderimage --pack --uboot u-boot.bin uboot.img 0x60000000
+```
+需要注意不同平台的'load_addr'不一样.
 
-### 9.5 buildman工具
+### 10.5 patman
 
-[ TODO ]
+详细信息参考tools/patman/README
+这是一个python写的工具, 通过调用其他工具, 完成patch的检查提交, 是做patch Upstream(U-Boot, Kernel)非常好用的必备工具. 主要功能:
+- 根据参数自动format补丁;
+- 调用checkpatch进行检查;
+- 从commit信息提取并转换成upstream mailing list所需的Cover-letter, patch version, version changes等信息;
+- 自动去掉commit中的change-id;
+- 自动根据Maintainer和文件提交信息提取每个patch所需的收件人;
+- 根据'~/.gitconfig'或者'./.gitconfig'配置把所有patch发送出去.
 
-### 9.6 mkimage工具
+使用'-h'选项查看所有命令选项:
+```
+$ patman -h
+Usage: patman [options]
 
-[ TODO ]
+Create patches from commits in a branch, check them and email them as
+specified by tags you place in the commits. Use -n to do a dry run first.
 
+Options:
+  -h, --help            show this help message and exit
+  -H, --full-help       Display the README file
+  -c COUNT, --count=COUNT
+                        Automatically create patches from top n commits
+  -i, --ignore-errors   Send patches email even if patch errors are found
+  -m, --no-maintainers  Don't cc the file maintainers automatically
+  -n, --dry-run         Do a dry run (create but don't email patches)
+  -p PROJECT, --project=PROJECT
+                        Project name; affects default option values and
+                        aliases [default: u-boot]
+  -r IN_REPLY_TO, --in-reply-to=IN_REPLY_TO
+                        Message ID that this series is in reply to
+  -s START, --start=START
+                        Commit to start creating patches from (0 = HEAD)
+  -t, --ignore-bad-tags
+                        Ignore bad tags / aliases
+  --test                run tests
+  -v, --verbose         Verbose output of errors and warnings
+  --cc-cmd=CC_CMD       Output cc list for patch file (used by git)
+  --no-check            Don't check for patch compliance
+  --no-tags             Don't process subject tags as aliaes
+  -T, --thread          Create patches as a single thread
+
+```
+典型用例, 提交最新的3个patch:
+```
+patman -t -c3
+```
+命令运行后checkpatch如果有error或者warning,会自动abort, 需要修改解决patch解决问题后重新运行.
+
+其他常用选项
+- '-t' 标题中":"前面的都当成TAG, 大部分无法被patman识别, 需要使用'-t'选项
+- '-i' 如果有些warning(如超过80个字符)我们认为无需解决, 可以直接加'-i'选项提交补丁
+- '-s' 如果要提交的补丁并不是在当前tree的top, 可以通过'-s'跳过top的N个补丁
+- '-n' 如果并不是想提交补丁,只是想校验最新补丁是否可以通过checkpatch, 可以使用'-n'选项
+
+patchman配合commit message中的关键字, 生成upstream mailing list 所需的信息.
+典型的commit:
+```
+commit 72aa9e3085e64e785680c3fa50a28651a8961feb
+Author: Kever Yang <kever.yang@rock-chips.com>
+Date:   Wed Sep 6 09:22:42 2017 +0800
+
+    spl: add support to booting with OP-TEE
+
+    OP-TEE is an open source trusted OS, in armv7, its loading and
+    running are like this:
+    loading:
+    - SPL load both OP-TEE and U-Boot
+    running:
+    - SPL run into OP-TEE in secure mode;
+    - OP-TEE run into U-Boot in non-secure mode;
+
+    More detail:
+    https://github.com/OP-TEE/optee_os
+    and search for 'boot arguments' for detail entry parameter in:
+    core/arch/arm/kernel/generic_entry_a32.S
+
+    Cover-letter:
+    rockchip: add tpl and OPTEE support for rk3229
+
+    Add some generic options for TPL support for arm 32bit, and then
+    and TPL support for rk3229(cortex-A7), and then add OPTEE support
+    in SPL.
+
+    Tested on latest u-boot-rockchip master.
+
+    END
+
+    Series-version: 4
+    Series-changes: 4
+    - use NULL instead of '0'
+    - add fdt_addr as arg2 of entry
+
+    Series-changes: 2
+    - Using new image type for op-tee
+
+    Change-Id: I3fd2b8305ba8fa9ea687ab7f3fd1ffd2fac9ece6
+    Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
+```
+这个patch通过patman命令发送的时候,会生成一份Cover-letter:
+```
+[PATCH v4 00/11] rockchip: add tpl and OPTEE support for rk3229
+```
+对应patch的标题如下, 包含version信息和当前patch是整个series的第几封:
+```
+[PATCH v4,07/11] spl: add support to booting with OP-TEE
+```
+Patch的commit message已经被处理过了, change-id被去掉, Cover-letter被去掉, version-changes信息被转换成非正文信息:
+```
+OP-TEE is an open source trusted OS, in armv7, its loading and
+running are like this:
+loading:
+- SPL load both OP-TEE and U-Boot
+running:
+- SPL run into OP-TEE in secure mode;
+- OP-TEE run into U-Boot in non-secure mode;
+
+More detail:
+https://github.com/OP-TEE/optee_os
+and search for 'boot arguments' for detail entry parameter in:
+core/arch/arm/kernel/generic_entry_a32.S
+
+Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
+---
+
+Changes in v4:
+- use NULL instead of '0'
+- add fdt_addr as arg2 of entry
+
+Changes in v3: None
+Changes in v2:
+- Using new image type for op-tee
+
+ common/spl/Kconfig     |  7 +++++++
+ common/spl/Makefile    |  1 +
+ common/spl/spl.c       |  9 +++++++++
+ common/spl/spl_optee.S | 13 +++++++++++++
+ include/spl.h          | 13 +++++++++++++
+ 5 files changed, 43 insertions(+)
+ create mode 100644 common/spl/spl_optee.S
+```
+更多关键字使用, 如"Series-prefix", "Series-cc"等请参考README.
+
+### 10.6 buildman工具
+
+详细信息请参考tools/buildman/README
+
+这个工具最主要的用处在于批量编译代码, 非常适合用于验证当前平台的提交是否影响到其他平台.
+
+使用buildman需要提前设置好toolchain路径, 编辑'~/.buildman'文件:
+```
+[toolchain]
+arm: ~/prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/
+aarch64: ~/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/
+```
+典型用例如编译所有Rockchip平台的U-Boot代码:
+```
+./tools/buildman/buildman rockchip
+```
+理想结果如下:
+```
+$ ./tools/buildman/buildman rockchip
+boards.cfg is up to date. Nothing to do.
+Building current source for 34 boards (4 threads, 1 job per thread)
+   34    0    0 /34     evb-rk3326
+```
+显示的结果中, 第一个是完全pass的平台数量(绿色), 第二个是含warning输出的平台数量(黄色), 第三个是有error无法编译通过的平台数量(红色). 如果编译过程中有warning或者error, 会在终端上显示出来.
+
+### 10.7 mkimage工具
+
+详细信息参考doc/mkimage.1
+这个工具可用于生成所有U-Boot/SPL支持的固件, 如通过下面的命令生成Rockchip的bootrom所需IDBLOCK格式, 这个命令会同时修改u-boot-tpl.bin的头4个byte为Bootrom所需校验的ID:
+```
+tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
+```
 
 ## 附录
 
