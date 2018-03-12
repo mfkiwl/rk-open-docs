@@ -845,6 +845,83 @@ if (ret != 1) {
 }
 ```
 
+### 5.10 串口支持
+
+U-Boot主要通过串口来打印启动过程中的log信息。
+
+在U-Boot中串口驱动有两种（目前Rockchip平台的串口对应的驱动为`drivers/serial/ns16550.c`）。
+
+U-Boot正常启动的时候，在relocation之前，会在board_f.c--->board_init_f函数中通过serial_init加载serial驱动。这是U-Boot中正式的debug console驱动，如果该驱动加载失败，U-Boot将停止启动。该驱动依赖dts中的chosen节点的stdout-path配置：
+
+假如某块板子使用UART2作为debug console，波特率为1500000，则DTS需做如下配置：
+
+‘’‘
+
+```c
+chosen {
+	stdout-path = "serial2:1500000n8";
+};
+```
+需要注意的是，serial驱动在加载的时候，需要依赖clk驱动，如果这时候clk驱动还没有正常加载，需要在对应uart的dts节点中加入clock-frequency属性：
+
+```c
+&uart2 {
+        clock-frequency = <24000000>;
+};
+```
+
+这种debug console驱动在U-Boot启动的过程中加载的相对比较晚，如果在这之前就出现了异常，那依赖debug console就看不到具体的异常信息，针对这种情况，U-Boot提供了另外一种能更早进行debug打印的机制，Early Debug UART，使能Early Debug UART的方法如下：
+
+在defconfig文件中打开DEBUG_UART, 指定该UART寄存器的基地址，时钟：
+
+```c
+CONFIG_DEBUG_UART=y
+
+CONFIG_DEBUG_UART_BASE=0x10210000
+
+CONFIG_DEBUG_UART_CLOCK=24000000
+
+CONFIG_DEBUG_UART_SHIFT=2
+
+CONFIG_DEBUG_UART_BOARD_INIT=y
+
+```
+
+在board文件中实现`board_debug_uart_init`, 该函数一般负责设置iomux：
+
+```c
+void board_debug_uart_init(void)
+{
+        static struct rk3308_grf * const grf = (void *)GRF_BASE;
+
+        /* Enable early UART2 channel m1 on the rk3308 */
+        rk_clrsetreg(&grf->gpio4d_iomux,
+                     GPIO4D3_MASK | GPIO4D2_MASK,
+                     GPIO4D2_UART2_RX_M1 << GPIO4D2_SHIFT |
+                     GPIO4D3_UART2_TX_M1 << GPIO4D3_SHIFT);
+}
+```
+
+在尽可能早的地方调用`debug_uart_init`:
+
+```c
+#define EARLY_UART
+#if defined(EARLY_UART) && defined(CONFIG_DEBUG_UART)
+        /*
+         * Debug UART can be used from here if required:
+         *
+         * debug_uart_init();
+         * printch('a');
+         * printhex8(0x1234);
+         * printascii("string");
+         */
+        debug_uart_init();
+        printascii("U-Boot SPL board init");
+#endif
+```
+
+在U-Boot/arch目录下搜索debug_uart_init可以看到很多使用范例。
+
 ## 6. USB download
 
 ### 6.1 rockusb
