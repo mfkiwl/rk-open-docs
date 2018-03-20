@@ -758,8 +758,13 @@ charge-animation {
 	rockchip,uboot-low-power-voltage = <3350>;		 // U-Boot无条件强制进入充电模式的最低电压
 
 	rockchip,system-suspend = <1>;					 // 灭屏时进入trust进行低功耗待机
+	rockchip,auto-off-screen-interval = <20>;		 // 亮屏超时后自动灭屏，单位秒。(如果没有这个属性，则默认15s)
+	rockchip,auto-wakeup-interval = <10>;			 // 休眠自动唤醒时间，单位秒。(如果值为0或没有这个属性，则禁止休眠自动唤醒)
+	rockchip,auto-wakeup-screen-invert = <1>;		 // 休眠自动唤醒的时候，是否让屏幕产生亮/灭效果
 };
 ```
+
+- 自动休眠唤醒功能的作用：1. 考虑到有些电量计（比如adc）需要定时更新软件算法，否则会造成电量统计不准，因此不能让cpu一直处于休眠状态；2. 方便进行休眠唤醒的压力测试；
 
 #### 5.8.4 低功耗休眠
 
@@ -767,7 +772,7 @@ charge-animation {
 
 #### 5.8.5 更换充电图片
 
-1. 更换./tools/images/目录下的图片，图片格式采用bmp。使用命令“ls |sort”确认图片排列顺序是低电量到高电量，所有图片按照这个顺序打包进resource；
+1. 更换./tools/images/目录下的图片，图片采用8bit或24bit bmp格式。使用命令“ls |sort”确认图片排列顺序是低电量到高电量，所有图片按照这个顺序打包进resource；
 2. 修改./drivers/power/charge_animation.c里的图片和电量关系信息：
 
 ```c
@@ -921,6 +926,74 @@ void board_debug_uart_init(void)
 ```
 
 在U-Boot/arch目录下搜索debug_uart_init可以看到很多使用范例。
+
+### 5.11 按键支持
+
+#### 5.11.1 框架支持
+
+按键功能方面，U-Boot框架默认没有给与足够的支持，因此我们自己实现了一套按键框架机制来支持按键管理。
+
+**按键框架代码：**
+
+```
+drivers/input/key-uclass.c
+include/key.h
+```
+
+**按键驱动：**
+
+```
+drivers/input/rk8xx_pwrkey.c	// 支持PMIC(RK805/RK809/RK816/RK817)的pwrkey按键
+drivers/input/rk_key.c			// 支持compatible = "rockchip,key"的节点
+drivers/input/gpio_key.c		// 支持compatible = "gpio-keys"的节点
+drivers/input/adc_key.c			// 支持compatible = "adc-keys"的节点
+```
+
+- 上面4个驱动包含了Rockchip平台上所有已在使用的key节点；
+- 考虑到U-Boot有充电休眠的功能，为了支持按键唤醒cpu，因此所有gpio类型的按键，目前全部都以中断的形式进行触发（不是轮询）。
+
+#### 5.11.2 相关接口
+
+**接口：**
+
+```
+int platform_key_read(int code)
+```
+
+**code头文件：**
+
+```
+/include/dt-bindings/input/linux-event-codes.h
+```
+
+**返回值：**
+
+```
+enum key_state {
+	KEY_PRESS_NONE,			// 非完整的短按（没有释放按键）或长按（按下时间不够长），都属于none事件；
+	KEY_PRESS_DOWN,			// 一次完整的短按（按下->释放）才算是一个press down事件；
+	KEY_PRESS_LONG_DOWN,	// 一次完整的长按（可以不释放）才算是一个press long down事件；
+	KEY_NOT_EXIST,			// 找不到code对应的按键
+};
+```
+
+KEY_PRESS_LONG_DOWN 事件的默认时长为2000ms，长按事件目前只在U-Boot充电时长按开机的时候会使用到。
+
+```
+#define KEY_LONG_DOWN_MS	2000
+```
+
+**范例：**
+
+```c
+platform_key_read(KEY_VOLUMEUP);
+platform_key_read(KEY_VOLUMEDOWN);
+platform_key_read(KEY_POWER);
+platform_key_read(KEY_HOME);
+platform_key_read(KEY_MENU);
+platform_key_read(KEY_ESC);
+...
+```
 
 ## 6. USB download
 
