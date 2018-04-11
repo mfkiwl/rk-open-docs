@@ -1474,4 +1474,49 @@ tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
 
 ## 附录
 
-[TODO]
+### IRAM程序内存分布(SPL/TPL)
+
+bootRom出来后的第一段代码在Intermal SRAM(U-Boot叫IRAM), 可能是TPL或者SPL, 同时存在TPL和SPL时描述的是TPL的map, SPL的map类似.
+
+| **Name**       | **start addr** |**size** |**Desc** |
+| ------------------- | :------------- | :------------- | :----------- |
+| Bootrom  | IRAM_START | TPL_TEXT_BASE-IRAM_START | data and stack |
+| TAG	| TPL_TEXT_BASE     | 4 | RKXX |
+| text 	| TEXT_BASE     | sizeof(text) |  |
+| bss 	| text_end     | sizeof(bss) | append to text |
+| dtb 	| bss_end     | sizeof(dtb) | append to bss |
+| | | | |
+| SP 	| gd start     |  | stack |
+| gd 	| malloc_start - sizeof(gd)     | sizeof(gd) |  |
+| malloc 	| IRAM_END-MALLOC_F_LEN | *PL_SYS_MALLOC_F_LEN | malloc_simple |
+
+text, bss, dtb的空间是编译时根据实际内容大小决定的；
+malloc, gd, SP是运行时根据配置来确定的位置；
+一般要求dtb尽量精简,把空间留给代码空间, text如果过大, 运行时比较容易碰到的问题是Stack把dtb冲了, 导致找不到dtb.
+
+### U-Boot内存分布(relocate后)
+U-Boot代码一开始由前级Loader搬到TEXT_BASE的位置,U-Boot在探明实际可用DRAM空间后,把自己relocate到ram_top位置, 其中Relocation Offset = 'U-Boot start - TEXT_BASE'.
+
+| **Name**       | **start addr** |**size** |**Desc** |
+| ------------------- | :------------- | :------------- | :----------- |
+| ATF   | RAM_START | 0x200000 | Reserved for bl31 |
+| OP-TEE	| 0x8400000     | 2M~16M | 参考TEE开发手册 |
+| kernel fdt| fdt_addr_r |  | |
+| kernel | kernel_addr_r | | |
+| ramdisk | ramdisk_addr_r | ||
+| fastboot buffer | CONFIG_FASTBOOT_BUF_ADDR | CONFIG_FASTBOOT_BUF_SIZE | |
+| | | | |
+| SP		|  |  | stack |
+| FDT 	|  | sizeof(dtb) | U-Boot自带dtb |
+| GD 	|  | sizeof(gd) |  |
+| Board 	|  | sizeof(bd_t) | board info, eg. dram size |
+| malloc 	|  | TOTAL_MALLOC_LEN | 约64M |
+| U-Boot 	|  | sizeof(mon) | 含text, bss |
+| Video FB 	|     | fb size | 约32M |
+| TLB table 	| RAM_TOP-64K    | 32K |  |
+
+Video FB/U-Boot/malloc/Board/GD/FDT/SP是由顶向下根据实际需求大小来分配的, 起始地址对齐到4K大小；
+ATF在armv8是必需的, 属于TE, armv7没有；
+OP-TEE在armv7属于TE+TOS, 可选, 根据是否需要TA来确定大小；在armv8属于bl32(TOS), 可选, 依据内含TA数量来确定大小；U-Boot在dram_init_banksize()函数解析实际占用空间；
+kernel fdt/kernel/ramdisk几个起始位置在includ/config/rkxx_common.h中的ENV_MEM_LAYOUT_SETTINGS定义,注意不能和已定义位置重合；
+FASTBOOT/ROCKUSB等下载功能的BUFFER地址,在config/evb-rkxx_defconfig中定义, FASTBOOT_BUF_ADDR注意不能和已定义位置重合, 可以跟上一条内容重合；
