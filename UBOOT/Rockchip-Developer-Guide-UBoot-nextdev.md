@@ -624,7 +624,173 @@ int dm_i2c_reg_write(struct udevice *dev, uint offset, unsigned int val);
 
 ### 5.6 显示驱动
 
-[ TODO ]
+#### 5.6.1 框架支持
+
+Rockchip U-Boot目前支持的显示接口包括RGB，LVDS，EDP，MIPI和HDMI，未来还会加入CVBS，DP等显示接口的支持。U-Boot显示的图片为保存在kernel根目录下的logo.bmp，和logo_kernel.bmp一起打包进resource.img中，图片要求:
+
+1. 8bit或者24bit BMP格式的图片；
+
+2. logo.bmp和logo_kernel.bmp的图片分辨率大小一致；
+
+3. 对于rk312x/px30/rk3308这种基于vop lite结构的芯片，由于VOP不支持镜像，而24bit的BMP图片是按镜像存储，所以如果发现显示的图片做了y方向的镜像，请在PC端提前将图片做好y方向的镜像。
+
+   ##### 框架代码：
+
+   ```
+   drivers/video/drm/rockchip_display.c
+   drivers/video/drm/rockchip_display.h
+   ```
+
+   ##### 驱动文件：
+
+   ```
+   vop:
+         drivers/video/drm/rockchip_crtc.c
+         drivers/video/drm/rockchip_crtc.h
+         drivers/video/drm/rockchip_vop.c
+         drivers/video/drm/rockchip_vop.h
+         drivers/video/drm/rockchip_vop_reg.c
+         drivers/video/drm/rockchip_vop_reg.h
+
+   rgb:
+         drivers/video/drm/rockchip_rgb.c
+         drivers/video/drm/rockchip_rgb.h
+
+   lvds:
+         drivers/video/drm/rockchip_lvds.c
+         drivers/video/drm/rockchip_lvds.h
+
+   mipi:
+         drivers/video/drm/rockchip_mipi_dsi.c
+         drivers/video/drm/rockchip_mipi_dsi.h
+         drivers/video/drm/rockchip-inno-mipi-dphy.c
+
+   edp:
+         drivers/video/drm/rockchip_analogix_dp.c
+         drivers/video/drm/rockchip_analogix_dp.h
+         drivers/video/drm/rockchip_analogix_dp_reg.c
+         drivers/video/drm/rockchip_analogix_dp_reg.h
+
+   hdmi:
+         drivers/video/drm/dw_hdmi.c
+         drivers/video/drm/dw_hdmi.h
+         drivers/video/drm/rockchip_dw_hdmi.c
+         drivers/video/drm/rockchip_dw_hdmi.h
+
+   panel:
+         drivers/video/drm/rockchip_panel.c
+         drivers/video/drm/rockchip_panel.h
+   ```
+
+#### 5.6.2 相关接口
+
+ 1. 显示U-Boot logo和kernel logo：
+
+    ```
+    void rockchip_show_logo(void);
+    ```
+
+ 2. 显示指定的bmp图片，目前主要用于充电logo的显示：
+
+    ```
+    void rockchip_show_bmp(const char *bmp);
+    ```
+
+ 3. 将U-Boot中确定的一些变量通过dtb文件传递给内核，包括kernel logo的大小、地址和格式，crtc输出扫描时序以及过扫描的配置，未来还会加入BCSH等相关变量配置。
+
+    ```
+    rockchip_display_fixup(void *blob);
+    ```
+
+#### 5.6.3 DTS配置
+
+```
+reserved-memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ranges;
+
+	drm_logo: drm-logo@00000000 {
+		compatible = "rockchip,drm-logo";
+		reg = <0x0 0x0 0x0 0x0>; //预留buffer用于kernel logo的存放，具体地址和大小在U-Boot中会修改
+	};
+};
+
+&route-edp {
+    status = "okay"; //使能U-Boot logo显示功能
+    logo,uboot = "logo.bmp"; //指定U-Boot logo显示的图片
+    logo,kernel = "logo_kernel.bmp"; //指定kernel logo显示的图片
+    logo,mode = "center";  //center：居中显示，fullscreen：全屏显示
+    charge_logo,mode = "center"; //center：居中显示，fullscreen：全屏显示
+    connect = <&vopb_out_edp>; //确定显示通路，vopb->edp->panel
+};
+
+&edp {
+    status = "okay"; //使能edp
+};
+
+&vopb {
+    status = "okay"; //使能vopb
+};
+
+&panel {
+    "simple-panel";
+    ...
+    status = "okay";
+
+    disp_timings: display-timings {
+        native-mode = <&timing0>;
+        timing0: timing0 {
+            ...
+        };
+    };
+};
+```
+
+#### 5.6.4 defconfig配置
+
+目前除了RK3308之外的其他平台U-Boot中defconfig已经默认支持显示，只要在dts中将显示相关的信息配置好即可。RK3308考虑到启动速度等一些原因默认不支持显示，需要在defconfig中加入如下修改：
+
+```
+--- a/configs/evb-rk3308_defconfig
++++ b/configs/evb-rk3308_defconfig
+@@ -4,7 +4,6 @@ CONFIG_SYS_MALLOC_F_LEN=0x2000
+CONFIG_ROCKCHIP_RK3308=y
+CONFIG_ROCKCHIP_SPL_RESERVE_IRAM=0x0
+CONFIG_RKIMG_BOOTLOADER=y
+-# CONFIG_USING_KERNEL_DTB is not set
+CONFIG_TARGET_EVB_RK3308=y
+CONFIG_DEFAULT_DEVICE_TREE="rk3308-evb"
+CONFIG_DEBUG_UART=y
+@@ -55,6 +54,11 @@ CONFIG_USB_GADGET_DOWNLOAD=y
+CONFIG_G_DNL_MANUFACTURER="Rockchip"
+CONFIG_G_DNL_VENDOR_NUM=0x2207
+CONFIG_G_DNL_PRODUCT_NUM=0x330d
++CONFIG_DM_VIDEO=y
++CONFIG_DISPLAY=y
++CONFIG_DRM_ROCKCHIP=y
++CONFIG_DRM_ROCKCHIP_RGB=y
++CONFIG_LCD=y
+CONFIG_USE_TINY_PRINTF=y
+CONFIG_SPL_TINY_MEMSET=y
+CONFIG_ERRNO_STR=y
+```
+
+**关于upstream defconfig配置的说明：**
+
+​	upstream维护了一套rockchip U-Boot显示驱动，目前主要支持RK3288和RK3399两个平台，驱动代码在：
+
+```
+./drivers/video/rockchip/
+```
+
+如果要使用这套驱动可以打开配置CONFIG_VIDEO_ROCKCHIP同时关闭CONFIG_DRM_ROCKCHIP，和我们目前SDK使用的显示驱动对比，后者的优势有：
+
+​	1. 支持的平台和显示接口更全面；
+
+​	2. HDMI、DP等显示接口可以根据用户的设定输出指定分辨率，过扫描效果，显示效果调节效果等。
+
+​	3. U-Boot logo可以平滑过渡到kernel logo直到系统起来；
 
 ### 5.7 PMIC/Regulator驱动
 
