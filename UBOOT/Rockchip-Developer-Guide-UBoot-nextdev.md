@@ -995,6 +995,10 @@ platform_key_read(KEY_ESC);
 ...
 ```
 
+### 5.12  Vendor Storage
+
+Vendor Storage 是设计用来存放SN、MAC等不需要加密的小数据。数据存放在NVM（EMMC、NAND等）的保留分区中，有多个备份，更新数据时数据不丢失，可靠性高。详细的资料参考文档《appnote rk vendor storage》。
+
 ## 6. USB download
 
 ### 6.1 rockusb
