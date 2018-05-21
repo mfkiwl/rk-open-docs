@@ -31,6 +31,7 @@
 | **日期**     | **版本** | **作者**    | **修改说明** |
 | ---------- | ------ | --------- | -------- |
 | 2018-03-12 | V1.0   | Jason Zhu | 初始版本     |
+| 2018-05-21 | V1.1   | Jason Zhu | 增加PUK    |
 
 ------
 
@@ -47,6 +48,8 @@
 ​	2. ProductIntermediate Key (PIK)：中间key，中介作用，谷歌提供保管。如果只用到avb，而没有用到需要谷歌认证的服务，可以由厂商自己生成。
 
 ​	3. ProductSigning Key (PSK)：用于签固件的key，谷歌提供保管。如果只用到avb，而没有用到需要谷歌认证的服务，可以由厂商自己生成。
+
+​	4. ProductUnlock Key (PUK)：用于解锁设备，谷歌提供保管。如果只用到avb，而没有用到需要谷歌认证的服务，可以由厂商自己生成。
 
 ## ATX permanent attributes及vbmeta生成
 
@@ -104,3 +107,59 @@
 ## 校验流程
 
 ![avb-verify-keys](avb-verify-keys.png)
+
+##PUK及atx_unlock_credential.bin生成
+
+​	PUK生成：
+
+```
+	openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -outform PEM -out testkey_atx_puk.pem
+```
+
+​	atx_unlock_credential.bin为需要下载到设备解锁的证书，其生成过程如下：
+
+```
+	python avbtool make_atx_certificate --output=atx_puk_certificate.bin --subject=atx_product_id.bin --subject_key=testkey_atx_puk.pem --usage=com.google.android.things.vboot.unlock --subject_key_version 42 --authority_key=testkey_atx_pik.pem
+	python avbtool make_atx_unlock_credential --output=atx_unlock_credential.bin --intermediate_key_certificate=atx_pik_certificate.bin --unlock_key_certificate=atx_puk_certificate.bin --challenge=atx_unlock_challenge.bin --unlock_key=testkey_atx_puk.pem
+```
+
+​	最终可以把证书通过fastboot命令下载到设备，并解锁设备，fastboot命令如下：
+
+```
+	fastboot stage atx_unlock_credential.bin
+	fastboot oem at-unlock-vboot
+```
+
+​	最后设备解锁流程：
+
+![uthenticated-unlock](authenticated-unlock.jpg)
+
+1. 设备进入fastboot模式，电脑端输入
+
+```
+	fastboot oem at-vboot-challenge
+	fastboot get-staged atx_unlock_challenge.bin
+```
+
+获得带版本、Product Id与16字节的随机数的数据，取出随机数作为atx_unlock_challenge.bin。
+
+2. 使用avbtool生成atx_unlock_credential.bin
+3. 电脑端输入
+
+```
+	fastboot stage atx_unlock_credential.bin
+	fastboot oem at-unlock-vboot
+```
+
+**注意**：此时设备状态一直处于第一次进入fastboot模式状态，在此期间不能断电、关机、重启。因为步骤1.做完后，设备也存储着生成的随机数，如果断电、关机、重启，会导致随机数丢失，后续校验challenge signature会因为随机数不匹配失败。
+
+4. 设备进入解锁状态，开始解锁。
+
+
+
+
+
+
+
+
+
