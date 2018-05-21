@@ -37,9 +37,10 @@ Rockchip SOCs通常内置多个USB控制器，不同控制器之间互相独立�
 **修订记录**
 | **日期**     | **版本** | **作者** | **修改说明**                 |
 | ---------- | ------ | ------ | ------------------------ |
-| 2017.12.12 | V1.0   | 吴良峰    |                          |
+| 2017.12.12 | V1.0   | 吴良峰    | 初始版本                     |
 | 2018.3.7   | V1.1   | 吴良峰    | 增加rk3399 Type-C反面测试命令    |
 | 2018.3.30  | V1.2   | 吴良峰    | 增加RK3229/RK3326/PX30测试命令 |
+| 2018.5.21  | V1.3   | 吴良峰    | 修正USB3.0 测试方法            |
 
 --------------------
 [TOC]
@@ -572,9 +573,11 @@ Android平台支持两种不同的测试命令，一种是io命令写寄存器�
 | RK3366  |      io  -4  0xff500430  0x0a010340      |              N.A               |
 | RK3399  |      io  -4  0xfe800430  0x0a010340      | io  -4  0xfe900430  0x0a010340 |
 
+**Note**： RK3228H 需要两条测试命令，其中命令“io -4 0xff478408 0x0000000c”是为了触发CP1 test pattern。
+
 **1.2)  Android平台写内核设备节点的方法[推荐优先使用]**
 
- **echo test_u3 > /sys/kernel/debug/usb3控制器节点/host_testmode** 
+ **echo test_u3 > /sys/kernel/debug/usb3控制器节点/host_testmode**
 
 其中，“usb3控制器节点”应该根据芯片的USB 3.0控制器节点的名称进行修改。
 
@@ -598,21 +601,34 @@ Chrome平台可使用表3-1和表3-2两种测试命令，效果一样，但Chrom
 
 表3-2 USB 3.0 Host Tx测试命令-Chrome平台
 
-|  芯片名称   |      DWC3_0 OTG Host 3.0       |      DWC3_1 OTG Host 3.0       |
-| :-----: | :----------------------------: | :----------------------------: |
-| RK3228H | mem  w  0xff600430  0x0a010340 |              N.A               |
-| RK3366  | mem  w  0xff500430  0x0a010340 |              N.A               |
-| RK3399  | mem  w  0xfe800430  0x0a010340 | mem  w  0xfe900430  0x0a010340 |
+|  芯片名称   |           DWC3_0 OTG Host 3.0            |      DWC3_1 OTG Host 3.0       |
+| :-----: | :--------------------------------------: | :----------------------------: |
+| RK3228H | mem w 0xff478408 0x0000000c<<br />mem  w  0xff600430  0x0a010340 |              N.A               |
+| RK3366  |      mem  w  0xff500430  0x0a010340      |              N.A               |
+| RK3399  |      mem  w  0xfe800430  0x0a010340      | mem  w  0xfe900430  0x0a010340 |
 
 ### 3.2.7 USB 3.0 Host Tx测试方法
 
 本文档主要说明使用Agilent 90000系列示波器(型号：DSO91204A和测试夹具U7242A)的USB 3.0 Device Tx测试方法。如果使用的是Tektronix或者LeCroy的示波器，请自行搜索Tektronix和LeCroy官方发布的测试指南。
 
-**测试注意事项：**
+**USB 3.0 Host Tx 测试注意事项：**
 
-1). 测试USB 3.0 Host Tx，需要先**输入测试命令**，USB 3.0控制器才能进入测试模式(Compliance mode)
+- 如果是测试 **Type-A USB3.0** 接口，测试前，**先将USB 3.0 Disk插入待测试的USB 3.0接口**，并通过串口log确认待测试的USB 3.0接口和固件是否支持USB 3.0，如果支持USB 3.0，log中会提示“**SuperSpeed**”，详细的参考log如下所示，然后再拔出USB3.0 Disk，开始测试Tx。**如果缺少该步骤，Type-A USB3.0 可能无法进入测试模式**；
 
-2). 测试Host Tx时，待测USB接口的VBus需要对外输出5v供电，而测试夹具U7242A则不需要5V供电(这与Device Tx测试恰好相反)。
+  ```
+  usb 8-1: new SuperSpeed USB device number 2 using xhci-hcd
+  usb 8-1: New USB device found,idVendor=0bc2, idProduct=2320
+  usb 8-1: New USB device strings:Mfr=2, Product=3, SerialNumber=1
+  usb 8-1: Product: Expansion
+  usb 8-1: Manufacturer: Seagate
+  usb 8-1: SerialNumber: NA45HT1K
+  usb-storage 8-1:1.0: USB MassStorage device detected
+  ```
+
+- 需要先**输入测试命令**，再连接测试夹具，USB 3.0控制器才能进入测试模式；
+
+- 待测试的USB接口的VBUS需要对外输出5v供电，而测试夹具U7242A则不需要5V供电(这与Device Tx测试恰好相反)；
+
 
 **USB 3.0 Host Tx测试步骤**
 
@@ -626,13 +642,15 @@ USB 3.0 Host Tx测试过程中，示波器的自动化测试软件的设置与US
 
 **Note：该方法不适用于RK3399 Type-C USB 3.0**
 
+- 如果是测试 **Type-A USB3.0** 接口，测试前，先将USB 3.0 Disk插入待测试的USB 3.0接口，并通过串口log确认可以识别为“SuperSpeed”，表示测试固件可以正常支持USB3.0，然后拔出USB 3.0 Disk。**如果缺少该步骤，Type-A USB3.0 可能无法进入测试模式**。
+
 - 将测试夹具的一端连接到示波器，**测试夹具的另外一端先不要连接到待测试的USB 3.0 Host port**；
 
 - 设置示波器进入USB 3.0 的LFPS测试项，示波器会提示断开测试夹具与待测的USB 3.0 Host port的连接；
 
 - 查表3-1，输入对应的测试命令；
 
-- 连接测试夹具与待测试的USB 3.0 Host port，则USB 3.0控制器会自动进入测试模式。
+- 连接测试夹具与待测试的USB 3.0 Host port，则USB 3.0控制器会自动进入测试模式；
 
   注意：一定要先输入测试命令，再连接测试夹具与待测试的USB3 port，否则可能导致USB 3.0控制器没有成功进入测试模式。
 
@@ -642,6 +660,7 @@ USB 3.0 Host Tx测试过程中，示波器的自动化测试软件的设置与US
 
 **Note：该方法适用于包括RK3399在内的所有Rockchip SoCs**
 
+- 如果是测试 **Type-A USB3.0** 接口，测试前，先将USB 3.0 Disk插入待测试的USB 3.0接口，并通过串口log确认可以识别为“SuperSpeed”，表示测试固件可以正常支持USB3.0，然后拔出USB 3.0 Disk。**如果缺少该步骤，Type-A USB3.0 可能无法进入测试模式**。
 - 将测试夹具的一端连接到示波器，**测试夹具的另外一端先不要连接到待测试的USB 3.0 Host port**；
 
 
@@ -760,6 +779,10 @@ USB 3.0控制器在link training的Polling.Configuration阶段，如果检测到
 不同芯片，PORTSC的地址也不同，请查芯片的TRM。
 
 比如，RK3399 USB3 Host0的PORTSC的地址为0xfe800430 , USB3 Host1的PORTSC地址为0xfe900430。
+
+**3). 测试注意事项**
+
+如果是测试 **Type-A USB3.0** 接口，测试前，先将USB 3.0 Disk插入待测试的USB 3.0接口，并通过串口log确认可以识别为“SuperSpeed”，表示测试固件可以正常支持USB3.0，然后拔出USB 3.0 Disk。**如果缺少该步骤，Type-A USB3.0 可能无法进入Loopback mode**。
 
 ----
 # 4 USB 3.0 HUB Compliance Test
