@@ -27,26 +27,27 @@
 
 **各芯片feature支持状态**
 
-| **芯片名称**            | **Distro Boot** |**RKIMG Boot** |**SPL/TPL** |**Trust(SPL)** |**AVB** |
-| ------------------- | :------------- | :------------- | :----------- | :----------- | :----------- |
-| RV1108 	| Y     | N | Y | N | N |
-| RK3036 	| Y     | N | N | N | N |
-| RK3126C 	| Y     | Y | N | N | N |
-| RK3128 	| Y     | Y | N | N | N |
-| RK3229 	| Y     | N | Y | Y | Y |
-| RK3288 	| Y     | N | Y | N | N |
-| RK3308 	| -     | - | - | - | - |
-| RK3326/PX30	| Y     | Y | N | N | Y |
-| RK3328 	| Y     | N | Y | Y | N |
-| RK3368/PX5 	| Y     | N | Y | Y | N |
-| RK3399 	| Y     | N | Y | Y | N |
+| **芯片名称**    | **Distro Boot** | **RKIMG Boot** | **SPL/TPL** | **Trust(SPL)** | **AVB** |
+| ----------- | :-------------- | :------------- | :---------- | :------------- | :------ |
+| RV1108      | Y               | N              | Y           | N              | N       |
+| RK3036      | Y               | N              | N           | N              | N       |
+| RK3126C     | Y               | Y              | N           | N              | N       |
+| RK3128      | Y               | Y              | N           | N              | N       |
+| RK3229      | Y               | N              | Y           | Y              | Y       |
+| RK3288      | Y               | N              | Y           | N              | N       |
+| RK3308      | -               | -              | -           | -              | -       |
+| RK3326/PX30 | Y               | Y              | N           | N              | Y       |
+| RK3328      | Y               | N              | Y           | Y              | N       |
+| RK3368/PX5  | Y               | N              | Y           | Y              | N       |
+| RK3399      | Y               | N              | Y           | Y              | N       |
 
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2018-02-28 | V1.0   | 陈健洪    | 初始版本     |
+| **日期**     | **版本** | **作者** | **修改说明**   |
+| ---------- | ------ | ------ | ---------- |
+| 2018-02-28 | V1.0   | 陈健洪    | 初始版本       |
+| 2018-06-22 | V1.1   | 朱志展    | fastboot说明 |
 
 -----------
 
@@ -1018,6 +1019,301 @@ Fastboot 默认使用Google adb的VID/PID, 命令行手动启动fastboot:
 fastboot usb 0
 ```
 
+6.2.1 fastboot支持命令速览
+
+```
+fastboot flash < partition > [ < filename > ]
+
+fastboot erase < partition >
+
+fastboot getvar < variable > | all
+
+fastboot set_active < slot >
+
+fastboot reboot
+
+fastboot reboot-bootloader
+
+fastboot flashing unlock
+
+fastboot flashing lock
+
+fastboot stage [ < filename > ]
+
+fastboot get_staged [ < filename > ]
+
+fastboot oem fuse at-perm-attr-data
+
+fastboot oem fuse at-perm-attr
+
+fastboot oem at-get-ca-request
+
+fastboot oem at-set-ca-response
+
+fastboot oem at-lock-vboot
+
+fastboot oem at-unlock-vboot
+
+fastboot oem at-disable-unlock-vboot
+
+fastboot oem fuse at-bootloader-vboot-key
+
+fastboot oem format
+
+fastboot oem at-get-vboot-unlock-challenge
+
+fastboot oem at-reset-rollback-index
+```
+
+6.2.2 fastboot具体使用
+
+1. fastboot flash < partition > [ < filename > ]
+
+功能：分区烧写。
+
+例： fastboot flash boot boot.img
+
+2. fastboot erase < partition >
+
+功能：擦除分区。
+
+举例：fastboot erase boot
+
+3. fastboot getvar < variable > | all
+
+功能：获取设备信息
+
+举例：fastboot getvar all （获取设备所有信息）
+
+variable 还可以带的参数：
+
+```
+version                               /* fastboot 版本 */
+version-bootloader                    /* uboot 版本 */
+version-baseband
+product                               /* 产品信息 */
+serialno                              /* 序列号 */
+secure                                /* 是否开启安全校验 */
+max-download-size                     /* fastboot 支持单次传输最大字节数 */
+logical-block-size                    /* 逻辑块数 */
+erase-block-size                      /* 擦除块数 */
+partition-type : < partition >        /* 分区类型 */
+partition-size : < partition >        /* 分区大小 */
+unlocked                              /* 设备lock状态 */
+off-mode-charge
+battery-voltage
+variant
+battery-soc-ok
+slot-count                            /* slot 数目 */
+has-slot: < partition >               /* 查看slot内是否有该分区名 */
+current-slot                          /* 当前启动的slot */
+slot-suffixes                         /* 当前设备具有的slot,打印出其name */
+slot-successful: < _a | _b >          /* 查看分区是否正确校验启动过 */
+slot-unbootable: < _a | _b >          /* 查看分区是否被设置为unbootable */
+slot-retry-count: < _a | _b >         /* 查看分区的retry-count次数 */
+at-attest-dh
+at-attest-uuid
+at-vboot-state
+```
+
+fastboot getvar all举例：
+
+```
+PS E:\U-Boot-AVB\adb> .\fastboot.exe getvar all
+(bootloader) version:0.4
+(bootloader) version-bootloader:U-Boot 2017.09-gc277677
+(bootloader) version-baseband:N/A
+(bootloader) product:rk3229
+(bootloader) serialno:7b2239270042f8b8
+(bootloader) secure:yes
+(bootloader) max-download-size:0x04000000
+(bootloader) logical-block-size:0x512
+(bootloader) erase-block-size:0x80000
+(bootloader) partition-type:bootloader_a:U-Boot
+(bootloader) partition-type:bootloader_b:U-Boot
+(bootloader) partition-type:tos_a:U-Boot
+(bootloader) partition-type:tos_b:U-Boot
+(bootloader) partition-type:boot_a:U-Boot
+(bootloader) partition-type:boot_b:U-Boot
+(bootloader) partition-type:system_a:ext4
+(bootloader) partition-type:system_b:ext4
+(bootloader) partition-type:vbmeta_a:U-Boot
+(bootloader) partition-type:vbmeta_b:U-Boot
+(bootloader) partition-type:misc:U-Boot
+(bootloader) partition-type:vendor_a:ext4
+(bootloader) partition-type:vendor_b:ext4
+(bootloader) partition-type:oem_bootloader_a:U-Boot
+(bootloader) partition-type:oem_bootloader_b:U-Boot
+(bootloader) partition-type:factory:U-Boot
+(bootloader) partition-type:factory_bootloader:U-Boot
+(bootloader) partition-type:oem_a:ext4
+(bootloader) partition-type:oem_b:ext4
+(bootloader) partition-type:userdata:ext4
+(bootloader) partition-size:bootloader_a:0x400000
+(bootloader) partition-size:bootloader_b:0x400000
+(bootloader) partition-size:tos_a:0x400000
+(bootloader) partition-size:tos_b:0x400000
+(bootloader) partition-size:boot_a:0x2000000
+(bootloader) partition-size:boot_b:0x2000000
+(bootloader) partition-size:system_a:0x20000000
+(bootloader) partition-size:system_b:0x20000000
+(bootloader) partition-size:vbmeta_a:0x10000
+(bootloader) partition-size:vbmeta_b:0x10000
+(bootloader) partition-size:misc:0x100000
+(bootloader) partition-size:vendor_a:0x4000000
+(bootloader) partition-size:vendor_b:0x4000000
+(bootloader) partition-size:oem_bootloader_a:0x400000
+(bootloader) partition-size:oem_bootloader_b:0x400000
+(bootloader) partition-size:factory:0x2000000
+(bootloader) partition-size:factory_bootloader:0x1000000
+(bootloader) partition-size:oem_a:0x10000000
+(bootloader) partition-size:oem_b:0x10000000
+(bootloader) partition-size:userdata:0x7ad80000
+(bootloader) unlocked:no
+(bootloader) off-mode-charge:0
+(bootloader) battery-voltage:0mv
+(bootloader) variant:rk3229_evb
+(bootloader) battery-soc-ok:no
+(bootloader) slot-count:2
+(bootloader) has-slot:bootloader:yes
+(bootloader) has-slot:tos:yes
+(bootloader) has-slot:boot:yes
+(bootloader) has-slot:system:yes
+(bootloader) has-slot:vbmeta:yes
+(bootloader) has-slot:misc:no
+(bootloader) has-slot:vendor:yes
+(bootloader) has-slot:oem_bootloader:yes
+(bootloader) has-slot:factory:no
+(bootloader) has-slot:factory_bootloader:no
+(bootloader) has-slot:oem:yes
+(bootloader) has-slot:userdata:no
+(bootloader) current-slot:a
+(bootloader) slot-suffixes:a,b
+(bootloader) slot-successful:a:yes
+(bootloader) slot-successful:b:no
+(bootloader) slot-unbootable:a:no
+(bootloader) slot-unbootable:b:yes
+(bootloader) slot-retry-count:a:0
+(bootloader) slot-retry-count:b:0
+(bootloader) at-attest-dh:1:P256
+(bootloader) at-attest-uuid:
+all: Done!
+finished. total time: 0.636s
+```
+
+4. fastboot set_active < slot >
+
+功能：设置重启的slot。
+
+举例：fastboot set_active _a
+
+5. fastboot reboot
+
+功能：重启设备，正常启动
+
+举例：fastboot reboot
+
+6. fastboot reboot-bootloader
+
+功能：重启设备，进入fastboot模式
+
+举例：fastboot reboot-bootloader
+
+7. fastboot flashing unlock
+
+功能：解锁设备，允许烧写固件
+
+举例：fastboot flashing unlock
+
+8. fastboot flashing lock
+
+功能：锁定设备，禁止烧写
+
+举例：fastboot flashing lock
+
+9. fastboot stage [ < filename > ]
+
+功能：下载数据到设备端内存，内存起始地址为CONFIG_FASTBOOT_BUF_ADDR
+
+举例：fastboot stage atx_permanent_attributes.bin
+
+10. fastboot get_staged [ < filename > ]
+
+功能：从设备端获取数据
+
+举例：fastboot get_staged raw_atx_unlock_challenge.bin
+
+11. fastboot oem fuse at-perm-attr
+
+功能：烧写ATX及hash
+
+举例：fastboot stage atx_permanent_attributes.bin
+
+​           fastboot oem fuse at-perm-attr
+
+12. fastboot oem fuse at-perm-attr-data
+
+功能：只烧写ATX到安全存储区域（RPMB）
+
+举例：fastboot stage atx_permanent_attributes.bin
+
+​           fastboot oem fuse at-perm-attr-data
+
+13.  fastboot oem at-get-ca-request
+
+14.  fastboot oem at-set-ca-response
+15.  fastboot oem at-lock-vboot
+
+功能：锁定设备
+
+举例：fastboot oem at-lock-vboot
+
+16. fastboot oem at-unlock-vboot
+
+功能：解锁设备，现支持authenticated unlock
+
+举例：fastboot oem at-get-vboot-unlock-challenge
+​           fastboot get_staged raw_atx_unlock_challenge.bin
+
+​           ./make_unlock.sh（见make_unlock.sh参考）
+
+​           fastboot stage atx_unlock_credential.bin
+​	   fastboot oem at-unlock-vboot
+
+可以参考《how-to-generate-keys-about-avb.md》
+
+17. fastboot oem fuse at-bootloader-vboot-key
+
+功能：烧写bootloader key hash
+
+举例：fastboot stage bootloader-pub-key.bin
+
+​           fastboot oem fuse at-bootloader-vboot-key
+
+18. fastboot oem format
+
+功能：重新格式化分区，分区信息依赖于$partitions
+
+举例：fastboot oem format
+
+19. fastboot oem at-get-vboot-unlock-challenge
+
+功能：authenticated unlock，需要获得unlock challenge 数据
+
+举例：参见16. fastboot oem at-unlock-vboot
+
+20. fastboot oem at-reset-rollback-index
+
+功能：复位设备的rollback数据
+
+举例：fastboot oem at-reset-rollback-index
+
+21. fastboot oem at-disable-unlock-vboot
+
+功能：使fastboot oem at-unlock-vboot命令失效
+
+举例：fastboot oem at-disable-unlock-vboot
+
 ## 7. 固件加载
 
 固件加载涉及parameter/gpt分区表、boot、recovery、kernel、resource分区以及dtb文件。
@@ -1482,17 +1778,17 @@ tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
 
 bootRom出来后的第一段代码在Intermal SRAM(U-Boot叫IRAM), 可能是TPL或者SPL, 同时存在TPL和SPL时描述的是TPL的map, SPL的map类似.
 
-| **Name**       | **start addr** |**size** |**Desc** |
-| ------------------- | :------------- | :------------- | :----------- |
-| Bootrom  | IRAM_START | TPL_TEXT_BASE-IRAM_START | data and stack |
-| TAG	| TPL_TEXT_BASE     | 4 | RKXX |
-| text 	| TEXT_BASE     | sizeof(text) |  |
-| bss 	| text_end     | sizeof(bss) | append to text |
-| dtb 	| bss_end     | sizeof(dtb) | append to bss |
-| | | | |
-| SP 	| gd start     |  | stack |
-| gd 	| malloc_start - sizeof(gd)     | sizeof(gd) |  |
-| malloc 	| IRAM_END-MALLOC_F_LEN | *PL_SYS_MALLOC_F_LEN | malloc_simple |
+| **Name** | **start addr**            | **size**                 | **Desc**       |
+| -------- | :------------------------ | :----------------------- | :------------- |
+| Bootrom  | IRAM_START                | TPL_TEXT_BASE-IRAM_START | data and stack |
+| TAG      | TPL_TEXT_BASE             | 4                        | RKXX           |
+| text     | TEXT_BASE                 | sizeof(text)             |                |
+| bss      | text_end                  | sizeof(bss)              | append to text |
+| dtb      | bss_end                   | sizeof(dtb)              | append to bss  |
+|          |                           |                          |                |
+| SP       | gd start                  |                          | stack          |
+| gd       | malloc_start - sizeof(gd) | sizeof(gd)               |                |
+| malloc   | IRAM_END-MALLOC_F_LEN     | *PL_SYS_MALLOC_F_LEN     | malloc_simple  |
 
 text, bss, dtb的空间是编译时根据实际内容大小决定的；
 malloc, gd, SP是运行时根据配置来确定的位置；
@@ -1501,26 +1797,78 @@ malloc, gd, SP是运行时根据配置来确定的位置；
 ### U-Boot内存分布(relocate后)
 U-Boot代码一开始由前级Loader搬到TEXT_BASE的位置,U-Boot在探明实际可用DRAM空间后,把自己relocate到ram_top位置, 其中Relocation Offset = 'U-Boot start - TEXT_BASE'.
 
-| **Name**       | **start addr** |**size** |**Desc** |
-| ------------------- | :------------- | :------------- | :----------- |
-| ATF   | RAM_START | 0x200000 | Reserved for bl31 |
-| OP-TEE	| 0x8400000     | 2M~16M | 参考TEE开发手册 |
-| kernel fdt| fdt_addr_r |  | |
-| kernel | kernel_addr_r | | |
-| ramdisk | ramdisk_addr_r | ||
-| fastboot buffer | CONFIG_FASTBOOT_BUF_ADDR | CONFIG_FASTBOOT_BUF_SIZE | |
-| | | | |
-| SP		|  |  | stack |
-| FDT 	|  | sizeof(dtb) | U-Boot自带dtb |
-| GD 	|  | sizeof(gd) |  |
-| Board 	|  | sizeof(bd_t) | board info, eg. dram size |
-| malloc 	|  | TOTAL_MALLOC_LEN | 约64M |
-| U-Boot 	|  | sizeof(mon) | 含text, bss |
-| Video FB 	|     | fb size | 约32M |
-| TLB table 	| RAM_TOP-64K    | 32K |  |
+| **Name**        | **start addr**           | **size**                 | **Desc**                  |
+| --------------- | :----------------------- | :----------------------- | :------------------------ |
+| ATF             | RAM_START                | 0x200000                 | Reserved for bl31         |
+| OP-TEE          | 0x8400000                | 2M~16M                   | 参考TEE开发手册                 |
+| kernel fdt      | fdt_addr_r               |                          |                           |
+| kernel          | kernel_addr_r            |                          |                           |
+| ramdisk         | ramdisk_addr_r           |                          |                           |
+| fastboot buffer | CONFIG_FASTBOOT_BUF_ADDR | CONFIG_FASTBOOT_BUF_SIZE |                           |
+|                 |                          |                          |                           |
+| SP              |                          |                          | stack                     |
+| FDT             |                          | sizeof(dtb)              | U-Boot自带dtb               |
+| GD              |                          | sizeof(gd)               |                           |
+| Board           |                          | sizeof(bd_t)             | board info, eg. dram size |
+| malloc          |                          | TOTAL_MALLOC_LEN         | 约64M                      |
+| U-Boot          |                          | sizeof(mon)              | 含text, bss                |
+| Video FB        |                          | fb size                  | 约32M                      |
+| TLB table       | RAM_TOP-64K              | 32K                      |                           |
 
 Video FB/U-Boot/malloc/Board/GD/FDT/SP是由顶向下根据实际需求大小来分配的, 起始地址对齐到4K大小；
 ATF在armv8是必需的, 属于TE, armv7没有；
 OP-TEE在armv7属于TE+TOS, 可选, 根据是否需要TA来确定大小；在armv8属于bl32(TOS), 可选, 依据内含TA数量来确定大小；U-Boot在dram_init_banksize()函数解析实际占用空间；
 kernel fdt/kernel/ramdisk几个起始位置在includ/config/rkxx_common.h中的ENV_MEM_LAYOUT_SETTINGS定义,注意不能和已定义位置重合；
 FASTBOOT/ROCKUSB等下载功能的BUFFER地址,在config/evb-rkxx_defconfig中定义, FASTBOOT_BUF_ADDR注意不能和已定义位置重合, 可以跟上一条内容重合；
+
+### fastboot一些参考
+
+make_unlock.sh参考
+
+```
+#!/bin/sh
+python avb-challenge-verify.py raw_atx_unlock_challenge.bin atx_product_id.bin
+python avbtool make_atx_unlock_credential --output=atx_unlock_credential.bin --intermediate_key_certificate=atx_pik_certificate.bin --unlock_key_certificate=atx_puk_certificate.bin --challenge=atx_unlock_challenge.bin --unlock_key=testkey_atx_puk.pem
+```
+
+avb-challenge-verify.py源码
+
+```
+#/user/bin/env python
+"this is a test module for getting unlock challenge"
+import sys
+import  os
+from hashlib import sha256
+
+def challenge_verify():
+	if (len(sys.argv) != 3) :
+		print "Usage: rkpublickey.py [challenge_file] [product_id_file]"
+		return
+	if ((sys.argv[1] == "-h") or (sys.argv[1] == "--h")):
+		print "Usage: rkpublickey.py [challenge_file] [product_id_file]"
+		return
+	try:
+		challenge_file = open(sys.argv[1], 'rb')
+		product_id_file = open(sys.argv[2], 'rb')
+		challenge_random_file = open('atx_unlock_challenge.bin', 'wb')
+		challenge_data = challenge_file.read(52)
+		product_id_data = product_id_file.read(16)
+		product_id_hash = sha256(product_id_data).digest()
+		print("The challege version is %d" %ord(challenge_data[0]))
+		if (product_id_hash != challenge_data[4:36]) :
+			print("Product id verify error!")
+			return
+		challenge_random_file.write(challenge_data[36:52])
+		print("Success!")
+
+	finally:
+		if challenge_file:
+			challenge_file.close()
+		if product_id_file:
+			product_id_file.close()
+		if challenge_random_file:
+			challenge_random_file.close()
+
+if __name__ == '__main__':
+	challenge_verify()
+```
