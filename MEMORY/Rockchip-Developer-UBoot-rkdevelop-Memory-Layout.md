@@ -91,6 +91,10 @@
 
 （2）46~48M空间：64位平台下没有使用，32位平台下作为last log使用（64位平台last log在1~2M空间）；
 
+注意：
+
+系统上电的时候，maskrom会把miniloader加载到ddr的0x0偏移的地址，然后miniloader会把自己再relocate到48M偏移的地址进行（原因：历史遗留的做法）。所以在内存空间要求比较严苛的平台上，对于低地址的使用要特别注意（比如：last log不可以放在太低的地址，否则会被miniloader冲掉）。
+
 
 
 ## 2. 加载Kernel<u>之后</u>
