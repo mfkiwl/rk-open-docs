@@ -44,10 +44,10 @@
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明**   |
-| ---------- | ------ | ------ | ---------- |
-| 2018-02-28 | V1.0   | 陈健洪    | 初始版本       |
-| 2018-06-22 | V1.1   | 朱志展    | fastboot说明 |
+| **日期**     | **版本** | **作者** | **修改说明**                  |
+| ---------- | ------ | ------ | ------------------------- |
+| 2018-02-28 | V1.0   | 陈健洪    | 初始版本                      |
+| 2018-06-22 | V1.1   | 朱志展    | fastboot说明，OPTEE Client说明 |
 
 -----------
 
@@ -999,6 +999,15 @@ platform_key_read(KEY_ESC);
 ### 5.12  Vendor Storage
 
 Vendor Storage 是设计用来存放SN、MAC等不需要加密的小数据。数据存放在NVM（EMMC、NAND等）的保留分区中，有多个备份，更新数据时数据不丢失，可靠性高。详细的资料参考文档《appnote rk vendor storage》。
+
+### 5.13 OPTEE Client支持
+
+目前一些安全的操作需要在uboot这级操作或读取一些数据必须需要OPTEE帮忙获取。UBOOT里面实现了OPTEE Client代码，可以通过该接口与OPTEE通信。配置及说明如下：
+
+CONFIG_OPTEE_CLIENT，uboot调用trust总开关。
+CONFIG_OPTEE_V1，旧平台使用，如312x,322x,3288,3228H,3368,3399。
+CONFIG_OPTEE_V2，新平台使用，如3326,3308。
+CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION， 当emmc的rpmb不能用，才开这个宏，默认不开。
 
 ## 6. USB download
 
