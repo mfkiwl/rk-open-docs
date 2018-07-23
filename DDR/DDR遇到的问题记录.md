@@ -2,7 +2,7 @@
 **Rockchip**
 # **DDR遇到的问题记录**
 
-发布版本：1.1
+发布版本：1.2
 
 作者邮箱：hcy@rock-chips.com
 
@@ -30,6 +30,7 @@
 | ---------- | :----: | :----: | :------: |
 | 2017.10.26 |  V1.0  |  何灿阳   |          |
 | 2017.11.29 |  V1.1  |  汤云平   |   增加描述   |
+| 2018.07.30 |  V1.2  |  汤云平   |   增加描述   |
 
 --------------------
 [TOC]
@@ -717,3 +718,55 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 ## 解决方法
 
 将驱动强度改为150ohm 或者直接去除RZQ来增强驱动强度。
+
+------
+
+# RK3229
+
+## 问题：压力测试报错
+
+## 关键词：stressapptest，memtester报错
+
+## 现象描述
+
+memtester和stressapptest均会报错，stressapptest报错的概率更大。
+
+## 分析过程
+
+1. 从出错的log上看为DQ2和DQ10报错。比较奇怪为什么出错的bit会再不同DQS的同一个bit。
+
+2. 分别调整DQ2 和DQ10 的tx， rx de-skew并无改善， 看情况不像是DDR信号问题。
+
+3. 从出错的数据看错误总是出现在结尾0x668和0xe6c的地址上。将CPU定频在816Mhz stressapptest pass。
+
+   ![](DDR遇到的问题记录\cpu引起压力测试报错.png)
+
+## 问题原因
+
+​	该stressapptest为cpu异常引起的，将cpu频率降低之后stressapptest pass。 所以stressapptest报错并非一定是DDR引起的错误。
+
+------
+
+# RK3229
+
+## 问题：压力测试报错
+
+## 关键词：stressapptest，memtester报错
+
+## 现象描述
+
+压力测试报错，提高logic电压后变好。
+
+## 分析过程
+
+1. 扫描rx  dqs de-skew窗口发现个别DQS的rx 窗口偏小。正常DQS的rx 的有效窗口为DLL=0°， de-skew=2 到DLL=67.5°，de-skew=10。而异常的DQS rx有效窗口为DLL=0°，de-skew=2到DLL=67.5°， de-skew=7。 而默认600MHz下rx DLL/de-skew配置是 DLL=67.5°，de-skew=7. 这导致了异常板子其中一个DQS没有任何margin 引起死机。
+2. 我们的evb上测试到同样600M的情况下 rx DQS 的magin在 DLL=0°，de-skew=4到DLL=67.5°，de-skew=13.
+3. 以我们的evb为例 de-skew 每单位20ps算，600Mhz下rx DQS实际有效窗口约为500ps，以最优采样点再90°计算的话窗口最左侧：90°-500ps/2 = 0°+（4-7）* 20ps+rx固有delay，窗口最右侧90°+（500/2）ps=67.5°+（13-7）*20ps+rx固有delay。得到phy内部rx固有delay大概在230ps左右， 这比inno 给的140ps典型值大了90ps。
+4. 提高logic电压后phy内部固有的delay会变小，增大hold time margin，所以能改善问题。
+5. 客户板子将rx DQS 的de-skew 提前7个单位后解决该问题。
+
+## 结论
+
+1. 客户板子可能pcb等影响吃掉一定的rx DQS margin。
+2. 我们实际rx  DQS采样窗口按140ps的phy内部固定delay来设置的，会损失一定的hold time margin。
+3. 后续trust更新rx DLL设置小于400MHz时DLL设置为67.5°，400MHz到680MHz之间DLL设置为45°，大于680MHz时DLL设置为22.5°
