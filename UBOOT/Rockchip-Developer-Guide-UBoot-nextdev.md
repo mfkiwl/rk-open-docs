@@ -1,10 +1,11 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.10
+发布版本：1.11
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
 ​	Kever Yang <kever.yang@rock-chips.com>
+​	Jon Lin jon.lin@rock-chips.com
 
 日期：2018.07
 
@@ -45,11 +46,12 @@
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明**                  |
-| ---------- | ------ | ------ | ------------------------- |
-| 2018-02-28 | V1.00  | 陈健洪    | 初始版本                      |
-| 2018-06-22 | V1.01  | 朱志展    | fastboot说明，OPTEE Client说明 |
-| 2018-07-23 | V1.10  | 陈健洪    | 完善文档，更新和调整大部分章节           |
+| **日期**   | **版本** | **作者** | **修改说明**                        |
+| ---------- | -------- | -------- | ----------------------------------- |
+| 2018-02-28 | V1.00    | 陈健洪   | 初始版本                            |
+| 2018-06-22 | V1.01    | 朱志展   | fastboot说明，OPTEE Client说明      |
+| 2018-07-23 | V1.10    | 陈健洪   | 完善文档，更新和调整大部分章节      |
+| 2018-07-26 | V1.11    | 林鼎强   | 完善Nand、SFC SPI Flash存储驱动部分 |
 
 -----------
 
@@ -73,7 +75,7 @@ next-dev是Rockchip从U-Boot官方的v2017.09正式版本中切出来进行开�
 
 - 支持LVDS、EDP、MIPI、HDMI等显示设备；
 
-- 支持Emmc、Nand Flash、SPI NOR flash、SD卡、 U盘等存储设备启动；
+- 支持Emmc、Nand Flash、SPI Nand flash、SPI NOR flash、SD卡、 U盘等存储设备启动；
 
 - 支持FAT、EXT2、EXT4文件系统；
 
@@ -2027,19 +2029,19 @@ static const struct charge_image image[] = {
 
 ### 5.9 存储驱动
 
-U-Boot的存储驱动走的是标准的存储通用框架，所有接口都对接到block层支持文件系统。目前支持的存储设备有：Emmc、Nand Flash、SPI NOR flash。
+U-Boot的存储驱动走的是标准的存储通用框架，所有接口都对接到block层支持文件系统。目前支持的存储设备有：EMMC、Nand flash、SPI Nand flash、SPI Nor flash。
 
 #### 5.9.1 相关接口
 
-**获取存储类型：**
+**获取blk描述符：**
 
-```
+```c
 struct blk_desc *rockchip_get_bootdev(void)
 ```
 
 **读写接口：**
 
-```
+```c
 unsigned long blk_dread(struct blk_desc *block_dev, lbaint_t start,
 						lbaint_t blkcnt, void *buffer)
 unsigned long blk_dwrite(struct blk_desc *block_dev, lbaint_t start,
@@ -2071,6 +2073,59 @@ if (ret != 1) {
 	goto err;
 }
 ```
+
+#### 5.9.2 DTS配置
+
+****
+
+```
+&nandc {
+        u-boot,dm-pre-reloc;
+        status = "okay";
+};
+```
+
+***
+
+```
+&sfc {
+        u-boot,dm-pre-reloc;
+        status = "okay";
+};
+```
+
+注：nandc节点是与nand flash设备通信的控制器节点，sfc节点是与spi flash设备通信的控制器节点，如果只用nand flash设备或只用spi flash设备，可以只使能对应节点，而两个节点都使能也是兼容的。
+
+#### 5.9.3 defconfig配置
+
+**rknand**
+
+rknand通常是指drivers/rknand/目录下的存储驱动，其是针对大容量Nand flash设备所设计的存储驱动，通过Nandc host与Nand flash device通信，具体适用颗粒选型参考《RKNandFlashSupportList》，适用以下存储：
+
+- SLC、MLC、TLC Nand flash
+
+```
+CONFIG_RKNAND=y
+```
+
+**rkflash**
+
+rkflash则是drivers/rkflash/目录下的存储驱动，其是针对选用小容量存储的设备所设计的存储驱动，其中Nand flash设备通过Nandc host与Nand flash device通信，SPI flash通过sfc host与SPI flash devices通信，适用的存储设备主要包括：
+
+- 128MB和256MB的SLC Nand flash
+- 部分SPI Nand flash
+- 部分SPI Nor flash颗粒
+
+具体适用颗粒选型参考《RK SpiNor and  SLC Nand SupportList》。
+
+```
+CONFIG_RKFLASH=y
+CONFIG_RKNANDC_NAND=y
+CONFIG_RKSFC_NOR=y
+CONFIG_RKSFC_NAND=y
+```
+
+注意：rknand/驱动与rkflash/驱动的ftl框架不兼容，所以两个框架无法同时配置使能Nand设备。
 
 ### 5.10 串口支持
 
