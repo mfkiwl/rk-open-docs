@@ -226,6 +226,92 @@ MODULE_DEVICE_TABLE(of, spidev_dt_ids);
 
 ​	请参照Documentation/spi/spidev_test.c
 
+#### 2.5 SPI 做slave
+
+​	使用的接口和master模式一样，都是spi_read和spi_write。
+
+内核补丁，请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
+
+~~~
+diff --git a/drivers/spi/spi-rockchip.c b/drivers/spi/spi-rockchip.c
+index 060806e..38eecdc 100644
+--- a/drivers/spi/spi-rockchip.c
++++ b/drivers/spi/spi-rockchip.c
+@@ -519,6 +519,8 @@ static void rockchip_spi_config(struct rockchip_spi *rs)
+        cr0 |= ((rs->mode & 0x3) << CR0_SCPH_OFFSET);
+        cr0 |= (rs->tmode << CR0_XFM_OFFSET);
+        cr0 |= (rs->type << CR0_FRF_OFFSET);
++       if (rs->mode & SPI_SLAVE_MODE)
++               cr0 |= (CR0_OPM_SLAVE << CR0_OPM_OFFSET);
+
+        if (rs->use_dma) {
+                if (rs->tx)
+@@ -734,7 +736,7 @@ static int rockchip_spi_probe(struct platform_device *pdev)
+
+        master->auto_runtime_pm = true;
+        master->bus_num = pdev->id;
+-       master->mode_bits = SPI_CPOL | SPI_CPHA | SPI_LOOP;
++       master->mode_bits = SPI_CPOL | SPI_CPHA | SPI_LOOP | SPI_SLAVE_MODE;
+        master->num_chipselect = 2;
+        master->dev.of_node = pdev->dev.of_node;
+        master->bits_per_word_mask = SPI_BPW_MASK(16) | SPI_BPW_MASK(8);
+diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
+index dee1cb8..4172da1 100644
+--- a/drivers/spi/spi.c
++++ b/drivers/spi/spi.c
+@@ -1466,6 +1466,8 @@ of_register_spi_device(struct spi_master *master, struct device_node *nc)
+                spi->mode |= SPI_3WIRE;
+        if (of_find_property(nc, "spi-lsb-first", NULL))
+                spi->mode |= SPI_LSB_FIRST;
++       if (of_find_property(nc, "spi-slave-mode", NULL))
++               spi->mode |= SPI_SLAVE_MODE;
+
+        /* Device DUAL/QUAD mode */
+        if (!of_property_read_u32(nc, "spi-tx-bus-width", &value)) {
+diff --git a/include/linux/spi/spi.h b/include/linux/spi/spi.h
+index cce80e6..ce2cec6 100644
+--- a/include/linux/spi/spi.h
++++ b/include/linux/spi/spi.h
+@@ -153,6 +153,7 @@ struct spi_device {
+ #define        SPI_TX_QUAD     0x200                   /* transmit with 4 wires */
+ #define        SPI_RX_DUAL     0x400                   /* receive with 2 wires */
+ #define        SPI_RX_QUAD     0x800                   /* receive with 4 wires */
++#define        SPI_SLAVE_MODE  0x1000                  /* enable spi slave mode */
+        int                     irq;
+        void                    *controller_state;
+        void                    *controller_data;
+~~~
+
+dts配置：
+
+    &spi0 {
+        max-freq = <48000000>;   //spi internal clk, don't modify
+        spi_test@01 {
+                compatible = "rockchip,spi_test_bus0_cs1";
+                id = <1>;
+                reg = <1>;
+                //spi-max-frequency = <24000000>;  这不需要配
+                spi-cpha;
+                spi-cpol;
+                spi-slave-mode; 使能slave 模式， 只需改这里就行。
+        };
+    };
+注意：max-freq 必须是master clk的6倍以上，比如max-freq = <48000000>; master给过来的时钟必须小于8M。
+
+测试：
+
+spi 做slave， 要先启动slave read，再启动master write，不然会导致slave还没读完，master已经写完了。
+
+slave write，master read也是需要先启动slave write，因为只有master送出clk后，slave才会工作，同时master
+
+会立即发送或接收数据。
+
+在第三章节的基础上：
+
+先master : `echo write 0 1 16 > /dev/spi_misc_test`
+
+再slave:  `echo read 0 1 16 > /dev/spi_misc_test`
+
 
 
 ## 3 SPI 内核测试驱动
@@ -233,7 +319,10 @@ MODULE_DEVICE_TABLE(of, spidev_dt_ids);
 ### 3.1 内核驱动
 
 ~~~
-drivers/spi/spi-rockchip-test.c  需要手动添加编译
+drivers/spi/spi-rockchip-test.c
+需要手动添加编译：
+drivers/spi/Makefile
++obj-y                                  += spi-rockchip-test.o
 ~~~
 
 ### 3.2 DTS配置
@@ -261,6 +350,7 @@ drivers/spi/spi-rockchip-test.c  需要手动添加编译
                 spi-max-frequency = <24000000>;
                 spi-cpha;
                 spi-cpol;
+                spi-slave-mode; 使能slave 模式， 只需改这里就行。
         };
 };
 ~~~
