@@ -271,7 +271,7 @@ root@android:/ # cat /sys/kernel/debug/clk/clk_summary | grep uart
 
 ### 3.1 FIQ debugger, ttyFIQ0设备作为console
 
-#### 3.1.1 使能DTS节点
+#### 3.1.1 DTS使能fiq_debugger节点，禁止对应uart节点
 
 ```
 fiq_debugger: fiq-debugger {
@@ -284,7 +284,11 @@ fiq_debugger: fiq-debugger {
 		pinctrl-0 = <&uart2c_xfer>;     /*换了不同的串口后，需要配置iomux*/
 		interrupts = <GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH 0>;  /* 配置signal irq，一般可以是该SOC最大中断号加1 */
 		status = "okay";
-	};
+};
+禁止对应uart节点
+&uart2 {
+	status = "disabled";
+};
 ```
 该节点驱动加载后会注册/dev/ttyFIQ0设备，需要注意的是rockchip,serial-id 即便改了，注册的也是ttyFIQ0。
 
@@ -308,7 +312,7 @@ chosen {
 一般以下参数可以不指定，会用默认的console device，比如上面注册的ttyFIQ0。但如果指定为ttyS2的话，就不能敲命令了。
 
 ~~~
-commandline：androidboot.console=ttyFIQ0
+commandline：androidboot.console=ttyFIQ0  console=ttyFIQ0
 ~~~
 
 ### 3.2 ttySx设备作为console
@@ -342,16 +346,18 @@ console=uart8250,mmio32,0xff1a0000  已经包含early printk的功能
 一般以下参数可以不指定，会用默认的console device，比如上面注册的ttyS2。单如果指定为ttyFIQ0的话，就不能敲命令了。
 
 ~~~
-commandline：androidboot.console=ttyS2
+commandline：androidboot.console=ttyS2 console=ttyS2
 ~~~
 
-**注意 ：3.1和3.2不能同时存在，否则打印有问题**
+**注意 ：3.1和3.2不能同时存在，否则打印有问题。 fiq debugger的rockchip,serial-id = <x>; 与ttySx互斥，就是说某个串口被fiq debugger驱动用了，就不能作为普通串口用。**
+
+
 
 
 
 ### 3.3 关掉串口打印功能
 
-#### 3.3.1 去掉或禁止3.1和3.2的所有配置
+#### 3.3.1 去掉或禁止3.1或3.2的所有配置
 
 #### 3.3.2 去掉8250驱动console的配置
 
@@ -361,6 +367,8 @@ Device Drivers  --->
 		Serial drivers  --->
 			[ ] Console on 8250/16550 and compatible serial port
 ```
+
+如果不想修改这个配置的，需要再command line 增加console= ，什么都不指定，表示不适用console。
 
 #### 3.3.3 安卓去掉recovery对console的使用，否则恢复出场设置的时候会卡住
 
