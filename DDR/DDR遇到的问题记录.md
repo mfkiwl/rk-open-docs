@@ -770,3 +770,117 @@ memtester和stressapptest均会报错，stressapptest报错的概率更大。
 1. 客户板子可能pcb等影响吃掉一定的rx DQS margin。
 2. 我们实际rx  DQS采样窗口按140ps的phy内部固定delay来设置的，会损失一定的hold time margin。
 3. 后续trust更新rx DLL设置小于400MHz时DLL设置为67.5°，400MHz到680MHz之间DLL设置为45°，大于680MHz时DLL设置为22.5°
+
+-----
+
+# RK3399
+
+## 问题：LPDDR4 reboot报错
+
+### 关键词：LPDDR4， reboot，DDR 报错
+
+#### 现象描述
+
+三星或使用三星晶圆的才有这个问题。在reboot老化中，会在loader的DDR初始化中报错，出错log是
+
+`read addr 0x40008000 = 0x40000000`，出错地址不同板子不同，同一块板子多次测试也会有不同地址。而且出错时LPDDR4的频率才50MHz.
+
+#### 分析过程
+
+- 假设报错跟“现象描述”里一样，是低16bit的数据错。JTAG看到，出错地址随后的大片地址，全部都是低16bit数据全为0.就算这时候再去写，再读回来，也还是低16bit全为0
+
+- 怀疑PHY的低16bit异常了。但是看到其他地址的低16bit，又是能正常读写的。所以排除PHY的问题
+
+- 经过地址核对，发现地址跟bank有些相关，有些bank就一直会出错。另外一些bank没问题。
+
+- JTAG一直读出错地址，示波器测低16bit的read DQS，结果确实read DQS没有出来。所以感觉像是颗粒有问题，或者命令没有正确的收到
+
+- 另外有再次写这些出错地址，测量write DQS和DQ，相位和幅度都是正确的
+
+- 测量CA0-CA5，CS0-CS3、CKE0/1、RESET。只发现RESET有一段时间是中间电平，如下图。其他信号的幅度和相位都没有问题。
+
+  ![LP4_RESET_50MHz-fail](DDR遇到的问题记录/LP4_RESET_50MHz-fail.jpg)
+
+#### 问题原因
+
+最终确认，问题原因正是由于RESET信号的这段中间电平导致的。而这段中间电平，是由于366/272 ball颗粒只有一根RESET_n信号，硬件上把2个RK通道的RESET信号连在一起，然后再连到颗粒的RESET_n信号，导致二驱一，所以出了中间电平。硬件连接如下图
+
+![RK3399_LP4_DDR0_RST](DDR遇到的问题记录/RK3399_LP4_DDR0_RST.jpg)
+
+![RK3399_LP4_die_RESET_n](DDR遇到的问题记录/RK3399_LP4_die_RESET_n.jpg)
+
+#### 解决方法
+
+之前我们想到的方法是，把主控Channel 1的RESET驱动都设置为高阻态。这样相当于没接Channel 1的RESET，实测颗粒端的RESET_n信号也是正常的。
+
+但是，由于200ball的颗粒，是有2个RESET_n信号的，所以接法跟366/272 ball不同，是RK主控每个通道的RESET连接到对应颗粒的RESET_n，如下图：
+
+![RK3399_LP4_200_DDR0_RST](DDR遇到的问题记录/RK3399_LP4_200_DDR0_RST.jpg)
+
+![RK3399_LP4_200_die_DDR0_RST](DDR遇到的问题记录/RK3399_LP4_200_die_DDR0_RST.jpg)
+
+![RK3399_LP4_200_die_DDR1_RST](DDR遇到的问题记录/RK3399_LP4_200_die_DDR1_RST.jpg)
+
+所以，让Channel 1的RESET驱动为高阻态，是不行的，这样200ball的通道1颗粒是没有被正确复位的。
+
+最终，我们的方案是：
+
+- loader中类型探测时，LPDDR4最早探测。否则其他类型的探测，每个通道的RESET也是会动的，也一样会导致中间电平。
+
+- 变频时，不再去更新RESET的驱动强度，因为变频代码对驱动强度的更新是一个通道一个通道的做，这样就有时间差，对于366/272 ball这种RESET二驱一的情况，还是会产生一段时间的中间电平。
+
+  刚好，不管是哪种DDR类型，对RESET驱动强度的配置，都跟频率没关系，是个固定值，所以，我们在初始化配置后，就再也不去动它了。
+
+- 在loader对LPDDR4初始化时，为了兼顾366/272 ball和200ball这两种RESET的连接方式，我们采用pctl_start前让Channel 1 RESET驱动强度为240欧，Channel 0还是正常的40欧配置。然后保证Channel 0先初始化，即Channel 0的RESET先拉高，这时候由于Channel 1还是输出低的，但是由于驱动强度只有240欧，所以对于366/272 ball二驱一的最终电压是0.85*VDDQ，这个电压已经大于VIH(AC)，足够让颗粒认为这是一个有效的RESET_n信号了,如下图
+
+  ![366ball_only_ch0_rst_output](DDR遇到的问题记录/366ball_only_ch0_rst_output.jpg)
+
+  等到Channel 1也初始化时，它的RESET也会输出高电平，二驱一的最终电平就是VDDQ了，整个过程如下图。
+
+  ![366ball_ch0_rst_to_ch1_rst_delay](DDR遇到的问题记录/366ball_ch0_rst_to_ch1_rst_delay.jpg)
+
+  如果放大来看2个电平跳变的波形如下图
+
+  ![366ball_ch0_rst_output_to_ch1_rst_output_rise_time](DDR遇到的问题记录/366ball_ch0_rst_output_to_ch1_rst_output_rise_time.jpg)
+
+  而对于200ball，Channel 0初始化时，因为RESET是正常驱动强度，所以上升沿比较快，如下图
+
+  ![200ball_ch0_rst_output](DDR遇到的问题记录/200ball_ch0_rst_output.jpg)
+
+  但是Channel 1初始化时，由于RESET驱动强度只有240欧，所以只是信号上升时间被拉长，实测18ns，最终还是可以拉到高电平，如下图
+
+  ![200ball_ch1_rst_output](DDR遇到的问题记录/200ball_ch1_rst_output.jpg)
+
+  不用担心RESET上升时间变成，会导致后续命令在其上升期间发出，因为LPDDR4在RESET_n拉高后，还需要等待tINIT3，而tINIT3有2ms之多。
+
+  ![RK3399_LP4_tINIT3](DDR遇到的问题记录/RK3399_LP4_tINIT3.jpg)
+
+  这样就能完美的兼顾366/272ball和200ball的问题了。
+
+- 一定要保证Channel 0先初始化，否则如果Channel 1先初始化，这时候Channel 1 RESET是用240欧来驱动高电平，而Channel 0 RESET却是用40欧来驱动低电平，最终二驱一的电平0.14*VDDQ，根本不够VIH(AC)，不会被认为是有效RESET_n信号的，如下图
+
+  ![366ball_if_ch0_rst_first_ch0_40_ch1_240](DDR遇到的问题记录/366ball_if_ch0_rst_first_ch0_40_ch1_240.jpg)
+
+- 等pctl_start初始化完以后，我们还是将Channel 1 RESET驱动强度改成正常的40欧，主要是为了提高防静电能力，怕240欧抗静电能力不足。而且pctl_start后，两个Channel的RESET都输出高电平了，这时候修改驱动强度，并不会导致幅度变化。
+
+- 代码修改要不影响DDR3，因为DDR3也用这个RESET信号。
+
+
+
+
+
+
+
+下面作为模版放这，免得格式不同，要新增问题，可以从这里拷贝
+
+## 问题：
+
+### 关键词：
+
+#### 现象描述
+
+#### 分析过程
+
+#### 问题原因
+
+#### 解决方法
