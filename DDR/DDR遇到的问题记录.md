@@ -116,6 +116,8 @@ REBOOT测试时VCCIO会塌陷到2.5V,而RESET检测VCCIO的阀值为2.63V。所�
 ![RK3228B_VCCIO](DDR遇到的问题记录/RK3228B_VCCIO.jpg)
 ![RK3228B_RESET_IC](DDR遇到的问题记录/RK3228B_RESET_IC.jpg)
 
+
+
 -----
 # PX3
 ## 问题：贴2GB DDR3L，只识别到1GB容量
@@ -144,7 +146,9 @@ DDR3L是2个CS的颗粒，而客户原理图只连了一个CS0到颗粒。导致
 #### 解决办法
 无法解决，除非客户改版
 
-----
+
+
+
 ## 问题：免拆机loader无法进入测试模式
 #### 关键词：无法进入测试模式，无法进入maskrom，免拆机loader，DDR工具测试失败
 #### 现象描述
@@ -211,6 +215,8 @@ graph TD
 ```
 #### 解决办法：
 参考RK3128平台，在uboot中增加切换测试模式的支持
+
+
 
 ------
 
@@ -402,6 +408,8 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 
 主控下方GND补焊。
 
+
+
 ------
 
 # RK3229
@@ -455,6 +463,58 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 #### 解决方法
 
 将最小的cl,cwl 现在在6和5 解决该问题。
+
+
+
+## 问题：压力测试报错
+
+### 关键词：stressapptest，memtester报错
+
+#### 现象描述
+
+压力测试报错，提高logic电压后变好。
+
+#### 分析过程
+
+1. 扫描rx  dqs de-skew窗口发现个别DQS的rx 窗口偏小。正常DQS的rx 的有效窗口为DLL=0°， de-skew=2 到DLL=67.5°，de-skew=10。而异常的DQS rx有效窗口为DLL=0°，de-skew=2到DLL=67.5°， de-skew=7。 而默认600MHz下rx DLL/de-skew配置是 DLL=67.5°，de-skew=7. 这导致了异常板子其中一个DQS没有任何margin 引起死机。
+2. 我们的evb上测试到同样600M的情况下 rx DQS 的magin在 DLL=0°，de-skew=4到DLL=67.5°，de-skew=13.
+3. 以我们的evb为例 de-skew 每单位20ps算，600Mhz下rx DQS实际有效窗口约为500ps，以最优采样点再90°计算的话窗口最左侧：90°-500ps/2 = 0°+（4-7）* 20ps+rx固有delay，窗口最右侧90°+（500/2）ps=67.5°+（13-7）*20ps+rx固有delay。得到phy内部rx固有delay大概在230ps左右， 这比inno 给的140ps典型值大了90ps。
+4. 提高logic电压后phy内部固有的delay会变小，增大hold time margin，所以能改善问题。
+5. 客户板子将rx DQS 的de-skew 提前7个单位后解决该问题。
+
+#### 结论
+
+1. 客户板子可能pcb等影响吃掉一定的rx DQS margin。
+
+2. 我们实际rx  DQS采样窗口按140ps的phy内部固定delay来设置的，会损失一定的hold time margin。
+
+3. 后续trust更新rx DLL设置小于400MHz时DLL设置为67.5°，400MHz到680MHz之间DLL设置为45°，大于680MHz时DLL设置为22.5°
+
+
+
+## 问题：压力测试报错
+
+### 关键词：stressapptest，memtester报错
+
+#### 现象描述
+
+memtester和stressapptest均会报错，stressapptest报错的概率更大。
+
+#### 分析过程
+
+1. 从出错的log上看为DQ2和DQ10报错。比较奇怪为什么出错的bit会再不同DQS的同一个bit。
+
+2. 分别调整DQ2 和DQ10 的tx， rx de-skew并无改善， 看情况不像是DDR信号问题。
+
+3. 从出错的数据看错误总是出现在结尾0x668和0xe6c的地址上。将CPU定频在816Mhz stressapptest pass。
+
+   ![](DDR%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/cpu%E5%BC%95%E8%B5%B7%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E6%8A%A5%E9%94%99.png)
+
+#### 问题原因
+
+该stressapptest为cpu异常引起的，将cpu频率降低之后stressapptest pass。 所以stressapptest报错并非一定是DDR引起的错误。
+
+
 
 ------
 
@@ -656,21 +716,23 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 传递给ddr_sre_2_srx 的参数最好设置成全局变量直接引用，而不通过参数传递。
 
+
+
 ------
 
 # RK3188/RK3026
 
 ## 问题：系统死机花屏
 
-## 关键词：重影花屏
+### 关键词：重影花屏
 
-## 现象描述
+#### 现象描述
 
 系统开机或者运行过程中系统死机，没有任何一次log直接卡住，同时显示异常呈现竖条纹状重影花屏。
 
 ![显示重影](DDR遇到的问题记录\显示重影.jpg)
 
-## 分析过程
+#### 分析过程
 
 1. 出现显示重影，说明这时候ddr里的read出来的数据已经严重出错了。 比如读地址A，可能直接返回的是地址B的数据。
 
@@ -681,15 +743,19 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 4. 提高尝试修改ddr增大其他timing 无明显改善。
 5. 尝试bypass ddr dll  解决问题。 但是对于dram来说 dll 和odt是挂钩的， 如果dll bypass掉的话 odt也是无法正常工作的， 所以bypass dll 的话 同时也要考虑该频率点下odt关闭是否稳定的问题。
 
-## 问题原因
+#### 问题原因
 
 怀疑参考层较差引起颗粒内部电源环境恶化，导致dll 失锁引起的数据读写异常。
 
-## 解决方法
+#### 解决方法
 
 1. 通过提高vcc_ddr电压解决该问题。
+
 2. bypass 颗粒端的dll 解决该问题。
+
 3. 改善layout 上参考层的完整性。
+
+
 
 ------
 
@@ -697,13 +763,13 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 ## 问题：系统死机
 
-## 关键词：三星 LPDDR3 pop， RZQ，驱动强度
+### 关键词：三星 LPDDR3 pop， RZQ，驱动强度
 
-## 现象描述
+#### 现象描述
 
 颗粒型号K3PE0E000M，K3PE0E000A开机过程中死机。
 
-## 分析过程
+#### 分析过程
 
 1. 查看电源纹波正常。
 2. 降低ddr频率效果不明显。
@@ -711,65 +777,15 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 4. 提高ddr驱动强度到34ohm并不明显。
 5. 改小或者去除RZQ后 驱动强度有明显改善。
 
-## 问题原因
+#### 问题原因
 
 由于是pop封装，怀疑该批次颗粒是samsung为特殊客户定制故意减弱驱动强度的。 read的驱动强度太弱导致读异常。
 
-## 解决方法
+#### 解决方法
 
 将驱动强度改为150ohm 或者直接去除RZQ来增强驱动强度。
 
-------
 
-# RK3229
-
-## 问题：压力测试报错
-
-## 关键词：stressapptest，memtester报错
-
-## 现象描述
-
-memtester和stressapptest均会报错，stressapptest报错的概率更大。
-
-## 分析过程
-
-1. 从出错的log上看为DQ2和DQ10报错。比较奇怪为什么出错的bit会再不同DQS的同一个bit。
-
-2. 分别调整DQ2 和DQ10 的tx， rx de-skew并无改善， 看情况不像是DDR信号问题。
-
-3. 从出错的数据看错误总是出现在结尾0x668和0xe6c的地址上。将CPU定频在816Mhz stressapptest pass。
-
-   ![](DDR遇到的问题记录\cpu引起压力测试报错.png)
-
-## 问题原因
-
-​	该stressapptest为cpu异常引起的，将cpu频率降低之后stressapptest pass。 所以stressapptest报错并非一定是DDR引起的错误。
-
-------
-
-# RK3229
-
-## 问题：压力测试报错
-
-## 关键词：stressapptest，memtester报错
-
-## 现象描述
-
-压力测试报错，提高logic电压后变好。
-
-## 分析过程
-
-1. 扫描rx  dqs de-skew窗口发现个别DQS的rx 窗口偏小。正常DQS的rx 的有效窗口为DLL=0°， de-skew=2 到DLL=67.5°，de-skew=10。而异常的DQS rx有效窗口为DLL=0°，de-skew=2到DLL=67.5°， de-skew=7。 而默认600MHz下rx DLL/de-skew配置是 DLL=67.5°，de-skew=7. 这导致了异常板子其中一个DQS没有任何margin 引起死机。
-2. 我们的evb上测试到同样600M的情况下 rx DQS 的magin在 DLL=0°，de-skew=4到DLL=67.5°，de-skew=13.
-3. 以我们的evb为例 de-skew 每单位20ps算，600Mhz下rx DQS实际有效窗口约为500ps，以最优采样点再90°计算的话窗口最左侧：90°-500ps/2 = 0°+（4-7）* 20ps+rx固有delay，窗口最右侧90°+（500/2）ps=67.5°+（13-7）*20ps+rx固有delay。得到phy内部rx固有delay大概在230ps左右， 这比inno 给的140ps典型值大了90ps。
-4. 提高logic电压后phy内部固有的delay会变小，增大hold time margin，所以能改善问题。
-5. 客户板子将rx DQS 的de-skew 提前7个单位后解决该问题。
-
-## 结论
-
-1. 客户板子可能pcb等影响吃掉一定的rx DQS margin。
-2. 我们实际rx  DQS采样窗口按140ps的phy内部固定delay来设置的，会损失一定的hold time margin。
-3. 后续trust更新rx DLL设置小于400MHz时DLL设置为67.5°，400MHz到680MHz之间DLL设置为45°，大于680MHz时DLL设置为22.5°
 
 -----
 
