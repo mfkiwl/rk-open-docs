@@ -1,13 +1,14 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.11
+发布版本：1.12
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
 ​	Kever Yang <kever.yang@rock-chips.com>
 ​	Jon Lin jon.lin@rock-chips.com
+​	Chen Liang cl@rock-chips.com
 
-日期：2018.07
+日期：2018.08
 
 文件密级：公开资料
 
@@ -52,6 +53,7 @@
 | 2018-06-22 | V1.01    | 朱志展   | fastboot说明，OPTEE Client说明      |
 | 2018-07-23 | V1.10    | 陈健洪   | 完善文档，更新和调整大部分章节      |
 | 2018-07-26 | V1.11    | 林鼎强   | 完善Nand、SFC SPI Flash存储驱动部分 |
+| 2018-08-08 | V1.12    | 陈亮     | 增加HW-ID使用说明                  |
 
 -----------
 
@@ -2854,6 +2856,123 @@ Starting kernel ...
 ```
 pre-loader => trust => U-Boot => kernel
 ```
+
+### 7.8 HW-ID适配硬件版本
+
+#### 7.8.1 HW-ID设计目的
+
+硬件会经常更新版本，更换一些元器件，比如，屏幕，wifi模组等，如果每一个版本硬件，都要一套软件，就会比较麻烦，通过HW_ID，可以保证一套软件适配不同版本的硬件。
+
+#### 7.8.2 HW-ID设计原理
+
+把多份dtb文件打包到同一个resource.img里面，U-Boot引导kernel的时候，从resource.img里面找到一份和当前硬件版本匹配的dtb，并传递给kernel，加载不同的软件配置。通过硬件配置ADC/GPIO的唯一值，可以确定当前的硬件版本，U-Boot就可以找到对应的dtb文件。
+
+
+#### 7.8.3 硬件参考设计
+
+目前支持ADC和GPIO两种方式确定硬件版本。
+
+##### ADC参考设计
+
+RK3326-EVB\PX30-EVB主板上有预留分压电阻，不同的电阻分压可以确定不同的硬件版本号:
+
+![RK3326-PX30-HW-ID1](Rockchip-Developer-Guide-UBoot-nextdev/RK3326-PX30-HW-ID1.png)
+
+配套使用的MIPI屏小板预留有另外一颗下拉电阻:
+
+![RK3326-PX30-HW-ID2](Rockchip-Developer-Guide-UBoot-nextdev/RK3326-PX30-HW-ID2.png)
+
+不同的mipi屏会配置不同的阻值，配合EVB主板确定一个唯一的ADC参数值。
+
+目前V1版本的ADC计算方法：ADC参数最大值为1024，对应着ADC_IN0引脚被直接上拉到供电电压1.8V,MIPI屏上有一颗10K的下拉电阻，接通EVB板后，ADC=1024*10K/(10K + 51K) =167.8。
+
+##### GPIO参考设计
+
+（目前没有GPIO的硬件参考设计）
+
+#### 7.8.4 软件配置
+
+把ADC和GPIO的信息放在dtb的文件名里面，U-Boot解析dtb的时候，从文件名中获取到当前dtb文件支持的硬件版本，并和实际的硬件版本做匹配。
+
+##### ADC作为HW_ID的dtb文件命名规则
+
+1. 文件名以“.dtb”结尾；
+
+2. HW_ID格式： #_[controller]_ch[channel]=[adcval]
+
+   ​	\[controller\]: dts里面ADC控制器的节点名字。
+
+   ​	\[channel\]: ADC通道。
+
+   ​	\[adcval\]: ADC的中心值，实际有效范围是：adcval+-30。
+
+3. 上述（2）表示一个完整含义，必须使用小写字母，一个完整含义内不能有空格之类的字符；
+
+4. 多个含义之间通过#进行分隔，最多支持10个完整含义；
+
+合法范例：
+
+rk3326-evb-lp3-v10#_saradc_ch2=111#_saradc_ch1=810.dtb
+
+rk3326-evb-lp3-v10#_saradc_ch2=569.dtb
+
+##### GPIO作为HW_ID的dtb命令规则
+
+1. 文件名以“.dtb”结尾；
+
+2. HW_ID格式：#gpio[pin]=[levle]
+
+  ​	\[pin\]: GPIO脚，如0a2表示gpio0a2
+
+  ​	\[levle\]: GPIO引脚电平。
+
+3. 上述（2）表示一个完整含义，必须使用小写字母，一个完整含义内不能有空格之类的字符；
+
+4. 多个含义之间通过#进行分隔，最多支持10个完整含义；
+
+合法范例：rk3326-evb-lp3-v10#gpio0a2=0#gpio0c3=1.dtb
+
+#### 7.8.5 代码位置
+
+代码实现位置在uboot工程：arch/arm/mach-rockchip/resource_img.c，主要包含下面两个函数：
+
+```
+static int rockchip_read_dtb_by_gpio(const char *file_name)；
+static int rockchip_read_dtb_by_adc(const char *file_name)；
+```
+
+#### 7.8.6 打包脚本
+
+通过脚本，可以很方便地把多个dtb打包到一个resource.img里面，脚本位置在kernel工程：scripts/mkmultidtb.py，打开脚本文件，把需要打包的dtb文件写到DTBS字典里面，并填上对应的ADC/GPIO的配置信息。
+
+```p
+...
+
+DTBS = {}
+
+DTBS['PX30-EVB'] = OrderedDict([('rk3326-evb-lp3-v10', '#_saradc_ch0=166'),
+				('px30-evb-ddr3-lvds-v10', '#_saradc_ch0=512')])
+...
+```
+
+以上例子，执行scripts/mkmultidtb.py PX30-EVB，就会生成包含多份dtb的resource.img，包含以下三个dtb:
+
+rk-kernel.dtb：rk默认的dtb，所有dtb都没匹配到时，会使用这个dtb，打包脚本使用DTBS的第一个dtb作为默认的dtb；
+
+rk3326-evb-lp3-v10#_saradc_ch0=166.dtb：包含ADC信息的rk3326 dtb文件；
+
+px30-evb-ddr3-lvds-v10#_saradc_ch0=512.dtb： 包含ADC信息的px30 dtb文件；
+
+#### 7.8.7 确认当前的dtb
+
+下面是开机U-Boot的log：
+
+mmc0(part 0) is current device
+boot mode: None
+**DTB: rk3326-evb-lp3-v10#_saradc_ch0=166.dtb**
+Using kernel dtb
+
+从这个log可以看出来，当前硬件版本匹配到了resource.img里面的rk3326-evb-lp3-v10#_saradc_ch0=166.dtb，如果匹配失败，则会使用rk-kernel.dtb。
 
 ## 8. SPL和TPL
 
