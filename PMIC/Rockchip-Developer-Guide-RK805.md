@@ -64,13 +64,13 @@ RK805 是一款高性能 PMIC，RK805集成4个大电流DCDC、3个LDO、1个RTC
 
 ### 1.3 芯片引脚功能
 
-![RK805-pins-list](S:\internal-docs\PMIC\Rockchip-Developer-Guide-RK805\RK805-pins-list.png)
+![RK805-pins-list](Rockchip-Developer-Guide-RK805\RK805-pins-list.png)
 
 下面描述中，SLEEP和INT引脚需要重点关注：
 
-![RK805-pins-function-1](S:\internal-docs\PMIC\Rockchip-Developer-Guide-RK805\RK805-pins-function-1.png)
+![RK805-pins-function-1](Rockchip-Developer-Guide-RK805\RK805-pins-function-1.png)
 
-![RK805-pins-function-2](S:\internal-docs\PMIC\Rockchip-Developer-Guide-RK805\RK805-pins-function-2.png)
+![RK805-pins-function-2](Rockchip-Developer-Guide-RK805\RK805-pins-function-2.png)
 
 ### 1.4 重要概念
 
@@ -146,7 +146,7 @@ RK805 是一款高性能 PMIC，RK805集成4个大电流DCDC、3个LDO、1个RTC
 
    每款SOC平台对各路电源上电时序要求可能不一样，目前上电时序有如下情况，具体请参考最新的datasheet：
 
-![RK805-power-start-seq](S:\internal-docs\PMIC\Rockchip-Developer-Guide-RK805\RK805-power-start-seq.png)
+![RK805-power-start-seq](Rockchip-Developer-Guide-RK805\RK805-power-start-seq.png)
 
 
 ## 2 配置
