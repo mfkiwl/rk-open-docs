@@ -1840,7 +1840,7 @@ regulator-init-microvolt = <1100000>// 初始化电压设置为1.1v
 
 把上述的"false"修改"true"即可打印出各路regulator的配置。如下：
 
-![UBoot-nextdev-probe-regulator-list](S:\internal-docs\UBOOT\UBoot-nextdev-png\UBoot-nextdev-probe-regulator-list.png)
+![UBoot-nextdev-probe-regulator-list](Rockchip-Developer-Guide-UBoot-nextdev\UBoot-nextdev-probe-regulator-list.png)
 
 内容说明：
 
@@ -3368,7 +3368,7 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 
 打印dts配置和当前实际各路电压情况：
 
-![UBoot-nextdev-rktest-regulator](S:\internal-docs\UBOOT\UBoot-nextdev-png\UBoot-nextdev-rktest-regulator.png)
+![UBoot-nextdev-rktest-regulator](Rockchip-Developer-Guide-UBoot-nextdev\UBoot-nextdev-rktest-regulator.png)
 
 调压精度测试：
 
