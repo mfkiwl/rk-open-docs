@@ -412,7 +412,7 @@ graph TD;
 
 ​	Inno USB3.0 PHY 只支持Super-speed，没有向下兼容High-Speed，所以需要和Inno USB2.0 PHY组成一个Combo PHY。如下图3-1 是一个典型的 USB3.0 OTG 架构图。
 
-![USB3-OTG-Block-Diagram](Rockchip-Developer-Guide-USB-PHY/USB3-OTG-Block-Diagram.bmp)
+![USB3-OTG-Block-Diagram](Rockchip-Developer-Guide-USB-PHY/USB3-OTG-Block-Diagram.png)
 
 图3-1 USB3.0 OTG Block Diagram
 
