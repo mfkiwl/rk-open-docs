@@ -1,6 +1,6 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.12
+发布版本：1.20
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -47,13 +47,14 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**                        |
-| ---------- | -------- | -------- | ----------------------------------- |
-| 2018-02-28 | V1.00    | 陈健洪   | 初始版本                            |
-| 2018-06-22 | V1.01    | 朱志展   | fastboot说明，OPTEE Client说明      |
-| 2018-07-23 | V1.10    | 陈健洪   | 完善文档，更新和调整大部分章节      |
-| 2018-07-26 | V1.11    | 林鼎强   | 完善Nand、SFC SPI Flash存储驱动部分 |
-| 2018-08-08 | V1.12    | 陈亮     | 增加HW-ID使用说明                  |
+| **日期**     | **版本** | **作者** | **修改说明**                   |
+| ---------- | ------ | ------ | -------------------------- |
+| 2018-02-28 | V1.00  | 陈健洪    | 初始版本                       |
+| 2018-06-22 | V1.01  | 朱志展    | fastboot说明，OPTEE Client说明  |
+| 2018-07-23 | V1.10  | 陈健洪    | 完善文档，更新和调整大部分章节            |
+| 2018-07-26 | V1.11  | 林鼎强    | 完善Nand、SFC SPI Flash存储驱动部分 |
+| 2018-08-08 | V1.12  | 陈亮     | 增加HW-ID使用说明                |
+| 2018-09-20 | V1.20  | 张晴     | 增加CLK使用说明                  |
 
 -----------
 
@@ -1466,22 +1467,154 @@ int irq_handler_disable(int irq);
 int irq_set_irq_type(int irq, unsigned int type);
 ```
 
-### 5.2 CLOCK支持
+### 5.2 CLOCK驱动
 
-驱动代码位于drivers/clk/rockchip目录, 每颗芯片有一份独立的驱动.
-驱动probe时会调用rkclk_init()函数对CPU和通用BUS进行初始化, 其他模块的clock如eMMC, I2C等在各自的驱动初始化时调用clk_get_by_indel()或者clk_get_by_name()获取clk句柄, 然后调用clk_set_rate()进行设置.
+#### 5.2.1 框架支持
 
-U-Boot只提供了已使用设备的clock驱动, 没有提供整个SoC完整的clock驱动, 所以如果新增驱动需要先确认clock驱动中是否有相应接口.
+CLK使用的是clk-uclass的通用框架，相关接口由uclass框架提供。
 
-[TODO]
-assigned-clocks
-CPU clock init
+1. probe中会rkclk_init（）可以设置部分PLL、CPU、总线等频率，可用于SPL阶段提高频率加速开机。
+
+```c
+./drivers/clk/rockchip/clk_rk3399.c
+
+static void rkclk_init(struct rk3399_cru *cru)
+{
+	rk3399_configure_cpu(cru, APLL_600_MHZ, CPU_CLUSTER_LITTLE);
+
+	/* configure perihp aclk, hclk, pclk */
+	aclk_div = DIV_ROUND_UP(GPLL_HZ, PERIHP_ACLK_HZ) - 1;
+
+	hclk_div = PERIHP_ACLK_HZ / PERIHP_HCLK_HZ - 1;
+	assert((hclk_div + 1) * PERIHP_HCLK_HZ ==
+	       PERIHP_ACLK_HZ && (hclk_div <= 0x3));
+
+	pclk_div = PERIHP_ACLK_HZ / PERIHP_PCLK_HZ - 1;
+	assert((pclk_div + 1) * PERIHP_PCLK_HZ ==
+	       PERIHP_ACLK_HZ && (pclk_div <= 0x7));
+
+	rk_clrsetreg(&cru->clksel_con[14],
+		     PCLK_PERIHP_DIV_CON_MASK | HCLK_PERIHP_DIV_CON_MASK |
+		     ACLK_PERIHP_PLL_SEL_MASK | ACLK_PERIHP_DIV_CON_MASK,
+		     pclk_div << PCLK_PERIHP_DIV_CON_SHIFT |
+		     hclk_div << HCLK_PERIHP_DIV_CON_SHIFT |
+		     ACLK_PERIHP_PLL_SEL_GPLL << ACLK_PERIHP_PLL_SEL_SHIFT |
+		     aclk_div << ACLK_PERIHP_DIV_CON_SHIFT);
+
+	rkclk_set_pll(&cru->gpll_con[0], &gpll_init_cfg);
+}
+```
+
+2. probe中增加clk_set_defaults解析cru节点设置assigned-clock的频率。
+
+```c
+./drivers/clk/rockchip/clk_px30.c
+
+ret = clk_set_defaults(dev);
+	if (ret)
+		debug("%s clk_set_defaults failed %d\n", __func__, ret);
+```
+
+```c
+./arch/arm64/boot/dts/rockchip/px30.dtsi
+
+		......
+		assigned-clocks =
+			<&pmucru PLL_GPLL>, <&pmucru PCLK_PMU_PRE>,
+			<&pmucru SCLK_WIFI_PMU>, <&cru ARMCLK>,
+			<&cru ACLK_BUS_PRE>, <&cru ACLK_PERI_PRE>,
+			<&cru HCLK_BUS_PRE>, <&cru HCLK_PERI_PRE>,
+			<&cru PCLK_BUS_PRE>, <&cru SCLK_GPU>;
+		assigned-clock-rates =
+			<1200000000>, <100000000>,
+			<26000000>, <600000000>,
+			<200000000>, <200000000>,
+			<150000000>, <150000000>,
+			<100000000>, <200000000>;
+		......
+```
+
+3. CPU提频开机加速
+
+  CPU频率设置可以使用上述中的2设置，但是需要注意电压是否足够，如果不够，在设置频率之前要设置电压，电压可以通过在对应的regulator节点下追加regulator-init-microvolt=<...>指定初始化电压。
+
+```c
+./arch/arm64/boot/dts/rockchip/px30-evb-ddr4-v10.dts
+
+	......
+	vdd_arm: DCDC_REG2 {
+		......
+		regulator-init-microvolt = <1100000>;
+		......
+	};
+```
+
+**框架代码：**
+
+```
+./drivers/clk/clk-uclass.c
+```
+
+**驱动代码：**
+
+```
+./drivers/clk/rockchip/clk_rkxxx.c
+./drivers/clk/rockchip/clk_pll.c
+```
+驱动代码位于drivers/clk/rockchip目录, 每颗芯片有一份独立的驱动。clk_pll.c是公用代码。
+
+#### 5.2.2 相关接口
+
+1. **clk 接口**
+
+使用clk-ops结构注册clk的接口，设备最常使用的接口：
+
+```
+ulong (*get_rate)(struct clk *clk);
+ulong (*set_rate)(struct clk *clk, ulong rate);
+int (*get_phase)(struct clk *clk);
+int (*set_phase)(struct clk *clk, int degrees);
+int (*set_parent)(struct clk *clk, struct clk *parent);
+```
+
+2. **代码范例**
+
+```c
+ret = clk_get_by_name(crtc_state->dev, "dclk_vop", &dclk);
+或者
+/* clocks = <&cru ACLK_VOPB>, <&cru DCLK_VOPB>, <&cru HCLK_VOPB>; */
+ret = clk_get_by_index(rtc_state->dev, 1, &dclk)
+
+if (!ret)
+	ret = clk_set_rate(&dclk, mode->clock * 1000);
+if (IS_ERR_VALUE(ret)) {
+	printf("%s: Failed to set dclk: ret=%d\n", __func__, ret);
+	return ret;
+}
+```
+
+3. **clk init**
+
+有三种方式实现部分时钟的init:
+
+- 驱动probe时会调用rkclk_init()函数对PLL、CPU和通用BUS进行初始化， 详细上文有描述；
+- 使用clk_set_defaults（dev），解析内核cru节点中的assigned-clocks 设置初始频率， 详细上文有描述；目前除了cru节点会解析assigned-clocks 设置初始频率，又在VOP和GMAC中增加此功能用于频率设置及PARENT设置。后续其他设备驱动里如果需要此功能请自行增加。
+
+
+- 其他设备的时钟设置，如eMMC, I2C等在各自的驱动初始化时调用clk_get_by_indel()或者clk_get_by_name()获取clk句柄, 然后调用clk_set_rate()进行设置。
+
+4. **clk dump**
+
+
+在clks_dump结构中增加想打印出的时钟的ID，然后使用soc_clk_dump()函数打印。目前默认会打印PLL、CPU、总线频率，如果需要其他时钟频率自行增加。
+
+备注：U-Boot只提供了已使用设备的clock驱动, 没有提供整个SoC完整的clock驱动, 所以如果新增驱动，需要先确认clock驱动中是否有相应接口。
 
 ### 5.3 GPIO驱动
 
 #### 5.3.1 框架支持
 
-GPIO走的是gpio-uclass的通用框架，相关接口由uclass框架提供。框架里管理GPIO的核心结构体是
+GPIO使用的是gpio-uclass的通用框架，相关接口由uclass框架提供。框架里管理GPIO的核心结构体是
 
 struct gpio_desc。这个结构体必须依赖device而存在，所以如果想要操作某个gpio，则必须要有对应的device设备存在。
 
