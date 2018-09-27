@@ -8,7 +8,7 @@
 ​	Jon Lin jon.lin@rock-chips.com
 ​	Chen Liang cl@rock-chips.com
 
-日期：2018.08
+日期：2018.11
 
 文件密级：公开资料
 
@@ -47,14 +47,15 @@
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明**                   |
-| ---------- | ------ | ------ | -------------------------- |
-| 2018-02-28 | V1.00  | 陈健洪    | 初始版本                       |
-| 2018-06-22 | V1.01  | 朱志展    | fastboot说明，OPTEE Client说明  |
-| 2018-07-23 | V1.10  | 陈健洪    | 完善文档，更新和调整大部分章节            |
-| 2018-07-26 | V1.11  | 林鼎强    | 完善Nand、SFC SPI Flash存储驱动部分 |
-| 2018-08-08 | V1.12  | 陈亮     | 增加HW-ID使用说明                |
-| 2018-09-20 | V1.20  | 张晴     | 增加CLK使用说明                  |
+| **日期**   | **版本** | **作者** | **修改说明**                                                 |
+| ---------- | -------- | -------- | ------------------------------------------------------------ |
+| 2018-02-28 | V1.00    | 陈健洪   | 初始版本                                                     |
+| 2018-06-22 | V1.01    | 朱志展   | fastboot说明，OPTEE Client说明                               |
+| 2018-07-23 | V1.10    | 陈健洪   | 完善文档，更新和调整大部分章节                               |
+| 2018-07-26 | V1.11    | 林鼎强   | 完善Nand、SFC SPI Flash存储驱动部分                          |
+| 2018-08-08 | V1.12    | 陈亮     | 增加HW-ID使用说明                                            |
+| 2018-09-20 | V1.13    | 张晴     | 增加CLK使用说明                                              |
+| 2018-11-06 | V1.20    | 陈健洪   | 增加/更新defconfig/rktest/probe/interrupt/kernel dtb/uart/atags |
 
 -----------
 
@@ -216,13 +217,20 @@ Device - an instance of a driver, tied to a particular port or peripheral.
 
 如果要新增一个defconfig文件，命名方面并没有特殊的格式要求，建议遵循现有大多数defconfig的命名方式：[board]-[chip]_defconfig。
 
-### 2.5 dtb使用
+### 2.5 dtb的使用
+
+#### 2.5.1 启用kernel dtb
 
 U-Boot的启动从时间先后来划分，可以分为两级启动阶段。
 
 1. 第一级（relocate之前）：使用的是U-Boot自己的dtb。
 
-   一般第一阶段只需要加载emmc、nand、cru、grf、uart等模块，为了加快设备树的解析过程，dts里一般只去使能会用到的节点。需要特别注意：第一阶段要使能的节点除了指明 "status=okay" 之外，还必须增加"u-boot,dm-pre-reloc;"属性，否则解析设备树时该节点会被忽略。这部分一般都在平台相关的[chip]-u-boot.dtsi里定义，例如：
+    一般第一阶段**只需要加载emmc、nand、cru、grf、uart等模块**，为了加快设备树的解析过程，dts里一般只去使能会用到的节点（板级差异的信息，如：电源、显示、clk等都会从第二阶段dtb中获取）。
+
+   需要特别注意：
+
+   - 第一阶段为了速度和效率，会对dtb做特殊处理，删除一些属性，例如：pinctrl-0 pinctrl-names clock-names interrupt-parent等，可以通过defconfig里的CONFIG_OF_SPL_REMOVE_PROPS指定。
+   - 第一阶段要使能的节点除了指明 "status=okay" 之外，还必须增加"u-boot,dm-pre-reloc;"属性，否则解析设备树时该节点会被忽略。这部分一般都在平台相关的[chip]-u-boot.dtsi里定义，例如：
 
 ```
 ./arch/arm/dts/px30-u-boot.dtsi
@@ -249,13 +257,19 @@ U-Boot的启动从时间先后来划分，可以分为两级启动阶段。
 ......
 ```
 
-
 2. 第二级启动（relocate之后）：使用的是kernel的dtb。
 
-   一旦进入第二级阶段后，启动流程里会迅速切到kernel的dtb(取决于CONFIG_USING_KERNEL_DTB是否使能），后续更多的驱动初始化都是使用kernel的dtb信息。
-
+一旦进入第二级阶段后，启动流程里会迅速切到kernel的dtb(取决于CONFIG_USING_KERNEL_DTB是否使能），后续更多的驱动初始化都是使用kernel的dtb信息。
 
 一般而言，用户可能会涉及第二阶段的修改，第一阶比较少需要改动。关于kernel dtb的更详细内容，可以参考本文的 [9. U-Boot和kernel DTB支持](#9. U-Boot和kernel DTB支持) 。
+
+#### 2.5.2 关闭kernel dtb
+
+如果出于某些特殊原因想要关闭kernel dtb的功能，即让U-Boot始终都使用U-Boot自身的dtb，则有如下操作点和注意事项。以rk3399为例，使用的是rk3399-evb.dts和rk3399_defconfig：
+
+- rk3399_defconfig：关闭CONFIG_USING_KERNEL_DTB；
+- rk3399-evb.dts：保留#include "rk3399-u-boot.dtsi"、chosen节点内容、各节点中的“u-boot,dm-pre-reloc;”属性（这些部分都是U-Boot特殊自用的内容，需要保留）；
+- 在第二点保留项的基础上，再追加kernel dts的内容**（注意：是追加，不是覆盖！）**。
 
 ### 2.6 宏配置
 
@@ -352,7 +366,7 @@ debug()函数默认定义为空函数，通过增加DEBUG宏定义就可以让de
 
 ##### 2.7.1.2 Early Debug UART
 
-参考本文档[5.10.2 Early Debug UART](#5.10.2 Early Debug UART)。
+参考本文档[5.10.2 Early Debug UART配置](#5.10.2 Early Debug UART配置)。
 
 ##### 2.7.1.3 initcall
 
@@ -963,6 +977,19 @@ tag:LOADER error,addr:0x4800
 
 上述两种情况，如果通过命令进入烧写模式，请参考本文的[3.2.8 烧写和工具](#3.2.8 烧写和工具)。
 
+### 2.8 atags传参机制
+
+运行在kernel之前的固件有：一级loader、trust（bl31和trust os）、U-Boot。这些前级固件之间有时候需要共享一些信息，因此需要一个统一的传参机制。由于atags实现起来比较精简，因此目前使用atags进行传参（注意：只传递到U-Boot为止，不会传递给kernel）。目前传递的信息包括：串口的配置、启动设备的类型、bl31和trust os的内存布局、ddr的容量信息等，具体参考代码：
+
+```
+./arch/arm/include/asm/arch-rockchip/rk_atags.h
+./arch/arm/mach-rockchip/rk_atags.c
+```
+
+### 2.9 驱动的probe
+
+这章节的内容非常重要，所以在此优先提出。具体请参考本文档[5. 驱动支持](#5. 驱动支持) 的前言。
+
 ## 3. 平台编译
 
 ### 3.1 前期准备
@@ -1003,6 +1030,32 @@ SUBLEVEL =
 EXTRAVERSION =
 NAME =
 ```
+
+#### 3.1.4 各平台defconfig
+
+目前主要在使用的各个芯片平台的defconfig对应情况如下（包含但不限于，基于commit:58d85a1）。大部分平台都开启了kernel dtb的支持，这意味着这个平台在board_r[]阶段使用的是kernel dtb，因此能兼容大多数的板级差异（如：外设、电源、clk、显示等）。对于不支持kernel dtb的defconfig，则无法兼容板级差异，但是有更优的启动速度和uboot.bin的size。
+
+通常情况下，如果没有对速度和固件大小有特别严苛的要求，建议采用开启了kernel dtb的defconfig。关于kernel dtb，可以参考本文的 [9. U-Boot和kernel DTB支持](#9. U-Boot和kernel DTB支持) 。
+
+|       芯片        |          defconfig           | kernel dtb 支持 |
+| :-------------: | :--------------------------: | :-----------: |
+|     rv1108      |     evb-rv1108_defconfig     |       N       |
+|     rk1808      |       rk1808_defconfig       |       Y       |
+|     rk3128x     |      rk3128x_defconfig       |       Y       |
+|     rk3128      |     evb-rk3128_defconfig     |       N       |
+|     rk3126      |       rk3126_defconfig       |       Y       |
+|     rk322x      |       rk322x_defconfig       |       Y       |
+|     rk3288      |       rk3288_defconfig       |       Y       |
+|     rk3368      |       rk3368_defconfig       |       Y       |
+|     rk3328      |       rk3328_defconfig       |       Y       |
+|     rk3399      |       rk3399_defconfig       |       Y       |
+|  rk3399pro-npu  |   rk3399pro-npu_defconfig    |       Y       |
+| rk3308(aarch32) |   rk3308-aarch32_defconfig   |       Y       |
+| rk3308(aarch32) | evb-aarch32-rk3308_defconfig |       N       |
+| rk3308(aarch64) |     evb-rk3308_defconfig     |       Y       |
+|      px30       |      evb-px30_defconfig      |       Y       |
+|     rk3326      |     evb-rk3326_defconfig     |       Y       |
+
 
 ### 3.2 编译配置
 
@@ -1316,25 +1369,33 @@ void invalidate_dcache_all(void);
 
 ## 5. 驱动支持
 
+### 前言
+
 U-Boot使用DM框架去管理所有的设备和驱动，它和kernel的device-driver模型非常类似。但是有一点需要注意的是，kernel在初始化时会使用initcall的机制自动把所有有效的driver进行probe，但是U-Boot里并没有这样的机制进行probe。U-Boot里想要probe某个驱动的话，必须由用户主动调用相应的框架接口进行发起，相关的接口如下：
 
-```
-int uclass_get(enum uclass_id id, struct uclass **ucp)
+```c
+./include/dm/uclass.h
 
-int uclass_find_device(enum uclass_id id, int index, struct udevice **devp)
-int uclass_find_first_device(enum uclass_id id, struct udevice **devp)
-int uclass_find_next_device(struct udevice **devp)
-int uclass_find_device_by_name(enum uclass_id id, const char *name, struct udevice **devp)
+int uclass_get_device(enum uclass_id id, int index, struct udevice **devp);
+int uclass_get_device_by_name(enum uclass_id id, const char *name,
+int uclass_get_device_by_seq(enum uclass_id id, int seq, struct udevice **devp);
+int uclass_get_device_by_of_offset(enum uclass_id id, int node, struct udevice **devp);
+int uclass_get_device_by_ofnode(enum uclass_id id, ofnode node, struct udevice **devp);
+int uclass_get_device_by_phandle_id(enum uclass_id id, int phandle_id, struct udevice **devp);
+int uclass_get_device_by_phandle(enum uclass_id id, struct udevice *parent, struct udevice **devp);
+int uclass_get_device_by_driver(enum uclass_id id, const struct driver *drv, struct udevice **devp);
+int uclass_get_device_tail(struct udevice *dev, int ret, struct udevice **devp);
 ......
 ```
-
-本质上所有的扩展接口都是在其内部调用了uclass_get()接口。
 
 ### 5.1 中断驱动
 
 #### 5.1.1 框架支持
 
-中断功能方面，U-Boot框架默认没有给与足够的支持，因此我们自己实现了一套中断框架机制来支持中断管理功能（支持GICv2/v3）。
+中断功能方面，U-Boot框架默认没有给与足够的支持，因此我们自己实现了一套中断框架机制来支持中断管理功能（支持GICv2/v3）。目前而言，会使用到中断情况主要有：
+
+- U-Boot充电休眠时cpu进入低功耗休眠模式，需要中断按键进行唤醒；
+- CONFIG_ROCKCHIP_DEBUGGER对应的驱动会使用到中断；
 
 **驱动代码：**
 
@@ -2264,83 +2325,129 @@ CONFIG_RKSFC_NAND=y
 
 ### 5.10 串口支持
 
-#### 5.10.1 Debug UART
+#### 5.10.1 串口配置
 
-U-Boot主要通过串口来打印启动过程中的log信息。在U-Boot中串口驱动有两种（目前Rockchip平台的串口对应的驱动为`drivers/serial/ns16550.c`）。
-
-U-Boot正常启动的时候，在relocation之前，会在board_f.c--->board_init_f[]函数列表中通过serial_init()加载serial驱动。这是U-Boot中正式的debug console驱动，如果该驱动加载失败，U-Boot将停止启动。该驱动依赖dts中的chosen节点的stdout-path配置。
-
-假如某块板子使用UART2作为debug console，波特率为1500000，则DTS需做如下配置：
+U-Boot主要通过串口来打印启动过程中的log信息。在U-Boot中串口驱动有两种，目前Rockchip平台的串口对应的驱动为：
 
 ```c
-chosen {
-	stdout-path = "serial2:1500000n8";
-};
-
-或着：
-
-chosen {
-	stdout-path = &uart2;	// 波特率需要另外通过CONFIG_BAUDRATE=<baundrate>指定
-};
+./drivers/serial/ns16550.c
+./drivers/serial/serial-uclass.c
+./include/debug_uart.h
 ```
-需要注意的是，serial驱动在加载的时候需要依赖clk驱动，如果这时候clk驱动还没有正常加载，需要在对应uart的dts节点中加入clock-frequency属性：
+
+U-Boot正常启动的时候，在relocation之前，会在board_init_f[]函数列表中通过serial_init()加载驱动。这是U-Boot中正式的debug console驱动，如果该驱动加载失败则U-Boot将停止启动。具体的配置流程如下（以uart2为例）：
+
+1. iomux配置：每个平台都有`board_debug_uart_init()`函数，一般位于rkxxx.c里（例如：rk3399.c/rk3368.c/px30.c等），需要在这个函数里完成uart iomux的配置。
+
+2. clock配置：每个平台默认都是把uart的时钟源配置为24Mhz，一般pre-loader里会帮忙配置好，在U-Boot阶段可以不用配置。但是如果是修改串口号，且pre-loader没有进行对应频率初始化，则U-Boot阶段要确认当前所用串口的时钟是24Mhz。代码修改一般加在`board_debug_uart_init()`函数里。
+
+3. uart节点配置：uart2节点里需要指定如下2个属性：
+
+   ```c
+   &uart2 {
+   	u-boot,dm-pre-reloc;
+   	clock-frequency = <24000000>;
+   };
+   ```
+
+4. chosen节点配置：必须以stdout-path的形式指定串口（这是U-Boot比较特殊的地方）
+
+   ```c
+   chosen {
+   	stdout-path = "serial2:1500000n8";	// 这里的波特率值实际是无效的
+   };
+   或着：	// 推荐采用下面这种方式
+   chosen {
+   	stdout-path = &uart2;
+   };
+   ```
+
+5. baudrate配置：通过宏```CONFIG_BAUDRATE```指定串口波特率，一般在对应的defconfig或者rkxxx_common.h里进行指定。
+
+
+#### 5.10.2 Early Debug UART配置
+
+上述这种debug console驱动在U-Boot启动的过程中加载的相对比较晚，如果在这之前就出现了异常，那依赖debug console就看不到具体的异常信息。
+
+针对这种情况，U-Boot提供了另外一种能更早进行debug打印的机制：Early Debug UART，本质上是绕过console框架，直接往uart寄存器写数据。目前各个平台默认都有启用这个功能，配置方法如下：
+
+1. 在defconfig文件中打开DEBUG_UART，指定该UART寄存器的基地址、时钟：
+
+   ```c
+   CONFIG_DEBUG_UART=y
+   CONFIG_DEBUG_UART_BASE=0x10210000	// 修改串口号时，只需要修改基地址即可
+   CONFIG_DEBUG_UART_CLOCK=24000000
+   CONFIG_DEBUG_UART_SHIFT=2
+   CONFIG_DEBUG_UART_BOARD_INIT=y
+   ```
+
+2. 在board文件中实现`board_debug_uart_init()`，该函数一般负责设置iomux。请在尽可能早的地方调用它，目前默认一般都是放在board文件里调用，即rkxxx.c中。
+
+   ```c
+   void board_debug_uart_init(void)
+   {
+           static struct rk3308_grf * const grf = (void *)GRF_BASE;
+
+           /* Enable early UART2 channel m1 on the rk3308 */
+           rk_clrsetreg(&grf->gpio4d_iomux, GPIO4D3_MASK | GPIO4D2_MASK,
+                        GPIO4D2_UART2_RX_M1 << GPIO4D2_SHIFT |
+                        GPIO4D3_UART2_TX_M1 << GPIO4D3_SHIFT);
+   }
+   ```
+
+#### 5.10.3 更改串口
+
+如果仅仅是 U-Boot需要更改串口号，而前级的loader、trust等固件不做改变，那么请执行[5.10.1 串口配置](#5.10.1 串口配置)和[5.10.2 Early Debug UART配置](#5.10.2 Early Debug UART配置)里的修改步骤。
+
+#### 5.10.4 Pre-loader serial
+
+同样是更改串口号的方式，但采取的是沿用前级的loader的配置。即loader改完串口后，后面的trust和U-Boot都继续沿用，这样就不必每一级固件都做修改。这个功能需要依赖：
+
+1. 一级loader和U-Boot都要支持atags传参，这样才能把前级loader的serial配置传递到U-Boot使用；
+2. 一级loader要更改好串口并且进行atags传参；
+3. U-Boot自身需要在rkxx-u-boot.dtsi里把需要的uart增加上属性“u-boot,dm-pre-reloc;”和在aliases里建立serial别名，例如./arch/arm/dts/rk1808-u-boot.dtsi里为了方便，把所有uart都配置上：
 
 ```c
+aliases {
+	mmc0 = &emmc;
+	mmc1 = &sdmmc;
+
+// 必须创建别名
+	serial0 = &uart0;
+	serial1 = &uart1;
+	serial2 = &uart2;
+	serial3 = &uart3;
+	serial4 = &uart4;
+	serial5 = &uart5;
+	serial6 = &uart6;
+	serial7 = &uart7;
+};
+
+.....
+
+// 必须增加u-boot,dm-pre-reloc属性
+&uart0 {
+	u-boot,dm-pre-reloc;
+};
+&uart1 {
+	u-boot,dm-pre-reloc;
+};
 &uart2 {
-        clock-frequency = <24000000>;
+	u-boot,dm-pre-reloc;
+	clock-frequency = <24000000>;
+	status = "okay";
+};
+&uart3 {
+	u-boot,dm-pre-reloc;
+};
+&uart4 {
+	u-boot,dm-pre-reloc;
 };
 ```
 
-#### 5.10.2 Early Debug UART
 
-上述这种debug console驱动在U-Boot启动的过程中加载的相对比较晚，如果在这之前就出现了异常，那依赖debug console就看不到具体的异常信息。针对这种情况，U-Boot提供了另外一种能更早进行debug打印的机制：Early Debug UART。
 
-使能Early Debug UART：在defconfig文件中打开DEBUG_UART，指定该UART寄存器的基地址、时钟：
-
-```c
-CONFIG_DEBUG_UART=y
-CONFIG_DEBUG_UART_BASE=0x10210000
-CONFIG_DEBUG_UART_CLOCK=24000000
-CONFIG_DEBUG_UART_SHIFT=2
-CONFIG_DEBUG_UART_BOARD_INIT=y
-```
-
-在board文件中实现`board_debug_uart_init()`，该函数一般负责设置iomux：
-
-```c
-void board_debug_uart_init(void)
-{
-        static struct rk3308_grf * const grf = (void *)GRF_BASE;
-
-        /* Enable early UART2 channel m1 on the rk3308 */
-        rk_clrsetreg(&grf->gpio4d_iomux,
-                     GPIO4D3_MASK | GPIO4D2_MASK,
-                     GPIO4D2_UART2_RX_M1 << GPIO4D2_SHIFT |
-                     GPIO4D3_UART2_TX_M1 << GPIO4D3_SHIFT);
-}
-```
-
-在尽可能早的地方调用`debug_uart_init()` ：
-
-```c
-#define EARLY_UART
-#if defined(EARLY_UART) && defined(CONFIG_DEBUG_UART)
-        /*
-         * Debug UART can be used from here if required:
-         *
-         * debug_uart_init();
-         * printch('a');
-         * printhex8(0x1234);
-         * printascii("string");
-         */
-        debug_uart_init();
-        printascii("U-Boot SPL board init");
-#endif
-```
-
-在U-Boot/arch目录下搜索debug_uart_init可以看到很多使用范例。
-
-#### 5.10.3 关闭console打印
+#### 5.10.5 关闭串口打印
 
 使能CONFIG_SILENT_CONSOLE即可关闭console打印（UART驱动还是会正常加载），仅仅保留一条提示信息。
 
@@ -3493,9 +3600,17 @@ rktest集成了对某些模块的测试命令，可以快速确认哪些模块�
 ```
 => rktest
 Command: rktest [module] [args...]
+  - module: timer|key|emmc|rknand|regulator|eth|ir|brom|rockusb|fastboot|vendor
+  - args: depends on module, try 'rktest [module]' for test or more help
 
-  - module: timer|key|emmc|rknand|regulator|eth|ir|brom|vendor
-  - args: depends on module
+  - Enabled modules:
+     -      timer: test timer and interrupt
+     -       brom: enter bootrom download mode
+     -    rockusb: enter rockusb download mode
+     -   fastboot: enter fastboot download mode
+     -        key: test board keys
+     -  regulator: test regulator volatge set and show regulator status
+     -     vendor: test vendor storage partition read/write
 ```
 
 1. timer测试：用于确认当前环境下系统timer是否正常工作（延时是否准确）、系统中断是否正常。
