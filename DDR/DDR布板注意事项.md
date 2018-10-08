@@ -1,10 +1,10 @@
 # **DDR布板注意事项**
 
-发布版本：1.2
+发布版本：1.3
 
 作者邮箱：hcy@rock-chips.com
 
-日期：2017.01.14
+日期：2018.10.08
 
 文件密级：内部资料
 
@@ -37,6 +37,7 @@
 | 2017.11.02 | V1.0   | 何灿阳    |                            |
 | 2017.11.09 | V1.1   | 陈炜     | 更改某些表述                     |
 | 2017.01.14 | V1.2   | 汤云平    | 增加RK3326描述及LPDDR2/LPDDR3要求 |
+| 2018.10.08 | V1.3   | 陈有敏    | 增加总容量3GB说明和RK3399单通道布线要求   |
 
 --------------------
 [TOC]
@@ -119,8 +120,19 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 
 由于LPDDR2/LPDDR3 Mode Register read的数据是通过DQ0-DQ7读回来，所以需要保证DQ0-DQ7的连接是一一对应的。如无法保证DQ0-DQ7一一对应的话需与软件确认。
 
+**12、双通道DRAM总容量3GB支持情况**
+双通道DRAM总容量3GB支持的颗粒组合如下图：
+
+  ![DRAM_3GB](DDR布板注意事项\2x_channel_DRAM_3GB.png)
+  说明：1）RK3288，RK3399支持双通道。
+
+**13、单通道DRAM总容量3GB支持情况**
+单通道DRAM总容量3GB支持的颗粒组合如下图：
+
+  ![DRAM_3GB](DDR布板注意事项\1x_channel_DRAM_3GB.png)
+
 ----
-##  RK33399特殊要求
+##  RK3399特殊要求
 **1、 CS2是CS0的复制信号，CS3是CS1的复制信号，其行为与被复制信号完全一样**
 
 因此对于DDR3，LPDDR3，实际只能使用2个CS。CS2，CS3主要是给LPDDR4使用的，因为LPDDR4颗粒一个channel是16bit，当要让主控达到32bit、2CS时，就需要用到4根CS信号。
@@ -162,6 +174,12 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 
 ​    假设原来DDRx_D0-D15是连到LPDDR4颗粒的channel A，DDRx_D16-D31是连到LPDDR4颗粒的channel C。
 如果希望将A/C通道的互连关系对调，即DDRx_D0-D15连到LPDDR4颗粒的channel C，DDRx_D16-D31连到LPDDR4颗粒的channel A。则这种对调方式，是允许的。但需要满足上面第5点的要求，保证LPDDR4上共用ZQ的通道不组合成32bit。
+
+**9、如果只用channel 0，channel 1也需要供电**
+
+原因：RK3399 DDR变频时是通过CIC模块控制DDR频率切换，而CIC模块要求两个channel要同时切换。即使channel 1上没有接DRAM，也需要对channel 1的controller和PHY进行初始化，否则CIC模块控制DDR频率切换时，会出现由于channel 1异常，导致CIC模块状态出错，DDR变频失败。
+
+ 因此对于单通道使用场景（channel 0有接DRAM，channel 1没有接DRAM），也需要对channel 1进行供电（DDR1_AVDD_0V9,DDR1_CLK_VDD,DDR1_VDD），否则channel 1上的controller和PHY无法完成初始化，影响DDR变频功能。
 
 -----
 ## RK3326、PX30特殊要求
