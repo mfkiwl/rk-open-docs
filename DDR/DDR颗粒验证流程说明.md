@@ -1,17 +1,17 @@
 **Rockchip**
 # **DDR颗粒验证流程说明**
 
-发布版本:1.1
+发布版本:1.2
 
 作者邮箱:cym@rock-chips.com
 
-日期:2018.03.22
+日期:2018.10.11
 
 文件密级:公开资料
 
 ---------
 # 前言
-​	对各个芯片平台DDR颗粒兼容性和稳定性的验证流程进行说明。文档分为linux 3.10，linux 4.4，RV1108三个章节，请根据实际测试平台情况选择对应章节进行参考。
+​	对各个芯片平台DDR颗粒兼容性和稳定性的验证流程进行说明。文档分为linux 3.10，linux 4.4，RV1108，RK3308三个章节，请根据实际测试平台情况选择对应章节进行参考。
 
 ------
 **产品版本**
@@ -30,17 +30,18 @@
 软件开发工程师
 
 **修订记录**
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017.11.21 | V1.0   | 陈有敏    | 初版       |
-| 2018.03.22 | V1.1   | 陈有敏    | 公开资料     |
+| **日期**   | **版本** | **作者** | **修改说明**               |
+| ---------- | -------- | -------- | -------------------------- |
+| 2017.11.21 | V1.0     | 陈有敏   | 初版                       |
+| 2018.03.22 | V1.1     | 陈有敏   | 公开资料                   |
+| 2018.10.11 | V1.2     | 何智欢   | 增加RK3308颗粒验证流程说明 |
 
 --------------------
 [TOC]
 
 ------------------
 # NOTE
-1. RV1108平台DDR颗粒验证流程与其它平台不同，RV1108请详见本文档的"RV1108 DDR颗粒验证流程说明"章节。其他平台，请根据linux kernel版本是linux 3.10还是linux 4.4，选择对应章节进行参考。
+1. RV1108平台DDR颗粒验证流程与其它平台不同，RV1108请详见本文档的"RV1108 DDR颗粒验证流程说明"章节；RK3308请详见本文档的"RK3308 DDR颗粒验证流程说明"章节。其他平台，请根据linux kernel版本是linux 3.10还是linux 4.4，选择对应章节进行参考。
 2. 本文中所述颗粒验证过程需要的DDR测试资源文件随该文档提供。
 
 -----------------
@@ -668,3 +669,176 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 ​	可用1108自带reboot功能，menu -> debug -> reboot test。
 
 -----------------------
+
+# RK3308 DDR颗粒验证流程说明
+
+## RK3308 确定容量是否正确
+
+通过`<rk3308:/ #>  cat /proc/meminfo`查看MemTotal项所示容量是否与测试机器DDR总容量相符。
+
+log eg：
+
+```
+<rk3308:/ #> cat /proc/meminfo
+MemTotal:         246832 kB
+MemFree:          201800 kB
+
+```
+
+64MB 约等于66688kB
+
+128MB 约等于133376kB
+
+256MB 约等于266752kB
+
+512MB 约等于533504kB
+
+由于系统内存分配管理差异的原因，得到的容量有些偏差，属于正常。
+
+## RK3308 拷机测试
+
+由于3308当前不支持变频功能，ddr频率由loader初始化期间设置的频率，到后面是不会修改ddr频率的。DDR颗粒测试请使用最高频率的设置，即800MHz的loader。
+
+1. memtester拷机，拷机时间12小时以上
+
+可用3308自带的memtester测试
+
+如果总容量是128MB则申请16MB进行memtester，一般是总容量的八分之一。
+
+```
+<rk3308:/ #> memtester 16m > /data/memtester_log.txt &
+
+```
+
+​    2.确认拷机结果
+
+- 拷机结束，确认机器是否正常。
+- 确认memtester 打印是否正常：（注意，memtester出错不会停止测试，需要查看所有打印是否正确）
+
+正确打印
+
+```
+Loop 1:
+  Stuck Address       : ok
+  Random Value        : ok
+  Compare XOR         : ok
+  Compare SUB         : ok
+  Compare MUL         : ok
+  Compare DIV         : ok
+  Compare OR          : ok
+  Compare AND         : ok
+  Sequential Increment: ok
+  Solid Bits          : ok
+  Block Sequential    : ok
+  Checkerboard        : ok
+  Bit Spread          : ok
+  Bit Flip            : ok
+  Walking Ones        : ok
+  Walking Zeroes      : ok
+  8-bit Writes        : ok
+  16-bit Writes       : ok
+
+```
+
+出错打印
+
+```
+Loop 92:
+  Stuck Address       : ok
+  Random Value        : FAILURE: 0x37fe0f4190f6b999 != 0x37fe0f4196f6b999 at offset 0x0027a958.
+FAILURE: 0x2823d0d6f62a4b01 != 0x2823d0d6f02a4b01 at offset 0x0027a958.
+  Compare XOR         : FAILURE: 0x4c4f418e764340e8 != 0x4c4f418e704340e8 at offset 0x0027a958.
+  Compare SUB         : FAILURE: 0x2856fb8ee22bd230 != 0xfe5ee503ee2bd230 at offset 0x0027a958.
+  Compare MUL         : FAILURE: 0x00000000 != 0x00000001 at offset 0x0027a958.
+  Compare DIV         : FAILURE: 0xefb2eceaffbf9604 != 0xefb2eceaffbf9605 at offset 0x0027a958.
+  Compare OR          : FAILURE: 0xcbb2a0e8cfbb8200 != 0xcbb2a0e8cfbb8201 at offset 0x0027a958.
+  Compare AND         :   Sequential Increment: ok
+  Solid Bits          : ok
+  Block Sequential    : ok
+  Checkerboard        : ok
+  Bit Spread          : ok
+  Bit Flip            : ok
+  Walking Ones        : ok
+  Walking Zeroes      : ok
+  8-bit Writes        : ok
+  16-bit Writes       : ok
+
+```
+
+​    3.google stressapptest拷机，拷机时间12小时以上
+
+可用3308自带的stressapptest拷机。
+如果总容量是128MB则申请16MB进行stressapptest，一般是总容量的八分之一。时间设置由-s后面的参数控制，单位是秒。如拷机24小时的命令：
+
+```
+<rk3308:/ #> stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 64
+
+```
+
+​    4.确认拷机结果
+
+- 拷机结束，确认机器是否正常。
+- stressapptest结果是PASS还是FAIL。stressapptest 每隔10秒会打印一条log，log显示测试剩余时间。测试完成后会打印测试结果，如果测试通过打印Status: PASS，如果测试失败打印Status: FAIL。
+
+## RK3308 休眠唤醒测试
+
+休眠唤醒需要kernel使能自动唤醒功能。打开rk3308.dtsi文件，找到休眠唤醒节点ockchip_suspend,位或上RKPM_TIMEOUT_WAKEUP_EN，使能自动唤醒：
+
+```
+rockchip_suspend: rockchip-suspend {
+				...
+                rockchip,wakeup-config = <
+                        (0
+                        | RKPM_GPIO0_WAKEUP_EN
+                        | RKPM_TIMEOUT_WAKEUP_EN
+                        )
+                >;
+        };
+
+```
+
+编译好固件后，建议使用3308测试脚本的休眠唤醒测试。首先要确认测试文件是否存在（不存在请咨询产品工程师）：
+
+```
+<rk3308:/ #> ls rockchip_test/rockchip_test.sh
+rockchip_test/rockchip_test.sh
+```
+
+若有测试文件，则休眠自动唤醒测试命令如下：
+
+```
+<rk3308:/ #> /rockchip_test/rockchip_test.sh
+...
+please input your test moudle: //串口先输入8<enter>，再输入1<enter>
+8
+1
+
+```
+
+若没有测试文件，可以在串口命令行直接输入命令进行休眠唤醒测试，命令如下：
+
+```
+<rk3308:/ #> while true; do echo mem >  /sys/power/state; sleep 5; done
+```
+
+拷机时间12h+，确认机器是否正常。
+
+## RK3308 reboot拷机
+
+建议使用3308测试脚本的reboot测试命令。首先要确认测试文件是否存在（不存在请咨询产品工程师）：
+
+```
+<rk3308:/ #> ls rockchip_test/rockchip_test.sh
+rockchip_test/rockchip_test.sh
+```
+
+reboot测试命令如下：
+
+```
+<rk3308:/ #> /rockchip_test/rockchip_test.sh
+...
+please input your test moudle:
+13
+```
+
+拷机时间12h+，确认机器是否正常。
