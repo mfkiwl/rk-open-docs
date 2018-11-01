@@ -217,7 +217,17 @@ $ sudo apt --purge autoremove postgresql lava-server
 
 ### 2.2.3 lava-server配置
 
-允许http访问
+#### 修改时间域
+LAVA默认显示使用的是UTC时间，需要修改为本地之间
+
+```shell
+vim /usr/lib/python3/dist-packages/lava_server/settings/common.py
+#修改如下内容
+TIME_ZONE = 'Asia/Shanghai'
+USE_TZ = False
+```
+
+#### 允许http访问
 
 编辑/etc/lava-server/settings.conf文件，添加如下配置：
 
