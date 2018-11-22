@@ -329,7 +329,7 @@ FIXME: 以上修改可以实现静态IP，但是无法产生正确的DNS server(
 ### 2.3.3 建立代码环境
 安装各种需要用到的基础包
 
-	sudo apt-get install vim apt-transport-https samba　git
+	sudo apt-get install vim apt-transport-https samba　git python-serial
 	sudo apt-get install simg2img img2simg #android sparse 解包打包
 
 在10.10.10.29 Gerrit新增lava用户，并上传lava公钥，
@@ -537,6 +537,7 @@ Jenkins服务器的job使用jenkins-job-builder进行管理, 官方文档位于:
 	https://docs.openstack.org/infra/jenkins-job-builder/
 安装(实测Ubuntu 14.04上有问题, Debian 9正常)
 
+	sudo apt install python-setuptools
 	sudo easy_install pip
 	sudo pip install PyYAML
 	sudo pip install jinja2
@@ -603,6 +604,7 @@ jenkins的每个Job都有一个独立的workspace, 其目录是builder根目录�
 
 	sudo pip install jinja2
 	sudo pip install PyYaml
+	sudo pip install pyelftools
 
 #### 交叉编译工具
 编译工具是提前从rk29部署好的，需要使用的job可以用链接的方式来获取编译工具的路径．
@@ -620,12 +622,12 @@ jenkins的每个Job都有一个独立的workspace, 其目录是builder根目录�
 ####　Kernel/U-Boot编译环境
 Kernel/U-Boot编译依赖软件包
 
-	sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libssl-dev lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip device-tree-compiler
+	sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libssl-dev lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip device-tree-compiler swig
 
 #### Buildroot编译环境
 Buildroot编译依赖软件包
 
-	sudo apt install libfile-which-perl sed make binutils gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc libmpc3 git texinfo pkg-config cmake　tree genext2fs
+	sudo apt install libfile-which-perl sed make binutils gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc libmpc3 git texinfo pkg-config cmake tree genext2fs
 	sudo apt install time
 另外需要用到repo，Debian9的源不包含，需使用从git仓库下载
 
