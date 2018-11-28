@@ -701,13 +701,43 @@ MemFree:          201800 kB
 
 1. memtester拷机，拷机时间12小时以上
 
-可用3308自带的memtester测试
+首先要确认测试文件是否存在：
 
-如果总容量是128MB则申请16MB进行memtester，一般是总容量的八分之一。
+```
+<rk3308:/ #> ls usr/bin/memtester
+usr/bin/memtester
+```
+
+* 如果有测试文件，memtester测试命令如下：（如果总容量是128MB则申请16MB进行memtester，一般是总容量的八分之一。）
 
 ```
 <rk3308:/ #> memtester 16m > /data/memtester_log.txt &
+```
 
+* 如果没有测试文件，则请将随此文件一同发布的memtester_32bit.32bit（或memtester_64bit.64bit） 文件通过adb push到data分区：（memtester_32bit.32bit适用于32位系统，memtester_64bit.64bit适用于64位系统）
+
+32位系统命令：
+
+```
+adb push \*文件路径*\memtester_32bit.32bit data/memtester
+```
+
+64位系统命令：
+
+```
+adb push \*文件路径*\memtester_64bit.64bit data/memtester
+```
+
+将memtester_32bit.32bit 文件修改权限为可执行：
+
+```
+<rk3308:/ #> chmod 777 /data/memtester
+```
+
+memtester测试命令如下：（如果总容量是128MB则申请16MB进行memtester，一般是总容量的八分之一。）
+
+```
+<rk3308:/ #> /data/memtester 16m > /data/memtester_log.txt &
 ```
 
 ​    2.确认拷机结果
@@ -767,12 +797,45 @@ FAILURE: 0x2823d0d6f62a4b01 != 0x2823d0d6f02a4b01 at offset 0x0027a958.
 
 ​    3.google stressapptest拷机，拷机时间12小时以上
 
-可用3308自带的stressapptest拷机。
-如果总容量是128MB则申请16MB进行stressapptest，一般是总容量的八分之一。时间设置由-s后面的参数控制，单位是秒。如拷机24小时的命令：
+首先要确认测试文件是否存在：
+
+```
+<rk3308:/ #> ls usr/bin/stressapptest
+usr/bin/stressapptest
+```
+
+- 如果有测试文件，stressapptest测试命令如下：（如果总容量是128MB则申请16MB进行stressapptest，一般是总容量的八分之一。时间设置由-s后面的参数控制，单位是秒。如下为拷机24小时的命令）
 
 ```
 <rk3308:/ #> stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 64
+```
 
+- 如果没有测试文件，则请将随此文件一同发布的stressapptest_32bit（或stressapptest_64bit） 文件通过adb push到data分区：（stressapptest_32bit适用于32位系统，stressapptest_64bit适用于64位系统）
+
+32位系统命令：
+
+```
+adb push \*文件路径*\stressapptest_32bit data/stressapptest
+```
+
+64位系统命令：
+
+```
+adb push \*文件路径*\stressapptest_64bit data/stressapptest
+```
+
+
+
+将stressapptest_32bit 文件修改权限为可执行：
+
+```
+<rk3308:/ #> chmod 777 /data/stressapptest
+```
+
+stressapptest测试命令如下：（如果总容量是128MB则申请16MB进行stressapptest，一般是总容量的八分之一。时间设置由-s后面的参数控制，单位是秒。如下为拷机24小时的命令）
+
+```
+<rk3308:/ #> /data/stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 64
 ```
 
 ​    4.确认拷机结果
@@ -782,7 +845,7 @@ FAILURE: 0x2823d0d6f62a4b01 != 0x2823d0d6f02a4b01 at offset 0x0027a958.
 
 ## RK3308 休眠唤醒测试
 
-休眠唤醒需要kernel使能自动唤醒功能。打开rk3308.dtsi文件，找到休眠唤醒节点ockchip_suspend,位或上RKPM_TIMEOUT_WAKEUP_EN，使能自动唤醒：
+休眠唤醒需要kernel使能自动唤醒功能。打开rk3308.dtsi文件，找到休眠唤醒节点rockchip_suspend,位或上RKPM_TIMEOUT_WAKEUP_EN，使能自动唤醒：
 
 ```
 rockchip_suspend: rockchip-suspend {
@@ -797,14 +860,14 @@ rockchip_suspend: rockchip-suspend {
 
 ```
 
-编译好固件后，建议使用3308测试脚本的休眠唤醒测试。首先要确认测试文件是否存在（不存在请咨询产品工程师）：
+编译好固件后，建议使用3308测试脚本的休眠唤醒测试。首先要确认测试文件是否存在：
 
 ```
 <rk3308:/ #> ls rockchip_test/rockchip_test.sh
 rockchip_test/rockchip_test.sh
 ```
 
-若有测试文件，则休眠自动唤醒测试命令如下：
+* 若有测试文件，则休眠自动唤醒测试命令如下：
 
 ```
 <rk3308:/ #> /rockchip_test/rockchip_test.sh
@@ -815,7 +878,7 @@ please input your test moudle: //串口先输入8<enter>，再输入1<enter>
 
 ```
 
-若没有测试文件，可以在串口命令行直接输入命令进行休眠唤醒测试，命令如下：
+* 若没有测试文件，可以在串口命令行直接输入命令进行休眠唤醒测试，命令如下：
 
 ```
 <rk3308:/ #> while true; do echo mem >  /sys/power/state; sleep 5; done
@@ -825,20 +888,38 @@ please input your test moudle: //串口先输入8<enter>，再输入1<enter>
 
 ## RK3308 reboot拷机
 
-建议使用3308测试脚本的reboot测试命令。首先要确认测试文件是否存在（不存在请咨询产品工程师）：
+建议使用3308测试脚本的reboot测试命令。首先要确认测试文件是否存在：
 
 ```
 <rk3308:/ #> ls rockchip_test/rockchip_test.sh
 rockchip_test/rockchip_test.sh
 ```
 
-reboot测试命令如下：
+* 若有测试文件，reboot测试命令如下：
 
 ```
 <rk3308:/ #> /rockchip_test/rockchip_test.sh
 ...
-please input your test moudle:
+please input your test moudle: //串口输入13<enter>
 13
+```
+
+* 若无测试文件，则请将随此文件一同发布的auto_reboot_test.sh 文件通过adb push到data分区：
+
+```
+adb push \*文件路径*\auto_reboot_test.sh data/.
+```
+
+将auto_reboot_test.sh 文件修改权限为可执行：
+
+```
+<rk3308:/ #> chmod 777 /data/auto_reboot_test.sh
+```
+
+reboot 测试命令如下：
+
+```
+<rk3308:/ #> /data/auto_reboot_test.sh
 ```
 
 拷机时间12h+，确认机器是否正常。
