@@ -145,13 +145,13 @@ Device Drivers  --->
 ```c
 gpu: gpu@ff9a0000 {
 	compatible = "arm,malit860",
-			     "arm,malit86x",
-			     "arm,malit8xx",
-			     "arm,mali-midgard";
+				 "arm,malit86x",
+				 "arm,malit8xx",
+				 "arm,mali-midgard";
 	...
 	clocks = <&cru ACLK_GPU>;
 	clock-names = "clk_mali";
-    ...
+	...
 };
 ```
 
@@ -216,17 +216,17 @@ DTSI文件中。以RK3399为例：
 };
 
 gpu_opp_table: opp-table2 {
-    compatible = "operating-points-v2";
+	compatible = "operating-points-v2";
 
-    opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
-        opp-microvolt = <800000>;               /* 单位uV */
-    };
-    ...
-    opp-800000000 {
-        opp-hz = /bits/ 64 <800000000>;
-        opp-microvolt = <1100000>;
-    };
+	opp-200000000 {
+		opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
+		opp-microvolt = <800000>;               /* 单位uV */
+	};
+	...
+	opp-800000000 {
+		opp-hz = /bits/ 64 <800000000>;
+		opp-microvolt = <1100000>;
+	};
 }
 ```
 
@@ -238,18 +238,18 @@ gpu_opp_table: opp-table2 {
 
 ```c
 gpu_opp_table: opp-table2 {
-    compatible = "operating-points-v2";
+	compatible = "operating-points-v2";
 
-    opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
-        opp-microvolt = <800000>;               /* 单位uV */
-    };
-    ...
-    opp-800000000 {
-        opp-hz = /bits/ 64 <800000000>;
-        opp-microvolt = <1100000>;
-        status = "disabled";
-    };
+	opp-200000000 {
+		opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
+		opp-microvolt = <800000>;               /* 单位uV */
+	};
+	...
+	opp-800000000 {
+		opp-hz = /bits/ 64 <800000000>;
+		opp-microvolt = <1100000>;
+		status = "disabled";
+	};
 }
 ```
 
@@ -258,7 +258,7 @@ gpu_opp_table: opp-table2 {
 ```c
 &gpu_opp_table {
 	opp-800000000 {
-        status = "disabled";
+		status = "disabled";
 	}；
 };
 ```
@@ -291,39 +291,39 @@ Table节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvm
 
 ```c
 gpu_opp_table: gpu-opp-table {
-    compatible = "operating-points-v2";
+	compatible = "operating-points-v2";
 
-    /*
-     * 从eFuse或OTP中获取GPU leakage值
-     */
-    nvmem-cells = <&gpu_leakage>;
-    nvmem-cell-names = "gpu_leakage";
+	/*
+	 * 从eFuse或OTP中获取GPU leakage值
+	 */
+	nvmem-cells = <&gpu_leakage>;
+	nvmem-cell-names = "gpu_leakage";
 
-    /*
-     * leakage值为1mA-10mA的芯片，使用opp-microvolt-L0指定的电压
-     * leakage值为11mA-254mA的芯片，使用opp-microvolt-L1指定的电压
-     *
-     * 如果删除rockchip,leakage-voltage-sell属性或者leakage值不在该属性指定的范围内，
-     * 则使用opp-microvolt指定的电压。
-     */
-    rockchip,leakage-voltage-sel = <
-        1   10    0
-        11  254   1
-    >;
+	/*
+	 * leakage值为1mA-10mA的芯片，使用opp-microvolt-L0指定的电压
+	 * leakage值为11mA-254mA的芯片，使用opp-microvolt-L1指定的电压
+	 *
+	 * 如果删除rockchip,leakage-voltage-sell属性或者leakage值不在该属性指定的范围内，
+	 * 则使用opp-microvolt指定的电压。
+	 */
+	rockchip,leakage-voltage-sel = <
+		1   10    0
+		11  254   1
+	>;
 
-    opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;
-        opp-microvolt = <950000>;
-        opp-microvolt-L0 = <950000>;
-        opp-microvolt-L1 = <950000>;
-    };
-    ...
-    opp-500000000 {
-        opp-hz = /bits/ 64 <500000000>;
-        opp-microvolt = <1150000>;
-        opp-microvolt-L0 = <1150000>;
-        opp-microvolt-L1 = <1100000>;
-    };
+	opp-200000000 {
+		opp-hz = /bits/ 64 <200000000>;
+		opp-microvolt = <950000>;
+		opp-microvolt-L0 = <950000>;
+		opp-microvolt-L1 = <950000>;
+	};
+	...
+	opp-500000000 {
+		opp-hz = /bits/ 64 <500000000>;
+		opp-microvolt = <1150000>;
+		opp-microvolt-L0 = <1150000>;
+		opp-microvolt-L1 = <1100000>;
+	};
 };
 ```
 
@@ -357,49 +357,49 @@ Vmin比较小，通过这一特性可以根据PVTM值降低大PVTM芯片的电�
 gpu_opp_table: opp-table2 {
 	compatible = "operating-points-v2";
 
-    /*
-     * PVTM值为0-121000的芯片，使用opp-microvolt-L0指定的电压；
-     * PVTM值为121001-125500的芯片，使用opp-microvolt-L1指定的电压；
-     * PVTM值为125501-128500的芯片，使用opp-microvolt-L2指定的电压；
-     * PVTM值为128501-999999的芯片，使用opp-microvolt-L3指定的电压；
-     *
-     * 如果删除rockchip,pvtm-voltage-sel属性或者PVTM值不在该属性指定的范围内，
-     * 则使用opp-microvolt指定的电压。
-     */
-    rockchip,pvtm-voltage-sel = <
-        0        121000   0
-        121001   125500   1
-        125501   128500   2
-        128501   999999   3
+	/*
+	 * PVTM值为0-121000的芯片，使用opp-microvolt-L0指定的电压；
+	 * PVTM值为121001-125500的芯片，使用opp-microvolt-L1指定的电压；
+	 * PVTM值为125501-128500的芯片，使用opp-microvolt-L2指定的电压；
+	 * PVTM值为128501-999999的芯片，使用opp-microvolt-L3指定的电压；
+	 *
+	 * 如果删除rockchip,pvtm-voltage-sel属性或者PVTM值不在该属性指定的范围内，
+	 * 则使用opp-microvolt指定的电压。
+	 */
+	rockchip,pvtm-voltage-sel = <
+		0        121000   0
+		121001   125500   1
+		125501   128500   2
+		128501   999999   3
 	>;
-    rockchip,pvtm-freq = <200000>;          /* 获取PVTM值前，需要先设置GPU频率，单位Khz */
-    rockchip,pvtm-volt = <900000>;          /* 获取PVTM值前，需要先设置GPU电压，单位uV */
-    rockchip,pvtm-ch = <3 0>;               /* PVTM通道，格式<通道序号 sel的序号> */
-    rockchip,pvtm-sample-time = <1000>;     /* PVTM采样时间，单位us */
-    rockchip,pvtm-number = <10>;            /* PVTM采样个数 */
-    rockchip,pvtm-error = <1000>;           /* 允许采样数据之间的误差 */
-    rockchip,pvtm-ref-temp = <41>;          /* 参考温度 */
-    /* PVTM随温度变化的比例系数，格式 <小于参考温度的比例系数 大于参考温度的比例系数> */
-    rockchip,pvtm-temp-prop = <46 12>;
-    rockchip,thermal-zone = "gpu-thermal";  /* 通过哪个thermal-zone获取温度 */
+	rockchip,pvtm-freq = <200000>;          /* 获取PVTM值前，需要先设置GPU频率，单位Khz */
+	rockchip,pvtm-volt = <900000>;          /* 获取PVTM值前，需要先设置GPU电压，单位uV */
+	rockchip,pvtm-ch = <3 0>;               /* PVTM通道，格式<通道序号 sel的序号> */
+	rockchip,pvtm-sample-time = <1000>;     /* PVTM采样时间，单位us */
+	rockchip,pvtm-number = <10>;            /* PVTM采样个数 */
+	rockchip,pvtm-error = <1000>;           /* 允许采样数据之间的误差 */
+	rockchip,pvtm-ref-temp = <41>;          /* 参考温度 */
+	/* PVTM随温度变化的比例系数，格式 <小于参考温度的比例系数 大于参考温度的比例系数> */
+	rockchip,pvtm-temp-prop = <46 12>;
+	rockchip,thermal-zone = "gpu-thermal";  /* 通过哪个thermal-zone获取温度 */
 
     opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;
-        opp-microvolt = <800000>;
-        opp-microvolt-L0 = <800000>;
-        opp-microvolt-L1 = <800000>;
-        opp-microvolt-L2 = <800000>;
-        opp-microvolt-L3 = <800000>;
-    };
-    ...
+		opp-hz = /bits/ 64 <200000000>;
+		opp-microvolt = <800000>;
+		opp-microvolt-L0 = <800000>;
+		opp-microvolt-L1 = <800000>;
+		opp-microvolt-L2 = <800000>;
+		opp-microvolt-L3 = <800000>;
+	};
+	...
 	opp-800000000 {
-        opp-hz = /bits/ 64 <800000000>;
-        opp-microvolt = <1100000>;
-        opp-microvolt-L0 = <1100000>;
-        opp-microvolt-L1 = <1075000>;
-        opp-microvolt-L2 = <1050000>;
-        opp-microvolt-L3 = <1025000>;
-    };
+		opp-hz = /bits/ 64 <800000000>;
+		opp-microvolt = <1100000>;
+		opp-microvolt-L0 = <1100000>;
+		opp-microvolt-L1 = <1075000>;
+		opp-microvolt-L2 = <1050000>;
+		opp-microvolt-L3 = <1025000>;
+	};
 };
 ```
 
@@ -429,10 +429,10 @@ gpu_opp_table: opp-table2 {
 gpu_opp_table: gpu-opp-table {
 	compatible = "operating-points-v2";
 
-    /* 允许设置的最高电压，单位uV */
-    rockchip,max-volt = <1175000>;
-    rockchip,evb-irdrop = <25000>;/* EVB板或者SDK板的电源纹波 */
-    ...
+	/* 允许设置的最高电压，单位uV */
+	rockchip,max-volt = <1175000>;
+	rockchip,evb-irdrop = <25000>;/* EVB板或者SDK板的电源纹波 */
+	...
 }
 ```
 
@@ -440,14 +440,14 @@ gpu_opp_table: gpu-opp-table {
 
 ```c
 &gpu_opp_table {
-    /*
-    * max IR-drop values on different freq condition for this board!
-    */
-    /*
-     * 实际产品硬件，不同频率下的电源纹波情况:
-     * 200Mhz-520MHz，电源纹波为50000uV，最终电压会增加25000uV（50000-25000（EVB板纹波））
-     */
-    rockchip,board-irdrop = <
+	/*
+	 * max IR-drop values on different freq condition for this board!
+	 */
+	/*
+	 * 实际产品硬件，不同频率下的电源纹波情况:
+	 * 200Mhz-520MHz，电源纹波为50000uV，最终电压会增加25000uV（50000-25000（EVB板纹波））
+	 */
+	rockchip,board-irdrop = <
 		/* MHz	MHz	uV */
 		   200	520 50000
 	>;
@@ -487,7 +487,7 @@ gpu_opp_table: opp-table2 {
 		/* MHz    MHz    uV */
 		   0      800    25000              /* 低温下，0-800MHz内的频点，电压增加25mV */
 	>;
-    rockchip,max-volt = <1150000>;          /* 最高电压不超过该值 */
+	rockchip,max-volt = <1150000>;          /* 最高电压不超过该值 */
 	...
 }
 ```
@@ -509,9 +509,9 @@ RK3288为例：
 ```c
 gpu: gpu@ffa30000 {
 	compatible = "arm,malit764",
-			     "arm,malit76x",
-			     "arm,malit7xx",
-			     "arm,mali-midgard";
+				 "arm,malit76x",
+				 "arm,malit7xx",
+				 "arm,mali-midgard";
 	reg = <0x0 0xffa30000 0x0 0x10000>;
 
 	upthreshold = <75>;
@@ -538,7 +538,7 @@ dmc: dmc {
 	...
 	clocks = <&cru SCLK_DDRCLK>;
 	clock-names = "dmc_clk";
-    ...
+	...
 };
 ```
 
@@ -552,8 +552,8 @@ Regulator的详细配置说明，请参考regulator和PMIC相关的开发文档�
 &i2c0 {
 	...
 	rk808: pmic@1b {
-        ...
-        regulators {
+		...
+		regulators {
 			vdd_center: DCDC_REG1 {
 				regulator-always-on;
 				regulator-boot-on;
@@ -565,8 +565,8 @@ Regulator的详细配置说明，请参考regulator和PMIC相关的开发文档�
 					regulator-off-in-suspend;
 				};
 			};
-        };
-    };
+		};
+	};
 };
 
 &dmc {
@@ -602,15 +602,15 @@ Documentation/power/opp.txt
 dmc_opp_table: opp-table3 {
 	compatible = "operating-points-v2";
 
-    opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
-        opp-microvolt = <900000>;               /* 单位uV */
-    };
-    ...
+	opp-200000000 {
+		opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
+		opp-microvolt = <900000>;               /* 单位uV */
+	};
+	...
 	opp-800000000 {
-        opp-hz = /bits/ 64 <800000000>;
-        opp-microvolt = <900000>;
-    };
+		opp-hz = /bits/ 64 <800000000>;
+		opp-microvolt = <900000>;
+	};
 };
 ```
 
@@ -624,16 +624,16 @@ dmc_opp_table: opp-table3 {
 dmc_opp_table: opp-table3 {
 	compatible = "operating-points-v2";
 
-    opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
-        opp-microvolt = <800000>;               /* 单位uV */
-    };
-    ...
-    opp-800000000 {
-        opp-hz = /bits/ 64 <800000000>;
-        opp-microvolt = <900000>;
-        status = "disabled";
-    };
+	opp-200000000 {
+		opp-hz = /bits/ 64 <200000000>;         /* 单位Hz */
+		opp-microvolt = <800000>;               /* 单位uV */
+	};
+	...
+	opp-800000000 {
+		opp-hz = /bits/ 64 <800000000>;
+		opp-microvolt = <900000>;
+		status = "disabled";
+	};
 }
 ```
 
@@ -642,7 +642,7 @@ dmc_opp_table: opp-table3 {
 ```c
 &dmc_opp_table {
 	opp-800000000 {
-        status = "disabled";
+		status = "disabled";
 	}；
 };
 ```
@@ -677,37 +677,37 @@ Table节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvm
 dmc_opp_table: dmc-opp-table {
 	compatible = "operating-points-v2";
 
-    /*
-     * 从eFuse或OTP中获取DDR leakage值
-     */
-    nvmem-cells = <&logic_leakage>;
-    nvmem-cell-names = "ddr_leakage";
+	/*
+	 * 从eFuse或OTP中获取DDR leakage值
+	 */
+	nvmem-cells = <&logic_leakage>;
+	nvmem-cell-names = "ddr_leakage";
 
-    /*
-     * leakage值为1mA-10mA的芯片，使用opp-microvolt-L0指定的电压
-     * leakage值为11mA-254mA的芯片，使用opp-microvolt-L1指定的电压
-     *
-     * 如果删除rockchip,leakage-voltage-sell属性或者leakage值不在该属性指定的范围内，
-     * 则使用opp-microvolt指定的电压。
-     */
-    rockchip,leakage-voltage-sel = <
-        1   10    0
-        11  254   1
-    >;
+	/*
+	 * leakage值为1mA-10mA的芯片，使用opp-microvolt-L0指定的电压
+	 * leakage值为11mA-254mA的芯片，使用opp-microvolt-L1指定的电压
+	 *
+	 * 如果删除rockchip,leakage-voltage-sell属性或者leakage值不在该属性指定的范围内，
+	 * 则使用opp-microvolt指定的电压。
+	 */
+	rockchip,leakage-voltage-sel = <
+		1   10    0
+		11  254   1
+	>;
 
-    opp-400000000 {
-        opp-hz = /bits/ 64 <400000000>;
-        opp-microvolt = <950000>;
-        opp-microvolt-L0 = <950000>;
-        opp-microvolt-L1 = <950000>;
-    };
-    ...
+	opp-400000000 {
+		opp-hz = /bits/ 64 <400000000>;
+		opp-microvolt = <950000>;
+		opp-microvolt-L0 = <950000>;
+		opp-microvolt-L1 = <950000>;
+	};
+	...
 	opp-1066000000 {
-        opp-hz = /bits/ 64 <1066000000>;
-        opp-microvolt = <1175000>;
-        opp-microvolt-L0 = <1175000>;
-        opp-microvolt-L1 = <1150000>;
-    };
+		opp-hz = /bits/ 64 <1066000000>;
+		opp-microvolt = <1175000>;
+		opp-microvolt-L0 = <1175000>;
+		opp-microvolt-L1 = <1150000>;
+	};
 };
 ```
 
@@ -737,41 +737,41 @@ Vmin比较小，通过这一特性可以根据PVTM值降低大PVTM芯片的电�
 dmc_opp_table: dmc-opp-table {
 	compatible = "operating-points-v2";
 
-    /*
-     * PVTM值为0-50000的芯片，使用opp-microvolt-L0指定的电压；
-     * PVTM值为50001-54000的芯片，使用opp-microvolt-L1指定的电压；
-     * PVTM值为54001-60000的芯片，使用opp-microvolt-L2指定的电压；
-     * PVTM值为60001-99999的芯片，使用opp-microvolt-L3指定的电压；
-     *
-     * 如果删除rockchip,pvtm-voltage-sel属性或者PVTM值不在该属性指定的范围内，
-     * 则使用opp-microvolt指定的电压。
-     */
-    rockchip,pvtm-voltage-sel = <
-        0        50000   0
-        50001    54000   1
-        54001    60000   2
-        60001    99999   3
+	/*
+	 * PVTM值为0-50000的芯片，使用opp-microvolt-L0指定的电压；
+	 * PVTM值为50001-54000的芯片，使用opp-microvolt-L1指定的电压；
+	 * PVTM值为54001-60000的芯片，使用opp-microvolt-L2指定的电压；
+	 * PVTM值为60001-99999的芯片，使用opp-microvolt-L3指定的电压；
+	 *
+	 * 如果删除rockchip,pvtm-voltage-sel属性或者PVTM值不在该属性指定的范围内，
+	 * 则使用opp-microvolt指定的电压。
+	 */
+	rockchip,pvtm-voltage-sel = <
+		0        50000   0
+		50001    54000   1
+		54001    60000   2
+		60001    99999   3
 	>;
-    rockchip,pvtm-ch = <0 0>; /* 延用CPU的PVTM值 */
+	rockchip,pvtm-ch = <0 0>; /* 延用CPU的PVTM值 */
 
-    opp-194000000 {
-        opp-hz = /bits/ 64 <194000000>;
-        opp-microvolt = <950000>;
-        opp-microvolt-L0 = <950000>;
-        opp-microvolt-L1 = <950000>;
-        opp-microvolt-L2 = <950000>;
-        opp-microvolt-L3 = <950000>;
-    };
-    ...
+	opp-194000000 {
+		opp-hz = /bits/ 64 <194000000>;
+		opp-microvolt = <950000>;
+		opp-microvolt-L0 = <950000>;
+		opp-microvolt-L1 = <950000>;
+		opp-microvolt-L2 = <950000>;
+		opp-microvolt-L3 = <950000>;
+	};
+	...
 	opp-786000000 {
-        opp-hz = /bits/ 64 <786000000>;
-        opp-microvolt = <1100000>;
-        opp-microvolt-L0 = <1100000>;
-        opp-microvolt-L1 = <1050000>;
-        opp-microvolt-L2 = <1025000>;
-        opp-microvolt-L3 = <1000000>;
-        status = "disabled";
-    };
+		opp-hz = /bits/ 64 <786000000>;
+		opp-microvolt = <1100000>;
+		opp-microvolt-L0 = <1100000>;
+		opp-microvolt-L1 = <1050000>;
+		opp-microvolt-L2 = <1025000>;
+		opp-microvolt-L3 = <1000000>;
+		status = "disabled";
+	};
 };
 ```
 
@@ -801,10 +801,10 @@ irdrop”属性，其中“rockchip,board-irdrop”一般在板级DTS文件中�
 dmc_opp_table: dmc-opp-table {
 	compatible = "operating-points-v2";
 
-    /* 允许设置的最高电压，单位uV */
-    rockchip,max-volt = <1150000>;
-    rockchip,evb-irdrop = <25000>;/* EVB板或者SDK板的电源纹波 */
-    ...
+	/* 允许设置的最高电压，单位uV */
+	rockchip,max-volt = <1150000>;
+	rockchip,evb-irdrop = <25000>;/* EVB板或者SDK板的电源纹波 */
+	...
 }
 ```
 
@@ -812,14 +812,14 @@ dmc_opp_table: dmc-opp-table {
 
 ```c
 &dmc_opp_table {
-    /*
-    * max IR-drop values on different freq condition for this board!
-    */
-    /*
-     * 实际产品硬件，不同频率下的电源纹波情况:
-     * 451Mhz-800MHz，电源纹波为75000uV，最终电压会增加50000uV（75000-25000（EVB板纹波））
-     */
-    rockchip,board-irdrop = <
+	/*
+	 * max IR-drop values on different freq condition for this board!
+	 */
+	/*
+	 * 实际产品硬件，不同频率下的电源纹波情况:
+	 * 451Mhz-800MHz，电源纹波为75000uV，最终电压会增加50000uV（75000-25000（EVB板纹波））
+	 */
+	rockchip,board-irdrop = <
 		/* MHz	MHz	uV */
 		   451	800	75000
 	>;
@@ -849,7 +849,7 @@ dmc_opp_table: dmc-opp-table {
 	status = "okay";
 	...
 	system-status-freq = <
-		/*system status         freq(KHz)*/
+		/* system status        freq(KHz) */
 		SYS_STATUS_NORMAL       800000  /* 除了以下定义的场景，其他场景都用该频率 */
 		SYS_STATUS_REBOOT       528000  /* reboot场景，在reboot前设置DDR频率 */
 		SYS_STATUS_SUSPEND      200000  /* 一级待机场景，灭屏后设置DDR频率 */
@@ -884,17 +884,17 @@ SYS_STATUS_ISP场景下DDR频率是固定的。
 &dmc {
 	status = "okay";
 	...
-    devfreq-events = <&dfi>;            /* 通过dfi监控DDR的利用率 */
-    /*
-     * 调频阀值：
-     * 当利用率超过40%时，调到最高频，
-     * 当负载小于40%且大于40%-20%是维持当前频率
-     * 当负载小于40%-20%，会调到一个频率，使得负载差不多为40%-2%/2。
-     */
+	devfreq-events = <&dfi>;            /* 通过dfi监控DDR的利用率 */
+	/*
+	 * 调频阀值：
+	 * 当利用率超过40%时，调到最高频，
+	 * 当负载小于40%且大于40%-20%是维持当前频率
+	 * 当负载小于40%-20%，会调到一个频率，使得负载差不多为40%-2%/2。
+	 */
 	upthreshold = <40>;
 	downdifferential = <20>;
 	system-status-freq = <
-		/*system status         freq(KHz)*/
+		/* system status        freq(KHz) */
 		SYS_STATUS_NORMAL       800000  /* 启动负载变频后，该场景无效 */
 		SYS_STATUS_REBOOT       528000  /* reboot场景，在reboot前修改DDR频率的最低值 */
 		SYS_STATUS_SUSPEND      200000  /* 一级待机场景，灭屏后修改DDR频率的最低值 */
@@ -906,9 +906,9 @@ SYS_STATUS_ISP场景下DDR频率是固定的。
 		SYS_STATUS_DUALVIEW     600000  /* 双屏显示场景，第二个屏显示前固定DDR的频率 */
 		SYS_STATUS_ISP          600000  /* 拍照场景，启动ISP前固定DDR的频率 */
 	>;
-     /* 除了以上定义的场景，其他场景下DDR频率的最低值，防止提频不及时导致闪屏 */
+	/* 除了以上定义的场景，其他场景下DDR频率的最低值，防止提频不及时导致闪屏 */
 	auto-min-freq = <400000>;
-    auto-freq-en = <1>;                 /* 负载变频开关，1为开启，0为关闭 */
+	auto-freq-en = <1>;                 /* 负载变频开关，1为开启，0为关闭 */
 };
 ```
 
@@ -939,10 +939,10 @@ SYS_STATUS_ISP场景下DDR频率是固定的。
 		578     1701     300000
 		1702    99999    400000
 	>;
-    /*
-     * 除了定义的场景，其他场景下DDR频率的最低值
-     * 加入VOP带宽统计后，可将该值改成比较低的频率。
-     */
+	/*
+	 * 除了定义的场景，其他场景下DDR频率的最低值
+	 * 加入VOP带宽统计后，可将该值改成比较低的频率。
+	 */
 	auto-min-freq = <200000>;
 };
 ```
@@ -973,29 +973,29 @@ DVFS。
 
 ```c
 bus_apll: bus-apll {
-    compatible = "rockchip,px30-bus";
-    /*
-     * 使用clkfreq调频调压策略，通过注册clock notifier，监控PLL频率的变化，
-     * 如果PLL是升频，先抬压再提频，如果PLL是降频，先降频再降压.
-     */
-    rockchip,busfreq-policy = "clkfreq";
-    clocks = <&cru PLL_APLL>;                    /* 时钟配置 */
-    clock-names = "bus";
-    operating-points-v2 = <&bus_apll_opp_table>; /* OPP Table配置 */
-    status = "disabled";
+	compatible = "rockchip,px30-bus";
+	/*
+	 * 使用clkfreq调频调压策略，通过注册clock notifier，监控PLL频率的变化，
+	 * 如果PLL是升频，先抬压再提频，如果PLL是降频，先降频再降压.
+	 */
+	rockchip,busfreq-policy = "clkfreq";
+	clocks = <&cru PLL_APLL>;                    /* 时钟配置 */
+	clock-names = "bus";
+	operating-points-v2 = <&bus_apll_opp_table>; /* OPP Table配置 */
+	status = "disabled";
 };
 
 bus_apll_opp_table: bus-apll-opp-table {
-    compatible = "operating-points-v2";
-    opp-shared;
+	compatible = "operating-points-v2";
+	opp-shared;
 	/* PLL频率小于等于1008MHz，电压950mV，大于1008MHz，电压1000mV */
-    opp-1512000000 {
-        opp-hz = /bits/ 64 <1512000000>;
-        opp-microvolt = <1000000>;
-    opp-1008000000 {
-        opp-hz = /bits/ 64 <1008000000>;
-        opp-microvolt = <950000>;
-    };
+	opp-1512000000 {
+		opp-hz = /bits/ 64 <1512000000>;
+		opp-microvolt = <1000000>;
+	opp-1008000000 {
+		opp-hz = /bits/ 64 <1008000000>;
+		opp-microvolt = <950000>;
+	};
 };
 ```
 
@@ -1004,11 +1004,11 @@ bus_apll_opp_table: bus-apll-opp-table {
 ```c
 &i2c0 {
 	status = "okay";
-    rk809: pmic@20 {
+	rk809: pmic@20 {
 		compatible = "rockchip,rk809";
 		reg = <0x20>;
-        ...
-        regulators {
+		...
+		regulators {
 			vdd_logic: DCDC_REG1 {
 				regulator-always-on;
 				regulator-boot-on;
@@ -1022,8 +1022,8 @@ bus_apll_opp_table: bus-apll-opp-table {
 					regulator-suspend-microvolt = <950000>;
 				};
 			};
-        }
-    }
+		}
+	}
 }
 
 &bus_apll {
@@ -1099,40 +1099,40 @@ gpu_opp_table: gpu-opp-table {
 	compatible = "operating-points-v2";
 	...
 	opp-200000000 {
-        opp-hz = /bits/ 64 <200000000>;
-        opp-microvolt = <950000>;
-        opp-microvolt-L0 = <950000>;
-        opp-microvolt-L1 = <950000>;
-        opp-microvolt-L2 = <950000>;
-        opp-microvolt-L3 = <950000>;
-        status = "disabled";
-    };
-    opp-300000000 {
-        opp-hz = /bits/ 64 <300000000>;
-        opp-microvolt = <975000>;
-        opp-microvolt-L0 = <975000>;
-        opp-microvolt-L1 = <950000>;
-        opp-microvolt-L2 = <950000>;
-        opp-microvolt-L3 = <950000>;
-        status = "disabled";
-    };
-    opp-400000000 {
-        opp-hz = /bits/ 64 <400000000>;
-        opp-microvolt = <1050000>;
-        opp-microvolt-L0 = <1050000>;
-        opp-microvolt-L1 = <1025000>;
-        opp-microvolt-L2 = <975000>;
-        opp-microvolt-L3 = <950000>;
-    };
+		opp-hz = /bits/ 64 <200000000>;
+		opp-microvolt = <950000>;
+		opp-microvolt-L0 = <950000>;
+		opp-microvolt-L1 = <950000>;
+		opp-microvolt-L2 = <950000>;
+		opp-microvolt-L3 = <950000>;
+		status = "disabled";
+	};
+	opp-300000000 {
+		opp-hz = /bits/ 64 <300000000>;
+		opp-microvolt = <975000>;
+		opp-microvolt-L0 = <975000>;
+		opp-microvolt-L1 = <950000>;
+		opp-microvolt-L2 = <950000>;
+		opp-microvolt-L3 = <950000>;
+		status = "disabled";
+	};
+	opp-400000000 {
+		opp-hz = /bits/ 64 <400000000>;
+		opp-microvolt = <1050000>;
+		opp-microvolt-L0 = <1050000>;
+		opp-microvolt-L1 = <1025000>;
+		opp-microvolt-L2 = <975000>;
+		opp-microvolt-L3 = <950000>;
+	};
     opp-480000000 {
-        opp-hz = /bits/ 64 <480000000>;
-        opp-microvolt = <1125000>;
-        opp-microvolt-L0 = <1125000>;
-        opp-microvolt-L1 = <1100000>;
-        opp-microvolt-L2 = <1050000>;
-        opp-microvolt-L3 = <1000000>;
-        status = "disabled";
-    };
+		opp-hz = /bits/ 64 <480000000>;
+		opp-microvolt = <1125000>;
+		opp-microvolt-L0 = <1125000>;
+		opp-microvolt-L1 = <1100000>;
+		opp-microvolt-L2 = <1050000>;
+		opp-microvolt-L3 = <1000000>;
+		status = "disabled";
+	};
 };
 ```
 
