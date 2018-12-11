@@ -1170,3 +1170,20 @@ dmesg | grep pvtm
 ```c
 dmesg | grep leakage
 ```
+
+### 5.9 如何查看leakage
+
+​	执行如下命令
+
+```c
+dmesg | grep leakage
+```
+
+​	以RK3399 CPU为例，会有如下打印：
+
+```c
+[    0.656175] cpu cpu0: leakage=10 /* leakage=10，说明当前芯片小核的leakage是10mA */
+[    0.671092] cpu cpu4: leakage=20 /* leakage=20，说明当前芯片大核的leakage是20mA */
+[    1.492769] rockchip-dmc dmc: Failed to get leakage
+[    3.341084] mali ff9a0000.gpu: leakage=15
+```
