@@ -154,10 +154,10 @@ RK3328为例：
 
 ```c
 cpu0: cpu@0 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLK>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	clocks = <&cru ARMCLK>;
 };
 ```
 
@@ -167,45 +167,45 @@ cpu0: cpu@0 {
 
 ```c
 cpu_l0: cpu@0 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLKL>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	clocks = <&cru ARMCLKL>;
 };
 
 cpu_l1: cpu@1 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLKL>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	clocks = <&cru ARMCLKL>;
 };
 
 cpu_l2: cpu@2 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLKL>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	clocks = <&cru ARMCLKL>;
 };
 
 cpu_l3: cpu@3 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLKL>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	clocks = <&cru ARMCLKL>;
 };
 
 cpu_b0: cpu@100 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a72", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLKB>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a72", "arm,armv8";
+	...
+	clocks = <&cru ARMCLKB>;
 };
 
 cpu_b1: cpu@101 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a72", "arm,armv8";
-    ...
-    clocks = <&cru ARMCLKB>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a72", "arm,armv8";
+	...
+	clocks = <&cru ARMCLKB>;
 };
 ```
 
@@ -314,57 +314,57 @@ Documentation/power/opp.txt
 
 ```c
 cpu0: cpu@0 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    operating-points-v2 = <&cpu0_opp_table>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	operating-points-v2 = <&cpu0_opp_table>;
 };
 cpu1: cpu@1 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    operating-points-v2 = <&cpu0_opp_table>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	operating-points-v2 = <&cpu0_opp_table>;
 };
 cpu2: cpu@2 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-   ...
-    operating-points-v2 = <&cpu0_opp_table>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	operating-points-v2 = <&cpu0_opp_table>;
 };
 cpu3: cpu@3 {
-    device_type = "cpu";
-    compatible = "arm,cortex-a53", "arm,armv8";
-    ...
-    operating-points-v2 = <&cpu0_opp_table>;
+	device_type = "cpu";
+	compatible = "arm,cortex-a53", "arm,armv8";
+	...
+	operating-points-v2 = <&cpu0_opp_table>;
 };
 
 cpu0_opp_table: opp_table0 {
-    compatible = "operating-points-v2";
-    opp-shared;                                 /* 表示该OPP Table是多个CPU共用的 */
+	compatible = "operating-points-v2";
+	opp-shared;                                 /* 表示该OPP Table是多个CPU共用的 */
 
-     /*
-      * 频转换因子，通过一定的算法转换成频率，表示该平台支持的最高频率，超过该频率的频点，会被删除。
-      * 比如13转换成频率后是1296MHz，那么OPP Table中超过1296MHz的频点都会被删除。
-      * 用于防止误填了该平台不支持的且较高的频率，一般不需要增加。
-      */
-    rockchip,avs-scale = <13>;
+	/*
+	 * 频转换因子，通过一定的算法转换成频率，表示该平台支持的最高频率，超过该频率的频点，会被删除。
+	 * 比如13转换成频率后是1296MHz，那么OPP Table中超过1296MHz的频点都会被删除。
+	 * 用于防止误填了该平台不支持的且较高的频率，一般不需要增加。
+	 */
+	rockchip,avs-scale = <13>;
 
-    opp-408000000 {
-        opp-hz = /bits/ 64 <408000000>;         /* 单位Hz */
-        opp-microvolt = <950000 950000 1350000>;/* 单位uV，格式<target min max> */
-        clock-latency-ns = <40000>;             /* 完成变频需要的时间，单位ns */
-        /*
-         * 休眠，关闭整个大核的CPU或者关闭整个小核的CPU的时候，会将CPU频率设置为包含该属性的
-         * OPP所指定的频率。一个OPP Table中，只有一个OPP节点包含该属性。
-         */
-        opp-suspend;
-    };
-    ...
-    opp-1296000000 {
-        opp-hz = /bits/ 64 <1296000000>;
-        opp-microvolt = <1350000 1350000 1350000>;
-        clock-latency-ns = <40000>;
-    };
+	opp-408000000 {
+		opp-hz = /bits/ 64 <408000000>;         /* 单位Hz */
+		opp-microvolt = <950000 950000 1350000>;/* 单位uV，格式<target min max> */
+		clock-latency-ns = <40000>;             /* 完成变频需要的时间，单位ns */
+		/*
+		 * 休眠，关闭整个大核的CPU或者关闭整个小核的CPU的时候，会将CPU频率设置为包含该属性的
+		 * OPP所指定的频率。一个OPP Table中，只有一个OPP节点包含该属性。
+		 */
+		opp-suspend;
+	};
+	...
+	opp-1296000000 {
+		opp-hz = /bits/ 64 <1296000000>;
+		opp-microvolt = <1350000 1350000 1350000>;
+		clock-latency-ns = <40000>;
+	};
 }
 ```
 
@@ -385,21 +385,21 @@ cpu cpu0: couldn't find opp table for cpu:0, -19
 
 ```c
 cpu0_opp_table: opp_table0 {
-    compatible = "operating-points-v2";
-    opp-shared;
+	compatible = "operating-points-v2";
+	opp-shared;
 
-    opp-408000000 {
-        opp-hz = /bits/ 64 <408000000>;
-        opp-microvolt = <950000 950000 1350000>;
-        clock-latency-ns = <40000>;
-    };
-    ...
-    opp-1296000000 {
-        opp-hz = /bits/ 64 <1296000000>;
-        opp-microvolt = <1350000 1350000 1350000>;
-        clock-latency-ns = <40000>;
-        status = "disabled";
-    };
+	opp-408000000 {
+		opp-hz = /bits/ 64 <408000000>;
+		opp-microvolt = <950000 950000 1350000>;
+		clock-latency-ns = <40000>;
+	};
+	...
+	opp-1296000000 {
+		opp-hz = /bits/ 64 <1296000000>;
+		opp-microvolt = <1350000 1350000 1350000>;
+		clock-latency-ns = <40000>;
+		status = "disabled";
+	};
 }
 ```
 
@@ -408,7 +408,7 @@ cpu0_opp_table: opp_table0 {
 ```c
 &cpu0_opp_table {
 	opp-1296000000 {
-        status = "disabled";
+		status = "disabled";
 	}；
 };
 ```
@@ -439,43 +439,43 @@ Table节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvm
 
 ```c
 cpu0_opp_table: cpu0-opp-table {
-    compatible = "operating-points-v2";
-    opp-shared;
+	compatible = "operating-points-v2";
+	opp-shared;
 
-    /*
-     * 从eFuse或OTP中获取CPU leakage值
-     */
-    nvmem-cells = <&cpu_leakage>;
-    nvmem-cell-names = "cpu_leakage";
+	/*
+	 * 从eFuse或OTP中获取CPU leakage值
+	 */
+	nvmem-cells = <&cpu_leakage>;
+	nvmem-cell-names = "cpu_leakage";
 
-    /*
-     * leakage值为1mA-10mA的芯片，使用opp-microvolt-L0指定的电压
-     * leakage值为11mA-254mA的芯片，使用opp-microvolt-L1指定的电压
-     *
-     * 如果删除rockchip,leakage-voltage-sell属性或者leakage值不在该属性指定的范围内，
-     * 则使用opp-microvolt指定的电压。
-     */
-    rockchip,leakage-voltage-sel = <
-        1   10    0
-        11  254   1
-    >;
+	/*
+	 * leakage值为1mA-10mA的芯片，使用opp-microvolt-L0指定的电压
+	 * leakage值为11mA-254mA的芯片，使用opp-microvolt-L1指定的电压
+	 *
+	 * 如果删除rockchip,leakage-voltage-sell属性或者leakage值不在该属性指定的范围内，
+	 * 则使用opp-microvolt指定的电压。
+	 */
+	rockchip,leakage-voltage-sel = <
+		1   10    0
+		11  254   1
+	>;
 
-    opp-408000000 {
-        opp-hz = /bits/ 64 <408000000>;
-        opp-microvolt = <950000 950000 1350000>;
-        opp-microvolt-L0 = <950000 950000 1350000>;
-        opp-microvolt-L1 = <950000 950000 1350000>;
-        clock-latency-ns = <40000>;
-        opp-suspend;
-    };
-    ...
+	opp-408000000 {
+		opp-hz = /bits/ 64 <408000000>;
+		opp-microvolt = <950000 950000 1350000>;
+		opp-microvolt-L0 = <950000 950000 1350000>;
+		opp-microvolt-L1 = <950000 950000 1350000>;
+		clock-latency-ns = <40000>;
+		opp-suspend;
+	};
+	...
     opp-1296000000 {
-        opp-hz = /bits/ 64 <1296000000>;
-        opp-microvolt = <1350000 1350000 1350000>;
-        opp-microvolt-L0 = <1350000 1350000 1350000>;
-        opp-microvolt-L1 = <1300000 1300000 1350000>;
-        clock-latency-ns = <40000>;
-    };
+		opp-hz = /bits/ 64 <1296000000>;
+		opp-microvolt = <1350000 1350000 1350000>;
+		opp-microvolt-L0 = <1350000 1350000 1350000>;
+		opp-microvolt-L1 = <1300000 1300000 1350000>;
+		clock-latency-ns = <40000>;
+	};
 };
 ```
 
@@ -504,11 +504,11 @@ cpu0_opp_table: opp_table0 {
 	compatible = "operating-points-v2";
 	opp-shared;
 
-    /*
-     * 从eFuse或OTP中获取CPU leakage值
-     */
-    nvmem-cells = <&cpu_leakage>;
-    nvmem-cell-names = "cpu_leakage";
+	/*
+	 * 从eFuse或OTP中获取CPU leakage值
+	 */
+	nvmem-cells = <&cpu_leakage>;
+	nvmem-cell-names = "cpu_leakage";
 
 	/*
 	 * 0：表示通过删除频点，限制最高频，最终电压表不显示删除的频点；
@@ -522,15 +522,15 @@ cpu0_opp_table: opp_table0 {
 	 */
 	clocks = <&cru PLL_APLL>;
 
-    /*
-     * leakage值为1mA-10mA的芯片，最高频转换因子为17，通过一定算法转换成频率
-     * leakage值为11mA-254mA的芯片，最高频转换因子为25，通过一定算法转换成频率
-     */
-    rockchip,leakage-scaling-sel = <
-        1   10    17
-        11  254   25
-    >;
-    ...
+	/*
+	 * leakage值为1mA-10mA的芯片，最高频转换因子为17，通过一定算法转换成频率
+	 * leakage值为11mA-254mA的芯片，最高频转换因子为25，通过一定算法转换成频率
+	 */
+	rockchip,leakage-scaling-sel = <
+		1   10    17
+		11  254   25
+	>;
+	...
 }
 ```
 
@@ -562,71 +562,71 @@ Vmin比较小，通过这一特性可以根据PVTM值降低大PVTM芯片的电�
 
 ```c
 cpu0_opp_table: opp_table0 {
-    compatible = "operating-points-v2";
-    opp-shared;
+	compatible = "operating-points-v2";
+	opp-shared;
 
-    ...
-    /*
-     * 从eFuse或OTP中获取CPU工艺信息。
-     * 只有一种工艺的情况，可以不加;
-     * 包含多种工艺的情况，需要增加。
-     */
-    nvmem-cells = <&process_version>;
+	...
+	/*
+	 * 从eFuse或OTP中获取CPU工艺信息。
+	 * 只有一种工艺的情况，可以不加;
+	 * 包含多种工艺的情况，需要增加。
+	 */
+	nvmem-cells = <&process_version>;
 	nvmem-cell-names = "process";
 
-    /*
-     * 只有一种工艺需要支持PVTM，需要增加rockchip,pvtm-voltage-sel属性，OPP节点也需要增加
-     * opp-microvolt-L0、opp-microvolt-L1等属性来区分电压；
-     *
-     * 多种工艺需要支持pvtm，比如有工艺0和工艺1，如果2种工艺配置不同，则需要增加
-     * rockchip,p0-pvtm-voltage-sel和rockchip,p1-pvtm-voltage-sel两个属性，
-     * 同时OPP节点也需要增加opp-microvolt-P0-L0、opp-microvolt-P1-L0等属性来区分电压；
-     * 如果2钟工艺配置相同，也可以只增加rockchip,pvtm-voltage-sel属性。
-     *
-     * PVTM值为0-14300的芯片，使用opp-microvolt-L0指定的电压；
-     * PVTM值为14301-15000的芯片，使用opp-microvolt-L1指定的电压；
-     * PVTM值为15001-16000的芯片，使用opp-microvolt-L2指定的电压；
-     * PVTM值为16001-99999的芯片，使用opp-microvolt-L3指定的电压；
-     *
-     * 如果删除rockchip,pvtm-voltage-sel属性或者PVTM值不在该属性指定的范围内，
-     * 则使用opp-microvolt指定的电压。
-     */
-    rockchip,pvtm-voltage-sel = <
-        0        14300   0
-        14301    15000   1
-        15001    16000   2
-        16001    99999   3
-    >;
-    rockchip,pvtm-freq = <408000>;          /* 获取PVTM值前，需要先设置CPU频率，单位Khz */
-    rockchip,pvtm-volt = <1000000>;         /* 获取PVTM值前，需要先设置CPU电压，单位uV */
-    rockchip,pvtm-ch = <0 0>;               /* PVTM通道，格式<通道序号 sel的序号> */
-    rockchip,pvtm-sample-time = <1000>;     /* PVTM采样时间，单位us */
-    rockchip,pvtm-number = <10>;            /* PVTM采样个数 */
-    rockchip,pvtm-error = <1000>;           /* 允许采样数据之间的误差 */
-    rockchip,pvtm-ref-temp = <35>;          /* 参考温度 */
-    /* PVTM随温度变化的比例系数，格式 <小于参考温度的比例系数 大于参考温度的比例系数> */
-    rockchip,pvtm-temp-prop = <(-18) (-18)>;
-    rockchip,thermal-zone = "soc-thermal";  /* 通过哪个thermal-zone获取温度 */
+	/*
+	 * 只有一种工艺需要支持PVTM，需要增加rockchip,pvtm-voltage-sel属性，OPP节点也需要增加
+	 * opp-microvolt-L0、opp-microvolt-L1等属性来区分电压；
+	 *
+	 * 多种工艺需要支持pvtm，比如有工艺0和工艺1，如果2种工艺配置不同，则需要增加
+	 * rockchip,p0-pvtm-voltage-sel和rockchip,p1-pvtm-voltage-sel两个属性，
+	 * 同时OPP节点也需要增加opp-microvolt-P0-L0、opp-microvolt-P1-L0等属性来区分电压；
+	 * 如果2钟工艺配置相同，也可以只增加rockchip,pvtm-voltage-sel属性。
+	 *
+	 * PVTM值为0-14300的芯片，使用opp-microvolt-L0指定的电压；
+	 * PVTM值为14301-15000的芯片，使用opp-microvolt-L1指定的电压；
+	 * PVTM值为15001-16000的芯片，使用opp-microvolt-L2指定的电压；
+	 * PVTM值为16001-99999的芯片，使用opp-microvolt-L3指定的电压；
+	 *
+	 * 如果删除rockchip,pvtm-voltage-sel属性或者PVTM值不在该属性指定的范围内，
+	 * 则使用opp-microvolt指定的电压。
+	 */
+	rockchip,pvtm-voltage-sel = <
+		0        14300   0
+		14301    15000   1
+		15001    16000   2
+		16001    99999   3
+	>;
+	rockchip,pvtm-freq = <408000>;          /* 获取PVTM值前，需要先设置CPU频率，单位Khz */
+	rockchip,pvtm-volt = <1000000>;         /* 获取PVTM值前，需要先设置CPU电压，单位uV */
+	rockchip,pvtm-ch = <0 0>;               /* PVTM通道，格式<通道序号 sel的序号> */
+	rockchip,pvtm-sample-time = <1000>;     /* PVTM采样时间，单位us */
+	rockchip,pvtm-number = <10>;            /* PVTM采样个数 */
+	rockchip,pvtm-error = <1000>;           /* 允许采样数据之间的误差 */
+	rockchip,pvtm-ref-temp = <35>;          /* 参考温度 */
+	/* PVTM随温度变化的比例系数，格式 <小于参考温度的比例系数 大于参考温度的比例系数> */
+	rockchip,pvtm-temp-prop = <(-18) (-18)>;
+	rockchip,thermal-zone = "soc-thermal";  /* 通过哪个thermal-zone获取温度 */
 
-    opp-126000000 {
-        opp-hz = /bits/ 64 <126000000>;
-        opp-microvolt = <950000 950000 1350000>;
-        opp-microvolt-L0 = <950000 950000 1350000>;
-        opp-microvolt-L1 = <950000 950000 1350000>;
-        opp-microvolt-L2 = <950000 950000 1350000>;
-        opp-microvolt-L3 = <950000 950000 1350000>;
-        clock-latency-ns = <40000>;
-    };
-    ...
-    opp-1608000000 {
-        opp-hz = /bits/ 64 <1608000000>;
-        opp-microvolt = <1350000 1350000 1350000>;
-        opp-microvolt-L0 = <1350000 1350000 1350000>;
-        opp-microvolt-L1 = <1350000 1350000 1350000>;
-        opp-microvolt-L2 = <1300000 1300000 1350000>;
-        opp-microvolt-L3 = <1250000 1250000 1350000>;
-        clock-latency-ns = <40000>;
-    };
+	opp-126000000 {
+		opp-hz = /bits/ 64 <126000000>;
+		opp-microvolt = <950000 950000 1350000>;
+		opp-microvolt-L0 = <950000 950000 1350000>;
+		opp-microvolt-L1 = <950000 950000 1350000>;
+		opp-microvolt-L2 = <950000 950000 1350000>;
+		opp-microvolt-L3 = <950000 950000 1350000>;
+		clock-latency-ns = <40000>;
+	};
+	...
+	opp-1608000000 {
+		opp-hz = /bits/ 64 <1608000000>;
+		opp-microvolt = <1350000 1350000 1350000>;
+		opp-microvolt-L0 = <1350000 1350000 1350000>;
+		opp-microvolt-L1 = <1350000 1350000 1350000>;
+		opp-microvolt-L2 = <1300000 1300000 1350000>;
+		opp-microvolt-L3 = <1250000 1250000 1350000>;
+		clock-latency-ns = <40000>;
+	};
 };
 ```
 
@@ -669,27 +669,27 @@ cpu0_opp_table: opp_table0 {
 	 */
 	clocks = <&cru PLL_APLL>;
 
-    /*
-     * PVTM值为0-14300的芯片，最高频转换因子为17，通过一定算法转换成频率
-     * PVTM值为14301-15000的芯片，最高频转换因子为25，通过一定算法转换成频率
-     *
-     * 多种工艺的配置和4.6.1中的相同
-     */
-    rockchip,pvtm-scaling-sel = <
-        0        14300   17
-        14301    15000   25
-    >;
-    rockchip,pvtm-freq = <408000>;          /* 获取PVTM值前，需要先设置CPU频率，单位Khz */
-    rockchip,pvtm-volt = <1000000>;         /* 获取PVTM值前，需要先设置CPU电压，单位uV */
-    rockchip,pvtm-ch = <0 0>;               /* PVTM通道，格式<通道序号 sel的序号> */
-    rockchip,pvtm-sample-time = <1000>;     /* PVTM采样时间，单位us */
-    rockchip,pvtm-number = <10>;            /* PVTM采样个数 */
-    rockchip,pvtm-error = <1000>;           /* 允许采样数据之间的误差 */
-    rockchip,pvtm-ref-temp = <35>;          /* 参考温度 */
-    /* PVTM随温度变化的比例系数，格式 <小于参考温度的比例系数 大于参考温度的比例系数> */
-    rockchip,pvtm-temp-prop = <(-18) (-18)>;
-    rockchip,thermal-zone = "soc-thermal";  /* 通过哪个thermal-zone获取温度 */
-    ...
+	/*
+	 * PVTM值为0-14300的芯片，最高频转换因子为17，通过一定算法转换成频率
+	 * PVTM值为14301-15000的芯片，最高频转换因子为25，通过一定算法转换成频率
+	 *
+	 * 多种工艺的配置和4.6.1中的相同
+	 */
+	rockchip,pvtm-scaling-sel = <
+		0        14300   17
+		14301    15000   25
+	>;
+	rockchip,pvtm-freq = <408000>;          /* 获取PVTM值前，需要先设置CPU频率，单位Khz */
+	rockchip,pvtm-volt = <1000000>;         /* 获取PVTM值前，需要先设置CPU电压，单位uV */
+	rockchip,pvtm-ch = <0 0>;               /* PVTM通道，格式<通道序号 sel的序号> */
+	rockchip,pvtm-sample-time = <1000>;     /* PVTM采样时间，单位us */
+	rockchip,pvtm-number = <10>;            /* PVTM采样个数 */
+	rockchip,pvtm-error = <1000>;           /* 允许采样数据之间的误差 */
+	rockchip,pvtm-ref-temp = <35>;          /* 参考温度 */
+	/* PVTM随温度变化的比例系数，格式 <小于参考温度的比例系数 大于参考温度的比例系数> */
+	rockchip,pvtm-temp-prop = <(-18) (-18)>;
+	rockchip,thermal-zone = "soc-thermal";  /* 通过哪个thermal-zone获取温度 */
+	...
 }
 ```
 
@@ -719,14 +719,14 @@ cpu0_opp_table: opp_table0 {
 
 ```c
 cpu0_opp_table: cpu0-opp-table {
-    compatible = "operating-points-v2";
-    opp-shared;
+	compatible = "operating-points-v2";
+	opp-shared;
 
     /* 允许设置的最高电压，单位uV */
-    rockchip,max-volt = <1350000>;
-    rockchip,evb-irdrop = <25000>;/* EVB板或者SDK板的电源纹波 */
+	rockchip,max-volt = <1350000>;
+	rockchip,evb-irdrop = <25000>;/* EVB板或者SDK板的电源纹波 */
 
-    /*
+	/*
 	 * 0：表示通过删除频点，调整最高频，最终电压表不显示删除的频点；
 	 * 1：表示在clock驱动层限制最高频，最终电压表显示所有频点；
 	 * 2：表示在cpufreq框架层限制最高频，最终电压表显示所有频点；
@@ -737,7 +737,7 @@ cpu0_opp_table: cpu0-opp-table {
 	 * 给CPU提供时钟的PLL对应的clock，rockchip,avs为1时才需要该属性。
 	 */
 	clocks = <&cru PLL_APLL>;
-    ...
+	...
 }
 ```
 
@@ -745,21 +745,21 @@ cpu0_opp_table: cpu0-opp-table {
 
 ```c
 &cpu0_opp_table {
-    /*
-    * max IR-drop values on different freq condition for this board!
-    */
-    /*
-     * 实际产品硬件，不同频率下的电源纹波情况:
-     * 0Mhz-815MHz，电源纹波为37500uV，最终电压会增加12500uV（37500-25000（evb板纹波））
-     * 816Mhz-1119MHz，电源纹波为50000uV，最终电压会增加25000uV（50000-25000（evb板纹波））
-     * 1200Mhz-1512MHz，电源纹波为75000uV，最终电压会增加50000uV（75000-25000（evb板纹波））
-     */
-    rockchip,board-irdrop = <
-        /*MHz	MHz		uV */
-        0		815		37500
-        816		1119	50000
-        1200	1512	75000
-    >;
+	/*
+	 * max IR-drop values on different freq condition for this board!
+	 */
+	/*
+	 * 实际产品硬件，不同频率下的电源纹波情况:
+	 * 0Mhz-815MHz，电源纹波为37500uV，最终电压会增加12500uV（37500-25000（evb板纹波））
+	 * 816Mhz-1119MHz，电源纹波为50000uV，最终电压会增加25000uV（50000-25000（evb板纹波））
+	 * 1200Mhz-1512MHz，电源纹波为75000uV，最终电压会增加50000uV（75000-25000（evb板纹波））
+	 */
+	rockchip,board-irdrop = <
+	/*MHz	MHz		uV */
+		0		815		37500
+		816		1119	50000
+		1200	1512	75000
+	>;
 };
 ```
 
@@ -952,7 +952,7 @@ cat /sys/kernel/debug/opp/opp_summary
 
 ```c
 opp-816000000 {
-    opp-hz = /bits/ 64 <816000000>;
+	opp-hz = /bits/ 64 <816000000>;
 	opp-microvolt = <1075000 1075000 1350000>;
 	opp-microvolt-L0 = <1075000 1075000 1350000>;
 	opp-microvolt-L1 = <1050000 1050000 1350000>;
@@ -966,7 +966,7 @@ opp-816000000 {
 
 ```c
 opp-816000000 {
-    opp-hz = /bits/ 64 <816000000>;
+	opp-hz = /bits/ 64 <816000000>;
     /* 单位uV，格式<target min max>，只需修改target和min，max为最高电压，不需要修改 */
 	opp-microvolt = <1100000 1100000 1350000>;
 	opp-microvolt-L0 = <1100000 1100000 1350000>;
