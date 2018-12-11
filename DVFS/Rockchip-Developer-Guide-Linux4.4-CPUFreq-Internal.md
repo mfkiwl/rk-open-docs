@@ -1142,3 +1142,31 @@ cat /sys/kernel/debug/regulator/vdd_core_b/voltage            /* 查看小核电
 ```
 
 ​	注意：升频时，先升压再升频，降频时，先降频再降压。
+
+### 5.8 如何查看当前电压的档位
+
+​	如果是通过PVTM调压，执行如下命令
+
+```c
+dmesg | grep pvtm
+```
+
+​	以RK3399 CPU为例，会打印出如下信息：
+
+```c
+[    0.669456] cpu cpu0: temp=22222, pvtm=138792 (140977 + -2185)
+/* pvtm-volt-sel=0，说明当前芯片小核用的是opp-microvolt-L0对应的电压 */
+[    0.670601] cpu cpu0: pvtm-volt-sel=0
+[    0.683008] cpu cpu4: temp=22222, pvtm=148761 (150110 + -1349)
+/* pvtm-volt-sel=1，说明当前芯片大核用的是opp-microvolt-L1对应的电压 */
+[    0.683109] cpu cpu4: pvtm-volt-sel=1
+[    1.495247] rockchip-dmc dmc: Failed to get pvtm
+[    3.366028] mali ff9a0000.gpu: temp=22777, pvtm=120824 (121698 + -874)
+[    3.366915] mali ff9a0000.gpu: pvtm-volt-sel=0
+```
+
+​	同理如果是通过leakage调压，则执行如下命令，也有类似打印输出。
+
+```c
+dmesg | grep leakage
+```
