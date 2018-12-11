@@ -1188,3 +1188,30 @@ cat /sys/kernel/debug/regulator/vdd_logic/voltage
 ```
 
 ​	注意：升频的时候，先升压再升频；降频的时候，先降频再降压。
+
+### 6.6 如何查看当前电压的档位
+
+​	如果是通过PVTM调压，执行如下命令
+
+```c
+dmesg | grep pvtm
+```
+
+​	以RK3399 GPU为例，会打印出如下信息：
+
+```c
+[    0.669456] cpu cpu0: temp=22222, pvtm=138792 (140977 + -2185)
+[    0.670601] cpu cpu0: pvtm-volt-sel=0
+[    0.683008] cpu cpu4: temp=22222, pvtm=148761 (150110 + -1349)
+[    0.683109] cpu cpu4: pvtm-volt-sel=0
+[    1.495247] rockchip-dmc dmc: Failed to get pvtm
+[    3.366028] mali ff9a0000.gpu: temp=22777, pvtm=120824 (121698 + -874)
+/* pvtm-volt-sel=0，说明当前芯片GPU用的是opp-microvolt-L0对应的电压 */
+[    3.366915] mali ff9a0000.gpu: pvtm-volt-sel=0
+```
+
+​	同理如果是通过leakage调压，则执行如下命令，也有类似打印输出。
+
+```c
+dmesg | grep leakage
+```
