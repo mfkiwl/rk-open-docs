@@ -1233,3 +1233,74 @@ dmesg | grep leakage
 /* leakage=15，说明当前芯片GPU的leakage是15mA */
 [    3.341084] mali ff9a0000.gpu: leakage=15
 ```
+
+### 6.8 如何修改电压
+
+​	方法一：直接修改电压表，以GPU 200MHz抬压25000uV为例。
+
+​	假设默认200MHz的OPP节点如下：
+
+```c
+opp-200000000 {
+	opp-hz = /bits/ 64 <200000000>;
+	opp-microvolt = <800000>;
+	opp-microvolt-L0 = <800000>;
+	opp-microvolt-L1 = <800000>;
+	opp-microvolt-L2 = <800000>;
+	opp-microvolt-L3 = <800000>;
+};
+```
+
+​	修改后：
+
+```c
+opp-200000000 {
+	opp-hz = /bits/ 64 <200000000>;
+	/* 每个档位都要加25000uV */
+	opp-microvolt = <825000>;
+	opp-microvolt-L0 = <825000>;
+	opp-microvolt-L1 = <825000>;
+	opp-microvolt-L2 = <825000>;
+	opp-microvolt-L3 = <825000>;
+};
+```
+
+​	方法二：通过修改IR-Drop的配置，调整电压。以GPU 200MHz抬压25000uV为例。
+
+​	假设IR-Drop默认配置如下：
+
+```c
+&gpu_opp_table {
+	/*
+	 * max IR-drop values on different freq condition for this board!
+	 */
+	/*
+	 * 实际产品硬件，不同频率下的电源纹波情况:
+	 * 200Mhz-520MHz，电源纹波为50000uV，最终电压会增加25000uV（50000-25000（EVB板纹波））
+	 */
+	rockchip,board-irdrop = <
+		/* MHz	MHz	uV */
+		   200	520 50000
+	>;
+};
+```
+
+​	修改后如下：
+
+```c
+&gpu_opp_table {
+	/*
+	 * max IR-drop values on different freq condition for this board!
+	 */
+	/*
+	 * 实际产品硬件，不同频率下的电源纹波情况:
+	 * 200Mhz-299MHz，电源纹波为75000uV，最终电压会增加50000uV（75000-25000（EVB板纹波））
+	 * 300Mhz-520MHz，电源纹波为50000uV，最终电压会增加25000uV（50000-25000（EVB板纹波））
+	 */
+	rockchip,board-irdrop = <
+		/* MHz	MHz	uV */
+		   200	299 75000  /* 200MHz-299MHz从之前的50000改成了75000 */
+		   300	520 50000
+	>;
+};
+```
