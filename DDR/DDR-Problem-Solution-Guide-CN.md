@@ -79,7 +79,7 @@
 
    如下图第一行为DDR版本号，第3行DDR频率，第4行DDR类型，第五行从左到右分别为系统的位宽数，列数，bank数，行数，片选数，颗粒的位宽数和总容量。第7行“OUT"打印出来后表面DDR初始化成功并退出，再下面就是usbplug或者miniloader 打印的log。这中间Die Bus-Width比实际的大不会有问题，但是比实际的小会引起死机。
 
-![DDR_Init_log](DDR问题排查手册\DDR_Init_log.jpg)
+![DDR_Init_log](DDR-Problem-Solution-Guide\DDR_Init_log.jpg)
 
 3. 看显示是否正常。
 
@@ -88,11 +88,11 @@
    2. 如果显示异常。
       1. 如下图花屏的话有可能是DDR变频的过程中死机了导致DDR处于不可访问状态，这时候可以定频试试。或者可能是电源问题导致DDR控制器逻辑异常。
 
-      ![显示花屏](DDR问题排查手册\显示花屏.jpg)
+      ![显示花屏](DDR-Problem-Solution-Guide\显示花屏.jpg)
 
       2. 如下图重影的话，之前遇到类似的情况是由于板子参考层不完整触发的Elpida，mira，kingston等DDR3死机问题。可尝试提高VCC_DDR电压到1.6V或者将颗粒的dll bypass掉解决。
 
-         ![显示重影](DDR问题排查手册\显示重影.jpg)
+         ![显示重影](DDR-Problem-Solution-Guide\显示重影.jpg)
 
 4. 排查是否是电源问题
 

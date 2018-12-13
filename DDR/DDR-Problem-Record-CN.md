@@ -107,14 +107,14 @@ graph TD
 #### 问题原因
 REBOOT测试时VCCIO会塌陷到2.5V,而RESET检测VCCIO的阀值为2.63V。所以导致RESET信号有效，从而复位了CPU，最终导致OS_REG的标志没了。再次启动后，就判断不到这个标志，从而进入不了recovery模式。下面是电源塌陷的波形
 
-![RK3228B_VCCIO_drop](DDR遇到的问题记录/RK3228B_VCCIO_drop.jpg)
+![RK3228B_VCCIO_drop](DDR-Problem-Record/RK3228B_VCCIO_drop.jpg)
 
 #### 解决办法
 由于塌陷是DC-DC导致的，最好的解决办法是换DC-DC。但是基于客户不换的解决办法是：
 
 将输出端C532更改为22Uf,同时将U509第3PIN加22uF电容,保证VCCIO塌陷不触发reset,功能即正常
-![RK3228B_VCCIO](DDR遇到的问题记录/RK3228B_VCCIO.jpg)
-![RK3228B_RESET_IC](DDR遇到的问题记录/RK3228B_RESET_IC.jpg)
+![RK3228B_VCCIO](DDR-Problem-Record/RK3228B_VCCIO.jpg)
+![RK3228B_RESET_IC](DDR-Problem-Record/RK3228B_RESET_IC.jpg)
 
 
 
@@ -130,7 +130,7 @@ REBOOT测试时VCCIO会塌陷到2.5V,而RESET检测VCCIO的阀值为2.63V。所�
 1. 让客户提供DDR3L的datasheet和原理图
 2. 看到DDR3L是512Mx16bit的，认真对比datasheet和开机log的DDR信息，发现DDR3L是2CS的，而开机log只识别到一个CS
 
-![PX3-2cs-die](DDR遇到的问题记录/PX3-2cs-die.jpg)
+![PX3-2cs-die](DDR-Problem-Record/PX3-2cs-die.jpg)
 
 3. 因为PX3芯片设计本身有一个局限，就是当颗粒的row数量为16时，这时候CS信号被拿过来当row15信号了，因此row数量为16时，只能支持一个CS。具体见“interconnect”章节的描述。
 
@@ -139,7 +139,7 @@ REBOOT测试时VCCIO会塌陷到2.5V,而RESET检测VCCIO的阀值为2.63V。所�
 4. 认真看了DDR3L的datasheet，确实是dual-die的，不是16跟row信号。所以，导致只识别到一个CS的问题，肯定不是芯片本身的这个局限导致的。
 5. 查看客户的原理图，发现颗粒板子只有CS0
 
-![PX3-原理图-1CS](DDR遇到的问题记录/PX3-原理图-1CS.jpg)
+![PX3-原理图-1CS](DDR-Problem-Record/PX3-原理图-1CS.jpg)
 
 #### 问题原因
 DDR3L是2个CS的颗粒，而客户原理图只连了一个CS0到颗粒。导致容量少了一半。
@@ -264,15 +264,15 @@ graph TD
 
 下图为实测到dll bypass下 read到的dqs信号，通过实际测量到的波形看，确实dqs1上的两个颗粒输出的dqs相位差比较大导致上升沿存在一个比较严重的台阶，严重影响信号质量。
 
-![x4颗粒dll_bypass下的DQS read信号](DDR遇到的问题记录\x4颗粒dll_bypass下的DQS read信号.png)
+![x4颗粒dll_bypass下的DQS read信号](DDR-Problem-Record\x4颗粒dll_bypass下的DQS read信号.png)
 
 2. 通过jedec标准可以知道，当dll bypass时 ddr的tDQSCK是在0.75-1.25tck之间范围比较广，而dll on的情况下tdqsck是在±225ps，相对比较小。所以尝试将dll enable起来看看dll enable下dqs的信号。下图为dll enable下的dqs的输出相位就比较一致。
 
-![x4颗粒dll_enable下的DQS read信号](DDR遇到的问题记录\x4颗粒dll_enable下的DQS read信号.png)
+![x4颗粒dll_enable下的DQS read信号](DDR-Problem-Record\x4颗粒dll_enable下的DQS read信号.png)
 
 3. 在dll enable之后3块板子中的两块观察到DQS均是对齐的，但是其中一块板子出现了如下波形， 而出现这种波形的原因是其中一个颗粒的DQS是正常的 而其他三个颗粒的DQS都推后了一个cycle引起的。试验发现初始化时发送带dll reset 的MR0 会引起该现象，而发送MR0 不带DLL reset或者发送带DLL reset的MR0后再发送一次不带DLL reset的MR0 会恢复正常。但是DLL reset 在jedec中的规定是self-clearing的，只能说这个颗粒比较奇怪，违反了jedec规定，需要手动去clear DLL reset bit。
 
-![x4颗粒dll_enable下的异常的DQS read信号](DDR遇到的问题记录\x4颗粒dll_enable下的异常的DQS read信号.jpg)
+![x4颗粒dll_enable下的异常的DQS read信号](DDR-Problem-Record\x4颗粒dll_enable下的异常的DQS read信号.jpg)
 
 
 
@@ -300,7 +300,7 @@ reboot后必现的在training处卡住，由于3126没有ddr reset pin，在打�
 
 1. 通过测量波形发现与之前MR0中的dll reset bit需要手动清0 的颗粒类似， 如下图，其中一个颗粒的DQS输出正常，而另一个颗粒的DQS 推迟了2个cycle 导致整个波形都是异常的。但是这个问题重新发送MR0 并不能够解决问题。
 
-![x4颗粒reboot死机下read DQS信号](DDR遇到的问题记录\x4颗粒reboot死机下read DQS信号.png)
+![x4颗粒reboot死机下read DQS信号](DDR-Problem-Record\x4颗粒reboot死机下read DQS信号.png)
 
 2. 从现象上看其中一个颗粒的cl 为8， 而其他3个颗粒均为6. 而8应该是系统中上次开机400M下的cl值。
 3. 正常上电开机后系统中变频的cl设置是成功的。
@@ -730,7 +730,7 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 系统开机或者运行过程中系统死机，没有任何一次log直接卡住，同时显示异常呈现竖条纹状重影花屏。
 
-![显示重影](DDR遇到的问题记录\显示重影.jpg)
+![显示重影](DDR-Problem-Record\显示重影.jpg)
 
 #### 分析过程
 
@@ -815,15 +815,15 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 - 测量CA0-CA5，CS0-CS3、CKE0/1、RESET。只发现RESET有一段时间是中间电平，如下图。其他信号的幅度和相位都没有问题。
 
-  ![LP4_RESET_50MHz-fail](DDR遇到的问题记录/LP4_RESET_50MHz-fail.jpg)
+  ![LP4_RESET_50MHz-fail](DDR-Problem-Record/LP4_RESET_50MHz-fail.jpg)
 
 #### 问题原因
 
 最终确认，问题原因正是由于RESET信号的这段中间电平导致的。而这段中间电平，是由于366/272 ball颗粒只有一根RESET_n信号，硬件上把2个RK通道的RESET信号连在一起，然后再连到颗粒的RESET_n信号，导致二驱一，所以出了中间电平。硬件连接如下图
 
-![RK3399_LP4_DDR0_RST](DDR遇到的问题记录/RK3399_LP4_DDR0_RST.jpg)
+![RK3399_LP4_DDR0_RST](DDR-Problem-Record/RK3399_LP4_DDR0_RST.jpg)
 
-![RK3399_LP4_die_RESET_n](DDR遇到的问题记录/RK3399_LP4_die_RESET_n.jpg)
+![RK3399_LP4_die_RESET_n](DDR-Problem-Record/RK3399_LP4_die_RESET_n.jpg)
 
 #### 解决方法
 
@@ -831,11 +831,11 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 但是，由于200ball的颗粒，是有2个RESET_n信号的，所以接法跟366/272 ball不同，是RK主控每个通道的RESET连接到对应颗粒的RESET_n，如下图：
 
-![RK3399_LP4_200_DDR0_RST](DDR遇到的问题记录/RK3399_LP4_200_DDR0_RST.jpg)
+![RK3399_LP4_200_DDR0_RST](DDR-Problem-Record/RK3399_LP4_200_DDR0_RST.jpg)
 
-![RK3399_LP4_200_die_DDR0_RST](DDR遇到的问题记录/RK3399_LP4_200_die_DDR0_RST.jpg)
+![RK3399_LP4_200_die_DDR0_RST](DDR-Problem-Record/RK3399_LP4_200_die_DDR0_RST.jpg)
 
-![RK3399_LP4_200_die_DDR1_RST](DDR遇到的问题记录/RK3399_LP4_200_die_DDR1_RST.jpg)
+![RK3399_LP4_200_die_DDR1_RST](DDR-Problem-Record/RK3399_LP4_200_die_DDR1_RST.jpg)
 
 所以，让Channel 1的RESET驱动为高阻态，是不行的，这样200ball的通道1颗粒是没有被正确复位的。
 
@@ -849,33 +849,33 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 - 在loader对LPDDR4初始化时，为了兼顾366/272 ball和200ball这两种RESET的连接方式，我们采用pctl_start前让Channel 1 RESET驱动强度为240欧，Channel 0还是正常的40欧配置。然后保证Channel 0先初始化，即Channel 0的RESET先拉高，这时候由于Channel 1还是输出低的，但是由于驱动强度只有240欧，所以对于366/272 ball二驱一的最终电压是0.85*VDDQ，这个电压已经大于VIH(AC)，足够让颗粒认为这是一个有效的RESET_n信号了,如下图
 
-  ![366ball_only_ch0_rst_output](DDR遇到的问题记录/366ball_only_ch0_rst_output.jpg)
+  ![366ball_only_ch0_rst_output](DDR-Problem-Record/366ball_only_ch0_rst_output.jpg)
 
   等到Channel 1也初始化时，它的RESET也会输出高电平，二驱一的最终电平就是VDDQ了，整个过程如下图。
 
-  ![366ball_ch0_rst_to_ch1_rst_delay](DDR遇到的问题记录/366ball_ch0_rst_to_ch1_rst_delay.jpg)
+  ![366ball_ch0_rst_to_ch1_rst_delay](DDR-Problem-Record/366ball_ch0_rst_to_ch1_rst_delay.jpg)
 
   如果放大来看2个电平跳变的波形如下图
 
-  ![366ball_ch0_rst_output_to_ch1_rst_output_rise_time](DDR遇到的问题记录/366ball_ch0_rst_output_to_ch1_rst_output_rise_time.jpg)
+  ![366ball_ch0_rst_output_to_ch1_rst_output_rise_time](DDR-Problem-Record/366ball_ch0_rst_output_to_ch1_rst_output_rise_time.jpg)
 
   而对于200ball，Channel 0初始化时，因为RESET是正常驱动强度，所以上升沿比较快，如下图
 
-  ![200ball_ch0_rst_output](DDR遇到的问题记录/200ball_ch0_rst_output.jpg)
+  ![200ball_ch0_rst_output](DDR-Problem-Record/200ball_ch0_rst_output.jpg)
 
   但是Channel 1初始化时，由于RESET驱动强度只有240欧，所以只是信号上升时间被拉长，实测18ns，最终还是可以拉到高电平，如下图
 
-  ![200ball_ch1_rst_output](DDR遇到的问题记录/200ball_ch1_rst_output.jpg)
+  ![200ball_ch1_rst_output](DDR-Problem-Record/200ball_ch1_rst_output.jpg)
 
   不用担心RESET上升时间变成，会导致后续命令在其上升期间发出，因为LPDDR4在RESET_n拉高后，还需要等待tINIT3，而tINIT3有2ms之多。
 
-  ![RK3399_LP4_tINIT3](DDR遇到的问题记录/RK3399_LP4_tINIT3.jpg)
+  ![RK3399_LP4_tINIT3](DDR-Problem-Record/RK3399_LP4_tINIT3.jpg)
 
   这样就能完美的兼顾366/272ball和200ball的问题了。
 
 - 一定要保证Channel 0先初始化，否则如果Channel 1先初始化，这时候Channel 1 RESET是用240欧来驱动高电平，而Channel 0 RESET却是用40欧来驱动低电平，最终二驱一的电平0.14*VDDQ，根本不够VIH(AC)，不会被认为是有效RESET_n信号的，如下图
 
-  ![366ball_if_ch0_rst_first_ch0_40_ch1_240](DDR遇到的问题记录/366ball_if_ch0_rst_first_ch0_40_ch1_240.jpg)
+  ![366ball_if_ch0_rst_first_ch0_40_ch1_240](DDR-Problem-Record/366ball_if_ch0_rst_first_ch0_40_ch1_240.jpg)
 
 - 等pctl_start初始化完以后，我们还是将Channel 1 RESET驱动强度改成正常的40欧，主要是为了提高防静电能力，怕240欧抗静电能力不足。而且pctl_start后，两个Channel的RESET都输出高电平了，这时候修改驱动强度，并不会导致幅度变化。
 
