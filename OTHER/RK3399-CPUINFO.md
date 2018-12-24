@@ -20,7 +20,6 @@
 | -------- | -------- |
 | RK3399   | 4.4      |
 
-
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
@@ -30,7 +29,6 @@
 软件开发工程师
 
 硬件开发工程师
-
 
 **修订记录**
 
@@ -44,8 +42,7 @@
 
 ---
 
-
-#  RK3399 CPUINFO 说明
+## RK3399 CPUINFO 说明
 
 ```c
 [    0.216592] rockchip-cpuinfo cpuinfo: Serial         : 0000000000000000
@@ -143,6 +140,7 @@ efuse0: efuse@ff690000 {
 	};
 };
 ```
+
 *kernel\arch\arm64\boot\dts\rockchip\rk3399-android.dtsi*
 
 ```c#
