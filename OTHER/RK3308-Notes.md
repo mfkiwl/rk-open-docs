@@ -61,6 +61,64 @@ RK3308B-EVB-V10要通过板子右边预留过孔飞线，使用的时候要请�
 
 ![](RK3308-Notes\RK3308B-EVB-V10.jpg)
 
+## 启动速度
+
+| Board               | Storage  | Mode    | DDR  | miniloader | trust | u-boot | kernel |
+| ------------------- | -------- | ------- | ---- | ---------- | ----- | ------ | ------ |
+| RK3308_VOICE_MODULE | SLC NAND | AArch32 | 10   | 242        | 13    | 628    | 530    |
+| RK3308_EVB_V10      | eMMC     | AArch64 | 18   | 83         | 19    | 338    | 1125   |
+| RK3308_EVB_V11      | SLC NAND | AArch64 | 18   | 270        | 18    | 653    | 1111   |
+| RK3308B_EVB_V10     | SPI NAND | AArch64 |      | 420        | 19    | 696    | 1215   |
+
+- 时间单位 ms
+
+- 测试的时候dts中屏蔽掉u2phy，因为发现这个模块对启动速度有几百毫秒的不稳定影响（300或者600）
+
+- DDR初始化时间仅供参考，发现时间不稳定，有时候十几毫秒，有时候打印出来只有1~2毫秒
+
+- 测试固件\\10.10.10.164\Linux_Repository\RK3308\IMAGE\20181212-RK3308-RK3308B，u-boot，kernel自己编译
+
+- u-boot：
+
+  ```c
+  commit f70f0bfd86cf8392694a891f5dc4b49db729dde7 (HEAD -> next-dev, origin/next-dev)
+  Author: Jason Zhu <jason.zhu@rock-chips.com>
+  Date:   Mon Nov 19 22:12:33 2018 +0800
+
+      gpt: repair the gpt table when head or backup gpt table is invalid
+
+      There is some gpt table errors when use open source tools to download
+      gpt table or is destroyed by other procedure.
+      Such as:
+      1.Get error storage size.
+      2.Download the gpt table in the error place.
+      3.The gpt table is destroyed by other procedure.
+
+      So test the gpt table is correct or not firstly. If the gpt table header is
+      error, update the correct gpt table. If the last partition size error in
+      the gpt table entry, get the size of current storage by dev_desc and update
+      the last partition size.
+
+      Change-Id: I0ef91a0f8462eca52924d17c5aaefcdae602267d
+      Signed-off-by: Jason Zhu <jason.zhu@rock-chips.com>
+  ```
+
+- kernel：
+
+  ```
+  commit b94ecddd31d6d3d4db789f3da6943ac48b (HEAD -> develop-4.4， origin/develop-4.4)
+  Author: David.Wu <david.wu@rock-chips.com>
+  Date:   Mon Dec 24 19:40:52 2018 +0800
+
+      pinctrl: rockchip: Add gpio3b4 io function recalculated select for RK3308B
+
+      Accroding to the datasheet, the pin of gpio3b4 needs to be
+      recalculated for iomux selecting.
+
+      Change-Id: I62cc16cae96fe2f9624d9c5940f9c34b304eaed7
+      Signed-off-by: David Wu <david.wu@rock-chips.com>
+  ```
+
 ## 开发过程中遇到的问题
 
 ### 1、CPU Qos 优先级过高导致EMMC 读写超时
