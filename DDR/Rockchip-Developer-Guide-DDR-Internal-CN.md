@@ -182,15 +182,15 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
   [4:0]bit用于配置 Output Impedance pull-down
 
-  ![CTL_DS_ODT](DDR-Develop-Guide-Internal/CTL_DS_ODT.jpg)
+  ![CTL_DS_ODT](Rockchip-Developer-Guide-DDR-Internal/CTL_DS_ODT.jpg)
 
   驱动强度(DS)和ODT的值可以分别根据下面两张配置表进行配置
 
-  驱动强度(DS)配置表：![CTL_DS](DDR-Develop-Guide-Internal/CTL_DS.jpg)
+  驱动强度(DS)配置表：![CTL_DS](Rockchip-Developer-Guide-DDR-Internal/CTL_DS.jpg)
 
   ODT配置表：
 
-  ![CTL_ODT](DDR-Develop-Guide-Internal/CTL_ODT.jpg)
+  ![CTL_ODT](Rockchip-Developer-Guide-DDR-Internal/CTL_ODT.jpg)
 
   ​
 
@@ -356,7 +356,7 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
   DDR3\_Rtt\_Nom\_XXX、LPDDR3\_ODT\_XXX，表示对应DDR颗粒端的ODT
 
-  ​
+  
 
   芯片：RK3126B、RK3126C走trust流程
 
