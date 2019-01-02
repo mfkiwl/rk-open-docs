@@ -2,7 +2,7 @@
 
 发布版本：1.0
 
-文件密级：公开资料
+文件密级：内部资料
 
 ------
 
@@ -605,6 +605,7 @@ jenkins的每个Job都有一个独立的workspace, 其目录是builder根目录�
 	sudo pip install jinja2
 	sudo pip install PyYaml
 	sudo pip install pyelftools
+	sudo pip install python-dev
 
 #### 交叉编译工具
 编译工具是提前从rk29部署好的，需要使用的job可以用链接的方式来获取编译工具的路径．
@@ -622,7 +623,7 @@ jenkins的每个Job都有一个独立的workspace, 其目录是builder根目录�
 ####　Kernel/U-Boot编译环境
 Kernel/U-Boot编译依赖软件包
 
-	sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libssl-dev lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip device-tree-compiler swig
+	sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libssl-dev lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip device-tree-compiler swig liblz4-tool
 
 #### Buildroot编译环境
 Buildroot编译依赖软件包
