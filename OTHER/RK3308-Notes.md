@@ -202,7 +202,171 @@ while true; do stressapptest -f /data/1 -f /data/2 -f /data/3 -f /data/4; done
 
 查阅TRM发现，RK3308 默认CPU Qos优先级位2，一般普通外设优先级位1、比CPU低。在DDR初始化阶段把CPU Qos优先级设置为1，其他外设Qos 优先级设置为2、问题解决。
 
-### 2、Soft Reset方案选择
+### 2、eMMC/SDIO控制器状态机信号采样点不同导致Tuning异常
+
+**现象：**
+
+Reboot压力测试过程中过程中发现系统CPU高概率block或者lockup，fiq可以看到系统卡在mmc那边。
+
+```c
+/dev/mmcblk0p8: 20/10608 files (0.0% non-contiguous), 1432/65536 blocks
+resize2fs 1.43.9 (8-Feb-2018)
+The filesystem is already 65536 (1k) blocks long.  Nothing to do!
+
+[    7.397688] EXT4-fs (mmcblk0p9): mounting ext2 file system using the ext4 subsystem
+[    7.419687] EXT4-fs (mmcblk0p9): mounted filesystem without journal. Opts: (null)
+[    7.424024] EXT4-fs (mmcblk0p8): mounting ext2 file system using the ext4 subsystem
+[    7.428019] EXT4-fs (mmcblk0p8): mounted filesystem without journal. Opts: (null)
+Starting pulseaudio: W: [pulseaudio] main.c: Running in system mode, but --disallow-exit not set.
+W: [pulseaudio] main.c: Running in system mode, but --disallow-module-loading not set.
+N: [pulseaudio] main.c: Running in system mode, forcibly disabling SHM mode.
+E: [pulseaudio] main.c: Daemon startup failed.
+OK
+Successfully initialized wpa_supplicant
+[  240.293391] INFO: task kworker/u8:1:38 blocked for more than 120 seconds.
+[  240.294002]       Not tainted 4.4.120 #190
+[  240.294422] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  240.295123] kworker/u8:1    D ffffff80080856c8     0    38      2 0x00000000
+[  240.295810] Workqueue: events_power_efficient reg_check_chans_work
+[  240.296379] Call trace:
+[  240.296615] [<ffffff80080856c8>] __switch_to+0x94/0xbc
+[  240.297079] [<ffffff8008b8b71c>] __schedule+0x324/0x624
+[  240.297560] [<ffffff8008b8ba8c>] schedule+0x70/0x84
+[  240.298001] [<ffffff8008b8bd54>] schedule_preempt_disabled+0x14/0x1c
+[  240.298577] [<ffffff8008b8d108>] __mutex_lock_slowpath+0xa4/0x11c
+[  240.299123] [<ffffff8008b8d1bc>] mutex_lock+0x3c/0x50
+[  240.299603] [<ffffff80089c4fec>] rtnl_lock+0x1c/0x24
+[  240.300058] [<ffffff8008af4980>] reg_check_chans_work+0x34/0x2dc
+[  240.300624] [<ffffff80080b2e30>] process_one_work+0x218/0x370
+[  240.301149] [<ffffff80080b3cec>] worker_thread+0x2e0/0x3a0
+[  240.301674] [<ffffff80080b8be8>] kthread+0xdc/0xec
+[  240.302117] [<ffffff8008082ef0>] ret_from_fork+0x10/0x20
+[  240.302620] Kernel panic - not syncing: hung_task: blocked tasks
+[  240.303167] CPU: 2 PID: 29 Comm: khungtaskd Not tainted 4.4.120 #190
+[  240.303727] Hardware name: Rockchip RK3308 evb digital-i2s mic board (DT)
+[  240.304322] Call trace:
+[  240.304554] [<ffffff8008088870>] dump_backtrace+0x0/0x220
+[  240.305039] [<ffffff8008088ab4>] show_stack+0x24/0x30
+[  240.305489] [<ffffff80083a202c>] dump_stack+0x94/0xbc
+[  240.305939] [<ffffff80081614a0>] panic+0xe4/0x238
+[  240.306369] [<ffffff800812c058>] watchdog+0x2d8/0x2f0
+[  240.306818] [<ffffff80080b8be8>] kthread+0xdc/0xec
+[  240.307243] [<ffffff8008082ef0>] ret_from_fork+0x10/0x20
+[  240.307718] CPU3: stopping
+[  240.307975] CPU: 3 PID: 0 Comm: swapper/3 Not tainted 4.4.120 #190
+[  240.308526] Hardware name: Rockchip RK3308 evb digital-i2s mic board (DT)
+[  240.309128] Call trace:
+[  240.309353] [<ffffff8008088870>] dump_backtrace+0x0/0x220
+[  240.309834] [<ffffff8008088ab4>] show_stack+0x24/0x30
+[  240.310281] [<ffffff80083a202c>] dump_stack+0x94/0xbc
+[  240.310729] [<ffffff800808dbc4>] handle_IPI+0x1e0/0x260
+[  240.311199] [<ffffff8008080d88>] gic_handle_irq+0xa0/0xc8
+[  240.311678] Exception stack(0xffffffc0003fbe00 to 0xffffffc0003fbf30)
+...........................................................................
+[  240.318481] bf20: ffffffffffffffff ffffffc0003e27c0
+[  240.318917] [<ffffff80080827b4>] el1_irq+0xb4/0x140
+[  240.319355] [<ffffff80080850b8>] arch_cpu_idle+0x74/0x108
+[  240.319836] [<ffffff80080e1014>] default_idle_call+0x2c/0x30
+[  240.320335] [<ffffff80080e12b0>] cpu_startup_entry+0x224/0x2bc
+[  240.320858] [<ffffff800808d58c>] secondary_start_kernel+0x198/0x1c4
+[  240.321410] [<0000000002b90178>] 0x2b90178
+[  240.321781] CPU1: stopping
+[  240.322029] CPU: 1 PID: 0 Comm: swapper/1 Not tainted 4.4.120 #190
+[  240.322579] Hardware name: Rockchip RK3308 evb digital-i2s mic board (DT)
+[  240.323182] Call trace:
+[  240.323405] [<ffffff8008088870>] dump_backtrace+0x0/0x220
+[  240.323883] [<ffffff8008088ab4>] show_stack+0x24/0x30
+[  240.324330] [<ffffff80083a202c>] dump_stack+0x94/0xbc
+[  240.324776] [<ffffff800808dbc4>] handle_IPI+0x1e0/0x260
+[  240.325244] [<ffffff8008080d88>] gic_handle_irq+0xa0/0xc8
+[  240.325721] Exception stack(0xffffffc0003efe00 to 0xffffffc0003eff30)
+..........................................................................
+[  240.332517] ff20: ffffffffffffffff ffffffc0003e0d40
+[  240.332952] [<ffffff80080827b4>] el1_irq+0xb4/0x140
+[  240.333388] [<ffffff80080850b8>] arch_cpu_idle+0x74/0x108
+[  240.333868] [<ffffff80080e1014>] default_idle_call+0x2c/0x30
+[  240.334368] [<ffffff80080e12b0>] cpu_startup_entry+0x224/0x2bc
+[  240.334889] [<ffffff800808d58c>] secondary_start_kernel+0x198/0x1c4
+[  240.335440] [<0000000002b90178>] 0x2b90178
+[  240.335810] CPU0: stopping
+[  240.336058] CPU: 0 PID: 247 Comm: dhcpcd Not tainted 4.4.120 #190
+[  240.336599] Hardware name: Rockchip RK3308 evb digital-i2s mic board (DT)
+[  240.337200] Call trace:
+[  240.337423] [<ffffff8008088870>] dump_backtrace+0x0/0x220
+[  240.337904] [<ffffff8008088ab4>] show_stack+0x24/0x30
+[  240.338350] [<ffffff80083a202c>] dump_stack+0x94/0xbc
+[  240.338797] [<ffffff800808dbc4>] handle_IPI+0x1e0/0x260
+[  240.339264] [<ffffff8008080d88>] gic_handle_irq+0xa0/0xc8
+[  240.339741] Exception stack(0xffffffc01d7031b0 to 0xffffffc01d7032e0)
+
+[  240.346538] 32c0: ffffffc01d7032e0 ffffff8008b8ebe0 0000008000000000 ffffffc01dad6c40
+[  240.347230] [<ffffff80080827b4>] el1_irq+0xb4/0x140
+[  240.347669] [<ffffff8008b8ebe4>] _raw_spin_unlock_irqrestore+0x28/0x34
+[  240.348247] [<ffffff80088f31a0>] dw_mci_start_command+0xe4/0xf8
+[  240.348771] [<ffffff80088f5ab8>] __dw_mci_start_request+0x3c4/0x46c
+[  240.349323] [<ffffff80088f5c24>] dw_mci_request+0xc4/0xf0
+[  240.349804] [<ffffff80088d5644>] __mmc_start_request+0xb0/0xc0
+[  240.350327] [<ffffff80088d5854>] mmc_start_request+0x200/0x21c
+[  240.350848] [<ffffff80088d5cfc>] mmc_wait_for_req+0x60/0x198
+[  240.351350] [<ffffff80088e1708>] mmc_io_rw_extended+0x1e4/0x2d8
+[  240.351873] [<ffffff80088e2e4c>] sdio_io_rw_ext_helper+0x174/0x1a4
+[  240.352426] [<ffffff80088e2ec0>] sdio_memcpy_fromio+0x44/0x54
+[  240.352936] [<ffffff80088e2f7c>] sdio_readl+0x40/0x6c
+[  240.353387] [<ffffff800860a8c8>] sdioh_request_word+0x2cc/0x374
+[  240.353911] [<ffffff8008608180>] bcmsdh_reg_read+0x88/0x100
+[  240.354412] [<ffffff80085cbcd4>] get_erom_ent+0xbc/0xc4
+[  240.354881] [<ffffff80085cc0b4>] get_asd.isra.0+0x58/0x13c
+[  240.355369] [<ffffff80085cc3c8>] ai_scan+0x230/0x66c
+[  240.355818] [<ffffff80085cee40>] si_doattach.isra.5+0x32c/0xa6c
+[  240.356339] [<ffffff80085cf66c>] si_attach+0xec/0x13c
+[  240.356788] [<ffffff800860dc94>] dhdsdio_probe_attach+0x1c8/0xa5c
+[  240.357333] [<ffffff800861891c>] dhd_bus_devreset+0x18c/0x338
+[  240.357846] [<ffffff80085dda60>] dhd_net_bus_devreset+0xb8/0x134
+[  240.358378] [<ffffff80085fac18>] wl_android_wifi_on+0x1bc/0x1ec
+[  240.358901] [<ffffff80085e465c>] dhd_open+0x1bc/0x37c
+[  240.359353] [<ffffff80089b9438>] __dev_open+0xf0/0x108
+[  240.359814] [<ffffff80089b96e0>] __dev_change_flags+0x9c/0x13c
+[  240.360336] [<ffffff80089b97b4>] dev_change_flags+0x34/0x70
+[  240.360838] [<ffffff8008a16280>] devinet_ioctl+0x2c4/0x564
+[  240.361330] [<ffffff8008a17c50>] inet_ioctl+0xfc/0x108
+[  240.361792] [<ffffff80089999d0>] sock_do_ioctl+0x40/0x6c
+[  240.362272] [<ffffff800899a0d8>] sock_ioctl+0xbc/0x2b4
+[  240.362733] [<ffffff80081b7914>] do_vfs_ioctl+0x9c/0x548
+[  240.363213] [<ffffff80081b7e10>] SyS_ioctl+0x50/0x80
+[  240.363662] [<ffffff8008082f30>] el0_svc_naked+0x24/0x28
+```
+
+**原因：**
+
+DW MMC控制器的状态机有多个执行路径会参考被采用的数据信号，然而由于芯片内部的路径不同，导致多个执行单元看到的数据信号的翻转存在先后时间差，导致执行单元A先执行，执行单元B后执行。在执行单元A执行而单元B未执行的间隔，这个状态机处于设计上的“未定义状态”，最终导致状态机异常，中断无法抛出给CPU，软件的流程依赖于中断进行触发、调度，所以最终的后果是软件流程无法被执行，那么提交数据请求的用户将被阻塞，最终导致系统Hung-up。
+
+理论上这个问题在RK所有采用DW MMC控制的平台上都存在，只不过概率不同，RK3308由于后端设计差异，状态恶化，这个问题在eMMC HS200 tuning和SDIO初始化的时候更加明显。
+
+**处理：**
+
+加定时器做超时检测，如果数据完成即使没有中断产生，我们也继续执行软件流程，并且复位控制器。
+
+```
+commit 75e03927eee6cca1c0878e579b4876544e770179
+Author: Ziyuan Xu <xzy.xu@rock-chips.com>
+Date:   Thu Apr 5 18:34:03 2018 +0800
+
+    mmc: dw_mmc: add xfer timer for avoid DTO without actual data payload
+
+    It has proved the controller has a potention broken state with a DTO
+    interrupt comes while the data payload is missing, which was not covered
+    by current software state machine. Add a xfer timer to work around
+    this buggy behaviour introduced by broken design.
+
+    Change-Id: I5019c5ba0cdeb59adcdd3a5231a2000b448762bc
+    Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
+
+drivers/mmc/host/dw_mmc-rockchip.c
+drivers/mmc/host/dw_mmc.c
+include/linux/mmc/dw_mmc.h
+```
+
+### 3、Soft Reset方案选择
 
 Glb_srstn_1 resets almost all logic
 
@@ -212,13 +376,13 @@ Glb_srstn_2 resets almost all logic except GRF and GPIOs
 
 RK3308B做了改进，在Glb_srstn_1的情况下，提供了GRF_SOC_CON14可以独立控制在reset的时候不reset GPIO和PWM。所以RK3308B使用Glb_srstn_1.
 
-### 3、VCCIO3 电源域控制
+### 4、VCCIO3 电源域控制
 
 电源域VCCIO3控制着eMMC/NAND FLASH/SFC的工作电压、根据外部颗粒的不同，有的工作电压为3.3V、有的为1.8V。系统上电，默认情况下，这几个控制器通过采集GPIO0_A4的电压来判断供电模式，GPIO0_A4这时候处于输入模式，高电平标示该电源域位1.8V供电，低电平标示该电源域位3.3V供电。
 
 系统启动，软件可以介入控制后，可以通过配置GRF_SOC_CON0的io_vsel3位来控制VCCIO3的电源域，将GPIO0_A4解放出来，用作其他用途。再配置io_vsel3之前，不能切GPIO0_A4, 否则存储模块工作会异常。
 
-### 4、PWM regulator pin脚在Glb_srstn_2 模式下的下拉设置
+### 5、PWM regulator pin脚在Glb_srstn_2 模式下的下拉设置
 
 在低温reboot拷机的过程中，部分机器表现不稳定，在内核随机崩溃。最后发现把调制ARM core电压的pwm pin脚设置为下拉状态，问题解决。
 
