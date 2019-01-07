@@ -44,7 +44,6 @@
 | RK3368/PX5  | Y               | N              | Y           | Y              | N       |
 | RK3399      | Y               | N              | Y           | Y              | N       |
 
-
 **修订记录**
 
 | **日期**   | **版本** | **作者** | **修改说明**                                                 |
@@ -57,11 +56,9 @@
 | 2018-09-20 | V1.13    | 张晴     | 增加CLK使用说明                                              |
 | 2018-11-06 | V1.20    | 陈健洪   | 增加/更新defconfig/rktest/probe/interrupt/kernel dtb/uart/atags |
 
------------
-
+---
 [TOC]
-
-------------------------
+---
 
 ## 1. U-Boot next-dev简介
 
@@ -70,31 +67,18 @@ next-dev是Rockchip从U-Boot官方的v2017.09正式版本中切出来进行开�
 目前支持的功能主要有：
 
 - 支持RK Android平台的固件启动；
-
 - 支持最新Android AOSP(如GVA)固件启动；
-
 - 支持Linux Distro固件启动；
-
 - 支持Rockchip miniloader和SPL/TPL两种pre-loader引导；
-
 - 支持LVDS、EDP、MIPI、HDMI等显示设备；
-
 - 支持Emmc、Nand Flash、SPI Nand flash、SPI NOR flash、SD卡、 U盘等存储设备启动；
-
 - 支持FAT、EXT2、EXT4文件系统；
-
 - 支持GPT、RK parameter分区格式；
-
 - 支持开机logo显示、充电动画显示，低电管理、电源管理；
-
 - 支持I2C、PMIC、CHARGE、GUAGE、USB、GPIO、PWM、GMAC、EMMC、NAND、中断等驱动；
-
 - 支持RockUSB 和 Google Fastboot两种USB gadget烧写EMMC；
-
 - 支持Mass storage, ethernet, HID等USB设备；
-
 - 支持使用kernel的dtb；
-
 - 支持dtbo功能；
 
 U-Boot的doc目录下提供了很丰富的README文档，它们向开发者介绍了U-Boot里各个功能模块的概念、设计理念、实现方法等，建议读者好好利用这些文档提高开发效率。
@@ -225,12 +209,12 @@ U-Boot的启动从时间先后来划分，可以分为两级启动阶段。
 
 1. 第一级（relocate之前）：使用的是U-Boot自己的dtb。
 
-    一般第一阶段**只需要加载emmc、nand、cru、grf、uart等模块**，为了加快设备树的解析过程，dts里一般只去使能会用到的节点（板级差异的信息，如：电源、显示、clk等都会从第二阶段dtb中获取）。
+一般第一阶段**只需要加载emmc、nand、cru、grf、uart等模块**，为了加快设备树的解析过程，dts里一般只去使能会用到的节点（板级差异的信息，如：电源、显示、clk等都会从第二阶段dtb中获取）。
 
-   需要特别注意：
+需要特别注意：
 
-   - 第一阶段为了速度和效率，会对dtb做特殊处理，删除一些属性，例如：pinctrl-0 pinctrl-names clock-names interrupt-parent等，可以通过defconfig里的CONFIG_OF_SPL_REMOVE_PROPS指定。
-   - 第一阶段要使能的节点除了指明 "status=okay" 之外，还必须增加"u-boot,dm-pre-reloc;"属性，否则解析设备树时该节点会被忽略。这部分一般都在平台相关的[chip]-u-boot.dtsi里定义，例如：
+- 第一阶段为了速度和效率，会对dtb做特殊处理，删除一些属性，例如：pinctrl-0 pinctrl-names clock-names interrupt-parent等，可以通过defconfig里的CONFIG_OF_SPL_REMOVE_PROPS指定。
+- 第一阶段要使能的节点除了指明 "status=okay" 之外，还必须增加"u-boot,dm-pre-reloc;"属性，否则解析设备树时该节点会被忽略。这部分一般都在平台相关的[chip]-u-boot.dtsi里定义，例如：
 
 ```
 ./arch/arm/dts/px30-u-boot.dtsi
@@ -996,9 +980,9 @@ tag:LOADER error,addr:0x4800
 
 #### 3.1.1 rkbin 仓库
 
-​	rkbin仓库主要存放了Rockchip不开源的bin文件（trust、loader等）、脚本、打包工具等，它只是一个“工具包”仓库 。**<u>bin文件会一直在不断更新，用户最好能及时同步相关内容，避免因为版本过旧引起问题</u>**。
+​	rkbin仓库主要存放了Rockchip不开源的bin文件（trust、loader等）、脚本、打包工具等，它只是一个“工具包”仓库 。**bin文件会一直在不断更新，用户最好能及时同步相关内容，避免因为版本过旧引起问题**。
 
-​	rkbin仓库需要和U-Boot工程<u>**保持同级目录关系**</u>，否则编译时会报找不到rkbin仓库。当在U-Boot工程执行编译的时候，编译脚本会从rkbin仓库里索引相关的bin文件和打包工具，最后在U-Boot根目录下生成trust.img、uboot.img、loader等相关固件。
+​	rkbin仓库需要和U-Boot工程**保持同级目录关系**，否则编译时会报找不到rkbin仓库。当在U-Boot工程执行编译的时候，编译脚本会从rkbin仓库里索引相关的bin文件和打包工具，最后在U-Boot根目录下生成trust.img、uboot.img、loader等相关固件。
 
 ​	下载方式见附录[rkbin仓库下载](#rkbin仓库下载) 。
 
@@ -1056,12 +1040,11 @@ NAME =
 |      px30       |      evb-px30_defconfig      |       Y       |
 |     rk3326      |     evb-rk3326_defconfig     |       Y       |
 
-
 ### 3.2 编译配置
 
 #### 3.2.1 gcc工具链路径指定
 
-默认使用Rockchip提供的工具包：prebuilts，请保证它和U-Boot工程**<u>保持同级目录关系</u>**，确保gcc-linaro-6.3.1版本的编译器放到如下路径：
+默认使用Rockchip提供的工具包：prebuilts，请保证它和U-Boot工程保持同级目录关系，确保gcc-linaro-6.3.1版本的编译器放到如下路径：
 
 ```
 ../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin
@@ -1182,7 +1165,7 @@ trust.img with ta is ready
 pack trust okay! Input: /home/guest/project/rkbin/RKTRUST/RK3126TOS.ini
 ```
 
-注意：当执行make clean/mrproper/distclean的时候，Makefile会默认把编译阶段生成的中间文件都删除，其中包括bin文件。因为loader固件的格式是.bin，所以也会被同时删除。**<u>用户需要注意：不要把重要的、不想被删除的.bin文件放在U-Boot的根目录下</u>**。
+注意：当执行make clean/mrproper/distclean的时候，Makefile会默认把编译阶段生成的中间文件都删除，其中包括bin文件。因为loader固件的格式是.bin，所以也会被同时删除。**用户需要注意：不要把重要的、不想被删除的.bin文件放在U-Boot的根目录下**。
 
 #### 3.2.5 pack辅助命令
 
@@ -1305,7 +1288,7 @@ make: *** No rule to make target `include/config/auto.conf', needed by `include/
 
 ##### 3.2.8.1 工具
 
-Windows烧写工具版本必须是**<u>v2.5版本或以上</u>**(推荐使用最新的版本)；
+Windows烧写工具版本必须是**V2.5版本或以上**(推荐使用最新的版本)；
 
 ##### 3.2.8.2 loader烧写模式
 
@@ -1335,7 +1318,6 @@ Windows烧写工具版本必须是**<u>v2.5版本或以上</u>**(推荐使用最
 - CONFIG_SYS_DCACHE_OFF：如果定义，则关闭dcache功能；否则打开。
 
 目前Rockchip都默认使能了icache和dcache功能。
-
 
 ### 4.2 dcache 模式
 
@@ -1622,6 +1604,7 @@ ret = clk_set_defaults(dev);
 ./drivers/clk/rockchip/clk_rkxxx.c
 ./drivers/clk/rockchip/clk_pll.c
 ```
+
 驱动代码位于drivers/clk/rockchip目录, 每颗芯片有一份独立的驱动。clk_pll.c是公用代码。
 
 #### 5.2.2 相关接口
@@ -1660,12 +1643,9 @@ if (IS_ERR_VALUE(ret)) {
 
 - 驱动probe时会调用rkclk_init()函数对PLL、CPU和通用BUS进行初始化， 详细上文有描述；
 - 使用clk_set_defaults（dev），解析内核cru节点中的assigned-clocks 设置初始频率， 详细上文有描述；目前除了cru节点会解析assigned-clocks 设置初始频率，又在VOP和GMAC中增加此功能用于频率设置及PARENT设置。后续其他设备驱动里如果需要此功能请自行增加。
-
-
 - 其他设备的时钟设置，如eMMC, I2C等在各自的驱动初始化时调用clk_get_by_indel()或者clk_get_by_name()获取clk句柄, 然后调用clk_set_rate()进行设置。
 
 4. **clk dump**
-
 
 在clks_dump结构中增加想打印出的时钟的ID，然后使用soc_clk_dump()函数打印。目前默认会打印PLL、CPU、总线频率，如果需要其他时钟频率自行增加。
 
@@ -1856,23 +1836,23 @@ Rockchip U-Boot目前支持的显示接口包括RGB，LVDS，EDP，MIPI和HDMI�
 
 #### 5.6.2 相关接口
 
- 1. 显示U-Boot logo和kernel logo：
+1. 显示U-Boot logo和kernel logo：
 
-    ```
-    void rockchip_show_logo(void);
-    ```
+   ```
+   void rockchip_show_logo(void);
+   ```
 
- 2. 显示指定的bmp图片，目前主要用于充电logo的显示：
+2. 显示指定的bmp图片，目前主要用于充电logo的显示：
 
-    ```
-    void rockchip_show_bmp(const char *bmp);
-    ```
+   ```
+   void rockchip_show_bmp(const char *bmp);
+   ```
 
- 3. 将U-Boot中确定的一些变量通过dtb文件传递给内核，包括kernel logo的大小、地址和格式，crtc输出扫描时序以及过扫描的配置，未来还会加入BCSH等相关变量配置。
+3. 将U-Boot中确定的一些变量通过dtb文件传递给内核，包括kernel logo的大小、地址和格式，crtc输出扫描时序以及过扫描的配置，未来还会加入BCSH等相关变量配置。
 
-    ```
-    rockchip_display_fixup(void *blob);
-    ```
+   ```
+   rockchip_display_fixup(void *blob);
+   ```
 
 #### 5.6.3 DTS配置
 
@@ -2057,6 +2037,7 @@ regulator-init-microvolt = <1100000>// 初始化电压设置为1.1v
 ```
 static void regulator_show(struct udevice *dev, int ret)
 ```
+
 **方法2：regulator初始化完成后**
 
 U-Boot串口命令行下，使用"regulator"命令。驱动如下：
@@ -2272,16 +2253,12 @@ if (ret != 1) {
 
 #### 5.9.2 DTS配置
 
-****
-
 ```
 &nandc {
         u-boot,dm-pre-reloc;
         status = "okay";
 };
 ```
-
-***
 
 ```
 &sfc {
@@ -2364,7 +2341,6 @@ U-Boot正常启动的时候，在relocation之前，会在board_init_f[]函数�
 
 5. baudrate配置：通过宏```CONFIG_BAUDRATE```指定串口波特率，一般在对应的defconfig或者rkxxx_common.h里进行指定。
 
-
 #### 5.10.2 Early Debug UART配置
 
 上述这种debug console驱动在U-Boot启动的过程中加载的相对比较晚，如果在这之前就出现了异常，那依赖debug console就看不到具体的异常信息。
@@ -2444,8 +2420,6 @@ aliases {
 	u-boot,dm-pre-reloc;
 };
 ```
-
-
 
 #### 5.10.5 关闭串口打印
 
@@ -2578,16 +2552,21 @@ CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION， 当emmc的rpmb不能用，才开�
 ### 6.1 rockusb
 
 命令行手动启用rockusb, 进入Windows烧写工具对应的Loader模式, eMMC:
+
 ```c
 rockusb 0 mmc 0
 ```
+
 RKNAND:
+
 ```c
 rockusb 0 rknand 0
 ```
+
 ### 6.2 Fastboot
 
 Fastboot 默认使用Google adb的VID/PID, 命令行手动启动fastboot:
+
 ```c
 fastboot usb 0
 ```
@@ -2812,10 +2791,11 @@ finished. total time: 0.636s
 
 ​           fastboot oem fuse at-perm-attr-data
 
-13.  fastboot oem at-get-ca-request
+13. fastboot oem at-get-ca-request
 
-14.  fastboot oem at-set-ca-response
-15.  fastboot oem at-lock-vboot
+14. fastboot oem at-set-ca-response
+
+15. fastboot oem at-lock-vboot
 
 功能：锁定设备
 
@@ -3107,7 +3087,6 @@ pre-loader => trust => U-Boot => kernel
 
 把多份dtb文件打包到同一个resource.img里面，U-Boot引导kernel的时候，从resource.img里面找到一份和当前硬件版本匹配的dtb，并传递给kernel，加载不同的软件配置。通过硬件配置ADC/GPIO的唯一值，可以确定当前的硬件版本，U-Boot就可以找到对应的dtb文件。
 
-
 #### 7.8.3 硬件参考设计
 
 目前支持ADC和GPIO两种方式确定硬件版本。
@@ -3224,7 +3203,7 @@ doc/README.SPL
 ```
 
 在Rockchip的方案中，TPL和SPL都是由Bootrom加载和引导的，具体引导流程、相关固件的生成方法和存放位置可参考如下链接内容:
-http://opensource.rock-chips.com/wiki_Boot_option
+<http://opensource.rock-chips.com/wiki_Boot_option>
 
 TPL功能是DDR初始化，代码运行在IRAM中，完成后返回Bootrom；
 SPL在没有TPL的情况下需要初始化DDR，然后加载Trust(可选)和U-Boot，并引导进入下一级。
@@ -3241,12 +3220,11 @@ SPL+TPL的组合实现了跟rockchip ddr.bin+miniloader完全一致的功能，�
 
 因为u-boot本身有一份dts，如果再加上kernel的dts，那么原有的fdt用法会有冲突。同时由于kernel的dts还需要提供给kernel使用，所以不能把u-boot dts中部分dts节点overlay到kernel dts上传给kernel，综合u-boot后续发展方向是使用live dt，决定启动Live dt。
 
-
 ### 9.2 关于live dt
 
 live dt功能是在v2017.07版本合并的，提交记录如下:
 
-https://lists.denx.de/pipermail/u-boot/2017-January/278610.html
+<https://lists.denx.de/pipermail/u-boot/2017-January/278610.html>
 
 live dt的原理是在初始化阶段直接扫描整个dtb，把所有设备节点转换成struct device_node节点链表，后续的bind和驱动访问dts都通过这个device_node或ofnode(device_node的封装)进行，而不再访问原有dtb。
 
@@ -3255,12 +3233,12 @@ live dt的原理是在初始化阶段直接扫描整个dtb，把所有设备节�
 ### 9.3 fdt代码转换为支持live dt的代码
 
 ofnode类型(include/dm/ofnode.h)是两种dt都支持的一种封装格式，使用live dt时使用device_node来访问dt结点，使用fdt时使用offset访问dt节点。当需要同时支持两种类型的驱动，请使用ofnode类型。
+
 ```
  47  * @np: Pointer to device node, used for live tree
  48  * @of_offset: Pointer into flat device tree, used for flat tree. Note that this
  49  *      is not a really a pointer to a node: it is an offset value. See above.
  50  */
-
  51 typedef union ofnode_union {
  52         const struct device_node *np;   /* will be used for future live tree */
  53         long of_offset;
@@ -3276,7 +3254,6 @@ ofnode类型(include/dm/ofnode.h)是两种dt都支持的一种封装格式，使
   "fdtdec_"、 "fdt_"开头的函数是只支持fdt的接口；
 
 驱动程序做转换的时候可以参考标题包含"live dt"的提交。
-
 
 ### 9.4 支持kernel dtb的实现
 
@@ -3397,7 +3374,7 @@ resource_tool用于打包任意资源文件，最终生成resource.img镜像。
 ./tools/resource_tool [--pack] [--image=<resource.img>] <file list>
 ```
 
- **解包命令：**
+**解包命令：**
 
 ```
 ./tools/resource_tool --unpack --image=<resource.img>
@@ -3407,17 +3384,20 @@ resource_tool用于打包任意资源文件，最终生成resource.img镜像。
 
 loaderimage工具用于打包rockchip miniloader所需固件, 含uboot.img和32bit的trust.img
 用法:
+
 ```
 loaderimage [--pack|--unpack] [--uboot|--trustos] file_in file_out [load_addr]
 loaderimage --pack --trustos ${RKBIN}/${TOS} ./trust.img
 loaderimage --pack --uboot u-boot.bin uboot.img 0x60000000
 ```
+
 需要注意不同平台的'load_addr'不一样.
 
 ### 10.5 patman
 
 详细信息参考tools/patman/README
 这是一个python写的工具, 通过调用其他工具, 完成patch的检查提交, 是做patch Upstream(U-Boot, Kernel)非常好用的必备工具. 主要功能:
+
 - 根据参数自动format补丁;
 - 调用checkpatch进行检查;
 - 从commit信息提取并转换成upstream mailing list所需的Cover-letter, patch version, version changes等信息;
@@ -3426,6 +3406,7 @@ loaderimage --pack --uboot u-boot.bin uboot.img 0x60000000
 - 根据'~/.gitconfig'或者'./.gitconfig'配置把所有patch发送出去.
 
 使用'-h'选项查看所有命令选项:
+
 ```
 $ patman -h
 Usage: patman [options]
@@ -3456,15 +3437,18 @@ Options:
   --no-check            Don't check for patch compliance
   --no-tags             Don't process subject tags as aliaes
   -T, --thread          Create patches as a single thread
-
 ```
+
 典型用例, 提交最新的3个patch:
+
 ```
 patman -t -c3
 ```
+
 命令运行后checkpatch如果有error或者warning,会自动abort, 需要修改解决patch解决问题后重新运行.
 
 其他常用选项
+
 - '-t' 标题中":"前面的都当成TAG, 大部分无法被patman识别, 需要使用'-t'选项
 - '-i' 如果有些warning(如超过80个字符)我们认为无需解决, 可以直接加'-i'选项提交补丁
 - '-s' 如果要提交的补丁并不是在当前tree的top, 可以通过'-s'跳过top的N个补丁
@@ -3472,6 +3456,7 @@ patman -t -c3
 
 patchman配合commit message中的关键字, 生成upstream mailing list 所需的信息.
 典型的commit:
+
 ```
 commit 72aa9e3085e64e785680c3fa50a28651a8961feb
 Author: Kever Yang <kever.yang@rock-chips.com>
@@ -3488,7 +3473,7 @@ Date:   Wed Sep 6 09:22:42 2017 +0800
     - OP-TEE run into U-Boot in non-secure mode;
 
     More detail:
-    https://github.com/OP-TEE/optee_os
+    <https://github.com/OP-TEE/optee_os>
     and search for 'boot arguments' for detail entry parameter in:
     core/arch/arm/kernel/generic_entry_a32.S
 
@@ -3514,15 +3499,21 @@ Date:   Wed Sep 6 09:22:42 2017 +0800
     Change-Id: I3fd2b8305ba8fa9ea687ab7f3fd1ffd2fac9ece6
     Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
 ```
+
 这个patch通过patman命令发送的时候,会生成一份Cover-letter:
+
 ```
 [PATCH v4 00/11] rockchip: add tpl and OPTEE support for rk3229
 ```
+
 对应patch的标题如下, 包含version信息和当前patch是整个series的第几封:
+
 ```
 [PATCH v4,07/11] spl: add support to booting with OP-TEE
 ```
+
 Patch的commit message已经被处理过了, change-id被去掉, Cover-letter被去掉, version-changes信息被转换成非正文信息:
+
 ```
 OP-TEE is an open source trusted OS, in armv7, its loading and
 running are like this:
@@ -3533,7 +3524,7 @@ running:
 - OP-TEE run into U-Boot in non-secure mode;
 
 More detail:
-https://github.com/OP-TEE/optee_os
+<https://github.com/OP-TEE/optee_os>
 and search for 'boot arguments' for detail entry parameter in:
 core/arch/arm/kernel/generic_entry_a32.S
 
@@ -3556,6 +3547,7 @@ Changes in v2:
  5 files changed, 43 insertions(+)
  create mode 100644 common/spl/spl_optee.S
 ```
+
 更多关键字使用, 如"Series-prefix", "Series-cc"等请参考README.
 
 ### 10.6 buildman工具
@@ -3565,28 +3557,36 @@ Changes in v2:
 这个工具最主要的用处在于批量编译代码, 非常适合用于验证当前平台的提交是否影响到其他平台.
 
 使用buildman需要提前设置好toolchain路径, 编辑'~/.buildman'文件:
+
 ```
 [toolchain]
 arm: ~/prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/
 aarch64: ~/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/
+
 ```
+
 典型用例如编译所有Rockchip平台的U-Boot代码:
+
 ```
 ./tools/buildman/buildman rockchip
 ```
+
 理想结果如下:
+
 ```
 $ ./tools/buildman/buildman rockchip
 boards.cfg is up to date. Nothing to do.
 Building current source for 34 boards (4 threads, 1 job per thread)
    34    0    0 /34     evb-rk3326
 ```
+
 显示的结果中, 第一个是完全pass的平台数量(绿色), 第二个是含warning输出的平台数量(黄色), 第三个是有error无法编译通过的平台数量(红色). 如果编译过程中有warning或者error, 会在终端上显示出来.
 
 ### 10.7 mkimage工具
 
 详细信息参考doc/mkimage.1
 这个工具可用于生成所有U-Boot/SPL支持的固件, 如通过下面的命令生成Rockchip的bootrom所需IDBLOCK格式, 这个命令会同时修改u-boot-tpl.bin的头4个byte为Bootrom所需校验的ID:
+
 ```
 tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
 ```
@@ -3614,7 +3614,6 @@ Command: rktest [module] [args...]
 ```
 
 1. timer测试：用于确认当前环境下系统timer是否正常工作（延时是否准确）、系统中断是否正常。
-
 
 ```
 => rktest timer
@@ -3644,7 +3643,6 @@ timer_irq_handler: irq test finish.
 ```
 
 2. key测试：用于确认当前环境下系统的按键是否能正常响应。输入命令后，可以按下各个按键进行确认；按下ctrl+c组合键可以退出测试。
-
 
 ```
 => rktest key
@@ -3695,7 +3693,6 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 
 5. vendor storage测试：用于确认当前环境下系统的vendor storage功能是否正常。
 
-
 ```
 => rktest vendor
 
@@ -3719,7 +3716,6 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 
 6. maskrom下载模式识别测试：用于确认当前环境下，能否退回到maskrom模式进行烧写。
 
-
 ```
 => rktest brom
 
@@ -3727,7 +3723,6 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 ```
 
 7. regulator测试：用于显示各路regulator的dts配置状态、当前的实际状态；BUCK调压是否正常。
-
 
 ```
 => rktest regulator
@@ -3796,6 +3791,7 @@ malloc, gd, SP是运行时根据配置来确定的位置；
 一般要求dtb尽量精简,把空间留给代码空间, text如果过大, 运行时比较容易碰到的问题是Stack把dtb冲了, 导致找不到dtb.
 
 ### U-Boot内存分布(relocate后)
+
 U-Boot代码一开始由前级Loader搬到TEXT_BASE的位置,U-Boot在探明实际可用DRAM空间后,把自己relocate到ram_top位置, 其中Relocation Offset = 'U-Boot start - TEXT_BASE'.
 
 | **Name**        | **start addr**           | **size**                 | **Desc**                  |
@@ -3873,6 +3869,7 @@ def challenge_verify():
 if __name__ == '__main__':
 	challenge_verify()
 ```
+
 ### rkbin仓库下载
 
 1. Rockchip内部工程师：
@@ -3883,7 +3880,7 @@ if __name__ == '__main__':
 
    （1）下载产品部门发布的完整SDK工程；
 
-   （2）从Github下载：https://github.com/rockchip-linux/rkbin"。
+   （2）从Github下载：<https://github.com/rockchip-linux/rkbin>。
 
 ### gcc编译器下载
 
