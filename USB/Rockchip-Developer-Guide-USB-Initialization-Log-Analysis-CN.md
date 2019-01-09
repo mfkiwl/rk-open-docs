@@ -2,11 +2,11 @@
 
 # **USB Initialization Log Analysis**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：frank.wang@rock-chips.com
 
-日期：2017.12
+日期：2019-01-09
 
 文件密级：公开资料
 
@@ -29,9 +29,10 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017-12-12 | V1.0   | 王明成    | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**             |
+| ---------- | -------- | -------- | ------------------------ |
+| 2017-12-12 | V1.0     | 王明成   | 初始版本                 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
 
 ------
 
@@ -42,8 +43,8 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 在Linux系统中，提供了主机侧和设备侧视角的USB驱动框架及通用驱动程序。
 
--   主机侧分为USB Core、HOST控制器驱动，HUB驱动和各设备类驱动。
--   设备侧分为Gadget框架、Devices控制器驱动和各设备类Function驱动。
+- 主机侧分为USB Core、HOST控制器驱动，HUB驱动和各设备类驱动。
+- 设备侧分为Gadget框架、Devices控制器驱动和各设备类Function驱动。
 
 ------
 # 2 Rockchip SoC USB控制器列表
@@ -72,16 +73,20 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 ### 3.2.1 USB CORE
 
 ```Log
+
 01 [    0.959817]  usbcore: registered new interface driver usbfs
 02 [    0.959890]  usbcore: registered new interface driver hub
 03 [    0.960070]  usbcore: registered new device driver usb
 ...
+
 ```
+
 以上是Linux Kernel 3.10启动阶段USB模块最早输出的3句log。01行表示注册USB文件系统，系统正常启动后，对应生成/sys/bus/usb/目录；02行表示成功注册USB HUB驱动；03行表明注册USB通用设备驱动，即usb_generic_driver。通常USB设备都是以设备的身份先与usb_generic_driver匹配，成功之后，会分裂出接口，当对接口调用device_add()后，会引起接口和接口驱动的匹配。
 
 ### 3.2.2 设备类驱动
 
 ```Log
+
 01 [    1.234947]  usbcore: registered new interface driver catc
 02 [    1.235015]  usbcore: registered new interface driver kaweth
 03 [    1.235109]  usbcore: registered new interface driver pegasus
@@ -101,16 +106,20 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 17 [    1.236197]  usbcore: registered new interface driver plusb
 18 [    1.236266]  usbcore: registered new interface driver rndis_host
 ...
+
 ```
+
 上面为主机侧设备类驱动，即各个USB设备HOST端的驱动程序，可通过menuconfig进行配置。
 
 ```Kconfig
+
  Location:
   |     -> Device Drivers
   |        -> USB support
   |        *** USB Device Class drivers ***
   |        < > xxx
   |        < > xxx
+
 ```
 
 ### 3.2.3 Host控制器驱动
@@ -118,6 +127,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 #### 3.2.3.1 EHCI
 
 ```Log
+
 01 [    1.243691]  ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
 02 [    1.243722]  ehci-platform: EHCI generic platform driver
 03 [    1.244307]  ehci-platform ff5c0000.usb: EHCI Host Controller
@@ -132,7 +142,9 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 12 [    1.253238]  hub 3-0:1.0: USB hub found
 13 [    1.253284]  hub 3-0:1.0: 1 port detected
 ...
+
 ```
+
 上述为EHCI控制器初始化完整打印，从log可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
@@ -141,6 +153,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 #### 3.2.3.2 OHCI
 
 ```Log
+
 01 [    1.253939]  ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
 02 [    1.253970]  ohci-platform: OHCI generic platform driver
 03 [    1.254316]  ohci-platform ff5d0000.usb: Generic Platform OHCI controller
@@ -154,7 +167,9 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 11 [    1.309601]  hub 4-0:1.0: USB hub found
 12 [    1.309648]  hub 4-0:1.0: 1 port detected
 ...
+
 ```
+
 上述为OHCI控制器初始化完整打印，同EHCI，从log也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
@@ -163,6 +178,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 #### 3.2.3.3 DWC2 Host
 
 ```Log
+
 01 [    1.313609]  usb20_otg ff580000.usb: DWC OTG Controller
 02 [    1.313660]  usb20_otg ff580000.usb: new USB bus registered, assigned bus number 5
 03 [    1.313719]  usb20_otg ff580000.usb: irq 55, io mem 0x00000000
@@ -175,7 +191,9 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 10 [    1.314568]  hub 5-0:1.0: 1 port detected
 11 [    1.315013]  usb20_host: version 3.10a 21-DEC-2012
 ...
+
 ```
+
 上述为DWC2 HOST控制器初始化完整打印，同其它Host控制器，从log也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本（version 3.10a 21-DEC-2012）等信息。
@@ -184,6 +202,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 #### 3.2.3.4 DWC3 Host
 
 ```Log
+
 01 [    1.240046]  xhci-hcd xhci-hcd.0.auto: xHCI Host Controller
 02 [    1.240104]  xhci-hcd xhci-hcd.0.auto: new USB bus registered, assigned bus number 1
 03 [    1.241268]  xhci-hcd xhci-hcd.0.auto: irq 99, io mem 0xff600000
@@ -204,12 +223,14 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 18 [    1.243408]  hub 2-0:1.0: USB hub found
 19 [    1.243451]  hub 2-0:1.0: 1 port detected
 ...
+
 ```
+
 DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从log可以获取到如下信息：
 
--   控制器基本信息，包括中断号、控制器物理地址等信息。
+- 控制器基本信息，包括中断号、控制器物理地址等信息。
 
--   XHCI控制器分别被枚举为一个USB3.0 Root HUB (hub 1-0:1.0)和一个USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出两个HUB分别被分配到的BUS Number。
+- XHCI控制器分别被枚举为一个USB3.0 Root HUB (hub 1-0:1.0)和一个USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出两个HUB分别被分配到的BUS Number。
 
 ## 3.3 设备侧日志
 
@@ -218,6 +239,7 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 ### 3.3.1 DWC2 Peripheral
 
 ```Log
+
 01 [    1.312160]  usb20_otg: version 3.10a 21-DEC-2012
 02 [    1.312963]  Core Release: 3.10a
 03 [    1.312992]  Setting default values for core params
@@ -227,6 +249,7 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 07 [    1.313262]  OTG VER PARAM: 0, OTG VER FLAG: 0
 08 [    1.313288]  ^^^^^^^^^^^^^^^^^Device Mode
 ...
+
 ```
 
 上面为Devcies控制器初始化log，从log也可以得到一些控制器信息。
@@ -270,7 +293,6 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 - 10行表示检测到VBUS；
 - 18－22行为USB枚举成功，并通过UEVENT事件通知Android层Gadget连接成功。
 
------
 # 4 Kernel 4.4
 
 ## 4.1 适用芯片
@@ -305,7 +327,9 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 13 [    0.884226] hub 2-0:1.0: USB hub found
 14 [    0.884291] hub 2-0:1.0: 1 port detected
 ...
+
 ```
+
 上述为EHCI控制器初始化完整打印，从log也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
@@ -314,6 +338,7 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 #### 4.2.3.2 OHCI
 
 ```Log
+
 01 [    0.884853] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
 02 [    0.884897] ohci-platform: OHCI generic platform driver
 03 [    0.885315] ohci-platform ff5d0000.usb: Generic Platform OHCI controller
@@ -327,7 +352,9 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 11 [    0.941546] hub 3-0:1.0: USB hub found
 12 [    0.941597] hub 3-0:1.0: 1 port detected
 ...
+
 ```
+
 上述为OHCI控制器初始化完整打印，同EHCI，从log也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
@@ -336,6 +363,7 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 #### 4.2.3.3 DWC2 Host
 
 ```Log
+
 01 [    0.579425] ff580000.usb supply vusb_d not found, using dummy regulator
 02 [    0.579500] ff580000.usb supply vusb_a not found, using dummy regulator
 03 [    0.866540] dwc2 ff580000.usb: EPs: 10, dedicated fifos, 972 entries in SPRAM
@@ -350,7 +378,9 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 12 [    0.868254] hub 1-0:1.0: USB hub found
 13 [    0.868303] hub 1-0:1.0: 1 port detected
 ...
+
 ```
+
 上述为DWC2 HOST控制器初始化完整打印，同其它Host控制器，从log也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器部分配置信息。
@@ -381,12 +411,13 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 20 [    0.945718] hub 5-0:1.0: USB hub found
 21 [    0.945766] hub 5-0:1.0: 1 port detected
 ...
+
 ```
+
 DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从log可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
 - XHCI控制器分别被枚举为一个USB3.0 Root HUB (hub 4-0:1.0)和一个USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出两个HUB被分配到的BUS Number。
-
 
 ## 4.3 设备侧日志
 
@@ -395,6 +426,7 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 Kernel 4.4，DWC2使用drivers/usb/dwc2目录驱动；DWC3使用drivers/usb/dwc3目录驱动。
 
 ### 4.3.1 DWC2/DWC3 Peripheral
+
 Kernel 4.4，开机在没有连接USB线的情况下，对于DWC2，如果控制器为OTG模式，日志同[DWC2 Host](#4.2.3.3 DWC2 Host)；如果为Peripheral模式，则没有特别log输出；DWC3跟DWC2类似。
 
 ### 4.3.2 DWC2 Peripheral枚举日志

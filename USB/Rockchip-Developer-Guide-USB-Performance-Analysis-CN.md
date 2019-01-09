@@ -1,10 +1,10 @@
 # **USB Performance Analysis Guide**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2017.12.25
+日期：2019-01-09
 
 文档密级：公开资料
 
@@ -29,14 +29,16 @@
 技术支持工程师
 
 **修订记录**
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017.12.25 | V1.0   | 吴良峰    |          |
+| **日期**   | **版本** | **作者** | **修改说明**             |
+| ---------- | -------- | -------- | ------------------------ |
+| 2017-12-25 | V1.0     | 吴良峰   | 初始版本                 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
 
---------------------
+---------
 [TOC]
-------
+
 ## 1 USB 理论传输速率分析
+
 ### 1.1 USB Communication Flow
 
 USB的通信流模型如图1-1所示，采用分层的结构，一台主机与一个USB设备间的连接是由许多层上的连接组成 。USB总线接口层提供了主机和设备之间的物理连接、发送和接收数据。USB设备层对USB系统软件是可见的，系统软件基于它所见的设备层来完成对设备的一般的USB操作。USB应用层可以通过与之相配合的客户软件向主机提供一些额外的功能。USB设备层和应用层的通信是逻辑上的，对应于这些逻辑通信的实际物理通信由USB总线接口层来完成。
@@ -71,16 +73,13 @@ USB体系支持四种传输类型：
 
   主要用于在设备连接时对设备进行枚举以及其他因设备而异的特定操作；
 
-
 - 中断传输（Interrupt Transfers）
 
   用于对延迟要求严格、小量数据的可靠传输，如键盘、游戏手柄等HID设备；
 
-
 - 批量传输（Bulk Transfers）
 
   用于对延迟要求宽松，大量数据的可靠传输，如U盘、USB以太网卡等；
-
 
 - 同步传输（Isochronous Transfers）
 
@@ -166,7 +165,6 @@ USB Disk的传输速率测试，通常有以下两种方法：
   `time cp /mnt/media_rw/0E64-5F76/test /sdcard/.`
 
   上述方法，是测试USB Disk的读速率，如果需要测试USB Disk的写速率，只要修改读写路径即可。
-
 
 - **方法2：使用dd命令测试**
 
@@ -268,10 +266,8 @@ USB Disk的传输速率测试，通常有以下两种方法：
 
 - 方法1可以统计USB Disk的实际数据读写速率，但测试结果同时受Host端存储介质、文件系统性能和USB控制器传输速率的影响，无法准确说明USB控制器的传输性能。
 
-
 - 方法2可以排除Host端存储介质和文件系统的影响，准确统计USB控制器的读写U盘的传输性能。但需要注意的是，USB Disk（Device端）的文件系统仍然会影响拷贝，如果要排除USB Disk文件系统的影响，需要直接读写/dev/路径下的sd*分区节点，但同时会破坏USB Disk原有的数据，所以要慎用。
 - dd命令，可以加**conv=fsync**，表示将缓存中的数据写入磁盘，这样可以完全排除缓存的影响。当然，如果测试的文件足够大，缓存的影响也是比较小的。
-
 
 - 测试时，建议两种方法都使用。先使用方法1测试，如果测试结果无法达到预期的传输速率，则进一步使用方法2分析是否传输瓶颈在USB控制器。详细的分析方法，将在”测试结果分析“章节中说明。
 
@@ -281,7 +277,6 @@ USB Disk的传输速率测试，通常有以下两种方法：
 
   使用dd命令测试，Rockchip USB 2.0 Host接口的USB Disk读写速率通常在 **25MBps ～ 35MBps**。
 
-
 - **USB 3.0 Host**
 
   使用dd命令测试，Rockchip USB 3.0 Host接口的USB3 Disk（不支持UAS）读写速率通常在 **60MBps ～ 100MBps**。 支持**UAS**的USB3 Disk，最大读写速率约为**350MBps**。
@@ -289,7 +284,6 @@ USB Disk的传输速率测试，通常有以下两种方法：
 **Note：**
 
 - 不同的USB3 Disk，读写性可能有明显差异，并且，有些USB3 Disk的读速率比写速率高3～5倍。所以，评估USB控制器的传输速率，应该尽量多测试几种不同型号的USB3 Disk，并使用同样的测试方法，在PC Ubuntu测试同样USB3 Disk的读写速率，以作对比参考。
-
 
 - UAS的支持：RK3399/RK3328 USB3 控制器支持UASP（USB Attached SCSI PROTOCOL），该功能可以大大提高USB Disk的读写速率。如果要使用UAS功能，首先，内核需要enable CONFIG_USB_UAS（kernel3.10和kernel4.4默认都已经enable），其次，USB3 Disk需要支持UAS功能。
 - 可以从枚举的log中，确认是否使用UAS协议
@@ -398,7 +392,6 @@ EMMC文件存储路径：/sdcard/.
 
   结果：1073741824 bytes (1.0GB) copied, 12.402147 seconds, 82.6MB/s
 
-
 - **测试3399 EMMC写性能**
 
   每次执行dd命令前，先清缓存
@@ -466,7 +459,6 @@ EMMC文件存储路径：/sdcard/.
   `strace cp /mnt/media_rw/0E64-5F76/test /sdcard/.`
 
   结果表明：RK3399平台的cp命令，读写的数据块都是4KB
-
 
 - **使用blktrace命令分析block层的merge行为**
 
@@ -587,14 +579,13 @@ USB Disk常用的文件系统格式包括：VFAT、EXT4和NTFS。对于VFAT/EXT4
 
 - iperf的官方网址：
 
-  https://iperf.fr/
-
+  <https://iperf.fr/>
 
 - iperf下载地址：
 
   支持Windows /Android/Ubuntu/macOS等系统，下载地址
 
-  https://iperf.fr/iperf-download.php
+  <https://iperf.fr/iperf-download.php>
 
   此外，Ubuntu系统可以直接使用如下命令安装iperf
 
@@ -602,12 +593,11 @@ USB Disk常用的文件系统格式包括：VFAT、EXT4和NTFS。对于VFAT/EXT4
 
   Andorid系统可以安装iperf.apk
 
-
 - iperf的使用方法：
 
-  https://iperf.fr/iperf-doc.php
+  <https://iperf.fr/iperf-doc.php>
 
-  http://man.linuxde.net/iperf
+  <http://man.linuxde.net/iperf>
 
 带宽测试通常采用**UDP模式**，因为能测出极限带宽、时延抖动、丢包率。在进行测试时，首先以链路理论带宽作为数据发送速率进行测试，例如，从客户端到服务器之间的链路的理论带宽为100Mbps，先用`-b 100M`进行测试，然后根据测试结果（包括实际带宽，时延抖动和丢包率），再以实际带宽作为数据发送速率进行测试，会发现时延抖动和丢包率比第一次好很多，重复测试几次，就能得出稳定的实际带宽。
 
@@ -750,7 +740,6 @@ b). USB Host驱动的同步传输性能；
 
 - 待测设备应保持在静态桌面，避免进休眠；
 
-
 - 待测设备连接到PC后，需要等待媒体库扫描完成（可以观察logcat打印），再执行拷贝操作；
 
 **测试结果：**
@@ -792,7 +781,6 @@ USB MTP采用的是批量传输的类型，理论上，Rockchip平台USB2.0控�
 
   CPU定为高频，MTP的拷贝速率会明显高于CPU变频时的拷贝速率。
 
-
 - 存储颗粒的读写性能
 
   如果存储颗粒的读写性能差，会严重影响MTP传输速率。评估存储颗粒的读写性能的方法，请参考[2.1 USB Disk传输速率分析](#2.1 USB Disk传输速率分析)
@@ -807,11 +795,9 @@ USB MTP采用的是批量传输的类型，理论上，Rockchip平台USB2.0控�
 
   `echo 0 > /sys/kernel/debug/usb_mtp/status`
 
-
 - USB控制器的传输性能
 
   提高USB2控制器的AHB CLK至150MHz，并且DMA Burst设置为最大，可以提高USB控制器的DMA传输性能，从而提高USB控制器的传输速率。
-
 
 - MTP驱动的Tx/Rx buffer大小
 
@@ -1016,7 +1002,7 @@ index d146ce7..9eb7aad 100644
 @@ -45,7 +45,7 @@ static unsigned int streaming_maxburst;
  module_param(streaming_maxburst, uint, S_IRUGO|S_IWUSR);
  MODULE_PARM_DESC(streaming_maxburst, "0 - 15 (ss only)");
- 
+
 -static bool bulk_streaming_ep;
 +static bool bulk_streaming_ep = true;
  module_param(bulk_streaming_ep, bool, S_IRUGO | S_IWUSR);
@@ -1045,7 +1031,6 @@ iperf工具的详细说明，请参考[2.2 USB Ethernet传输速率分析](#2.2 
 
 - Linux-3.10 Android Gadget USB Rndis配置方法：
 
-
 ```
 Device Drivers  --->
    [*] USB support  --->
@@ -1060,7 +1045,6 @@ Device Drivers  --->
 
 - Linux-3.10 Ethernet Gadget USB Rndis配置方法：
 
-
 ```
 Device Drivers  --->
    [*] USB support  --->
@@ -1070,7 +1054,6 @@ Device Drivers  --->
 ```
 
 - Linux-4.4 Configfs USB Rndis配置方法：
-
 
 ```
 Device Drivers  --->
@@ -1160,7 +1143,7 @@ index 79afa82..a05ad79 100644
 @@ -271,10 +272,93 @@ MODULE_DESCRIPTION(DRIVER_DESC);
  MODULE_AUTHOR("Fabien Chouteau, Peter Korsgaard");
  MODULE_LICENSE("GPL");
- 
+
 +static struct hidg_func_descriptor rk_hidg_desc = {
 +	.subclass		= 0, /* No subclass */
 +	.protocol		= 2, /* Keyboard */

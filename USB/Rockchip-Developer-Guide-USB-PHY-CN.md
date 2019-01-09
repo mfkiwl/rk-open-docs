@@ -1,10 +1,10 @@
-# **Rockchip-Developer-Guide-USB-PHY**
+# Rockchip Developer Guide USB PHY
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2018.5.21
+日期：2019-01-09
 
 文档密级：内部资料
 
@@ -28,11 +28,12 @@
 技术支持工程师
 
 **修订记录**
-| **日期**    | **版本** | **作者** | **修改说明** |
-| --------- | ------ | ------ | -------- |
-| 2018.5.21 | V1.0   | 吴良峰    | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**             |
+| ---------- | -------- | -------- | ------------------------ |
+| 2018-05-21 | V1.0     | 吴良峰   | 初始版本                 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
 
---------------------
+---------
 [TOC]
 ------
 ## 1 USB PHY 支持列表
@@ -43,7 +44,6 @@
 - USB3.0 PHY [Vendor: Innosilicon]
 - USB2.0 PHY [Vendor: Synopsys]
 - Type-C PHY [Vendor: Cadence]
-
 
 ​	如下表 1-1 为各芯片采用的 USB PHY，其中 [1 × port] 表示一个 PHY 支持一个 USB port，[2 × ports] 表示一个 PHY 支持两个 USB port。
 
@@ -56,7 +56,6 @@
 | RK303X<br />RK312X<br />RK322X<br />RK3308<br />RK3326<br />RK3368<br />PX30 | Y<br />[2 × ports] |        N        |          N          |          N           |
 | RK3228H<br />RK3328<br />                |         Y          |        Y        |          N          |          N           |
 | RK3399                                   |         Y          |        N        |          N          |          Y           |
-
 
 ## 2 USB2.0 PHY
 
@@ -94,9 +93,7 @@
 
 - Note1：表1-2 只给出了 Inno USB2 PHY Port0 的主要寄存器说明。Port1 的寄存器与 Port0 基本一致，只是 Bit位置不同，请参考PHY的手册即可。
 
-
 - Note2：bit0 为 SOF 和 EOP 的预加重，应该慎用，如果同时设置 bit[0] 和 [41:37] = 5'b10000，容易导致disconnect 误判。此外，bit1 为 chrip state 预加重，也要慎用，可能会导致 high-speed 握手失败。
-
 
 - Note3：如果通过调整 bit[2:0]，bit[115]，bit[4:3]，bit[55:53]，bit[49:47] 这些寄存器，USB 眼图指标测试仍无法PASS，可以考虑设置 bit[41:37]。设置方法是：首先，设置 [42] =1'b1，[57] = 1'b0，bypass comp 电路中的电阻自动调节电路，但仍然保留电流自动调节电路（避免引起兼容性问题）。然后，再根据USB眼图的测试结果，动态调整 [41:37] ，找到最佳的配置。更详细的设置方法，请参考 [2.1.6 PHY tuning 流程](#2.1.6 PHY tuning 流程)
 
@@ -355,8 +352,6 @@ graph TD;
 |   TXVREFTUNE[3:0]    |  I   | HS DC Voltage Level Adjustment<br />Function: This bus adjusts the high-speed DC level voltage. |
 |   TXHSXVTUNE[1:0]    |  I   | Transmitter High-Speed Crossover Adjustment<br />Function: This bus adjusts the voltage at which the DP0 and DM0 signals cross while transmitting in HS mode. |
 |    TXRESTUNE[1:0]    |  I   | USB Source Impedance Adjustment<br />Function: In some applications, there can be significant series resistance on the D+ and D– paths between the transceiver and cable. This bus adjusts the driver source impedance to compensate for added series resistance on the USB.<br />Note: Any setting other than the default can result in source impedance variation across process, voltage, and temperature conditions that does not meet USB 2.0 specification limits.<br />11: Source impedance is decreased by approximately 4 Ω.<br />10: Source impedance is decreased by approximately 2 Ω.<br />01: Design default<br />00: Source impedance is increased by approximately 1.5 Ω. |
-
-
 
 #### 2.2.3 参考电阻 REXT 说明
 
@@ -734,7 +729,7 @@ U3: lowest power state, internal clocks can be turned off. The PIPE interface is
 
 1. 现象：RK312x/RK3368 的 PHY 由于兼容性问题，无法识别个别型号的U盘（一般为 Kingston U盘），表现的出错现象是，在 EHCI port 挂载速度变慢（识别为全速设备），在 OTG port 无法识别。但如果如外接HUB，则正常识别HS。
 2. 原因：U盘在高速握手时会发送异常的信号，位置在chirp K 后面，host KJ 对前面。是一个类似脉冲的形式，展开后是有sync EOP的不完整的数据。该异常信号会导致PHY进入异常的状态，并且无法恢复。
-3. 解决方法：软件强制控制器运行在Full speed（参考补丁“0001-USB-dwc_otg_310-hcd-force-fs-if-phy-in-rx-active-sta.patch”），应用在这些无法识别的U盘，目前没有其它 workround 的办法，除非芯片硬件ECO。Inno 已经在后续的 USB2.0 PHY 版本中解决该兼容性问题，所以该问题只存在于 RK312x/RK3368 的 USB2.0 PHY。 
+3. 解决方法：软件强制控制器运行在Full speed（参考补丁“0001-USB-dwc_otg_310-hcd-force-fs-if-phy-in-rx-active-sta.patch”），应用在这些无法识别的U盘，目前没有其它 workround 的办法，除非芯片硬件ECO。Inno 已经在后续的 USB2.0 PHY 版本中解决该兼容性问题，所以该问题只存在于 RK312x/RK3368 的 USB2.0 PHY。
 
 ### 4.8 RK3228H/RK3328 USB3.0 PHY 若干问题
 
@@ -751,7 +746,6 @@ U3: lowest power state, internal clocks can be turned off. The PIPE interface is
 - 修改switch MOS 尺寸
 
   解决了USB3.0 Port U2的眼图中有6根离散的线，导致指标临界的问题。
-
 
 - 增加寄存器调节范围，细化步长
 

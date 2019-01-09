@@ -1,19 +1,20 @@
 # **Rockchip-USB-FFS-Test-Demo**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2018.7.2
+日期：2019-01-09
 
 文档密级：内部资料
 
----------
+------
 **概述**
 
 ​	本文档提供 Rockchip 平台 USB FFS Test Demo 的使用方法。
 
 **产品版本**
+
 | **芯片名称**                                 | **内核版本** |
 | ---------------------------------------- | -------- |
 | RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux4.4 |
@@ -26,11 +27,12 @@
 技术支持工程师
 
 **修订记录**
-| **日期**   | **版本** | **作者** | **修改说明** |
-| -------- | ------ | ------ | -------- |
-| 2018.7.2 | V1.0   | 吴良峰    | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**             |
+| ---------- | -------- | -------- | ------------------------ |
+| 2018-07-02 | V1.0     | 吴良峰   | 初始版本                 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
 
---------------------
+------
 [TOC]
 ------
 
@@ -42,7 +44,6 @@
 Note:
 
 - The two test demo showing usage of Asynchronous I/O API of FunctionFS.
-
 
 - "Simple-Demo" is a simple example of bidirectional data; "Multibuf-Demo" shows multi-buffer data transfer, which may to be used in high performance applications.
 - Both examples contains userspace applications for device and for host.
@@ -57,7 +58,7 @@ Note: "wulf"请修改为自己的Gerrit用户名
 
 ## Libaio下载地址
 
-https://pagure.io/libaio.git
+<https://pagure.io/libaio.git>
 
 ## Libaio库的编译
 
@@ -266,7 +267,7 @@ make ARCH=arm64  CROSS_COMPILE=../..toolchain/gcc-linaro-6.3.1-2017.05-x86_64_aa
 
    `./aio_simple /dev/usb-ffs/test &`
 
-   `./aio_multibuff /dev/usb-ffs/test & `
+   `./aio_multibuff /dev/usb-ffs/test &`
 
    如果执行成功，可以在 /dev/usb-ffs/test 目录下，查看到 ep0/ep1/ep2 三个设备端点。
 

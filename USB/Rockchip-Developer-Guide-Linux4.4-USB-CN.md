@@ -1,10 +1,10 @@
-# **USB开发指南**
+# Linux 4.4 USB 开发指南
 
-发布版本：1.1
+发布版本：1.2
 
 作者邮箱：wulf@rock-chips.com、frank.wang@rock-chips.com、daniel.meng@rockchip.com
 
-日期：2018.06.08
+日期：2019-01-09
 
 文档密级：公开资料
 
@@ -28,14 +28,15 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**     | **版本** | **作者**      | **修改说明**                                 |
-| ---------- | ------ | ----------- | ---------------------------------------- |
-| 2017-12-22 | v1.0   | 吴良峰、王明成、孟东阳 | 初始版本                                     |
-| 2018-06-08 | v1.1   | 吴良峰         | support RK3308、RK3326、PX30<br />修正格式和错误<br /> |
+| **日期**   | **版本** | **作者**               | **修改说明**                                     |
+| ---------- | -------- | ---------------------- | ------------------------------------------------ |
+| 2017-12-22 | v1.0     | 吴良峰、王明成、孟东阳 | 初始版本                                         |
+| 2018-06-08 | v1.1     | 吴良峰                 | support RK3308、RK3326、PX30<br />修正格式和错误 |
+| 2019-01-09 | V1.2     | 吴良峰                 | 使用markdownlint修订格式                         |
 
 ---
 [TOC]
----
+
 ## 1 概述
 
 ### 1.1 RK平台USB控制器方案
@@ -62,7 +63,6 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 - Compatible Specification
 
-
 Universal Serial Bus Specification, Revision 2.0
 
 Enhanced Host Controller Interface Specification(EHCI), Revision 1.0
@@ -84,7 +84,6 @@ Support high-speed(480Mbps), full-speed(12Mbps) andlow-speed(1.5Mbps)
 ### 1.3 USB 2.0 OTG
 
 - Compatible Specification
-
 
 Universal Serial Bus Specification, Revision 2.0
 
@@ -121,7 +120,6 @@ OTG Port: used for USB 3.0 OTG controller with TypeC PHY to compriseas fully fea
 ### 1.5 USB OTG 3.0
 
 - Compatible Specification
-
 
 Universal Serial Bus 3.0 Specification, Revision 1.0
 
@@ -201,7 +199,7 @@ Support DisplayPort Alt Mode on TypeC A, B, C, D, E and F pinassignments
 
 Support Normal and Flipped orientation
 
-​						![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-linux4.4-USB/TypC-PHY-BlockDiagram.png) 
+​						![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-linux4.4-USB/TypC-PHY-BlockDiagram.png)
 
 ​								图 1‑5 TypeC PHY Block Diagram
 
@@ -267,21 +265,17 @@ Support Normal and Flipped orientation
 
   输入信号，用于 USB DEVICE 检测 VBUS 电平， 0：低电平约 0V， 1：高电平约 3V。默认无连接时电平为低，连接至 PC 或充电器时电平为高。
 
-
 - OTG_ID
 
   输入信号，由 USB OTG 协议定义，用于识别 USB 口所接设备的默认角色(HOST or device)。 USB_ID 默认上拉，处于 device 状况，如果要控制器进入 HOST 状态，需外接 mini-A 口或 micro-A 口将 USB_ID 短接到地。
-
 
 - OTG_RKELVIN
 
   参考电阻默认 43.2 欧到地，可通过调节该电阻阻值来调整 USB 信号质量。 不**同芯片，该参考电阻的阻值不同， 具体请见相应的 SDK 参考设计原理图**。
 
-
 - OTG_DRVVBUS
 
   该信号由 USB OTG 控制器的 HOST 寄存器控制，硬件上通过该信号来控制HOST 所需 5V VBUS 输出。
-
 
 - OTG_DP/OTG_DM
 
@@ -294,8 +288,6 @@ Support Normal and Flipped orientation
 ​		![table-GND-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/table-GND-kernel4.4.png)
 
 ![tabel-socketkernel4.4](Rockchip-Developer-Guide-linux4.4-USB/tabel-socketkernel4.4.png)
-
-
 
  				![Type-C-Interface-Definition](Rockchip-Developer-Guide-linux4.4-USB/Type-C-Interface-Definition.png)
 
@@ -313,7 +305,7 @@ Support Normal and Flipped orientation
 
 ​							图 2‑8 USB3Type-C pd/cc 电路（FUSB302）
 
-![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-linux4.4-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png) 
+![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-linux4.4-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png)
 
 ![kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-017-kernel4.4.png)
 
@@ -334,21 +326,26 @@ Support Normal and Flipped orientation
 make ARCH=arm64 rockchip_defconfig
 ```
 
-
 ​	选择Kernel配置：
+
 ```sh
 make ARCH=arm64 menuconfig
 ```
+
 ​	保存default配置：
+
 ```sh
 make ARCH=arm64 savedefconfig
 ```
+
 ​	保存default配置，然后用defconfig替换rockchip_defconfig。
 
 ### 3.1 USB PHY CONFIG
 
 ​	USB PHY模块的配置位于
-```c
+
+```makefile
+
 Device Drivers  --->
 	PHY Subsystem  --->
 		...
@@ -357,7 +354,9 @@ Device Drivers  --->
 		<*>	Rockchip TYPEC PHY Driver
 		...
 		<*>	Rockchip INNO USB 3.0 PHY Driver
+
 ```
+
 ​	USB 2.0 PHY使用的是Innosilicon IP，所以应选择“Rockchip INNO USB2PHY Driver”。
 
 ​	RK3399 RK3366 USB 3.0 PHY使用的是Type-C，所以应选择“Rockchip TYPEC PHY Driver”。
@@ -369,7 +368,9 @@ Device Drivers  --->
 ### 3.2 USB HOST CONFIG
 
 ​	USB HOST模块的配置位于
-```c
+
+```makefile
+
 Device Drivers  --->
 	-*-	Support for Host-side USB
 	[*] USB support  --->
@@ -385,15 +386,19 @@ Device Drivers  --->
 		<*>	OHCI HCD (USB 1.1) support
 		< >		OHCI support for PCI-bus USB controllers
 		<*>		Generic OHCI driver for a platform device
+
 ```
+
 ​	必须选上USB Support项后才能支持USB模块并进行进一步的配置。
 
-​	如果需要支持USB HOST，首先需要选上 **<*>Supportfor Host-side USB** 项，然后会现如下的HOST相关的配置，其中，USB HOST 1.1 选择OHCI Driver 配置，USB HOST 2.0 选择EHCI Driver 配置，USB HOST 3.0选择XHCI Driver配置。 
+​	如果需要支持USB HOST，首先需要选上 **<*>Supportfor Host-side USB** 项，然后会现如下的HOST相关的配置，其中，USB HOST 1.1 选择OHCI Driver 配置，USB HOST 2.0 选择EHCI Driver 配置，USB HOST 3.0选择XHCI Driver配置。
 
 ​	需要注意的是RK3308 的default config （rk3308_linux_defconfig）为了裁剪内核，默认是disable USB HOST，如果要支持USB 2.0 HOST和相关USB外设，需要先手动 enable  EHCI Driver 配置，然后参考 [3.5 USB其它模块配置](#3.5 USB其它模块配置)，使能对应的USB外设驱动。
 
 ### 3.3 USB OTG CONFIG
-```c
+
+```makefile
+
 Device Drivers  --->
 	-*-	Support for Host-side USB
 	[*] USB support  --->
@@ -403,12 +408,15 @@ Device Drivers  --->
 		...
 		<*>	DesignWare USB3 DRD Core Support
 				DWC3 Mode Selection (Dual Role mode)
+
 ```
+
 ### 3.4 USB Gadget CONFIG
 
 ​	USB Gadget 模块的配置位于
 
-```c
+```makefile
+
 DeviceDrivers  --->
 	[*]USB support  --->
 		[*] USB Gadget Support  --->
@@ -436,6 +444,7 @@ DeviceDrivers  --->
   				[ ]       HID function
   				[ ]       USB Webcam function
   				[ ]       Printer function
+
 ```
 
 ​	Rockchip平台默认支持RNDIS、MTP、PTP、Accessory、ADB、MIDI、Audio等Gadget功能。开发者可以根据实际产品需求，enable 更多的USB Gadget功能，但同时，需要修改init 文件（init.rk30board.usb.rc和init.usb.configfs.rc）。
@@ -445,7 +454,9 @@ DeviceDrivers  --->
 #### 3.5.1 Mass Storage Class CONFIG
 
 ​	U盘属于SCSI设备，所以在配置USB模块之前需要配置SCSI选项。
-```c
+
+```makefile
+
 Device Drivers --->
 	SCSI device support --->
 		<*> SCSI device support
@@ -465,33 +476,38 @@ Device Drivers --->
 		[*] SCSI low-level drivers  --->
 		[ ] PCMCIA SCSI adapter support  ----
 		[ ] SCSI Device Handlers  ----
+
 ```
 
 ​	配置完SCSI Device Support后，可以在USB Support中找到如下选项，选上即可。
 
-```c
+```makefile
+
 Device Driver --->
 	[*] USB support  --->
 		<*> USB Mass Storage support
+
 ```
 
 #### 3.5.2 USB Serial Converter CONFIG
 
 - 支持USB 3G Modem
 
-
   USB 3G Modem使用的是USB转串口，使用时需要选上如下选项：
 
-```c
+```makefile
+
 Device Driver --->
 	[*] USB support  --->
 		<*> USB Serial Converter support  --->
-			<*>   USB driver for GSM and CDMA modems 
+			<*>   USB driver for GSM and CDMA modems
+
 ```
 
 ​	此外，USB 3G Modem还需要使能PPP拨号的相关配置项：
 
-```
+```makefile
+
 Device Driver --->
 	[*] Network device support  --->
 		<*>   PPP (point-to-point protocol) support
@@ -506,45 +522,54 @@ Device Driver --->
 			<*>     PPP on PPTP Network Server
 			<*>     PPP support for async serial ports
 			<*>     PPP support for sync tty ports
+
 ```
 
 - 支持PL2303
 
   如果要使用PL2303输出数据到串口，需要选择如下选项，同时需要disable “USB driver for GSM and CDMA modems”，否则，PL2303可能会被误识别为USB 3G modem。
 
-```c
+```makefile
+
 Device Driver --->
 	[*] USB support  --->
 		<*> USB Serial Converter support  --->
 			<*> USB Prolific 2303 Single Port Serial Driver
+
 ```
 
 - 支持USB GPS
 
-
   如果要支持USB GPS，如u-blox 6 - GPS Receiver设备，需要选择如下选项：
 
- ```c
+ ```makefile
+
 Device Drivers	--->
 	[*]	USB support	--->
 		[*] USB Modem (CDC ACM) support
+
  ```
+
 #### 3.5.3 USB HID CONFIG
 
 ​	USB键鼠的配置选项如下：
-```c
+
+```makefile
+
 Device Drivers	--->
 	[*]	HID support
 		[*] USB HID transport layer
 		[ ] PID device support
 		[*] /dev/hiddev raw HID device support
+
 ```
+
 #### 3.5.4 USB Net CONFIG
 
 - USB Bluetooth CONFIG
 
+```makefile
 
-```c
 [*] Networking support  --->
 	...
 	<*>	Bluetooth subsystem support  --->
@@ -554,16 +579,17 @@ Device Drivers	--->
 			[*]   Broadcom protocol support (NEW)
 			[*]   Realtek protocol support (NEW)
 			...
+
 ```
 
 - USB Wifi CONFIG
-
 
   通常直接使用Vendor提供的驱动和配置。
 
 - USB Ethernet CONFIG
 
-```c
+```makefile
+
 Device Driver --->
 	[*] Network device support  --->
 		<*>	USB Network Adapters  --->
@@ -608,38 +634,47 @@ Device Driver --->
 			<*>	USB-to-WWAN Driver for Sierra Wireless modems
 			< >	LG VL600 modem dongle
 			< >	QingHeng CH9200 USB ethernet support
+
 ```
 
 #### 3.5.5 USB Camera CONFIG
-```c
+
+```makefile
+
 Device Driver --->
 	<*> Multimedia support  --->
 		[*]   Media USB Adapters  --->
 			*** Webcam devices ***
 			<*>	USB Video Class (UVC)
 			[*]	UVC input events device support
+
 ```
 
 #### 3.5.6 USB Audio CONFIG
 
-```c
+```makefile
+
 Device Driver --->
 	<*> Sound card support	--->
 		<*>	Advanced Linux Sound Architecture --->
 			...
 			[*]	USB sound devices	--->
 				[*]	USB Audio /MIDI driver
+
 ```
+
 #### 3.5.7 USB HUB CONFIG
 
 如果要支持USB HUB，请将“Disable external HUBs”配置选项去掉。
 
-```c
+```makefile
+
 Device Drivers --->
 	[*]	USB support	--->
 		-*-	Support for Host-side USB
 		...
 		[*]		Disable external hubs
+
 ```
 
 ​	其他有可能用到的USB设备还有很多，如GPS，Printer等，有可能需要Vendor定制的驱动，也有可能是标准的Class驱动，如需支持，可直接在网络上搜索Linux对该设备支持要做的工作，RK平台并无特殊要求，可直接参考。
@@ -668,6 +703,7 @@ Device Drivers --->
 ​	下面所示为DTSI的配置，DTSI主要配置PHY的公有属性。
 
 ```c
+
 grf: syscon@ff770000 {
 	compatible = "rockchip,rk3399-grf", "syscon", "simple-mfd";
 	reg = <0x0 0xff770000 0x0 0x10000>;
@@ -690,6 +726,7 @@ grf: syscon@ff770000 {
 			status = "disabled";
 		};
 };
+
 ```
 
 ​	首先，USB PHY Driver中都是在操作GRF，所以USB PHY的节点必须作为GRF的一个子节点。
@@ -699,10 +736,12 @@ grf: syscon@ff770000 {
 ​	最后，需要注意的是port的名称，HOST对应的port要求命名为“host-port”，OTG对应的命名为“otg-port”，因为Driver中根据这两个名称做不同port的初始化。下面所示为DTS的配置。
 
 ```c
+
 u2phy0_host: host-port {
 	phy-supply = <&vcc5v0_host>;
 	status = "okay";
 };
+
 ```
 
 ​	DTS的配置，主要根据不同的产品形态，配置PHY的私有属性。目前SDK-DTS的配置，主要包括phy-port的Enable以及phy-Supply即Vbus Supply的配置。
@@ -712,6 +751,7 @@ u2phy0_host: host-port {
 ​	下面以Host Vbus的配置，详细讲述regulator的配置方法。其主要分为Regulator及pinctrl两个节点的配置。
 
 ```c
+
 vcc5v0_host: vcc5v0-host-regulator {
 	compatible = "regulator-fixed";
 	enable-active-high;
@@ -721,17 +761,20 @@ vcc5v0_host: vcc5v0-host-regulator {
 	regulator-name = "vcc5v0_host";
 	regulator-always-on;
 };
+
 ```
 
 ​	如上面所示，这是一个vbus-host-regulator的配置实例，“enable-active-high”属性标识GPIO拉高使能；“pinctrl-0 = <&host_vbus_drv>;”Property代表这个regulator所引用的Pinctrl中节点的名称，具体regulator的配置可参考LinuxKernel相关regulator的文档。通过对于USB模块而言，vbus-regulator应该在DTS中（而不是DTSI中）做配置。
 
 ```c
+
 usb2 {
 	host_vbus_drv: host-vbus-drv {
 		rockchip,pins =
 				<4 25 RK_FUNC_GPIO &pcfg_pull_none>;
 	};
 };
+
 ```
 
 ​	如上面所示，这是hostvbus-drv的pinctrl属性，rockchip,pins属性即GPIO信息，需要从硬件原理图获知。这个节点作为Pinctrl的子节点，通过在DTSI（而不是DTS中）做配置。
@@ -745,6 +788,7 @@ usb2 {
 ​	Example：
 
 ```c
+
 tcphy0: phy@ff7c0000 {
 	compatible = "rockchip,rk3399-typec-phy";
 	reg = <0x0 0xff7c0000 0x0 0x40000>;
@@ -777,6 +821,7 @@ tcphy0: phy@ff7c0000 {
 		#phy-cells = <0>;
 	};
 };
+
 ```
 
 ### 4.2 USB 2.0 Controller DTS
@@ -788,6 +833,7 @@ tcphy0: phy@ff7c0000 {
 ​	下面所示为一个EHCI控制器的典型配置，主要包括register、interrupts、clocks的配置。需要注意，EHCI相关的时钟，通常需要配置EHCI控制器和EHCI/OHCI仲裁器两个时钟。此外，phys直接配置对应phy-port的名称即可。
 
 ```c
+
 usb_host0_ehci: usb@fe380000 {
 	compatible = "generic-ehci";
  	reg = <0x0 0xfe380000 0x0 0x20000>;
@@ -800,11 +846,13 @@ usb_host0_ehci: usb@fe380000 {
 	power-domains = <&power RK3399_PD_PERIHP>;
 	status = "disabled";
 };
+
 ```
 
 ​	下面所示为一个OHCI控制器的配置，其内容基本跟EHCI相同。
 
 ```c
+
 usb_host0_ohci: usb@fe3a0000 {
 	compatible = "generic-ohci";
 	reg = <0x0 0xfe3a0000 0x0 0x20000>;
@@ -817,6 +865,7 @@ usb_host0_ohci: usb@fe3a0000 {
 	power-domains = <&power RK3399_PD_PERIHP>;
 	status = "disabled";
 };
+
 ```
 
 #### 4.2.2 USB 2.0 otg Controller DTS
@@ -828,6 +877,7 @@ usb_host0_ohci: usb@fe3a0000 {
 ​	Documentation/devicetree/bindings/usb/dwc2.txt
 
 ```c
+
 usb20_otg: usb@ff580000 {
 	compatible = "rockchip,rk3328-usb", "rockchip,rk3066-usb",
 			     "snps,dwc2";
@@ -844,9 +894,11 @@ usb20_otg: usb@ff580000 {
 	phy-names = "usb2-phy";
 	status = "disabled";
 };
+
 ```
 
 ### 4.3 USB 3.0 Controller DTS
+
 #### 4.3.1 USB 3.0 HOST Controller DTS
 
 ​	USB 3.0 HOST控制器为XHCI，集成于DWC3 OTG IP中，所以不用单独配置dts，只需要配置DWC3，并且设置DWC3的dr_mode属性为dr_mode = "otg"或者dr_mode = "host"，即可以enable XHCI控制器。
@@ -860,6 +912,7 @@ usb20_otg: usb@ff580000 {
 ​	Example：
 
 ```c
+
 usbdrd3: usb@ff600000 {
 	compatible = "rockchip,rk3328-dwc3";
 	clocks = <&cru SCLK_USB3OTG_REF>, <&cru SCLK_USB3OTG_SUSPEND>,
@@ -889,6 +942,7 @@ usbdrd3: usb@ff600000 {
 		status = "disabled";
 	};
 };
+
 ```
 
 ## 5 驱动开发
@@ -914,6 +968,7 @@ usbdrd3: usb@ff600000 {
 ​	同时，配合上面两个数据结构，还有struct rockchip_usb2phy_cfg 和struct rockchip_usb2phy_port_cfg两个用于配置的数据结构。如下是一个典型的USB 2.0 host port的配置。
 
 ```c
+
 static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 	{
 		.reg		= 0xe450,
@@ -930,11 +985,13 @@ static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 				.utmi_hstdet	= { 0xe2ac, 23, 23, 0, 1 }
 			}
 		},
+
 ```
 
 ​	下面是USB 2.0 otg-port phy配置参考，port_cfgs主要用于插拔和otg mode 检测，chg_det主要用于充电类型检测：
 
 ```c
+
 static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 	{
 		.reg		= 0xe450,
@@ -978,14 +1035,17 @@ static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 			.vdp_src_en	= { 0xe450, 11, 11, 0, 1 },
 		},
 	},
+
 ```
 
 ​	USB 2.0 PHY驱动在sys/devices/platform/下建立了一个otg_mode节点，用于切换dwc2的host和peripheral mode，以RK3326 SoC为例：
 
 ```sh
+
 rk3326_evb:/sys/devices/platform/ff2c0000.syscon/ff2c0000.syscon:usb2-phy@100 # ls
-driver          extcon   of_node  phy   subsystem 
-driver_override modalias otg_mode power uevent 
+driver          extcon   of_node  phy   subsystem
+driver_override modalias otg_mode power uevent
+
 ```
 
 ​	**otg_mode:** Show & store the current value of otg mode for otg port
@@ -1049,6 +1109,7 @@ echo 0 > /sys/devices/platform/<u2phy dev name>/otg_mode
 ​	同时，配合上面两个数据结构，还有struct rockchip_u3phy_cfg 、struct rockchip_u3phy_grf_cfg和 struct rockchip_u3phy_apbcfg三个用于配置的数据结构。struct rockchip_u3phy_apbcfg主要用于保存USB物理信号tuning的相关参数，在 tuning 函数中直接赋值给相关寄存器；struct rockchip_u3phy_cfg和struct rockchip_u2phy_grf_cfg 则是用于USB底层协议相关的功能性相关属性配置，如下是一个典型的rockchip_u3phy_cfg的配置。
 
 ```c
+
 static const struct rockchip_u3phy_cfg rk3328_u3phy_cfgs[] = {
 	{
 		.reg		= 0xff470000,
@@ -1072,6 +1133,7 @@ static const struct rockchip_u3phy_cfg rk3328_u3phy_cfgs[] = {
 	},
 	{ /* sentinel */ }
 };
+
 ```
 
 ​	其余芯片的USB 3.0 PHY 为Cadence IP，
@@ -1089,6 +1151,7 @@ static const struct rockchip_u3phy_cfg rk3328_u3phy_cfgs[] = {
 ​	除此之外驱动中新建了struct phy_reg usb3_pll_cfg用于保存PLL相关的寄存器配置，常见的配置参数如下：
 
 ```c
+
 struct phy_reg usb3_pll_cfg[] = {
 	{ 0xf0,		CMN_PLL0_VCOCAL_INIT },
 	{ 0x18,		CMN_PLL0_VCOCAL_ITER },
@@ -1105,6 +1168,7 @@ struct phy_reg usb3_pll_cfg[] = {
 	{ 0x45,		CMN_DIAG_PLL0_CP_TUNE },
 	{ 0x8,		CMN_DIAG_PLL0_LF_PROG },
 };
+
 ```
 
 ### 5.2 USB Controller drivers
@@ -1124,6 +1188,7 @@ struct phy_reg usb3_pll_cfg[] = {
 ​	重要的结构体：
 
 ```c
+
 static const struct usb_gadget_ops dwc3_gadget_ops = {
 	.get_frame		= dwc3_gadget_get_frame,
 	.wakeup			= dwc3_gadget_wakeup,
@@ -1131,7 +1196,8 @@ static const struct usb_gadget_ops dwc3_gadget_ops = {
 	.pullup			= dwc3_gadget_pullup,
 	.udc_start		= dwc3_gadget_start,
 	.udc_stop		= dwc3_gadget_stop,
-};	
+};
+
 ```
 
 ​	drivers/usb/host目录下文件名含有“xhci“的为XHCI控制器相关驱动，其中xhci-plat.c是注册驱动的初始化文件，xhci.c是控制器基础文件，实现USB core层HCD接口和USB传输控制的相关操作，xhci-ring.c是控制器数据结构TRB以及传输机制相关的文件，实现具体的传输功能，xhci-hub.c是控制器自带的USB 3.0 root Hub驱动。
@@ -1139,6 +1205,7 @@ static const struct usb_gadget_ops dwc3_gadget_ops = {
 ​	重要的结构体：
 
 ```c
+
 static const struct hc_driver xhci_hc_driver = {
 	.description =		"xhci-hcd",
 	.product_desc =		"xHCI Host Controller",
@@ -1193,13 +1260,15 @@ static const struct hc_driver xhci_hc_driver = {
 	.disable_usb3_lpm_timeout =	xhci_disable_usb3_lpm_timeout,
 	.find_raw_port_number =	xhci_find_raw_port_number,
 };
+
 ```
 
 ##### 5.2.1.2 USB 3.0 OTG 调试接口
 
-以RK3399 SoC USB 3.0 OTG0 为例: 
+以RK3399 SoC USB 3.0 OTG0 为例:
 
 ```sh
+
 rk3399_box:/sys/kernel/debug/usb@fe800000 # ls
 host_testmode     rk_usb_force_mode
 
@@ -1211,6 +1280,7 @@ rk3399_box:/sys/kernel/debug/fe800000.dwc3/ep0in # ls
 descriptor_fetch_queue rx_info_queue    trb_ring
 event_queue            rx_request_queue tx_fifo_queue
 rx_fifo_queue          transfer_type    tx_request_queue
+
 ```
 
 - **host_testmode**
@@ -1238,6 +1308,7 @@ echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
 ```
 
 4. check the testmode status:
+
 ```sh
 cat /sys/kernel/debug/usb@fe800000/host_testmode
 ```
@@ -1248,24 +1319,30 @@ cat /sys/kernel/debug/usb@fe800000/host_testmode
 
 - **rk_usb_force_mode**
 
-  force dr_mode of DWC3 controller 
+  force dr_mode of DWC3 controller
 
   (**Note: the dr_mode of DTS must be "otg" and extcon of DTS must be config to null**).
 
   For example， set force mode for RK3399 board USB:
 
 1. Force host mode:
+
 ```sh
 echo host > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 ```
+
 2. Force peripheral mode:
+
 ```sh
 echo peripheral > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 ```
+
 3. Force otg mode:
+
 ```sh
 echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 ```
+
 - **ep*in/out:** Directory of EP debug files
 
 - **mode:** dr_mode read or store
@@ -1323,9 +1400,11 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
    以RK3328 SoC 为例：
 
    ```sh
+
    rk3328_box:/sys/kernel/debug/ff580000.usb # ls
    ep0   ep2out ep4out ep6out ep8in  ep9in  fifo    state
    ep1in ep3in  ep5in  ep7in  ep8out ep9out regdump testmode
+
    ```
 
    **ep*in/out:** Shows the state of the given endpoint (one is registered for each available).
@@ -1343,6 +1422,7 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
    以RK3328 SoC 为例：
 
    ```sh
+
    rk3328_box:/sys/devices/platform/ff580000.usb # ls
    busconnected  fr_interval gsnpsid   modalias       regoffset     uevent
    buspower      gadget      guid      mode           regvalue      usb5
@@ -1355,6 +1435,7 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
    rk3328_box:/sys/devices/platform/ff580000.usb/driver # ls
    bind       dwc_otg_conn_en force_usb_mode uevent vbus_status
    debuglevel ff580000.usb    op_state       unbind versio
+
    ```
 
    **busconnected:** Gets or sets the Core Control Status Register.
@@ -1377,7 +1458,7 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 
    **gusbcfg:** Gets or sets the Core USB Configuration Register.
 
-   **mode_ch_tim_en:** This bit is used to enable or disable the host core to wait for 200 PHY clock cycles at the end of Resume to change the opmode signal to the PHY to 00 after Suspend or LPM. 
+   **mode_ch_tim_en:** This bit is used to enable or disable the host core to wait for 200 PHY clock cycles at the end of Resume to change the opmode signal to the PHY to 00 after Suspend or LPM.
 
    **remote_wakeup:** On read, shows the status of Remote Wakeup. On write, initiates a remote wakeup of the host. When bit 0 is 1 and Remote Wakeup is enabled, the Remote Wakeup signalling bit in the Device Control Register is set for 1 milli-second.
 
@@ -1438,6 +1519,7 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 ​	重要的结构体：
 
 ```c
+
 static const struct hc_driver ehci_hc_driver = {
 	.description =		hcd_name,
 	.product_desc =		"EHCI Host Controller",
@@ -1480,6 +1562,7 @@ static const struct hc_driver ehci_hc_driver = {
 	 */
 	.free_dev =		ehci_remove_device,
 };
+
 ```
 
 ​	OHCI控制器使用的也是Upstream版驱动，host目录下文件名包含“ohci”的是OHCI控制器相关文件，其中文件名包含厂商名字的为厂商引导文件，与EHCI一样，RK使用ohci-platform.c进行驱动加载和初始化。类似的，ohci-hcd.c实现USB core层的HCD控制器接口，ohci-mem.c和ohci-q.c是传输数据结构和传输调度相关代码，ohci-hub.c是OHCI控制器root hub驱动代码。
@@ -1487,6 +1570,7 @@ static const struct hc_driver ehci_hc_driver = {
 ​	重要的结构体：
 
 ```c
+
 static const struct hc_driver ohci_hc_driver = {
 	.description =          hcd_name,
 	.product_desc =         "OHCI Host Controller",
@@ -1524,6 +1608,7 @@ static const struct hc_driver ohci_hc_driver = {
 #endif
 	.start_port_reset =	ohci_start_port_reset,
 };
+
 ```
 
 ##### 5.2.3.2 USB 2.0 HOST 调试接口
@@ -1533,8 +1618,10 @@ static const struct hc_driver ohci_hc_driver = {
 （需要enable CONFIG_DYNAMIC_DEBUG）
 
 ```sh
+
 rk3399_box:/sys/kernel/debug/fe380000.usb # ls
 async bandwidth periodic registers
+
 ```
 
 ​	**async:** Dump a snapshot of the Async Schedule.
@@ -1550,8 +1637,10 @@ async bandwidth periodic registers
 （需要enable CONFIG_DYNAMIC_DEBUG）
 
 ```sh
+
 rk3399_box:/sys/kernel/debug/usb/ohci/fe3a0000.usb # ls
 async periodic registers
+
 ```
 
 ​	**async:** Display Control and Bulk Lists together, for simplicity
@@ -1578,25 +1667,30 @@ async periodic registers
 ​	Android中与USB相关的script主要有：
 
 ```
+
 init.usb.rc
 init.usb.configfs.rc
 init.rk30board.usb.rc
 fstab.rk30board.bootmode.emmc
+
 ```
 
 1. init.usb.rc：为Android标准rc文件，一般不需要改动。
 2. fstab.rk30board.bootmode.emmc：为Android fstab文件，可以用于配置sdcard、usb的mount路径，Rockchip平台的vold和kernel已经可以做到使用通配符来自动搜索和匹配usb mount路径，不需要再做修改
 
 ```c
+
 # for USB 2.0
 /devices/platform/*.usb*         auto vfat defaults     voldmanaged=usb:auto
 # for USB 3.0
 /devices/platform/usb@*/*.dwc3*    auto vfat defaults     voldmanaged=usb:auto
+
 ```
 
 3. init.rk30board.usb.rc和init.usb.configfs.rc：为我们平台Gadget功能的配置管理文件，其内容主要包括usb gadget configfs的创建、描述符的定义（VID/PID）、Gadget function的配置等，如下所示：
 
-```c
+```shell
+
 on boot
     mkdir /dev/usb-ffs 0770 shell shell
     mkdir /dev/usb-ffs/adb 0770 shell shell
@@ -1665,18 +1759,24 @@ setprop sys.usb.controller "fe900000.usb"
 ​	内核提供了设备节点来查看USB Gadget的关键配置信息，如下：
 
 ```sh
+
 root@rk3399:/config/usb_gadget/g1 # ls
 UDC          bDeviceProtocol bMaxPacketSize0 bcdUSB  functions idVendor strings
 bDeviceClass bDeviceSubClass bcdDevice       configs idProduct os_desc
+
 ```
 
 ​	大部分节点的功能，可以直观地看出来，这里就不再赘述。
 
 ​	“UDC”可以确认当前Gadget对应的usb controller, 也可以用于手动选择对应的usb controller。如默认使用Type-C 0 USB Controller，要切换为使用Type-C 1 USB Controller，则手动执行如下的命令：
+
 ```sh
+
 echo none > config/usb_gadget/g1/UDC
 echo fe900000.dwc3 > config/usb_gadget/g1/UDC
+
 ```
+
 ---
 
 ## 7 常见问题分析
@@ -1688,6 +1788,7 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 ​	开机未连线，默认为device模式。
 
 ```c
+
 [    8.764441]otg id chg last id -1 currentid 67108864
 [    8.764925] PortPower off
 [    8.866923] Using Buffer DMA mode
@@ -1695,10 +1796,13 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 [    8.867787] Multiprocessor InterruptEnhancement - disabled
 [    8.868294] OTG VER PARAM: 0, OTG VER FLAG: 0
 [    8.868700] ^^^^^^^^^^^^^^^^^Device Mode
+
 ```
 
 #### 7.1.2 USB 2.0 Device连接
+
 ```c
+
 [  133.368479] ***vbusdetect*
 [ 133.500590] Using Buffer DMA mode
 [  133.500886] Periodic Transfer InterruptEnhancement - disabled
@@ -1712,32 +1816,48 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 [  133.947001] configfs-gadget gadget: high-speed config #1: b
 [  133.947649] android_work: sent ueventUSB_STATE=CONFIGURED
 [  133.995447] mtp_open
+
 ```
+
 #### 7.1.3 USB 2.0 Device断开连接
+
 ```c
+
 [  187.085682] ********session end ,softdisconnect***********
 [  187.086486] android_work: sent ueventUSB_STATE=DISCONNECTED
 [  187.087217] mtp_release
+
 ```
+
 #### 7.1.4 USB 2.0 HOST-LS设备
+
 ```c
+
 [  325.412454] usb 2-1: new low-speed USB device number 2 using ohci-platform
 [  325.619507] usb 2-1: New USB device found,idVendor=046d, idProduct=c077
 [  325.620116] usb 2-1: New USB device strings:Mfr=1, Product=2, SerialNumber=0
 [  325.620809] usb 2-1: Product: USB OpticalMouse
 [  325.621222] usb 2-1: Manufacturer: Logitech
+
 ```
+
 #### 7.1.5 USB 2.0 HOST-FS设备
+
 ```c
+
 [  370.896519] usb 2-1: new full-speed USB device number 3 using ohci-platform
 [  371.109574] usb 2-1: New USB device found,idVendor=1915, idProduct=0199
 [  371.110183] usb 2-1: New USB device strings:Mfr=1, Product=2, SerialNumber=0
 [  371.110832] usb 2-1: Product: Memsartcontroller
 [  371.111251] usb 2-1: Manufacturer: Memsart
 [  371.123172] input: Memsart Memsart controlleras /
+
 ```
+
 #### 7.1.6 USB 2.0 HOST-HS设备
+
 ```c
+
 [  405.400521] usb 1-1: new high-speed USB device number 5 using ehci-platform
 [  405.536569] usb 1-1: New USB device found,idVendor=0951, idProduct=1687
 [  405.537178] usb 1-1: New USB device strings:Mfr=1, Product=2, SerialNumber=3
@@ -1754,7 +1874,9 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 [  408.174453] sd 1:0:0:0: [sda] Assuming drivecache: write through
 [  408.223001] sda: sda1
 [  408.229280] sd 1:0:0:0: [sda] Attached SCSIremovable disk
+
 ```
+
 #### 7.1.7 USB 2.0 HOST-LS/FS/HS设备断开
 
 ```c
@@ -1764,15 +1886,18 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 #### 7.1.8 USB 3.0 Device连接
 
 ```c
+
 [   72.310531] android_work: sent ueventUSB_STATE=CONNECTED
 [   72.689120] configfs-gadget gadget: super-speed config #1: b
 [   72.690110] android_work: sent ueventUSB_STATE=CONFIGURED
 [   72.767950] mtp_open
+
 ```
 
 #### 7.1.9 USB 3.0 HOST-SS设备
 
 ```c
+
 [   26.715320] usb 8-1: new SuperSpeed USB device number 2 using xhci-hcd
 [   26.732190] usb 8-1: New USB device found,idVendor=0bc2, idProduct=2320
 [   26.732812] usb 8-1: New USB device strings:Mfr=2, Product=3, SerialNumber=1
@@ -1788,6 +1913,7 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 [   27.755281] sd 0:0:0:0: [sda] Write cache:enabled, read cache: enabled, doesn't support DPO or FUA
 [   27.783395] sda: sda1
 [   27.791561] sd 0:0:0:0: [sda] Attached SCSIdisk
+
 ```
 
 ### 7.2 USB 常见问题分析
@@ -1829,10 +1955,13 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
    **异常2：**连接失败，PC显示不可识别设备，log一直重复打印：
 
 ```c
+
 [36.682587] DWC_OTG: ********softconnect!!!*****************************************
 [36.688603] DWC_OTG: USB SUSPEND
 [36.807373] DWC_OTG: USB RESET
+
 ```
+
 ​	排查方法：没有正常log中的后面几条信息。一般为USB硬件信号差，无法完成枚举。
 
 ​	**异常3：**连接PC后，kernel log正常，并且设备为出现USB已连接”标识，但PC无法访问设备
@@ -1892,8 +2021,10 @@ dev_mount udisk /mnt/udisk 1 /devices/platform/usb20_HOST/usb2
 ​	**异常4：**串口一直打印如下提示字节没有对齐的类似log：
 
 ```c
+
 DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte0xd6eab00a
 DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte0xccf6140a
+
 ```
 
 ​	排查方法：RK平台的USB驱动要求在提交URB传输请求时， URB的成员transfer_buffer地址必须为四字节对齐，否则会提示上述错误log。
@@ -1961,9 +2092,9 @@ DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte
 
 ​	所有USB设备要在PC上正常工作都是需要驱动的，有些驱动是标准且通用的，而有些驱动是需要额外安装的。对于RK的设备连接到PC后，需要安装驱动的情况有两种的设备，需要分别选择对应的驱动。
 
-1.  生成后未烧写的裸片或者进入升级模式后的RK设备，会以rockUSB的模式连接到PC，需要在PC端使用RK平台专门的驱动安装助手DriverAssitant（RK3399需要v4.4支持）安装驱动才能识别到USB设备；
+1. 生成后未烧写的裸片或者进入升级模式后的RK设备，会以rockUSB的模式连接到PC，需要在PC端使用RK平台专门的驱动安装助手DriverAssitant（RK3399需要v4.4支持）安装驱动才能识别到USB设备；
 
-2.  RK的设备正常运行时，在设置里面打开了USB debugging选项，连接时会以ADB的模式连接PC，同样需要在PC端使用RK平台专门的驱动安装助手DriverAssitant安装ADB驱动后，才能正常识别到ADB设备。
+2. RK的设备正常运行时，在设置里面打开了USB debugging选项，连接时会以ADB的模式连接PC，同样需要在PC端使用RK平台专门的驱动安装助手DriverAssitant安装ADB驱动后，才能正常识别到ADB设备。
 
 ---
 

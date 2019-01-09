@@ -1,10 +1,10 @@
-# **RK3399 USB DTS配置说明**
+# RK3399 USB DTS 配置说明
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2018.3.1
+日期：2019-01-09
 
 文档密级：公开资料
 
@@ -24,13 +24,14 @@
 技术支持工程师
 
 **修订记录**
-| **日期**   | **版本** | **作者** | **修改说明** |
-| -------- | ------ | ------ | -------- |
-| 2018.3.1 | V1.0   | 吴良峰    |          |
+| **日期**   | **版本** | **作者** | **修改说明**             |
+| ---------- | -------- | -------- | ------------------------ |
+| 2018-03-01 | V1.0     | 吴良峰   | 初始版本                 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
 
---------------------
+---------
 [TOC]
-------
+
 ## 1 Type-C USB DTS配置 (default)
 
 ​	Type-C 的接口类型如下图1-1所示。
@@ -359,8 +360,6 @@ grf: syscon@ff770000 {
 
 ```
 
-
-
 ### 1.3 Type-C1 USB OTG DTS配置
 
 ​	在[1.1 Type-C0 /C1 USB 控制器DTS配置](#1.1 Type-C0 /C1 USB 控制器DTS配置)中已经提到，由于当前的内核USB框架只能支持一个USB 口作为Peripheral功能，所以RK3399 SDK默认配置Type-C0作为OTG mode 支持USB Peripheral功能，而Type-C1只支持Host mode。实际产品中，可以根据应用需求，修改为Type-C1作为OTG mode支持USB Peripheral功能，需要修改的地方有两个：
@@ -399,9 +398,6 @@ grf: syscon@ff770000 {
 - 对应的fusb节点不要配置，因为Type-A USB3.0不需要fusb302芯片
 - 对应的USB控制器父节点（usbdrd3）和PHY的节点（tcphy和u2phy）都要删除extcon属性
 - 对应的USB控制器子节点（usbdrd_dwc3）的dr_mode属性要配置为"host"
-
-
-
 
 ​	以RK3399 BOX平台为例（Type-C0 配置为Type-C接口，Type-C1配置为Type-A USB3 接口），介绍Type-A USB3.0 Host DTS配置的方法：
 
@@ -503,9 +499,6 @@ grf: syscon@ff770000 {
 - 对应的USB控制器子节点（usbdrd_dwc3）的dr_mode属性要配置为"otg"
 - 对应的USB2 PHY节点（u2phy）中，配置Vbus regulator
 
-
-
-
 ​	以Type-C0 USB配置为Micro USB3.0 OTG为例：
 
 ```
@@ -591,8 +584,6 @@ vcc_otg_vbus: otg-vbus-regulator {
 - 对应的USB2 PHY节点（u2phy）要删除extcon属性，并且配置Vbus regulator
 - 对应的USB控制器父节点（usbdrd3）中，extcon属性引用为u2phy
 - 对应的USB控制器子节点（usbdrd_dwc3）的dr_mode属性要配置为"otg"，maximum-speed 属性配置为high-speed，phys 属性只引用USB2 PHY节点
-
-
 
 ​	以Type-C0 USB配置为Micro USB2.0 OTG为例：
 
