@@ -55,11 +55,15 @@ ARM/LOGIC 分离供电。
 
 RK3308-EVB-V10/V11/V12 通过扩展板接JTAG：
 
-![](RK3308-Notes\RK3308-EVB-V10.jpg)
+![](RK3308-Notes/RK3308-EVB-V10.jpg)
 
 RK3308B-EVB-V10要通过板子右边预留过孔飞线，使用的时候要请硬件确认，因为还涉及到和其他复用跳线的情况。
 
-![](RK3308-Notes\RK3308B-EVB-V10.jpg)
+![](RK3308-Notes/RK3308B-EVB-V10.jpg)
+
+## EVB板编译参考
+
+[RK3308 SDK编译参考](http://10.10.10.164:9999/bin/view/Home/sdk/sdk%E5%B7%A5%E7%A8%8B%E5%9C%B0%E5%9D%80/RK3308/?tdsourcetag=s_pcqq_aiomsg)
 
 ## 启动速度
 
