@@ -1,14 +1,15 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.21
+发布版本：1.22
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
 ​	Kever Yang <kever.yang@rock-chips.com>
 ​	Jon Lin jon.lin@rock-chips.com
 ​	Chen Liang cl@rock-chips.com
+	Ping Lin <hisping.lin@rock-chips.com>
 
-日期：2019.01
+日期：2019.03
 
 文件密级：公开资料
 
@@ -56,6 +57,7 @@
 | 2018-09-20 | V1.13    | 张晴     | 增加CLK使用说明                                              |
 | 2018-11-06 | V1.20    | 陈健洪   | 增加/更新defconfig/rktest/probe/interrupt/kernel dtb/uart/atags |
 | 2019-01-21 | V1.21    | 陈健洪   | 增加dtbo/amp/dvfs宽温/fdt命令说明                            |
+| 2019-03-05 | V1.22    | 林平     | 增加optee client说明                                         |
 
 ---
 [TOC]
@@ -2564,12 +2566,64 @@ U-Boot串口命令行下，使用"rktest vendor"命令可以进行Vendor Storage
 
 ### 5.13 OPTEE Client支持
 
-目前一些安全的操作需要在U-Boot这级操作或读取一些数据必须需要OPTEE帮忙获取。U-Boot里面实现了OPTEE Client代码，可以通过该接口与OPTEE通信。配置及说明如下：
+目前一些安全的操作需要在U-Boot这级操作或读取一些数据必须需要OPTEE帮忙获取。U-Boot里面实现了OPTEE Client代码，可以通过该接口与OPTEE通信。
+
+#### 5.13.1 宏定义说明
 
 CONFIG_OPTEE_CLIENT，U-Boot调用trust总开关。
 CONFIG_OPTEE_V1，旧平台使用，如312x,322x,3288,3228H,3368,3399。
 CONFIG_OPTEE_V2，新平台使用，如3326,3308。
 CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION， 当emmc的rpmb不能用，才开这个宏，默认不开。
+
+#### 5.13.2 镜像说明
+
+32位系统在U-Boot编译时会生成trust.img和trust_with_ta.img，trust.img不能运行外部ta，但是节省内存，trust_with_ta.img可以运行外部ta，一般情况下使用trust_with_ta.img。
+64位系统只生成一个trust.img，可以运行外部ta，编译完U-Boot生成trust镜像后，建议查看生成镜像的日期，避免烧错。
+
+#### 5.13.3 API文档
+
+Optee client驱动在lib/optee_client目录下，Optee Client Api请参考《TEE_Client_API_Specification-V1.0_c.pdf》。
+下载地址为：<https://globalplatform.org/specs-library/tee-client-api-specification/>
+
+#### 5.13.4 共享内存说明
+
+U-Boot与Optee通信时，数据需放在共享内存中，可以通过TEEC_AllocateSharedMemory()来申请共享内存，但各个平台共享内存大小不同，建议不超过1M，若超过则建议分割数据多次传递，使用完需调用TEEC_ReleaseSharedMemory()释放共享内存。
+
+#### 5.13.5 测试命令
+
+测试安全存储功能，需进入U-Boot串口命令，执行：
+
+```
+=> mmc testsecurestorage
+```
+
+该测试用例将循环测试安全存储读写功能，当硬件使用emmc时将测试rpmb与security分区两种安全存储方式，当硬件使用nand时只测试security分区安全存储。
+
+#### 5.13.6 常见错误打印
+
+```
+"TEEC: Could not find device"
+```
+
+没有找到emmc或者nand设备，请检查U-Boot中驱动，或者硬件是否损坏。
+
+```
+"TEEC: Could not find security partition"
+```
+
+当采用security分区安全存储时，加密数据会在该分区，请检查parameter.txt中是否定义了security分区。
+
+```
+"TEEC: verify [%d] fail, cleanning ...."
+```
+
+第一次使用security分区进行安全存储时，或者security分区数据被非法篡改时出现，security分区数据会全部清空。
+
+```
+"TEEC: Not enough space available in secure storage !"
+```
+
+安全存储的空间不足，请检查存储的数据是否过大，或者之前是否存储过大量的数据而没有删除。
 
 ### 5.14 DVFS宽温
 
