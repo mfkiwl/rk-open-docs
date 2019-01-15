@@ -1,10 +1,10 @@
 # USB SQ Test Guide
 
-发布版本：1.4
+发布版本：1.5
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2019-01-09
+日期：2019-01-15
 
 文档密级：公开资料
 
@@ -33,13 +33,15 @@ Rockchip SOCs通常内置多个USB控制器，不同控制器之间互相独立�
 技术支持工程师
 
 **修订记录**
-| **日期**   | **版本** | **作者** | **修改说明**                   |
-| ---------- | -------- | -------- | ------------------------------ |
-| 2017-12-12 | V1.0     | 吴良峰   | 初始版本                       |
-| 2018-03-07 | V1.1     | 吴良峰   | 增加rk3399 Type-C反面测试命令  |
-| 2018-03-30 | V1.2     | 吴良峰   | 增加RK3229/RK3326/PX30测试命令 |
-| 2018-05-21 | V1.3     | 吴良峰   | 修正USB3.0 测试方法            |
-| 2019-01-09 | V1.4     | 吴良峰   | 使用markdownlint修订格式       |
+
+| **日期**   | **版本** | **作者** | **修改说明**                                         |
+| ---------- | -------- | -------- | ---------------------------------------------------- |
+| 2017-12-12 | V1.0     | 吴良峰   | 初始版本                                             |
+| 2018-03-07 | V1.1     | 吴良峰   | 增加rk3399 Type-C反面测试命令                        |
+| 2018-03-30 | V1.2     | 吴良峰   | 增加RK3229/RK3326/PX30测试命令                       |
+| 2018-05-21 | V1.3     | 吴良峰   | 修正USB3.0 测试方法                                  |
+| 2019-01-09 | V1.4     | 吴良峰   | 使用markdownlint修订格式                             |
+| 2019-01-15 | V1.5     | 吴良峰   | 增加RK1808测试命令、修正文档缩进、修正USB3.0测试命令 |
 
 ---------
 [TOC]
@@ -73,17 +75,18 @@ USB 2.0 SQ的测试原理是，设置USB控制器的Test Control寄存器，使U
 
 表1-1 USB 2.0 Device SQ测试命令
 
-|                   芯片名称                   | DWC2_0 OTG 2.0 Device |    DWC3_0 OTG 2.0 device    |    DWC3_1 OTG 2.0 device    |
-| :--------------------------------------: | :-------------------: | :-------------------------: | :-------------------------: |
-|   RK29XX<br />RK30XX<br />RK31XX<br />   | io -4 0x10180804 0x40 |             N.A             |             N.A             |
-|         RK3228<br />RK3229<br />         | io -4 0x30040804 0x40 |             N.A             |             N.A             |
+|                     芯片名称                     | DWC2_0 OTG 2.0 Device |    DWC3_0 OTG 2.0 device    |    DWC3_1 OTG 2.0 device    |
+| :----------------------------------------------: | :-------------------: | :-------------------------: | :-------------------------: |
+|                      RK1808                      |          N.A          | io -4 0xfd00c704 0x8c000a08 |             N.A             |
+|       RK29XX<br />RK30XX<br />RK31XX<br />       | io -4 0x10180804 0x40 |             N.A             |             N.A             |
+|             RK3228<br />RK3229<br />             | io -4 0x30040804 0x40 |             N.A             |             N.A             |
 | RK3288<br />RK3228H<br/>RK3328<br />RK3368<br /> | io -4 0xff580804 0x40 |             N.A             |             N.A             |
-|                  RK3308                  | io -4 0xff400804 0x40 |             N.A             |             N.A             |
-|          RK3326<br />PX30<br />          | io -4 0xff300804 0x40 |             N.A             |             N.A             |
-|                  RV1108                  | io -4 0x30180804 0x40 |             N.A             |             N.A             |
-|                SOFIA-3GR                 | io -4 0xe2100804 0x40 |             N.A             |             N.A             |
-|                  RK3366                  | io -4 0xff4c0804 0x40 | io -4 0xff50c704 0x8c000a08 |             N.A             |
-|                  RK3399                  |          N.A          | io -4 0xfe80c704 0x8c000a08 | io -4 0xfe90c704 0x8c000a08 |
+|                      RK3308                      | io -4 0xff400804 0x40 |             N.A             |             N.A             |
+|              RK3326<br />PX30<br />              | io -4 0xff300804 0x40 |             N.A             |             N.A             |
+|                      RV1108                      | io -4 0x30180804 0x40 |             N.A             |             N.A             |
+|                    SOFIA-3GR                     | io -4 0xe2100804 0x40 |             N.A             |             N.A             |
+|                      RK3366                      | io -4 0xff4c0804 0x40 | io -4 0xff50c704 0x8c000a08 |             N.A             |
+|                      RK3399                      |          N.A          | io -4 0xfe80c704 0x8c000a08 | io -4 0xfe90c704 0x8c000a08 |
 
 **测试工具**
 
@@ -123,8 +126,9 @@ USB 2.0 Host SQ测试，只能使用测试命令，没有专门的测试工具�
 
 表1-2 USB 2.0 Host 测试命令(a)
 
-|                 芯片名称                 |    DWC2 OTG Host 2.0    |      DWC2 Host 2.0      |     EHCI_0 Host 2.0      |
+|               芯片名称               |    DWC2 OTG Host 2.0    |      DWC2 Host 2.0      |     EHCI_0 Host 2.0      |
 | :----------------------------------: | :---------------------: | :---------------------: | :----------------------: |
+|                RK1808                |           N.A           |           N.A           | io -4 0xffd80054 0x40000 |
 | RK29XX<br />RK30XX<br />RK3188<br /> | io -4 0x10180440 0x8000 | io -4 0x101c0440 0x8000 |           N.A            |
 |                RK312X                | io -4 0x10180440 0x8000 | io -4 0x101c0440 0x8000 | io -4 0x101c0054 0x40000 |
 |       RK3228<br />RK3229<br />       | io -4 0x30040440 0x8000 |           N.A           | io -4 0x30080054 0x40000 |
@@ -150,11 +154,12 @@ USB 2.0 Host SQ测试，只能使用测试命令，没有专门的测试工具�
 
 表1-4 USB 2.0 Host 测试命令(c)
 
-|  芯片名称   |     DWC3_0 OTG Host 2.0     |     DWC3_1 OTG Host 2.0     |
-| :-----: | :-------------------------: | :-------------------------: |
-| RK3228H | io -4 0xff600424 0x40000000 |             N.A             |
-| RK3366  | io -4 0xff500424 0x40000000 |             N.A             |
-| RK3399  | io -4 0xfe800424 0x40000000 | io -4 0xfe900424 0x40000000 |
+| 芯片名称 |     DWC3_0 OTG Host 2.0     |     DWC3_1 OTG Host 2.0     |
+| :------: | :-------------------------: | :-------------------------: |
+|  RK1808  | io -4 0xfd000424 0x40000000 |             N.A             |
+| RK3228H  | io -4 0xff600424 0x40000000 |             N.A             |
+|  RK3366  | io -4 0xff500424 0x40000000 |             N.A             |
+|  RK3399  | io -4 0xfe800424 0x40000000 | io -4 0xfe900424 0x40000000 |
 
 ### 1.3 USB 2.0 测试环境
 
@@ -310,11 +315,13 @@ USB 2.0 HUB的SQ test包括了upstream ports和downstream ports，但实际应�
 
 将编译生成的可执行文件linux-eye拷贝到系统的data目录下，并 执行命令
 
-`chmod 777 linux-eye`
+```shell
+chmod 777 linux-eye
+```
 
 执行测试脚本linux-eye，然后，根据脚本的提示，输入测试命令，参考如下：
 
-```
+```shell
 [root@hari LinuxEye]# ./linuxEye
 LinuxEye - select one of the following hub for testing.
 [ 0] 4-port Full-Speed hub at tier 2 of Bus 3
@@ -366,7 +373,7 @@ USB 3.0是双总线架构，在USB 2.0的基础上增加了超高速(Super Speed
 
 - Host 接收端眼图幅度标准为180mVpp
 
-USB 3.0的电气性能测试分为**发送信号测试(Tx)**、**接收容限测试(Rx Tolerance Compliance Test)**以及电缆/连接器的测试。
+  USB 3.0的电气性能测试分为**发送信号测试(Tx)**、**接收容限测试(Rx Tolerance Compliance Test)**以及电缆/连接器的测试。
 
 ### 3.2 USB 3.0 Tx Compliance Test
 
@@ -432,25 +439,44 @@ USB 3.0的电气性能测试分为**发送信号测试(Tx)**、**接收容限测
 
 Tektronix的Tx测试示意图如图3-10所示，Tektronix USB 3.0 发射机测量（选项USB-Tx）适用于 DPO/MSO70000 系列示波器，提供了自动 USB 3.0发射机解决方案。
 
-具体测试方案请参考：<https://www.tek.com.cn/datasheet/usb3-transmitter-and-receiver-solutions-datasheet>
+具体测试方案请参考：
+
+<https://www.tek.com.cn/datasheet/usb3-transmitter-and-receiver-solutions-datasheet>
 
 ![Tek-USB3-Transmitter-Receiver-Solutions](Rockchip-USB-SQ-Test-Guide/Tek-USB3-Transmitter-Receiver-Solutions.jpg)
 
 ​								图3-10 Tektronix USB 3.0 Tx测试示意图
 
-#### 3.2.5 USB 3.0 Device Tx 测试方法
+#### 3.2.5 USB 3.0 Device Tx 测试命令
+
+如下芯片在测试USB 3.0 Device Tx时，需要输入测试命令，作用是为了触发CP1 test pattern。并且，**要严格按照测试步骤的要求，在示波器弹出测试CP1 test pattern时，再输入Device测试命令**。否则，可能会导致CP0 test pattern或CP1 test pattern测试异常。
+
+表3-1 USB 3.0 Device Tx测试命令
+
+|      芯片名称       | DWC3_0 OTG Host 3.0  | DWC3_1 OTG Host 3.0 |
+| :-----------------: | :------------------: | :-----------------: |
+|       RK1808        | io -4 0xff384008 0xc |         N.A         |
+| RK3228H<br />RK3328 | io -4 0xff478408 0xc |         N.A         |
+
+#### 3.2.6 USB 3.0 Device Tx 测试方法
 
 本文档主要说明使用Agilent 90000系列示波器(型号：DSO91204A和测试夹具U7242A)的USB 3.0 Device Tx测试方法。如果使用的是Tektronix或者LeCroy的示波器，请自行搜索Tektronix和LeCroy官方发布的测试指南。
 
 **测试注意事项：**
 
-1). 测试USB 3.0 Device Tx时，**不用输入任何测试命令**，只要按照示波器测试软件提示的测试步骤操作，将待测试的Device USB口连接到测试夹具，USB 3.0控制器就会自动进入Compliance mode。而**测试host Tx时，需要输入测试命令**，具体命令将在[3.2.6 USB 3.0 Host Tx 测试方法](#3.2.6 USB 3.0 Host Tx 测试方法)章节中详细描述。
+1). 测试USB 3.0 Device Tx时，请先查表3-1，确认是否需要输入测试命令。
+
+如果不用输入测试命令，则只要按照示波器测试软件提示的测试步骤操作，将待测试的Device USB口连接到测试夹具，USB 3.0控制器就会自动进入Compliance mode。
+
+如果需要输入测试命令，则先按照示波器测试软件提示的测试步骤操作，将待测试的Device USB口连接到测试夹具，USB 3.0控制器就会自动进入Compliance mode。然后，在示波器弹出测试CP1 test pattern时，再输入Device测试命令。
 
 2). 执行如下命令，可以查询USB 3.0控制器是否进入Compliance mode：
 
-​     `cat /sys/kernel/debug/xxxx.dwc3/link_state    (xxxx表示USB3控制器基地址)`
+```shell
+cat /sys/kernel/debug/xxxx.dwc3/link_state    (xxxx表示USB3控制器基地址)
+```
 
-​     返回的值如果为“compliance”，表示控制器已进入Compliance mode
+返回的值如果为“compliance”，表示控制器已进入Compliance mode
 
 3). 测试USB 3.0 Device Tx时，**VBus 5V不能自供电，否则会导致USB 3.0控制器无法进入Compliance mode**。VBus的供电需要由测试夹具U7242A提供，可以通过USB线将测试夹具的USB供电口与示波器或者PC的USB口连接，实现VBus 5V的供电。
 
@@ -546,7 +572,7 @@ Channel Settings默认选择Normal Channel，即嵌入S参数，来模拟3m长us
 
 ​							图3-24 USB 3.0 Device Tx Far End Eye Diagram
 
-#### 3.2.6 USB 3.0 Host Tx 测试命令
+#### 3.2.7 USB 3.0 Host Tx 测试命令
 
 Android平台和Chrome平台的USB 3.0 Host Tx测试命令有所不同，以下分别说明。
 
@@ -556,49 +582,114 @@ Android平台支持两种不同的测试命令，一种是io命令写寄存器�
 
 **1.1)  Android平台io测试命令**
 
-表3-1 USB 3.0 Host Tx测试命令-Android平台
+表3-2 USB 3.0 Host Tx测试命令-Android平台
 
-|  芯片名称   |           DWC3_0 OTG Host 3.0            |      DWC3_1 OTG Host 3.0       |
-| :-----: | :--------------------------------------: | :----------------------------: |
-| RK3228H | io -4 0xff478408 0x0000000c<br />io  -4  0xff600430  0x0a010340 |              N.A               |
-| RK3366  |      io  -4  0xff500430  0x0a010340      |              N.A               |
-| RK3399  |      io  -4  0xfe800430  0x0a010340      | io  -4  0xfe900430  0x0a010340 |
+| 芯片名称 |                   DWC3_0 OTG Host 3.0                    |      DWC3_1 OTG Host 3.0       |
+| :------: | :------------------------------------------------------: | :----------------------------: |
+|  RK1808  |  io -4 0xff384008 0xc<br />io -4 0xfd000430 0x0a010340   |              N.A               |
+| RK3228H  | io -4 0xff478408 0xc<br />io  -4  0xff600430  0x0a010340 |              N.A               |
+|  RK3366  |              io  -4  0xff500430  0x0a010340              |              N.A               |
+|  RK3399  |              io  -4  0xfe800430  0x0a010340              | io  -4  0xfe900430  0x0a010340 |
 
-**Note**： RK3228H 需要两条测试命令，其中命令“io -4 0xff478408 0x0000000c”是为了触发CP1 test pattern。
+**Note**：RK1808/RK3228H 需要两条测试命令，其中第一个命令（即写”0xc“）是为了触发CP1 test pattern。一般情况下，测试时，两条命令可以同时输入。但如果出现CP0或CP1 test pattern切换异常时，请先不要执行第一个命令（即写”0xc“），但写“ 0x0a010340”的命令仍需要在测试前输入，然后，待示波器弹出CP1 pattern测试的提示窗口时，再输入写“0xc”的命令。
 
 **1.2)  Android平台写内核设备节点的方法[推荐优先使用]**
 
- **echo test_u3 > /sys/kernel/debug/usb3控制器节点/host_testmode**
+**Legacy：**（适用于较早的Linux-3.10/Linux-4.4版本）
+
+```shell
+echo test_u3 > /sys/kernel/debug/usb3控制器节点/host_testmode
+```
 
 其中，“usb3控制器节点”应该根据芯片的USB 3.0控制器节点的名称进行修改。
+
+**Tips：**
+
+可以在系统的根目录下，通过如下命令搜索“host_testmode”节点的完整路径
+
+```shell
+find . -name "host_testmode"
+```
 
 比如，**rk3399**平台的USB3 Host Tx测试命令如下：
 
 **rk3399 Type-C USB正面连接的测试命令：**
 
-Type-C0 USB：`echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+Type-C0 USB：
 
-Type-C1 USB：`echo test_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
+```shell
+echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
+```
+
+Type-C1 USB：
+
+```shell
+echo test_u3 > /sys/kernel/debug/usb@fe900000/host_testmode
+```
 
 **rk3399 Type-C USB反面连接的测试命令：**
 
-Type-C0 USB flip：`echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode`
+Type-C0 USB flip：
 
-Type-C1 USB flip：`echo test_flip_u3 > /sys/kernel/debug/usb@fe900000/host_testmode`
+```shell
+echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
+```
+
+Type-C1 USB flip：
+
+```shell
+echo test_flip_u3 > /sys/kernel/debug/usb@fe900000/host_testmode
+```
+
+**New：**（适用于最新的Linux-4.4版本）
+
+```shell
+echo test_u3 > /sys/devices/platform/usb3控制器节点/host_testmode
+```
+
+比如，**rk3399**平台的USB3 Host Tx测试命令如下：
+
+**rk3399 Type-C USB正面连接的测试命令：**
+
+Type-C0 USB：
+
+```shell
+echo test_u3 > /sys/devices/platform/usb0/host_testmode
+```
+
+Type-C1 USB：
+
+```shell
+echo test_u3 > /sys/devices/platform/usb1/host_testmode
+```
+
+**rk3399 Type-C USB反面连接的测试命令：**
+
+Type-C0 USB flip：
+
+```shell
+echo test_flip_u3 > /sys/devices/platform/usb0/host_testmode
+```
+
+Type-C1 USB flip：
+
+```shell
+echo test_flip_u3 > /sys/devices/platform/usb1/host_testmode
+```
 
 **2).  Chrome平台USB 3.0 Host Tx测试命令**
 
-Chrome平台可使用表3-1和表3-2两种测试命令，效果一样，但Chrome平台不支持写内核设备节点的方法。
+Chrome平台可使用表3-2和表3-3两种测试命令，效果一样，但Chrome平台不支持写内核设备节点的方法。
 
-表3-2 USB 3.0 Host Tx测试命令-Chrome平台
+表3-3 USB 3.0 Host Tx测试命令-Chrome平台
 
-|  芯片名称   |           DWC3_0 OTG Host 3.0            |      DWC3_1 OTG Host 3.0       |
-| :-----: | :--------------------------------------: | :----------------------------: |
-| RK3228H | mem w 0xff478408 0x0000000c<<br />mem  w  0xff600430  0x0a010340 |              N.A               |
-| RK3366  |      mem  w  0xff500430  0x0a010340      |              N.A               |
-| RK3399  |      mem  w  0xfe800430  0x0a010340      | mem  w  0xfe900430  0x0a010340 |
+|      芯片名称       |                     DWC3_0 OTG Host 3.0                      |      DWC3_1 OTG Host 3.0       |
+| :-----------------: | :----------------------------------------------------------: | :----------------------------: |
+| RK3228H<br />RK3328 | mem w 0xff478408 0x0000000c<<br />mem  w  0xff600430  0x0a010340 |              N.A               |
+|       RK3366        |                mem  w  0xff500430  0x0a010340                |              N.A               |
+|       RK3399        |                mem  w  0xfe800430  0x0a010340                | mem  w  0xfe900430  0x0a010340 |
 
-#### 3.2.7 USB 3.0 Host Tx测试方法
+#### 3.2.8 USB 3.0 Host Tx测试方法
 
 本文档主要说明使用Agilent 90000系列示波器(型号：DSO91204A和测试夹具U7242A)的USB 3.0 Device Tx测试方法。如果使用的是Tektronix或者LeCroy的示波器，请自行搜索Tektronix和LeCroy官方发布的测试指南。
 
@@ -638,7 +729,7 @@ USB 3.0 Host Tx测试过程中，示波器的自动化测试软件的设置与US
 
 - 设置示波器进入USB 3.0 的LFPS测试项，示波器会提示断开测试夹具与待测的USB 3.0 Host port的连接；
 
-- 查表3-1，输入对应的测试命令；
+- 查表3-2，输入对应的测试命令；
 
 - 连接测试夹具与待测试的USB 3.0 Host port，则USB 3.0控制器会自动进入测试模式；
 
@@ -701,7 +792,7 @@ Chrome平台支持USB 3.0的芯片，目前只有RK3399，以下提供两种Chro
 
 - 连接测试夹具与待测试的USB 3.0 Host port，则示波器会检测到LFPS，开始进入LFPS测试项；
 
-- LFPS测试完成后，会进入SSC测试项，需要检测CP0 test pattern，在示波器弹出CP0 test pattern界面时，同时断开测试夹具与示波器、RK3399待测试USB3 port的连接。然后，先连接测试夹具与K3399待测试的USB3 port，再查表3-2，输入对应的测试命令。最后，连接测试夹具与示波器，USB控制器就能自动进入测试模式，同时会自动触发CP0 test pattern；
+- LFPS测试完成后，会进入SSC测试项，需要检测CP0 test pattern，在示波器弹出CP0 test pattern界面时，同时断开测试夹具与示波器、RK3399待测试USB3 port的连接。然后，先连接测试夹具与K3399待测试的USB3 port，再查表3-3，输入对应的测试命令。最后，连接测试夹具与示波器，USB控制器就能自动进入测试模式，同时会自动触发CP0 test pattern；
 
 - 按照示波器操作提示,完成所有的测试项；
 
@@ -769,7 +860,7 @@ USB 3.0 HUB的Compliance test包括了upstream ports和downstream ports，但实
 
 以RK3399 平台测试GL3523 HUB为例，测试步骤如下：
 
-```
+```shell
 1. 使用adb push 脚本到Android系统，如：
    adb push C:\Users\user\Desktop\linux-eye /data
 
