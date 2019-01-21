@@ -1,6 +1,6 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.20
+发布版本：1.21
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -8,7 +8,7 @@
 ​	Jon Lin jon.lin@rock-chips.com
 ​	Chen Liang cl@rock-chips.com
 
-日期：2018.11
+日期：2019.01
 
 文件密级：公开资料
 
@@ -55,6 +55,7 @@
 | 2018-08-08 | V1.12    | 陈亮     | 增加HW-ID使用说明                                            |
 | 2018-09-20 | V1.13    | 张晴     | 增加CLK使用说明                                              |
 | 2018-11-06 | V1.20    | 陈健洪   | 增加/更新defconfig/rktest/probe/interrupt/kernel dtb/uart/atags |
+| 2019-01-21 | V1.21    | 陈健洪   | 增加dtbo/amp/dvfs宽温/fdt命令说明                            |
 
 ---
 [TOC]
@@ -575,6 +576,29 @@ Setting bus to 0
 => i2c md 0x1b 0x2e 0x20		// 回读（对比上述"1.读操作"的内容）
 002e: 10 0f 00 00 11 0f 00 00 01 00 00 00 09 00 00 0c    ................
 003e: 00 0a 0a 0c 0c 0c 00 07 07 0a 00 0c 0c 00 00 00    ................
+```
+
+##### 2.7.2.5 fdt读写
+
+U-Boot提供的fdt命令可以实现对当前dtb的读写操作：
+
+```
+=> fdt
+fdt - flattened device tree utility commands
+
+Usage:
+fdt addr [-c]  <addr> [<length>]    - Set the [control] fdt location to <addr>
+fdt print  <path> [<prop>]          - Recursive print starting at <path>
+fdt list   <path> [<prop>]          - Print one level starting at <path>
+......
+NOTE: Dereference aliases by omitting the leading '/', e.g. fdt print ethernet0.
+```
+
+其中如下两条组合命令可以把fdt完整dump出来，比较常用：
+
+```
+=> fdt addr $fdt_addr_r   // 指定fdt地址
+=> fdt print              // 把fdt内容全部打印出来
 ```
 
 #### 2.7.3 状态类
@@ -2546,6 +2570,268 @@ CONFIG_OPTEE_CLIENT，U-Boot调用trust总开关。
 CONFIG_OPTEE_V1，旧平台使用，如312x,322x,3288,3228H,3368,3399。
 CONFIG_OPTEE_V2，新平台使用，如3326,3308。
 CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION， 当emmc的rpmb不能用，才开这个宏，默认不开。
+
+### 5.14 DVFS宽温
+
+#### 5.14.1 宽温策略
+
+U-Boot框架没有支持DVFS，但是为了支持某些芯片的宽温功能，我们实现了一套DVFS宽温驱动去根据芯片温度调整cpu/dmc频率-电压。但有别于内核DVFS驱动，这套宽温驱动仅仅对触发了最高/低温度阈值的时刻进行控制。
+
+**具体的宽温策略：**
+
+1. 宽温驱动用于调整cpu/dmc的频率-电压，控制策略可同时对cpu和dmc生效，也可只对其中一个生效，由dts配置决定；cpu和dmc的控制策略是一样的；
+2. 宽温驱动会解析cpu/dmc节点的opp table、regulator、clock、thermal zone的"trip-point-0"，获取频率-电压档位、最高/低温度阈值、允许的最高电压等信息；
+3. 若cpu/dmc的opp table里指定了rockchip,low-temp = <...>或 rockchip,high-temp = <...>，又或者cpu/dmc引用了thermal zone的trip节点，那么cpu/dmc宽温控制策略就会生效。
+4. 关键属性：
+
+- rockchip,low-temp：最低温度阈值，下述用TEMP_min表示；
+- rockchip,high-temp和thermal zone：最高温度阈值，下述用TEMP_max表示（二者都有效，策略上都会拿当前温度进与之比较）；
+- rockchip,max-volt：允许设置的最高电压值，下述用V_max表示；
+
+5. 阈值触发处理：
+
+- 如果温度高于TEMP_max，把频率和电压都降到最低档位；
+- 如果温度低于TEMP_min，默认抬压50mv。若抬压50mv会导致电压超过V_max，则电压设定为V_max，同时把频率降低2档；
+
+6. 目前宽温策略应用在2个时刻点：
+
+- regulator和clk框架初始化完成后，宽温驱动进行初始化并且执行一次宽温策略，具体位置在board.c文件的board_init()中调用；
+- preboot阶段（即准备加载固件之前）再执行一次宽温策略：如果dts节点中指定了"repeat"等相关属性（见下文），那么再执行完本次宽温策略后如果芯片温度依然不在温度阈值范围内，那就停止系统启动并且不断执行宽温策略，直到芯片温度回归到阈值范围内才继续启动系统。如果没有"repeat"等相关属性，则执行完本次宽温策略后就直接启动系统。
+
+#### 5.14.2 框架支持
+
+**框架代码：**
+
+```
+./drivers/power/dvfs/dvfs-uclass.c
+./include/dvfs.h
+./cmd/dvfs.c
+```
+
+**宽温驱动：**
+
+```
+./drivers/power/dvfs/rockchip_wtemp_dvfs.c
+```
+
+#### 5.14.3 相关接口
+
+```
+// 执行一次dvfs策略
+int dvfs_apply(struct udevice *dev);
+
+// 如果存在repeat属性，当温度不在阈值范围内时循环执行dvfs策略
+int dvfs_repeat_apply(struct udevice *dev);
+```
+
+#### 5.14.4 启用宽温
+
+1. defconfig里使能配置：
+
+   ```
+   CONFIG_DM_DVFS=y
+   CONFIG_ROCKCHIP_WTEMP_DVFS=y
+   ```
+
+   依赖于：
+
+   ```
+   CONFIG_DM_THERMAL=y
+   CONFIG_ROCKCHIP_THERMAL=y
+   CONFIG_USING_KERNEL_DTB=y
+   ```
+
+2. 对应平台的rkxxx_common.h指定CONFIG_PREBOOT：
+
+   ```
+   #ifdef CONFIG_DM_DVFS
+   #define CONFIG_PREBOOT			"dvfs repeat"
+   #else
+   #define CONFIG_PREBOOT
+   #endif
+   ```
+
+3. 内核dts的宽温节点配置：
+
+   ```c
+   uboot-wide-temperature {
+   	compatible = "rockchip,uboot-wide-temperature";
+
+   	// 可选项。表示是否在U-Boot阶段触发cpu的最高/低温度阈值时让宽温驱动停止启动系统，
+   	// 且不断执行宽温处理策略，直到芯片温度回归到阈值范围内才继续启动系统。
+   	cpu,low-temp-repeat;
+   	cpu,high-temp-repeat;
+
+   	// 可选项。表示是否在U-Boot阶段触发dmc的最高/低温度阈值时让宽温驱动停止启动系统，
+   	// 且不断执行宽温处理策略，直到芯片温度回归到阈值范围内才继续启动系统。
+   	dmc,low-temp-repeat;
+   	dmc,high-temp-repeat;
+
+   	status = "okay";
+   };
+   ```
+
+   一般情况下不需要配置上述的repeat相关属性。
+
+#### 5.14.5 宽温结果
+
+当cpu温控启用的时候，正确解析完参数后会有如下打印，主要是关键信息的内容：
+
+```
+// <NULL>表明没有指定低温阈值
+DVFS: cpu: low=<NULL>'c, high=95.5'c, Vmax=1350000uV, tz_temp=88.0'c, h_repeat=0, l_repeat=0
+```
+
+当cpu温控触发高温阈值时会有调整信息：
+
+```
+DVFS: 90.352'c
+DVFS: cpu(high): 600000000->408000000 Hz, 1050000->950000 uV
+```
+
+当cpu温控触发低温阈值时会有调整信息：
+
+```
+DVFS: 10.352'c
+DVFS: cpu(low): 600000000->600000000 Hz, 1050000->1100000 uV
+```
+
+同理，当dmc触发高低温阈值时，也会有上述信息打印，信息前缀为"dmc"：
+
+```\
+DVFS: dmc: ......
+DVFS: dmc(high): ......
+DVFS: dmc(low): ......
+```
+
+### 5.15 AMP(Asymmetric Multi-Processing)
+
+目前的U-Boot架构只支持单核启动和运行，并不支持AMP运行。如果用户有AMP的需求（这里指的是：不同的core运行在不同的firmwarm上），那么U-Boot阶段可以通过psci_cpu_on()指定core从不同的firmware入口地址启动。
+
+```c
+/*
+ * psci_cpu_on() - Standard ARM PSCI cpu on call.
+ *
+ * @cpuid:          cpu id
+ * @entry_point:    boot entry point
+ *
+ * @return 0 on success, otherwise failed.
+ */
+int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
+```
+
+特别注意：如果上述firmware是在U-Boot阶段加载到DRAM上，那么当加载完成后需要把cache数据全都刷到DRAM上，否则可能引起core启动失败等问题。
+
+cache接口：
+
+```c
+void flush_cache(unsigned long start, unsigned long size) // 需要指定刷cache的空间范围
+void flush_dcache_all(void)  // 默认全部空间刷cache，推荐用这种方式。
+```
+
+### 5.16 DTBO/DTO(Devcie Tree Overlay)
+
+为了便于用户对本章节内容的理解，这里先明确相关的专业术语，本章节更多相关知识可参考：<https://source.android.google.cn/devices/architecture/dto>。
+
+| 名词 | 解释                        |
+| ---- | --------------------------- |
+| DTB  | 名词。设备树 Blob           |
+| DTBO | 名词。用于叠加的设备树 Blob |
+| DTC  | 名词。设备树编译器          |
+| DTO  | 动词。设备树叠加操作        |
+| DTS  | 名词。设备树源文件          |
+| FDT  | 名词。扁平化设备树          |
+
+它们之间的关系，可以描述为：
+
+- DTS是用于描述FDT的文件；
+
+- DTS经过DTC编译后可生成DTB/DTBO；
+
+- DTB和DTBO通过DTO操作可合并成一个新的DTB；
+
+通常情况下很多用户习惯把“DTO“这个词的动作含义用“DTBO“来替代，下文中我们避开这个概念混用，明确：DTO是一个动词概念，代表的是操作；DTBO是一个名词概念，指的是用于叠加的次dtb。
+
+#### 5.16.1 原理介绍
+
+DTO是Android P后引入且必须强制启用的功能，可让次设备树 Blob（DTBO） 叠加在已有的主设备树Blob 上。DTO 可以维护系统芯片 SoC设备树，并动态叠加针对特定设备的设备树，从而向树中添加节点并对现有树中的属性进行更改。
+
+主设备树Blob（\*.dtb）一般由Vendor厂商提供，次设备树Blob（\*.dtbo）可由ODM/OEM等厂商提供，最后通过bootloader合并后再传递给kernel。如图：
+![UBoot-nextdev-DTO](Rockchip-Developer-Guide-UBoot-nextdev/UBoot-nextdev-DTO.png)
+
+需要注意：DTO操作使用的DTB和DTBO的编译跟普通的DTB编译有区别，语法上有特殊区别：
+
+使用dtc编译.dts时，您必须添加选项**-@**以在生成的.dtbo中添加\__symbols\__节点。\__symbols\__节点包含带标签的所有节点的列表，DTO库可使用这个列表作为参考。如下示例：
+
+1. 编译主.dts的示例命令：
+
+```
+dtc -@ -O dtb -o my_main_dt.dtb my_main_dt.dts
+```
+
+2. 编译叠加层 DT `.dts` 的示例命令：
+
+```
+dtc -@ -O dtb -o my_overlay_dt.dtbo my_overlay_dt.dts
+```
+
+#### 5.16.2 DTO启用
+
+1. defconfig里使能配置：
+
+   ```
+   CONFIG_CMD_DTIMG=y
+   CONFIG_OF_LIBFDT_OVERLAY=y
+   ```
+
+2. board_select_fdt_index()函数的实现。这是一个__weak函数，用户可以根据实际情况重新实现它。函数作用是在多份DTBO中获取用于执行DTO操作的那份DTBO（返回index索引，最小从0开始），默认的weak函数返回的index为0。
+
+   ```c
+   /*
+    * Default return index 0.
+    */
+   __weak int board_select_fdt_index(ulong dt_table_hdr)
+   {
+   /*
+    * User can use "dt_for_each_entry(entry, hdr, idx)" to iterate
+    * over all dt entry of DT image and pick up which they want.
+    *
+    * Example:
+    *	struct dt_table_entry *entry;
+    *	int index;
+    *
+    *	dt_for_each_entry(entry, dt_table_hdr, index) {
+    *
+    *		.... (use entry)
+    *	}
+    *
+    *	return index;
+    */
+       return 0;
+   }
+   ```
+
+#### 5.16.3 DTO结果
+
+1. DTO执行完成后，在U-Boot的开机信息中可以看到结果：
+
+   ```
+   // 成功时的打印
+   ANDROID: fdt overlay OK
+
+   // 失败时的打印
+   ANDROID: fdt overlay failed, ret=-19
+   ```
+
+   通常引起失败的原因一般都是因为主/次设备书blob的内容存在不兼容引起，所以用户需要对它们的生成语法和兼容性要比较清楚。
+
+2. 当DTO执行成功后，会在传递给kernel的cmdline里追加如下内容，表明当前使用哪份DTBO进行DTO操作：
+
+   ```
+   androidboot.dtbo_idx=1	// idx从0开始，这里表示选取idx=1的那份DTBO进行DTO操作
+   ```
+
+3. DTO执行成功后如果想进一步确认新生成的dtb内容，用户可通过"fdt"命令把新生成的dtb内容打印出来确认，具体参考[2.7.2.5 fdt读取](#2.7.2.5 fdt读取)。
 
 ## 6. USB download
 
