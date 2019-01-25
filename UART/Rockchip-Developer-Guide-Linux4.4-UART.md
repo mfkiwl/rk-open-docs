@@ -1,18 +1,16 @@
 # **UART**开发指南
 
-发布版本：1.00
+发布版本：1.1
 
 作者邮箱：hhb@rock-chips.com
 
-日期：2017.12
+日期：2019.01
 
 **文件密级：公开资料**
 
 **前言**
 
 ---
-
-
 
 **概述**
 
@@ -29,13 +27,13 @@
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017-12-21 | V1.0   | 洪慧斌    | 初始发布     |
-|            |        |        |          |
-|            |        |        |          |
+| **日期**   | **版本** | **作者** | **修改说明** |
+| ---------- | -------- | -------- | ------------ |
+| 2017-12-21 | V1.0     | 洪慧斌   | 初始发布     |
+| 2019-02-14 | V1.1     | 洪慧斌   | 更新版本     |
+|            |          |          |              |
 
--------
+---
 [TOC]
 -----
 
@@ -53,7 +51,7 @@ UART （Universal Asynchronous Receiver/Transmitter），以下是linux 4.4 uart
 
 <u>采用</u>的是8250通用驱动，类型是16550A
 
-~~~
+```
 drivers/tty/serial/8250/8250_core.c
 drivers/tty/serial/8250/8250_dma.c          dma实现
 drivers/tty/serial/8250/8250_dw.c           design ware ip相关操作
@@ -62,11 +60,11 @@ drivers/tty/serial/8250/8250_fsl.c
 drivers/tty/serial/8250/8250.c
 drivers/tty/serial/8250/8250_port.c         端口相关的接口
 drivers/tty/serial/earlycon.c               解析命令行参数，并提供注册early con接口
-~~~
+```
 
 ### 2.2 内核配置
 
-~~~
+```
 Device Drivers  --->
     Character devices  --->
         Serial drivers  --->
@@ -78,7 +76,7 @@ Device Drivers  --->
 		 (5)   Number of 8250/16550 serial ports to register at runtime     一般填最大串口数
 		 [ ]   Extended 8250/16550 serial driver options
 		 [*] Support for Synopsys DesignWare 8250 quirks
-~~~
+```
 
 ### 2.3 使能串口设备
 
@@ -86,7 +84,7 @@ Device Drivers  --->
 
 在板级DTS文件里添加以下代码：
 
-```
+```c
 &uart0 {
 		status = "okay";
 };
@@ -105,16 +103,37 @@ Device Drivers  --->
 
 #### 2.3.3 串口设备
 
-驱动起来后会先注册5个ttySx设备。但如果没有经过2.3.1使能的串口，虽然也有设备节点，但是是不能操作的。
+旧的驱动起来后会先注册5个ttySx设备。但如果没有经过2.3.1使能的串口，虽然也有设备节点，但是是不能操作的。
 
-~~~
+```
 1|root@android:/ # ls /dev/tt
 ttyS0   ttyS1   ttyS2   ttyS3  ttyS4
-~~~
+```
+
+如果内核包含以下补丁，则串口驱动只会生成dts有使能的串口。
+
+```
+commit a997ba744c6b001b8a8033aaacc65d6f4ce849a2
+Author: Huibin Hong <huibin.hong@rock-chips.com>
+Date:   Mon Nov 5 15:56:03 2018 +0800
+
+    serial: 8250: add /dev/ttySx when uart is enable
+
+    before the patch:
+    ls /dev/ttyS
+    ttyS0 ttyS1 ttyS2 ttyS3 ttyS4 ttyS5  ttyS6 ttyS7
+
+    after the patch:
+    ls /dev/ttyS
+    ttyS3  ttyS4  ttyS6
+
+    Change-Id: I844523408751cb579bbfb50fafb7923d5c2cafdf
+    Signed-off-by: Huibin Hong <huibin.hong@rock-chips.com>
+```
 
 驱动会根据aliase，来对应串口编号，如下： serial0最终会生成ttyS0，serial3会生成ttyS3设备。
 
-~~~
+```c
 	aliases {
 		serial0 = &uart0;
 		serial1 = &uart1;
@@ -122,9 +141,7 @@ ttyS0   ttyS1   ttyS2   ttyS3  ttyS4
 		serial3 = &uart3;
 		serial4 = &uart4;
 	};
-~~~
-
-
+```
 
 ### 2.4 DTS节点配置
 
@@ -132,7 +149,7 @@ ttyS0   ttyS1   ttyS2   ttyS3  ttyS4
 
 dtsi文件里：
 
-```
+```c
 uart0: serial@ff180000 {
 		compatible = "rockchip,rk3399-uart", "snps,dw-apb-uart";
 		reg = <0x0 0xff180000 0x0 0x100>;
@@ -151,20 +168,20 @@ uart0: serial@ff180000 {
 
 板级dts文件添加：
 
-~~~
+```c
 &uart0 {
 		status = "okay";
 };
-~~~
+```
 
 #### 2.4.1 pinctrl配置
 
 有时一个串口有多组IOMUX配置，需要根据实际使用配置
 
-~~~
+```c
 pinctrl-names = "default";
 pinctrl-0 = <&uart0xfer &uart0cts &uart0_rts>;
-~~~
+```
 
 其中uart0_cts和uart0_rts是硬件流控脚，这只代表引脚有配置为相应的功能脚，并不代表使能硬件流控。使能硬件流控需要从运用层设置下来。**需要注意的是，如果使能流控，uart0_cts和uart0_rts必须同时配上。如果不需要流控，可以把uart0_cts和uart0_rts去掉。**
 
@@ -202,7 +219,7 @@ DMAC0是dmac_bus。
 
 如下：
 
-~~~
+```c
 amba {
 compatible = "arm,amba-bus";
 		#address-cells = <2>;
@@ -231,13 +248,33 @@ compatible = "arm,amba-bus";
 			peripherals-req-type-burst;
 		};
 	};
-~~~
+```
 
-注意：没开DMA的时候，在使用过程中，会报以下log，也不影响正常使用。
+注意：
 
-~~~
-[54696.575402] ttyS0 - failed to request DMA
-~~~
+有些不需要使用DMA的场景，也可以考虑收发都关闭DMA，如下
+
+```c
+dma-names = "!tx", "!rx";
+```
+
+会有以下log：
+
+```
+[54696.575402] ttyS0 - failed to request DMA, use interrupt mode
+```
+
+由于DMA通道资源有限，在通道资源紧张的情况下，可以考虑关掉TX的DMA传输，如下
+
+```c
+dma-names = "!tx", "rx";
+```
+
+会有以下log：
+
+```
+[  498.889713] dw-apb-uart ff0a0000.serial: got rx dma channels only
+```
 
 #### 2.4.3 波特率配置说明
 
@@ -247,23 +284,32 @@ compatible = "arm,amba-bus";
 
 ​	如果在操作串口的时候出现以下log，需要通过打印时钟树来确定串口的时钟设置是否正确。
 
-~~~
+```
 [54131.273012] rockchip_fractional_approximation parent_rate(676000000) is low than
 	rate(48000000)*20, fractional div is not allowed
-~~~
+```
 
 ​	注意以下命令必须在串口打开的时候打，否则clk可能不准。本次例子串口设置的是3M的波特率，从以下log可以看出，串口走的是clk_uart4_pmu 整数分频，由676M PLL分出来接近48M的的clk（48M根据上面的公式，是分出3M波特率的最小时钟）。这虽然有误差，但在允许范围内，这个误差的大小驱动里设定为正负2%。
 
-~~~
+```
 root@android:/ # cat /sys/kernel/debug/clk/clk_summary | grep uart
           clk_uart4_src                   1            1   676000000          0 0
              clk_uart4_div                1            1    48285715          0 0
                 clk_uart4_pmu             1            1    48285715          0 0
                 clk_uart4_frac            0            0      285257          0 0
              pclk_uart4_pmu               1            1    48285715          0 0
-~~~
+```
 
+#### 2.4.4 串口唤醒系统
 
+​	内核需要打补丁，对应的SOC的trust firmware也可能需要修改，这块需要咨询维护trust firmware的人员。
+
+```c
+&uart0 {
+	wakeup-source;     使能串口唤醒功能，作用是待机时不去关闭串口，并把串口中断设置为唤醒源
+	status = "okay";
+};
+```
 
 ---
 
@@ -273,7 +319,7 @@ root@android:/ # cat /sys/kernel/debug/clk/clk_summary | grep uart
 
 #### 3.1.1 DTS使能fiq_debugger节点，禁止对应uart节点
 
-```
+```c
 fiq_debugger: fiq-debugger {
 		compatible = "rockchip,fiq-debugger";
 		rockchip,serial-id = <2>;    /*设置串口id，如果想换不同的串口就改这个ID*/
@@ -290,6 +336,7 @@ fiq_debugger: fiq-debugger {
 	status = "disabled";
 };
 ```
+
 该节点驱动加载后会注册/dev/ttyFIQ0设备，需要注意的是rockchip,serial-id 即便改了，注册的也是ttyFIQ0。
 
 rockchip,irq-mode-enable = <0>;  这个如果为1，串口中断方式采用的是irq，一般不会遇到问题。但如果是0，用的是FIQ模式，有些带有trust firmeware的平台就需要谨慎用，这可能会因为trust firmeware版本和内核版本不匹配出问题。
@@ -302,18 +349,19 @@ rockchip,irq-mode-enable = <0>;  这个如果为1，串口中断方式采用的�
 
 如果配了波特率可能会出问题，因为内核early con对这块的支持不是很好。
 
-```
+```c
 chosen {
 	bootargs ="earlycon=uart8250,mmio32,0xff1a0000";
 };
 ```
+
 #### 3.1.3 安卓 parameter.txt 配置console设备
 
 一般以下参数可以不指定，会用默认的console device，比如上面注册的ttyFIQ0。但如果指定为ttyS2的话，就不能敲命令了。
 
-~~~
+```
 commandline：androidboot.console=ttyFIQ0  console=ttyFIQ0
-~~~
+```
 
 ### 3.2 ttySx设备作为console
 
@@ -325,7 +373,7 @@ commandline：androidboot.console=ttyFIQ0  console=ttyFIQ0
 
 如果配了波特率可能会出问题，因为内核early con对这块的支持不是很好。
 
-~~~
+```c
 chosen {
 	bootargs ="console=uart8250,mmio32,0xff1a0000";
 };
@@ -333,7 +381,7 @@ chosen {
 &uart2 {
   status = "okay";
 };
-~~~
+```
 
 #### 3.2.2 使能early printk功能
 
@@ -345,15 +393,11 @@ console=uart8250,mmio32,0xff1a0000  已经包含early printk的功能
 
 一般以下参数可以不指定，会用默认的console device，比如上面注册的ttyS2。单如果指定为ttyFIQ0的话，就不能敲命令了。
 
-~~~
+```
 commandline：androidboot.console=ttyS2 console=ttyS2
-~~~
+```
 
 **注意 ：3.1和3.2不能同时存在，否则打印有问题。 fiq debugger的rockchip,serial-id = <x>; 与ttySx互斥，就是说某个串口被fiq debugger驱动用了，就不能作为普通串口用。**
-
-
-
-
 
 ### 3.3 关掉串口打印功能
 
@@ -372,18 +416,18 @@ Device Drivers  --->
 
 #### 3.3.3 安卓去掉recovery对console的使用，否则恢复出场设置的时候会卡住
 
-~~~
+```
 android/device/rockchip/common/recovery/etc/init.rc
 service recovery /sbin/recovery
 #console  这个注释掉
 seclabel u:r:recovery:s0
-~~~
+```
 
 ---
 ## 4 调试串口设备
 调试串口设备最好不要用echo cat等命令来粗鲁地调试，最好用测试的APK软件，或找我司FAE获取ts_uart测试bin文件。在命令行输入ts_uart会有使用帮助。
 
-~~~
+```
 1|root@android:/ # ts_uart
  Use the following format to run the HS-UART TEST PROGRAM
  ts_uart v1.0
@@ -403,10 +447,13 @@ seclabel u:r:recovery:s0
  ts_uart m init.rc 1500000 0 0 0 /dev/ttyS0
  receive then send
  ts_uart r init.rc 1500000 0 0 0 /dev/ttyS0
-~~~
+```
 
+如果串口APK无法打开串口设备，那可能是权限问题，需要修改/dev/ttySx的设备权限为0666。
 
+以安卓为例，在ueventd.rc里添加以下配置，如果还是不行请联系安卓开发人员修改权限。
 
-## 5 常见问题
+```
+/dev/ttySx            0666   system       system
+```
 
-详细见另一份文档
