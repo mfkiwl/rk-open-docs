@@ -1,10 +1,10 @@
 # **DDR开发指南内部文档**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：hcy@rock-chips.com
 
-日期：2017.12.21
+日期：2019.1.29
 
 文件密级：内部资料
 
@@ -21,7 +21,6 @@
 | -------- | -------- |
 | 所有芯片     | 所有内核版本   |
 
-
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
@@ -30,15 +29,14 @@
 
 软件开发工程师
 
-
-
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017.12.21 | V1.0   | 何灿阳    |          |
+| **日期**   | **版本** | **作者** | **修改说明**                 |
+| ---------- | -------- | -------- | ---------------------------- |
+| 2017.12.21 | V1.0     | 何灿阳   |                              |
+| 2019.1.29  | V1.1     | 何智欢   | 增加RK3308 modify deskew工具 |
 
---------------------
+---------
 [TOC]
 ------
 
@@ -47,8 +45,6 @@
 1. 将DDR bin文件更新到最新
 2. 通过modify_ddr_bin.exe，查看该芯片是否支持修改DDR频率
 3. 修改后，按后面的“如何将我们给的DDR bin 合成成完整可用的loader”生成新loader
-
-
 
 我们有提供工具modify_ddr_bin.exe，用于修改DDR bin文件中的DDR频率，能支持修改频率的，只有RK322x、RK322xh、RK3328、RK3368、RK3399、RV1108，而且有的芯片，只能修改成某些频率。详细见modify_ddr_bin.exe的使用说明。
 
@@ -66,8 +62,6 @@
 1. 将DDR bin文件更新到最新
 2. 通过modify_ddr_bin.exe，查看该芯片是否支持修改串口号和波特率
 3. 修改后，按后面的“如何将我们给的DDR bin 合成成完整可用的loader”生成新loader
-
-
 
 我们有提供工具modify_ddr_bin.exe，可用于修改DDR bin文件中的串口号和波特率，当然，不是所有芯片都支持。详细见modify_ddr_bin.exe的使用说明。
 
@@ -144,8 +138,6 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
   这些设置的都是单端的上下拉阻值
 
-  ​
-
   芯片：RK3066
 
   代码位置：arch/arm/mach-rk30/ddr.c的ddr_update_odt()函数
@@ -192,8 +184,6 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
   ![CTL_ODT](Rockchip-Developer-Guide-DDR-Internal/CTL_ODT.jpg)
 
-  ​
-
   芯片：RK3126B、RK3126C走trust流程
 
   代码位置：arch/arm/boot/dts/rk312x_ddr_default_timing.dtsi
@@ -231,8 +221,6 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
   phy_XXX_drv表示控制器端的驱动强度
 
   phy_XXX_odt表示控制器端的ODT
-
-  ​
 
 - DDR颗粒端的驱动强度(DS)和ODT调整
 
@@ -272,8 +260,6 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
   DDR3\_Rtt\_Nom\_XXX、DDR2\_Rtt\_Nom\_XXX，表示对应DDR颗粒端的ODT
 
-  ​
-
   芯片：RK3126、RK3128
 
   代码位置：arch/arm/mach-rockchip/ddr_rk3126.c的ddr_get_parameter()函数
@@ -303,8 +289,6 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
   DDR3\_DS\_XX、LPDDR2\_DS\_XX表示对应DDR颗粒端的驱动强度
 
   DDR3\_Rtt\_Nom\_XXX表示对应DDR颗粒端的ODT
-
-  ​
 
   芯片：RK3066
 
@@ -355,8 +339,6 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
   DDR3\_DS\_XX、LPDDR2\_DS\_XX、LPDDR3\_DS\_XX，表示对应DDR颗粒端的驱动强度
 
   DDR3\_Rtt\_Nom\_XXX、LPDDR3\_ODT\_XXX，表示对应DDR颗粒端的ODT
-
-  
 
   芯片：RK3126B、RK3126C走trust流程
 
@@ -418,13 +400,19 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 
 除了对外开放的文档《DDR开发指南》中对应章节讲到的内容，内部资料补充如下信息：
 
-要调整loader中的de-skew，需要借助工具，目前只有RK322xh、RK3328支持。工具路径在
+要调整loader中的de-skew，需要借助工具，目前只有RK322xh、RK3328、RK3308支持。
 
-\\\10.10.10.164\Kitkat_Repository\rk3228h\SDK_IMAGE\loader\修改3228H DDR参数工具_V1.04.7z
+- RK322xh、RK3328
 
-机器都能开机，就不需要调整loader中的de-skew，直接去调整kernel中的de-skew
+  工具路径在
 
+  \\\10.10.10.164\Kitkat_Repository\rk3228h\SDK_IMAGE\loader\修改3228H DDR参数工具_V1.04.7z
 
+  机器都能开机，就不需要调整loader中的de-skew，直接去调整kernel中的de-skew
+
+- RK3308
+
+  工具路径在\\\\10.10.10.164\Common_Repository\DDR相关工具\modify_ddr_bin_deskew\rk3308_modify_deskew\3308_deskew.exe
 
 内部存放“deskew自动扫描工具”的路径在
 
@@ -478,18 +466,19 @@ kernel中的DDR容量信息，只要是走trust流程的，都没有打印这些
 - DDR3、DDR2最高频率533MHz
 
 3066已实现feature：
+
 - DDR2支持
 - DDR3、LPDDR2最高频率533MHz
 - DDR2最高频率目前只验证到400MHz
 
 3128已实现feature：
+
 - DDR2支持
 - DDR3、DDR2、LPDDDR2最高频率533MHz
 
 3126B、3126C已实现feature：
 
 - DDR2支持
-
 
 - DDR2、DDR3最高频率480MHz
 

@@ -1,10 +1,10 @@
 # **DDR Develop Guide**
 
-Release Version：1.1
+Release Version：1.2
 
 E-mail：hcy@rock-chips.com
 
-Release Date：2018.3.30
+Release Date：2019.1.29
 
 Classifed Level：Publicity
 
@@ -36,8 +36,9 @@ Software Development Engineer
 | ---------- | ---------------- | ---------- | ---------------------------------------------------------- |
 | 2017.12.21 | V1.0             | CanYang He |                                                            |
 | 2018.3.30  | V1.1             | CanYang He | Added the related description of  Kernel 4.4 DDR frequency |
+| 2019.1.29  | V1.2             | Zhihuan He | Added the statement  on adjusting the de-skew in loader    |
 
---------------------
+---------
 [TOC]
 ------
 
@@ -76,7 +77,7 @@ The kernel 3.10 will also have the following log, which is the output informatio
 
 ```c
 [    1.473637] ddrfreq: verion 1.2 20140526	//DDR frequency scaling module version
-[    1.473653] ddrfreq: normal 396MHz video_1080p 240MHz video_4k 396MHz dualview 396MHz idle 0MHz suspend 200MHz reboot 396MHz	//The frequencies which read from dts table are corresponding to the different scenarios. 
+[    1.473653] ddrfreq: normal 396MHz video_1080p 240MHz video_4k 396MHz dualview 396MHz idle 0MHz suspend 200MHz reboot 396MHz	//The frequencies which read from dts table are corresponding to the different scenarios.
 [    1.473661] ddrfreq: auto-freq=1	//This line reflects load scaling functon is enable or not,"1" means on,"0" means off.
 [    1.473667] ddrfreq: auto-freq-table[0] 240MHz	//the  table of the load scaling
 [    1.473673] ddrfreq: auto-freq-table[1] 324MHz
@@ -87,34 +88,39 @@ The kernel 3.10 will also have the following log, which is the output informatio
 
 ## How to Integrate RK DDR Bin into A Completed and Usable Loader
 
-1. Put the DDR bin in the corresponding directory of the `tools\rk_tools\bin\` of the U-Boot project.
+1. Put the DDR bin in the corresponding directory of the `rk\rkbin\bin\` of the U-Boot project.
 2. Delete the original DDR bin file.
 3. Rename the new DDR bin to the name which have been deleted.
-4. Compile U-Boot (see UserManual in U-Boot root directory), it will generate the corresponding loader file.
+4. Compile U-Boot (see "Rockchip-Developer-Guide-UBoot-nextdev.pdf"), it will generate the corresponding loader file.
 
 5. Confirm that the loader already updated correctly according to the log of loader
 
 Summarize all platforms DDR bin corresponding directory as below：
 
-| Chip Type                | Path                                                    | Note |
-| ------------------------ | ------------------------------------------------------- | ---- |
-| RK3036                   | tools\rk_tools\bin\rk30\rk3036\_ddr3\_XXXMHz\_vX.XX.bin | 1    |
-| RK3126、RK3126B、RK3126C | tools\rk_tools\bin\rk31\rk3126\_ddr3\_300MHz\_vX.XX.bin |      |
-| RK3128                   | tools\rk_tools\bin\rk31\rk3128\_ddr\_300MHz\_vX.XX.bin  |      |
-| RK3288                   | tools\rk_tools\bin\rk32\rk3288\_ddr\_400MHz\_vX.XX.bin  |      |
-| RK322x                   | tools\rk_tools\bin\rk32\rk322x\_ddr\_300MHz\_vX.XX.bin  |      |
-| RK3368                   | tools\rk_tools\bin\rk33\rk3368\_ddr\_600MHz\_vX.XX.bin  |      |
-| RK322xh                  | tools\rk_tools\bin\rk33\rk322xh_ddr_333MHz_vX.XX.bin    |      |
-| RK3328                   | tools\rk_tools\bin\rk33\rk3328\_ddr\_333MHz\_vX.XX.bin  |      |
-| RK3399                   | tools\rk_tools\bin\rk33\rk3399\_ddr\_XXXMHz\_vX.XX.bin  | 2    |
+| Chip Type                | Path                                                        | Note |
+| ------------------------ | ----------------------------------------------------------- | ---- |
+| RK1808                   | rk\rkbin\bin\rk1x\rk1808\_ddr\_XXXMHz\_vX.XX.bin            |      |
+| RK3036                   | rk\rkbin\bin\rk30\rk3036\_ddr3\_XXXMHz\_vX.XX.bin           | 1    |
+| RK3126、RK3126B、RK3126C | rk\rkbin\bin\rk31\rk3126\_ddr3\_300MHz\_vX.XX.bin           |      |
+| RK3128                   | rk\rkbin\bin\rk31\rk3128\_ddr\_300MHz\_vX.XX.bin            |      |
+| RK3288                   | rk\rkbin\bin\rk32\rk3288\_ddr\_400MHz\_vX.XX.bin            |      |
+| RK322x                   | rk\rkbin\bin\rk32\rk322x\_ddr\_300MHz\_vX.XX.bin            |      |
+| RK3308                   | rk\rkbin\bin\rk33\rk3308\_ddr\_XXXMHz\_uartX\_mX\_vX.XX.bin |      |
+| PX30                     | rk\rkbin\bin\rk33\px30\_ddr\_333MHz\_vX.XX.bin              |      |
+| RK3326                   | rk\rkbin\bin\rk33\rk3326\_ddr\_333MHz\_vX.XX.bin            |      |
+| RK3368                   | rk\rkbin\bin\rk33\rk3368\_ddr\_600MHz\_vX.XX.bin            |      |
+| RK322xh                  | rk\rkbin\bin\rk33\rk322xh_ddr_333MHz_vX.XX.bin              |      |
+| RK3328                   | rk\rkbin\bin\rk33\rk3328\_ddr\_333MHz\_vX.XX.bin            |      |
+| RK3399                   | rk\rkbin\bin\rk33\rk3399\_ddr\_XXXMHz\_vX.XX.bin            | 2    |
 
-Note 1：To use which frequency is specified in `tools\rk_tools\RKBOOT\RK3036_ECHOMINIALL.ini` or `RK3036MINIALL.ini`.  And  `RK3036_ECHOMINIALL.ini` is special for ECHO products, the other RK3036 products use RK3036MINIALL.ini. As for how to check ECHO machine, please consult Rockchip system product department.
+Note 1：To use which frequency is specified in `rk\rkbin\RKBOOT\RK3036_ECHOMINIALL.ini` or `RK3036MINIALL.ini`.  And  `RK3036_ECHOMINIALL.ini` is special for ECHO products, the other RK3036 products use RK3036MINIALL.ini. As for how to check ECHO machine, please consult Rockchip system product department.
 
-Note 2：To use which frequency is specified in `tools\rk_tools\RKBOOT\RK3399MINIALL.ini` file.
+Note 2：To use which frequency is specified in `rk\rkbin\RKBOOT\RK3399MINIALL.ini` file.
 
 Note 3：The chipsets not involved in this table, may not support generating loaders from U-Boot.
 
 ## How to Change DDR Frequency in U-Boot
+
 Currently RK322x supports this feature only. The method is to modify `arch/arm/boot/dts/rk322x.dtsi` in kernel-3.10 code.
 
 ```c
@@ -139,6 +145,7 @@ Firstly,  confirm that the chip do support DDR frequency scaling in the kernel. 
   Note: It is better keep **dfi** node status consistent with **dmc** node because **dmc** node restricted by **dfi** node in the lagacy code, **dfi** node  "disabled " would make the **dmc** node invalid.
 
   For example, RK3399 EVB,  the final **dmc** node is in `arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi`.
+
 ``` c
 &dfi {
     status = "okay";
@@ -149,6 +156,7 @@ Firstly,  confirm that the chip do support DDR frequency scaling in the kernel. 
 	........
 };
 ```
+
 ``` c
 &dfi {
     status = "disabled";
@@ -160,7 +168,7 @@ Firstly,  confirm that the chip do support DDR frequency scaling in the kernel. 
 };
 ```
 
-- For kernel 3.10, you need to find the final **clk_ddr_dvfs_table** node in dts. Modify the status to "disabled" to disable the DDR scaling function in the kernel. Conversely, modify to "okay "will enable the DDR scaling function. 
+- For kernel 3.10, you need to find the final **clk_ddr_dvfs_table** node in dts. Modify the status to "disabled" to disable the DDR scaling function in the kernel. Conversely, modify to "okay "will enable the DDR scaling function.
 
   For example, the final `clk_ddr_dvfs_table` of the RK3288 SDK board is in `arch/arm/boot/dts/rk3288-tb_8846.dts.`
 
@@ -170,6 +178,7 @@ Firstly,  confirm that the chip do support DDR frequency scaling in the kernel. 
 	status="okay";	/* enable kernel DDR scaling function */
 };
 ```
+
 ``` c
 &clk_ddr_dvfs_table {
 	........
@@ -190,6 +199,7 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 	{.frequency = CPUFREQ_TABLE_END},
 };
 ```
+
 ``` c
 /* This table disable DDR scaling function */
 static struct cpufreq_frequency_table dvfs_ddr_table[] = {
@@ -208,7 +218,6 @@ The previous topic just talk about how to enable or disable DDR scaling function
 
   Only following the Chapter "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel",DDR frequency scaling  will stop working, included in `ddr_init`.
 
-
 - For kernel 3.10
 
   Chip Type:**RK322X**
@@ -225,7 +234,6 @@ The previous topic just talk about how to enable or disable DDR scaling function
   	rockchip,dram_timing = <&dram_timing>;
   };
   ```
-  ​
 
   Chip type : **RK3188**
 
@@ -252,13 +260,11 @@ The previous topic just talk about how to enable or disable DDR scaling function
   	value = clk_set_rate(clk, clk_get_rate(clk));
   ```
 
+  Chip type : **RV1108**
 
+​  Code Location: ddr_init() function in the file `arch/arm/mach-rockchip/ddr_rv1108.c`
 
-​	Chip type : **RV1108**
-
-​	Code Location: ddr_init() function in the file `arch/arm/mach-rockchip/ddr_rv1108.c`
-
-​	Method: comment out the following lines in `ddr_init()`function code :
+  Method: comment out the following lines in `ddr_init()`function code :
 
   ```c
 if (freq == 0)
@@ -266,8 +272,6 @@ if (freq == 0)
 else
 	_ddr_change_freq(freq);
   ```
-
-
 
 The other chip included RK3126B and RK3126C 's firmware with trust.img, only need to do following the Chapter "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel", DDR frequency scaling  will stop working, included in `ddr_init`.
 
@@ -278,14 +282,13 @@ The other chip included RK3126B and RK3126C 's firmware with trust.img, only nee
   | RK3066          | arch/arm/mach-rk30/ddr.c, ddr_init() function   |
   | RK3026、RK3028A | arch/arm/mach-rk2928/ddr.c, ddr_init() function |
   Method: comment out the following lines in `ddr_init()`function code :
+
   ```c
   if(freq != 0)
   	value=ddr_change_freq(freq);
   else
   	value=ddr_change_freq(clk_get_rate(clk_get(NULL, "ddr"))/1000000);
   ```
-
-
 
 ## How to Check the DDR Capacity
 
@@ -295,8 +298,6 @@ If you look for a DDR capacity roughly, using the command blow.This data looks a
 root@rk3399:/ # cat /proc/meminfo
 MemTotal:        3969804 kB
 ```
-
-
 
 If you need for more detail about DDR capacity, follow this:
 
@@ -374,7 +375,7 @@ Load frequency scaling means: it is used to replace scenario  `SYS_STATUS_NORMAL
 
 To modify the DDR frequency, it still has to be handled by kernel branch separately.
 
-- For kernel 4.4, it requires get the **dmc** node in dts. For example, **dmc** node in RK3300 EVB is in `arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi` and `arch/arm64/boot/dts/rockchip/rk3399.dtsi` 
+- For kernel 4.4, it requires get the **dmc** node in dts. For example, **dmc** node in RK3300 EVB is in `arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi` and `arch/arm64/boot/dts/rockchip/rk3399.dtsi`
 
 ``` c
 &dmc {
@@ -448,6 +449,7 @@ dmc: dmc {
 	status = "disabled";
 };
 ```
+
 ==Note==: Kernel 4.4  frequency voltage is different from kernel 3.10, it runs in this frequency only when frequency equals to `opp-hz`listed by `dmc_opp_table`.If the frequency less than  `opp-hz`,  compatible to it upwardly,otherwise, it exceeds  `opp-hz`the upper limited,it will restricted by `opp-hz`.So, if you do not want to be controlled, you should concern `dmc_opp_table`.
 
 ```c
@@ -526,6 +528,7 @@ After understanding the meaning of each configuration, modify the corresponding 
 	status="okay";
 };
 ```
+
 After understanding the meaning of each configuration, modify the corresponding frequency definition according to the scene you need to modify. If `auto-freq-en=1`, it is not good to control the frequency. If  reducing frequency is to locate problem, you can set `auto-freq-en` value to 0, then modify the frequency value defined by each scene to achieve your purpose.
 
 ==Note: you must make sure that the voltage can work at this frequency==.As for how to modify voltage, see the chapter "How to modify the  voltage corresponding to a certain DDR frequency ".
@@ -543,7 +546,8 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 	{.frequency = CPUFREQ_TABLE_END},
 };
 ```
-Kernel 3.0 has only 3 scenes. The DDR frequency to be modified is in `"200 * 1000" ` of `.frequency` and the frequency unit here is KHz. The `"+ DDR_FREQ_SUSPEND"` string can be ignored.
+
+Kernel 3.0 has only 3 scenes. The DDR frequency to be modified is in `"200 * 1000"` of `.frequency` and the frequency unit here is KHz. The `"+ DDR_FREQ_SUSPEND"` string can be ignored.
 
 ==Note: you must make sure that the voltage can work at this frequency==.As for how to modify voltage, see the chapter "How to modify the  voltage corresponding to a certain DDR frequency ".
 
@@ -561,8 +565,6 @@ RK3399： `echo set vdd_center  900000 > /sys/pm_tests/clk_volt`
 
 Other Chip： `echo set vdd_logic  1200000 > /sys/pm_tests/clk_volt`
 
-
-
 If there is no "pm_tests" or the command cannot meet the requirements, you need to change the kernel firmware, as follows:
 
 - For kernel 4.4, you need to find the node `dmc_opp_table` in dts. For example,RK3399 EVB's node is in `arch/arm64/boot/dts/rockchip/rk3399-opp.dtsi`,RK3368's node is in `arch/arm64/boot/dts/rockchip/rk3368.dtsi`
@@ -570,7 +572,7 @@ If there is no "pm_tests" or the command cannot meet the requirements, you need 
   RK3399:
 
 ```c
-/* it runs in this frequency only when frequency equals to "opp-hz"listed by "dmc_opp_table".If the frequency less than "opp-hz", the frequency will getting higher,otherwise, it exceeds "opp-hz" the upper limited,it will restricted by "opp-hz".It is different from kernel 3.10 */ 
+/* it runs in this frequency only when frequency equals to "opp-hz"listed by "dmc_opp_table".If the frequency less than "opp-hz", the frequency will getting higher,otherwise, it exceeds "opp-hz" the upper limited,it will restricted by "opp-hz".It is different from kernel 3.10 */
 dmc_opp_table: opp-table3 {
 	compatible = "operating-points-v2";
 
@@ -636,7 +638,6 @@ dmc_opp_table: opp_table2 {
 The voltage in accordance with the frequency can be modified. Since the frequency-voltage table using voltage less than or equal to the specified frequency, the added frequency that exceeds the limited frequency of this table cannot match the appropriated voltage, which will cause DDR  fail to switch to the new frequency. At this time, it is necessary to add a frequency-voltage item corresponding to the frequency.
 
 - For kernel 3.10, you need to find the node `clk_ddr_dvfs_table` in dts , for example, RK3288 SDK the last`clk_ddr_dvfs_table` is in `arch/arm/boot/dts/rk3288-tb_8846.dts`.
-
 
 ```c
 &clk_ddr_dvfs_table {
@@ -722,8 +723,6 @@ You need to compile the kernel, open  "pm_tests" option (make menuconfig ->Syste
 
 The frequency unit here is Hz and  the command parameter can be changed according to the requirement.
 
-
-
 If the method above is not feasible, you can only modify the code or dts.
 
 - For kernel 4.4, if the method above does not work, it is generally because the target frequency, not in `cat /sys/class/devfreq/dmc/available_frequencies`.
@@ -733,7 +732,7 @@ If the method above is not feasible, you can only modify the code or dts.
   ```c
   dmc_opp_table: opp-table3 {
   compatible = "operating-points-v2";
-  
+
   opp-200000000 {
   	opp-hz = /bits/ 64 <200000000>;
   	opp-microvolt = <825000>;
@@ -753,11 +752,9 @@ If the method above is not feasible, you can only modify the code or dts.
 
   After that, you can just use the previous command to fix the frequency.
 
+  If you do not want to fix frequency through inputing command at power-on, but starts from at a fixed frequency, modify the dts as beblow:
 
-
-​	If you do not want to fix frequency through inputing command at power-on, but starts from at a fixed frequency, modify the dts as beblow:
-
-​	Supposed your target frequency is 666MHz. For example, the **dmc** node of RK3399 EVB board is in `arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi`
+  Supposed your target frequency is 666MHz. For example, the **dmc** node of RK3399 EVB board is in `arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi`
 
   ```c
   /* Here "dfi" status must be "okay", it is due to lagacy code, the dmc node is restriced by the dfi node. If the "dfi" node is disabled, it will also invalidate the dmc node. So it is best to keep the status of the "dfi" node consistent with dmc */
@@ -790,7 +787,6 @@ If the method above is not feasible, you can only modify the code or dts.
   auto-freq-en = <0>;
   };
   ```
-
 
 - For kernel 3.10,  you need to find the node  `clk_ddr_dvfs_table`, for example, RK3288 SDK's  `clk_ddr_dvfs_table` is in `arch/arm/boot/dts/rk3288-tb_8846.dts`.
 
@@ -896,14 +892,9 @@ Please see the document "DDR-Verification-Process"
 
 "memtester" can be found in the file  "DDR Verification Process" , which consists of introduction and software.We don't talk anymore here.
 
-
-
-
 "Google stressapptest" is a rough  process,which can quickly report error. And " memtester"  is more careful, so it reports error more slow. But “memtester” is mainly for the signal test, can cover the part that "google stressapptest" missing.
 
 Apparently , the methods above are all based on the software test, which used to quickly get the maximum frequency. It is not sure  the actual DDR SI can meet the JEDEC standard at the maximum frequency,that is necessary to measure the signal and burn-test.
-
-
 
 ## How to Judge DDR  in Self-Refresh Mode
 
@@ -933,6 +924,10 @@ Note: The time when CKE is low must be less than 7.8 us(DDR3/DDR4) , 3.9us(LPDDR
 
 ## How to Adjust the De-skew of  DQ/DQS/CA/CLK
 
+Mainly due to the unequal length of DDR routing in hardware PCB, the skew can be adjusted to achieve the effect similar to the same length of DDR routing. The skew function is the delay units in series on the signal line inside the DDR PHY. The delay of each signal line can be changed by controlling the number of delay units in series on each signal line through the skew register.
+
+### Adjusting the de-skew in kernel
+
 Only RK322Xh/RK3328 support modifying the de-skew in kernel. The method is modify dts.
 
 Chip Type：**RK322xh、RK3328**
@@ -950,3 +945,19 @@ Modify method:
 According to the results of the released tool "deskew automatic scanning tool", select the `"mid"` value and add it to the corresponding dts definition.
 
 Please according to "3228H deskew automatic scanning tool instruction. pdf" to use "deskew automatic scanning tool".
+
+### Adjusting the de-skew in loader
+
+Only RK3308 support modifying the de-skew in loader.
+
+Chip Type：**RK3308**
+
+Required documents:
+
+deskew automatic scanning tool, 3308_deskew.exe, RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt, rk3308_ddr_XXXMHz_uartX_mX_vX.XX.bin
+
+Modify method:
+
+According to the results of the released tool "deskew automatic scanning tool", select the `"mid"` value and add it to the corresponding definition in RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt. Using 3308_deskew.exe, change the definition of de-skew on rk3308_ddrxpxxxxxx_template_vxx_de-skew.txt to rk3308_ddr_xxxmhz_uartx_mx_vx.xx.bin.
+
+Please according to "deskew automatic scanning tool instruction. pdf" to use "deskew automatic scanning tool".
