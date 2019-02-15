@@ -1,6 +1,6 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.22
+发布版本：1.23
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -58,6 +58,7 @@
 | 2018-11-06 | V1.20    | 陈健洪   | 增加/更新defconfig/rktest/probe/interrupt/kernel dtb/uart/atags |
 | 2019-01-21 | V1.21    | 陈健洪   | 增加dtbo/amp/dvfs宽温/fdt命令说明                            |
 | 2019-03-05 | V1.22    | 林平     | 增加optee client说明                                         |
+| 2019-03-25 | V1.23    | 陈健洪/朱志展   | 增加kernel cmdline说明                            |
 
 ---
 [TOC]
@@ -2886,6 +2887,134 @@ dtc -@ -O dtb -o my_overlay_dt.dtbo my_overlay_dt.dts
    ```
 
 3. DTO执行成功后如果想进一步确认新生成的dtb内容，用户可通过"fdt"命令把新生成的dtb内容打印出来确认，具体参考[2.7.2.5 fdt读取](#2.7.2.5 fdt读取)。
+
+### 5.17 kernel cmdline
+
+kernel cmdline为U-Boot向kernel传递参数的一个重要手段，诸如传递启动存储，设备状态等。目前kernel cmdline参数有多个来源，并经由U-Boot进行拼接、过滤重复数据之后传递给kernel。U-Boot阶段的cmdline被保存在“bootargs”环境变量里。
+
+U-Boot向kernel传递cmdline的方法是：篡改内核dtb里的/chosen/bootargs节点，把完整的cmdline赋值给/chosen/bootargs。
+
+#### 5.17.1 cmdline来源
+
+- parameter.txt文件
+
+  1. 如果是RK格式的分区表，可以在parameter.txt存放kernel cmdline信息，例如：
+
+  ```
+  ......
+  CMDLINE: console=ttyFIQ0 androidboot.baseband=N/A androidboot.selinux=permissive androidboot.hardware=rk30board androidboot.console=ttyFIQ0 init=/init mtdparts=rk29xxnand:0x00002000@0x00002000(uboot),0x00002000@0x00004000(trust),
+  ......
+  ```
+
+  2. 如果是GPT格式的分区表，parameter.txt存放kernel cmdline信息无效。
+
+- kernel dts的/chosen/bootargs节点，例如：
+
+  ```
+  chosen {
+      bootargs = "earlyprintk=uart8250,mmio32,0xff160000 swiotlb=1 console=ttyFIQ0
+                  androidboot.baseband=N/A androidboot.veritymode=enforcing
+                  androidboot.hardware=rk30board androidboot.console=ttyFIQ0
+                  init=/init kpti=0";
+  };
+  ```
+
+- U-Boot：根据当前运行的状态，U-Boot会动态追加一些内容到kernel cmdline。比如：
+
+  ```
+  storagemedia=emmc androidboot.mode=emmc ......
+  ```
+
+#### 5.17.2 ENV修改
+
+1. env_update()是RK提供的统一处理ENV的接口，具有增、改、覆盖功能。
+
+   ```c
+   /**
+    * env_update() - update sub value of an environment variable
+    *
+    * This add/append/replace the sub value of an environment variable.
+    *
+    * @varname: Variable to adjust
+    * @valude: Value to add/append/replace
+    * @return 0 if OK, 1 on error
+    */
+   int env_update(const char *varname, const char *varvalue);
+   ```
+
+   使用原则：
+
+- 如果varname不存在，则创建varname和varvalue；
+- 如果varname已存在，varvalue不存在，则追加varvalue；
+- 如果varname已存在，varvalue已存在，则用当前的varvalue替换原来的。比如：原来存在“storagemedia=emmc”，当前传入varvalue为“storagemedia=rknand”，则最终更新为"storagemedia=rknand"。
+
+2. env_update_filter()是env_update()的扩展版本：更新env时把varvalue里的某个关键字剔除；
+
+   ```c
+   /**
+    * env_update_filter() - update sub value of an environment variable but
+    * ignore some key word
+    *
+    * This add/append/replace/igore the sub value of an environment variable.
+    *
+    * @varname: Variable to adjust
+    * @valude: Value to add/append/replace
+    * @ignore: Value to be ignored that in varvalue
+    * @return 0 if OK, 1 on error
+    */
+   int env_update_filter(const char *varname,
+                         const char *varvalue, const char *ignore);
+   ```
+
+3. 特别注意：上述两个接口均以空格和“=”作为分隔符对ENV内容进行单元分割，所以处理的单元是：单个词、"key=value"组合词。
+
+- 单个词：sdfwupdate、......
+- "key=value"组合词：storagemedia=emmc、 init=/init、androidboot.console=ttyFIQ0、......
+
+   上述两个接口无法处理长字符串单元。比如无法把“console=ttyFIQ0 androidboot.baseband=N/A androidboot.selinux=permissive“作为一个整体单元进行操作。
+
+#### 5.17.3 cmdline含义
+
+- sdfwupdate：用作sd升级卡升级标志
+- root=PARTUUID：为kernel指定rootfs(system)在存储中的位置，仅GPT表支持
+- skip_initramfs：不使用uboot加载起来的ramdisk，从rootfs(system)读取ramdisk再加载整个rootfs(system)
+- storagemedia：传递从哪种存储启动
+- console：指定kernel打印的串口节点
+- earlycon：在串口节点未建立之前，指定串口及其配置
+- loop.max_part：max_part用来设定每个loop的设备所能支持的分区数目
+- rootwait：用于文件系统不能立即可用的情况，例如emmc初始化未完成，这个时候如果不设置root_wait的话，就会mount rootfs failed，而加上这个参数的话，则可以等待driver加载完成后，在从存储设备中copy出rootfs，再mount的话，就不会提示失败了
+- ro/rw：加载rootfs的属性，只读/读写
+- firmware_calss.path：指定驱动位置，如wifi、bt、gpu等
+- dm="lroot none 0, 0 4096 linear 98:16 0, 4096 4096 linear 98:32" root=/dev/dm-0：Will boot to a rw dm-linear target of 8192 sectors split across two block devices identified by their major:minor numbers.After boot, udev will rename this target to /dev/mapper/lroot (depending on the rules).No uuid was assigned.参考链接<https://android.googlesource.com/kernel/common/+/android-3.18/Documentation/device-mapper/boot.txt>
+- androidboot.slot_suffix：AB System时为kernel指定从哪个slot启动
+- androidboot.serialno：为kernel及上层提供序列号，例如adb的序列号等
+- androidboot.verifiedbootstate：安卓需求，为上层提供uboot校验固件的状态，有三种状态，如下：
+
+1. green: If in LOCKED state and the key used for verification was not set by the end user
+2. yellow: If in LOCKED state and the key used for verification was set by the end user
+3. orange: If in the UNLOCKED state
+
+- androidboot.hardware：启动设备，如rk30board
+- androidboot.verifymode：指定验证分区的真实模式/状态（即验证固件的完整性）
+- androidboot.selinux：SELinux是一种基于域-类型模型（domain-type）的强制访问控制（MAC）安全系统。有三种模式：
+
+1. enforcing：强制模式，代表 SELinux 运作中，且已经正确的开始限制 domain/type 了
+2. permissive：宽容模式：代表 SELinux 运作中，不过仅会有警告讯息并不会实际限制 domain/type 的存取。这种模式可以运来作为 SELinux 的 debug 之用
+3. disabled：关闭，SELinux 并没有实际运作
+
+- androidboot.mode：安卓启动方式，有normal与charger。
+
+1. normal：正常开机启动
+2. charger：关机后接电源开机，androidboot.mode被设置为charger，这个值由uboot检测电源充电后设置到bootargs环境变量内
+
+- androidboot.wificountrycode：设置wifi国家码，如US，CN
+- androidboot.baseband：配置基带，RK无此功能，设置为N/A
+- androidboot.console：android信息输出口配置
+- androidboot.vbmeta.device=PARTUUID：指定vbmeta在存储中的位置
+- androidboot.vbmeta.hash_alg：设置vbmeta hash算法，如sha512
+- androidboot.vbmeta.size：指定vbmeta的size
+- androidboot.vbmeta.digest：给kernel上传vbmeta的digest，kernel加载vbmeta后计算digest，并与此digest对比
+- androidboot.vbmeta.device_state：avb2.0指定系统lock与unlock
 
 ## 6. USB download
 
