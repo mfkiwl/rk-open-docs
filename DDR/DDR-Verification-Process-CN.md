@@ -537,8 +537,8 @@ already change to 200000000 done
 
 ​	开启计算器 Calculator,输入 "839910906=",点击"RebootTest"，拷机时间12小时以上。
 
-## Linux 4.4 sleep拷机（optional）
-​	拔掉连接ADB的USB线，开启计算器 Calculator,输入 "839910906=",点击"SleepTest"，拷机时间12小时以上。
+## Linux 4.4 sleep拷机
+​	拔掉连接ADB的USB线，开启计算器 Calculator,输入 "839910906=",点击"SleepTest"，拷机时间12小时以上。3399 LPDDR4，这项测试是必须的；其他DDR类型及其他平台是optional。
 
 ----------------------
 # RV1108 DDR颗粒验证流程说明
