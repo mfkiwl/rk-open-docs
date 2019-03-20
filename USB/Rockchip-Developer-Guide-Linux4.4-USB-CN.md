@@ -1,14 +1,12 @@
 # Linux 4.4 USB 开发指南
 
-发布版本：1.2
+发布版本：1.2.1
 
 作者邮箱：wulf@rock-chips.com、frank.wang@rock-chips.com、daniel.meng@rockchip.com
 
-日期：2019-01-09
+日期：2019-03-20
 
 文档密级：公开资料
-
-Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
@@ -28,11 +26,12 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者**               | **修改说明**                                     |
-| ---------- | -------- | ---------------------- | ------------------------------------------------ |
-| 2017-12-22 | v1.0     | 吴良峰、王明成、孟东阳 | 初始版本                                         |
-| 2018-06-08 | v1.1     | 吴良峰                 | support RK3308、RK3326、PX30<br />修正格式和错误 |
-| 2019-01-09 | V1.2     | 吴良峰                 | 使用markdownlint修订格式                         |
+| **日期**   | **版本** | **作者**               | **修改说明**                                           |
+| ---------- | -------- | ---------------------- | ------------------------------------------------------ |
+| 2017-12-22 | v1.0     | 吴良峰、王明成、孟东阳 | 初始版本                                               |
+| 2018-06-08 | v1.1     | 吴良峰                 | support RK3308、RK3326、PX30<br />修正格式和错误       |
+| 2019-01-09 | V1.2     | 吴良峰                 | 使用markdownlint修订格式                               |
+| 2019-03-20 | V1.2.1   | 吴良峰                 | 修正USB OTG控制器硬件电路说明<br />删除段首Tab空格符号 |
 
 ---
 [TOC]
@@ -41,7 +40,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ### 1.1 RK平台USB控制器方案
 
-​	Rockchip SOC通常内置多个USB控制器，不同控制器互相独立，请在芯片TRM中获取详细信息。由于部分USB控制器有使用限制，所以请务必明确方案的需求及控制器限制后，再确定USB的使用方案。各芯片内置的USB控制器如表1-1所示：
+Rockchip SOC通常内置多个USB控制器，不同控制器互相独立，请在芯片TRM中获取详细信息。由于部分USB控制器有使用限制，所以请务必明确方案的需求及控制器限制后，再确定USB的使用方案。各芯片内置的USB控制器如表1-1所示：
 
 表 1‑1 RK平台USB控制器列表
 
@@ -209,15 +208,15 @@ Support Normal and Flipped orientation
 
 ### 2.1 USB HOST控制器硬件电路
 
-​	USB Host控制器分别包含USB 2.0 Host和HSIC，其硬件电路及信号分别说明如下：
+USB Host控制器分别包含USB 2.0 Host和HSIC，其硬件电路及信号分别说明如下：
 
 #### 2.1.1 USB 2.0 HOST控制器硬件电路
 
-​	USB 2.0的工作时钟高达480MHz，所以layout时需要特别注意，USB走线宽度为7-8MIL，做90Ω阻抗差分走线，最好在表层走线并有包地，边上无干扰源，正对的上下层不能有其他信号走线。
+USB 2.0的工作时钟高达480MHz，所以layout时需要特别注意，USB走线宽度为7-8MIL，做90Ω阻抗差分走线，最好在表层走线并有包地，边上无干扰源，正对的上下层不能有其他信号走线。
 
-​	USB HSIC（High Speed Inter Chip）使用240MHz DDR信号，传输速率与USB 2.0同为480Mbps，典型的走线阻抗为50Ω，建议最大走线长度不要超过10cm。
+USB HSIC（High Speed Inter Chip）使用240MHz DDR信号，传输速率与USB 2.0同为480Mbps，典型的走线阻抗为50Ω，建议最大走线长度不要超过10cm。
 
-​	USB 2.0 HOST控制器硬件信号参考电路如图2-1所示，USB 2.0 HOST的VBUS控制电路和接口电路如图2-2和图2-3所示：
+USB 2.0 HOST控制器硬件信号参考电路如图2-1所示，USB 2.0 HOST的VBUS控制电路和接口电路如图2-2和图2-3所示：
 
 ![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB-20-HOST-SoCsignal-Pin.png)
 
@@ -231,7 +230,7 @@ Support Normal and Flipped orientation
 
 ​									图 2‑3 HSIC控制器硬件电路
 
-​	HSIC（High Speed Inter Chip）是具有与USB 2.0相同的带宽（480Mbps）的芯片间互连接口，如图2-4所示，USIC_STROBE为240MHz DDR信号线，USIC_DATA为数据线，供电电压为0.9V和1.2V， 信号传输的标准电压为1.2V，降低了系统的功耗，最大的走线长度为10cm（4英寸）。
+HSIC（High Speed Inter Chip）是具有与USB 2.0相同的带宽（480Mbps）的芯片间互连接口，如图2-4所示，USIC_STROBE为240MHz DDR信号线，USIC_DATA为数据线，供电电压为0.9V和1.2V， 信号传输的标准电压为1.2V，降低了系统的功耗，最大的走线长度为10cm（4英寸）。
 
 ![HSIC-Hardware](Rockchip-Developer-Guide-linux4.4-USB/HSIC-Hardware.png)
 
@@ -241,9 +240,9 @@ Support Normal and Flipped orientation
 
 #### 2.2.1 USB 2.0 OTG控制器硬件电路
 
-​	RK3399没有独立的USB 2.0 OTG控制器，但有独立的USB 3.0 OTG控制器，并且可以向下兼容USB 2.0 OTG的完整功能，而RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX有独立的USB 2.0 OTG控制器。
+RK3399没有独立的USB 2.0 OTG控制器，但有独立的USB 3.0 OTG控制器，并且可以向下兼容USB 2.0 OTG的完整功能，而RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX有独立的USB 2.0 OTG控制器。
 
-​	完整的 USB 2.0 OTG 参考电路如图2-5 ~ 图2-8所示：
+完整的 USB 2.0 OTG 参考电路如图2-5 ~ 图2-8所示：
 
 ![USB2.0-OTG-控制器硬件信号](Rockchip-Developer-Guide-linux4.4-USB\USB2.0-OTG-控制器硬件信号.png)
 
@@ -261,29 +260,16 @@ Support Normal and Flipped orientation
 
 ​									图 2-8  OTG DRV 电路图
 
-- OTG_VBUS
-
-  输入信号，用于 USB DEVICE 检测 VBUS 电平， 0：低电平约 0V， 1：高电平约 3V。默认无连接时电平为低，连接至 PC 或充电器时电平为高。
-
-- OTG_ID
-
-  输入信号，由 USB OTG 协议定义，用于识别 USB 口所接设备的默认角色(HOST or device)。 USB_ID 默认上拉，处于 device 状况，如果要控制器进入 HOST 状态，需外接 mini-A 口或 micro-A 口将 USB_ID 短接到地。
-
-- OTG_RKELVIN
-
-  参考电阻默认 43.2 欧到地，可通过调节该电阻阻值来调整 USB 信号质量。 不**同芯片，该参考电阻的阻值不同， 具体请见相应的 SDK 参考设计原理图**。
-
-- OTG_DRVVBUS
-
-  该信号由 USB OTG 控制器的 HOST 寄存器控制，硬件上通过该信号来控制HOST 所需 5V VBUS 输出。
-
-- OTG_DP/OTG_DM
-
-  即 Data+, Data-， USB 的两根差分信号线。
+- OTG_DP/OTG_DM: USB 差分信号 D+/D-，需要在每根信号线上串联 2.2Ω 的电阻。
+- USB_DET: 输入信号，当 OTG 作为 Peripheral mode 时，用于检测 USB 是否连接到 Host（如: PC Host）或者 USB 充电器。默认为低电平0V。当连接到 Host 或者 USB 充电器时，为高电平 3.0 ～ 3.2 V。
+- USB_ID: 输入信号，用于判断切换为 Host mode 或者 Peripheral mode. 默认为高电平 1.8V（芯片内部拉高），OTG 作为 Peripheral mode。当插入OTG-Host 线缆时，USB_ID会被拉低到地，USB驱动会根据USB_ID电平变化，将OTG切换为Host mode。
+- USB_RBIAS: USB 2.0 PHY的外部基准电阻。该电阻的阻值会影响 USB 信号的幅值，所以请严格按照 SDK 参考原理图的阻值设计。
+- VCC5V0_OTG:  当 OTG 工作于 Peripheral mode 时，VCC5V0_OTG 是 USB_DET 的输入源信号。当 OTG 工作于 Host mode 时，VCC5V0_OTG 输出 VBUS 5V给 USB 外设。
+- USB_AVDD_1V0/USB_AVDD_1V8/USB_AVDD_3V3: USB 2.0 PHY 的供电电源。
 
 #### 2.2.2 USB 3.0 OTG控制器硬件电路
 
-​	USB 3.0 OTG具有USB 3.0 OTG功能，且向下兼容USB 2.0 OTG功能，最大传输速率为5Gbps，物理接口为Type-C，支持正反插。在传输线方面，USB 3.0支持长达3米的四线差分信号线及11英寸PCB。5Gbps信号在长线缆上采用的是差分信号方式传输，从而避免信号被干扰及减少电磁干扰问题。
+USB 3.0 OTG具有USB 3.0 OTG功能，且向下兼容USB 2.0 OTG功能，最大传输速率为5Gbps，物理接口为Type-C，支持正反插。在传输线方面，USB 3.0支持长达3米的四线差分信号线及11英寸PCB。5Gbps信号在长线缆上采用的是差分信号方式传输，从而避免信号被干扰及减少电磁干扰问题。
 
 ​		![table-GND-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/table-GND-kernel4.4.png)
 
@@ -318,31 +304,31 @@ Support Normal and Flipped orientation
 ---
 ## 3 Kernel USB CONFIG
 
-​	USB模块的配置及保存和其它内核模块的配置方法一样：
+USB模块的配置及保存和其它内核模块的配置方法一样：
 
-​	导入默认配置：
+导入默认配置：
 
 ```sh
 make ARCH=arm64 rockchip_defconfig
 ```
 
-​	选择Kernel配置：
+选择Kernel配置：
 
 ```sh
 make ARCH=arm64 menuconfig
 ```
 
-​	保存default配置：
+保存default配置：
 
 ```sh
 make ARCH=arm64 savedefconfig
 ```
 
-​	保存default配置，然后用defconfig替换rockchip_defconfig。
+保存default配置，然后用defconfig替换rockchip_defconfig。
 
 ### 3.1 USB PHY CONFIG
 
-​	USB PHY模块的配置位于
+USB PHY模块的配置位于
 
 ```makefile
 
@@ -357,17 +343,17 @@ Device Drivers  --->
 
 ```
 
-​	USB 2.0 PHY使用的是Innosilicon IP，所以应选择“Rockchip INNO USB2PHY Driver”。
+USB 2.0 PHY使用的是Innosilicon IP，所以应选择“Rockchip INNO USB2PHY Driver”。
 
-​	RK3399 RK3366 USB 3.0 PHY使用的是Type-C，所以应选择“Rockchip TYPEC PHY Driver”。
+RK3399 RK3366 USB 3.0 PHY使用的是Type-C，所以应选择“Rockchip TYPEC PHY Driver”。
 
-​	RK3328 USB 3.0 PHY 使用的是Innosilicon USB 3.0 PHY，所以应选择：
+RK3328 USB 3.0 PHY 使用的是Innosilicon USB 3.0 PHY，所以应选择：
 
-​	“Rockchip INNO USB 3.0 PHY Driver”。
+“Rockchip INNO USB 3.0 PHY Driver”。
 
 ### 3.2 USB HOST CONFIG
 
-​	USB HOST模块的配置位于
+USB HOST模块的配置位于
 
 ```makefile
 
@@ -389,11 +375,11 @@ Device Drivers  --->
 
 ```
 
-​	必须选上USB Support项后才能支持USB模块并进行进一步的配置。
+必须选上USB Support项后才能支持USB模块并进行进一步的配置。
 
-​	如果需要支持USB HOST，首先需要选上 **<*>Supportfor Host-side USB** 项，然后会现如下的HOST相关的配置，其中，USB HOST 1.1 选择OHCI Driver 配置，USB HOST 2.0 选择EHCI Driver 配置，USB HOST 3.0选择XHCI Driver配置。
+如果需要支持USB HOST，首先需要选上 **<*>Supportfor Host-side USB** 项，然后会现如下的HOST相关的配置，其中，USB HOST 1.1 选择OHCI Driver 配置，USB HOST 2.0 选择EHCI Driver 配置，USB HOST 3.0选择XHCI Driver配置。
 
-​	需要注意的是RK3308 的default config （rk3308_linux_defconfig）为了裁剪内核，默认是disable USB HOST，如果要支持USB 2.0 HOST和相关USB外设，需要先手动 enable  EHCI Driver 配置，然后参考 [3.5 USB其它模块配置](#3.5 USB其它模块配置)，使能对应的USB外设驱动。
+需要注意的是RK3308 的default config （rk3308_linux_defconfig）为了裁剪内核，默认是disable USB HOST，如果要支持USB 2.0 HOST和相关USB外设，需要先手动 enable  EHCI Driver 配置，然后参考 [3.5 USB其它模块配置](#3.5 USB其它模块配置)，使能对应的USB外设驱动。
 
 ### 3.3 USB OTG CONFIG
 
@@ -413,7 +399,7 @@ Device Drivers  --->
 
 ### 3.4 USB Gadget CONFIG
 
-​	USB Gadget 模块的配置位于
+USB Gadget 模块的配置位于
 
 ```makefile
 
@@ -447,13 +433,13 @@ DeviceDrivers  --->
 
 ```
 
-​	Rockchip平台默认支持RNDIS、MTP、PTP、Accessory、ADB、MIDI、Audio等Gadget功能。开发者可以根据实际产品需求，enable 更多的USB Gadget功能，但同时，需要修改init 文件（init.rk30board.usb.rc和init.usb.configfs.rc）。
+Rockchip平台默认支持RNDIS、MTP、PTP、Accessory、ADB、MIDI、Audio等Gadget功能。开发者可以根据实际产品需求，enable 更多的USB Gadget功能，但同时，需要修改init 文件（init.rk30board.usb.rc和init.usb.configfs.rc）。
 
 ### 3.5 USB外设CONFIG
 
 #### 3.5.1 Mass Storage Class CONFIG
 
-​	U盘属于SCSI设备，所以在配置USB模块之前需要配置SCSI选项。
+U盘属于SCSI设备，所以在配置USB模块之前需要配置SCSI选项。
 
 ```makefile
 
@@ -479,7 +465,7 @@ Device Drivers --->
 
 ```
 
-​	配置完SCSI Device Support后，可以在USB Support中找到如下选项，选上即可。
+配置完SCSI Device Support后，可以在USB Support中找到如下选项，选上即可。
 
 ```makefile
 
@@ -504,7 +490,7 @@ Device Driver --->
 
 ```
 
-​	此外，USB 3G Modem还需要使能PPP拨号的相关配置项：
+此外，USB 3G Modem还需要使能PPP拨号的相关配置项：
 
 ```makefile
 
@@ -552,7 +538,7 @@ Device Drivers	--->
 
 #### 3.5.3 USB HID CONFIG
 
-​	USB键鼠的配置选项如下：
+USB键鼠的配置选项如下：
 
 ```makefile
 
@@ -677,30 +663,30 @@ Device Drivers --->
 
 ```
 
-​	其他有可能用到的USB设备还有很多，如GPS，Printer等，有可能需要Vendor定制的驱动，也有可能是标准的Class驱动，如需支持，可直接在网络上搜索Linux对该设备支持要做的工作，RK平台并无特殊要求，可直接参考。
+其他有可能用到的USB设备还有很多，如GPS，Printer等，有可能需要Vendor定制的驱动，也有可能是标准的Class驱动，如需支持，可直接在网络上搜索Linux对该设备支持要做的工作，RK平台并无特殊要求，可直接参考。
 
 ---
 ## 4 Device Tree开发
 
-​	ARM Linux内核在Linux-3.x内核取消了传统的设备文件而用设备树（DT）取代，因此，现在内核有关硬件描述的信息都需要放入DT中配置，下面对涉及到USB模块的DT开发做以详细说明。
+ARM Linux内核在Linux-3.x内核取消了传统的设备文件而用设备树（DT）取代，因此，现在内核有关硬件描述的信息都需要放入DT中配置，下面对涉及到USB模块的DT开发做以详细说明。
 
 ### 4.1 USB PHY DTS
 
-​	USB 2.0 PHY的配置主要包括PHY的时钟、中断配置和VBUS Supply的配置。
+USB 2.0 PHY的配置主要包括PHY的时钟、中断配置和VBUS Supply的配置。
 
-​	USB 3.0 PHY的配置主要包括PHY的时钟、中断配置、Reset和Type-CPHY状态寄存器地址。
+USB 3.0 PHY的配置主要包括PHY的时钟、中断配置、Reset和Type-CPHY状态寄存器地址。
 
 #### 4.1.1 USB 2.0 PHY DTS
 
-​	USB 2.0 PHY详细配置可参考内核Documentation/devicetree/bindings/phy目录文档说明。
+USB 2.0 PHY详细配置可参考内核Documentation/devicetree/bindings/phy目录文档说明。
 
-​	Innosilicon PHY对应的文档为：
+Innosilicon PHY对应的文档为：
 
-​	Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb2.txt
+Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb2.txt
 
-​	具体分为DTSI和DTS两部分配置，下面以RK3399上一个Host Port的PHY为例说明。
+具体分为DTSI和DTS两部分配置，下面以RK3399上一个Host Port的PHY为例说明。
 
-​	下面所示为DTSI的配置，DTSI主要配置PHY的公有属性。
+下面所示为DTSI的配置，DTSI主要配置PHY的公有属性。
 
 ```c
 
@@ -729,11 +715,11 @@ grf: syscon@ff770000 {
 
 ```
 
-​	首先，USB PHY Driver中都是在操作GRF，所以USB PHY的节点必须作为GRF的一个子节点。
+首先，USB PHY Driver中都是在操作GRF，所以USB PHY的节点必须作为GRF的一个子节点。
 
-​	其次，USB PHY节点中包括USB PHY的硬件属性和PHY port的硬件属性，其中PHY的属性为所有port的共有属性，比如Input时钟；port属性主要包括各个port所拥有的中断，比如Linestate中断、otg-id中断，otg-bvalid等。
+其次，USB PHY节点中包括USB PHY的硬件属性和PHY port的硬件属性，其中PHY的属性为所有port的共有属性，比如Input时钟；port属性主要包括各个port所拥有的中断，比如Linestate中断、otg-id中断，otg-bvalid等。
 
-​	最后，需要注意的是port的名称，HOST对应的port要求命名为“host-port”，OTG对应的命名为“otg-port”，因为Driver中根据这两个名称做不同port的初始化。下面所示为DTS的配置。
+最后，需要注意的是port的名称，HOST对应的port要求命名为“host-port”，OTG对应的命名为“otg-port”，因为Driver中根据这两个名称做不同port的初始化。下面所示为DTS的配置。
 
 ```c
 
@@ -744,11 +730,11 @@ u2phy0_host: host-port {
 
 ```
 
-​	DTS的配置，主要根据不同的产品形态，配置PHY的私有属性。目前SDK-DTS的配置，主要包括phy-port的Enable以及phy-Supply即Vbus Supply的配置。
+DTS的配置，主要根据不同的产品形态，配置PHY的私有属性。目前SDK-DTS的配置，主要包括phy-port的Enable以及phy-Supply即Vbus Supply的配置。
 
-​	Vbus supply的配置有两种方式，一种是配置成GPIO形式，直接在驱动中控制GPIO，进而控制的供给；另外一种是目前内核比较通用的Regulator配置。
+Vbus supply的配置有两种方式，一种是配置成GPIO形式，直接在驱动中控制GPIO，进而控制的供给；另外一种是目前内核比较通用的Regulator配置。
 
-​	下面以Host Vbus的配置，详细讲述regulator的配置方法。其主要分为Regulator及pinctrl两个节点的配置。
+下面以Host Vbus的配置，详细讲述regulator的配置方法。其主要分为Regulator及pinctrl两个节点的配置。
 
 ```c
 
@@ -764,7 +750,7 @@ vcc5v0_host: vcc5v0-host-regulator {
 
 ```
 
-​	如上面所示，这是一个vbus-host-regulator的配置实例，“enable-active-high”属性标识GPIO拉高使能；“pinctrl-0 = <&host_vbus_drv>;”Property代表这个regulator所引用的Pinctrl中节点的名称，具体regulator的配置可参考LinuxKernel相关regulator的文档。通过对于USB模块而言，vbus-regulator应该在DTS中（而不是DTSI中）做配置。
+如上面所示，这是一个vbus-host-regulator的配置实例，“enable-active-high”属性标识GPIO拉高使能；“pinctrl-0 = <&host_vbus_drv>;”Property代表这个regulator所引用的Pinctrl中节点的名称，具体regulator的配置可参考LinuxKernel相关regulator的文档。通过对于USB模块而言，vbus-regulator应该在DTS中（而不是DTSI中）做配置。
 
 ```c
 
@@ -777,15 +763,15 @@ usb2 {
 
 ```
 
-​	如上面所示，这是hostvbus-drv的pinctrl属性，rockchip,pins属性即GPIO信息，需要从硬件原理图获知。这个节点作为Pinctrl的子节点，通过在DTSI（而不是DTS中）做配置。
+如上面所示，这是hostvbus-drv的pinctrl属性，rockchip,pins属性即GPIO信息，需要从硬件原理图获知。这个节点作为Pinctrl的子节点，通过在DTSI（而不是DTS中）做配置。
 
 #### 4.1.2 USB 3.0 PHY DTS
 
-​	USB 3.0 PHY为Type-C PHY，详细的配置说明请查看：
+USB 3.0 PHY为Type-C PHY，详细的配置说明请查看：
 
-​	Documentation/devicetree/bindings/phy/phy-rockchip-typec.txt
+Documentation/devicetree/bindings/phy/phy-rockchip-typec.txt
 
-​	Example：
+Example：
 
 ```c
 
@@ -826,11 +812,11 @@ tcphy0: phy@ff7c0000 {
 
 ### 4.2 USB 2.0 Controller DTS
 
-​	USB 2.0控制器主要包括EHCI、OHCI、OTG。其中EHCI和OHCI Rockchip采用Linux 内核Generic驱动，一般开发时只需要对DT作相应配置，即可正常工作。
+USB 2.0控制器主要包括EHCI、OHCI、OTG。其中EHCI和OHCI Rockchip采用Linux 内核Generic驱动，一般开发时只需要对DT作相应配置，即可正常工作。
 
 #### 4.2.1 USB 2.0 HOST Controller DTS
 
-​	下面所示为一个EHCI控制器的典型配置，主要包括register、interrupts、clocks的配置。需要注意，EHCI相关的时钟，通常需要配置EHCI控制器和EHCI/OHCI仲裁器两个时钟。此外，phys直接配置对应phy-port的名称即可。
+下面所示为一个EHCI控制器的典型配置，主要包括register、interrupts、clocks的配置。需要注意，EHCI相关的时钟，通常需要配置EHCI控制器和EHCI/OHCI仲裁器两个时钟。此外，phys直接配置对应phy-port的名称即可。
 
 ```c
 
@@ -849,7 +835,7 @@ usb_host0_ehci: usb@fe380000 {
 
 ```
 
-​	下面所示为一个OHCI控制器的配置，其内容基本跟EHCI相同。
+下面所示为一个OHCI控制器的配置，其内容基本跟EHCI相同。
 
 ```c
 
@@ -870,11 +856,11 @@ usb_host0_ohci: usb@fe3a0000 {
 
 #### 4.2.2 USB 2.0 otg Controller DTS
 
-​	如下所示，为一个DWC2控制器的典型配置，主要包括register、interrupts、clocks的配置。需要注意，DWC2相关的时钟，通常需要配置HCLK和PMUCLK两个时钟。此外，phys直接配置对应phy-port的名称即可。
+如下所示，为一个DWC2控制器的典型配置，主要包括register、interrupts、clocks的配置。需要注意，DWC2相关的时钟，通常需要配置HCLK和PMUCLK两个时钟。此外，phys直接配置对应phy-port的名称即可。
 
-​	详细的配置说明请查看：
+详细的配置说明请查看：
 
-​	Documentation/devicetree/bindings/usb/dwc2.txt
+Documentation/devicetree/bindings/usb/dwc2.txt
 
 ```c
 
@@ -901,15 +887,15 @@ usb20_otg: usb@ff580000 {
 
 #### 4.3.1 USB 3.0 HOST Controller DTS
 
-​	USB 3.0 HOST控制器为XHCI，集成于DWC3 OTG IP中，所以不用单独配置dts，只需要配置DWC3，并且设置DWC3的dr_mode属性为dr_mode = "otg"或者dr_mode = "host"，即可以enable XHCI控制器。
+USB 3.0 HOST控制器为XHCI，集成于DWC3 OTG IP中，所以不用单独配置dts，只需要配置DWC3，并且设置DWC3的dr_mode属性为dr_mode = "otg"或者dr_mode = "host"，即可以enable XHCI控制器。
 
 #### 4.3.2 USB 3.0 OTG Controller DTS
 
-​	USB 3.0 OTG的详细配置方法，请查看：
+USB 3.0 OTG的详细配置方法，请查看：
 
-​	Documentation/devicetree/bindings/usb/dwc3-rockchip.txt
+Documentation/devicetree/bindings/usb/dwc3-rockchip.txt
 
-​	Example：
+Example：
 
 ```c
 
@@ -947,25 +933,25 @@ usbdrd3: usb@ff600000 {
 
 ## 5 驱动开发
 
-​	目前，EHCI、OHCI和DWC3均采用Linux Upstream的代码，因此驱动本身修改的可能性很少，只需要对DT做正确配置即可。DWC2使用内部版和Upstream 版两个版本，内部版使用的时间较久，稳定性相对较好，Upstream版主要和Upstream Mainline同步更新。USB 2.0 PHY的驱动也已经upstream，后续开发仅需对芯片做适配即可。
+目前，EHCI、OHCI和DWC3均采用Linux Upstream的代码，因此驱动本身修改的可能性很少，只需要对DT做正确配置即可。DWC2使用内部版和Upstream 版两个版本，内部版使用的时间较久，稳定性相对较好，Upstream版主要和Upstream Mainline同步更新。USB 2.0 PHY的驱动也已经upstream，后续开发仅需对芯片做适配即可。
 
 ### 5.1 USB PHY drivers
 
 #### 5.1.1 USB 2.0 PHY driver
 
-​	Driver代码路径：
+Driver代码路径：
 
-​	`drivers/phy/phy-rockchip-inno-usb2.c`
+`drivers/phy/phy-rockchip-inno-usb2.c`
 
-​	USB 2.0 PHY采用Innosilicon IP，SoC上有两个USB 2.0的PHY，每个PHY有两个port，一个port用于支持USB 2.0 HOST控制器，另一个port用于支持USB 2.0 OTG控制器。
+USB 2.0 PHY采用Innosilicon IP，SoC上有两个USB 2.0的PHY，每个PHY有两个port，一个port用于支持USB 2.0 HOST控制器，另一个port用于支持USB 2.0 OTG控制器。
 
-​	对于Innosilicon IP USB 2.0 PHY特性，目前已开发并upstream了相应的PHY驱动代码，针对host-port，主要涉及到suspend/resume、sm_work相关的配置；具体register说明可参考代码（drivers/phy/phy-rockchip-inno-usb2.c）中注释。
+对于Innosilicon IP USB 2.0 PHY特性，目前已开发并upstream了相应的PHY驱动代码，针对host-port，主要涉及到suspend/resume、sm_work相关的配置；具体register说明可参考代码（drivers/phy/phy-rockchip-inno-usb2.c）中注释。
 
-​	**NOTE：**	请参照代码阅读以下内容。
+**NOTE：**	请参照代码阅读以下内容。
 
-​	对于新功能的开发，首先应清楚该功能是针对phy还是phy-port，然后对应操作struct rockchip_usb2phy和struct rockchip_usb2phy_port两个数据结构，第一个用于管理phy的成员属性；第二个用于管理phy-port的成员属性。
+对于新功能的开发，首先应清楚该功能是针对phy还是phy-port，然后对应操作struct rockchip_usb2phy和struct rockchip_usb2phy_port两个数据结构，第一个用于管理phy的成员属性；第二个用于管理phy-port的成员属性。
 
-​	同时，配合上面两个数据结构，还有struct rockchip_usb2phy_cfg 和struct rockchip_usb2phy_port_cfg两个用于配置的数据结构。如下是一个典型的USB 2.0 host port的配置。
+同时，配合上面两个数据结构，还有struct rockchip_usb2phy_cfg 和struct rockchip_usb2phy_port_cfg两个用于配置的数据结构。如下是一个典型的USB 2.0 host port的配置。
 
 ```c
 
@@ -988,7 +974,7 @@ static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 
 ```
 
-​	下面是USB 2.0 otg-port phy配置参考，port_cfgs主要用于插拔和otg mode 检测，chg_det主要用于充电类型检测：
+下面是USB 2.0 otg-port phy配置参考，port_cfgs主要用于插拔和otg mode 检测，chg_det主要用于充电类型检测：
 
 ```c
 
@@ -1038,7 +1024,7 @@ static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 
 ```
 
-​	USB 2.0 PHY驱动在sys/devices/platform/下建立了一个otg_mode节点，用于切换dwc2的host和peripheral mode，以RK3326 SoC为例：
+USB 2.0 PHY驱动在sys/devices/platform/下建立了一个otg_mode节点，用于切换dwc2的host和peripheral mode，以RK3326 SoC为例：
 
 ```sh
 
@@ -1048,9 +1034,9 @@ driver_override modalias otg_mode power uevent
 
 ```
 
-​	**otg_mode:** Show & store the current value of otg mode for otg port
+**otg_mode:** Show & store the current value of otg mode for otg port
 
-​	For example, force mode for RK3326 board USB:
+For example, force mode for RK3326 board USB:
 
 1. Force host mode
 
@@ -1070,7 +1056,7 @@ echo peripheral > /sys/devices/platform/<u2phy dev name>/otg_mode
 echo otg > /sys/devices/platform/<u2phy dev name>/otg_mode
 ```
 
-​	Legacy Usage:
+Legacy Usage:
 
 1. Force host mode
 
@@ -1092,21 +1078,21 @@ echo 0 > /sys/devices/platform/<u2phy dev name>/otg_mode
 
 #### 5.1.2 USB 3.0 PHY driver
 
-​	Driver代码有两个版本，3228H、3328的USB 3.0 PHY使用Innosilicon IP。
+Driver代码有两个版本，3228H、3328的USB 3.0 PHY使用Innosilicon IP。
 
-​	代码路径：
+代码路径：
 
-​	`drivers/phy/rockchip/phy-rockchip-inno-usb3.c`
+`drivers/phy/rockchip/phy-rockchip-inno-usb3.c`
 
-​	Innosilicon IP 只包含一个USB 3.0 PHY 端口，支持USB 3.0 底层数据传输、LFPS通信和物理信号检测等功能。
+Innosilicon IP 只包含一个USB 3.0 PHY 端口，支持USB 3.0 底层数据传输、LFPS通信和物理信号检测等功能。
 
-​	对于Innosilicon IP USB 3.0 PHY特性，目前已开发了相应的PHY驱动代码，暂时还未upstream，对端口的控制，主要涉及suspend/resume、power和detective等，具体register说明可参考代码（drivers/phy/phy-rockchip-inno-usb3.c）中注释。
+对于Innosilicon IP USB 3.0 PHY特性，目前已开发了相应的PHY驱动代码，暂时还未upstream，对端口的控制，主要涉及suspend/resume、power和detective等，具体register说明可参考代码（drivers/phy/phy-rockchip-inno-usb3.c）中注释。
 
-​	**NOTE：**	请参照代码阅读以下内容。
+**NOTE：**	请参照代码阅读以下内容。
 
-​	对于新功能的开发，主要操作struct rockchip_u3phy和struct rockchip_u3phy_port两个数据结构，第一个用于管理phy的成员属性；第二个用于管理phy-port的成员属性。
+对于新功能的开发，主要操作struct rockchip_u3phy和struct rockchip_u3phy_port两个数据结构，第一个用于管理phy的成员属性；第二个用于管理phy-port的成员属性。
 
-​	同时，配合上面两个数据结构，还有struct rockchip_u3phy_cfg 、struct rockchip_u3phy_grf_cfg和 struct rockchip_u3phy_apbcfg三个用于配置的数据结构。struct rockchip_u3phy_apbcfg主要用于保存USB物理信号tuning的相关参数，在 tuning 函数中直接赋值给相关寄存器；struct rockchip_u3phy_cfg和struct rockchip_u2phy_grf_cfg 则是用于USB底层协议相关的功能性相关属性配置，如下是一个典型的rockchip_u3phy_cfg的配置。
+同时，配合上面两个数据结构，还有struct rockchip_u3phy_cfg 、struct rockchip_u3phy_grf_cfg和 struct rockchip_u3phy_apbcfg三个用于配置的数据结构。struct rockchip_u3phy_apbcfg主要用于保存USB物理信号tuning的相关参数，在 tuning 函数中直接赋值给相关寄存器；struct rockchip_u3phy_cfg和struct rockchip_u2phy_grf_cfg 则是用于USB底层协议相关的功能性相关属性配置，如下是一个典型的rockchip_u3phy_cfg的配置。
 
 ```c
 
@@ -1136,19 +1122,19 @@ static const struct rockchip_u3phy_cfg rk3328_u3phy_cfgs[] = {
 
 ```
 
-​	其余芯片的USB 3.0 PHY 为Cadence IP，
+其余芯片的USB 3.0 PHY 为Cadence IP，
 
-​	代码路径：
+代码路径：
 
-​	`drivers/phy/rockchip/phy-rockchip-typec.c`
+`drivers/phy/rockchip/phy-rockchip-typec.c`
 
-​	Cadence IP 只有一个端口，支持USB3.1、DisplayPort1.3，可以工作在USB、DisplayPort、USB+DisplayPort三种模式，DisplayPort部分在显示部分的文档描述，这里我们只关心USB部分，Cadence IP同样支持USB 3.0 底层数据传输、LFPS通信和物理信号检测等功能。
+Cadence IP 只有一个端口，支持USB3.1、DisplayPort1.3，可以工作在USB、DisplayPort、USB+DisplayPort三种模式，DisplayPort部分在显示部分的文档描述，这里我们只关心USB部分，Cadence IP同样支持USB 3.0 底层数据传输、LFPS通信和物理信号检测等功能。
 
-​	对于Cadence IP USB 3.0 PHY特性，目前已开发并upstream了相应的PHY驱动代码，针对端口的控制，主要涉及到suspend/resume、power、DP USB模式切换等，具体register说明可参考驱动文件（`drivers/phy/rockchip/phy-rockchip-inno-usb3.c`）中注释。
+对于Cadence IP USB 3.0 PHY特性，目前已开发并upstream了相应的PHY驱动代码，针对端口的控制，主要涉及到suspend/resume、power、DP USB模式切换等，具体register说明可参考驱动文件（`drivers/phy/rockchip/phy-rockchip-inno-usb3.c`）中注释。
 
-​	对于新功能的开发，主要操作struct rockchip_typec和stuct rockchip_usb3phy_port_cfg 两个数据结构，第一个用于管理phy的成员属性；第二个用于管理phy-port的成员属性。rockchip_usb3phy_port_cfg的配置参数在驱动初始化时通过DTS传入，运行过程中通过调用tcphy_get_mode获取实际连接状态进行实时配置。
+对于新功能的开发，主要操作struct rockchip_typec和stuct rockchip_usb3phy_port_cfg 两个数据结构，第一个用于管理phy的成员属性；第二个用于管理phy-port的成员属性。rockchip_usb3phy_port_cfg的配置参数在驱动初始化时通过DTS传入，运行过程中通过调用tcphy_get_mode获取实际连接状态进行实时配置。
 
-​	除此之外驱动中新建了struct phy_reg usb3_pll_cfg用于保存PLL相关的寄存器配置，常见的配置参数如下：
+除此之外驱动中新建了struct phy_reg usb3_pll_cfg用于保存PLL相关的寄存器配置，常见的配置参数如下：
 
 ```c
 
@@ -1177,15 +1163,15 @@ struct phy_reg usb3_pll_cfg[] = {
 
 ##### 5.2.1.1 USB 3.0 OTG 驱动说明
 
-​	USB 3.0 OTG 采用DWC3控制器（内嵌xHCI控制器），支持Peripheral和Host mode，并且可以动态切换mode。
+USB 3.0 OTG 采用DWC3控制器（内嵌xHCI控制器），支持Peripheral和Host mode，并且可以动态切换mode。
 
-​	Driver代码路径：
-​	`drivers/usb/dwc3/*` （USB3.0 OTG Global  core和 Peripheral 相关驱动）
-​	`drivers/usb/host/xhci*` （USB3.0 Host 相关驱动）
+Driver代码路径：
+`drivers/usb/dwc3/*` （USB3.0 OTG Global  core和 Peripheral 相关驱动）
+`drivers/usb/host/xhci*` （USB3.0 Host 相关驱动）
 
-​	drivers/usb/dwc3 目录下的文件主要包括DWC3控制器core驱动、Device驱动以及Vendor Special驱动。其中，文件名带Vendor名字的为Vendor Special驱动，Rcockchip的驱动文件名为dwc3-rockchip.c，core.c主要负责DWC3控制器core的初始化，gadget.c是DWC3 Device驱动文件，主要实现控制器Device初始化、中断处理和数据传输等功能。
+drivers/usb/dwc3 目录下的文件主要包括DWC3控制器core驱动、Device驱动以及Vendor Special驱动。其中，文件名带Vendor名字的为Vendor Special驱动，Rcockchip的驱动文件名为dwc3-rockchip.c，core.c主要负责DWC3控制器core的初始化，gadget.c是DWC3 Device驱动文件，主要实现控制器Device初始化、中断处理和数据传输等功能。
 
-​	重要的结构体：
+重要的结构体：
 
 ```c
 
@@ -1200,9 +1186,9 @@ static const struct usb_gadget_ops dwc3_gadget_ops = {
 
 ```
 
-​	drivers/usb/host目录下文件名含有“xhci“的为XHCI控制器相关驱动，其中xhci-plat.c是注册驱动的初始化文件，xhci.c是控制器基础文件，实现USB core层HCD接口和USB传输控制的相关操作，xhci-ring.c是控制器数据结构TRB以及传输机制相关的文件，实现具体的传输功能，xhci-hub.c是控制器自带的USB 3.0 root Hub驱动。
+drivers/usb/host目录下文件名含有“xhci“的为XHCI控制器相关驱动，其中xhci-plat.c是注册驱动的初始化文件，xhci.c是控制器基础文件，实现USB core层HCD接口和USB传输控制的相关操作，xhci-ring.c是控制器数据结构TRB以及传输机制相关的文件，实现具体的传输功能，xhci-hub.c是控制器自带的USB 3.0 root Hub驱动。
 
-​	重要的结构体：
+重要的结构体：
 
 ```c
 
@@ -1285,9 +1271,9 @@ rx_fifo_queue          transfer_type    tx_request_queue
 
 - **host_testmode**
 
-  ​Enables USB2/USB3 HOST Test Modes (U2: J, K SE0 NAK, Test_packet,Force Enable; U3: Compliance mode)
+  Enables USB2/USB3 HOST Test Modes (U2: J, K SE0 NAK, Test_packet,Force Enable; U3: Compliance mode)
 
-  ​For example， set testmodes for RK3399 board USB:
+  For example， set testmodes for RK3399 board USB:
 
 1. set Test packet for Type-C0 USB2 HOST:
 
@@ -1313,9 +1299,9 @@ echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
 cat /sys/kernel/debug/usb@fe800000/host_testmode
 ```
 
-​	The log maybe like this:
-​	U2: test_packet     /* means that U2 in test mode */
-​	U3: compliance mode /* means that U3 in test mode */
+The log maybe like this:
+​U2: test_packet     /* means that U2 in test mode */
+U3: compliance mode /* means that U3 in test mode */
 
 - **rk_usb_force_mode**
 
@@ -1369,29 +1355,27 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 
 - **tx_request_queue:** Dump the abaliable TxReqQ space of EP
 
-  ​
-
   Note：
 
-  ​XHCI驱动没有文件系统下的debug接口，但是可以通过在内核编译的config文件中增加CONFIG_DYNAMIC_DEBUG，打开debug信息。
+  XHCI驱动没有文件系统下的debug接口，但是可以通过在内核编译的config文件中增加CONFIG_DYNAMIC_DEBUG，打开debug信息。
 
 #### 5.2.2 USB 2.0 OTG drivers
 
 ##### 5.2.2.1 USB 2.0 OTG 驱动说明
 
-​	USB 2.0 OTG使用的是Synopsys 方案，即使用DWC2控制器同时实现Host和Device功能，DWC2控制器通过检测OTG口上ID脚的电平切换模式，ID脚的电平变化触发控制器ID脚中断，然后由软件切换到对应模式。
+USB 2.0 OTG使用的是Synopsys 方案，即使用DWC2控制器同时实现Host和Device功能，DWC2控制器通过检测OTG口上ID脚的电平切换模式，ID脚的电平变化触发控制器ID脚中断，然后由软件切换到对应模式。
 
-​	USB2.0 OTG使用两种驱动版本，一个是upstream 版，驱动在dwc2目录下，主要从upstream开源项目更新代码，另一个是内部版，驱动在dwc_otg_310目录下，由RK内部自行维护，还未upstream。
+USB2.0 OTG使用两种驱动版本，一个是upstream 版，驱动在dwc2目录下，主要从upstream开源项目更新代码，另一个是内部版，驱动在dwc_otg_310目录下，由RK内部自行维护，还未upstream。
 
-​	Driver 代码路径：
+Driver 代码路径：
 
-​	upstream 版：`drivers/usb/dwc2/*`
+upstream 版：`drivers/usb/dwc2/*`
 
-​	内部版：`drivers/usb/dwc_otg_310/*`
+内部版：`drivers/usb/dwc_otg_310/*`
 
-​	drivers/usb/dwc2目录下的文件可以分成三类，一类是文件名包含“hcd”的Host相关驱动，负责Host初始化、Host中断处理和Host数据传输操作，一类是Device相关文件gadget.c，负责Device初始化、中断处理、数据传输的工作，其余的文件是控制器core层和引导驱动，包括通用接口、通用中断处理和控制器初始化等功能。
+drivers/usb/dwc2目录下的文件可以分成三类，一类是文件名包含“hcd”的Host相关驱动，负责Host初始化、Host中断处理和Host数据传输操作，一类是Device相关文件gadget.c，负责Device初始化、中断处理、数据传输的工作，其余的文件是控制器core层和引导驱动，包括通用接口、通用中断处理和控制器初始化等功能。
 
-​	drivers/usb/dwc_otg_310目录下有多个dwc_otg开头的文件，分成三类，一类是文件名包含“hcd”的host相关驱动文件，主要负责Host初始化、Host中断处理和Host数据传输相关操作，一类是文件名包含“pcd”的Device相关驱动，主要负责Device初始化、Device中断处理和Device数据传输相关操作，还有一类是Host Device通用驱动，主要包括通用属性配置、通用中断处理、通用控制器接口、控制器初始化以及“usbdev”开头的PHY相关的设置文件。
+drivers/usb/dwc_otg_310目录下有多个dwc_otg开头的文件，分成三类，一类是文件名包含“hcd”的host相关驱动文件，主要负责Host初始化、Host中断处理和Host数据传输相关操作，一类是文件名包含“pcd”的Device相关驱动，主要负责Device初始化、Device中断处理和Device数据传输相关操作，还有一类是Host Device通用驱动，主要包括通用属性配置、通用中断处理、通用控制器接口、控制器初始化以及“usbdev”开头的PHY相关的设置文件。
 
 ##### 5.2.2.2 USB 2.0 OTG 调试接口
 
@@ -1508,15 +1492,15 @@ echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 
 ##### 5.2.3.1 USB 2.0 HOST驱动说明
 
-​	Driver代码路径：
+Driver代码路径：
 
-​	`drivers/usb/host/ehci*` （USB 2.0 Host驱动）
+`drivers/usb/host/ehci*` （USB 2.0 Host驱动）
 
-​	`drivers/usb/host/ohci*` （USB1.1/1.0 Host驱动）
+`drivers/usb/host/ohci*` （USB1.1/1.0 Host驱动）
 
-​	EHCI控制器使用的是Upstream 版驱动，host 目录下文件名包含“ehci”的为EHCI控制器相关文件，其中文件名包含厂商名字的为产商引导文件，目前RK没有使用厂商引导文件，而是使用通用引导文件ehci-platform.c进行驱动的加载与初始化。ehci-hcd.c负责控制整个控制器，实现USB core层HCD控制器接口，ehci-mem.c与ehci-sched.c是控制器数据传输结构与传输调度的相关代码，ehci-hub.c是EHCI控制器root hub驱动代码。
+EHCI控制器使用的是Upstream 版驱动，host 目录下文件名包含“ehci”的为EHCI控制器相关文件，其中文件名包含厂商名字的为产商引导文件，目前RK没有使用厂商引导文件，而是使用通用引导文件ehci-platform.c进行驱动的加载与初始化。ehci-hcd.c负责控制整个控制器，实现USB core层HCD控制器接口，ehci-mem.c与ehci-sched.c是控制器数据传输结构与传输调度的相关代码，ehci-hub.c是EHCI控制器root hub驱动代码。
 
-​	重要的结构体：
+重要的结构体：
 
 ```c
 
@@ -1565,9 +1549,9 @@ static const struct hc_driver ehci_hc_driver = {
 
 ```
 
-​	OHCI控制器使用的也是Upstream版驱动，host目录下文件名包含“ohci”的是OHCI控制器相关文件，其中文件名包含厂商名字的为厂商引导文件，与EHCI一样，RK使用ohci-platform.c进行驱动加载和初始化。类似的，ohci-hcd.c实现USB core层的HCD控制器接口，ohci-mem.c和ohci-q.c是传输数据结构和传输调度相关代码，ohci-hub.c是OHCI控制器root hub驱动代码。
+OHCI控制器使用的也是Upstream版驱动，host目录下文件名包含“ohci”的是OHCI控制器相关文件，其中文件名包含厂商名字的为厂商引导文件，与EHCI一样，RK使用ohci-platform.c进行驱动加载和初始化。类似的，ohci-hcd.c实现USB core层的HCD控制器接口，ohci-mem.c和ohci-q.c是传输数据结构和传输调度相关代码，ohci-hub.c是OHCI控制器root hub驱动代码。
 
-​	重要的结构体：
+重要的结构体：
 
 ```c
 
@@ -1624,13 +1608,13 @@ async bandwidth periodic registers
 
 ```
 
-​	**async:** Dump a snapshot of the Async Schedule.
+**async:** Dump a snapshot of the Async Schedule.
 
-​	**bandwidth:** Dump the HS Bandwidth Table.
+**bandwidth:** Dump the HS Bandwidth Table.
 
-​	**periodic:** Dump a snapshot of the Periodic Schedule.
+**periodic:** Dump a snapshot of the Periodic Schedule.
 
-​	**registers:** Dump Capability Registers, Interrupt Params and Operational Registers.
+**registers:** Dump Capability Registers, Interrupt Params and Operational Registers.
 
 2. OHCI驱动debug接口
 
@@ -1652,19 +1636,19 @@ async periodic registers
 ---
 ## 6 Android USB Gadget配置
 
-​	Linux Kernel4.0，Android5.0及其后版本，USB Gadget均采用ConfigFs配置，同时内核也删除了Gadget目录下android.c文件。因此Gadget与之前配置方式有所差异。
+Linux Kernel4.0，Android5.0及其后版本，USB Gadget均采用ConfigFs配置，同时内核也删除了Gadget目录下android.c文件。因此Gadget与之前配置方式有所差异。
 
-​	关于如何使能Android ConfigFs Gadgets功能，请参考Linaro官网的说明：
+关于如何使能Android ConfigFs Gadgets功能，请参考Linaro官网的说明：
 
-​	[https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets](https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets)
+[https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets](https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets)
 
 ### 6.1 USB Gadget CONFIG
 
-​	请参阅[3.4 USB Gadget CONFIG](#3.4 USB Gadget CONFIG)
+请参阅[3.4 USB Gadget CONFIG](#3.4 USB Gadget CONFIG)
 
 ### 6.2 USB Gadget init script
 
-​	Android中与USB相关的script主要有：
+Android中与USB相关的script主要有：
 
 ```
 
@@ -1740,15 +1724,15 @@ on property:sys.usb.config=mtp,adb && property:sys.usb.configfs=1
 
 ```
 
-​	其中，Serialnumber、manufacturer、product三个属性由Android配置。如果Serialnumber没有配置成功，可能会造成ADB无法使用。
+其中，Serialnumber、manufacturer、product三个属性由Android配置。如果Serialnumber没有配置成功，可能会造成ADB无法使用。
 
-​	setprop sys.usb.controller用来使能Gadget对应的USB控制器，RK3399有两个OTG控制器，都可以支持USB Gadget功能，但由于当前USB Gadget driver内核架构只支持一个USB控制器，所以需要根据实际的产品需求来配置使能对应的USB控制器，如RK3399 Android SDK，默认使能Type-C 0 port的USB Gadget功能：
+setprop sys.usb.controller用来使能Gadget对应的USB控制器，RK3399有两个OTG控制器，都可以支持USB Gadget功能，但由于当前USB Gadget driver内核架构只支持一个USB控制器，所以需要根据实际的产品需求来配置使能对应的USB控制器，如RK3399 Android SDK，默认使能Type-C 0 port的USB Gadget功能：
 
 ```sh
 setprop sys.usb.controller "fe800000.usb"
 ```
 
-​	如果要使能Type-C 1 port的USB Gadget 功能，则修改为init.rk30board.usb.rc的sys.usb.controller为fe900000.usb，参考修改如下：
+如果要使能Type-C 1 port的USB Gadget 功能，则修改为init.rk30board.usb.rc的sys.usb.controller为fe900000.usb，参考修改如下：
 
 ```sh
 setprop sys.usb.controller "fe900000.usb"
@@ -1756,7 +1740,7 @@ setprop sys.usb.controller "fe900000.usb"
 
 ### 6.3 USB Gadget调试接口
 
-​	内核提供了设备节点来查看USB Gadget的关键配置信息，如下：
+内核提供了设备节点来查看USB Gadget的关键配置信息，如下：
 
 ```sh
 
@@ -1766,9 +1750,9 @@ bDeviceClass bDeviceSubClass bcdDevice       configs idProduct os_desc
 
 ```
 
-​	大部分节点的功能，可以直观地看出来，这里就不再赘述。
+大部分节点的功能，可以直观地看出来，这里就不再赘述。
 
-​	“UDC”可以确认当前Gadget对应的usb controller, 也可以用于手动选择对应的usb controller。如默认使用Type-C 0 USB Controller，要切换为使用Type-C 1 USB Controller，则手动执行如下的命令：
+“UDC”可以确认当前Gadget对应的usb controller, 也可以用于手动选择对应的usb controller。如默认使用Type-C 0 USB Controller，要切换为使用Type-C 1 USB Controller，则手动执行如下的命令：
 
 ```sh
 
@@ -1785,7 +1769,7 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 
 #### 7.1.1 USB 2.0 OTG正常开机
 
-​	开机未连线，默认为device模式。
+开机未连线，默认为device模式。
 
 ```c
 
@@ -1920,39 +1904,36 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 
 #### 7.2.1 硬件电路
 
-​	在同时使用多个控制器对应同一个USB口，或者一个控制器对应多个USB口时，可能会使用电子开关来切换USB信号及电源。需要确保不同控制器的电源控制是互相独立的，通过电子开关后，控制器与USB口之间的连接是有效的。
+在同时使用多个控制器对应同一个USB口，或者一个控制器对应多个USB口时，可能会使用电子开关来切换USB信号及电源。需要确保不同控制器的电源控制是互相独立的，通过电子开关后，控制器与USB口之间的连接是有效的。
 
-​	场景一:
+场景一:
 
-​	1个硬件USB口同时支持host和device功能，使用USB 2.0 HOST控制器作为host和USB 2.0 OTG控制器作为device，通过硬件电子开关进行切换。
+1个硬件USB口同时支持host和device功能，使用USB 2.0 HOST控制器作为host和USB 2.0 OTG控制器作为device，通过硬件电子开关进行切换。
 
-​	需要保证工作于host状态时，USB信号是切换到USB 2.0 HOST控制器，而VBUS是由HOST供电电路提供，而不影响device的VBUS电平检测电路。工作于device状态时，USB信号是切换到USB 2.0 OTG控制器，VBUS由PC通过USB线提供。
+需要保证工作于host状态时，USB信号是切换到USB 2.0 HOST控制器，而VBUS是由HOST供电电路提供，而不影响device的VBUS电平检测电路。工作于device状态时，USB信号是切换到USB 2.0 OTG控制器，VBUS由PC通过USB线提供。
 
-​	场景二:
+场景二:
 
-​	使用一个USB 2.0 OTG控制器，对应使用两个硬件USB口分别是host和device。通过电子开关进行信号切换。
+使用一个USB 2.0 OTG控制器，对应使用两个硬件USB口分别是host和device。通过电子开关进行信号切换。
 
-​	工作于HOST状态时，USB 2.0 OTG的DP/DM信号线是切换到HOST口，且HOST口VBUS提供5V 500MA的供电；工作于device状态时DP/DM信号是切换到device口，VBUS电平检测电路只检测PC提供的5V供电。
+工作于HOST状态时，USB 2.0 OTG的DP/DM信号线是切换到HOST口，且HOST口VBUS提供5V 500MA的供电；工作于device状态时DP/DM信号是切换到device口，VBUS电平检测电路只检测PC提供的5V供电。
 
 #### 7.2.2 Device功能异常分析
 
-​	USB Device正常连接至PC的现象主要有：
+USB Device正常连接至PC的现象主要有：
 
 1. 串口输出正常log，见[7.1.2 USB 2.0 Device连接](#7.1.2 USB 2.0 Device连接)；
-
 2. PC出现盘符，但默认不能访问；(Windows 7和MAC OS可能只出现在设备管理器)；
-
 3. 设备UI状态栏出现”USB已连接”标识；
-
 4. 打开USB已连接的提示窗口，默认为charger only模式，选择“MTP”或者“PTP”后，PC可以访问盘符。
 
-   **USB Device异常现象的排查方法：**
+**USB Device异常现象的排查方法：**
 
-   **异常1：**连接USB时串口完全没有log
+**异常1：**连接USB时串口完全没有log
 
-   排查方法：首先，通过调试接口，确认USB控制器是否工作在device状态；然后，检查USB硬件电路和信号；最后，测量USB_DET信号电压，USB连接时应该由低到高。
+排查方法：首先，通过调试接口，确认USB控制器是否工作在device状态；然后，检查USB硬件电路和信号；最后，测量USB_DET信号电压，USB连接时应该由低到高。
 
-   **异常2：**连接失败，PC显示不可识别设备，log一直重复打印：
+**异常2：**连接失败，PC显示不可识别设备，log一直重复打印：
 
 ```c
 
@@ -1962,63 +1943,62 @@ echo fe900000.dwc3 > config/usb_gadget/g1/UDC
 
 ```
 
-​	排查方法：没有正常log中的后面几条信息。一般为USB硬件信号差，无法完成枚举。
+排查方法：没有正常log中的后面几条信息。一般为USB硬件信号差，无法完成枚举。
 
-​	**异常3：**连接PC后，kernel log正常，并且设备为出现USB已连接”标识，但PC无法访问设备
+**异常3：**连接PC后，kernel log正常，并且设备为出现USB已连接”标识，但PC无法访问设备
 
-​	排查方法：驱动工作正常，请先确认是否有选择USB为“MTP”或“PTP”，如果已选择，则可能是Android层异常，请截取logcat内容，并请负责维护vold/mtpserver代码的Android工程师帮忙debug。
+排查方法：驱动工作正常，请先确认是否有选择USB为“MTP”或“PTP”，如果已选择，则可能是Android层异常，请截取logcat内容，并请负责维护vold/mtpserver代码的Android工程师帮忙debug。
 
-​	**异常4：**连接PC正常，并能正常访问，拷贝文件过程中提示拷贝失败。
+**异常4：**连接PC正常，并能正常访问，拷贝文件过程中提示拷贝失败。
 
-​	排查方法：首先，测试下USB眼图，并使用USB分析仪抓取数据流进行分析。其次，排查是否为Flash/SD卡读写超时，log一般为连接Window XP时约10S出现一次重新连接的log。最后，排斥是否为Flash/SD磁盘分区出错，导致每次拷贝到同一个点时失败。可使用命令检查并修复磁盘分区。假设挂载的磁盘分区为E，则打开Windows命令提示符窗口，输入命令：chkdsk E: /f
+排查方法：首先，测试下USB眼图，并使用USB分析仪抓取数据流进行分析。其次，排查是否为Flash/SD卡读写超时，log一般为连接Window XP时约10S出现一次重新连接的log。最后，排斥是否为Flash/SD磁盘分区出错，导致每次拷贝到同一个点时失败。可使用命令检查并修复磁盘分区。假设挂载的磁盘分区为E，则打开Windows命令提示符窗口，输入命令：chkdsk E: /f
 
-​	**异常5：**USB线拔掉后UI状态栏仍然显示“USB已连接”，或USB线拔掉时只有以下log：
+**异常5：**USB线拔掉后UI状态栏仍然显示“USB已连接”，或USB线拔掉时只有以下log：
 
 ```c
 [25.330017] DWC_OTG: USB SUSPEND
 ```
 
-​	而没有下面的log：
+而没有下面的log：
 
 ```c
 [25.514407] DWC_OTG: session end intr, softdisconnect
 ```
 
-​	排查方法：VBUS异常，一直为高，会影响USB检测及系统休眠唤醒，请硬件工程师排查问题。
+排查方法：VBUS异常，一直为高，会影响USB检测及系统休眠唤醒，请硬件工程师排查问题。
 
 #### 7.2.3 Host功能异常分析
 
-​	USB HOST正常工作情况如下：
+USB HOST正常工作情况如下：
 
 1. 首先 HOST电路提供5V，至少500mA的供电；
-
 2. 如果有USB设备连接进来，串口首先会打印HOST枚举USB设备的log(见[7.1.4](#_6.1.4_USB 2.0_LS设备)至[7.1.7](#_USB 2.0_HOST-LS/FS/HS设备断开log))，表明USB设备已经通过HOST的标准设备枚举；
 
-   **USB HOST异常现象的排查方法：**
+**USB HOST异常现象的排查方法：**
 
-   **异常1：**HOST口接入设备后，串口无任何打印：
+**异常1：**HOST口接入设备后，串口无任何打印：
 
-   排查方法：首先需要确认通过电子开关后的电路连接正确；然后，确认控制器工作于HOST状态，并确认供电电路正常。
+排查方法：首先需要确认通过电子开关后的电路连接正确；然后，确认控制器工作于HOST状态，并确认供电电路正常。
 
-   **异常2：**串口有HOST枚举USB设备内容，但是没有出现class驱动的打印信息。
+**异常2：**串口有HOST枚举USB设备内容，但是没有出现class驱动的打印信息。
 
-   排查方法：Kernel没有加载class驱动，需要重新配置kernel，加入对应class驱动支持。
+排查方法：Kernel没有加载class驱动，需要重新配置kernel，加入对应class驱动支持。
 
-   **异常3：**kernel打印信息完整(USB标准枚举信息及CLASS驱动信息)，已在Linux对应位置生成节点，但是Android层无法使用。
+**异常3**：kernel打印信息完整(USB标准枚举信息及CLASS驱动信息)，已在Linux对应位置生成节点，但是Android层无法使用。
 
-   排查方法：Android层支持不完善，如U盘在kernel挂载完成/dev/block/sda节点后，需要Android层vold程序将可存储介质挂载到/udisk提供媒体库，资源管理器等访问，同样鼠标键盘等HID设备也需要Android层程序支持。
+排查方法：Android层支持不完善，如U盘在kernel挂载完成/dev/block/sda节点后，需要Android层vold程序将可存储介质挂载到/udisk提供媒体库，资源管理器等访问，同样鼠标键盘等HID设备也需要Android层程序支持。
 
-   U盘枚举出现/dev/block/sda后仍然无法使用，一般是vold.fstab中U盘的mount路径有问题，如果vold.fstab代码如下(系统起来后可直接cat/system/etc/vold.fstab 查看)：
+U盘枚举出现/dev/block/sda后仍然无法使用，一般是vold.fstab中U盘的mount路径有问题，如果vold.fstab代码如下(系统起来后可直接cat/system/etc/vold.fstab 查看)：
 
 ```sh
 dev_mount udisk /mnt/udisk 1 /devices/platform/usb20_HOST/usb2
 ```
 
-​	而实际的device路径可能是在usb20_OTG控制器下或者最后的字段为usb1.
+而实际的device路径可能是在usb20_OTG控制器下或者最后的字段为usb1.
 
-​	如果设备属于这种情况的无法正常使用，需要联系Android工程师帮忙debug。
+如果设备属于这种情况的无法正常使用，需要联系Android工程师帮忙debug。
 
-​	**异常4：**串口一直打印如下提示字节没有对齐的类似log：
+**异常4：**串口一直打印如下提示字节没有对齐的类似log：
 
 ```c
 
@@ -2027,13 +2007,13 @@ DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte
 
 ```
 
-​	排查方法：RK平台的USB驱动要求在提交URB传输请求时， URB的成员transfer_buffer地址必须为四字节对齐，否则会提示上述错误log。
+排查方法：RK平台的USB驱动要求在提交URB传输请求时， URB的成员transfer_buffer地址必须为四字节对齐，否则会提示上述错误log。
 
-​	如：函数usb_control_msg的data参数必须要四字节对齐。
+如：函数usb_control_msg的data参数必须要四字节对齐。
 
-​	**异常5：**OTG口作为host时，无法识别接入的设备
+**异常5：**OTG口作为host时，无法识别接入的设备
 
-​	排查方法：首先，检查Kernel的OTG配置是否正确；然后，检查OTG电路的ID电平(作host，为低电平)和VBUS 5V供电是否正常；最后，如果确认1和2都正常，仍无法识别设备，请提供设备插入后无法识别的错误log给我们。
+排查方法：首先，检查Kernel的OTG配置是否正确；然后，检查OTG电路的ID电平(作host，为低电平)和VBUS 5V供电是否正常；最后，如果确认1和2都正常，仍无法识别设备，请提供设备插入后无法识别的错误log给我们。
 
 #### 7.2.4 USB Camera异常分析
 
@@ -2048,49 +2028,49 @@ DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte
 
 #### 7.2.5 USB充电检测
 
-​	USB2 PHY支持BC1.2标准的充电检测，代码实现请参考drivers/phy/rockchip/phy-rockchip-inno-usb2.c， 可以检测SDP/CDP/标准DCP(D+/D-短接)/非标准DCP(D+/D-未短接)四种充电类型。
+USB2 PHY支持BC1.2标准的充电检测，代码实现请参考drivers/phy/rockchip/phy-rockchip-inno-usb2.c， 可以检测SDP/CDP/标准DCP(D+/D-短接)/非标准DCP(D+/D-未短接)四种充电类型。
 
-​	SDP —— Standard Downstream Port
+**SDP** —— Standard Downstream Port
 
-​	根据USB 2.0规范，当USB外设处于未连接(un-connect)或休眠(suspend)的状态时，一个Standard Downstream Port可向该外设提供不超过2.5mA的平均电流;当外设处于已经连接并且未休眠的状态时，电流可以至最大100mA(USB 3.0 150mA);而当外设已经配置(configured )并且未休眠时，最大可从VBUS获得500mA(USB 3.0 900mA)电流。
+根据USB 2.0规范，当USB外设处于未连接(un-connect)或休眠(suspend)的状态时，一个Standard Downstream Port可向该外设提供不超过2.5mA的平均电流;当外设处于已经连接并且未休眠的状态时，电流可以至最大100mA(USB 3.0 150mA);而当外设已经配置(configured )并且未休眠时，最大可从VBUS获得500mA(USB 3.0 900mA)电流。
 
-​	CDP —— Charging Downstream Port
+**CDP** —— Charging Downstream Port
 
-​	即兼容 USB 2.0 规范，又针对 USB 充电作出了优化的下行USB 接口，提供最大1.5A的供电电流，满足大电流快速充电的需求。
+即兼容 USB 2.0 规范，又针对 USB 充电作出了优化的下行USB 接口，提供最大1.5A的供电电流，满足大电流快速充电的需求。
 
-​	DCP —— Dedicated Charging Port (USB Charger)
+**DCP** —— Dedicated Charging Port (USB Charger)
 
-​	BC1.2 spec要求将USB Charger中的D+和D-进行短接，以配合USB外设的识别动作，但它不具备和USB设备通信的能力。
+BC1.2 spec要求将USB Charger中的D+和D-进行短接，以配合USB外设的识别动作，但它不具备和USB设备通信的能力。
 
-​	USB充电类型检测流程见下图所示：
+USB充电类型检测流程见下图所示：
 
 ![USB-065-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-065-kernel4.4.png)
 
 ​									图 7‑1 USB充电检测流程
 
-​	典型的SDP 检测过程中，D+/D-波形如下图所示：
+典型的SDP 检测过程中，D+/D-波形如下图所示：
 
 ![USB-066-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-066-kernel4.4.png)
 
 ​									图 7‑2 SDP检测波形
 
-​	典型的DCP 检测过程中，D+/D-波形如下图所示：
+典型的DCP 检测过程中，D+/D-波形如下图所示：
 
  ![USB-067-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-067-kernel4.4.png)
 
 ​									图 7‑3 DCP检测波形
 
-​	如果连接USB充电器，发现充电慢，有可能是DCP被误检测为SDP，导致充电电流被设置为500mA。当USB线连接不稳定或者充电检测驱动出错，都可能会产生该问题。解决方法：
+如果连接USB充电器，发现充电慢，有可能是DCP被误检测为SDP，导致充电电流被设置为500mA。当USB线连接不稳定或者充电检测驱动出错，都可能会产生该问题。解决方法：
 
-​	抓取USB充电器连接的log，通过log的提示判断检测的充电类型，正常应为DCP；
+抓取USB充电器连接的log，通过log的提示判断检测的充电类型，正常应为DCP；
 
-​	如果连接的是USB充电器，但log提示为SDP，则表示发生了误检测。请先更换USB线测试，并使用万用表确认D+/D-是否短接。如果仍无法解决，请将检测的log发给我们测试。同时，如果有条件，请使用示波器抓USB插入时的D+/D-波形，并连同log一起发送给我们分析和定位问题。
+如果连接的是USB充电器，但log提示为SDP，则表示发生了误检测。请先更换USB线测试，并使用万用表确认D+/D-是否短接。如果仍无法解决，请将检测的log发给我们测试。同时，如果有条件，请使用示波器抓USB插入时的D+/D-波形，并连同log一起发送给我们分析和定位问题。
 
-​	如果连接的是USB充电器，并且log提示为DCP，但充电仍然很慢，则表明软件检测正常，可能是充电IC或者电池的问题。
+如果连接的是USB充电器，并且log提示为DCP，但充电仍然很慢，则表明软件检测正常，可能是充电IC或者电池的问题。
 
 ### 7.3 PC驱动问题
 
-​	所有USB设备要在PC上正常工作都是需要驱动的，有些驱动是标准且通用的，而有些驱动是需要额外安装的。对于RK的设备连接到PC后，需要安装驱动的情况有两种的设备，需要分别选择对应的驱动。
+所有USB设备要在PC上正常工作都是需要驱动的，有些驱动是标准且通用的，而有些驱动是需要额外安装的。对于RK的设备连接到PC后，需要安装驱动的情况有两种的设备，需要分别选择对应的驱动。
 
 1. 生成后未烧写的裸片或者进入升级模式后的RK设备，会以rockUSB的模式连接到PC，需要在PC端使用RK平台专门的驱动安装助手DriverAssitant（RK3399需要v4.4支持）安装驱动才能识别到USB设备；
 
