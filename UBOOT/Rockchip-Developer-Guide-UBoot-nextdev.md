@@ -1,13 +1,13 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.23
+发布版本：1.30
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
 ​	Kever Yang <kever.yang@rock-chips.com>
 ​	Jon Lin jon.lin@rock-chips.com
 ​	Chen Liang cl@rock-chips.com
-	Ping Lin <hisping.lin@rock-chips.com>
+​	Ping Lin <hisping.lin@rock-chips.com>
 
 日期：2019.03
 
@@ -59,6 +59,7 @@
 | 2019-01-21 | V1.21    | 陈健洪   | 增加dtbo/amp/dvfs宽温/fdt命令说明                            |
 | 2019-03-05 | V1.22    | 林平     | 增加optee client说明                                         |
 | 2019-03-25 | V1.23    | 陈健洪/朱志展   | 增加kernel cmdline说明                            |
+| 2019-03-25 | V1.30    | 陈健洪   | 精简和整理文档、纠正排版问题、完善和调整部分章节内容               |
 
 ---
 [TOC]
@@ -71,163 +72,155 @@ next-dev是Rockchip从U-Boot官方的v2017.09正式版本中切出来进行开�
 目前支持的功能主要有：
 
 - 支持RK Android平台的固件启动；
-- 支持最新Android AOSP(如GVA)固件启动；
+- 支持Android AOSP(如GVA)固件启动；
 - 支持Linux Distro固件启动；
 - 支持Rockchip miniloader和SPL/TPL两种pre-loader引导；
 - 支持LVDS、EDP、MIPI、HDMI等显示设备；
-- 支持Emmc、Nand Flash、SPI Nand flash、SPI NOR flash、SD卡、 U盘等存储设备启动；
+- 支持eMMC、Nand Flash、SPI Nand flash、SPI NOR flash、SD卡、 U盘等存储设备启动；
 - 支持FAT、EXT2、EXT4文件系统；
 - 支持GPT、RK parameter分区格式；
 - 支持开机logo显示、充电动画显示，低电管理、电源管理；
-- 支持I2C、PMIC、CHARGE、GUAGE、USB、GPIO、PWM、GMAC、EMMC、NAND、中断等驱动；
-- 支持RockUSB 和 Google Fastboot两种USB gadget烧写EMMC；
-- 支持Mass storage, ethernet, HID等USB设备；
+- 支持I2C、PMIC、CHARGE、GUAGE、USB、GPIO、PWM、GMAC、eMMC、NAND、中断等驱动；
+- 支持RockUSB 和 Google Fastboot两种USB gadget烧写eMMC；
+- 支持Mass storage、ethernet、HID等USB设备；
 - 支持使用kernel的dtb；
 - 支持dtbo功能；
 
-U-Boot的doc目录下提供了很丰富的README文档，它们向开发者介绍了U-Boot里各个功能模块的概念、设计理念、实现方法等，建议读者好好利用这些文档提高开发效率。
+U-Boot的doc目录向用户提供了丰富的文档，介绍了U-Boot里各个功能模块的概念、设计理念、实现方法等，建议用户阅读这些文档提高开发效率。
 
 ## 2. 平台架构
 
-### 2.1 DM(Driver Model)
+### 2.1 DM架构
 
-这是目前U-Boot的一套driver-device的标准开发模型，它和kernel的driver-device模式是非常类似的。U-Boot使用这套DM模型对各类设备进行规范化管理：驱动框架对应uclass，设备驱动对应driver，设备对应device。Rockchip提供的这套U-Boot也都遵循现有的标准驱动框架进行开发。
+DM（Driver Model）是U-Boot标准的device-driver开发模型，跟kernel的device-driver模型非常类似。U-Boot使用DM对各类设备和驱动进行管理，Rockchip提供的这套U-Boot也遵循DM框架进行开发。建议读者先阅读文档理解DM，同时关注实现DM架构的相关代码。
 
-如下是README文档中的片段：
+README：
+
+```
+./doc/driver-model/README.txt
+```
 
 ```
 Terminology
 -----------
 
 Uclass - a group of devices which operate in the same way. A uclass provides
-        a way of accessing individual devices within the group, but always
-        using the same interface. For example a GPIO uclass provides
-        operations for get/set value. An I2C uclass may have 10 I2C ports,
-        4 with one driver, and 6 with another.
+         a way of accessing individual devices within the group, but always
+         using the same interface. For example a GPIO uclass provides
+         operations for get/set value. An I2C uclass may have 10 I2C ports,
+         4 with one driver, and 6 with another.
 
 Driver - some code which talks to a peripheral and presents a higher-level
-        interface to it.
+         interface to it.
 
 Device - an instance of a driver, tied to a particular port or peripheral.
 ```
 
-建议读者先阅读U-Boot自带的相关文档，对DM模型有一定了解后方便对本文档后续的理解和U-Boot开发。
+总结：
+
+- uclass：设备驱动框架
+- driver： 驱动
+- device：设备
+
+### 2.2 平台架构文件
+
+平台架构文件主要是Rockchip的芯片级代码，本章重点介绍重要文件的位置，请用户深入了解其作用。
+
+1. 平台目录
 
 ```
-./doc/driver-model/README.txt
+./arch/arm/include/asm/arch-rockchip/
+./arch/arm/mach-rockchip/
+./board/rockchip/
 ```
 
-### 2.2 SoC架构文件
-
-各SoC的架构级文件在如下各自的芯片目录里，主要都是芯片级别的初始化代码。一般情况下普通用户不需要、也不要轻易修改它们。
-
-**头文件：**
+2. 平台头文件：
 
 ```
 ./arch/arm/include/asm/arch-rockchip/qos_rk3288.h
-./arch/arm/include/asm/arch-rockchip/grf_rk3188.h
-./arch/arm/include/asm/arch-rockchip/pmu_rk3288.h
 ./arch/arm/include/asm/arch-rockchip/grf_rk3368.h
-./arch/arm/include/asm/arch-rockchip/grf_rk322x.h
+./arch/arm/include/asm/arch-rockchip/pmu_rk3399.h
 ......
 ```
-
-**驱动文件：**
-
-```
-./arch/arm/mach-rockchip/rk3036/rk3036.c
-./arch/arm/mach-rockchip/rk3066/sdram_rk3036.c
-./arch/arm/mach-rockchip/rk3128/rk3128.c
-./arch/arm/mach-rockchip/rk3188/rk3188.c
-./arch/arm/mach-rockchip/rk322x/rk322x.c
-......
-```
-
-### 2.3 board架构文件
-
-由于每个项目硬件上的设计不同，Upstream U-Boot的设计是每块板子一份board实体，所以会存在不同的board驱动文件，参考RK3288的板子可以明显看出这个结构。Rockchip为了简化板级支持，引入支持kernel dtb的feature，在U-Boot阶段共用eMMC dts和驱动，而在PMIC/regulator、Display、IOMUX等存在板级差异的模块直接使用kernel dtb，使U-Boot可以一颗芯片共用一个evb配置。
-
-**头文件：**
 
 ```
 ./include/configs/rk3368_common.h
-./include/configs/evb_rk3288_rk1608.h
-./include/configs/tinker_rk3288.h
-./include/configs/evb_rk3288.h
-./include/configs/vyasa-rk3288.h
+./include/configs/rk3328_common.h
+./include/configs/rk3128_common.h
 ......
 ```
 
-**驱动文件：**
-
 ```
-./board/rockchip/evb_px5/evb-px5.c
-./board/rockchip/evb_rk3036/evb_rk3036.c
-./board/rockchip/evb_rk3128/evb_rk3128.c
-./board/rockchip/evb_rk3229/evb_rk3229.c
-./board/rockchip/sheep_rk3368/sheep_rk3368.c
+./include/configs/evb_rk3368.h
+./include/configs/evb_rk3328.h
+./include/configs/evb_rk3128.h
 ......
 ```
 
-**统一后的board文件：**
+3. 平台驱动文件：
+
+```
+./arch/arm/mach-rockchip/rk3288/rk3288.c
+./arch/arm/mach-rockchip/rk3368/rk3368.c
+./arch/arm/mach-rockchip/rk3399/rk3399.c
+......
+```
+
+```
+./board/rockchip/evb_rk3288/evb_rk3288.c
+./board/rockchip/evb_rk3368/evb_rk3368.c
+./board/rockchip/evb_rk3399/evb_rk3399.c
+......
+```
+
+4. 公共板级文件（核心！）：
 
 ```
 ./arch/arm/mach-rockchip/board.c
 ```
 
-有了这个统一的board.c文件后，目前大部分平台都可以走通用的板级初始化流程，我们在这个流程里使能了kenrel dtb方便兼容板级差异。
-
-**板级指导文档：**
+5. README：
 
 ```
+./board/rockchip/evb_px5/README
 ./board/rockchip/evb_rv1108/README
 ./board/rockchip/sheep_rk3368/README
-./board/rockchip/gva_rk3229/README
-./board/rockchip/evb_rk3399/README
-./board/rockchip/evb_rk3328/README
 ......
 ```
 
-这些文档可以有效指导开发者如何让自己的机器正常运行起来。
-
-### 2.4 defconfig文件
-
-每一款board都有相对应的defconfig文件：
+6. defconfig：
 
 ```
-./configs/evb-rk3328_defconfig
-./configs/evb-rk3036_defconfig
-./configs/evb-rk3229_defconfig
-./configs/firefly-rk3288_defconfig
-./configs/evb-rk3399_defconfig
+./configs/rk3328_defconfig
+./configs/rk3036_defconfig
+./configs/rk322x_defconfig
 ......
 ```
 
-如果要新增一个defconfig文件，命名方面并没有特殊的格式要求，建议遵循现有大多数defconfig的命名方式：[board]-[chip]_defconfig。
+### 2.3 DTB的使用
 
-### 2.5 dtb的使用
+请务必先阅读[9. U-Boot和kernel DTB支持](#9. U-Boot和kernel DTB支持)，了解引入kernel dtb的相关技术背景。
 
-#### 2.5.1 启用kernel dtb
+说明：本文档中提到的“kernel dtb”一词除了表示名词含义：kernel的dtb文件，也表示一种技术：U-Boot阶段使用kernel dtb。
 
-U-Boot的启动从时间先后来划分，可以分为两级启动阶段。
+U-Boot的启动分为两个阶段：before relocate和after relocate。如下针对启用/未启用kernel dtb的情况，说明两个启动阶段中dtb的使用情况。
 
-1. 第一级（relocate之前）：使用的是U-Boot自己的dtb。
+#### 2.3.1 启用kernel dtb
 
-一般第一阶段**只需要加载emmc、nand、cru、grf、uart等模块**，为了加快设备树的解析过程，dts里一般只去使能会用到的节点（板级差异的信息，如：电源、显示、clk等都会从第二阶段dtb中获取）。
+**第一阶段（before relocate）：使用U-Boot的最简dt-spl.dtb**
 
-需要特别注意：
+因为第一阶段通常只加载MMC、NAND、CRU、GRF、UART等基础模块，所以只需要一个最简dtb即可，这样还能节省dtb的扫描时间。U-Boot 自己的dts在编译阶段只保留带有"u-boot,dm-pre-reloc"属性的节点，由此得到一个dt.dtb。然后再删除dt.dtb中被CONFIG_OF_SPL_REMOVE_PROPS指定的property，最后得到一个最简dt-spl.dtb（CONFIG_OF_SPL_REMOVE_PROPS在defconfig中定义）。
 
-- 第一阶段为了速度和效率，会对dtb做特殊处理，删除一些属性，例如：pinctrl-0 pinctrl-names clock-names interrupt-parent等，可以通过defconfig里的CONFIG_OF_SPL_REMOVE_PROPS指定。
-- 第一阶段要使能的节点除了指明 "status=okay" 之外，还必须增加"u-boot,dm-pre-reloc;"属性，否则解析设备树时该节点会被忽略。这部分一般都在平台相关的[chip]-u-boot.dtsi里定义，例如：
+通常把带有"u-boot,dm-pre-reloc"的节点放在各平台的rkxxx-u-boot.dtsi中：
 
 ```
-./arch/arm/dts/px30-u-boot.dtsi
+./arch/arm/dts/rk3328-u-boot.dtsi
 ./arch/arm/dts/rk3399-u-boot.dtsi
 ./arch/arm/dts/rk3128-u-boot.dtsi
 ......
 ```
 
-./arch/arm/dts/px30-u-boot.dtsi如下：
+./arch/arm/dts/rk3399-u-boot.dtsi：
 
 ```
 ......
@@ -245,39 +238,37 @@ U-Boot的启动从时间先后来划分，可以分为两级启动阶段。
 ......
 ```
 
-2. 第二级启动（relocate之后）：使用的是kernel的dtb。
+**第二阶段（after relocate）：使用kernel的dtb**
 
-一旦进入第二级阶段后，启动流程里会迅速切到kernel的dtb(取决于CONFIG_USING_KERNEL_DTB是否使能），后续更多的驱动初始化都是使用kernel的dtb信息。
+U-Boot进入第二阶段后，在./arch/arm/mach-rockchip/board.c的board_init()中加载并切换到kernel dtb，后续所有外设的初始化都使用kernel dtb信息，因此一份U-Boot固件可以兼容不同板子的硬件差异。
 
-一般而言，用户可能会涉及第二阶段的修改，第一阶比较少需要改动。关于kernel dtb的更详细内容，可以参考本文的 [9. U-Boot和kernel DTB支持](#9. U-Boot和kernel DTB支持) 。
+#### 2.3.2 关闭kernel dtb
 
-#### 2.5.2 关闭kernel dtb
+U-Boot两个阶段都使用U-Boot自己的dtb（非最简dtb，即所有节点都是有效的）。
 
-如果出于某些特殊原因想要关闭kernel dtb的功能，即让U-Boot始终都使用U-Boot自身的dtb，则有如下操作点和注意事项。以rk3399为例，使用的是rk3399-evb.dts和rk3399_defconfig：
+### 2.4 平台配置
 
-- rk3399_defconfig：关闭CONFIG_USING_KERNEL_DTB；
-- rk3399-evb.dts：保留#include "rk3399-u-boot.dtsi"、chosen节点内容、各节点中的“u-boot,dm-pre-reloc;”属性（这些部分都是U-Boot特殊自用的内容，需要保留）；
-- 在第二点保留项的基础上，再追加kernel dts的内容**（注意：是追加，不是覆盖！）**。
+本章针对rockchip-common.h、rkxxx_common.h、evb_rkxxx.h定义的重要配置给出说明。
 
-### 2.6 宏配置
+- RKIMG_DET_BOOTDEV：存储类型探测命令，以逐个扫描的方式探测当前的存储设备类型
+- RKIMG_BOOTCOMMAND：kernel启动命令
+- ENV_MEM_LAYOUT_SETTINGS：固件加载地址：包括ramdisk/fdt/kernel
+- PARTS_DEFAULT：默认的GPT分区表，在某些情况下，当存储中没有发现有效的GPT分区表时被使用
+- ROCKCHIP_DEVICE_SETTINGS：外设相关命令，主要是指定stdio（一般会包含显示模块启动命令）
+- BOOTENV：distro方式启动linux时的启动设备探测命令
+- CONFIG_SYS_MALLOC_LEN：malloc内存池大小
+- CONFIG_SYS_TEXT_BASE：U-Boot运行的起始地址
+- CONFIG_BOOTCOMMAND：启动命令，一般定义为RKIMG_BOOTCOMMAND
+- CONFIG_PREBOOT：预启动命令，在CONFIG_BOOTCOMMAND前被执行
+- CONFIG_SYS_MMC_ENV_DEV：MMC作为ENV存储介质时的dev num，一般是0
 
-目前的宏配置选项一般出现在如下几个地方（以rk3399为例，其余平台类同）
+如下以RK3399为例进行说明：
 
-```
-./include/configs/rockchip-common.h
-./include/configs/evb_rk3399.h
-./include/configs/rk3399_common.h
-configs/rk3399_defconfig
-arch/arm/mach-rockchip/Kconfig
-```
-
-如下对用户可能改动的重要宏配置做说明：
-
-./include/configs/rockchip-common.h
+./include/configs/rockchip-common.h：
 
 ```
 ......
-#define RKIMG_DET_BOOTDEV \                           // 动态探测当前设备的存储类型
+#define RKIMG_DET_BOOTDEV \                           // 动态探测当前的存储类型
 	"rkimg_bootdev=" \
 	"if mmc dev 1 && rkimgtest mmc 1; then " \
 		"setenv devtype mmc; setenv devnum 1; echo Boot from SDcard;" \
@@ -289,25 +280,10 @@ arch/arm/mach-rockchip/Kconfig
                 "setenv devtype rksfc; setenv devnum 0;" \
 	"fi; \0"
 
-#define RKIMG_BOOTCOMMAND \                          // 启动kernel的命令
-	"boot_android ${devtype} ${devnum};" \           // 启动AOSP标准格式的固件
-	"bootrkp;" \                                     // 启动rockchip格式的固件
+#define RKIMG_BOOTCOMMAND \
+	"boot_android ${devtype} ${devnum};" \           // 启动android格式固件
+	"bootrkp;" \                                     // 启动RK格式固件
 	"run distro_bootcmd;"                            // 启动linux固件
-......
-```
-
-./include/configs/evb_rk3399.h：
-
-```
-......
-#ifndef CONFIG_SPL_BUILD
-#undef CONFIG_BOOTCOMMAND
-#define CONFIG_BOOTCOMMAND RKIMG_BOOTCOMMAND      // 设置U-Boot的自启动命令为RKIMG_BOOTCOMMAND
-#endif
-......
-#define ROCKCHIP_DEVICE_SETTINGS \                // 使能显示模块
-		"stdout=serial,vidconsole\0" \
-		"stderr=serial,vidconsole\0"
 ......
 ```
 
@@ -324,49 +300,54 @@ arch/arm/mach-rockchip/Kconfig
 	"ramdisk_addr_r=0x0a200000\0"
 
 #include <config_distro_bootcmd.h>
-#define CONFIG_EXTRA_ENV_SETTINGS \      // 把上述所有相关的环境变量在此汇合
+#define CONFIG_EXTRA_ENV_SETTINGS \
 	ENV_MEM_LAYOUT_SETTINGS \
-	"partitions=" PARTS_DEFAULT \        // 默认的GPT分区表内容
+	"partitions=" PARTS_DEFAULT \        // 默认的GPT分区表
 	ROCKCHIP_DEVICE_SETTINGS \
 	RKIMG_DET_BOOTDEV \
-	BOOTENV                              // 启动linux的设备探测顺序
+	BOOTENV                              // 启动linux时的启动设备探测命令
 #endif
 
-#define CONFIG_PREBOOT                   // 在CONFIG_BOOTCOMMAND之前被执行的预处理命令
+#define CONFIG_PREBOOT                   // 在CONFIG_BOOTCOMMAND之前被执行的预启动命令
 ......
 ```
 
-### 2.7 debug手段
+./include/configs/evb_rk3399.h：
 
-目前U-Boot里debug的手段相比kernel是比较有限的，例如：不支持dump_stack()等。这里介绍几个比较常用、重要的debug手段，方便用户在开发过程中对遇到的问题进行调试。
+```
+......
+#ifndef CONFIG_SPL_BUILD
+#undef CONFIG_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND RKIMG_BOOTCOMMAND // 定义启动命令（设置为RKIMG_BOOTCOMMAND）
+#endif
+......
+#define ROCKCHIP_DEVICE_SETTINGS \           // 使能显示模块
+		"stdout=serial,vidconsole\0" \
+		"stderr=serial,vidconsole\0"
+......
+```
 
-#### 2.7.1 流程类
+### 2.5 调试方法
 
-##### 2.7.1.1 debug函数
+#### 2.5.1 流程类
 
-debug()函数默认定义为空函数，通过增加DEBUG宏定义就可以让debug()函数生效。打开这个调试信息之后用户可以很方便追踪整个U-Boot的启动过程。
+##### 2.5.1.1 debug()
 
-一般各个平台有对应的common文件： ./include/configs/rkxxx_common.h文件，可以在里面增加定义：
+如果需要debug()生效，可在各平台rkxxx_common.h中定义：
 
 ````
 #define DEBUG
 ````
 
-##### 2.7.1.2 Early Debug UART
+##### 2.5.1.2 Early Debug UART
 
-参考本文档[5.10.2 Early Debug UART配置](#5.10.2 Early Debug UART配置)。
+请参考本文档[5.10.2 Early Debug UART配置](#5.10.2 Early Debug UART配置)。
 
-##### 2.7.1.3 initcall
+##### 2.5.1.3 initcall
 
-U-Boot分成board_f.c和board_r.c两个阶段启动，分别对应init_sequence_f[]和init_sequence_r[]两个系统函数列表，如果想定位是在哪个系统函数里被调用、出现问题、死机等，可以把initcall_run_list()函数里的debug改为printf打印出调用顺序。上述涉及相关文件：
+U-Boot的启动流程本质上是一系列函数调用，把initcall_run_list()里的debug改成printf可以打印出调用顺序。
 
-```
-./common/board_f.c
-./common/board_r.c
-./lib/initcall.c
-```
-
-修改initcall_run_list()后的启动打印如下：
+例如RK3399：
 
 ```
 U-Boot 2017.09-01725-g03b8d3b-dirty (Jul 06 2018 - 10:08:27 +0800)
@@ -379,30 +360,24 @@ DRAM:  initcall: 0000000000203f68
 initcall: 0000000000214410
 initcall: 00000000002140dc
 ....
-initcall: 00000000002143a8
-initcall: 00000000002143cc
 3.8 GiB
 initcall: 00000000002143b8
-initcall: 00000000002141f8
-initcall: 00000000002143c0
-initcall: 000000000021423c
+....
 Relocation Offset is: f5c03000
 initcall: 00000000f5e176bc
-initcall: 00000000f5e174a8
 initcall: 00000000002146a4 (relocated to 00000000f5e176a4)
 initcall: 0000000000214668 (relocated to 00000000f5e17668)
-initcall: 00000000002146c4 (relocated to 00000000f5e176c4)
-initcall: 0000000000202900 (relocated to 00000000f5e05900)
+
 ....
 ```
 
-有了如上信息之后，此时我们只需要进行反汇编或者打开符号表即可知道每个initcall的地址对应哪个函数，具体请参考本文的[3.2.6 debug辅助命令](#3.2.6 debug辅助命令)。
+虽然只打印出函数地址，但只要结合反汇编就可以对应上函数名。请参考本文档[3.2.6 debug辅助命令](#3.2.6 debug辅助命令)。
 
-#### 2.7.2 读写类
+#### 2.5.2 读写类
 
-##### 2.7.2.1 进入U-Boot命令行
+##### 2.5.2.1 命令行模式
 
-U-Boot的命令行模式提供了很多命令供用户调试问题使用。命令行下输入"?"即可列出所有支持的命令：
+U-Boot命令行模式提供了许多命令，输入"?"可列出当前支持的所有命令：
 
 ```
 => ?
@@ -417,14 +392,14 @@ bootelf - Boot from an ELF image in memory
 ......
 ```
 
-通常在默认情况下，U-Boot启动时不会自动进入串口的命令行模式，用户有2种方式进入（任选其一）：
+2种方法进入命令行模式（2选1）：
 
-1. 在对应的defconfig配置CONFIG_BOOTDELAY=\<seconds\>，就可以让U-Boot进入命令行倒计时模式；
-2. U-Boot开机阶段，长按ctrl + c 组合键直到强制进入命令行模式；
+- 配置CONFIG_BOOTDELAY=\<seconds\>进入命令行倒计时模式，再按ctrl+c进入命令行；
+- U-Boot开机阶段长按ctrl+c 组合键，强制进入命令行；
 
-##### 2.7.2.2 md/mw：内存/寄存器读写
+##### 2.5.2.2 io命令
 
-U-Boot提供的"md"、"mw"命令可以实现内存或寄存器的读写。如下：
+U-Boot中的io命令为：md/mw
 
 ```
 // 读操作
@@ -445,9 +420,9 @@ Usage: mw [.b, .w, .l, .q] address value [count]
  .q 表示的数据长度是： 8 byte;
 ```
 
-**使用范例：**
+范例：
 
-1. 读操作：显示0x76000000地址开始的连续0x10个数据单元，每个数据单元的长度是4byte。
+1. 读操作：显示0x76000000地址开始的连续0x10个数据单元，每个数据单元的长度是4-byte。
 
 ```
 => md.l 0x76000000 0x10
@@ -461,7 +436,6 @@ Usage: mw [.b, .w, .l, .q] address value [count]
 
 ```
 => mw.l 0x76000000 0xffff0000
-
 => md.l 0x76000000 0x10	// 回读
 76000000: ffff0000 ffffffff ffffffff ffffffff    ................
 76000010: ffffffdf ffffffff feffffff ffffffff    ................
@@ -469,11 +443,10 @@ Usage: mw [.b, .w, .l, .q] address value [count]
 76000030: ffffffff ffffffff ffffffff ffffffff    ................
 ```
 
-3. 写操作（连续）：对0x76000000地址开始的连续0x10个数据单元都赋值为0xffff0000，每个数据单元的长度是4byte。
+3. 写操作（连续）：对0x76000000地址开始的连续0x10个数据单元都赋值为0xffff0000，每个数据单元的长度是4-byte。
 
 ```
-=> mw.l 0x76000000 0xffff0000	0x10
-
+=> mw.l 0x76000000 0xffff0000 0x10
 => md.l 0x76000000 0x10		// 回读
 76000000: ffff0000 ffff0000 ffff0000 ffff0000    ................
 76000010: ffff0000 ffff0000 ffff0000 ffff0000    ................
@@ -481,89 +454,64 @@ Usage: mw [.b, .w, .l, .q] address value [count]
 76000030: ffff0000 ffff0000 ffff0000 ffff0000    ................
 ```
 
-##### 2.7.2.3 iomem：读寄存器
+##### 2.5.2.3 iomem命令
 
-**命令行方式：**
+iomem：解析dts节点获取基地址信息后再读取寄存器值，比md更灵活。有2种使用方式：命令行和函数接口。
 
-注意，这里介绍的方式只支持读取寄存器，不支持写操作。相比md命令需要手动指定寄存器地址，我们提供了一个iomem命令直接解析dts的device节点，获取基地址信息，用起来应该是更加省时方便的。iomem命令如下：
+1. 命令行
 
 ```
 => iomem
 iomem - Show iomem data by device compatible
 
 Usage:
-iomem iomem <compatible> <start offset>  <end offset>
-  eg: iomem -grf 0x0 0x200
+iomem <compatible> <start offset>  <end offset>
+eg: iomem -grf 0x0 0x200
 ```
 
-这里的\<compatible\>内容支持**子字符串**进行匹配。以grf为例，不同平台的grf节点的compatible字段名字不同，例如：“rockchip,px30-grf”、"rockchip,rk3368-grf"等，为了通用性强，这个接口可以支持关键字匹配。但是仅匹配最先查找到的device节点。
-
-使用范例：
+@\<compatible\>：支持compatible关键字匹配。例如RK3228平台上读取GRF：
 
 ```
-=> iomem -grf 0x0 0x50
+=> iomem -grf 0x0 0x20
 rockchip,rk3228-grf:
 11000000:  00000000 00000000 00004000 00002000
 11000010:  00000000 00005028 0000a5a5 0000aaaa
-11000020:  00009955 00000000 00000000 00000000
-11000030:  00000000 00000000 00000000 00000000
-11000040:  00000000 00000000 00000000 00000000
-11000050:  0000090f
+11000020:  00009955
 ```
 
-**函数接口方式：**
+2. 函数接口：
 
-上述是以命令的形式提供了读寄存器的接口。目前也提供了函数接口方便用户调试：
-
-```
-./arch/arm/mach-rockchip/iomem.c
-./include/iomem.h
-```
-
-接口：
-
-```
+```c
 void iomem_show(const char *label, unsigned long base, size_t start, size_t end);
 void iomem_show_by_compatible(const char *compat, size_t start, size_t end);
 ```
 
-##### 2.7.2.4 i2c读写
+##### 2.5.2.4 i2c命令
 
-U-Boot提供的"i2c"命令可以实现i2c设备的寄存器读写。如下：
+```
+CONFIG_CMD_I2C
+```
 
 ```
 => i2c
 i2c - I2C sub-system
 
 Usage:
-i2c bus [muxtype:muxaddr:muxchannel] - show I2C bus info
-crc32 chip address[.0, .1, .2] count - compute CRC32 checksum
 i2c dev [dev] - show or set current I2C bus
-i2c edid chip - print EDID configuration information
-i2c loop chip address[.0, .1, .2] [# of objects] - looping read of device
 i2c md chip address[.0, .1, .2] [# of objects] - read from I2C device
-i2c mm chip address[.0, .1, .2] - write to I2C device (auto-incrementing)
-i2c mw chip address[.0, .1, .2] value [count] - write to I2C device (fill)
-i2c nm chip address[.0, .1, .2] - write to I2C device (constant address)
-i2c probe [address] - test for and show device(s) on the I2C bus
-i2c read chip address[.0, .1, .2] length memaddress - read to memory
-i2c write memaddress chip address[.0, .1, .2] length [-s] - write memory
-          to I2C; the -s option selects bulk write in a single transaction
-i2c flags chip [flags] - set or get chip flags
-i2c olen chip [offset_length] - set or get chip offset length
-i2c reset - re-init the I2C Controller
-i2c speed [speed] - show or set I2C bus speed
+i2c mw chip address[.0, .1, .2] value [count] ‐ write to I2C device (fill)
+......
 ```
 
-**使用范例：**
+范例：
 
 1. 读操作：
 
 ```
-=> i2c dev 0					// 切到i2c0（指定一次即可）
+=> i2c dev 0                     // 切到i2c0（指定一次即可）
 Setting bus to 0
 
-=> i2c md 0x1b 0x2e 0x20		// i2c设备地址为1b(7位地址)，读取0x2e开始的连续0x20个寄存器值
+=> i2c md 0x1b 0x2e 0x20         // i2c设备地址为1b(7位地址)，读取0x2e开始的连续0x20个寄存器值
 002e: 11 0f 00 00 11 0f 00 00 01 00 00 00 09 00 00 0c    ................
 003e: 00 0a 0a 0c 0c 0c 00 07 07 0a 00 0c 0c 00 00 00    ................
 ```
@@ -571,19 +519,18 @@ Setting bus to 0
 2. 写操作：
 
 ```
-=> i2c dev 0					// 切到i2c0（指定一次即可）
+=> i2c dev 0                     // 切到i2c0（指定一次即可）
 Setting bus to 0
 
-=> i2c mw 0x1b 0x2e 0x10		// i2c设备地址为1b(7位地址)，对0x2e寄存器赋值为0x10
-
-=> i2c md 0x1b 0x2e 0x20		// 回读（对比上述"1.读操作"的内容）
+=> i2c mw 0x1b 0x2e 0x10         // i2c设备地址为1b(7位地址)，对0x2e寄存器赋值为0x10
+=> i2c md 0x1b 0x2e 0x20         // 回读
 002e: 10 0f 00 00 11 0f 00 00 01 00 00 00 09 00 00 0c    ................
 003e: 00 0a 0a 0c 0c 0c 00 07 07 0a 00 0c 0c 00 00 00    ................
 ```
 
-##### 2.7.2.5 fdt读写
+##### 2.5.2.5 fdt读写
 
-U-Boot提供的fdt命令可以实现对当前dtb的读写操作：
+U-Boot提供的fdt命令可以实现对当前dtb的读、写操作：
 
 ```
 => fdt
@@ -604,19 +551,15 @@ NOTE: Dereference aliases by omitting the leading '/', e.g. fdt print ethernet0.
 => fdt print              // 把fdt内容全部打印出来
 ```
 
-#### 2.7.3 状态类
+#### 2.5.3 状态类
 
-##### 2.7.3.1 printf 时间戳
-
-目前U-Boot也可以支持让printf打印的信息带有时间戳，这样便于开发者快速确认各个阶段的启动流程耗时（注意：本身串口打印也是需要耗时的）。启动该项功能，只需要打开宏：
+##### 2.5.3.1 printf 时间戳
 
 ```
 CONFIG_BOOTSTAGE_PRINTF_TIMESTAMP
 ```
 
-注意：这里的时间戳并不是从0开始，仅仅是把当前系统的timer时间读出来而已，所以仅适合计算时间差。
-
-RK3399开机信息范例：
+范例：
 
 ```
 [    0.259266] U-Boot 2017.09-01739-g856f373-dirty (Jul 10 2018 - 20:26:05 +0800)
@@ -636,30 +579,38 @@ Using default environment
 ......
 ```
 
-因为U-Boot阶段是单核，串口打印过多本身就会影响启动速度，加入时间戳之后更加会消耗时间。因此一般情况下，建议关闭该功能，仅在调试阶段打开。
+注意：
 
-##### 2.7.3.2 dm框架统计信息
+1. U-Boot是单核运行，时间戳打印会增加耗时；
+2. 时间戳的时间不是从0开始，只是把当前系统的timer时间读出来而已，所以只适合计算时间差；
+3. 建议默认关闭该功能，仅调试打开。
 
-U-Boot提供的"dm"命令可以查看dm框架的统计信息。通过这些信息我们可以知道U-Boot里所有设备的管理情况（拓扑图），能让我们从更高的视角去审视当前的系统状态。这个功能一般对于搭建、调试、维护整个U-Boot基础平台的用户会比较有帮助。
+##### 2.5.3.2 dm命令
 
-dm信息主要是把"status=okay"的device-driver进行展示，从这个信息中我们可以知道：
+"dm"命令：查看dm框架管理下的所有device-driver状态。
 
-- 某个device是否已经被dm框架解析且和对应的driver进行绑定；
-- 某个驱动是否已经被probe过；
-- 某个uclass到底挂载了多少个device；
-- 各个device之间的parent-child关系；
+通过dm命令展示的拓扑图，用户能看到所有device-driver的状态，包含的信息：
+
+- 某个device是否和driver完成bind；
+- 某个driver是否已经probe；
+- 某个uclass下的所有device；
+- 各个device之间的关系；
 
 ```
 => dm
 dm - Driver model low level access
 
 Usage:
-dm tree			Dump driver model tree ('*' = activated)
+dm tree          Dump driver model tree ('*' = activated)
 dm uclass        Dump list of instances for each uclass
-dm devres        Dump list of device resources for each device
+dm devres        Dump list of device resources for each device // 暂时无用
 ```
 
-使用范例1：
+1. "dm tree"命令：
+
+- 列出所有完成bind的device-driver；
+- 列出所有uclass-device-driver的隶属关系；
+- [ + ] 表示当前driver已经完成probe；
 
 ```
 => dm tree
@@ -675,21 +626,12 @@ dm devres        Dump list of device resources for each device
  mmc        [ + ]   rockchip_rk3288_dw_mshc    |-- dwmmc@30020000
  blk        [ + ]   mmc_blk                    |   `-- dwmmc@30020000.blk
  ram        [   ]   rockchip_rk322x_dmc        |-- dmc@11200000
- syscon     [   ]   rk322x_syscon              |-- syscon@31090000
- clk        [ + ]   fixed_rate_clock           |-- oscillator
- syscon     [ + ]   rk322x_syscon              |-- syscon@11000000
- phy        [   ]   rockchip_usb2phy           |   |-- usb2-phy@760
- phy        [   ]   rockchip_usb2phy_port      |   |   |-- otg-port
- phy        [   ]   rockchip_usb2phy_port      |   |   `-- host-port
- phy        [   ]   rockchip_usb2phy           |   `-- usb2-phy@800
- phy        [   ]   rockchip_usb2phy_port      |       |-- otg-port
- phy        [   ]   rockchip_usb2phy_port      |       `-- host-port
  serial     [ + ]   ns16550_serial             |-- serial@11020000
  i2c        [ + ]   i2c_rockchip               |-- i2c@11050000
  ......
 ```
 
-使用范例2：
+2. "dm uclass"命令：列出uclass下的所有device；
 
 ```
 => dm uclass
@@ -697,43 +639,9 @@ dm devres        Dump list of device resources for each device
 uclass 0: root
 - * root_driver @ 7be54c88, seq 0, (req -1)
 
-uclass 10: simple_bus
 uclass 11: adc
 - * saradc@ff100000 @ 7be56220, seq 0, (req -1)
-
-uclass 13: blk
--   dwmmc@ff0c0000.blk @ 7be54ea0
-- * dwmmc@ff0f0000.blk @ 7be550e8, seq 0, (req -1)
--   dwmmc@ff0d0000.blk @ 7be55da0
-
-uclass 14: clk
-- * oscillator @ 7be55b50, seq 0, (req -1)
-- * clock-controller@ff760000 @ 7be7d058, seq 1, (req -1)
-- * external-gmac-clock @ 7be80c58, seq 2, (req -1)
-- * xin32k @ 7be814c8, seq 3, (req -1)
-
-uclass 17: display
-- * dp@ff970000 @ 7be7d2c8, seq 0, (req -1)
-
-uclass 21: firmware
--   psci @ 7be810a8
-
-uclass 22: i2c
-- * i2c@ff650000 @ 7be562c8, seq 0, (req 0)
--   i2c@ff140000 @ 7be7c838, seq -1, (req 1)
--   i2c@ff150000 @ 7be7c890, seq -1, (req 3)
--   i2c@ff160000 @ 7be7c8e8, seq -1, (req 4)
--   i2c@ff660000 @ 7be7c9b0, seq -1, (req 2)
-
-uclass 24: i2c_generic
-uclass 34: mmc
-- * dwmmc@ff0c0000 @ 7be54d10, seq 1, (req 1)
-- * dwmmc@ff0f0000 @ 7be54f78, seq 0, (req 0)
--   dwmmc@ff0d0000 @ 7be55c30
-
-uclass 39: panel
-- * edp-panel @ 7be80bd0, seq 0, (req -1)
-
+......
 uclass 40: backlight
 - * backlight @ 7be81178, seq 0, (req -1)
 
@@ -742,9 +650,9 @@ uclass 77: key
 ......
 ```
 
-##### 2.7.3.3 panic cpu信息
+##### 2.5.3.3 panic cpu信息
 
-当U-Boot发生异常产生panic的时候，系统会打印出panic时刻的CPU状态信息。通过这些信息我们可以知道当前CPU状态和异常原因。如下：
+系统的panic信息包含CPU现场状态，用户可以通过它们定位问题原因：
 
 ```
 * Relocate offset = 000000003db55000
@@ -786,17 +694,19 @@ x4 : 0000000039d7fe80 x5 : 000000003de24ab0
 x28: 0000000039d81ef0 x29: 0000000039d4a910
 ```
 
-其中EC[31:26]说明了当前这次panic的原因，此外还提供了各种寄存器状态信息。其中比较关注的有：pc、lr、sp等。我们结合反汇编就可以快速定位错误的点，关于反汇编的方式请参考本文的[3.2.6 debug辅助命令](#3.2.6 debug辅助命令)。
+- EC[31:26]表明了CPU异常原因；
+- 各寄存器展示了CPU现场状态；
+- PC、LR、SP 最重要，用户结合反汇编能定位到出错点，请参考本文档[3.2.6 debug辅助命令](#3.2.6 debug辅助命令)。
 
-##### 2.7.3.4 panic 寄存器信息
+##### 2.5.3.4 panic register信息
 
-当U-Boot发生panic的时候，我们还可以让寄存器信息一起dump出来：目前默认提供cru，pmucru, grf，pmugrf。要使能这个功能，需要打开宏：
+系统的panic信息也可以包含平台相关的寄存器状态。目前支持打印：CRU、PMUCRU、GRF、PMUGRF。
 
 ```
 CONFIG_ROCKCHIP_CRASH_DUMP
 ```
 
-打印信息是追加在cpu的panic信息之中，如下：
+范例：
 
 ```
 ......
@@ -808,8 +718,7 @@ x0 : 00000000ff300000 x1 : 0000000054808028
 x2 : 000000000000002f x3 : 00000000ff160000
 ......
 
-// 平台相关的寄存器dump：
-
+// 平台寄存器信息：
 rockchip,px30-cru:
 ff2b0000:  0000304b 00001441 00000001 00000007
 ff2b0010:  00007f00 00000000 00000000 00000000
@@ -823,11 +732,9 @@ ff140020:  00000000 00000000 00000000 00000202
 ......
 ```
 
-如果想增加更多的打印，则需要修改代码。位置如下：
+用户想增加更多打印需要修改./arch/arm/lib/interrupts_64.c：
 
 ```
-vim ./arch/arm/lib/interrupts_64.c
-
 void show_regs(struct pt_regs *regs)
 {
 ......
@@ -841,11 +748,15 @@ void show_regs(struct pt_regs *regs)
 }
 ```
 
-##### 2.7.3.5 hang信息（relocate之后）
+##### 2.5.3.5 卡死信息
 
-有时候我们会碰到U-Boot启动时突然hang住不动，串口也毫无响应，并且没有任何有效打印输出的情况。以往在这种情况下，我们只能增加大量的log来追踪启动流程或者直接连JTAG进行定位。
+U-Boot启动遇到卡死、串口无响应、无有效打印时，用户可以提前使能该功能，串口会每隔5s dump出panic信息（请参考本文档[2.5.3.3 panic cpu信息](#2.5.3.3 panic cpu信息)）。建议默认关闭此功能，仅调试打开。
 
-现在如果遇到这种情况，用户可以打开CONFIG_ROCKCHIP_DEBUGGER。如果U-Boot启动后5s内还没有进入kernel，则串口每隔5s就会自动dump当前的CPU现场状态。这部分内容同上面提到的PANIC信息是一样的格式：
+```
+CONFIG_ROCKCHIP_DEBUGGER
+```
+
+范例：
 
 ```
 >>> Rockchip Debugger:
@@ -855,7 +766,7 @@ void show_regs(struct pt_regs *regs)
 * SP         =   0000000039d4a6b0
 
 * ESR_EL2    =   0000000040732550
-		<NULL>		// 因为只是hang住，CPU本身可能状态正常，所以EC[31:26]没有显示异常原因。
+		<NULL>		// 因为只是卡住，CPU本身可能状态正常，所以EC[31:26]没有显示异常原因。
 		IL[25] == 0, 16-bit instruction trapped
 
 * DAIF       =   00000000000003c0
@@ -863,24 +774,18 @@ void show_regs(struct pt_regs *regs)
 		A[8] == 1, ABORT masked
 		I[7] == 1, IRQ masked
 		F[6] == 1, FIQ masked
-
-* SPSR_EL2   =   0000000080000349
-		D[9] == 1, DBG masked
-		A[8] == 1, ABORT masked
-		I[7] == 0, IRQ not masked
+......
 ```
 
-一般情况下，建议默认把这个功能关闭，仅当出问题时再打开即可。
+##### 2.5.3.6 CRC校验
 
-##### 2.7.3.6 固件crc校验
-
-固件在打包的时候在img头里有打包工具计算的固件CRC值，如果遇到问题怀疑是U-Boot加载到内存的固件有完整性问题，则可以打开CRC校验功能进行确认：
+RK格式打包的固件，hdr里包含了打包工具计算的CRC。如果用户怀疑U-Boot加载的固件存在完整性问题，可打开CRC校验进行确认。CRC校验比较耗时，建议默认关闭此功能，仅调试打开。
 
 ```
 CONFIG_ROCKCHIP_CRC
 ```
 
-打开后的U-Boot提示信息：
+范例：
 
 ```
 =Booting Rockchip format image=
@@ -899,25 +804,15 @@ Adding bank: start=0x0a200000, size=0xede00000
 Starting kernel ...
 ```
 
-打开CRC校验后U-Boot的启动时间会变长，所以一般仅在调试问题时才打开，默认配置不要打开。
+##### 2.5.3.7 开机信息
 
-##### 2.7.3.7 开机log
+某些情况下，开机信息也可以帮助用户定位一些死机问题。
 
-目前各个平台的固件启动流程如下：
+1. trust跑完后就卡死
 
-```
-pre-loader => trust => U-Boot => kernel
-```
+trust跑完后就卡死的可能性：固件打包或者烧写有问题，导致trust跳转到错误的U-Boot启动地址。此时，用户可以通过trust启动信息里的U-Boot启动地址来确认。
 
-**情况1：**
-
-有时候我们会遇到跑完trust后没有任何U-Boot打印输出就卡死的情况，比较大的可能是打包固件或者烧写固件有问题。
-
-此时可以注意trust打印信息中的"INFO:    Entry point address = 0x200000"和"INF [0x0] TEE-CORE:init_primary_helper:379: Next entry point address: 0x60000000" 指明了U-Boot的运行地址，这个地址来自于固件的打包头信息，参考本文档[3.2.4 固件生成](#3.2.4 固件生成)。
-
-一般情况下，U-Boot的启动地址：64位平台上是从SDRAM偏移2M地址处，32位平台上是从SDRAM偏移0地址处。
-
-64位平台trust：
+64位平台U-Boot启动地址一般是偏移0x200000（DRAM起始地址是0x0）：
 
 ```
 NOTICE:  BL31: v1.3(debug):d98d16e
@@ -934,7 +829,7 @@ INFO:    Entry point address = 0x200000	 // U-Boot地址
 INFO:    SPSR = 0x3c9
 ```
 
-32位平台trust：
+32位平台U-Boot启动地址一般是偏移0x0（DRAM起始地址是0x60000000）：
 
 ```
 INF [0x0] TEE-CORE:init_primary_helper:378: Release version: 1.9
@@ -942,64 +837,59 @@ INF [0x0] TEE-CORE:init_primary_helper:379: Next entry point address: 0x60000000
 INF [0x0] TEE-CORE:init_teecore:83: teecore inits done
 ```
 
-**情况2 ：**
+2. U-Boot版本回溯：
 
-通过U-Boot开机第一行打印信息回溯固件对应的代码仓库的提交点。如下可以看出这份固件对应的代码commit-id是b34f08b（前面的'g'忽略），可以达到精确回溯。
+通过U-Boot开机信息可回溯编译版本。如下，对应提交点是commit: b34f08b。
 
 ```
 U-Boot 2017.09-01730-gb34f08b (Jul 06 2018 - 17:47:52 +0800)
 ```
 
-相比上面的情况，如下的信息中出现了"dirty"，说明当时编译固件的时候本地还存在临时改动，而且没有通过git commit提交进仓库。这个固件编译点是不干净的，虽然同样可以确认是b34f08b提交点，但是因为当时还有本地临时代码，所以无法达到精确回溯。
+开机信息中出现"dirty"，说明编译时有本地改动没有提交进仓库，编译点不干净。
 
 ```
 U-Boot 2017.09-01730-gb34f08b-dirty (Jul 06 2018 - 17:35:04 +0800)
 ```
 
-##### 2.7.3.8 分区表信息
+#### 2.5.4 烧写类
 
-有时候可能会遇到开机时pre-loader（一级loader）加载固件报异常的情况，比较大的可能性是固件的地址烧写存在问题。例如：
+当烧写按键无法正常使用时，用户可以通过U-Boot命令行进入烧写模式，请参考本文档[3.2.8 烧写和工具](#3.2.8 烧写和工具)。
 
-```
-SdmmcInit=0 1
-StorageInit ok = 30370
-tag:LOADER error,addr:0x2000
-hdr 032c77e4 + 0x0:0x20534f54,0x20202020,0x00000000,0x00000000,
-tag:LOADER error,addr:0x4000
-hdr 032c77e4 + 0x0:0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+### 2.6 ATAGS机制
 
-tag:LOADER error,addr:0x2800
-hdr 032c77e4 + 0x0:0x20534f54,0x20202020,0x00000000,0x00000000,
-tag:LOADER error,addr:0x4800
-......
-```
+Pre-loader、trust(bl31/op-tee)、U-Boot之间需要传递和共享某些信息，通过这些信息完成一些特定的功能。目前可通过ATAGS机制进行传递（不会传给kernel），传递内容：串口配置、存储类型、bl31和op-tee的内存布局、ddr容量信息等。
 
-此时我们可能会想知道当前机器的分区表信息，包括各个分区的大小、地址等，我们可以通过命令行提供的"part"命令查看，具体请参考[7.1 分区表](#7.1 分区表) 。
-
-#### 2.7.4 烧写类
-
-##### 2.7.4.1 maskrom/loader烧写模式
-
-在U-Boot开发调试阶段如果出现在U-Boot阶段就启动失败，进入命令行的情况。这时候的情况是：
-
-1. 可能无法识别recovery按键进入loader烧写模式，这时可以通过命令行的方式进入loader烧写模式；
-
-2. 可能无法识别recovery按键，也无法使用loader烧写模式。这时可以通过命令行的方式进入maskrom模式，（否则要硬件上短接相关引脚才行，比较麻烦）。
-
-上述两种情况，如果通过命令进入烧写模式，请参考本文的[3.2.8 烧写和工具](#3.2.8 烧写和工具)。
-
-### 2.8 atags传参机制
-
-运行在kernel之前的固件有：一级loader、trust（bl31和trust os）、U-Boot。这些前级固件之间有时候需要共享一些信息，因此需要一个统一的传参机制。由于atags实现起来比较精简，因此目前使用atags进行传参（注意：只传递到U-Boot为止，不会传递给kernel）。目前传递的信息包括：串口的配置、启动设备的类型、bl31和trust os的内存布局、ddr的容量信息等，具体参考代码：
+驱动代码：
 
 ```
 ./arch/arm/include/asm/arch-rockchip/rk_atags.h
 ./arch/arm/mach-rockchip/rk_atags.c
 ```
 
-### 2.9 驱动的probe
+### 2.7 Probe机制
 
-这章节的内容非常重要，所以在此优先提出。具体请参考本文档[5. 驱动支持](#5. 驱动支持) 的前言。
+U-Boot通过DM管理所有的设备和驱动，它和kernel的device-driver模型非常类似。kernel初始化时使用initcall机制把所有已经bind过的device-driver进行probe，但是U-Boot没有这样的机制。
+
+如果要让U-Boot中某个driver执行probe，用户必须主动调用框架接口发起probe。
+
+```c
+// 常用：
+int uclass_get_device(enum uclass_id id, int index, struct udevice **devp);
+int uclass_get_device_by_name(enum uclass_id id, const char *name,
+
+// 不常用：
+int uclass_get_device_by_seq(enum uclass_id id, int seq, struct udevice **devp);
+int uclass_get_device_by_of_offset(enum uclass_id id, int node, struct udevice **devp);
+int uclass_get_device_by_ofnode(enum uclass_id id, ofnode node, struct udevice **devp);
+int uclass_get_device_by_phandle_id(enum uclass_id id,
+									int phandle_id, struct udevice **devp);
+int uclass_get_device_by_phandle(enum uclass_id id,
+								 struct udevice *parent, struct udevice **devp);
+int uclass_get_device_by_driver(enum uclass_id id,
+								const struct driver *drv, struct udevice **devp);
+int uclass_get_device_tail(struct udevice *dev, int ret, struct udevice **devp);
+......
+```
 
 ## 3. 平台编译
 
@@ -1007,13 +897,13 @@ tag:LOADER error,addr:0x4800
 
 #### 3.1.1 rkbin 仓库
 
-​	rkbin仓库主要存放了Rockchip不开源的bin文件（trust、loader等）、脚本、打包工具等，它只是一个“工具包”仓库 。**bin文件会一直在不断更新，用户最好能及时同步相关内容，避免因为版本过旧引起问题**。
+rkbin仓库用于存放Rockchip不开源的bin（ddr、trust、loader等）、脚本、打包工具等，它只是一个“工具包”仓库 （**注意：bin会不断更新，请用户及时同步，避免因为版本过旧引起问题**）。
 
-​	rkbin仓库需要和U-Boot工程**保持同级目录关系**，否则编译时会报找不到rkbin仓库。当在U-Boot工程执行编译的时候，编译脚本会从rkbin仓库里索引相关的bin文件和打包工具，最后在U-Boot根目录下生成trust.img、uboot.img、loader等相关固件。
+- rkbin要跟U-Boot工程保持同级目录关系，否则编译会报错找不到rkbin；
+- U-Boot编译时会从rkbin索引相关的bin、配置文件和打包工具，最后在根目录下生成trust.img、uboot.img、loader固件；
+- 下载方式见附录[rkbin仓库下载](#rkbin仓库下载) 。
 
-​	下载方式见附录[rkbin仓库下载](#rkbin仓库下载) 。
-
-#### 3.1.2 gcc工具链
+#### 3.1.2 gcc版本
 
 默认使用的编译器是gcc-linaro-6.3.1版本，下载方式见附录[gcc编译器下载](#gcc编译器下载) 。
 
@@ -1024,13 +914,13 @@ tag:LOADER error,addr:0x4800
 
 #### 3.1.3 U-Boot分支
 
-确认U-Boot工程里的代码使用的是next-dev分支：
+请确认U-Boot使用的是next-dev分支：
 
 ```
 remotes/origin/next-dev
 ```
 
-开发者可以从U-Boot根目录下的./Makefile里获知版本（v2017-09）：
+U-Boot根目录下的./Makefile可看到版本信息：
 
 ```
 SPDX-License-Identifier:      GPL-2.0+
@@ -1042,50 +932,52 @@ EXTRAVERSION =
 NAME =
 ```
 
-#### 3.1.4 各平台defconfig
+#### 3.1.4 defconfig选择
 
-目前主要在使用的各个芯片平台的defconfig对应情况如下（包含但不限于，基于commit:58d85a1）。大部分平台都开启了kernel dtb的支持，这意味着这个平台在board_r[]阶段使用的是kernel dtb，因此能兼容大多数的板级差异（如：外设、电源、clk、显示等）。对于不支持kernel dtb的defconfig，则无法兼容板级差异，但是有更优的启动速度和uboot.bin的size。
+目前大部分平台都开启了kernel dtb支持，能兼容板级差异（如：外设、电源、clk、显示等）。虽然不支持kernel dtb的情况下无法兼容板级差异，但却有更优的启动速度和固件大小。
 
-通常情况下，如果没有对速度和固件大小有特别严苛的要求，建议采用开启了kernel dtb的defconfig。关于kernel dtb，可以参考本文的 [9. U-Boot和kernel DTB支持](#9. U-Boot和kernel DTB支持) 。
+通常情况下，如果没有对速度和固件大小有特别严苛的要求，推荐使用支持kernel dtb的defconfig。
 
-|       芯片        |          defconfig           | kernel dtb 支持 |
-| :-------------: | :--------------------------: | :-----------: |
-|     rv1108      |     evb-rv1108_defconfig     |       N       |
-|     rk1808      |       rk1808_defconfig       |       Y       |
-|     rk3128x     |      rk3128x_defconfig       |       Y       |
-|     rk3128      |     evb-rk3128_defconfig     |       N       |
-|     rk3126      |       rk3126_defconfig       |       Y       |
-|     rk322x      |       rk322x_defconfig       |       Y       |
-|     rk3288      |       rk3288_defconfig       |       Y       |
-|     rk3368      |       rk3368_defconfig       |       Y       |
-|     rk3328      |       rk3328_defconfig       |       Y       |
-|     rk3399      |       rk3399_defconfig       |       Y       |
-|  rk3399pro-npu  |   rk3399pro-npu_defconfig    |       Y       |
-| rk3308(aarch32) |   rk3308-aarch32_defconfig   |       Y       |
-| rk3308(aarch32) | evb-aarch32-rk3308_defconfig |       N       |
-| rk3308(aarch64) |     evb-rk3308_defconfig     |       Y       |
-|      px30       |      evb-px30_defconfig      |       Y       |
-|     rk3326      |     evb-rk3326_defconfig     |       Y       |
+|       芯片       |            defconfig            | kernel dtb 支持 |
+| :------------: | :-----------------------------: | :-----------: |
+|     rv1108     |      evb-rv1108_defconfig       |       N       |
+|     rk1808     |        rk1808_defconfig         |       Y       |
+|    rk3128x     |        rk3128x_defconfig        |       Y       |
+|     rk3128     |      evb-rk3128_defconfig       |       N       |
+|     rk3126     |        rk3126_defconfig         |       Y       |
+|     rk322x     |        rk322x_defconfig         |       Y       |
+|     rk3288     |        rk3288_defconfig         |       Y       |
+|     rk3368     |        rk3368_defconfig         |       Y       |
+|     rk3328     |        rk3328_defconfig         |       Y       |
+|     rk3399     |        rk3399_defconfig         |       Y       |
+| rk3399pro-npu  |     rk3399pro-npu_defconfig     |       Y       |
+| rk3308-aarch32 |    rk3308-aarch32_defconfig     |       Y       |
+| rk3308-aarch32 |  evb-aarch32-rk3308_defconfig   |       N       |
+| rk3308-aarch64 |        rk3308_defconfig         |       Y       |
+| rk3308-aarch64 |      evb-rk3308_defconfig       |       N       |
+|      px30      |       evb-px30_defconfig        |       Y       |
+|      px30      |  px30_defconfig (Android 9.0+)  |       Y       |
+|     rk3326     |      evb-rk3326_defconfig       |       Y       |
+|     rk3326     | rk3326_defconfig (Android 9.0+) |       Y       |
 
 ### 3.2 编译配置
 
 #### 3.2.1 gcc工具链路径指定
 
-默认使用Rockchip提供的工具包：prebuilts，请保证它和U-Boot工程保持同级目录关系，确保gcc-linaro-6.3.1版本的编译器放到如下路径：
+默认使用Rockchip提供的prebuilts工具包，请保证它和U-Boot工程保持同级目录关系，gcc-linaro-6.3.1编译器路径：
 
 ```
 ../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin
 ../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin
 ```
 
-如果需要更改编译器路径，可以修改编译脚本./make.sh里的内容：
+如果需要更改编译器路径，可以修改编译脚本./make.sh：
 
 ```
 # debug使用
 ADDR2LINE_ARM32=arm-linux-gnueabihf-addr2line
 ADDR2LINE_ARM64=aarch64-linux-gnu-addr2line
 
-# debug使用
 OBJ_ARM32=arm-linux-gnueabihf-objdump
 OBJ_ARM64=aarch64-linux-gnu-objdump
 
@@ -1099,25 +991,25 @@ TOOLCHAIN_ARM64=../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_
 
 #### 3.2.2 menuconfig支持
 
-U-Boot和kernel一样，已经支持Kbuild编译机制，开发者可以使用 make menuconfig对某块进行开启或者关闭；使用make savedefconfig来保存配置修改。
+U-Boot支持Kbuild，可以使用"make menuconfig"和"make savedefconfig"修改/保存配置。
 
 #### 3.2.3 固件编译
 
-**帮助信息：**
+帮助信息：
 
 ```
 ./make.sh --help
 ```
 
-**编译命令：**
+编译命令：
 
 ```
-./make.sh [board]               ---- [board]的名字来源是：configs/[board]_defconfig文件。
+./make.sh [board]               ---- [board]：configs/[board]_defconfig文件。
 ```
 
 1. 首次编译
 
-无论32位或64位平台，如果是第一次或者想重新指定defconfig进行编译，则必须指定[board]，这样才会生成新的.config。如下：
+无论32位或64位平台，如果是第一次或者想重新指定defconfig进行编译，则必须指定[board]：
 
 ```
 ./make.sh rk3399                ---- build for rk3399_defconfig
@@ -1134,7 +1026,7 @@ Platform RK3399 is build OK, with new .config(make evb-rk3399_defconfig)
 
 2. 二次编译
 
-无论32位或64位平台，如果想使用已有的.config进行二次编译，则不需要指定[board]字段。如下：
+无论32位或64位平台，如果想基于当前".config"进行二次编译，则不需要指定[board]：
 
 ```
 ./make.sh
@@ -1149,7 +1041,7 @@ Platform RK3399 is build OK, with exist .config
 
 #### 3.2.4 固件生成
 
-1. 编译完成后，最终打包生成的固件：trust、uboot、loader等，都在U-Boot根目录下：
+1. 编译完成后，最终打包生成的固件都在U-Boot根目录下：trust、uboot、loader。
 
 ```
 ./uboot.img
@@ -1157,12 +1049,12 @@ Platform RK3399 is build OK, with exist .config
 ./rk3126_loader_v2.09.247.bin
 ```
 
-2. 上述固件打包过程的提示信息如下，从打印可以知道打包用的原始二进制可执行文件的路径或者INI文件。
+2. 根据固件打包的过程信息可以知道bin和INI文件的来源。
 
-uboot.img打包提示：
+uboot.img：
 
 ```
- load addr is 0x60000000!				// U-Boot的运行地址会被追加在打包头信息里
+ load addr is 0x60000000!	// U-Boot的运行地址会被追加在打包头信息里
 pack input rockdev/rk3126/out/u-boot.bin
 pack file size: 478737
 crc = 0x840f163c
@@ -1171,7 +1063,7 @@ pack uboot.img success!
 pack uboot okay! Input: rockdev/rk3126/out/u-boot.bin
 ```
 
-loader打包提示：
+loader：
 
 ```
 out:rk3126_loader_v2.09.247.bin
@@ -1180,10 +1072,10 @@ merge success(rk3126_loader_v2.09.247.bin)
 pack loader okay! Input: /home/guest/project/rkbin/RKBOOT/RK3126MINIALL.ini
 ```
 
-trust.img打包提示：
+trust.img：
 
 ```
- load addr is 0x68400000!			// trust的运行地址会被追加在打包头信息里
+ load addr is 0x68400000!	// trust的运行地址会被追加在打包头信息里
 pack file size: 602104
 crc = 0x9c178803
 trustos version: Trust os
@@ -1192,58 +1084,72 @@ trust.img with ta is ready
 pack trust okay! Input: /home/guest/project/rkbin/RKTRUST/RK3126TOS.ini
 ```
 
-注意：当执行make clean/mrproper/distclean的时候，Makefile会默认把编译阶段生成的中间文件都删除，其中包括bin文件。因为loader固件的格式是.bin，所以也会被同时删除。**用户需要注意：不要把重要的、不想被删除的.bin文件放在U-Boot的根目录下**。
+注意：make clean/mrproper/distclean会把编译阶段的中间文件都清除，包括bin和img文件。
+
+**请用户不要把重要的bin或者img文件放在U-Boot的根目录下。**
 
 #### 3.2.5 pack辅助命令
 
-**命令格式：**
+命令格式：
 
 ```
 ./make.sh	[loader|loader-all|uboot|trust]
 ```
 
-如果用户不想每次生成固件的时候都编译整个U-Boot工程，则可以通过辅助命令对某个固件进行单独打包（用.config里获取芯片信息）。如下：
+单独打包命令（不重新编译U-Boot）：
 
 ```
-./make.sh trust        --- 只打包trust.img
-./make.sh loader       --- 只打包loader bin
+./make.sh uboot        --- 打包uboot.img
+./make.sh trust        --- 打包trust.img
+./make.sh loader       --- 打包loader bin
 ./make.sh loader-all   --- 打包所有支持的loader bin
-./make.sh uboot        --- 只打包uboot.img
 ```
 
-**loader-all：**打包当前平台所有的loader
+关于" loader-all"：
 
-有些平台上会支持多种存储启动引导，因此会提供特殊的loader进行支持（比如支持spi nor flash...）。默认编译U-Boot时只会生成一个默认的loader（适用于大部分产品形态），不会打包生成这些特殊loader。如果需要的话，请使用"loader-all"命令：
+有些平台会提供多种loader支持不同的存储启动，而U-Boot在编译时只会生成一个默认的loader（支持大部分存储启动），如果需要生成其余特殊loader，请使用"./make.sh loader-all"命令。
 
-例如rk3399平台执行完"loader-all"后生成：
+例如RK3399可生成：
 
 ```
-./rk3399_loader_v1.12.112.bin           // 支持emmc、nand的默认loader，可满足大部分产品形态需求
+./rk3399_loader_v1.12.112.bin           // 支持eMMC、NAND的默认loader，可满足大部分产品形态需求
 ./rk3399_loader_spinor_v1.12.114.bin    // 支持spi nor flash的loader
 ```
 
 #### 3.2.6 debug辅助命令
 
-**命令格式：**
+编译结束后在根目录下会生成一些符号表、ELF等调试文件：
+
+```
+u-boot.map        --- section文件
+u-boot.sym        --- SYMBOL TABLE文件
+u-boot.lds        --- 链接文件
+u-boot            --- ELF文件，类同内核的vmlinux（重要！）
+```
+
+**特别注意：**当使用下面介绍的命令进行问题调试时，一定要保证机器上烧写的U-Boot固件和当前代码编译环境是一致的，否则使用下面的调试命令是没有任何意义的，反而会误导分析。
+
+命令格式：
 
 ```
 ./make.sh		[elf|map|sym|addr]
 ```
 
-为了开发时候调试方便，我们支持一些辅助命令快速打开一些调试文件（用.config里获取芯片信息）。如下：
+为了开发调试方便，make.sh支持一些debug辅助命令：
 
 ```
 ./make.sh elf		--- 反汇编，默认使用-D参数
 ./make.sh elf-S		--- 反汇编，使用-S参数
 ./make.sh elf-d		--- 反汇编，使用-d参数
+./make.sh elf-[x]	--- 反汇编，使用-[x]参数
 ./make.sh map		--- 打开u-boot.map
 ./make.sh sym		--- 打开u-boot.sym
 ./make.sh <addr>	--- 需要addr对应的函数名和代码位置
 ```
 
-**addr命令：**
+./make.sh addr：
 
-通过add命令可以打印出地址对应的函数名和具体的代码位置：
+通过反汇编获取地址对应的函数名和代码位置：
 
 ```
 guest@ubuntu:~/u-boot$ ./make.sh 000000000024fb1c
@@ -1260,17 +1166,17 @@ guest@ubuntu:~/u-boot$ ./make.sh 000000000024fb1c
 ??:0
 ```
 
-**elf命令：**
+./make.sh elf[option]：
 
-它的格式可以是elf[option]。例如：“elf-d”、“elf-D”、“elf-S”等，[option]会被用来做为objdump的参数，如果省略[option]，即“elf”，则会默认使用“-D”作为参数。如果不清楚[option]有哪些参数可选，可以执行如下命令获取帮信息：
+例如：“elf-d”、“elf-D”、“elf-S”等，[option]会被用来做为objdump的参数，如果省略[option]，则默认使用“-D”作为参数。执行如下命令可获取更多支持的[option]选项：
 
 ```
-./make.sh elf-H		----- 反汇编参数的help指导信息
+./make.sh elf-H		----- 反汇编参数的help信息
 ```
 
 #### 3.2.7 编译报错处理
 
-**关于make clean/mrproper/distclean：**
+make clean/mrproper/distclean的清除强度：distclean > mrproper > clean。
 
 ```
 1. make clean:
@@ -1281,9 +1187,7 @@ guest@ubuntu:~/u-boot$ ./make.sh 000000000024fb1c
 	Remove editor backup files, patch leftover files and the like Directories & files removed with 'make clean
 ```
 
-清除强度：distclean > mrproper > clean。
-
-**报错1：**
+报错1：
 
 ```
   UPD     include/config/uboot.release
@@ -1299,9 +1203,9 @@ make[1]: Leaving directory `/home/guest/uboot-nextdev/u-boot/rockdev'
 make: *** [sub-make] Error 2
 ```
 
-如上的编译报错信息，一般是因为改变了编译输出的目录，导致新旧目录之间的中间文件让Makefile对编译依赖产生了不清晰的判断。只需要按照提示信息，执行make mrproper 即可。
+一般是因为改变了编译输出目录后导致新旧目录同时存在，让Makefile对编译依赖产生不清晰的判断。处理方法：make mrproper 。
 
-**报错2 ：**
+报错2：
 
 ```
 make[2]: *** [silentoldconfig] Error 1
@@ -1309,104 +1213,89 @@ make[1]: *** [silentoldconfig] Error 2
 make: *** No rule to make target `include/config/auto.conf', needed by `include/ config/kernel.release'.  Stop.
 ```
 
-如上的编译报错信息，一般也是因为编译的工程环境不干净导致的。通过make mrproper或distclean可以解决。
+一般是因为编译的工程环境不干净。处理方法：make mrproper或make distclean。
 
 #### 3.2.8 烧写和工具
 
-##### 3.2.8.1 工具
+1. 烧写工具：Windows烧写工具版本必须是**V2.5版本或以上**（推荐使用最新的版本）；
 
-Windows烧写工具版本必须是**V2.5版本或以上**(推荐使用最新的版本)；
+2. 按键进入烧写模式：开机阶段插着USB的情况下长按 "音量+"；
 
-##### 3.2.8.2 loader烧写模式
+3. 命令行进入烧写模式：
 
-开机阶段，在插着USB的情况下长按 "音量+" 即可进入loader烧写模式；
-
-##### 3.2.8.3 命令行进入烧写模式
-
-在U-Boot命令行下：
-
-1. 输入"rbrom"可以进入maskrom烧写模式；
-2. 输入“rockusb 0 mmc 0”可以进入loader烧写模式（也可能是"rknand"，取决于当前存储类型）；
+- 输入"rbrom"：maskrom烧写模式；
+- 输入“rockusb 0 \$devtype $devnum”：loader烧写模式；
+- 开机阶段长按ctrl+d：loader烧写模式
+- 开机阶段长按ctrl+b：maksrom烧写模式
+- 开机阶段长按ctrl+f：fastboot模式
 
 #### 3.2.9 分区表
 
-1. 目前U-Boot支持RK parameter分区表和GPT分区表；
-2. 如果想从当前的分区表替换成另外一种分区表类型，则Nand机器必须整套固件重新烧写；EMMC机器可以支持单独替换分区表；
+1. 目前U-Boot支持两种分区表：RK parameter分区表和GPT分区表；
+2. 如果想从当前的分区表替换成另外一种分区表类型，则Nand机器必须整套固件重新烧写；eMMC机器可以支持单独替换分区表；
 3. GPT和RK parameter分区表的具体格式请参考文档：《Rockchip-Parameter-File-Format-Version1.4.md》和本文的[7.1 分区表](#7.1 分区表)。
 
 ## 4. cache机制
 
-目前所有芯片的cache配置都采用U-Boot提供的标准接口。
+### 4.1 on/off
 
-### 4.1 dcache和icache的开关
+Rockchip平台默认使能icache和dcache。
 
 - CONFIG_SYS_ICACHE_OFF：如果定义，则关闭icache功能；否则打开。
 
 - CONFIG_SYS_DCACHE_OFF：如果定义，则关闭dcache功能；否则打开。
 
-目前Rockchip都默认使能了icache和dcache功能。
+### 4.2 dcache模式
 
-### 4.2 dcache 模式
+dcache有多种工作模式，Rockchip平台默认使能dcache writeback。
 
-- CONFIG_SYS_ARM_CACHE_WRITETHROUGH: 如果定义，则配置为 dcache writethrouch模式；
-- CONFIG_SYS_ARM_CACHE_WRITEALLOC: 如果定义，则配置为 dcache writealloc模式；
+- CONFIG_SYS_ARM_CACHE_WRITETHROUGH：如果定义，则配置为 dcache writethrouch模式；
+- CONFIG_SYS_ARM_CACHE_WRITEALLOC：如果定义，则配置为 dcache writealloc模式；
 - 如果上述两个宏都没有配置，则默认为dcache writeback 模式；
 
-目前Rockchip都默认选择dcache writeback模式。
+### 4.3 相关接口
 
-### 4.3 icache/dcache操作的常用接口
+icache：
 
-**icache 的常用接口：**
-
-```
+```c
 void icache_enable (void);
 void icache_disable (void);
 void invalidate_icache_all(void);
 ```
 
-**dcache 的常用接口：**
+dcache：
 
-```
+```c
 void dcache_disable (void);
-void enable_caches(void);
-void flush_cache(unsigned long, unsigned long);
-void flush_dcache_all(void);
+void dcache_enable(void);
 void flush_dcache_range(unsigned long start, unsigned long stop);
+void flush_cache(unsigned long start, unsigned long size)；
+void flush_dcache_all(void);
 void invalidate_dcache_range(unsigned long start, unsigned long stop);
 void invalidate_dcache_all(void);
 ```
 
 ## 5. 驱动支持
 
-### 前言
-
-U-Boot使用DM框架去管理所有的设备和驱动，它和kernel的device-driver模型非常类似。但是有一点需要注意的是，kernel在初始化时会使用initcall的机制自动把所有有效的driver进行probe，但是U-Boot里并没有这样的机制进行probe。U-Boot里想要probe某个驱动的话，必须由用户主动调用相应的框架接口进行发起，相关的接口如下：
-
-```c
-./include/dm/uclass.h
-
-int uclass_get_device(enum uclass_id id, int index, struct udevice **devp);
-int uclass_get_device_by_name(enum uclass_id id, const char *name,
-int uclass_get_device_by_seq(enum uclass_id id, int seq, struct udevice **devp);
-int uclass_get_device_by_of_offset(enum uclass_id id, int node, struct udevice **devp);
-int uclass_get_device_by_ofnode(enum uclass_id id, ofnode node, struct udevice **devp);
-int uclass_get_device_by_phandle_id(enum uclass_id id, int phandle_id, struct udevice **devp);
-int uclass_get_device_by_phandle(enum uclass_id id, struct udevice *parent, struct udevice **devp);
-int uclass_get_device_by_driver(enum uclass_id id, const struct driver *drv, struct udevice **devp);
-int uclass_get_device_tail(struct udevice *dev, int ret, struct udevice **devp);
-......
-```
-
 ### 5.1 中断驱动
 
 #### 5.1.1 框架支持
 
-中断功能方面，U-Boot框架默认没有给与足够的支持，因此我们自己实现了一套中断框架机制来支持中断管理功能（支持GICv2/v3）。目前而言，会使用到中断情况主要有：
+U-Boot没有完整的中断框架支持，Rockchip自己实现了一套中断框架（支持GICv2/v3，默认使能）。目前用到中断的场景有：
 
-- U-Boot充电休眠时cpu进入低功耗休眠模式，需要中断按键进行唤醒；
-- CONFIG_ROCKCHIP_DEBUGGER对应的驱动会使用到中断；
+- pwrkey：U-Boot充电时CPU可进入低功耗休眠，需要pwrkey中断唤醒CPU；
+- timer：U-Boot充电和测试用例中会用到timer中断；
+- debug：CONFIG_ROCKCHIP_DEBUGGER会用到中断；
 
-**驱动代码：**
+配置：
+
+```
+CONFIG_GICV2
+CONFIG_GICV3
+CONFIG_IRQ
+```
+
+框架代码：
 
 ```
 ./drivers/irq/irq-gpio-switch.c
@@ -1418,26 +1307,25 @@ int uclass_get_device_tail(struct udevice *dev, int ret, struct udevice **devp);
 
 #### 5.1.2 相关接口
 
-1. **开关CPU本地中断**
+1. 开关CPU本地中断
 
-```
+```c
 void enable_interrupts(void);
-int	disable_interrupts(void);
+int disable_interrupts(void);
 ```
 
-2. **申请IRQ**
+2. 申请IRQ
 
-目前支持3种方式把gpio转换成对应的irq。
+普通外设一般有独立的硬件中断号（比如：pwm、timer、sdmmc等），注册中断时把中断号传入中断注册函数即可。GPIO的各个pin没有独立的硬件中断号，所以需要向中断框架申请。目前支持3种方式申请GPIO的pin脚中断号：
 
-**法1：传入标准gpio框架的struct gpio_desc结构体：**
+（1）传入struct gpio_desc结构体
 
-```
+```c
+// 此方法可以动态解析dts配置，比较灵活、常用。
 int gpio_to_irq(struct gpio_desc *gpio);
-
-*此方法可以动态解析dts里的配置信息，比较灵活，常用。
 ```
 
-**节点范例：**
+范例：
 
 ```
 battery {
@@ -1448,30 +1336,29 @@ battery {
 };
 ```
 
-**代码范例：**
-
 ```c
-struct gpio_desc *dc_det;
+struct gpio_desc dc_det;
 int ret, irq;
 
-ret = gpio_request_by_name_nodev(dev_ofnode(dev), "dc_det_gpio", 0, dc_det, GPIOD_IS_IN);
+ret = gpio_request_by_name_nodev(dev_ofnode(dev), "dc_det_gpio", 0,
+								 &dc_det, GPIOD_IS_IN);
+// 为了示例简单，省去返回值判断
 if (!ret) {
-	irq = gpio_to_irq(dc_det);
+	irq = gpio_to_irq(&dc_det);
 	irq_install_handler(irq, ...);
 	irq_set_irq_type(irq, IRQ_TYPE_EDGE_FALLING);
 	irq_handler_enable(irq);
 }
 ```
 
-**法2：传入gpio phandle和pin**
+（2）传入gpio的phandle和pin
 
+```c
+// 此方法可以动态解析dts配置，比较灵活、常用。
+int phandle_gpio_to_irq(u32 gpio_phandle, u32 pin);
 ```
-int phandle_gpio_to_irq(u32 gpio_phandle, u32 pin);		--参考：./drivers/input/rk8xx_pwrkey.c
 
-*此方法可以动态解析dts里的配置信息，比较灵活，常用。
-```
-
-**节点范例：**如下是rk817的中断引脚GPIO0_A7的信息：
+范例（rk817的中断引脚GPIO0_A7）：
 
 ```
 rk817: pmic@20 {
@@ -1483,8 +1370,6 @@ rk817: pmic@20 {
 	......
 };
 ```
-
-**代码范例：**
 
 ```c
 u32 interrupt[2], phandle;
@@ -1502,52 +1387,136 @@ if (ret) {
 	return ret;
 }
 
+// 为了示例简单，省去返回值判断
 irq = phandle_gpio_to_irq(phandle, interrupt[0]);
 irq_install_handler(irq, pwrkey_irq_handler, dev);
 irq_set_irq_type(irq, IRQ_TYPE_EDGE_FALLING);
 irq_handler_enable(irq);
 ```
 
-**法3：强制指定GPIO引脚**
+（3）强制指定gpio
 
-```
+```c
+// 此方法直接强制指定gpio，传入的gpio必须通过Rockchip特殊的宏来声明才行，不够灵活，比较少用。
 int hard_gpio_to_irq(unsigned gpio);
-
-*此方法直接强制指定gpio的方法，传入的gpio必须通过Rockchip特殊的宏来声明才行。不够灵活，比较少用。
 ```
 
-**代码范例：**如下是对GPIO0_A0申请中断：
+范例（GPIO0_A0申请中断）：
 
 ```c
 int gpio0_a0, irq;
 
+// 为了示例简单，省去返回值判断
 gpio = RK_IRQ_GPIO(RK_GPIO0, RK_PA0);
 irq = hard_gpio_to_irq(gpio0_a0);
 irq_install_handler(irq, ...);
 irq_handler_enable(irq);
 ```
 
-3. **使能/注册/注销handler**
+3. 使能/注册/注销handler
 
-```
+```c
 void irq_install_handler(int irq, interrupt_handler_t *handler, void *data);
 void irq_free_handler(int irq);
 int irq_handler_enable(int irq);
 int irq_handler_disable(int irq);
+```
+
+4. 设置触发电平类型
+
+```c
 int irq_set_irq_type(int irq, unsigned int type);
 ```
 
-### 5.2 CLOCK驱动
+### 5.2 Clock驱动
 
 #### 5.2.1 框架支持
 
-CLK使用的是clk-uclass的通用框架，相关接口由uclass框架提供。
+clock驱动使用clk-uclass通用框架和标准接口。
 
-1. probe中会rkclk_init（）可以设置部分PLL、CPU、总线等频率，可用于SPL阶段提高频率加速开机。
+配置：
+
+```
+CONFIG_CLK
+```
+
+框架代码：
+
+```
+./drivers/clk/clk-uclass.c
+```
+
+平台驱动代码：
+
+```
+./drivers/clk/rockchip/clk_rk3128.c
+./drivers/clk/rockchip/clk_rk3328.c
+./drivers/clk/rockchip/clk_rk3368.c
+......
+```
+
+平台公共驱动代码：
+
+```
+./drivers/clk/rockchip/clk_rkxxx.c
+./drivers/clk/rockchip/clk_pll.c
+```
+
+#### 5.2.2 相关接口
 
 ```c
-./drivers/clk/rockchip/clk_rk3399.c
+int clk_get_by_index(struct udevice *dev, int index, struct clk *clk);
+int clk_get_by_name(struct udevice *dev, const char *name, struct clk *clk);
+int (*set_parent)(struct clk *clk, struct clk *parent);
+int clk_enable(struct clk *clk);
+int clk_disable(struct clk *clk);
+ulong (*get_rate)(struct clk *clk);
+ulong (*set_rate)(struct clk *clk, ulong rate);
+int (*get_phase)(struct clk *clk);
+int (*set_phase)(struct clk *clk, int degrees);
+```
 
+范例：
+
+```c
+ret = clk_get_by_name(crtc_state->dev, "dclk_vop", &dclk);
+if (!ret)
+	ret = clk_set_rate(&dclk, mode->clock * 1000);
+if (IS_ERR_VALUE(ret)) {
+	printf("%s: Failed to set dclk: ret=%d\n", __func__, ret);
+	return ret;
+}
+```
+
+#### 5.2.3 平台时钟初始化
+
+目前一共有3类接口涉及时钟初始化:
+
+1. 平台基础时钟初始化：rkclk_init()
+
+   各平台的CRU驱动probe时调用rkclk_init()对PLL/CPU/BUS进行频率初始化，这些频率定义在cru_rkxxx.h中。例如RK3399：
+
+```c
+#define APLL_HZ			(600 * MHz)
+#define GPLL_HZ			(800 * MHz)
+#define CPLL_HZ			(384 * MHz)
+#define NPLL_HZ			(600 * MHz)
+#define PPLL_HZ			(676 * MHz)
+#define PMU_PCLK_HZ		( 48 * MHz)
+#define ACLKM_CORE_HZ	(300 * MHz)
+#define ATCLK_CORE_HZ	(300 * MHz)
+#define PCLK_DBG_HZ		(100 * MHz)
+#define PERIHP_ACLK_HZ	(150 * MHz)
+#define PERIHP_HCLK_HZ	( 75 * MHz)
+#define PERIHP_PCLK_HZ	(37500 * KHz)
+#define PERILP0_ACLK_HZ	(300 * MHz)
+#define PERILP0_HCLK_HZ	(100 * MHz)
+#define PERILP0_PCLK_HZ	( 50 * MHz)
+#define PERILP1_HCLK_HZ	(100 * MHz)
+#define PERILP1_PCLK_HZ	( 50 * MHz)
+```
+
+```c
 static void rkclk_init(struct rk3399_cru *cru)
 {
 	rk3399_configure_cpu(cru, APLL_600_MHZ, CPU_CLUSTER_LITTLE);
@@ -1575,125 +1544,114 @@ static void rkclk_init(struct rk3399_cru *cru)
 }
 ```
 
-2. probe中增加clk_set_defaults解析cru节点设置assigned-clock的频率。
+2. 平台二次/模块时钟初始化：clk_set_defaults()
+
+    解析当前dev节点的assigned-clocks/assigned-clock-parents/assigned-clock-rates 属性，进行频率设置。目前用到此接口的模块有：CRU、VOP、GMAC。其它有需要的驱动请自行调用clk_set_defaults()。
+
+    **特别注意**：
+
+    当CRU驱动调用clk_set_defaults()时，其实有可能是对PLL/CPU/BUS的又一次调整，但是默认不会设置assigned-clocks指定的ARM频率。如果要设置ARM频率，需要再单独实现当前平台的set_armclk_rate()。关于set_armclk_rate()，请参考下文的CPU提频章节。
+
+    例如PX30：根据cru节点的assigned-clocks属性重新调整总线频率（ARM频率除外）。
 
 ```c
-./drivers/clk/rockchip/clk_px30.c
-
-ret = clk_set_defaults(dev);
+static int px30_clk_probe(struct udevice *dev)
+{
+	......
+	ret = clk_set_defaults(dev);
 	if (ret)
 		debug("%s clk_set_defaults failed %d\n", __func__, ret);
-```
-
-```c
-./arch/arm64/boot/dts/rockchip/px30.dtsi
-
-		......
-		assigned-clocks =
-			<&pmucru PLL_GPLL>, <&pmucru PCLK_PMU_PRE>,
-			<&pmucru SCLK_WIFI_PMU>, <&cru ARMCLK>,
-			<&cru ACLK_BUS_PRE>, <&cru ACLK_PERI_PRE>,
-			<&cru HCLK_BUS_PRE>, <&cru HCLK_PERI_PRE>,
-			<&cru PCLK_BUS_PRE>, <&cru SCLK_GPU>;
-		assigned-clock-rates =
-			<1200000000>, <100000000>,
-			<26000000>, <600000000>,
-			<200000000>, <200000000>,
-			<150000000>, <150000000>,
-			<100000000>, <200000000>;
-		......
-```
-
-3. CPU提频开机加速
-
-  CPU频率设置可以使用上述中的2设置，但是需要注意电压是否足够，如果不够，在设置频率之前要设置电压，电压可以通过在对应的regulator节点下追加regulator-init-microvolt=<...>指定初始化电压。
-
-```c
-./arch/arm64/boot/dts/rockchip/px30-evb-ddr4-v10.dts
-
 	......
-	vdd_arm: DCDC_REG2 {
-		......
-		regulator-init-microvolt = <1100000>;
-		......
-	};
-```
-
-**框架代码：**
-
-```
-./drivers/clk/clk-uclass.c
-```
-
-**驱动代码：**
-
-```
-./drivers/clk/rockchip/clk_rkxxx.c
-./drivers/clk/rockchip/clk_pll.c
-```
-
-驱动代码位于drivers/clk/rockchip目录, 每颗芯片有一份独立的驱动。clk_pll.c是公用代码。
-
-#### 5.2.2 相关接口
-
-1. **clk 接口**
-
-使用clk-ops结构注册clk的接口，设备最常使用的接口：
-
-```
-ulong (*get_rate)(struct clk *clk);
-ulong (*set_rate)(struct clk *clk, ulong rate);
-int (*get_phase)(struct clk *clk);
-int (*set_phase)(struct clk *clk, int degrees);
-int (*set_parent)(struct clk *clk, struct clk *parent);
-```
-
-2. **代码范例**
-
-```c
-ret = clk_get_by_name(crtc_state->dev, "dclk_vop", &dclk);
-或者
-/* clocks = <&cru ACLK_VOPB>, <&cru DCLK_VOPB>, <&cru HCLK_VOPB>; */
-ret = clk_get_by_index(rtc_state->dev, 1, &dclk)
-
-if (!ret)
-	ret = clk_set_rate(&dclk, mode->clock * 1000);
-if (IS_ERR_VALUE(ret)) {
-	printf("%s: Failed to set dclk: ret=%d\n", __func__, ret);
-	return ret;
 }
 ```
 
-3. **clk init**
+内核：./arch/arm64/boot/dts/rockchip/px30.dtsi：
 
-有三种方式实现部分时钟的init:
+```c
+cru: clock-controller@ff2b0000 {
+	compatible = "rockchip,px30-cru";
+	......
+	assigned-clocks =
+		<&pmucru PLL_GPLL>, <&pmucru PCLK_PMU_PRE>,
+		<&pmucru SCLK_WIFI_PMU>, <&cru ARMCLK>,
+		<&cru ACLK_BUS_PRE>, <&cru ACLK_PERI_PRE>,
+		<&cru HCLK_BUS_PRE>, <&cru HCLK_PERI_PRE>,
+		<&cru PCLK_BUS_PRE>, <&cru SCLK_GPU>;
+	assigned-clock-rates =
+		<1200000000>, <100000000>,
+		<26000000>, <600000000>,
+		<200000000>, <200000000>,
+		<150000000>, <150000000>,
+		<100000000>, <200000000>;
+	......
+}
+```
 
-- 驱动probe时会调用rkclk_init()函数对PLL、CPU和通用BUS进行初始化， 详细上文有描述；
-- 使用clk_set_defaults（dev），解析内核cru节点中的assigned-clocks 设置初始频率， 详细上文有描述；目前除了cru节点会解析assigned-clocks 设置初始频率，又在VOP和GMAC中增加此功能用于频率设置及PARENT设置。后续其他设备驱动里如果需要此功能请自行增加。
-- 其他设备的时钟设置，如eMMC, I2C等在各自的驱动初始化时调用clk_get_by_indel()或者clk_get_by_name()获取clk句柄, 然后调用clk_set_rate()进行设置。
+3. 模块时钟初始化：clk_set_rate()
 
-4. **clk dump**
+   外设可以在自己的驱动中调用clk_set_rate()设置自己模块的频率。
 
-在clks_dump结构中增加想打印出的时钟的ID，然后使用soc_clk_dump()函数打印。目前默认会打印PLL、CPU、总线频率，如果需要其他时钟频率自行增加。
+#### 5.2.4 CPU提频
 
-备注：U-Boot只提供了已使用设备的clock驱动, 没有提供整个SoC完整的clock驱动, 所以如果新增驱动，需要先确认clock驱动中是否有相应接口。
+CPU提频由set_armclk_rate()实现，它会设置CRU节点下assigned-clocks指定的ARM频率。目前CPU提频动作紧跟在regulator初始化之后，这已经是最早能实现CPU提频的时刻点。
+
+set_armclk_rate()是一个weak函数，各平台只在有CPU提频需求时才会实现它。实现的同时要求CRU驱动必须调用clk_set_defaults()，因为ARM频率是通过clk_set_defaults()获取的，在set_armclk_rate()里设置生效。
+
+各平台实现CPU提频的步骤：
+
+- 实现set_armclk_rate()；
+- CRU节点的assigned-clocks里指定ARM频率；
+- CRU驱动调用clk_set_defaults()；
+- ARM对应的regulator节点里增加regulator-init-microvolt=<...>指定初始化电压；
+
+#### 5.2.5 时钟树
+
+U-Boot框架没有提供时钟树管理，目前各平台提供了soc_clk_dump()简单打印时钟状态。如果有其他时钟打印需求，可以在clks_dump[]中增加时钟定义。
+
+范例：
+
+````
+CLK: (sync kernel. arm: enter 1200000 KHz, init 1200000 KHz, kernel 800000 KHz)
+  apll 800000 KHz
+  dpll 392000 KHz
+  cpll 1000000 KHz
+  gpll 1188000 KHz
+  npll 24000 KHz
+  ppll 100000 KHz
+  hsclk_bus 297000 KHz
+  msclk_bus 198000 KHz
+  lsclk_bus 99000 KHz
+  msclk_peri 198000 KHz
+  lsclk_peri 99000 KHz
+````
+
+含义说明：
+
+- sync kernel：设置了kernel cru节点里assigned-clocks指定的各总线频率（ARM频率除外）；否则显示：sync uboot；
+- enter 1200000 KHz：前级loader跳到U-Boot时的arm频率；
+- init 1200000 KHz：U-Boot的arm初始化频率，即APLL_HZ；
+- kernel 800000 KHz：实现了set_armclk_rate()，并设置了kernel cru节点里assigned-clocks指定的ARM频率；否则显示："kernel 0N/A"；
 
 ### 5.3 GPIO驱动
 
 #### 5.3.1 框架支持
 
-GPIO使用的是gpio-uclass的通用框架，相关接口由uclass框架提供。框架里管理GPIO的核心结构体是
+GPIO驱动使用gpio-uclass通用框架和标准接口。GPIO框架管理的核心结构体是struct gpio_desc，它必须依附于device存在，不允许用户直接访问GPIO寄存器。
 
-struct gpio_desc。这个结构体必须依赖device而存在，所以如果想要操作某个gpio，则必须要有对应的device设备存在。
-
-**框架代码：**
+配置：
 
 ```
-./include/asm-generic/gpio.h
+CONFIG_DM_GPIO
+CONFIG_ROCKCHIP_GPIO
+```
+
+框架代码：
+
+```
 ./drivers/gpio/gpio-uclass.c
 ```
 
-**驱动代码：**
+驱动代码：
 
 ```
 ./drivers/gpio/rk_gpio.c
@@ -1701,67 +1659,80 @@ struct gpio_desc。这个结构体必须依赖device而存在，所以如果想�
 
 #### 5.3.2 相关接口
 
-1. **gpio申请（初始化struct gpio_desc）**
+1. request：获取struct gpio_desc。
 
-```
+```c
 int gpio_request_by_name(struct udevice *dev, const char *list_name,
-                        int index, struct gpio_desc *desc, int flags);
+                         int index, struct gpio_desc *desc, int flags);
 int gpio_request_by_name_nodev(ofnode node, const char *list_name, int index,
-                              struct gpio_desc *desc, int flags);
+                               struct gpio_desc *desc, int flags);
 int gpio_request_list_by_name(struct udevice *dev, const char *list_name,
-                             struct gpio_desc *desc_list, int max_count, int flags);
+                              struct gpio_desc *desc_list, int max_count, int flags);
 int gpio_request_list_by_name_nodev(ofnode node, const char *list_name,
-                                   struct gpio_desc *desc_list, int max_count, int flags);
+									struct gpio_desc *desc_list, int max_count,
+									int flags);
 int dm_gpio_free(struct udevice *dev, struct gpio_desc *desc)
 ```
 
-上述的申请接口：目的都是为了从传入的device里获取对应的gpio（即初始化struct gpio_desc结构体）。
+2. input/out
 
-2. gpio input/out
-
-```
+```c
+// @flags：GPIOD_IS_OUT（输出）和GPIOD_IS_IN（输入）
 int dm_gpio_set_dir_flags(struct gpio_desc *desc, ulong flags);
 ```
 
-其中flags：GPIOD_IS_OUT：输出模式；	GPIOD_IS_IN：输入模式；
+3. set/get
 
-3. **gpio set/get**
-
-```
+```c
 int dm_gpio_get_value(const struct gpio_desc *desc)
 int dm_gpio_set_value(const struct gpio_desc *desc, int value)
 ```
 
-**关于返回值：**
+dm_gpio_get_value()的返回值：
 
-​	dm_gpio_get_value()的返回值和dts里指定的电平属性（GPIO_ACTIVE_LOW/HIGH）有关系，并不表示当前的引脚电平值，而是表示是否触发了，其中1表示是触发了，0表示没有触发。例如：gpios = <&gpio 0 GPIO_ACTIVE_LOW>，如果此时引脚电平为低，则函数返回1；如果电平引脚为高，函数返回值为0。
+返回值1或0，并不表示引脚电平的高或低，只表示是否触发了active属性：（GPIO_ACTIVE_LOW或GPIO_ACTIVE_HIGH）。1：触发，0：没触发。
 
-4. **代码范例**
+例如：
+
+- gpios = <&gpio2 0 GPIO_ACTIVE_LOW>，引脚电平为低时，返回值为1，引脚电平为高时返回值为0。
+
+- gpios = <&gpio2 1 GPIO_ACTIVE_HIGH>，引脚电平为低时，返回值为0，引脚电平为高时返回值为1。
+
+同理，dm_gpio_set_value()传入的value表示是否把gpio电平设置为active状态，1：active，0：inactive。
+
+4. 范例
 
 ```c
 struct gpio_desc *gpio;
 int value;
 
+// 为了示例简单，省去返回值判断
 gpio_request_by_name(dev, "gpios", 0, gpio, GPIOD_IS_OUT);  // 申请gpio
-dm_gpio_set_value(gpio, enable);                            // 设置gpio输出电平
-dm_gpio_set_dir_flags(gpio, GPIOD_IS_IN);                   // 设置gpio为输入
-value = dm_gpio_get_value(gpio);                            // 读取gpio电平
+dm_gpio_set_value(gpio, enable);                            // 设置gpio输出电平状态
+dm_gpio_set_dir_flags(gpio, GPIOD_IS_IN);                   // 设置gpio输入模式
+value = dm_gpio_get_value(gpio);                            // 读取gpio电平状态
 ```
 
 ### 5.4 Pinctrl
 
 #### 5.4.1 框架支持
 
-pinctrl走的是pinctrl-class的通用框架，相关接口由uclass框架提供。使用方法同kernel类似，通过dts里的pinctrl节点指定。
+pinctrl驱动使用pinctrl-uclass通用框架和标准接口。
 
-**框架代码：**
+配置：
+
+```
+CONFIG_PINCTRL_GENERIC
+CONFIG_PINCTRL_ROCKCHIP
+```
+
+框架代码：
 
 ```
 ./drivers/pinctrl/pinctrl-uclass.c
-./include/dm/pinctrl.h
 ```
 
-**驱动代码：**
+驱动代码：
 
 ```
 ./drivers/pinctrl/pinctrl-rockchip.c
@@ -1774,21 +1745,28 @@ int pinctrl_select_state(struct udevice *dev, const char *statename)    // 设�
 int pinctrl_get_gpio_mux(struct udevice *dev, int banknum, int index)   // 获取状态
 ```
 
-一般情况下，用户很少会需要调用上述接口进行引脚功能的切换，通常都是在device进行probe时设置"default"状态即可满足使用，而这部分已经由系统框架在驱动probe时自动完成，用户不用关心。
+通常用户很少需要手动切换引脚功能，pinctrl框架会在driver probe时设置pin的"default"状态，一般都能满足使用。
 
 ### 5.5. I2C驱动
 
 #### 5.5.1 框架支持
 
-I2C走的是i2c-uclass的通用框架，相关接口由uclass框架提供。i2c的相关接口都必须依赖device，因此类同内核的处理一样，需要在dts里把 子设备挂接到i2c  bus节点之下。i2c框架在初始化的时候会把这些device作为i2c slave纳入自己的管理中。
+i2c驱动使用i2c-uclass通用框架和标准接口。
 
-**框架代码：**
+配置：
+
+```
+CONFIG_DM_I2C
+CONFIG_SYS_I2C_ROCKCHIP
+```
+
+框架代码：
 
 ```
 ./drivers/i2c/i2c-uclass.c
 ```
 
-**驱动代码：**
+驱动代码：
 
 ```
 ./drivers/i2c/rk_i2c.c
@@ -1796,7 +1774,11 @@ I2C走的是i2c-uclass的通用框架，相关接口由uclass框架提供。i2c�
 
 #### 5.5.2 相关接口
 
-```
+```c
+int dm_i2c_read(struct udevice *dev, uint offset, uint8_t *buffer, int len)
+int dm_i2c_write(struct udevice *dev, uint offset, const uint8_t *buffer, int len)
+
+// 对上面接口的另一种格式封装
 int dm_i2c_reg_read(struct udevice *dev, uint offset)
 int dm_i2c_reg_write(struct udevice *dev, uint offset, unsigned int val);
 ```
@@ -1805,81 +1787,99 @@ int dm_i2c_reg_write(struct udevice *dev, uint offset, unsigned int val);
 
 #### 5.6.1 框架支持
 
-Rockchip U-Boot目前支持的显示接口包括RGB，LVDS，EDP，MIPI和HDMI，未来还会加入CVBS，DP等显示接口的支持。U-Boot显示的图片为保存在kernel根目录下的logo.bmp，和logo_kernel.bmp一起打包进resource.img中，图片要求:
+Rockchip U-Boot目前支持的显示接口包括：RGB、LVDS、EDP、MIPI和HDMI，未来还会加入CVBS、DP等。U-Boot显示的logo图片来自kernel根目录下的logo.bmp和logo_kernel.bmp，它们被打包在resource.img里。
 
-1. 8bit或者24bit BMP格式的图片；
+对图片的要求:
 
-2. logo.bmp和logo_kernel.bmp的图片分辨率大小一致；
+1. 8bit或者24bit BMP格式；
+   2. logo.bmp和logo_kernel.bmp的图片分辨率大小一致；
+2. 对于rk312x/px30/rk3308这种基于vop lite结构的芯片，由于VOP不支持镜像，而24bit的BMP图片是按镜像存储，所以如果发现显示的图片做了y方向的镜像，请在PC端提前将图片做好y方向的镜像。
 
-3. 对于rk312x/px30/rk3308这种基于vop lite结构的芯片，由于VOP不支持镜像，而24bit的BMP图片是按镜像存储，所以如果发现显示的图片做了y方向的镜像，请在PC端提前将图片做好y方向的镜像。
+配置：
 
-   ##### 框架代码：
+```
+CONFIG_DM_VIDEO
+CONFIG_DISPLAY
+CONFIG_DRM_ROCKCHIP
+CONFIG_DRM_ROCKCHIP_PANEL
+CONFIG_DRM_ROCKCHIP_DW_MIPI_DSI
+CONFIG_DRM_ROCKCHIP_DW_HDMI
+CONFIG_DRM_ROCKCHIP_LVDS
+CONFIG_DRM_ROCKCHIP_RGB
+CONFIG_DRM_ROCKCHIP_RK618
+CONFIG_ROCKCHIP_DRM_TVE
+CONFIG_DRM_ROCKCHIP_ANALOGIX_DP
+CONFIG_DRM_ROCKCHIP_INNO_VIDEO_COMBO_PHY
+CONFIG_DRM_ROCKCHIP_INNO_VIDEO_PHY
+```
 
-   ```
-   drivers/video/drm/rockchip_display.c
-   drivers/video/drm/rockchip_display.h
-   ```
+框架代码：
 
-   ##### 驱动文件：
+```
+drivers/video/drm/rockchip_display.c
+drivers/video/drm/rockchip_display.h
+```
 
-   ```
-   vop:
-         drivers/video/drm/rockchip_crtc.c
-         drivers/video/drm/rockchip_crtc.h
-         drivers/video/drm/rockchip_vop.c
-         drivers/video/drm/rockchip_vop.h
-         drivers/video/drm/rockchip_vop_reg.c
-         drivers/video/drm/rockchip_vop_reg.h
+驱动文件：
 
-   rgb:
-         drivers/video/drm/rockchip_rgb.c
-         drivers/video/drm/rockchip_rgb.h
+```
+vop:
+  drivers/video/drm/rockchip_crtc.c
+  drivers/video/drm/rockchip_crtc.h
+  drivers/video/drm/rockchip_vop.c
+  drivers/video/drm/rockchip_vop.h
+  drivers/video/drm/rockchip_vop_reg.c
+  drivers/video/drm/rockchip_vop_reg.h
 
-   lvds:
-         drivers/video/drm/rockchip_lvds.c
-         drivers/video/drm/rockchip_lvds.h
+rgb:
+  drivers/video/drm/rockchip_rgb.c
+  drivers/video/drm/rockchip_rgb.h
 
-   mipi:
-         drivers/video/drm/rockchip_mipi_dsi.c
-         drivers/video/drm/rockchip_mipi_dsi.h
-         drivers/video/drm/rockchip-inno-mipi-dphy.c
+lvds:
+  drivers/video/drm/rockchip_lvds.c
+  drivers/video/drm/rockchip_lvds.h
 
-   edp:
-         drivers/video/drm/rockchip_analogix_dp.c
-         drivers/video/drm/rockchip_analogix_dp.h
-         drivers/video/drm/rockchip_analogix_dp_reg.c
-         drivers/video/drm/rockchip_analogix_dp_reg.h
+mipi:
+  drivers/video/drm/rockchip_mipi_dsi.c
+  drivers/video/drm/rockchip_mipi_dsi.h
+  drivers/video/drm/rockchip-inno-mipi-dphy.c
 
-   hdmi:
-         drivers/video/drm/dw_hdmi.c
-         drivers/video/drm/dw_hdmi.h
-         drivers/video/drm/rockchip_dw_hdmi.c
-         drivers/video/drm/rockchip_dw_hdmi.h
+edp:
+  drivers/video/drm/rockchip_analogix_dp.c
+  drivers/video/drm/rockchip_analogix_dp.h
+  drivers/video/drm/rockchip_analogix_dp_reg.c
+  drivers/video/drm/rockchip_analogix_dp_reg.h
 
-   panel:
-         drivers/video/drm/rockchip_panel.c
-         drivers/video/drm/rockchip_panel.h
-   ```
+hdmi:
+  drivers/video/drm/dw_hdmi.c
+  drivers/video/drm/dw_hdmi.h
+  drivers/video/drm/rockchip_dw_hdmi.c
+  drivers/video/drm/rockchip_dw_hdmi.h
+
+panel:
+  drivers/video/drm/rockchip_panel.c
+  drivers/video/drm/rockchip_panel.h
+```
 
 #### 5.6.2 相关接口
 
 1. 显示U-Boot logo和kernel logo：
 
-   ```
-   void rockchip_show_logo(void);
-   ```
+```
+void rockchip_show_logo(void);
+```
 
-2. 显示指定的bmp图片，目前主要用于充电logo的显示：
+2. 显示bmp图片，目前主要用于充电图片显示：
 
-   ```
-   void rockchip_show_bmp(const char *bmp);
-   ```
+```
+void rockchip_show_bmp(const char *bmp);
+```
 
-3. 将U-Boot中确定的一些变量通过dtb文件传递给内核，包括kernel logo的大小、地址和格式，crtc输出扫描时序以及过扫描的配置，未来还会加入BCSH等相关变量配置。
+3. 将U-Boot中的一些变量通过dtb传给内核。包括kernel logo的大小、地址、格式、crtc输出扫描时序以及过扫描的配置，未来还会加入BCSH等相关变量配置。
 
-   ```
-   rockchip_display_fixup(void *blob);
-   ```
+```
+rockchip_display_fixup(void *blob);
+```
 
 #### 5.6.3 DTS配置
 
@@ -1891,7 +1891,8 @@ reserved-memory {
 
 	drm_logo: drm-logo@00000000 {
 		compatible = "rockchip,drm-logo";
-		reg = <0x0 0x0 0x0 0x0>; //预留buffer用于kernel logo的存放，具体地址和大小在U-Boot中会修改
+		//预留buffer用于kernel logo的存放，具体地址和大小在U-Boot中会修改
+		reg = <0x0 0x0 0x0 0x0>;
 	};
 };
 
@@ -1928,7 +1929,7 @@ reserved-memory {
 
 #### 5.6.4 defconfig配置
 
-目前除了RK3308之外的其他平台U-Boot中defconfig已经默认支持显示，只要在dts中将显示相关的信息配置好即可。RK3308考虑到启动速度等一些原因默认不支持显示，需要在defconfig中加入如下修改：
+目前除了RK3308之外的其他平台，U-Boot的defconfig已经默认支持显示，只要在dts中将显示相关的信息配置好即可。RK3308考虑到启动速度等一些原因默认不支持显示，需要在defconfig中加入如下修改：
 
 ```
 --- a/configs/evb-rk3308_defconfig
@@ -1957,123 +1958,149 @@ CONFIG_ERRNO_STR=y
 
 **关于upstream defconfig配置的说明：**
 
-​	upstream维护了一套rockchip U-Boot显示驱动，目前主要支持RK3288和RK3399两个平台，驱动代码在：
+upstream维护了一套rockchip U-Boot显示驱动，目前主要支持RK3288和RK3399两个平台：
 
 ```
 ./drivers/video/rockchip/
 ```
 
-如果要使用这套驱动可以打开配置CONFIG_VIDEO_ROCKCHIP同时关闭CONFIG_DRM_ROCKCHIP，和我们目前SDK使用的显示驱动对比，后者的优势有：
+如果要使用这套驱动，可以打开CONFIG_VIDEO_ROCKCHIP，同时关闭CONFIG_DRM_ROCKCHIP。跟我们目前SDK使用的显示驱动对比，后者的优势有：
 
-​	1. 支持的平台和显示接口更全面；
+1. 支持的平台和显示接口更全面；
 
-​	2. HDMI、DP等显示接口可以根据用户的设定输出指定分辨率，过扫描效果，显示效果调节效果等。
+2. HDMI、DP等显示接口可以根据用户的设定输出指定分辨率，过扫描效果，显示效果调节效果等。
 
-​	3. U-Boot logo可以平滑过渡到kernel logo直到系统起来；
+3. U-Boot logo可以平滑过渡到kernel logo直到系统起来；
 
 ### 5.7 PMIC/Regulator驱动
 
 #### 5.7.1 框架支持
 
-PMIC/regulator驱动走的是标准pmic-uclass、regulator-uclass的通用框架。目前支持的PMIC：RK805/RK808/RK809/RK816/RK817/RK818。
+PMIC/Regulator驱动使用pmic-uclass、regulator-uclass通用框架和标准接口。
 
-**框架代码：**
+支持的PMIC：rk805/rk808/rk809/rk816/rk817/rk818；
+
+支持的Regulator：rk805/rk808/rk809/rk816/rk817/rk818/syr82x/tcs452x/fan53555/pwm/gpio/fixed。
+
+配置：
+
+```
+CONFIG_DM_PMIC
+CONFIG_PMIC_CHILDREN
+CONFIG_PMIC_RK8XX
+CONFIG_DM_REGULATOR
+CONFIG_REGULATOR_PWM
+CONFIG_REGULATOR_RK8XX
+CONFIG_REGULATOR_FAN53555
+```
+
+框架代码：
 
 ```
 ./drivers/power/pmic/pmic-uclass.c
 ./drivers/power/regulator/regulator-uclass.c
 ```
 
-**驱动文件：**
+驱动文件：
 
 ```
 ./drivers/power/pmic/rk8xx.c
 ./drivers/power/regulator/rk8xx.c
+./drivers/power/regulator/pwm_regulator.c
+./drivers/power/regulator/fan53555_regulator.c
 ```
 
 #### 5.7.2 相关接口
 
-1. **获取regulator**
+1. get
 
-```
+```c
+// @platname：“regulator-name”指定的名字，如：vdd_arm、vdd_logic；
+// @devp：保存获取的regulator device；
+// 常用。
 int regulator_get_by_platname(const char *platname, struct udevice **devp);
+
+// 不常用。
+int regulator_get_by_devname(const char *devname, struct udevice **devp);
 ```
 
-platname：dts中regulator节点里“regulator-name”指定的名字，例如：vdd_arm、vdd_logic等；
+2. enable/disable
 
-devp：指向vdd_arm、vdd_logic对应的regulator device；
-
-2. **开/关regulator**
-
-```
+```c
 int regulator_get_enable(struct udevice *dev);
 int regulator_set_enable(struct udevice *dev, bool enable);
 int regulator_set_suspend_enable(struct udevice *dev, bool enable);
+int regulator_get_suspend_enable(struct udevice *dev);
 ```
 
-3. **设置regulator电压**
+3. set/get
 
-```
+```c
 int regulator_get_value(struct udevice *dev);
 int regulator_set_value(struct udevice *dev, int uV);
 int regulator_set_suspend_value(struct udevice *dev, int uV);
+int regulator_get_suspend_value(struct udevice *dev);
 ```
 
-#### 5.7.3 初始化电压
+#### 5.7.3 init电压
 
-Buck1/2在使用时通常需要进行调压，因此regulator节点里设置的"regulator-min-microvolt"和"regulator-min-microvolt"一般不会相等，这样在初始化regulator的时候就只会用PMIC的默认上电电压，软件不会去设置电压。当需要制定初始化电压的时候，可以通过"regulator-init-microvolt"指定，一般在U-Boot阶段进行CPU提频时会用到。如下：
+当"regulator-min-microvolt"和"regulator-min-microvolt"不同时，regulator框架不会设置电压。用户可以通过"regulator-init-microvolt = <...>"指定regulator的init电压，此功能一般配合CPU提频使用。
 
+```c
+vdd_arm: DCDC_REG1 {
+	regulator-name = "vdd_arm";
+	regulator-min-microvolt = <712500>;
+	regulator-max-microvolt = <1450000>;
+	regulator-init-microvolt = <1100000>	// 设置初始化电压为1.1v
+	regulator-ramp-delay = <6001>;
+	regulator-boot-on;
+	regulator-always-on;
+	regulator-state-mem {
+		regulator-on-in-suspend;
+		regulator-suspend-microvolt = <1000000>;
+	};
+};
 ```
-regulator-min-microvolt = <900000>
-regulator-max-microvolt = <1500000>
-regulator-init-microvolt = <1100000>// 初始化电压设置为1.1v
-```
 
-#### 5.7.4 debug方法
+#### 5.7.4 调试方法
 
-**方法1：regulator初始化阶段**
-
-系统各路regulator的初始化位置。如下：
+1. regulator初始化阶段
 
 ```
 ./arch/arm/mach-rockchip/board.c
-	--> board_init
-		--> regulators_enable_boot_on(false);
+  -> board_init
+    -> regulators_enable_boot_on(false);
 ```
 
-把上述的"false"修改"true"即可打印出各路regulator的配置。如下：
+把"false"修改"true"可显示各路regulator状态：
 
 ![UBoot-nextdev-probe-regulator-list](Rockchip-Developer-Guide-UBoot-nextdev\UBoot-nextdev-probe-regulator-list.png)
 
 内容说明：
 
-1. “-61”对应的是错误码，表示没有找到dts里对应的属性；
+（1）“-61”对应的是错误码：没有找到dts里对应的属性；
 
 ```
 #define	ENODATA		61	/* No data available */
 ```
 
-2. "（ret: -38）"对应的错误码是，表示没有实现对应的回调接口；
+（2）"（ret: -38）"对应的错误码：没有实现对应的回调接口；
 
 ```
 #define	ENOSYS		38	/* Invalid system call number */,
 ```
 
-3. 如果对上述各参数的内部含义有疑问，可直接阅读对应的源代码。
+（3）如果对上述各参数的内部含义有疑问，可直接阅读对应的源代码。
 
 ```
 static void regulator_show(struct udevice *dev, int ret)
 ```
 
-**方法2：regulator初始化完成后**
-
-U-Boot串口命令行下，使用"regulator"命令。驱动如下：
+2. regulator命令
 
 ```
-cmd/regulator.c
+CONFIG_CMD_REGULATOR
 ```
-
-命令格式：
 
 ```
 => regulator
@@ -2091,23 +2118,45 @@ regulator enable               - enable the regulator output
 regulator disable              - disable the regulator output
 ```
 
-**法3：regulator初始化完成后（类同法2）**
-
-U-Boot串口命令行下使用"rktest regulator"命令，具体参考[11. rktest测试程序](#11. rktest测试程序)。
+3 rktest regulator命令：请参考本文档[11. rktest测试程序](#11. rktest测试程序)。
 
 ### 5.8 充电驱动
 
 #### 5.8.1 框架支持
 
-充电功能方面，U-Boot里默认没有给与足够支持，因此我们自己增加了一套处理的框架代码，包括电量计部分和充电动画部分。目前支持的电量计：RK809/RK816/RK817/RK818。
+U-Boot没有完整的充电功能支持，Rockchip自己实现了一套充电框架。模块涉及：Display、PMIC、电量计、充电动画、pwrkey、led、低功耗休眠、中断定时器。目前支持的电量计：RK809/RK816/RK817/RK818/cw201x。
 
-**电量计框架代码：**
+配置：
+
+```
+CONFIG_DM_CHARGE_DISPLAY
+CONFIG_CHARGE_ANIMATION
+CONFIG_DM_FUEL_GAUGE
+CONFIG_POWER_FG_CW201X
+CONFIG_POWER_FG_RK818
+CONFIG_POWER_FG_RK817
+CONFIG_POWER_FG_RK816
+```
+
+充电框架：
+
+```
+./drivers/power/charge-display-uclass.c
+```
+
+充电动画驱动：
+
+```
+./drivers/power/charge_animation.c
+```
+
+电量计框架：
 
 ```
 ./drivers/power/fuel_gauge/fuel_gauge_uclass.c
 ```
 
-**电量计驱动：**
+电量计驱动：
 
 ```
 ./drivers/power/fuel_gauge/fg_rk818.c
@@ -2116,40 +2165,32 @@ U-Boot串口命令行下使用"rktest regulator"命令，具体参考[11. rktest
 ......
 ```
 
-**充电框架代码：**
-
-```
-./drivers/power/charge-display-uclass.c
-```
-
-**充电动画驱动：**
-
-```
-./drivers/power/charge_animation.c
-```
-
-charge_animation.c是真正具体实现充电流程的驱动，驱动里面会调用电量计上报的电量、适配器状态、检测按键、进入低功耗休眠等。逻辑流程：
+charge_animation.c是通用的充电框架，管理了整个充电过程的所有事件和状态：它会调用电量计上报的电量、充电器类型、pwrkey事件、进入低功耗休眠等。逻辑流程：
 
 ```
 charge-display-uclass.c
 	-> charge_animation.c
 		-> fuel_gauge_uclass.c
-			->fg_rk818.c/fg_rk817.c
+			->fg_rkxx.c
 ```
 
 #### 5.8.2 充电图片打包
 
-充电图片需要打包进resource.img才能被充电驱动读取并且显示。编译内核时默认不会打包充电图片，所以需要另外单独把这些图片打包进resource.img。
-
-**打包命令：**
+充电图片位于./tools/images/目录下，需要打包到resource.img才能被充电框架显示。内核编译时默认不打包充电图片，需要另外单独打包。
 
 ```
-./pack_resource.sh <input resource.img>
+$ ls tools/images/
+battery_0.bmp  battery_1.bmp  battery_2.bmp  battery_3.bmp  battery_4.bmp  battery_5.bmp  battery_fail.bmp
 ```
 
-这个命令默认会把./tools/images/目录里的图片作为充电图片打包进resource.img，新的resource.img会生成在U-Boot根目录下，烧写的时候请烧写这个新的resource.img。
+打包命令：
 
-**如下是打包时的提示信息：**
+```
+./pack_resource.sh <input resource.img> 或
+./scripts/pack_resource.sh <input resource.img>
+```
+
+打包信息：
 
 ```
 ./pack_resource.sh  /home/guest/3399/kernel/resource.img
@@ -2164,43 +2205,71 @@ rk-kernel.dtb battery_1.bmp battery_2.bmp battery_3.bmp battery_4.bmp battery_5.
 resource.img is packed ready
 ```
 
-#### 5.8.3 DTS使能充电
-
-默认代码已经使能了该驱动，通过在dts里增加并且使能charge-animation节点即可使能充电动画的功能。
+命令执行成功后会在U-Boot根目录下生成打包了充电图片的resource.img，用户需要烧写打包图片后的resource.img。通过hd命令可以确认新resource.img是否包含图片：
 
 ```
+$ hd resource.img | less
+
+00000000  52 53 43 45 00 00 00 00  01 01 01 00 0a 00 00 00  |RSCE............|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+......
+*
+00000400  45 4e 54 52 62 61 74 74  65 72 79 5f 31 2e 62 6d  |ENTRbattery_1.bm|
+00000410  70 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |p...............|
+00000420  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000500  00 00 00 00 4d 00 00 00  9c 18 00 00 00 00 00 00  |....M...........|
+00000510  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000600  45 4e 54 52 62 61 74 74  65 72 79 5f 32 2e 62 6d  |ENTRbattery_2.bm|
+00000610  70 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |p...............|
+00000620  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+......
+```
+
+#### 5.8.3 DTS使能充电
+
+充电驱动使能后，还需要使能charge-animation节点：
+
+```c
 charge-animation {
 	compatible = "rockchip,uboot-charge";
 	status = "okay";
 
-	rockchip,uboot-charge-on = <0>；              // 是否在U-Boot进行充电
-	rockchip,android-charge-on = <1>；            // 是否在Android进行充电
+	rockchip,uboot-charge-on = <0>;             // 是否开启U-Boot充电
+	rockchip,android-charge-on = <1>;           // 是否开启Android充电
 
-	rockchip,uboot-exit-charge-level = <5>;       // U-Boot充电时，允许开机的最低电量
-	rockchip,uboot-exit-charge-voltage = <3650>； // U-Boot充电时，允许开机的最低电压
-	rockchip,screen-on-voltage = <3400>;          // U-Boot充电时，允许点亮屏幕的最低电压
+	rockchip,uboot-exit-charge-level = <5>;     // U-Boot充电时，允许开机的最低电量
+	rockchip,uboot-exit-charge-voltage = <3650>;// U-Boot充电时，允许开机的最低电压
+	rockchip,screen-on-voltage = <3400>;        // U-Boot充电时，允许点亮屏幕的最低电压
 
-	rockchip,uboot-low-power-voltage = <3350>;    // U-Boot无条件强制进入充电模式的最低电压
+	rockchip,uboot-low-power-voltage = <3350>;  // U-Boot无条件强制进入充电模式的最低电压
 
-	rockchip,system-suspend = <1>;                // 灭屏时进入trust进行低功耗待机
-	rockchip,auto-off-screen-interval = <20>;     // 亮屏超时后自动灭屏，单位秒。(如果没有这个属性，则默认15s)
-	rockchip,auto-wakeup-interval = <10>;         // 休眠自动唤醒时间，单位秒。(如果值为0或没有这个属性，则禁止休眠自动唤醒)
-	rockchip,auto-wakeup-screen-invert = <1>;     // 休眠自动唤醒的时候，是否让屏幕产生亮/灭效果
+	rockchip,system-suspend = <1>;              // 是否灭屏时进入trust低功耗待机（要ATF支持）
+	rockchip,auto-off-screen-interval = <20>;   // 亮屏超时（自动灭屏），单位秒，默认15s
+	rockchip,auto-wakeup-interval = <10>;       // 休眠自动唤醒时间，单位秒。如果值为0或没
+	                                            // 有这个属性，则禁止休眠自动唤醒。
+	rockchip,auto-wakeup-screen-invert = <1>;   // 休眠自动唤醒时是否需要亮/灭屏
 };
 ```
 
-- 自动休眠唤醒功能的作用：
-1. 考虑到有些电量计（比如adc）需要定时更新软件算法，否则会造成电量统计不准，因此不能让cpu一直处于休眠状态；
+自动休眠唤醒功能：
 
-2. 方便进行休眠唤醒的压力测试；
+- 考虑到有些电量计（比如：adc）需要定时更新软件算法，否则会造成电量统计不准，因此不能让CPU一直处于休眠状态，需要定时唤醒；
+
+- 方便进行休眠唤醒的压力测试；
 
 #### 5.8.4 低功耗休眠
 
-进入充电流程后可通过短按power实现系统亮灭屏，灭屏时进入低功耗待机状态，再次按下按键可唤醒。非低电状态下，长按power可退出充电流程进行开机。
+充电过程可以短按pwrkey实现亮灭屏，灭屏时系统会进入低功耗状态，长按pwrkey可开机进入系统。低功耗状态有2种模式可选，通过rockchip,system-suspend = <...> 选择：
+
+- wfi模式：外设不处理，仅仅cpu进入低功耗模式；
+- system suspend模式：类同内核的二级待机模式，但是这个功能需要ATF支持才有效；
 
 #### 5.8.5 更换充电图片
 
-1. 更换./tools/images/目录下的图片，图片采用8bit或24bit bmp格式。使用命令“ls |sort”确认图片排列顺序是低电量到高电量，在使用pack_resource.sh脚本打包时，所有图片会按照这个顺序被打包进resource；
+1. 更换./tools/images/目录下的图片，图片采用8bit或24bit bmp格式。使用命令“ls |sort”确认图片排列顺序是低电量到高电量，使用pack_resource.sh脚本把图片打包进resource；
 2. 修改./drivers/power/charge_animation.c里的图片和电量关系信息：
 
 ```c
@@ -2221,29 +2290,29 @@ static const struct charge_image image[] = {
 };
 ```
 
-​	name：图片的名字；
+​	@name：图片的名字；
 
-​	soc：图片对应的电量；
+​	@soc：图片对应的电量；
 
-​	period：图片刷新时间（单位：ms）；
+​	@period：图片刷新时间（单位：ms）；
 
-​	**注意：**最后一张图片一定要是failed的图片，且“soc=-1”不可改变。
+​	注意：最后一张图片必须是fail图片，且“soc=-1”不可改变。
 
-3. 执行pack_resource.sh打包命令获取新的resource.img即可；
+3. 执行pack_resource.sh获取新的resource.img；
 
 ### 5.9 存储驱动
 
-U-Boot的存储驱动走的是标准的存储通用框架，所有接口都对接到block层支持文件系统。目前支持的存储设备有：EMMC、Nand flash、SPI Nand flash、SPI Nor flash。
+存储驱动使用标准的存储框架，接口对接到block层支持文件系统。目前支持的存储设备：eMMC、Nand flash、SPI Nand flash、SPI Nor flash。
 
 #### 5.9.1 相关接口
 
-**获取blk描述符：**
+获取blk描述符：
 
 ```c
 struct blk_desc *rockchip_get_bootdev(void)
 ```
 
-**读写接口：**
+读写接口：
 
 ```c
 unsigned long blk_dread(struct blk_desc *block_dev, lbaint_t start,
@@ -2252,13 +2321,12 @@ unsigned long blk_dwrite(struct blk_desc *block_dev, lbaint_t start,
 						lbaint_t blkcnt, const void *buffer)
 ```
 
-**代码范例：**
+范例：
 
 ```c
 struct rockchip_image *img;
 
 dev_desc = rockchip_get_bootdev();				// 获取blk描述符
-
 img = memalign(ARCH_DMA_MINALIGN, RK_BLK_SIZE);
 if (!img) {
 	printf("out of memory\n");
@@ -2281,26 +2349,33 @@ if (ret != 1) {
 #### 5.9.2 DTS配置
 
 ```
+&emmc {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+}
+```
+
+```
 &nandc {
-        u-boot,dm-pre-reloc;
-        status = "okay";
+	 u-boot,dm-pre-reloc;
+	status = "okay";
 };
 ```
 
 ```
 &sfc {
-        u-boot,dm-pre-reloc;
-        status = "okay";
+	u-boot,dm-pre-reloc;
+	status = "okay";
 };
 ```
 
-注：nandc节点是与nand flash设备通信的控制器节点，sfc节点是与spi flash设备通信的控制器节点，如果只用nand flash设备或只用spi flash设备，可以只使能对应节点，而两个节点都使能也是兼容的。
+注意：nandc节点是与nand flash设备通信的控制器节点，sfc节点是与spi flash设备通信的控制器节点，如果只用nand flash设备或只用spi flash设备，可以只使能对应节点，而两个节点都使能也是兼容的。
 
 #### 5.9.3 defconfig配置
 
 **rknand**
 
-rknand通常是指drivers/rknand/目录下的存储驱动，其是针对大容量Nand flash设备所设计的存储驱动，通过Nandc host与Nand flash device通信，具体适用颗粒选型参考《RKNandFlashSupportList》，适用以下存储：
+rknand通常是指drivers/rknand/目录下的存储驱动，是针对大容量Nand flash设备所设计的存储驱动，通过Nandc host与Nand flash device通信，具体适用颗粒选型参考《RKNandFlashSupportList》，适用以下存储：
 
 - SLC、MLC、TLC Nand flash
 
@@ -2325,90 +2400,76 @@ CONFIG_RKSFC_NOR=y
 CONFIG_RKSFC_NAND=y
 ```
 
-注意：rknand/驱动与rkflash/驱动的ftl框架不兼容，所以两个框架无法同时配置使能Nand设备。
+注意：rknand驱动与rkflash驱动的ftl框架不兼容，所以两个框架无法同时配置使能。
 
-### 5.10 串口支持
+### 5.10 串口驱动
 
-#### 5.10.1 串口配置
+U-Boot的串口大致分为两类，我们暂且称之为：
 
-U-Boot主要通过串口来打印启动过程中的log信息。在U-Boot中串口驱动有两种，目前Rockchip平台的串口对应的驱动为：
+- Console UART：遵循标准serial框架的串口驱动，U-Boot大部分时间都在用这种驱动；
+- Early Debug UART：Console UART加载较晚，如果在此之前出现异常就看不到打印。针对这种情况，U-Boot提供了另外一种机制：Early Debug UART，本质上是绕过serial框架，直接往uart寄存器写数据。
+
+目前这两种串口驱动在Rockchip平台都有实现。
+
+#### 5.10.1 Console UART配置
+
+驱动代码：
 
 ```c
 ./drivers/serial/ns16550.c
 ./drivers/serial/serial-uclass.c
-./include/debug_uart.h
 ```
 
-U-Boot正常启动的时候，在relocation之前，会在board_init_f[]函数列表中通过serial_init()加载驱动。这是U-Boot中正式的debug console驱动，如果该驱动加载失败则U-Boot将停止启动。具体的配置流程如下（以uart2为例）：
+配置步骤（uart2为例）：
 
-1. iomux配置：每个平台都有`board_debug_uart_init()`函数，一般位于rkxxx.c里（例如：rk3399.c/rk3368.c/px30.c等），需要在这个函数里完成uart iomux的配置。
+1. iomux：在board_debug_uart_init()完成uart iomux的配置；
+2. clock：在board_debug_uart_init()完成uart clock的配置，时钟源一般配置为24Mhz；
+3. baudrate：CONFIG_BAUDRATE 设置波特率。
+4. U-Boot uart节点中增加2个必要属性：
 
-2. clock配置：每个平台默认都是把uart的时钟源配置为24Mhz，一般pre-loader里会帮忙配置好，在U-Boot阶段可以不用配置。但是如果是修改串口号，且pre-loader没有进行对应频率初始化，则U-Boot阶段要确认当前所用串口的时钟是24Mhz。代码修改一般加在`board_debug_uart_init()`函数里。
+```c
+&uart2 {
+	u-boot,dm-pre-reloc;
+	clock-frequency = <24000000>;
+};
+```
 
-3. uart节点配置：uart2节点里需要指定如下2个属性：
+5. U-Boot chosen节点中以stdout-path指定串口：
 
-   ```c
-   &uart2 {
-   	u-boot,dm-pre-reloc;
-   	clock-frequency = <24000000>;
-   };
-   ```
+```c
+chosen {
+	stdout-path = &uart2;
+};
+```
 
-4. chosen节点配置：必须以stdout-path的形式指定串口（这是U-Boot比较特殊的地方）
-
-   ```c
-   chosen {
-   	stdout-path = "serial2:1500000n8";	// 这里的波特率值实际是无效的
-   };
-   或着：	// 推荐采用下面这种方式
-   chosen {
-   	stdout-path = &uart2;
-   };
-   ```
-
-5. baudrate配置：通过宏```CONFIG_BAUDRATE```指定串口波特率，一般在对应的defconfig或者rkxxx_common.h里进行指定。
+注意：默认串口在loader已经配置好，包括时钟源选择24Mhz、iomux的切换。所以如果仅仅在U-Boot阶段更换串口，请务必完成这两项配置。
 
 #### 5.10.2 Early Debug UART配置
 
-上述这种debug console驱动在U-Boot启动的过程中加载的相对比较晚，如果在这之前就出现了异常，那依赖debug console就看不到具体的异常信息。
+1. defconfig中打开CONFIG_DEBUG_UART，指定UART寄存器的基地址、时钟、波特率：
 
-针对这种情况，U-Boot提供了另外一种能更早进行debug打印的机制：Early Debug UART，本质上是绕过console框架，直接往uart寄存器写数据。目前各个平台默认都有启用这个功能，配置方法如下：
+```c
+CONFIG_DEBUG_UART=y
+CONFIG_DEBUG_UART_BASE=0x10210000  // 更改串口时需要修改
+CONFIG_DEBUG_UART_CLOCK=24000000
+CONFIG_DEBUG_UART_SHIFT=2
+CONFIG_DEBUG_UART_BOARD_INIT=y
+CONFIG_BAUDRATE=1500000            // 更改波特率时需要修改
+```
 
-1. 在defconfig文件中打开DEBUG_UART，指定该UART寄存器的基地址、时钟：
+2. 在board_debug_uart_init()完成uart 时钟和iomux配置。
 
-   ```c
-   CONFIG_DEBUG_UART=y
-   CONFIG_DEBUG_UART_BASE=0x10210000	// 修改串口号时，只需要修改基地址即可
-   CONFIG_DEBUG_UART_CLOCK=24000000
-   CONFIG_DEBUG_UART_SHIFT=2
-   CONFIG_DEBUG_UART_BOARD_INIT=y
-   ```
+#### 5.10.3 Pre-loader serial
 
-2. 在board文件中实现`board_debug_uart_init()`，该函数一般负责设置iomux。请在尽可能早的地方调用它，目前默认一般都是放在board文件里调用，即rkxxx.c中。
+Pre-loader serial是实现前级固件“一键更换串口号”的机制（包括：ddr、miniloader、bl31、op-tee、U-Boot），只需要修改ddr里的串口配置即可，后级固件会动态适配。
 
-   ```c
-   void board_debug_uart_init(void)
-   {
-           static struct rk3308_grf * const grf = (void *)GRF_BASE;
+使用步骤：
 
-           /* Enable early UART2 channel m1 on the rk3308 */
-           rk_clrsetreg(&grf->gpio4d_iomux, GPIO4D3_MASK | GPIO4D2_MASK,
-                        GPIO4D2_UART2_RX_M1 << GPIO4D2_SHIFT |
-                        GPIO4D3_UART2_TX_M1 << GPIO4D3_SHIFT);
-   }
-   ```
-
-#### 5.10.3 更改串口
-
-如果仅仅是 U-Boot需要更改串口号，而前级的loader、trust等固件不做改变，那么请执行[5.10.1 串口配置](#5.10.1 串口配置)和[5.10.2 Early Debug UART配置](#5.10.2 Early Debug UART配置)里的修改步骤。
-
-#### 5.10.4 Pre-loader serial
-
-同样是更改串口号的方式，但采取的是沿用前级的loader的配置。即loader改完串口后，后面的trust和U-Boot都继续沿用，这样就不必每一级固件都做修改。这个功能需要依赖：
-
-1. 一级loader和U-Boot都要支持atags传参，这样才能把前级loader的serial配置传递到U-Boot使用；
-2. 一级loader要更改好串口并且进行atags传参；
-3. U-Boot自身需要在rkxx-u-boot.dtsi里把需要的uart增加上属性“u-boot,dm-pre-reloc;”和在aliases里建立serial别名，例如./arch/arm/dts/rk1808-u-boot.dtsi里为了方便，把所有uart都配置上：
+- 各级固件之间要支持ATAGS传参；
+- ddr支持更改串口号且发起ATAGS传参；
+- U-Boot驱动要支持：
+1. rkxx-u-boot.dtsi中把使用到的uart节点加上属性“u-boot,dm-pre-reloc;”；
+2. aliases建立serial别名，例如：./arch/arm/dts/rk1808-u-boot.dtsi里为了方便，为所有uart都建立别名；
 
 ```c
 aliases {
@@ -2448,9 +2509,13 @@ aliases {
 };
 ```
 
-#### 5.10.5 关闭串口打印
+#### 5.10.4 关闭串口打印
 
-使能CONFIG_SILENT_CONSOLE即可关闭console打印（UART驱动还是会正常加载），仅仅保留一条提示信息。
+```
+CONFIG_SILENT_CONSOLE
+```
+
+console关闭后仅保留一条提示信息：
 
 ```
 ......
@@ -2469,116 +2534,139 @@ U-Boot: enable slient console			// 只有一条U-Boot提示信息，没有其余
 
 #### 5.11.1 框架支持
 
-按键功能方面，U-Boot框架默认没有给与足够的支持，因此我们自己实现了一套按键框架机制来支持按键管理。
+U-Boot框架默认没有支持按键功能，Rockchip自己实现了一套按键框架。
 
-**按键框架代码：**
-
-```
-drivers/input/key-uclass.c
-include/key.h
-```
-
-**按键驱动：**
+配置：
 
 ```
-drivers/input/rk8xx_pwrkey.c    // 支持PMIC(RK805/RK809/RK816/RK817)的pwrkey按键
-drivers/input/rk_key.c          // 支持compatible = "rockchip,key"的节点
-drivers/input/gpio_key.c        // 支持compatible = "gpio-keys"的节点
-drivers/input/adc_key.c         // 支持compatible = "adc-keys"的节点
+CONFIG_DM_KEY
+CONFIG_RK8XX_PWRKEY
+CONFIG_ADC_KEY
+CONFIG_GPIO_KEY
+CONFIG_RK_KEY
 ```
 
-- 上面4个驱动包含了Rockchip平台上所有已在使用的key节点；
-- 考虑到U-Boot有充电休眠的功能，为了支持按键唤醒cpu，因此所有gpio类型的按键全部都以中断的形式进行触发（不是轮询）。
+框架代码：
+
+```
+./include/dt-bindings/input/linux-event-codes.h
+./drivers/input/key-uclass.c
+./include/key.h
+```
+
+驱动代码：
+
+```
+./drivers/input/rk8xx_pwrkey.c    // 支持PMIC的pwrkey(RK805/RK809/RK816/RK817)
+./drivers/input/rk_key.c          // 支持compatible = "rockchip,key"
+./drivers/input/gpio_key.c        // 支持compatible = "gpio-keys"
+./drivers/input/adc_key.c         // 支持compatible = "adc-keys"
+```
+
+- 上面4个驱动涵盖了Rockchip平台上所有在用的key节点；
+- 为了支持充电休眠状态下的CPU唤醒，所有的pwrkey都以中断形式触发；
 
 #### 5.11.2 相关接口
 
-**接口：**
+接口：
 
 ```
 int key_read(int code)
 ```
 
-**code头文件：**
+code定义：
 
 ```
 /include/dt-bindings/input/linux-event-codes.h
 ```
 
-**返回值：**
+返回值：
 
 ```
 enum key_state {
-	KEY_PRESS_NONE,         // 非完整的短按（没有释放按键）或长按（按下时间不够长），都属于none事件；
-	KEY_PRESS_DOWN,         // 一次完整的短按（按下->释放）才算是一个press down事件；
-	KEY_PRESS_LONG_DOWN,    // 一次完整的长按（可以不释放）才算是一个press long down事件；
-	KEY_NOT_EXIST,          // 找不到code对应的按键
+	KEY_PRESS_NONE,      // 非完整的短按（没有释放按键）或长按（按下时间不够长）；
+	KEY_PRESS_DOWN,      // 一次完整的短按（按下=>释放）；
+	KEY_PRESS_LONG_DOWN, // 一次完整的长按（可以不释放）；
+	KEY_NOT_EXIST,       // 按键不存在
 };
 ```
 
-KEY_PRESS_LONG_DOWN 事件的默认时长为2000ms，长按事件目前只在U-Boot充电时长按开机的时候会使用到。
+KEY_PRESS_LONG_DOWN 默认时长2000ms，目前只用于U-Boot充电的pwrkey长按事件。
 
 ```
 #define KEY_LONG_DOWN_MS	2000
 ```
 
-**范例：**
+范例：
 
 ```c
-key_read(KEY_VOLUMEUP);
-key_read(KEY_VOLUMEDOWN);
-key_read(KEY_POWER);
-key_read(KEY_HOME);
-key_read(KEY_MENU);
-key_read(KEY_ESC);
+ret = key_read(KEY_VOLUMEUP);
+......
+ret = key_read(KEY_VOLUMEDOWN);
+......
+ret = key_read(KEY_POWER);
 ...
 ```
 
 ### 5.12  Vendor Storage
 
-Vendor Storage 是设计用来存放SN、MAC等不需要加密的小数据。数据存放在NVM（EMMC、NAND等）的保留分区中，有多个备份，更新数据时数据不丢失，可靠性高。详细的资料参考文档《appnote rk vendor storage》。
+Vendor Storage 用于存放SN、MAC等不需要加密的小数据。数据存放在NVM（eMMC、NAND等）的保留分区中，有多个备份，更新数据时数据不丢失，可靠性高。详细的资料参考文档《appnote rk vendor storage》。
 
 #### 5.12.1 原理概述
 
-我们一共把vendor的存储块分成4个分区，vendor0、vendor1、vendor2、vendor3。每个vendorX的hdr里都有一个单调递增的version字段用于表明vendorX被更新的时刻点。每次读操作只读取最新的vendorX（即version最大），写操作的时候会更新version并且把整个原有信息和新增信息搬移到下一个vendor分区里。例如当前从vendor2读取到信息，经过修改后再回写，此时写入的是vendor3。这样做只是为了起到一个简单的安全防护作用。
+一共把vendor的存储块分成4个分区，vendor0、vendor1、vendor2、vendor3。每个vendorX（X=0、1、2、3）的hdr里都有一个单调递增的version字段用于表明vendorX被更新的时刻点。每次读操作只读取最新的vendorX（即version最大），写操作的时候会更新version并且把整个原有信息和新增信息搬移到vendorX+1分区里。例如当前从vendor2读取到信息，经过修改后再回写，此时写入的是vendor3。这样做只是为了起到一个简单的安全防护作用。
 
 #### 5.12.2 框架支持
 
-Vendor Storage方面，U-Boot框架默认没有给与足够的支持，因此我们自己实现了一套机制。
+U-Boot框架没有支持Vendor Storage功能，Rockchip自己实现了一套Vendor Storage驱动。
 
-**驱动文件：**
+配置：
 
 ```
-arch/arm/mach-rockchip/vendor.c
+CONFIG_ROCKCHIP_VENDOR_PARTITION
+```
+
+驱动文件：
+
+```
+./arch/arm/mach-rockchip/vendor.c
 ./arch/arm/include/asm/arch-rockchip/vendor.h
 ```
 
 #### 5.12.3 相关接口
-
-**读写接口：**
 
 ```
 int vendor_storage_read(u16 id, void *pbuf, u16 size)
 int vendor_storage_write(u16 id, void *pbuf, u16 size)
 ```
 
-#### 5.12.4 自测程序
+关于id的定义和使用，请参考《appnote rk vendor storage》。
 
-U-Boot串口命令行下，使用"rktest vendor"命令可以进行Vendor Storage功能的测试，具体参考[11. rktest测试程序](#11. rktest测试程序)。这个测试命令可以测试当前Vendor Storage驱动的基本读写和逻辑等功能是否正常，如果内部的所有测试项都pass，则说明一切正常。
+#### 5.12.4 功能自测
+
+U-Boot串口命令行下使用"rktest vendor"命令可以进行Vendor Storage功能自测。目的是测试Vendor Storage驱动的基本读写和逻辑功能是否正常，具体请参考本文档[11. rktest测试程序](#11. rktest测试程序)。
 
 ### 5.13 OPTEE Client支持
 
 目前一些安全的操作需要在U-Boot这级操作或读取一些数据必须需要OPTEE帮忙获取。U-Boot里面实现了OPTEE Client代码，可以通过该接口与OPTEE通信。
 
+驱动目录：
+
+```
+lib/optee_clientApi/
+```
+
 #### 5.13.1 宏定义说明
 
-CONFIG_OPTEE_CLIENT，U-Boot调用trust总开关。
-CONFIG_OPTEE_V1，旧平台使用，如312x,322x,3288,3228H,3368,3399。
-CONFIG_OPTEE_V2，新平台使用，如3326,3308。
-CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION， 当emmc的rpmb不能用，才开这个宏，默认不开。
+- CONFIG_OPTEE_CLIENT，U-Boot调用trust总开关。
+- CONFIG_OPTEE_V1，旧平台使用，如RK312x、RK322x、RK3288、RK3228H、RK3368、RK3399。
+- CONFIG_OPTEE_V2，新平台使用，如RK3326、RK3308。
+- CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION，当emmc的rpmb不能用，才开这个宏，默认不开。
 
 #### 5.13.2 镜像说明
 
-32位系统在U-Boot编译时会生成trust.img和trust_with_ta.img，trust.img不能运行外部ta，但是节省内存，trust_with_ta.img可以运行外部ta，一般情况下使用trust_with_ta.img。
+32位系统在U-Boot编译时会生成trust.img和trust_with_ta.img，trust.img不能运行外部ta，但是节省内存；trust_with_ta.img可以运行外部ta，一般情况下使用trust_with_ta.img。
+
 64位系统只生成一个trust.img，可以运行外部ta，编译完U-Boot生成trust镜像后，建议查看生成镜像的日期，避免烧错。
 
 #### 5.13.3 API文档
@@ -2630,13 +2718,13 @@ U-Boot与Optee通信时，数据需放在共享内存中，可以通过TEEC_Allo
 
 #### 5.14.1 宽温策略
 
-U-Boot框架没有支持DVFS，但是为了支持某些芯片的宽温功能，我们实现了一套DVFS宽温驱动去根据芯片温度调整cpu/dmc频率-电压。但有别于内核DVFS驱动，这套宽温驱动仅仅对触发了最高/低温度阈值的时刻进行控制。
+U-Boot框架没有支持DVFS，为了支持某些芯片的宽温功能，我们实现了一套DVFS宽温驱动根据芯片温度调整cpu/dmc频率-电压。但有别于内核DVFS驱动，这套宽温驱动仅仅对触发了最高/低温度阈值的时刻进行控制。
 
 **具体的宽温策略：**
 
 1. 宽温驱动用于调整cpu/dmc的频率-电压，控制策略可同时对cpu和dmc生效，也可只对其中一个生效，由dts配置决定；cpu和dmc的控制策略是一样的；
 2. 宽温驱动会解析cpu/dmc节点的opp table、regulator、clock、thermal zone的"trip-point-0"，获取频率-电压档位、最高/低温度阈值、允许的最高电压等信息；
-3. 若cpu/dmc的opp table里指定了rockchip,low-temp = <...>或 rockchip,high-temp = <...>，又或者cpu/dmc引用了thermal zone的trip节点，那么cpu/dmc宽温控制策略就会生效。
+3. 若cpu/dmc的opp table里指定了rockchip,low-temp = <...>或 rockchip,high-temp = <...>，又或者cpu/dmc引用了thermal zone的trip节点，那么cpu/dmc宽温控制策略就会生效；
 4. 关键属性：
 
 - rockchip,low-temp：最低温度阈值，下述用TEMP_min表示；
@@ -2651,7 +2739,7 @@ U-Boot框架没有支持DVFS，但是为了支持某些芯片的宽温功能，�
 6. 目前宽温策略应用在2个时刻点：
 
 - regulator和clk框架初始化完成后，宽温驱动进行初始化并且执行一次宽温策略，具体位置在board.c文件的board_init()中调用；
-- preboot阶段（即准备加载固件之前）再执行一次宽温策略：如果dts节点中指定了"repeat"等相关属性（见下文），那么再执行完本次宽温策略后如果芯片温度依然不在温度阈值范围内，那就停止系统启动并且不断执行宽温策略，直到芯片温度回归到阈值范围内才继续启动系统。如果没有"repeat"等相关属性，则执行完本次宽温策略后就直接启动系统。
+- preboot阶段（即加载固件之前）再执行一次宽温策略：如果dts节点中指定了"repeat"等相关属性（见下文），当执行完本次宽温策略后芯片温度依然不在温度阈值范围内，那就停止系统启动并且不断执行宽温策略，直到芯片温度回归到阈值范围内才继续启动系统。如果没有"repeat"等相关属性，则执行完本次宽温策略后就直接启动系统，目前一般不需要repeat属性。
 
 #### 5.14.2 框架支持
 
@@ -2683,48 +2771,48 @@ int dvfs_repeat_apply(struct udevice *dev);
 
 1. defconfig里使能配置：
 
-   ```
-   CONFIG_DM_DVFS=y
-   CONFIG_ROCKCHIP_WTEMP_DVFS=y
-   ```
+```
+CONFIG_DM_DVFS=y
+CONFIG_ROCKCHIP_WTEMP_DVFS=y
+```
 
    依赖于：
 
-   ```
-   CONFIG_DM_THERMAL=y
-   CONFIG_ROCKCHIP_THERMAL=y
-   CONFIG_USING_KERNEL_DTB=y
-   ```
+```
+CONFIG_DM_THERMAL=y
+CONFIG_ROCKCHIP_THERMAL=y
+CONFIG_USING_KERNEL_DTB=y
+```
 
 2. 对应平台的rkxxx_common.h指定CONFIG_PREBOOT：
 
-   ```
-   #ifdef CONFIG_DM_DVFS
-   #define CONFIG_PREBOOT			"dvfs repeat"
-   #else
-   #define CONFIG_PREBOOT
-   #endif
-   ```
+```
+#ifdef CONFIG_DM_DVFS
+#define CONFIG_PREBOOT	"dvfs repeat"
+#else
+#define CONFIG_PREBOOT
+#endif
+```
 
 3. 内核dts的宽温节点配置：
 
-   ```c
-   uboot-wide-temperature {
-   	compatible = "rockchip,uboot-wide-temperature";
+```c
+uboot-wide-temperature {
+	compatible = "rockchip,uboot-wide-temperature";
 
-   	// 可选项。表示是否在U-Boot阶段触发cpu的最高/低温度阈值时让宽温驱动停止启动系统，
-   	// 且不断执行宽温处理策略，直到芯片温度回归到阈值范围内才继续启动系统。
-   	cpu,low-temp-repeat;
-   	cpu,high-temp-repeat;
+	// 可选项。表示是否在U-Boot阶段触发cpu的最高/低温度阈值时让宽温驱动停止启动系统，
+	// 且不断执行宽温处理策略，直到芯片温度回归到阈值范围内才继续启动系统。
+	cpu,low-temp-repeat;
+	cpu,high-temp-repeat;
 
-   	// 可选项。表示是否在U-Boot阶段触发dmc的最高/低温度阈值时让宽温驱动停止启动系统，
-   	// 且不断执行宽温处理策略，直到芯片温度回归到阈值范围内才继续启动系统。
-   	dmc,low-temp-repeat;
-   	dmc,high-temp-repeat;
+	// 可选项。表示是否在U-Boot阶段触发dmc的最高/低温度阈值时让宽温驱动停止启动系统，
+	// 且不断执行宽温处理策略，直到芯片温度回归到阈值范围内才继续启动系统。
+	dmc,low-temp-repeat;
+	dmc,high-temp-repeat;
 
-   	status = "okay";
-   };
-   ```
+	status = "okay";
+};
+```
 
    一般情况下不需要配置上述的repeat相关属性。
 
@@ -2834,59 +2922,59 @@ dtc -@ -O dtb -o my_overlay_dt.dtbo my_overlay_dt.dts
 
 1. defconfig里使能配置：
 
-   ```
-   CONFIG_CMD_DTIMG=y
-   CONFIG_OF_LIBFDT_OVERLAY=y
-   ```
+```
+CONFIG_CMD_DTIMG=y
+CONFIG_OF_LIBFDT_OVERLAY=y
+```
 
 2. board_select_fdt_index()函数的实现。这是一个__weak函数，用户可以根据实际情况重新实现它。函数作用是在多份DTBO中获取用于执行DTO操作的那份DTBO（返回index索引，最小从0开始），默认的weak函数返回的index为0。
 
-   ```c
-   /*
-    * Default return index 0.
-    */
-   __weak int board_select_fdt_index(ulong dt_table_hdr)
-   {
-   /*
-    * User can use "dt_for_each_entry(entry, hdr, idx)" to iterate
-    * over all dt entry of DT image and pick up which they want.
-    *
-    * Example:
-    *	struct dt_table_entry *entry;
-    *	int index;
-    *
-    *	dt_for_each_entry(entry, dt_table_hdr, index) {
-    *
-    *		.... (use entry)
-    *	}
-    *
-    *	return index;
-    */
-       return 0;
-   }
-   ```
+```c
+/*
+* Default return index 0.
+*/
+__weak int board_select_fdt_index(ulong dt_table_hdr)
+{
+	/*
+	 * User can use "dt_for_each_entry(entry, hdr, idx)" to iterate
+	 * over all dt entry of DT image and pick up which they want.
+	 *
+	 * Example:
+	 *	struct dt_table_entry *entry;
+	 *	int index;
+	 *
+	 *	dt_for_each_entry(entry, dt_table_hdr, index) {
+	 *
+	 *		.... (use entry)
+	 *	}
+	 *
+	 *	return index;
+	 */
+	return 0;
+}
+```
 
 #### 5.16.3 DTO结果
 
 1. DTO执行完成后，在U-Boot的开机信息中可以看到结果：
 
-   ```
-   // 成功时的打印
-   ANDROID: fdt overlay OK
+```
+// 成功时的打印
+ANDROID: fdt overlay OK
 
-   // 失败时的打印
-   ANDROID: fdt overlay failed, ret=-19
-   ```
+// 失败时的打印
+ANDROID: fdt overlay failed, ret=-19
+```
 
    通常引起失败的原因一般都是因为主/次设备书blob的内容存在不兼容引起，所以用户需要对它们的生成语法和兼容性要比较清楚。
 
 2. 当DTO执行成功后，会在传递给kernel的cmdline里追加如下内容，表明当前使用哪份DTBO进行DTO操作：
 
-   ```
-   androidboot.dtbo_idx=1	// idx从0开始，这里表示选取idx=1的那份DTBO进行DTO操作
-   ```
+```
+androidboot.dtbo_idx=1	// idx从0开始，这里表示选取idx=1的那份DTBO进行DTO操作
+```
 
-3. DTO执行成功后如果想进一步确认新生成的dtb内容，用户可通过"fdt"命令把新生成的dtb内容打印出来确认，具体参考[2.7.2.5 fdt读取](#2.7.2.5 fdt读取)。
+3. DTO执行成功后如果想进一步确认新生成的dtb内容，用户可通过"fdt"命令把新生成的dtb内容打印出来确认，具体参考[2.5.2.5 fdt读取](#2.5.2.5 fdt读取)。
 
 ### 5.17 kernel cmdline
 
@@ -2898,7 +2986,7 @@ U-Boot向kernel传递cmdline的方法是：篡改内核dtb里的/chosen/bootargs
 
 - parameter.txt文件
 
-  1. 如果是RK格式的分区表，可以在parameter.txt存放kernel cmdline信息，例如：
+1. 如果是RK格式的分区表，可以在parameter.txt存放kernel cmdline信息，例如：
 
   ```
   ......
@@ -2906,7 +2994,7 @@ U-Boot向kernel传递cmdline的方法是：篡改内核dtb里的/chosen/bootargs
   ......
   ```
 
-  2. 如果是GPT格式的分区表，parameter.txt存放kernel cmdline信息无效。
+2. 如果是GPT格式的分区表，parameter.txt存放kernel cmdline信息无效。
 
 - kernel dts的/chosen/bootargs节点，例如：
 
@@ -3020,27 +3108,21 @@ U-Boot向kernel传递cmdline的方法是：篡改内核dtb里的/chosen/bootargs
 
 ### 6.1 rockusb
 
-命令行手动启用rockusb, 进入Windows烧写工具对应的Loader模式, eMMC:
+从命令行进入Loader烧写模式：
 
 ```c
-rockusb 0 mmc 0
-```
-
-RKNAND:
-
-```c
-rockusb 0 rknand 0
+rockusb 0 $devtype $devnum
 ```
 
 ### 6.2 Fastboot
 
-Fastboot 默认使用Google adb的VID/PID, 命令行手动启动fastboot:
+Fastboot 默认使用Google adb的VID/PID，命令行手动启动fastboot：
 
 ```c
 fastboot usb 0
 ```
 
-#### 6.2.1 fastboot支持命令速览
+#### 6.2.1 fastboot命令
 
 ```
 fastboot flash < partition > [ < filename > ]
@@ -3072,7 +3154,7 @@ fastboot oem at-reset-rollback-index
 
 功能：分区烧写。
 
-例： fastboot flash boot boot.img
+举例： fastboot flash boot boot.img
 
 2. fastboot erase < partition >
 
@@ -3318,15 +3400,15 @@ finished. total time: 0.636s
 
 ## 7. 固件加载
 
-固件加载涉及RK parameter/GPT分区表、boot、recovery、kernel、resource分区以及dtb文件。
+固件加载涉及：RK parameter/GPT分区表、boot、recovery、kernel、resource分区以及dtb文件，本章节会做出详细介绍。
 
 ### 7.1 分区表
 
-U-Boot支持两种分区表：RK parameter格式和GPT格式。启动的时候优先寻找GPT分区表，如果不存在就尝试使用RK parameter分区表。
+U-Boot支持两种分区表：RK parameter分区表和GPT分区表。U-Boot优先寻找GPT分区表，如果不存在就再查找RK parameter分区表。
 
 #### 7.1.1 分区表文件
 
-如下是GPT分区的parameter.txt文件内容。可以通过"TYPE: GPT"属性可以确认当前是GPT分区表还是RK parameter分区表（没有这个属性）。
+无论是GPT还是RK parameter，烧写用的分区表文件都叫parameter.txt。用户可以通过"TYPE: GPT"属性确认是否为GPT。
 
 ```
 FIRMWARE_VER:8.1
@@ -3338,7 +3420,7 @@ ATAG: 0x00200800
 MACHINE: 3399
 CHECK_MASK: 0x80
 PWR_HLD: 0,0,A,0,1
-TYPE: GPT
+TYPE: GPT				// 当前是GPT分区表
 CMDLINE:mtdparts=rk29xxnand:0x00002000@0x00004000(uboot),0x00002000@0x00006000(trust),0x00002000@0x00008000(misc),0x00008000@0x0000a000(resource),0x00010000@0x00012000(kernel),0x00010000@0x00022000(boot),0x00020000@0x00032000(recovery),0x00038000@0x00052000(backup),0x00002000@0x0008a000(security),0x00100000@0x0008c000(cache),0x00500000@0x0018c000(system),0x00008000@0x0068c000(metadata),0x00100000@0x00694000(vendor),0x00100000@0x00796000(oem),0x00000400@0x00896000(frp),-@0x00896400(userdata:grow)
 ```
 
@@ -3346,13 +3428,10 @@ GPT和RK parameter分区表的具体格式请参考文档：《Rockchip-Paramete
 
 #### 7.1.2 分区表查看
 
-在U-Boot串口命令行下，可以通过如下命令进行分区表信息查看：
+命令查看分区表：
 
 ```
-part list <interface> <dev>
-
-<interface>: 存储设备类型，可以是：mmc、rknand、rksfc；
-<dev>: 设备号，可以是：0、1、2....。
+part list $devtype $devnum
 ```
 
 1. GPT分区表（Partition Type: EFI）：
@@ -3386,50 +3465,7 @@ Part    Start LBA       End LBA         Name
         attrs:  0x0000000000000000
         type:   33770000-0000-401d-8000-505400004c3e
         guid:   464f0000-0000-4317-8000-1f2f00004af7
-  6     0x00022000      0x00031fff      "boot"
-        attrs:  0x0000000000000000
-        type:   575e0000-0000-4666-8000-74ae000055fe
-        guid:   43270000-0000-456c-8000-0ace00004560
-  7     0x00032000      0x00051fff      "recovery"
-        attrs:  0x0000000000000000
-        type:   273b0000-0000-4d5e-8000-6fcd0000106a
-        guid:   614e0000-0000-4b53-8000-1d28000054a9
-  8     0x00052000      0x00089fff      "backup"
-        attrs:  0x0000000000000000
-        type:   8c3f0000-0000-4d58-8000-009b00006ee9
-        guid:   86300000-0000-4f7a-8000-102300000338
-  9     0x0008a000      0x0008bfff      "security"
-        attrs:  0x0000000000000000
-        type:   6c100000-0000-4e5c-8000-5afe000015e2
-        guid:   9b2f0000-0000-4843-8000-12a900001176
- 10     0x0008c000      0x0018bfff      "cache"
-        attrs:  0x0000000000000000
-        type:   b1490000-0000-4927-8000-24e000005fbf
-        guid:   891d0000-0000-4e45-8000-43a1000072cb
- 11     0x0018c000      0x0068bfff      "system"
-        attrs:  0x0000000000000000
-        type:   41770000-0000-442b-8000-7928000058e7
-        guid:   36430000-0000-484a-8000-37f200004ca0
- 12     0x0068c000      0x00693fff      "metadata"
-        attrs:  0x0000000000000000
-        type:   061c0000-0000-480a-8000-67be000043c2
-        guid:   8c5d0000-0000-4052-8000-798600007d5b
- 13     0x00694000      0x00793fff      "vendor"
-        attrs:  0x0000000000000000
-        type:   e62f0000-0000-4e1e-8000-738a000015b8
-        guid:   721a0000-0000-4d0e-8000-044400001366
- 14     0x00796000      0x00895fff      "oem"
-        attrs:  0x0000000000000000
-        type:   cb190000-0000-4c74-8000-137300007831
-        guid:   cf200000-0000-4765-8000-4b1400005227
- 15     0x00896000      0x008963ff      "frp"
-        attrs:  0x0000000000000000
-        type:   9c380000-0000-4c4b-8000-326400004995
-        guid:   8d060000-0000-4772-8000-32de00003108
- 16     0x00896400      0x00e8ffde      "userdata"
-        attrs:  0x0000000000000000
-        type:   415f0000-0000-4419-8000-2f420000194c
-        guid:   93580000-0000-4303-8000-128a00005c6f
+ ......
 ```
 
 2. RK parameter分区表（Partition Type: RKPARM）：
@@ -3446,46 +3482,35 @@ Part    Start LBA       Size            Name
   4     0x0000a000      0x00008000      resource
   5     0x00012000      0x00010000      kernel
   6     0x00022000      0x00010000      boot
-  7     0x00032000      0x00020000      recovery
-  8     0x00052000      0x00038000      backup
-  9     0x0008a000      0x00002000      security
- 10     0x0008c000      0x00100000      cache
- 11     0x0018c000      0x00500000      system
- 12     0x0068c000      0x00008000      metadata
- 13     0x00694000      0x00100000      vendor
- 14     0x00796000      0x00100000      oem
- 15     0x00896000      0x00000400      frp
- 16     0x00896400      0x005f9c00      userdata
+......
 ```
 
 ### 7.2 dtb文件
 
-dtb文件是新版本kernel的dts配置文件的二进制化文件。目前dtb文件可以存放于AOSP的boot/recovery分区中，也可以存放于RK格式的resource分区。
-
-对于U-Boot阶段的dtb使用，可以参考本文的 [9. U-Boot和kernel DTB支持](#9. U-Boot和kernel DTB支持) 。
+dtb文件可以存放于AOSP的boot/recovery分区中，也可以存放于RK格式的resource分区。关于U-Boot对dtb的使用，请参考本文档[2.3 DTB的使用](#2.3 DTB的使用)。
 
 ### 7.3 boot/recovery分区
 
-boot.img和recovery.img的固件分为两种打包格式：AOSP格式（Android标准格式）和RK格式。
+boot.img和recovery.img有2种打包格式：AOSP格式（Android标准格式）和RK格式。
 
-#### 7.3.1 AOSP格式（Android标准格式）
+#### 7.3.1 AOSP格式
 
-镜像文件的魔数为”ANDROID!”：
+Android标准格式，镜像文件的magic为”ANDROID!”：
 
 ```
 00000000   41 4E 44 52  4F 49 44 21  24 10 74 00  00 80 40 60  ANDROID!$.t...@`
 00000010   F9 31 CD 00  00 00 00 62  00 00 00 00  00 00 F0 60  .1.....b.......`
 ```
 
-boot.img = kernel + ramdisk  dtb + android parameter；
+boot.img = kernel + ramdisk+ dtb + android parameter；
 
 recovery.img = kernel + ramdisk(for recovery) + dtb；
 
-分区表 = RK parameter和GPT都支持（2选1）；
+分区表 = RK parameter或GPT（2选1）；
 
 #### 7.3.2 RK格式
 
-RK格式的镜像单独打包kernel、dtb（从boot、recovery中剥离），镜像文件的魔数为”KRNL”：
+RK格式的镜像单独打包kernel、dtb（从boot、recovery中剥离），镜像文件的magic为”KRNL”：
 
 ```
 00000000   4B 52 4E 4C  42 97 0F 00  1F 8B 08 00  00 00 00 00  KRNL..y.........
@@ -3500,47 +3525,39 @@ boot.img = ramdisk；
 
 recovery.img = kernel + ramdisk(for recovery) + dtb；
 
-分区表 = RK parameter和GPT都支持（2选1）；
+分区表 = RK parameter或GPT（2选1）；
 
 #### 7.3.3 优先级
 
-U-Boot启动的时候默认优先使用“boot_android”命令加载AOSP格式（Android标准格式）的固件，如果加载失败则继续使用“bootrkp”命令加载RK格式的固件，如果加载失败则继续使用"run distro"命令加载Linux固件。
+U-Boot启动系统时优先使用“boot_android”加载android格式固件，如果失败就使用“bootrkp”加载RK格式固件，如果失败就使用"run distro"命令加载Linux固件。
+
+```c
+#define RKIMG_BOOTCOMMAND \
+	"boot_android ${devtype} ${devnum};" \
+	"bootrkp;" \
+	"run distro_bootcmd;"
+```
 
 ### 7.4 Kernel分区
 
-Kernel分区包含kernel信息，即打包过的zImage或者Image。
+这个分区主要存放kernel.img，它是打包过的zImage或者Image。
 
 ### 7.5 resource分区
 
-Resource镜像格式是为了能够同时存储多个资源文件（dtb、图片等）而设计的镜像格式，其魔数为”RSCE”：
+Resource镜像格式是为了能够同时存储多个资源文件（dtb、图片等）而设计的镜像格式，magic为”RSCE”：
 
 ```
 00000000   52 53 43 45  00 00 00 00  01 01 01 00  01 00 00 00  RSCE............
 00000010   00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00  ................
 ```
 
-目前这个分区主要用来打包dtb、开机logo、充电图片等。
+这个分区主要存放resource.img，它打包的资源可能包括：dtb、开机logo、充电图片等。
 
 ### 7.6 加载的固件
 
-U-Boot负责加载ramdisk、dtb、kernel到内存中，具体的加载地址可以通过串口信息知道。例如：
+U-Boot负责加载的固件：ramdisk、dtb、kernel。
 
-```
-......
-=Booting Rockchip format image=
-kernel   @ 0x02080000 (0x0124e008)
-ramdisk  @ 0x0a200000 (0x0017871c)
-## Flattened Device Tree blob at 01f00000
-   Booting using the fdt blob at 0x1f00000
-   Loading Ramdisk to 08087000, end 081ff71c ... OK
-   Loading Device Tree to 0000000008070000, end 00000000080860b7 ... OK
-Adding bank: start=0x00200000, size=0x08200000
-Adding bank: start=0x0a200000, size=0xede00000
-
-Starting kernel ...
-```
-
-### 7.7 固件启动流程
+### 7.7 固件启动顺序
 
 ```
 pre-loader => trust => U-Boot => kernel
@@ -3548,21 +3565,21 @@ pre-loader => trust => U-Boot => kernel
 
 ### 7.8 HW-ID适配硬件版本
 
-#### 7.8.1 HW-ID设计目的
+#### 7.8.1 设计目的
 
-硬件会经常更新版本，更换一些元器件，比如，屏幕，wifi模组等，如果每一个版本硬件，都要一套软件，就会比较麻烦，通过HW_ID，可以保证一套软件适配不同版本的硬件。
+通常，硬件设计上会经常更新版本和一些元器件，比如：屏幕、wifi模组等。如果每一个硬件版本都要对应一套软件，维护起来就比较麻烦。所以需要HW_ID功能实现一套软件可以适配不同版本的硬件。
 
-#### 7.8.2 HW-ID设计原理
+#### 7.8.2 设计原理
 
-把多份dtb文件打包到同一个resource.img里面，U-Boot引导kernel的时候，从resource.img里面找到一份和当前硬件版本匹配的dtb，并传递给kernel，加载不同的软件配置。通过硬件配置ADC/GPIO的唯一值，可以确定当前的硬件版本，U-Boot就可以找到对应的dtb文件。
+不同硬件版本需要提供对应的dtb文件，同时还要提供ADC/GPIO硬件唯一值用于表征当前硬件版本（比如：固定的adc值、固定的某GPIO电平）。用户把这些和硬件版本对应的dtb文件全部打包进同一个resource.img，U-Boot引导kernel时会检测硬件唯一值，从resource.img里找出和当前硬件版本匹配的dtb传给kernel。
 
 #### 7.8.3 硬件参考设计
 
 目前支持ADC和GPIO两种方式确定硬件版本。
 
-##### ADC参考设计
+##### 7.8.3.1 ADC参考设计
 
-RK3326-EVB\PX30-EVB主板上有预留分压电阻，不同的电阻分压可以确定不同的硬件版本号:
+RK3326-EVB/PX30-EVB主板上有预留分压电阻，不同的电阻分压有不同的ADC值，这样可以确定不同硬件版本:
 
 ![RK3326-PX30-HW-ID1](Rockchip-Developer-Guide-UBoot-nextdev/RK3326-PX30-HW-ID1.png)
 
@@ -3572,21 +3589,23 @@ RK3326-EVB\PX30-EVB主板上有预留分压电阻，不同的电阻分压可以�
 
 不同的mipi屏会配置不同的阻值，配合EVB主板确定一个唯一的ADC参数值。
 
-目前V1版本的ADC计算方法：ADC参数最大值为1024，对应着ADC_IN0引脚被直接上拉到供电电压1.8V,MIPI屏上有一颗10K的下拉电阻，接通EVB板后，ADC=1024*10K/(10K + 51K) =167.8。
+目前V1版本的ADC计算方法：ADC参数最大值为1024，对应着ADC_IN0引脚被直接上拉到供电电压1.8V，MIPI屏上有一颗10K的下拉电阻，接通EVB板后ADC=1024*10K/(10K + 51K) =167.8。
 
-##### GPIO参考设计
+##### 7.8.3.2 GPIO参考设计
 
 （目前没有GPIO的硬件参考设计）
 
 #### 7.8.4 软件配置
 
-把ADC和GPIO的信息放在dtb的文件名里面，U-Boot解析dtb的时候，从文件名中获取到当前dtb文件支持的硬件版本，并和实际的硬件版本做匹配。
+把ADC/GPIO的硬件唯一值信息放在dtb的文件名里即可（U-Boot会遍历所有dtb文件，从dtb文件名中获得ADC/GPIO硬件唯一值，然后匹配当前硬件版本）。的dtb文件命名规则
 
-##### ADC作为HW_ID的dtb文件命名规则
+##### 7.8.4.1 ADC作为HW_ID
+
+DTB文件命名规则：
 
 1. 文件名以“.dtb”结尾；
 
-2. HW_ID格式： #_[controller]_ch[channel]=[adcval]
+2. HW_ID格式： #[controller]_ch[channel]=[adcval]
 
    ​	\[controller\]: dts里面ADC控制器的节点名字。
 
@@ -3600,11 +3619,14 @@ RK3326-EVB\PX30-EVB主板上有预留分压电阻，不同的电阻分压可以�
 
 合法范例：
 
-rk3326-evb-lp3-v10#_saradc_ch2=111#_saradc_ch1=810.dtb
-
+```
+rk3326-evb-lp3-v10#saradc_ch2=111#saradc_ch1=810.dtb
 rk3326-evb-lp3-v10#_saradc_ch2=569.dtb
+```
 
-##### GPIO作为HW_ID的dtb命令规则
+##### 7.8.4.2 GPIO作为HW_ID
+
+DTB文件命名规则：
 
 1. 文件名以“.dtb”结尾；
 
@@ -3618,11 +3640,15 @@ rk3326-evb-lp3-v10#_saradc_ch2=569.dtb
 
 4. 多个含义之间通过#进行分隔，最多支持10个完整含义；
 
-合法范例：rk3326-evb-lp3-v10#gpio0a2=0#gpio0c3=1.dtb
+合法范例：
+
+```
+rk3326-evb-lp3-v10#gpio0a2=0#gpio0c3=1.dtb
+```
 
 #### 7.8.5 代码位置
 
-代码实现位置在uboot工程：arch/arm/mach-rockchip/resource_img.c，主要包含下面两个函数：
+./arch/arm/mach-rockchip/resource_img.c：
 
 ```
 static int rockchip_read_dtb_by_gpio(const char *file_name)；
@@ -3631,36 +3657,34 @@ static int rockchip_read_dtb_by_adc(const char *file_name)；
 
 #### 7.8.6 打包脚本
 
-通过脚本，可以很方便地把多个dtb打包到一个resource.img里面，脚本位置在kernel工程：scripts/mkmultidtb.py，打开脚本文件，把需要打包的dtb文件写到DTBS字典里面，并填上对应的ADC/GPIO的配置信息。
+通过脚本可以把多个dtb打包进同一个resource.img，脚本位置在kernel工程：scripts/mkmultidtb.py。打开脚本文件，把需要打包的dtb文件写到DTBS字典里面，并填上对应的ADC/GPIO的配置信息。
 
 ```p
 ...
-
 DTBS = {}
-
 DTBS['PX30-EVB'] = OrderedDict([('rk3326-evb-lp3-v10', '#_saradc_ch0=166'),
 				('px30-evb-ddr3-lvds-v10', '#_saradc_ch0=512')])
 ...
 ```
 
-以上例子，执行scripts/mkmultidtb.py PX30-EVB，就会生成包含多份dtb的resource.img，包含以下三个dtb:
+上述例子中，执行scripts/mkmultidtb.py PX30-EVB 就会生成包含3份dtb的resource.img：:
 
-rk-kernel.dtb：rk默认的dtb，所有dtb都没匹配到时，会使用这个dtb，打包脚本使用DTBS的第一个dtb作为默认的dtb；
+- rk-kernel.dtb：rk默认的dtb，所有dtb都没匹配成功时默认被使用。打包脚本会使用DTBS的第一个dtb作为默认的dtb；
+- rk3326-evb-lp3-v10#_saradc_ch0=166.dtb：包含ADC信息的rk3326 dtb文件；
+- px30-evb-ddr3-lvds-v10#_saradc_ch0=512.dtb：包含ADC信息的px30 dtb文件；
 
-rk3326-evb-lp3-v10#_saradc_ch0=166.dtb：包含ADC信息的rk3326 dtb文件；
+#### 7.8.7 确认匹配的dtb
 
-px30-evb-ddr3-lvds-v10#_saradc_ch0=512.dtb： 包含ADC信息的px30 dtb文件；
-
-#### 7.8.7 确认当前的dtb
-
-下面是开机U-Boot的log：
-
+```
+......
 mmc0(part 0) is current device
 boot mode: None
-**DTB: rk3326-evb-lp3-v10#_saradc_ch0=166.dtb**
+DTB: rk3326-evb-lp3-v10#_saradc_ch0=166.dtb		// 匹配到的文件
 Using kernel dtb
+......
+```
 
-从这个log可以看出来，当前硬件版本匹配到了resource.img里面的rk3326-evb-lp3-v10#_saradc_ch0=166.dtb，如果匹配失败，则会使用rk-kernel.dtb。
+从U-Boot的log可看出当前硬件版本匹配到了resource.img里面的rk3326-evb-lp3-v10#_saradc_ch0=166.dtb，如果匹配失败，则会使用rk-kernel.dtb。
 
 ## 8. SPL和TPL
 
@@ -3681,91 +3705,101 @@ SPL+TPL的组合实现了跟rockchip ddr.bin+miniloader完全一致的功能，�
 
 ## 9. U-Boot和kernel DTB支持
 
-### 9.1 设计出发点
+### 9.1 kernel dtb设计出发点
 
-按照U-Boot的最新架构，每个驱动代码本身需要依赖dts，因此每一块板子都有一份对应的dts。
+按照U-Boot的最新架构设计，每一块板子都要有一份对应的dts。为了降低U-Boot在不同项目的维护量，实现一颗芯片在同一类系统中能共用一份U-Boot，因此在U-Boot中增加kernel dtb支持。通过支持kernel dtb可以达到兼容板子差异的目的，如：display、pmic/regulator、pinctrl、clk等。
 
-为了降低U-Boot在不同项目的维护量，实现一颗芯片在同一类系统中能共用一份U-Boot，而不是每一块板子都需要独立的dts编译成不同的U-Boot固件。因此在U-Boot中增加支持使用kernel dtb，复用其中的display、pmic/regulator、pinctrl等硬件相关信息。
+kernel dtb的启用需要依赖OF_LIVE（见下文）。
 
-因为u-boot本身有一份dts，如果再加上kernel的dts，那么原有的fdt用法会有冲突。同时由于kernel的dts还需要提供给kernel使用，所以不能把u-boot dts中部分dts节点overlay到kernel dts上传给kernel，综合u-boot后续发展方向是使用live dt，决定启动Live dt。
+```
+config USING_KERNEL_DTB
+        bool "Using dtb from Kernel/resource for U-Boot"
+        depends on RKIMG_BOOTLOADER && OF_LIVE
+        default y
+        help
+          This enable support to read dtb from resource and use it for U-Boot,
+          the uart and emmc will still using U-Boot dtb, but other devices like
+          regulator/pmic, display, usb will use dts node from kernel.
+```
 
 ### 9.2 关于live dt
+
+#### 9.2.1 live dt原理
 
 live dt功能是在v2017.07版本合并的，提交记录如下:
 
 <https://lists.denx.de/pipermail/u-boot/2017-January/278610.html>
 
-live dt的原理是在初始化阶段直接扫描整个dtb，把所有设备节点转换成struct device_node节点链表，后续的bind和驱动访问dts都通过这个device_node或ofnode(device_node的封装)进行，而不再访问原有dtb。
+live dt的原理：在初始化阶段直接扫描整个dtb，把所有设备节点转换成struct device_node节点链表，后续的bind和驱动的dts访问都通过device_node或ofnode（device_node的封装）进行，而不再访问原有dtb。
 
-更多详细信息请参考: doc/driver-model/livetree.txt
+因为 U-Boot本身有一份dts，如果再加上kernel的dts，那么原有的fdt用法会冲突。同时由于kernel的dts还需要提供给kernel使用，所以不能把U-Boot dts中的某些dts节点overlay到kernel dts上再传给kernel。综合考虑U-Boot的后续发展方向是使用live dt，所以决定启动live dt。
 
-### 9.3 fdt代码转换为支持live dt的代码
-
-ofnode类型(include/dm/ofnode.h)是两种dt都支持的一种封装格式，使用live dt时使用device_node来访问dt结点，使用fdt时使用offset访问dt节点。当需要同时支持两种类型的驱动，请使用ofnode类型。
+更多详细信息请参考:
 
 ```
- 47  * @np: Pointer to device node, used for live tree
- 48  * @of_offset: Pointer into flat device tree, used for flat tree. Note that this
- 49  *      is not a really a pointer to a node: it is an offset value. See above.
- 50  */
- 51 typedef union ofnode_union {
- 52         const struct device_node *np;   /* will be used for future live tree */
- 53         long of_offset;
- 54 } ofnode;
+./doc/driver-model/livetree.txt
 ```
 
-- "dev_"、"ofnode_"开头的函数为支持两种dt访问方式，
+#### 9.2.2 fdt和live dt转换
 
-- 根据程序当前使用dt类型来调用对应接口：
+ofnode类型（include/dm/ofnode.h）是两种dt都支持的一种封装格式，使用live dt时使用device_node来访问dt结点，使用fdt时使用offset访问dt节点。当需要同时支持两种类型的驱动时，请使用ofnode类型。
 
-  "of_"开头的函数是只支持live dt的接口；
+ofnode结构：
 
-  "fdtdec_"、 "fdt_"开头的函数是只支持fdt的接口；
+```c
+ /*
+  * @np: Pointer to device node, used for live tree
+  * @of_offset: Pointer into flat device tree, used for flat tree. Note that this
+  *      is not a really a pointer to a node: it is an offset value. See above.
+  */
+ typedef union ofnode_union {
+         const struct device_node *np;   /* will be used for future live tree */
+         long of_offset;
+ } ofnode;
+```
 
-驱动程序做转换的时候可以参考标题包含"live dt"的提交。
+- "dev\_"、"ofnode_"开头的函数为支持两种dt访问方式；
+- "of_"开头的函数是只支持live dt的接口；
+- "fdtdec\_"、 "fdt_"开头的函数是只支持fdt的接口；
 
-### 9.4 支持kernel dtb的实现
+### 9.3 kernel dtb的实现
 
-kernel的dtb支持是加在board_init的开头，此时U-Boot的dts已经扫描完成，可以通过增加代码实现mmc/nand的读操作来读取kernel dtb。kernel的dtb读进来后进行live dt建表，并bind所有设备，最后更新gd->fdt_blob指针指向kernel dtb。
+kernel dtb支持是在./arch/arm/mach-rockchip/board.c的board_init()里实现的。此时U-Boot的dts已经扫描完成，mmc/nand/等存储驱动也可以工作，所以此时能够从存储中读取kernel dtb。kernel dtb读进来后进行live dt建表并bind所有设备，最后更新gd->fdt_blob指针指向kernel dtb。
 
-请注意：该功能启用后，大部分设备修改U-Boot的dts是无效的，需要修改kernel的dts。
+特别注意：该功能启用后，大部分设备修改U-Boot的dts是无效的，需要修改kernel的dts。
 
 用户可以通过查找.config是否包含CONFIG_USING_KERNEL_DTB确认是否已启用kernel dtb，该功能需要依赖live dt。因为读dtb依赖rk格式固件或rk android固件，所以Android以外的平台未启用。
 
-### 9.5 关于U-Boot dts
+### 9.4 关于U-Boot dts
 
-U-Boot的根目录有个dts/文件夹，编译完成后会生产dt.dtb和dt-spl.dtb两个DTB。dt.dtb是由defconfig里CONFIG_DEFAULT_DEVICE_TREE指定的dts编译得到的dtb拷贝过来的，而dt-spl.dtb是把dt.dtb中带"u-boot,dm-pre-reloc"节点的设备的设备过滤出来，并且去掉CONFIG_OF_SPL_REMOVE_PROPS选项中所有的property，这样可以得到一个用于SPL的最简dtb。
+#### 9.4.1 dt.dtb和dt-spl.dtb
 
-- dt-spl.dtb一般仅包含dmc、 uart、 mmc、nand、grf、cru等节点。也就是串口、DDR和存储设备控制器及其依赖的CRU/GRF；
-- u-boot.bin默认打包的是dt.dtb，在CONFIG_USING_KERNEL_DTB使能后默认打包的是dt-spl.dtb，因为其他设备驱动将使用kernel中的dts；
-- U-Boot中所有芯片级dtsi请和kernel保持完全一致，板级dts视情况简化得到一个evb的即可，因为kernel的dts全套下来可能有几十个，没必要全部引进到U-Boot；
-- U-Boot特有的节点（如：uart、emmc的alias等）请全部加到独立的rkxx-u-boot.dtsi里面，不要破坏原有dtsi。
+U-Boot编译完成后会在./dts/目录下生成两个DTB：dt.dtb和dt-spl.dtb。
+
+1. dt.dtb是由defconfig里CONFIG_DEFAULT_DEVICE_TREE指定的dts编译得到的；
+2. dt-spl.dtb是把dt.dtb中带"u-boot,dm-pre-reloc"属性的节点全部抽取出来后，去掉defconfig里CONFIG_OF_SPL_REMOVE_PROPS指定的property得到的，是一个用于SPL的最简dtb。最简dtb的好处是可以节省dtb的扫描耗时。
+
+#### 9.4.2 关于dt-spl.dtb
+
+1. dt-spl.dtb一般仅包含DMC、UART、MMC、NAND、GRF、CRU等节点。也就是串口、DDR、存储及其依赖的CRU/GRF；
+
+2. U-Boot自己的dtb被追加打包在u-boot.bin中：不启用CONFIG_USING_KERNEL_DTB的情况下使用dt.dtb；启用CONFIG_USING_KERNEL_DTB的情况下使用dt-spl.dtb。
+
+#### 9.4.3 U-Boot的dts管理
+
+1. U-Boot中所有芯片级dtsi请和kernel保持完全一致，板级dts视情况简化得到一个evb的即可，因为kernel的dts全套下来可能有几十个，没必要全部引进到U-Boot；
+
+2. U-Boot特有的节点（如：UART、eMMC的alias等）请全部加到独立的rkxx-u-boot.dtsi里面，不要破坏原有dtsi。
 
 ## 10. U-Boot相关工具
 
 ### 10.1 trust_merger工具
 
-trust_merger用于64bit SoC打包bl30、bl31 bin、bl32 bin等文件，生成烧写工具需要的TrustImage格式固件。
+trust_merger用于64-bit SoC打包bl30、bl31 bin、bl32 bin等文件，生成trust.img。
 
-#### 10.1.1 trust的打包和解包
+#### 10.1.1 ini文件
 
-**打包命令：**
-
-```
-./tools/trust_merger [--pack] <config.ini>
-```
-
-打包需要传递描述打包参数的ini配置文件路径。
-
-**解包命令：**
-
-```
-./tools/trust_merger --unpack <trust.img>
-```
-
-#### 10.1.2 工具参数
-
-以3368的配置文件为例：
+以RK3368TRUST.ini为例：
 
 ```
 [VERSION]
@@ -3780,101 +3814,295 @@ SEC=1                       ----存在BL31 bin
 PATH=tools/rk_tools/bin/rk33/rk3368bl31-20150401-v0.1.bin----指定bin路径
 ADDR=0x00008000             ----固件DDR中的加载和运行地址
 [BL32_OPTION]
-SEC=0                       ----不存在BL31 bin
+SEC=0                       ----不存在BL32 bin
 [BL33_OPTION]
-SEC=0                       ----不存在BL31 bin
+SEC=0                       ----不存在BL33 bin
 [OUTPUT]
 PATH=trust.img [OUTPUT]     ----输出固件名字
 ```
 
+#### 10.1.2 trust的打包和解包
+
+打包命令：
+
+```
+./tools/trust_merger <sha> <rsa> <output size> [ini fixup] [ini file]
+
+@<sha>：可选。sha相关，参考make.sh
+@<rsa>：可选。rsa相关，参考make.sh
+@<output size>：可选，格式：--size [KB] [count]。输出文件大小，省略时默认单份2M，打包2份
+@[ini fixup]: 必选，格式："--replace tools/rk_tools/ ./"。ini文件修正参数
+@[ini file]: 必选。ini文件
+```
+
+范例：
+
+```
+./tools/trust_merger --rsa 3 --sha 2 \
+                     --replace tools/rk_tools/ ./ RKTRUST/RK3399TRUST.ini
+out:trust.img
+merge success(trust.img)
+```
+
+解包命令：
+
+```
+./tools/trust_merger --unpack [input image]
+
+@ [input image]: 解包源固件，一般是trust.img
+```
+
+范例：
+
+```
+./tools/trust_merger --unpack trust.img
+
+File Size = 4194304
+Header Tag:BL3X
+Header version:256
+Header flag:35
+SrcFileNum:4
+SignOffset:992
+Component 0:
+ComponentID:BL31
+StorageAddr:0x4
+ImageSize:0x1c0
+LoadAddr:0x10000
+Component 1:
+ComponentID:BL31
+StorageAddr:0x1c4
+ImageSize:0x10
+LoadAddr:0xff8c0000
+Component 2:
+ComponentID:BL31
+StorageAddr:0x1d4
+ImageSize:0x48
+LoadAddr:0xff8c2000
+Component 3:
+ComponentID:BL32
+StorageAddr:0x21c
+ImageSize:0x2e0
+LoadAddr:0x8400000
+unpack success
+```
+
 ### 10.2 boot_merger工具
 
-boot_merger用于打包loader、ddr bin、usb plug bin等文件，生成烧写工具需要的loader格式的固件。
+boot_merger用于打包loader、ddr bin、usb plug bin等文件，生成烧写工具需要的loader格式固件。
 
-#### 10.2.1 Loader的打包和解包
+#### 10.2.1 ini文件
 
-**打包命令：**
-
-```
-./tools/boot_merger [--pack] <config.ini>
-```
-
-打包需要传递描述打包参数的ini配置文件路径。
-
-**解包命令：**
-
-```
-./tools/boot_merger --unpack <loader.bin>
-```
-
-#### 10.2.2 工具参数
-
-以3288的配置文件为例：
+以RK3288MINIALL.ini文件为例：
 
 ```
 [CHIP_NAME]
-NAME=RK320A					----芯片名称：”RK”加上与maskrom约定的4B芯片型号
+NAME=RK320A                 ----芯片名称：”RK”加上与maskrom约定的4B芯片型号
 [VERSION]
-MAJOR=2						----主版本号
-MINOR=15					----次版本号
-[CODE471_OPTION]			----code471，目前设置为ddr bin
+MAJOR=2                     ----主版本号
+MINOR=36                    ----次版本号
+[CODE471_OPTION]            ----code471，目前设置为ddr bin
 NUM=1
-Path1=tools/rk_tools/32_LPDDR2_300MHz_LPDDR3_300MHz_DDR3_300MHz_20140404.bin
-[CODE472_OPTION]			----code472，目前设置为usbplug bin
+Path1=tools/rk_tools/bin/rk32/rk3288_ddr_400MHz_v1.06.bin
+[CODE472_OPTION]            ----code472，目前设置为usbplug bin
 NUM=1
-Path1=tools/rk_tools/rk32xxusbplug.bin
+Path1=tools/rk_tools/bin/rk32/rk3288_usbplug_v2.36.bin
 [LOADER_OPTION]
 NUM=2
-LOADER1=FlashData			----flash data，目前设置为ddr bin
-LOADER2=FlashBoot			----flash boot，目前设置为U-Boot bin
-FlashData=tools/rk_tools/32_LPDDR2_300MHz_LPDDR3_300MHz_DDR3_300MHz_20140404.bin
-FlashBoot=u-boot.bin
-[OUTPUT]					----输出路径，目前文件名会自动添加版本号
-PATH=RK3288Loader_UBOOT.bin
+LOADER1=FlashData           ----flash data，目前设置为ddr bin
+LOADER2=FlashBoot           ----flash boot，目前设置为miniloader bin
+FlashData=tools/rk_tools/bin/rk32/rk3288_ddr_400MHz_v1.06.bin
+FlashBoot=tools/rk_tools/bin/rk32/rk3288_miniloader_v2.36.bin
+[OUTPUT]                    ----输出文件名
+PATH=rk3288_loader_v1.06.236.bin
+```
+
+#### 10.2.2 Loader的打包和解包
+
+1. 打包命令：
+
+```
+./tools/boot_merger [ini fixup] [ini file]
+
+@[ini fixup]: 必选，格式："--replace tools/rk_tools/ ./"。ini文件修正参数
+@[ini file]: 必选。ini文件
+```
+
+范例：
+
+```
+./tools/boot_merger --replace tools/rk_tools/ ./ RKBOOT/RK3399MINIALL.ini
+out:rk3399_loader_v1.17.115.bin
+fix opt:rk3399_loader_v1.17.115.bin
+merge success(rk3399_loader_v1.17.115.bin)
+```
+
+2. 解包命令：
+
+```
+./tools/boot_merger --unpack [input image]
+
+@ [input image]: 解包源固件，一般是loader文件
+```
+
+范例：
+
+```
+./tools/boot_merger --unpack rk3399_loader_v1.17.115.bin
+unpack entry(rk3399_ddr_800MHz_v1.17)
+unpack entry(rk3399_usbplug_v1.15)
+unpack entry(FlashData)
+unpack entry(FlashBoot)
+unpack success
 ```
 
 ### 10.3 resource_tool工具
 
-resource_tool用于打包任意资源文件，最终生成resource.img镜像。
+resource_tool用于打包任意资源文件，最终生成resource.img。
 
-**打包命令：**
+打包命令：
 
 ```
 ./tools/resource_tool [--pack] [--image=<resource.img>] <file list>
 ```
 
-**解包命令：**
+范例：
 
 ```
-./tools/resource_tool --unpack --image=<resource.img>
+./scripts/resource_tool ./arch/arm/boot/dts/rk3126-evb.dtb logo.bmp \
+                        logo_kernel.bmp
+Pack to resource.img successed!
+```
+
+解包命令：
+
+```
+./tools/resource_tool --unpack --image=<resource.img> [output dir]
+```
+
+范例：
+
+```
+./tools/resource_tool --unpack --image=resource.img ./out/
+
+Dump header:
+partition version:0.0
+header size:1
+index tbl:
+        offset:1        entry size:1    entry num:3
+Dump Index table:
+entry(0):
+        path:rk-kernel.dtb
+        offset:4        size:33728
+entry(1):
+        path:logo.bmp
+        offset:70       size:170326
+entry(2):
+        path:logo_kernel.bmp
+        offset:403      size:19160
+Unack resource.img to ./out successed!
 ```
 
 ### 10.4 loaderimage
 
-loaderimage工具用于打包rockchip miniloader所需固件, 含uboot.img和32bit的trust.img
-用法:
+loaderimage工具用于打包miniloader支持的加载固件格式，支持打包uboot.img和32-bit的trust.img。
+
+#### 10.4.1 打包uboot.img
+
+1. 打包命令：
 
 ```
-loaderimage [--pack|--unpack] [--uboot|--trustos] file_in file_out [load_addr]
-loaderimage --pack --trustos ${RKBIN}/${TOS} ./trust.img
-loaderimage --pack --uboot u-boot.bin uboot.img 0x60000000
+./tools/loaderimage --pack --uboot [input bin] [output image] [load_addr] <output size>
+
+@[input bin]: 必选。bin源文件
+@[output image]：必选。输出文件
+@[load_addr]：必选。加载地址
+@<output size>：可选，格式：--size [KB] [count]。输出文件大小，省略时默认单份1M，打包4份
 ```
 
-需要注意不同平台的'load_addr'不一样.
+范例：
+
+```
+./tools/loaderimage --pack --uboot ./u-boot.bin uboot.img 0x60000000 --size 1024 2
+
+ load addr is 0x60000000!
+pack input u-boot.bin
+pack file size: 701981
+crc = 0xc595eb85
+uboot version: U-Boot 2017.09-02593-gb6e59d9 (Feb 18 2019 - 13:58:53)
+pack uboot.img success!
+```
+
+2. 解包命令：
+
+```
+./tools/loaderimage --unpack --uboot [input image] [output bin]
+@[input image]: 必选。解包源文件
+@[output bin]: 必选。解包输出文件，任意名字均可
+```
+
+范例：
+
+```
+./tools/loaderimage --unpack --uboot uboot.img uboot.bin
+unpack input uboot.img
+unpack uboot.bin success!
+```
+
+#### 10.4.2 打包32-bit trust.img
+
+1. 打包命令：
+
+```
+./tools/loaderimage --pack --trustos [input bin] [output image] [load_addr] <output size>
+
+@[input bin]: 必选。bin文件
+@[output image]：必选。输出文件
+@[load_addr]：必选。加载地址
+@<output size>：可选。格式：--size [KB] [count]，输出文件大小，省略时默认单份1M，打包4份
+```
+
+范例：
+
+```
+./tools/loaderimage --pack --trustos ./bin/rk32/rk322x_tee_v2.00.bin trust.img \
+                       0x80000000  --size 1024 2
+
+ load addr is 0x80000000!
+pack input bin/rk32/rk322x_tee_v2.00.bin
+pack file size: 333896
+crc = 0x2de93b46
+pack trust.img success!
+```
+
+2. 解包命令：
+
+```
+./tools/loaderimage --unpack --trustos [input image] [output bin]
+@[input image]: 必选。解包源文件
+@[output bin]: 必选。解包输出文件，任意名均可
+```
+
+范例：
+
+```
+./tools/loaderimage --unpack --trustos trust.img tee.bin
+unpack input trust.img
+unpack tee.bin success!
+```
 
 ### 10.5 patman
 
-详细信息参考tools/patman/README
-这是一个python写的工具, 通过调用其他工具, 完成patch的检查提交, 是做patch Upstream(U-Boot, Kernel)非常好用的必备工具. 主要功能:
+详细信息参考tools/patman/README。
+这是一个python写的工具，通过调用其他工具完成patch的检查提交，是做patch Upstream（U-Boot、Kernel）非常好用的必备工具。主要功能：
 
-- 根据参数自动format补丁;
-- 调用checkpatch进行检查;
-- 从commit信息提取并转换成upstream mailing list所需的Cover-letter, patch version, version changes等信息;
-- 自动去掉commit中的change-id;
-- 自动根据Maintainer和文件提交信息提取每个patch所需的收件人;
-- 根据'~/.gitconfig'或者'./.gitconfig'配置把所有patch发送出去.
+- 根据参数自动format补丁；
+- 调用checkpatch进行检查；
+- 从commit信息提取并转换成upstream mailing list所需的Cover-letter、patch version、version changes等信息；
+- 自动去掉commit中的change-id；
+- 自动根据Maintainer和文件提交信息提取每个patch所需的收件人；
+- 根据'~/.gitconfig'或者'./.gitconfig'配置把所有patch发送出去。
 
-使用'-h'选项查看所有命令选项:
+使用'-h'选项查看所有命令选项：
 
 ```
 $ patman -h
@@ -3908,23 +4136,23 @@ Options:
   -T, --thread          Create patches as a single thread
 ```
 
-典型用例, 提交最新的3个patch:
+典型用例，提交最新的3个patch：
 
 ```
 patman -t -c3
 ```
 
-命令运行后checkpatch如果有error或者warning,会自动abort, 需要修改解决patch解决问题后重新运行.
+命令运行后checkpatch如果有error或者warning会自动abort，需要修改解决patch解决问题后重新运行。
 
 其他常用选项
 
-- '-t' 标题中":"前面的都当成TAG, 大部分无法被patman识别, 需要使用'-t'选项
-- '-i' 如果有些warning(如超过80个字符)我们认为无需解决, 可以直接加'-i'选项提交补丁
-- '-s' 如果要提交的补丁并不是在当前tree的top, 可以通过'-s'跳过top的N个补丁
-- '-n' 如果并不是想提交补丁,只是想校验最新补丁是否可以通过checkpatch, 可以使用'-n'选项
+- '-t' 标题中":"前面的都当成TAG，大部分无法被patman识别，需要使用'-t'选项；
+- '-i' 如果有些warning（如超过80个字符）我们认为无需解决，可以直接加'-i'选项提交补丁；
+- '-s' 如果要提交的补丁并不是在当前tree的top，可以通过'-s'跳过top的N个补丁；
+- '-n' 如果并不是想提交补丁，只是想校验最新补丁是否可以通过checkpatch，可以使用'-n'选项；
 
-patchman配合commit message中的关键字, 生成upstream mailing list 所需的信息.
-典型的commit:
+patchman配合commit message中的关键字，生成upstream mailing list 所需的信息。
+典型的commit：
 
 ```
 commit 72aa9e3085e64e785680c3fa50a28651a8961feb
@@ -3969,19 +4197,19 @@ Date:   Wed Sep 6 09:22:42 2017 +0800
     Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
 ```
 
-这个patch通过patman命令发送的时候,会生成一份Cover-letter:
+这个patch通过patman命令发送的时候，会生成一份Cover-letter：
 
 ```
 [PATCH v4 00/11] rockchip: add tpl and OPTEE support for rk3229
 ```
 
-对应patch的标题如下, 包含version信息和当前patch是整个series的第几封:
+对应patch的标题如下， 包含version信息和当前patch是整个series的第几封：
 
 ```
 [PATCH v4,07/11] spl: add support to booting with OP-TEE
 ```
 
-Patch的commit message已经被处理过了, change-id被去掉, Cover-letter被去掉, version-changes信息被转换成非正文信息:
+Patch的commit message已经被处理过了，change-id被去掉、 Cover-letter被去掉、version-changes信息被转换成非正文信息：
 
 ```
 OP-TEE is an open source trusted OS, in armv7, its loading and
@@ -4017,30 +4245,29 @@ Changes in v2:
  create mode 100644 common/spl/spl_optee.S
 ```
 
-更多关键字使用, 如"Series-prefix", "Series-cc"等请参考README.
+更多关键字使用，如"Series-prefix"、 "Series-cc"等请参考README。
 
 ### 10.6 buildman工具
 
-详细信息请参考tools/buildman/README
+详细信息请参考tools/buildman/README。
 
-这个工具最主要的用处在于批量编译代码, 非常适合用于验证当前平台的提交是否影响到其他平台.
+这个工具最主要的用处在于批量编译代码，非常适合用于验证当前平台的提交是否影响到其他平台。
 
-使用buildman需要提前设置好toolchain路径, 编辑'~/.buildman'文件:
+使用buildman需要提前设置好toolchain路径，编辑'~/.buildman'文件：
 
 ```
 [toolchain]
 arm: ~/prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/
 aarch64: ~/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/
-
 ```
 
-典型用例如编译所有Rockchip平台的U-Boot代码:
+典型用例：如编译所有Rockchip平台的U-Boot代码：
 
 ```
 ./tools/buildman/buildman rockchip
 ```
 
-理想结果如下:
+理想结果如下：
 
 ```
 $ ./tools/buildman/buildman rockchip
@@ -4049,12 +4276,12 @@ Building current source for 34 boards (4 threads, 1 job per thread)
    34    0    0 /34     evb-rk3326
 ```
 
-显示的结果中, 第一个是完全pass的平台数量(绿色), 第二个是含warning输出的平台数量(黄色), 第三个是有error无法编译通过的平台数量(红色). 如果编译过程中有warning或者error, 会在终端上显示出来.
+显示的结果中，第一个是完全pass的平台数量（绿色），第二个是含warning输出的平台数量（黄色），第三个是有error无法编译通过的平台数量（红色）。如果编译过程中有warning或者error会在终端上显示出来。
 
 ### 10.7 mkimage工具
 
-详细信息参考doc/mkimage.1
-这个工具可用于生成所有U-Boot/SPL支持的固件, 如通过下面的命令生成Rockchip的bootrom所需IDBLOCK格式, 这个命令会同时修改u-boot-tpl.bin的头4个byte为Bootrom所需校验的ID:
+详细信息参考doc/mkimage.1。
+这个工具可用于生成所有U-Boot/SPL支持的固件，如：通过下面的命令生成Rockchip的bootrom所需IDBLOCK格式，这个命令会同时修改u-boot-tpl.bin的头4个byte为Bootrom所需校验的ID：
 
 ```
 tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
@@ -4063,6 +4290,10 @@ tools/mkimage -n rk3328 -T rksd -d tpl/u-boot-tpl.bin idbloader.img
 ## 11. rktest测试程序
 
 rktest集成了对某些模块的测试命令，可以快速确认哪些模块是否正常。
+
+```
+CONFIG_TEST_ROCKCHIP
+```
 
 命令格式：
 
@@ -4082,7 +4313,7 @@ Command: rktest [module] [args...]
      -     vendor: test vendor storage partition read/write
 ```
 
-1. timer测试：用于确认当前环境下系统timer是否正常工作（延时是否准确）、系统中断是否正常。
+1. timer测试：用于确认timer是否正常工作（延时是否准确）、中断是否正常。
 
 ```
 => rktest timer
@@ -4111,7 +4342,7 @@ timer_irq_handler: round-4, irq=114, period=1000ms
 timer_irq_handler: irq test finish.
 ```
 
-2. key测试：用于确认当前环境下系统的按键是否能正常响应。输入命令后，可以按下各个按键进行确认；按下ctrl+c组合键可以退出测试。
+2. key测试：用于确认按键是否能正常响应。输入命令后可以按下各个按键进行确认；按下ctrl+c组合键可以退出测试。
 
 ```
 => rktest key
@@ -4126,7 +4357,7 @@ power key short pressed..
 power key long pressed..
 ```
 
-3. emmc测试：用于确认当前环境下系统的emmc读写速度。
+3. eMMC测试：用于确认eMMC读写速度。
 
    命令格式：rktest	emmc\<start_lba\> \<blocks\>
 
@@ -4142,9 +4373,9 @@ MMC read: dev # 0, block # 8192, count 8192 ... 8192 blocks read: OK
 eMMC read: size 4MB, used 95ms, speed 43MB/s
 ```
 
-注意：测试后对应的被写存储区域的数据已经变化了。如果这个区域对应的是固件分区，则固件可能已经被破坏，请重新烧写固件。
+注意：测试后对应的被写存储区域的数据已经变化。如果这个区域对应的是固件分区，则固件可能已经被破坏，请重新烧写固件。
 
-4. rknand测试：用于确认当前环境下系统的rknand读写速度。
+4. rknand测试：用于确认rknand读写速度。
 
    命令格式：rktest rknand \<start_lba\> \<blocks\>
 
@@ -4160,7 +4391,7 @@ rknand read: dev # 0, block # 8192, count 8192 ... 8192 blocks read: OK
 rknand read: size 4MB, used 95ms, speed 43MB/s
 ```
 
-5. vendor storage测试：用于确认当前环境下系统的vendor storage功能是否正常。
+5. vendor storage测试：用于确认vendor storage功能是否正常。
 
 ```
 => rktest vendor
@@ -4183,7 +4414,7 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 [Vendor Test]:Test End.
 ```
 
-6. maskrom下载模式识别测试：用于确认当前环境下，能否退回到maskrom模式进行烧写。
+6. maskrom下载模式识别测试：用于确认当前环境下能否退回到maskrom模式进行烧写。
 
 ```
 => rktest brom
@@ -4205,27 +4436,16 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 
 ```
 [DCDC_REG1@vdd_center] set: 900000 uV -> 912500 uV;  ReadBack: 912500 uV
-
 Confirm 'vdd_center' voltage, then hit any key to continue...
-
 [DCDC_REG1@vdd_center] set: 912500 uV -> 937500 uV;  ReadBack: 937500 uV
-
 Confirm 'vdd_center' voltage, then hit any key to continue...
-
 [DCDC_REG1@vdd_center] set: 937500 uV -> 975000 uV;  ReadBack: 975000 uV
-
 Confirm 'vdd_center' voltage, then hit any key to continue...
-
 [DCDC_REG2@vdd_cpu_l] set: 900000 uV -> 912500 uV;  ReadBack: 912500 uV
-
 Confirm 'vdd_cpu_l' voltage, then hit any key to continue...
-
 [DCDC_REG2@vdd_cpu_l] set: 912500 uV -> 937500 uV;  ReadBack: 937500 uV
-
 Confirm 'vdd_cpu_l' voltage, then hit any key to continue...
-
 [DCDC_REG2@vdd_cpu_l] set: 937500 uV -> 975000 uV;  ReadBack: 975000 uV
-
 Confirm 'vdd_cpu_l' voltage, then hit any key to continue..
 ```
 
@@ -4241,7 +4461,7 @@ Confirm 'vdd_cpu_l' voltage, then hit any key to continue..
 
 ### IRAM程序内存分布(SPL/TPL)
 
-bootRom出来后的第一段代码在Intermal SRAM(U-Boot叫IRAM), 可能是TPL或者SPL, 同时存在TPL和SPL时描述的是TPL的map, SPL的map类似.
+bootRom出来后的第一段代码在Intermal SRAM(U-Boot叫IRAM)，可能是TPL或者SPL，同时存在TPL和SPL时描述的是TPL的map、SPL的map类似。
 
 | **Name** | **start addr**            | **size**                 | **Desc**       |
 | -------- | :------------------------ | :----------------------- | :------------- |
@@ -4255,13 +4475,13 @@ bootRom出来后的第一段代码在Intermal SRAM(U-Boot叫IRAM), 可能是TPL�
 | gd       | malloc_start - sizeof(gd) | sizeof(gd)               |                |
 | malloc   | IRAM_END-MALLOC_F_LEN     | *PL_SYS_MALLOC_F_LEN     | malloc_simple  |
 
-text, bss, dtb的空间是编译时根据实际内容大小决定的；
-malloc, gd, SP是运行时根据配置来确定的位置；
-一般要求dtb尽量精简,把空间留给代码空间, text如果过大, 运行时比较容易碰到的问题是Stack把dtb冲了, 导致找不到dtb.
+text、bss、dtb的空间是编译时根据实际内容大小决定的；
+malloc、gd、SP是运行时根据配置来确定的位置；
+一般要求dtb尽量精简,把空间留给代码空间，text如果过大，运行时比较容易碰到的问题是Stack把dtb冲了，导致找不到dtb。
 
 ### U-Boot内存分布(relocate后)
 
-U-Boot代码一开始由前级Loader搬到TEXT_BASE的位置,U-Boot在探明实际可用DRAM空间后,把自己relocate到ram_top位置, 其中Relocation Offset = 'U-Boot start - TEXT_BASE'.
+U-Boot代码一开始由前级Loader搬到TEXT_BASE的位置，U-Boot在探明实际可用DRAM空间后把自己relocate到ram_top位置，其中Relocation Offset = 'U-Boot start - TEXT_BASE'。
 
 | **Name**        | **start addr**           | **size**                 | **Desc**                  |
 | --------------- | :----------------------- | :----------------------- | :------------------------ |
@@ -4281,11 +4501,11 @@ U-Boot代码一开始由前级Loader搬到TEXT_BASE的位置,U-Boot在探明实�
 | Video FB        |                          | fb size                  | 约32M                      |
 | TLB table       | RAM_TOP-64K              | 32K                      |                           |
 
-Video FB/U-Boot/malloc/Board/GD/FDT/SP是由顶向下根据实际需求大小来分配的, 起始地址对齐到4K大小；
-ATF在armv8是必需的, 属于TE, armv7没有；
-OP-TEE在armv7属于TE+TOS, 可选, 根据是否需要TA来确定大小；在armv8属于bl32(TOS), 可选, 依据内含TA数量来确定大小；U-Boot在dram_init_banksize()函数解析实际占用空间；
-kernel fdt/kernel/ramdisk几个起始位置在includ/config/rkxx_common.h中的ENV_MEM_LAYOUT_SETTINGS定义,注意不能和已定义位置重合；
-FASTBOOT/ROCKUSB等下载功能的BUFFER地址,在config/evb-rkxx_defconfig中定义, FASTBOOT_BUF_ADDR注意不能和已定义位置重合, 可以跟上一条内容重合；
+- Video FB/U-Boot/malloc/Board/GD/FDT/SP由顶向下根据实际需求大小来分配，起始地址对齐到4K大小；
+- ATF是armv8必需的，属于TEE；armv7没有ATF；
+- OP-TEE在armv7属于TA+TOS，可选，根据是否需要TA来确定大小；在armv8属于BL32(TOS)，可选，依据内含TA数量来确定占用内存大小；U-Boot在dram_init_banksize()函数解析实际占用空间；
+- kernel fdt/kernel/ramdisk加载地址在include/config/rkxx_common.h中的ENV_MEM_LAYOUT_SETTINGS定义，注意不能和已定义位置重合；
+- FASTBOOT/ROCKUSB等下载功能的BUFFER地址，在config/evb-rkxx_defconfig中定义，FASTBOOT_BUF_ADDR注意不能和已定义位置重合，可以跟上一条内容重合；
 
 ### fastboot一些参考
 
