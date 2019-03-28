@@ -29,6 +29,8 @@ SDK维护工程师
 | 2018-10-09 | V1.0   | 杨凯    | 初始版本     |
 | 2019-03-09 | V1.1   | 杨凯    | 新增job详细流程     |
 | 2019-04-11 | V1.2 | 陈谋春 | 新增LAVA Server详细实现流程 |
+| 2019-04-28 | V1.3   | 朱志展  | Chameleon辅助板说明 |
+| 2019-08-22 | V1.4   | 任家宁  | Chameleon辅助板补充说明 |
 
 ------
 
@@ -910,13 +912,456 @@ sudo vim /etc/fstab
 
 # 四 Chameleon硬件辅助板
 
+Chameleon硬件辅助板为自动化测试不可缺少的一环,它连接测试板与lava slave上位机,提供对控制测试板的上电,复位,以及通信等功能.
+
 ## 4.1 硬件资源
+
+- 4个USB2.0接口: 作为测试板串口输出接口
+- 4个USB3.0接口: 作为测试板OTG接口
+- 4个type-c接口: 可作为测试板测试接口,功能包括供电,串口通信,测试板状态控制,目前支持的板子有evb-rk1808, evb-rk3399pro
+- 4个JTAG插座: 作为测试板状态控制接口,同时提供串口输出接口
+- 4个音频接口: 提供音频采集测接口
+- 六个拨码开关: 一些管脚复用(主要是type-c与JTAG上的管脚冲突),提供管脚切换功能
+- 12个电流采集ADC INA226: 可以监控DUT设备的电流和功耗
+
+INA226的电压测量值如下，其中U2 - 1 代表USB2.0的第一个设备，USB2.0与USB3.0共用四组电源，DUT设备为evb-rk1808
+
+| INA226 | 第一次 | 第二次 | 第三次 | 第四次 | 第五次 | 平均值 |电压表实际测量值 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | --------------- |
+| U3 - 1 | 5179mV | 5180mV | 5178mV | 5181mV | 5180mV | 5180mV | 5.19V |
+| U3 - 2 | 5184mV | 5184mV | 5184mV | 5184mV | 5184mV | 5184mV | 5.20V |
+| U3 - 3 | 5193mV | 5193mV | 5193mV | 5193mV | 5193mV | 5193mV | 5.21V |
+| U3 - 4 | 5204mV | 5204mV | 5204mV | 5204mV | 5204mV | 5204mV | 5.22V |
+| U2 - 1（正在给手机充电） | 5156mV | 5161mV | 5161mV | 5161mV | 5159mV | 5160mV | 5.17V |
+| U2 - 2 | 5183mV | 5183mV | 5184mV | 5184mV | 5184mV | 5184mV | 5.20V |
+| U2 - 3 | 5193mV | 5193mV | 5193mV | 5193mV | 5193mV | 5193mV | 5.21V |
+| U2 - 4 | 5204mV | 5204mV | 5204mV | 5204mV | 5204mV | 5204mV | 5.22V |
+| DUT - 1 | 11400mV | 11400mV | 11400mV | 11400mV | 11400mV | 11400mV | 11.43V |
+| DUT - 2 | 11408mV | 11408mV | 11409mV | 11409mV | 11408mV | 11408mV | 11.44V |
+| DUT - 3 | 12195mV | 12195mV | 12193mV | 12195mV | 12195mV | 12195mV | 12.23V |
+| DUT - 4 | 11423mV | 11423mV | 11423mV | 11423mV | 11423mV | 11423mV | 11.46V |
+
+硬件整体框图如下所示:
+
+![chameleon hardware frame](./chameleon/chameleon-frame.png)
+
+目前测试板有两种连接方式.如下:
+
+硬件板连接1(包括evb-rk3326, evb-rk3308, evb-rk3229, evb-rk3328, evb-rk3399, evb-rk3126, evb-rk3368等):
+
+![hardware-link1](./chameleon/hardware-link1.png)
+
+硬件板连接2(包括evb-rk1808, evb-rk3399pro):
+
+![hardware-link2](./chameleon/hardware-link2.png)
 
 ## 4.2 软件系统
 
+chameleon硬件辅助板的软件系统包括RK3308固件编译, 辅助板app 和上位机的控制脚本
+
+**功能列表**
+
+| 预期功能 				| 完成度 | 备注 |
+| ----------------------------------------------------- | ------ | ---- |
+| 串口控制硬件辅助板GPIO 		| 已完成 | |
+| 串口下发shell命令让chameleon板执行 	| 已完成 | 目前不会返回具体执行结果，而且是阻塞等待执行完成 |
+| 串口控制DUT设备power-on/dis, reset, 进入bootloader或maskroom模式 | 已完成 | chameleon.py控制脚本有三种模式，针对不同evb板有不同的控制模式，具体在4.3.1章节中有介绍 |
+| 串口获取和设置板级参数 		| 已完成 | 目前可以获取每个dut设备的电压电流功率和采样间隔，可以设置ina226的采样间隔 |
+| 串口控制录音 				| 待完善 | 将录音文件存储到/tmp/record.wav, 再通过文件传输到上位机，但是目前没有做到四通道数据分离，录音控制还有待完善 |
+| 串口文件传输 				| 待完善 | 上位机发送/接受文件的速度大约为100/10 KB/s，接收文件的速度太慢，还没找到原因 |
+| USB文件传输 				| 未完成 | |
+
+### 4.2.1 整体框架
+
+![chameleon software system](./chameleon/chameleon-software-system.png)
+
+### 4.2.2 固件编译
+
+chameleon硬件辅助板的固件包括MiniLoaderAll.bin, parameter.txt, trust.img, uboot.img, boot.img 和 rootfs.img, 接下来介绍固件的编译流程
+
+#### BootLoader
+
+引导程序包括ddr.bin、miniloader.bin、trust和uboot，在gerrit上可以下载到uboot和rkbin的源码
+
+```shell
+git clone ssh://user@10.10.10.29:29418/android/rk/u-boot
+git clone ssh://user@10.10.10.29:29418/linux/rkbin
+```
+
+我们使用uart0作为Debug串口，RK3308固件的默认串口都是uart2，uboot的debug串口从miniloader.bin中获取，所以在rkbin源码中做如下修改
+
+```
+diff --git a/RKBOOT/RK3308MINIALL.ini b/RKBOOT/RK3308MINIALL.ini
+index 473778a..f274b95 100644
+--- a/RKBOOT/RK3308MINIALL.ini
++++ b/RKBOOT/RK3308MINIALL.ini
+@@ -5,7 +5,7 @@ MAJOR=1
+ MINOR=05
+ [CODE471_OPTION]
+ NUM=1
+-Path1=bin/rk33/rk3308_ddr_589MHz_uart2_m1_v1.26.bin
++Path1=bin/rk33/rk3308_ddr_589MHz_uart0_m0_v1.26.bin
+ Sleep=1
+ [CODE472_OPTION]
+ NUM=1
+@@ -14,7 +14,7 @@ Path1=bin/rk33/rk3308_usbplug_v1.14.bin
+ NUM=2
+ LOADER1=FlashData
+ LOADER2=FlashBoot
+-FlashData=bin/rk33/rk3308_ddr_589MHz_uart2_m1_v1.26.bin
++FlashData=bin/rk33/rk3308_ddr_589MHz_uart0_m0_v1.26.bin
+ FlashBoot=bin/rk33/rk3308_miniloader_v1.14.bin
+ [OUTPUT]
+ PATH=rk3308_loader_v1.26.114.bin
+```
+
+- 编译uboot
+
+```shell
+cd u-boot && ./make.sh rk3308-aarch32 && cd -
+cp u-boot/uboot.img ./$FIRMWARE/uboot.img
+cp u-boot/trust.img ./$FIRMWARE/trust.img
+cp u-boot/*_loader_*.bin ./$FIRMWARE/MiniLoaderAll.bin
+```
+
+编译成功后会在固件目录中生成uboot.ing, trust.img, MiniLoaderAll.bin
+
+#### Kernel
+
+chameleon 硬件辅助版只用到了很少的板级资源，主要包括串口，i2c和acodec，DTS和Makefile请参考rk3308-chameleon-aarch32.dts, rk3308_chameleon_aarch32_defconfig
+
+- 下载kernel 4.4源码
+
+```shell
+git clone ssh://user@10.10.10.29:29418/rk/kernel
+git checkout develop-4.4
+```
+
+- 编译kernel：
+
+```shell
+KERNEL_DEFCONFIG=rk3308_chameleon_aarch32_defconfig
+KERNEL_DTS=rk3308-chameleon-aarch32
+cd kernel && make ARCH=arm $KERNEL_DEFCONFIG && make ARCH=arm $KERNEL_DTS.img -j32 && cd -
+cp kernel/boot.img $FIRMWARE/
+```
+
+编译成功后在固件目录下生成boot.img
+
+#### Rootfs
+
+根文件系统的制作包括busybox编译，alsa库移植和chameleon-app的编译
+
+- 制作根文件系统rootfs
+
+编译根文件系统和app都使用arm-linux-gnueabihf- 交叉编译工具，可以运行`sudo apt install gcc-arm-linux-gnueabihf`安装
+
+```shell
+./build-rootfs.sh $ROOTFS_PATH
+```
+
+运行build-rootfs.sh脚本后会在当前目录下载busybox源码，编译成功后会在ROOTFS_PATH下生成一份rootfs，注意该文件系统并没有移植alsa
+
+- 移植alsa
+
+alsa 包括alsa-lib和alsa-until, 可以在官网下载, 编译alsa的时候需要root权限, 因为要在/usr目录下安装文件，
+特别注意编译时指定什么路径就要把生成的文件放在rootfs相同的路径下，在build-rootfs.sh中添加alsa的path为/usr/alsa/bin，
+所以这里应该指定--prefix=/usr/alsa
+
+```shell
+cd alsa-lib-1.1.9
+./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc --prefix=/usr/alsa
+make -j32
+sudo make install
+cd -
+
+cd alsa-utils-1.1.9
+./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc --prefix=/usr/alsa --with-alsa-inc-prefix=/usr/alsa/include --with-alsa-prefix=/usr/alsa/lib --disable-alsamixer
+make -j32
+sudo make install
+cd -
+```
+
+然后将生成的文件复制到rootfs下
+
+```shell
+cp -R /usr/alsa $ROOTFS_PATH/rootfs/usr/
+cd $ROOTFS_PATH/rootfs/usr && ln -s alsa/lib lib && cd -
+```
+
+- 打包rootfs
+
+```
+cd chameleon-app && make && cp chameleon ../$FIRMWARE/rootfs/app/. && make clean && cd -
+mksquashfs $ROOTFS_PATH/rootfs/ $FIRMWARE/rootfs.squashfs -noappend -processors 24 -comp gzip
+```
+
 ## 4.3 通讯协议
 
-## 4.3 dispatcher控制接口
+### 4.3.1 dispatcher控制命令
+
+usage: chameleon.py [-h] [--device DEVICE] [--uart UART] [--ops OPS]
+                    [--get_var GET_VAR] [--set_var SET_VAR]
+                    [--get_file GET_FILE] [--send_file SEND_FILE]
+                    [--record RECORD] [--run_cmd RUN_CMD] [--value VALUE]
+                    [--dst_path DST_PATH] [--record_time RECORD_TIME]
+                    [--mode MODE]
+
+- uart：对应Chameleon控制板的串口编号, 例如--device /dev/ttyUSB0
+
+- device：连接Chameleon控制板的测试板编号, 可以是[1-4], 例如--device 1
+
+- ops：对应操作，后续可以添加新的操作命令
+
+目前命令有：
+
+```
+reset-device: 复位设备
+reset-mashrom: 复位进入maskrom
+reset-loader: 复位进入recovery
+usb-en: USB设备电源使能, USB2.0和USB3.0共用4组电源
+usn-dis: USB设备电源关闭
+usb-en-all: 使能全部USB设备电源
+usb-dis-all: 关闭全部USB设备电源
+power-en: DUT设备电源使能
+power-dis: DUT设备电源关闭
+gpioxxxx: 控制单个GOIO引脚电平
+...
+```
+
+- get_var: 获取参数
+
+目前可以获取的参数有
+
+```
+u2-voltage: USB2.0设备当前电压值，单位为mV
+u2-current: USB2.0设备当前电流值，单位为mA
+u2-power: USB2.0设备当前功率，单位为mW
+u2-interval: USB2.0设备当前采样间隔，单位为ms
+u3-voltage: USB3.0设备当前电压值
+u3-current: USB3.0设备当前电流值
+u3-power: USB3.0设备当前功率
+u3-interval: USB3.0设备当前采样间隔
+dut-voltage: DUT设备当前电压值
+dut-current: DUT设备当前电流值
+dut-power: DUT设备当前功率
+dut-interval: DUT设备当前采样间隔
+```
+
+- set_var: 设定参数
+
+- value: 要设定的参数值，只能和set_var同时使用
+
+目前可以设定的参数有
+
+```
+u2-interval: USB2.0设备当前采样间隔，单位为ms
+u3-interval: USB3.0设备当前采样间隔，单位为ms
+dut-interval: DUT设备当前采样间隔，单位为ms
+
+```
+
+- send-file: 发送文件到硬件辅助板, 参数为本地文件路径
+
+- get-file: 从硬件辅助板接收文件, 参数为硬件辅助板的文件绝对路径
+
+- dst_path: 文件传输的目标地址，是send_file 和get_file 功能的必选参数
+
+- record: 控制硬件辅助板录音，录音文件保存在/tmp/record.wav
+
+目前录音的参数有
+
+```
+16K: 采样率16K, 四通道录音, 格式为S16_LE
+48K: 采样率48K, 四通道录音, 格式为S16_LE
+...
+```
+
+- record_time: 录音时间，是record功能的必须参数，单位为秒
+
+- run_cmd: 发送shell命令让辅助板执行，目前只是调试使用
+
+- mode: 命令模式，默认为0
+	- 当mode等于0时，发送精简指令调用app函数，如"1 reset-device\n"
+	- 当mode等于1时，逐条发送GPIO控制指令，控制引脚方便修改，目前实现的功能和mode 0一样
+	- 当mode等于2时，逐条发送GPIO控制指令，是针对rk1808evb和rk3399pro_evb错板的控制方式
+
+rk1808 evb和rk3399pro evb硬件typec画反了,这两块evb板不可以使用uart/i2c/JTAG, recovery和maskrom key错连在uart/i2c/JTAG上；
+vccio_det接在了power_on key上，没有上拉电阻，所以vccio的检测功能无法使用
+
+目前的解决方法是将拨码开关拨至i2c，使用i2c引脚控制recovery和maskrom，如果需要调节vccio则手动修改控制脚本，之后的evb板会修正该错误
+
+如果在mode == 2时开启dut3，挂载在i2c3上的电源监控ADC将无法通信，如果需要测量电压电流请重启chameleon硬件辅助板并不要使用dut3
+
+**使用实例**
+
+例如上位机查看到的Chameleon硬件辅助板通信串口位/dev/ttyUSB0
+
+```shell
+# 复位测试板1:
+sudo python chameleon.py --uart /dev/ttyUSB0 --device 1 --ops reset-device
+# 打开测试板2的电源:
+sudo python chameleon.py --uart /dev/ttyUSB0 --device 2 --ops power-en
+# 获取测试板3的功率:
+sudo python chameleon.py --uart /dev/ttyUSB0 --device 3 --get_var dut-power
+# 设置测试板4的采样间隔为300ms:
+sudo python chameleon.py --uart /dev/ttyUSB0 --device 4 --set_var dut_interval --value 300
+# 以16K的采样率录音3秒并下载到上位机
+sudo python chameleon.py --uart /dev/ttyUSB0 --record 16K --time 3
+sudo python chameleon.py --uart /dev/ttyUSB0 --get_file /tmp/record.wav --path ./record.wav
+# reset rk1808evb
+sudo python chameleon.py --uart /dev/ttyUSB0 --mode 2 --device 1 --ops reset-device
+```
+
+### 4.3.2 chameleon串口通信协议
+
+#### 控制命令
+
+上位机与控制板以ascii形式传输命令，相邻命令字段用空格' '间隔，命令尾使用'\n'，数据格式定义如下:
+
+|  id | 定义 | 备注 |
+| --- | ---- | ---- |
+|  1  | 设备号 | 每条指令的第一个字节都是设备号，如果有具体设备则为[1-4], 如果是录音或文件传输等不需要设备号的操作则为a，如果检测到其它字符则返回DEVICE_ERROR |
+|  2  | 命令字段 | 该字段包括`reset_device`等基本操作; `get_var set_var`参数获取和设定; `send_file get_file`文件传输; `run_cmd` shell命令 |
+|  3  | 参数1 | 可选字段，基本操作不需要该字段；如果是参数获取和设定则设置为`dut-power`等具体参数；如果是文件传输则设置为辅助板上文件绝对路径；如果是shell命令则设置为具体指令 |
+|  4  | 参数2 | 可选字段，只出现在set_var命令中，表示设置的具体数值 |
+
+GPIO命令字段定义
+
+| 字节 | 定义     |
+| ---- | -------- |
+| 4    | 控制项   |
+| 4    | 控制地址 |
+| 4    | 操作     |
+| 4    | crc32    |
+
+目前尚未做crc32校验
+
+例如设置gpio的GPIO0_A1为高，则下发“gpio0001high”, 获取GPIO0_B1的电平，则下发“gpio0009get"
+
+**串口通信传输实例**
+
+```
+# 复位测试板1:
+# sudo python chameleon.py --uart /dev/ttyUSB0 --device 1 --ops reset-device
+
+"1 reset-device\n"
+
+# 打开测试板2的电源:
+# sudo python chameleon.py --uart /dev/ttyUSB0 --device 2 --ops power-on
+
+"2 power-on\n"
+
+# 获取测试板3的功率:
+# sudo python chameleon.py --uart /dev/ttyUSB0 --device 3 --get_var dut-power
+
+"3 get-var dut-power\n"
+
+# 设置测试板4的采样间隔:
+# sudo python chameleon.py --uart /dev/ttyUSB0 --device 4 --set_var dut_interval --value 300
+
+"4 set-var dut-interval 300\n"
+
+# 以16K的采样率录音3秒并下载到上位机
+# sudo python chameleon.py --uart /dev/ttyUSB0 --record 16K --time 3
+
+"a run-cmd arecord -D hw:0,0 --period-size=1024 --buffer-size=4096 -f S16_LE -r 16000 -c 4 -d 3 /tmp/record.wav\n"
+
+# sudo python chameleon.py --uart .dev/ttyUSB0 --get_file /tmp/record.wav --path ./record.wav
+
+"a get-file /tmp/record.wav\n"
+
+# reset rk1808evb
+# sudo python chameleon.py --uart /dev/ttyUSB0 --mode 2 --device 1 --ops reset-device
+
+"a gpio0049high\n"
+"a gpio0069high\n"
+"a gpio0049low\n"
+"a gpio0069low\n"
+```
+
+#### 返回值
+
+| Return value 		| 含义		| 备注              |
+| --------------------- | ------------- | ----------------- |
+| OKAY			| 执行成功	| |
+| OKEY[0-9]+		| 成功获取到数据| OKAY后面的数据即为返回值，例如发送"1 get-var dut-voltage\n", 会得到“OKAY11400\n” |
+| FAIL			| 未知错误	| |
+| FAILcrc error		| CRC校验错误	| 目前还没有该功能  |
+| FAILdata error	| 数据获取错误	| 在获取GPIO电平值或ina226测量结果失败时会返回该错误码，最大的可能是ina226通信失败 |
+| FAILno device		| 未连接设备错误| 设备插入后typec的CC位会被拉低，通过检测CC位电平判断是否有设备插入 |
+| FAILparameter error	| 参数错误	| 比如设备号出错，参数设置时vlaue超出可调节大小，文件传输时路径错误等|
+| FAILimplement error	| 执行错误	| chameleon硬件板执行命令时发生错误，可能是打开文件错误(无权限，路径不对），也有可能是内存申请失败，需要配合debug串口定位错误 |
+| FAILunknown operation	| 操作错误	| 下发的命令字段出错，可能是命令输入错误，或者传输乱码 |
+
+### 4.3.2 chameleon app
+
+chameleon app代码tree如下
+
+```
+.
+├── Makefile
+├── README.md
+├── chameleon.py		/* python 控制脚本 */
+├── chameleon_error.h		/* 定义chameleon 错误码 */
+├── dac8552.c			/* dac8552 控制代码，用于设置VBUS电压 */
+├── dac8552.h
+├── debug.h			/* 定义debug输出 */
+├── gpio.c			/* GPIO读写操作 */
+├── gpio.h
+├── gpio_ctrl.c			/* 基于GPIO的一些控制指令，包括reset-device等指令 */
+├── gpio_ctrl.h
+├── ina226.c			/* INA226的基本读写操作 */
+├── ina226.h
+├── main.c
+├── power_ctrl.c		/* 电源管理相关函数，基于GPIO控制 */
+├── power_ctrl.h
+├── protocol.c			/* 协议解析 */
+├── protocol.h
+├── saradc.c			/* 获取saradc的电压值，用于监测VBUS的电压需求 */
+├── saradc.h
+├── tags
+├── uart.c			/* 命令传输串口的基本操作，包括文本传输和文件传输 */
+└── uart.h
+```
+
+- GPIO控制
+
+chameleon硬件辅助板的大部分操作都基于GPIO控制，在chameleon app中使用/sys/class/gpio节点控制GPIO
+
+- 串口通信
+
+chameleon使用uart4作为控制串口，同时做为文件传输串口，开启硬件流控防止数据丢失
+
+字符串传输，接收命令以'\n'为结束标志
+
+文件传输以二进制模式传输，直到传输字节数达到文件大小才会退出，此时函数属于阻塞状态，
+因为开启硬件流控并严格按照协议传输文件，一般不会出错，所以目前没有做超时处理和其他验证
+
+- 电压电流采集
+
+电压电流和功率的测量使用TI的ina226 adc芯片，在kernel中有这款芯片的驱动源码, 直接读取/sys/class/hwmon下的文件就可以获取电压等参数
+
+- 电源管理
+
+chameleon硬件辅助板的电源管理包括rkdfp-vccio的电压检测与设定，dut-vbus的检测与设定，以及设备接口的电源使能
+
+dut_vbus的需求检测是通过测量电阻分压实现的，dut_vbus的设定是通过dac调节电压芯片，saradc的值与电压设置对应关系如下
+
+| vbus power | 12V |  9V | 8V  | 5V  | 4.2v | 3.8v |
+| ---------- | --- | --- | --- | --- | ---- | ---- |
+| Pull-up resistor | 1.1k | 1.1k | 1.1K | 1.1k |1.1k | 1.1k |
+| Pull-down resistor | 5.6k | 3.3k | 2.2k | 1.8k | 1.5k | 0.82 |
+| adc value | 855 | 768 | 682 | 635 | 590 | 437 |
+| dac value | 10000 | 27142 | 31714 | 44000 | 49085 | 50914 |
+
+- 协议控制
+
+协议控制就是将接收到的串口指令解析，然后调用相关函数的过程，protocol_handle就是无限循环接收指令并执行的函数
+
+协议控制中定义了一个chameleon_ops的结构体，定义了chameleon与上位机交互函数，目前都指向了串口
+
+在每一次的protocol_data_handle处理中，当接收到来自上位机的字符串指令时，先解析设备号，然后解析命令字段
 
 # 五 添加DUT
 
