@@ -1764,6 +1764,8 @@ Android的测试在Linux测试的基础上加入了LXC的deploy和boot, 需要�
 - loader文件，image关键词为'loader', 在maskrom模式使用'ul'命令；
 - 独立分区的固件，除前面两种image关键词以外的key默认为分区固件，在loader模式使用'di -xxx'命令(xxx为前面的key)，需要保证已有固件中包含可用分区表(并包含一个分区名能匹配image key)；
 
+如果有独立分区固件，dispatcher会在固件路径中查找并下载loader文件用于下载工具，需要保证有loader文件存在(按“*_loader_*”匹配)。
+
 可以支持多个固件烧写，如果同时有update.img和其他固件，会先少些update.img然后烧写其他固件。典型的yaml配置如下，
 
 ```yaml
@@ -1784,9 +1786,9 @@ Android的测试在Linux测试的基础上加入了LXC的deploy和boot, 需要�
 
 dispatcher在'lava_dispatcher/lava_test_shell/'目录提供了一系列的黑盒工具，用于运行test-definition脚本，在deploy阶段需要进行预编译到可直接执行的状态，然后打包到rootfs中，然后运行测试时由test　action　’lava-test-shell‘(lava_dispatcher/actions/test/shell.py)启用。
 
-lava-test-shell这个test　action的主要流程是：
+lava-test-shell这个test action的主要流程是：
 
-- test　action是在boot action之后，默认已经完成了boot流程，并默认已经完成root用户登录，有管理员权限，可以直接进行命令行交互；
+- test action是在boot action之后，默认已经完成了boot流程，并默认已经完成root用户登录，有管理员权限，可以直接进行命令行交互；
 - 发送一个check_char(回车)到连接串口，等待预定义的prompt字符串，一般是'root@'或者'/ #';
 - 收到预期回应后，查询root文件系统中是否存在预先部署好的测试目录，一般是’/lava-id‘;
 - 如果测试目录存在，则调用lava_test_shell的lava-test-runner启动测试流程；
