@@ -1165,6 +1165,577 @@ adb devices
 LAVA Server有多个模块，任务是提交到database，scheduler模块负责查询database中任务状态改变并查询Worker/Device状态后，把任务发给Dispatcher.
 <http://172.16.12.246/static/docs/v2/scheduler.html>
 
+#### Job状态机
+
+   一个LAVA的Job在其生命周期内，可以分为如下状态：
+
+- SUBMITTED: Job在成功提交后的初始状态
+- SCHEDULING: 这个是多节点的Job特有的状态，表示还有子Job还没有得到调度，等所有子Job都完成调度以后，会进SCHEDULED
+- SCHEDULED: Job已经调度成功，分配好Device和Worker
+- RUNNING: Job正在Device上运行
+- CANCELING: 用户中断Job
+- FINISHED: Job已经完成
+
+#### Submit Job
+
+   提交一个Job有两种方式：通过lava-tool或自己写脚本调用XML-RPC接口；在网页上直接填写并提交。这两种方式都不在本节的讨论范围，本节主要分析LAVA服务器端收到Job以后的处理、调度和分发流程。
+
+   提交Job会先调用到lava_scheduler_app.views.job_submit，这个函数会完全用户权限检查和测试用例的检查，具体如下：
+
+```python
+@BreadCrumb("Submit", parent=job_list)
+def job_submit(request):
+
+    is_authorized = False
+    # 用户需要有add_testjob权限，这个需要管理员创建用户的时候勾选，或者用户管理里修改
+    if request.user and request.user.has_perm(
+            'lava_scheduler_app.add_testjob'):
+        is_authorized = True
+
+    response_data = {
+        'is_authorized': is_authorized,
+        'bread_crumb_trail': BreadCrumbTrail.leading_to(job_submit),
+    }
+
+    if request.method == "POST" and is_authorized:
+        if request.is_ajax():
+            # 网页提交会进这个分支
+            try:
+                # 这里就是做job的合法性检查
+                validate_job(request.POST.get("definition-input"))
+                return HttpResponse(simplejson.dumps("success"))
+            except Exception as e:
+                return HttpResponse(simplejson.dumps(str(e)),
+                                    content_type="application/json")
+
+        else:
+            # xml-rpc提交进这个分支
+            try:
+                definition_data = request.POST.get("definition-input")
+                job = testjob_submission(definition_data, request.user)
+
+                if isinstance(job, type(list())):
+                    response_data["job_list"] = [j.sub_id for j in job]
+                    # Refer to first job in list for job info.
+                    job = job[0]
+                else:
+                    response_data["job_id"] = job.id
+```
+
+   具体的job合法性检查是在lava_scheduler_app.models.validate_job里完成的，这个函数会调用validate_submission检查Job是否符合规范要求，同时检查一些语义冲突，具体如下：
+
+```python
+def validate_submission(data_object):
+    """
+    Validates a python object as a TestJob submission
+    :param data: Python object, e.g. from yaml.load()
+    :return: True if valid, else raises SubmissionException
+    """
+    try:
+        data_object = handle_include_option(data_object)
+        # 检查语法规范
+        schema = _job_schema()
+        schema(data_object)
+    except MultipleInvalid as exc:
+        raise SubmissionException(exc)
+
+    # 检查各种语义冲突，secret不能和visbility=public一起出现
+    _validate_secrets(data_object)
+    # revision不能和shallow=true一起出现
+    _validate_vcs_parameters(data_object)
+    # 检查多节点的角色冲突
+    _validate_multinode(data_object)
+    return True
+```
+
+   可以再来看看语法规范检查的具体内容，写测试用例出错，如果在出错信息上看不出原因，都可以参考具体实现，函数实现比较检查，直接贴代码，不细数：
+
+```python
+def _job_schema():
+    if sys.version_info[0] == 2:
+        metadata_types = Any(str, int, unicode)
+    else:
+        metadata_types = Any(str, int)
+    return Schema(
+        {
+            'device_type': All(str, Length(min=1)),  # not Required as some protocols encode it elsewhere
+            Required('job_name'): All(str, Length(min=1, max=200)),
+            Optional('include'): str,
+            Optional('priority'): Any('high', 'medium', 'low', int),
+            Optional('protocols'): _job_protocols_schema(),
+            Optional('context'): _context_schema(),
+            Optional('metadata'): All({metadata_types: metadata_types}),
+            Optional('secrets'): dict,
+            Optional('tags'): [str],
+            Required('visibility'): visibility_schema(),
+            Required('timeouts'): _job_timeout_schema(),
+            Required('actions'): _job_actions_schema(),
+            Optional('notify'): _job_notify_schema(),
+            Optional('reboot_to_fastboot'): bool
+        }
+    )
+```
+
+   完成语法和语义检查后，脚本会检查Job的通知设置，测试用例可以在这里配置什么情况下通知哪些用户，通过哪些方式通知，具体如下：
+
+```python
+def validate_yaml(yaml_data):
+    if "notify" in yaml_data:
+        if "recipients" in yaml_data["notify"]:
+            for recipient in yaml_data["notify"]["recipients"]:
+                if recipient["to"]["method"] == \
+                   NotificationRecipient.EMAIL_STR:
+                    if "email" not in recipient["to"] and \
+                       "user" not in recipient["to"]:
+                        raise SubmissionException("No valid user or email address specified.")
+                else:
+                    if "handle" not in recipient["to"] and \
+                       "user" not in recipient["to"]:
+                        raise SubmissionException("No valid user or IRC handle specified.")
+                if "user" in recipient["to"]:
+                    try:
+                        User.objects.get(username=recipient["to"]["user"])
+                    except User.DoesNotExist:
+                        raise SubmissionException("%r is not an existing user in LAVA." % recipient["to"]["user"])
+                elif "email" in recipient["to"]:
+                    try:
+                        validate_email(recipient["to"]["email"])
+                    except ValidationError:
+                        raise SubmissionException("%r is not a valid email address." % recipient["to"]["email"])
+
+        # 从代码上看，测试用例可以设置以结果比较作为触发通知的条件，比较适合于性能测试，后续有时间再研究具体语法
+        if "compare" in yaml_data["notify"] and \
+           "query" in yaml_data["notify"]["compare"]:
+            from lava_results_app.models import Query
+            query_yaml_data = yaml_data["notify"]["compare"]["query"]
+            if "username" in query_yaml_data:
+                try:
+                    query = Query.objects.get(
+                        owner__username=query_yaml_data["username"],
+                        name=query_yaml_data["name"])
+                    if query.content_type.model_class() != TestJob:
+                        raise SubmissionException(
+                            "Only TestJob queries allowed.")
+                except Query.DoesNotExist:
+                    raise SubmissionException(
+                        "Query ~%s/%s does not exist" % (
+                            query_yaml_data["username"],
+                            query_yaml_data["name"]))
+            else:  # Custom query.
+                if query_yaml_data["entity"] != "testjob":
+                    raise SubmissionException(
+                        "Only TestJob queries allowed.")
+                try:
+                    conditions = None
+                    if "conditions" in query_yaml_data:
+                        conditions = query_yaml_data["conditions"]
+                    Query.validate_custom_query(
+                        query_yaml_data["entity"],
+                        conditions
+                    )
+                except Exception as e:
+                    raise SubmissionException(e)
+```
+
+   完成这一系列的检查后，Job就会被添加到一个TestJob的对象列表中，后续服务器调度的时候会遍历这个列表。
+
+#### Schedule Job
+
+   LAVA服务器在启动时候先完成初始化和配置socket侦听后，会进到一个main_loop中，函数中有个死循环，而这个循环就是Job调度的主入口，其先计算一个超时时间，然后等dispatcher的命令或事件通知，并进相应的处理流程，都完成后才会开始调度TestJob，具体如下：
+
+```python
+def main_loop(self, options):
+        last_schedule = last_dispatcher_check = time.time()
+
+        while True:
+            try:
+                try:
+                    # 计算超时时间，最长20s，最小1ms
+                    now = time.time()
+                    timeout = min(SCHEDULE_INTERVAL - (now - last_schedule),
+                                  PING_INTERVAL - (now - last_dispatcher_check))
+                    # If some actions are remaining, decrease the timeout
+                    if self.events["canceling"]:
+                        timeout = min(timeout, 1)
+                    # Wait at least for 1ms
+                    timeout = max(timeout * 1000, 1)
+
+                    # 等待dispatcher的命令或事件通知
+                    sockets = dict(self.poller.poll(timeout))
+                except zmq.error.ZMQError:
+                    continue
+
+                if sockets.get(self.pipe_r) == zmq.POLLIN:
+                    self.logger.info("[POLL] Received a signal, leaving")
+                    break
+
+                # 处理dispatcher的命令
+                if sockets.get(self.controler) == zmq.POLLIN:
+                    while self.controler_socket():  # Unqueue all pending messages
+                        pass
+
+                # 处理dispatcher的事件通知
+                if sockets.get(self.event_socket) == zmq.POLLIN:
+                    while self.read_event_socket():  # Unqueue all pending messages
+                        pass
+                    # Wait for the next iteration to handle the event.
+                    # In fact, the code that generated the event (lava-logs or
+                    # lava-server-gunicorn) needs some time to commit the
+                    # database transaction.
+                    # If we are too fast, the database object won't be
+                    # available (or in the right state) yet.
+                    continue
+
+                # Inotify socket
+                if sockets.get(self.inotify_fd) == zmq.POLLIN:
+                    os.read(self.inotify_fd, 4096)
+                    self.logger.debug("[AUTH] Reloading certificates from %s",
+                                      options['slaves_certs'])
+                    self.auth.configure_curve(domain='*', location=options['slaves_certs'])
+
+                # 检查dispatcher状态，太久没发消息给server的dispatcher会被offline
+                now = time.time()
+                if now - last_dispatcher_check > PING_INTERVAL:
+                    for hostname, dispatcher in self.dispatchers.items():
+                        if dispatcher.online and now - dispatcher.last_msg > DISPATCHER_TIMEOUT:
+                            if hostname == "lava-logs":
+                                self.logger.error("[STATE] lava-logs goes OFFLINE")
+                            else:
+                                self.logger.error("[STATE] Dispatcher <%s> goes OFFLINE", hostname)
+                            self.dispatchers[hostname].go_offline()
+                    last_dispatcher_check = now
+
+                # 开始调度和分发Job，最小间隔也是20s
+                if time.time() - last_schedule > SCHEDULE_INTERVAL:
+                    if self.dispatchers["lava-logs"].online:
+                        # Job调度，符合条件的Job都会进SCHEDULED状态
+                        schedule(self.logger)
+
+                        # 分发调度，SCHEDULED状态的Job会被发给dispatcher
+                        with transaction.atomic():
+                            self.start_jobs(options)
+                    else:
+                        self.logger.warning("lava-logs is offline: can't schedule jobs")
+
+                    # Handle canceling jobs
+                    self.cancel_jobs()
+
+                    # Do not count the time taken to schedule jobs
+                    last_schedule = time.time()
+                else:
+                    # Cancel the jobs and remove the jobs from the set
+                    if self.events["canceling"]:
+                        self.cancel_jobs(partial=True)
+                        self.events["canceling"] = set()
+
+            except (OperationalError, InterfaceError):
+                self.logger.info("[RESET] database connection reset.")
+                # Closing the database connection will force Django to reopen
+                # the connection
+                connection.close()
+                time.sleep(2)
+
+```
+
+   我们先来看一下调度函数schedule，在这里会完成所有Job和Device的遍历和匹配，并切换符合条件的Job进SCHEDULED状态，先看具体实现：
+
+```python
+def schedule(logger):
+    available_devices = schedule_health_checks(logger)
+    schedule_jobs(logger, available_devices)
+```
+
+   可以看到，首先是调用schedule_health_checks做健康检查，这个函数会调用每个device的health check（后面简称hc），并把通过的device加到列表中返回，具体如下：
+
+```python
+def schedule_health_checks(logger):
+    logger.info("scheduling health checks:")
+    available_devices = {}
+    hc_disabled = []
+    # 遍历所有的device type
+    for dt in DeviceType.objects.all().order_by("name"):
+        if dt.disable_health_check:
+            hc_disabled.append(dt.name)
+            # 如果这个device type关闭了健康检查，则所有在idle状态，并且其连接的worker处于online，健康状态处于good或unknown的设备都会进设备列表
+            devices = dt.device_set.filter(state=Device.STATE_IDLE)
+            devices = devices.filter(worker_host__state=Worker.STATE_ONLINE)
+            devices = devices.filter(health__in=[Device.HEALTH_GOOD,
+                                                 Device.HEALTH_UNKNOWN])
+            devices = devices.order_by("hostname")
+            available_devices[dt.name] = list(devices.values_list("hostname", flat=True))
+
+        else:
+            with transaction.atomic():
+                # 启用健康检查的device type，在这里完成健康检查
+                available_devices[dt.name] = schedule_health_checks_for_device_type(logger, dt)
+
+    # Print disabled device types
+    if hc_disabled:
+        logger.debug("-> disabled on: %s", ", ".join(hc_disabled))
+
+    return available_devices
+```
+
+   可以看到进一步会调用到schedule_health_checks_for_device_type函数，这里才是真正做check的地方，具体如下：
+
+```python
+def schedule_health_checks_for_device_type(logger, dt):
+    # 遍历所有状态idle，worker处于online，健康度good，unknown，looping的设备
+    devices = dt.device_set.select_for_update()
+    devices = devices.filter(state=Device.STATE_IDLE)
+    devices = devices.filter(worker_host__state=Worker.STATE_ONLINE)
+    devices = devices.filter(health__in=[Device.HEALTH_GOOD,
+                                         Device.HEALTH_UNKNOWN,
+                                         Device.HEALTH_LOOPING])
+    devices = devices.order_by("hostname")
+
+    print_header = True
+    available_devices = []
+    for device in devices:
+        # 没有hc的设备，直接加到可用设备列表中
+        health_check = device.get_health_check()
+        if health_check is None:
+            available_devices.append(device.hostname)
+            continue
+
+        # 检查是否可以跳过健康检查
+        scheduling = False
+        if device.health in [Device.HEALTH_UNKNOWN, Device.HEALTH_LOOPING]:
+            scheduling = True
+        elif device.last_health_report_job is None:
+            scheduling = True
+        else:
+            # 每个device type都可以配置自己的检查检查频度，可以根据Job数量，也可以根据时间
+            submit_time = device.last_health_report_job.submit_time
+            if dt.health_denominator == DeviceType.HEALTH_PER_JOB:
+                count = device.testjobs.filter(health_check=False,
+                                               start_time__gte=submit_time).count()
+
+                scheduling = count >= dt.health_frequency
+            else:
+                frequency = datetime.timedelta(hours=dt.health_frequency)
+                now = timezone.now()
+
+                scheduling = submit_time + frequency < now
+
+        if not scheduling:
+            available_devices.append(device.hostname)
+            continue
+
+        # log some information
+        if print_header:
+            logger.debug("- %s", dt.name)
+            print_header = False
+
+        logger.debug(" -> %s (%s, %s)", device.hostname,
+                     device.get_state_display(),
+                     device.get_health_display())
+        logger.debug("  |--> scheduling health check")
+        try:
+            # 实际的健康检查从这里进去
+            schedule_health_check(device, health_check)
+        except Exception as exc:
+            # If the health check cannot be schedule, set health to BAD to exclude the device
+            logger.error("  |--> Unable to schedule health check")
+            logger.exception(exc)
+            prev_health_display = device.get_health_display()
+            device.health = Device.HEALTH_BAD
+            device.log_admin_entry(None, "%s 鈫?%s (Invalid health check)" % (prev_health_display, device.get_health_display()))
+            device.save()
+
+    return available_devices
+```
+
+   这里需要注意的有两个函数，get_health_check和schedule_health_check，前者涉及到hc和device的匹配算法，后者是hc的入口，具体如下：
+
+```python
+def get_health_check(self):
+        # 获取设备字典，这里实际上就是获取device定义的extends字段
+        extends = self.get_extends()
+        if not extends:
+            return None
+
+        # 从hc的主目录，根据extends去匹配yaml文件
+        # HEALTH_CHECK_PATH=“/etc/lava-server/dispatcher-config/health-checks”
+        filename = os.path.join(Device.HEALTH_CHECK_PATH, "%s.yaml" % extends)
+        # Try if health check file is having a .yml extension
+        if not os.path.exists(filename):
+            filename = os.path.join(Device.HEALTH_CHECK_PATH,
+                                    "%s.yml" % extends)
+        try:
+            with open(filename, "r") as f_in:
+                return f_in.read()
+        except IOError:
+            return None
+```
+
+```python
+def schedule_health_check(device, definition):
+    user = User.objects.get(username="lava-health")
+    # 创建一个pipeline job(本质也是TestJob)，并设为SCHEDULED状态，真正执行检查还要回到前面的start_jobs
+    job = _create_pipeline_job(yaml.load(definition), user, [], device_type=device.device_type, orig=definition)
+    job.health_check = True
+    job.go_state_scheduled(device)
+    job.save()
+```
+
+   到目前为止，hc的job就创建并调度完成，回到前面我们可以看到下一步是schedule_jobs，先来看一下具体实现：
+
+```python
+def schedule_jobs(logger, available_devices):
+    logger.info("scheduling jobs:")
+    # 遍历所有的device type，并跳过不可用的device
+    for dt in DeviceType.objects.all().order_by("name"):
+        # Check that some devices are available for this device-type
+        if not available_devices.get(dt.name):
+            continue
+        with transaction.atomic():
+            # 实际job调度入口
+            schedule_jobs_for_device_type(logger, dt, available_devices[dt.name])
+
+    with transaction.atomic():
+        # Transition multinode if needed
+        transition_multinode_jobs(logger)
+
+```
+
+   schedule_jobs_for_device_type会遍历指定device type的所有可用设备，进一步调用schedule_jobs_for_device_type，先看一下实际实现：
+
+```python
+def schedule_jobs_for_device(logger, device):
+    # 遍历所有STATE_SUBMITTED和STATE_SCHEDULING状态的Job，并且其还没有分配device，
+    # 同时device type要和device一致，最后做个分组排序
+    jobs = TestJob.objects.filter(state__in=[TestJob.STATE_SUBMITTED,
+                                             TestJob.STATE_SCHEDULING])
+    jobs = jobs.filter(actual_device__isnull=True)
+    jobs = jobs.filter(requested_device_type__pk=device.device_type.pk)
+    jobs = jobs.order_by("-state", "-priority", "submit_time", "target_group", "id")
+
+    for job in jobs:
+        # device可以指定允许的提交者，这里先跳过不匹配的Job
+        if not device.can_submit(job.submitter):
+            continue
+
+        device_tags = set(device.tags.all())
+        job_tags = set(job.tags.all())
+        # job的tag必须是device tag的子集
+        if not job_tags.issubset(device_tags):
+            continue
+
+        job_dict = yaml.load(job.definition)
+        # 这里检查vland协议的匹配，对这个协议有兴趣可以参考:
+        # http://ip_of_lava_server/static/docs/v2/vland.html
+        if 'protocols' in job_dict and 'lava-vland' in job_dict['protocols']:
+            if not match_vlan_interface(device, job_dict):
+                continue
+
+        logger.debug(" -> %s (%s, %s)", device.hostname,
+                     device.get_state_display(),
+                     device.get_health_display())
+        logger.debug("  |--> [%d] scheduling", job.id)
+        if job.is_multinode:
+            # TODO: keep track of the multinode jobs
+            job.go_state_scheduling(device)
+        else:
+            # 设置job的状态为SCHEDULED，比较简单，不细诉
+            job.go_state_scheduled(device)
+        job.save()
+        break
+
+```
+
+   到这里为止，Job的调度就完成了，所有SCHEDULED状态的Job都找到自己的device和worker了。
+
+#### Start Job
+
+   这一步要把已经调度好的Job，发START消息给相应的dispatcher（其主入口在lava-slave[^1]里，所有代码中经常会把dispatcher叫做slave，相应的server的主入口在lava-master[^2]，有时候会简称master），先看总入口：
+
+```python
+def start_jobs(self, options):
+        """
+        Loop on all scheduled jobs and send the START message to the slave.
+        """
+        # 筛选状态为SCHEDULED和分配到的device online的Job
+        query = TestJob.objects.select_for_update()
+        # Only select test job that are ready
+        query = query.filter(state=TestJob.STATE_SCHEDULED)
+        # Only start jobs on online workers
+        query = query.filter(actual_device__worker_host__state=Worker.STATE_ONLINE)
+        # exclude test job without a device: they are special test jobs like
+        # dynamic connection.
+        query = query.exclude(actual_device=None)
+        # TODO: find a way to lock actual_device
+
+        # Loop on all jobs
+        for job in query:
+            msg = None
+            try:
+                self.start_job(job, options)
+            except jinja2.TemplateNotFound as exc:
+                self.logger.error("[%d] Template not found: '%s'",
+                                  job.id, exc.message)
+                msg = "Template not found: '%s'" % exc.message
+            except jinja2.TemplateSyntaxError as exc:
+                self.logger.error("[%d] Template syntax error in '%s', line %d: %s",
+                                  job.id, exc.name, exc.lineno, exc.message)
+                msg = "Template syntax error in '%s', line %d: %s" % (exc.name, exc.lineno, exc.message)
+            except IOError as exc:
+                self.logger.error("[%d] Unable to read '%s': %s",
+                                  job.id, exc.filename, exc.strerror)
+                msg = "Cannot open '%s': %s" % (exc.filename, exc.strerror)
+            except yaml.YAMLError as exc:
+                self.logger.error("[%d] Unable to parse job definition: %s",
+                                  job.id, exc)
+                msg = "Cannot parse job definition: %s" % exc
+
+            if msg:
+                # Add the error as lava.job result
+                metadata = {"case": "job",
+                            "definition": "lava",
+                            "error_type": "Infrastructure",
+                            "error_msg": msg,
+                            "result": "fail"}
+                suite, _ = TestSuite.objects.get_or_create(name="lava", job=job)
+                TestCase.objects.create(name="job", suite=suite, result=TestCase.RESULT_FAIL,
+                                        metadata=yaml.dump(metadata))
+                job.go_state_finished(TestJob.HEALTH_INCOMPLETE, True)
+                job.save()
+```
+
+   进一步可以看start_job的实现，这里我们只看普通Job的实现，多节点的类似，这里不细述，可以看到实际的发送实现是在send_multipart_u实现的，下面是具体实现：
+
+```python
+def start_job(self, job, options):
+        # Load job definition to get the variables for template
+        # rendering
+        job_def = yaml.load(job.definition)
+        job_ctx = job_def.get('context', {})
+
+        device = job.actual_device
+        worker = device.worker_host
+
+        # Load configurations
+        env_str = load_optional_yaml_file(options['env'])
+        env_dut_str = load_optional_yaml_file(options['env_dut'])
+        device_cfg = device.load_configuration(job_ctx)
+        dispatcher_cfg_file = os.path.join(options['dispatchers_config'],
+                                           "%s.yaml" % worker.hostname)
+        dispatcher_cfg = load_optional_yaml_file(dispatcher_cfg_file)
+
+        self.save_job_config(job, worker, device_cfg, options)
+        self.logger.info("[%d] START => %s (%s)", job.id,
+                         worker.hostname, device.hostname)
+        # 再进去就是转成字节流通过socket发送了，不细看了
+        send_multipart_u(self.controler,
+                         [worker.hostname, 'START', str(job.id),
+                          self.export_definition(job),
+                          yaml.dump(device_cfg),
+                          dispatcher_cfg, env_str, env_dut_str])
+```
+
+[^1]: 代码可以看/etc/init.d/lava-slave
+[^2]: 代码可以看/etc/init.d/lava-master
+
 ### LAVA Dispatcher解析执行
 
 LAVA dispatcher中的daemon收到master的任务后，会开始解析任务，为每个任务建立独立的临时工作目录/环境，把任务细化为不同的action, 最后调用JobRunner一条一条的执行。
