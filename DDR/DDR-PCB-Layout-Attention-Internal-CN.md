@@ -59,7 +59,7 @@
 
 - **AXI SPLIT**：非对称容量组合模式，如高位寻址区为16bit位宽，低位寻址区为32bit位宽。例如常规的组合为256x16+256x16，而AXI SPLIT的组合为256x16+128x16=768MB，在高位寻址区只剩16bit位宽，示意图如下图。
 
-  ![AXI_SPLIT](DDR-PCB-Layout-Attention\AXI_SPLIT.png)
+  ![AXI_SPLIT](DDR-PCB-Layout-Attention-Internal\AXI_SPLIT.png)
 
 -----
 ## 总的要求
@@ -123,13 +123,13 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 **12、双通道DRAM总容量3GB支持情况**
 双通道DRAM总容量3GB支持的颗粒组合如下图：
 
-  ![DRAM_3GB](DDR-PCB-Layout-Attention\2x_channel_DRAM_3GB.png)
+  ![DRAM_3GB](DDR-PCB-Layout-Attention-Internal\2x_channel_DRAM_3GB.png)
   说明：1）RK3288，RK3399支持双通道。
 
 **13、单通道DRAM总容量3GB支持情况**
 单通道DRAM总容量3GB支持的颗粒组合如下图：
 
-  ![DRAM_3GB](DDR-PCB-Layout-Attention\1x_channel_DRAM_3GB.png)
+  ![DRAM_3GB](DDR-PCB-Layout-Attention-Internal\1x_channel_DRAM_3GB.png)
 
 ----
 ##  RK3399特殊要求
@@ -157,7 +157,7 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 
 ​    c. 设计要求不共用ZQ的channel组合成一个32bit连接到RK3399。如下图，不能把Channel A和Channel D拿来组合。也不能把Channel B和Channel C拿来组合。这2组Channel都是共用一个ZQ的。
 
-![LPDDR4_ZQ](DDR-PCB-Layout-Attention/LPDDR4_ZQ.png)
+![LPDDR4_ZQ](DDR-PCB-Layout-Attention-Internal/LPDDR4_ZQ.png)
 目前通过Micron、Samsung、Hynix三家颗粒的Channel A\B\C\D定义来看，采用颗粒的Channel A + Channel C组成一个32bit，和Channel B + Channel D组成一个32bit，这种方法，能做到三家颗粒都可以避免ZQ共用的问题。所以，改版后的LPDDR4都采用这种方式的连线。
 
 **6、LPDDR4的RZQ要通过240电阻接VDDQ，而不是GND，这点要注意，RK3399主控端没有变，还是一样RZQ通过240电阻接GND**
@@ -170,7 +170,7 @@ LPDDR4有大于2个CS的颗粒，如果使用，只能用到2个CS
 
 ​    对单个LPDDR4 channel来说（16bit），MRR功能需要用到DQ[0：7]；CA training功能需要用到DQS0、DQ[0:6]、DQ[8:13]；RD DQ Calibration用到DQ[0:15]和DMI[1:0]。所以，所有数据线都不能对调。
 
-​   额外说明：
+   额外说明：
 
 ​    假设原来DDRx_D0-D15是连到LPDDR4颗粒的channel A，DDRx_D16-D31是连到LPDDR4颗粒的channel C。
 如果希望将A/C通道的互连关系对调，即DDRx_D0-D15连到LPDDR4颗粒的channel C，DDRx_D16-D31连到LPDDR4颗粒的channel A。则这种对调方式，是允许的。但需要满足上面第5点的要求，保证LPDDR4上共用ZQ的通道不组合成32bit。
