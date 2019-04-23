@@ -9,7 +9,7 @@
 ​	Chen Liang cl@rock-chips.com
 ​	Ping Lin <hisping.lin@rock-chips.com>
 
-日期：2019.03
+日期：2019.04
 
 文件密级：公开资料
 
@@ -60,7 +60,7 @@
 | 2019-03-05 | V1.22    | 林平     | 增加optee client说明                                         |
 | 2019-03-25 | V1.23    | 陈健洪/朱志展   | 增加kernel cmdline说明                            |
 | 2019-03-25 | V1.30    | 陈健洪   | 精简和整理文档、纠正排版问题、完善和调整部分章节内容               |
-
+| 2019-04-23 | V1.31    | 朱志展   | 增加硬件CRYPTO说明                                                 |
 ---
 [TOC]
 ---
@@ -3103,6 +3103,95 @@ U-Boot向kernel传递cmdline的方法是：篡改内核dtb里的/chosen/bootargs
 - androidboot.vbmeta.size：指定vbmeta的size
 - androidboot.vbmeta.digest：给kernel上传vbmeta的digest，kernel加载vbmeta后计算digest，并与此digest对比
 - androidboot.vbmeta.device_state：avb2.0指定系统lock与unlock
+
+### 5.18 硬件CRYPTO说明
+
+CRYPTO模块目的是提供通用的加密和哈希算法，而硬件CRYPTO模块为使用硬件IP实现这些算法，达到加速的目的。Rockchip芯片内有两种硬件CRYPTO模块，分为：CRYPTO V1，对应平台有rk3399、rk3229、rk3288等；CRYPTO V2，对应平台有rk3308、rk3326。
+
+#### 5.18.1 框架支持
+
+**框架代码：**
+
+```
+公用代码：
+./drivers/crypto/rockchip/rockchip_crypto.c
+./cmd/crypto.c
+
+CRYPTO V1:
+./drivers/crypto/rockchip/rockchip_crypto_hd.c
+
+CRYPTO V2:
+./drivers/crypto/rockchip/rockchip_cryptov2_hd.c
+./drivers/crypto/rockchip/rockchip_cryptov2_pka.c
+./drivers/crypto/rockchip/rockchip_util.c
+```
+
+**相关接口：**
+
+```
+probe：
+int rk_crypto_probe(void);
+
+获取udevice：
+int get_rk_crypto_desc(struct rk_crypto_desc *crypto_desc);
+
+sha256接口：
+void rk_sha256_starts(sha256_context * ctx);
+void rk_sha256_update(sha256_context *ctx, const uint8_t *input, uint32_t length);
+void rk_sha256_finish(sha256_context * ctx, uint8_t digest[SHA256_SUM_LEN]);
+
+rsa接口：
+int rk_crypto_rsa_init(struct rk_crypto_desc *rk_crypto);
+int rk_crypto_rsa_start(struct rk_crypto_desc *rk_crypto, u32 *m,
+			u32 *n, u32 *e, u32 *c);
+int rk_crypto_rsa_end(struct rk_crypto_desc *rk_crypto, u32 *result);
+```
+
+#### 5.18.2 启用硬件CRYPTO
+
+defconfig添加：
+
+```
+CONFIG_CRYPTO_ROCKCHIP=y
+
+CRYPTO V1:
+CONFIG_CRYPTO_ROCKCHIP_V1=y
+
+CRYPTO V2:
+CONFIG_CRYPTO_ROCKCHIP_V2=y
+```
+
+#### 5.18.3 dts配置
+
+CRYPTO V1:
+
+```
+crypto: crypto@ff8b0000 {
+	compatible = "rockchip,rk3399-crypto";
+	default-addr = <0xff8b0000>;
+	default-frequency = <10000000>;
+	reg = <0x0 0xff8b0000 0x0 0x4000>;
+	clocks = <&cru SCLK_CRYPTO0>, <&cru SCLK_CRYPTO1>;
+	clock-names = "crypto0", "crypto1";
+	status = "okay";
+};
+```
+
+CRYPTO V2:
+
+```
+crypto: crypto@ff0b0000 {
+	compatible = "rockchip,px30-crypto";
+	reg = <0x0 0xff0b0000 0x0 0x4000>;
+	interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>;
+	clocks = <&cru ACLK_CRYPTO >, <&cru HCLK_CRYPTO >,
+	<&cru SCLK_CRYPTO>, <&cru SCLK_CRYPTO_APK>;
+	clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+	resets = <&cru SRST_CRYPTO>;
+	reset-names = "crypto-rst";
+	status = "okay";
+};
+```
 
 ## 6. USB download
 
