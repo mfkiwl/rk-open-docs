@@ -65,7 +65,7 @@
     [*]   DDR Test
 ```
 
-​	如果menuconfig中没有`[] /sys/pm_tests/ support`选项，请参考《DDR开发指南》的"DDR如何定频"和"如何enable/disable kernel中的DDR变频功能"章节，分别编译定频固件和变频固件。
+​	如果menuconfig中没有`[] /sys/pm_tests/ support`选项，请参考《Rockchip-Developer-Guide-DDR-CN》的"DDR如何定频"和"如何enable/disable kernel中的DDR变频功能"章节，分别编译定频固件和变频固件。
 
 ### Linux 3.10 测试环境搭建
 
@@ -356,7 +356,7 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 };
 ```
 
-​	关于测试固件编译这里只做简单说明，详细介绍请参考《DDR开发指南》的"如何enable/disable kernel中的DDR变频功能"章节。
+​	关于测试固件编译这里只做简单说明，详细介绍请参考《Rockchip-Developer-Guide-DDR-CN》的"如何enable/disable kernel中的DDR变频功能"章节。
 
 ### Linux 4.4 测试环境搭建
 
@@ -728,7 +728,7 @@ already change to 200000000 done
     [*]   DDR Test
 ```
 
-​	如果menuconfig中没有`[] /sys/pm_tests/ support`选项，请参考《DDR开发指南》的"DDR如何定频"和"如何enable/disable kernel中的DDR变频功能"章节，分别编译定频固件和变频固件。
+​	如果menuconfig中没有`[] /sys/pm_tests/ support`选项，请参考《Rockchip-Developer-Guide-DDR-CN》的"DDR如何定频"和"如何enable/disable kernel中的DDR变频功能"章节，分别编译定频固件和变频固件。
 
 ### RV1108 测试环境搭建
 
@@ -934,7 +934,7 @@ memtester测试命令如下：（如果总容量是128MB则申请16MB进行memte
 ​    2.确认拷机结果
 
 * 拷机结束，确认机器是否正常。
-* 确认memtester 打印是否正常：（注意，memtester出错不会停止测试，需要查看所有打印是否正确）
+* 确认memtester 打印是否正常：（注意，memtester出错==**不会**==停止测试，需要查看所有打印是否正确）
 
 正确打印
 
@@ -998,7 +998,7 @@ usr/bin/stressapptest
 * 如果有测试文件，stressapptest测试命令如下：（如果总容量是128MB则申请16MB进行stressapptest，一般是总容量的八分之一。时间设置由-s后面的参数控制，单位是秒。如下为拷机24小时的命令）
 
 ```
-<rk3308:/ #> stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 64
+<rk3308:/ #> stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 16
 ```
 
 * 如果没有测试文件，则请将随此文件一同发布的stressapptest_32bit（或stressapptest_64bit） 文件通过adb push到data分区：（stressapptest_32bit适用于32位系统，stressapptest_64bit适用于64位系统）
@@ -1024,7 +1024,7 @@ adb push \*文件路径*\stressapptest_64bit data/stressapptest
 stressapptest测试命令如下：（如果总容量是128MB则申请16MB进行stressapptest，一般是总容量的八分之一。时间设置由-s后面的参数控制，单位是秒。如下为拷机24小时的命令）
 
 ```
-<rk3308:/ #> /data/stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 64
+<rk3308:/ #> /data/stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 16
 ```
 
 ​    4.确认拷机结果
