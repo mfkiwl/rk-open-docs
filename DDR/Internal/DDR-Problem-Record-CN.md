@@ -8,39 +8,54 @@
 
 文件密级：内部资料
 
----------
-# 前言
-**记录所有DDR遇到的问题，不管是哪个平台，用于Q4期间整理成DDR问题排查手册**
+---
 
-------
+**前言**
+记录所有DDR遇到的问题，不管是哪个平台，用于Q4期间整理成DDR问题排查手册
+
+**概述**
+
 **产品版本**
+
 | **芯片名称** | **内核版本** |
 | -------- | -------- |
 | 所有芯片     | 所有内核版本   |
 
 **读者对象**
+
 本文档（本指南）主要适用于以下工程师：
+
 技术支持工程师
+
 软件开发工程师
 
 **修订记录**
+
 | **日期**     | **版本** | **作者** | **修改说明** |
 | ---------- | :----: | :----: | :------: |
 | 2017.10.26 |  V1.0  |  何灿阳   |          |
 | 2017.11.29 |  V1.1  |  汤云平   |   增加描述   |
 | 2018.07.30 |  V1.2  |  汤云平   |   增加描述   |
 
---------------------
-[TOC]
-------
+---
 
-#  RK3228B
-## 问题：无法恢复出厂设置
+[TOC]
+
+---
+
+## RK3228B
+
+### 问题：无法恢复出厂设置
+
 #### 关键词：无法恢复出厂设置，OS_REG被清，GRF_OS_REG被清，LPDDR3板子无法恢复出厂设置
+
 #### 现象描述
+
 从菜单点恢复出厂设置，机器重启后，还是正常开机，并没有进入recovery模式。
 而且客户这款机器用得是LPDDR3的颗粒才有这个问题，另外一款用DDR3的就没有这个问题。
+
 #### 恢复出厂设置的原理
+
 ```mermaid
 graph TD
 	A[用户通过菜单点恢复出厂设置]-->B[kernel会在OS_REG中<br/>写上recovery的特殊标志]
@@ -50,12 +65,15 @@ graph TD
 	E-->|有|F[进入recovery流程]
 	E-->|没有|G[正常启动kernel]
 ```
+
 其中的OS_REG，不同平台使用的不同。因为有的平台是PMU_OS_REG在reboot后不会被清0.
 有的平台没有PMU_OS_REG，有GRF_OS_REG，也是reboot后不会被清0.
 而对于3229，使用的是GRF_OS_REG.
 
 另一个，OS_REG一般我们都设计有4个，这4个具体怎么使用的，都是由kernel负责人、loader负责人、DDR负责人一起协商定义好的，而且各个芯片都这样沿用下来。对于此问题，用于进入recovery流程的标志，记录在GRF_OS_REG[0]上。
+
 #### 分析过程
+
 从无法进recovery模式的kernel log可以看到，kernel并没有进入recovery流程，而是走了正常启动kernel的流程。所以，问题一定出在OS_REG的标志上。
 
 可能原因有2个：
@@ -103,26 +121,33 @@ graph TD
 最终让硬件测电源和reset信号，找到了原因。
 
 #### 问题原因
+
 REBOOT测试时VCCIO会塌陷到2.5V,而RESET检测VCCIO的阀值为2.63V。所以导致RESET信号有效，从而复位了CPU，最终导致OS_REG的标志没了。再次启动后，就判断不到这个标志，从而进入不了recovery模式。下面是电源塌陷的波形
 
 ![RK3228B-VCCIO-Drop](DDR-Problem-Record/RK3228B-VCCIO-Drop.jpg)
 
 #### 解决办法
+
 由于塌陷是DC-DC导致的，最好的解决办法是换DC-DC。但是基于客户不换的解决办法是：
 
 将输出端C532更改为22Uf,同时将U509第3PIN加22uF电容,保证VCCIO塌陷不触发reset,功能即正常
 ![RK3228B-VCCIO](DDR-Problem-Record/RK3228B-VCCIO.jpg)
 ![RK3228B-RESET-IC](DDR-Problem-Record/RK3228B-RESET-IC.jpg)
 
+---
 
+## PX3
 
------
-# PX3
-## 问题：贴2GB DDR3L，只识别到1GB容量
+### 问题：贴2GB DDR3L，只识别到1GB容量
+
 #### 关键词：容量识别错，容量不对，少了一个CS，少了一个片选
+
 #### 现象描述
+
 客户板子贴了2片512Mx16bit的颗粒，总容量应该是2GB，但开机log看，容量只识别到1GB
+
 #### 分析过程
+
 查找过程：
 
 1. 让客户提供DDR3L的datasheet和原理图
@@ -140,21 +165,25 @@ REBOOT测试时VCCIO会塌陷到2.5V,而RESET检测VCCIO的阀值为2.63V。所�
 ![PX3-SCH-1CS](DDR-Problem-Record/PX3-SCH-1CS.jpg)
 
 #### 问题原因
+
 DDR3L是2个CS的颗粒，而客户原理图只连了一个CS0到颗粒。导致容量少了一半。
+
 #### 解决办法
+
 无法解决，除非客户改版
 
+### 问题：免拆机loader无法进入测试模式
 
-
-
-## 问题：免拆机loader无法进入测试模式
 #### 关键词：无法进入测试模式，无法进入maskrom，免拆机loader，DDR工具测试失败
+
 #### 现象描述
+
 客户板子进入loader模式，再用DDR测试工具测试，会测试失败。
 
 如果直接在maskrom模式下，用DDR测试工具测试，是能成功的。
 
 #### 分析过程
+
 查找过程：
 
 1. 因为免拆机的loader是一定版本后才支持的，不知道客户的版本是否支持。所以，先让客户把串口log发过来，我确认了DDR版本，确认这个版本是可以支持的。
@@ -179,6 +208,7 @@ DDR3L是2个CS的颗粒，而客户原理图只连了一个CS0到颗粒。导致
 15:58:39 064 等待Maskrom失败!
 16:00:55 023 等待Maskrom失败!
 ```
+
 6. 搞不清楚到底这时候是loader没切换到maskrom，还是切换到maskrom里面异常了
 
    让客户抓串口log，因为PX3如果正常进入maskrom模式，会一直打印
@@ -196,12 +226,14 @@ DDR3L是2个CS的颗粒，而客户原理图只连了一个CS0到颗粒。导致
    结果：找到原因
 
 #### 问题原因：
+
 用户使用的是miniall的loader，RKPX3Loader_miniall.bin，这种loader有特殊处理：
 即这种loader，如果搭配uboot使用，那么当PC工具显示loader状态时，机器上的代码是运行在uboot中。
 如果不搭配uboot使用，则PC工具显示loader状态时，机器上的代码是运行在miniloader中。
 而这个版本的miniall，其中的miniloader是支持DDR测试工具的切换测试状态，但是客户使用的uboot不支持。
 
 之所以客户不能测试，而我们这边可以测试，是因为我们这边的机器是没有搭配uboot使用，所以看到的loader状态，此时是由miniloader负责切换到测试模式。而客户是有uboot的，所以客户看到的loader状态，是uboot负责切换测试模式，而这刚好是当前版本的uboot没有支持的。
+
 ```mermaid
 graph TD
 	A[启动或重启后]-->|进loader模式|B[miniloader运行]
@@ -211,20 +243,20 @@ graph TD
 	D-->F[PC上的DDR测试工具]
 	E-->F
 ```
+
 #### 解决办法：
+
 参考RK3128平台，在uboot中增加切换测试模式的支持
 
+---
 
+## RK3126/RK3128
 
-------
+### 问题：reboot测试失败
 
-# RK3126/RK3128
+#### 关键词：reboot 失败，概率性
 
-## 问题：reboot测试失败
-
-### 关键词：reboot 失败，概率性
-
-####现象描述
+#### 现象描述
 
 部分颗粒reboot测试概率性在ddr初始化处初始化失败，烧写固件后reboot在ddr初始化处初始化失败。
 
@@ -246,11 +278,9 @@ graph TD
 
 所以相应的uboot， kernel中的reboot代码都需要做相应的改动，reboot前让dram进入self-refresh mode。
 
+### 问题：x4颗粒初始化失败
 
-
-## 问题：x4颗粒初始化失败
-
-### 关键词：x4颗粒，初始化失败，Col error！， W FF！=R，必现， 白牌颗粒
+#### 关键词：x4颗粒，初始化失败，Col error！， W FF！=R，必现， 白牌颗粒
 
 #### 现象描述
 
@@ -272,8 +302,6 @@ graph TD
 
 ![x4-Die-DLL-Enable-Read-DQS-Abnormal](DDR-Problem-Record\x4-Die-DLL-Enable-Read-DQS-Abnormal.jpg)
 
-
-
 #### 问题原因
 
 1. 由于我们主控并不支持x4颗粒， 所有主控端一个DQS对应两个颗粒，这样在read的时候就存在2驱1的情况，如果一个DQS上的两个颗粒存相位差的话就会引起信号质量问题。
@@ -284,11 +312,9 @@ graph TD
 1. 针对x4颗粒两个颗粒连接到同一个DQS上的情况，通过enable DLL来尽量减少颗粒的不一致性带来的DQS之间的相位差的问题。
 2. 针对部分违反jedec 需要手动清DLL Reset bit的颗粒手动清该bit解决问题。
 
+### 问题：x4颗粒reboot死机问题
 
-
-## 问题：x4颗粒reboot死机问题
-
-### 关键词：x4颗粒，reboot， 必现， 白牌颗粒
+#### 关键词：x4颗粒，reboot， 必现， 白牌颗粒
 
 #### 现象描述
 
@@ -311,11 +337,9 @@ reboot后必现的在training处卡住，由于3126没有ddr reset pin，在打�
 
 在reboot前调用ddr变频命令将ddr频率变到与loader 初始化相同的300Mhz。这样初始化时的cl就正常了。
 
+### 问题：概率性开机初始化出错，报Col error
 
-
-## 问题：概率性开机初始化出错，报Col error
-
-### 关键词：初始化出错， Col error， 白牌颗粒
+#### 关键词：初始化出错， Col error， 白牌颗粒
 
 #### 现象描述
 
@@ -335,11 +359,9 @@ redmine号112646，开机概率性会卡在ddr初始化处报Col error， 复位
 
 出现异常的颗粒直接更换。
 
+### 问题：系统中报错，死机
 
-
-## 问题：系统中报错，死机
-
-### 关键词：panic，白牌颗粒
+#### 关键词：panic，白牌颗粒
 
 #### 现象描述
 
@@ -381,11 +403,9 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 
 对于存储单元异常的白牌颗粒只能通过更换颗粒来解决。
 
+### 问题：rk3126c ddr2系统中不稳定容易panic
 
-
-## 问题：rk3126c ddr2系统中不稳定容易panic
-
-### 关键词：panic
+#### 关键词：panic
 
 #### 现象描述
 
@@ -406,15 +426,13 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 
 主控下方GND补焊。
 
+---
 
+## RK3229
 
-------
+### 问题：4bit ddr3大于600M时死机
 
-# RK3229
-
-## 问题：4bit ddr3大于600M时死机
-
-### 关键词：屏幕绿屏，无法运行高频
+#### 关键词：屏幕绿屏，无法运行高频
 
 #### 现象描述
 
@@ -434,11 +452,9 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 
 将电容移到颗粒端。
 
+### 问题：DDR2支持
 
-
-## 问题：DDR2支持
-
-### 关键词：ddr2，ddr控制器1:2 mode
+#### 关键词：ddr2，ddr控制器1:2 mode
 
 #### 现象描述
 
@@ -462,11 +478,9 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 
 将最小的cl,cwl 现在在6和5 解决该问题。
 
+### 问题：压力测试报错
 
-
-## 问题：压力测试报错
-
-### 关键词：stressapptest，memtester报错
+#### 关键词：stressapptest，memtester报错
 
 #### 现象描述
 
@@ -488,11 +502,9 @@ ddr测试工具march 专项，以及系统中的memtester在较低频率下均�
 
 3. 后续trust更新rx DLL设置小于400MHz时DLL设置为67.5°，400MHz到680MHz之间DLL设置为45°，大于680MHz时DLL设置为22.5°
 
+### 问题：压力测试报错
 
-
-## 问题：压力测试报错
-
-### 关键词：stressapptest，memtester报错
+#### 关键词：stressapptest，memtester报错
 
 #### 现象描述
 
@@ -512,15 +524,13 @@ memtester和stressapptest均会报错，stressapptest报错的概率更大。
 
 该stressapptest为cpu异常引起的，将cpu频率降低之后stressapptest pass。 所以stressapptest报错并非一定是DDR引起的错误。
 
+---
 
+## RK3128/RK322X/RK3368/RK322XH
 
-------
+### 问题：概率性出现颗粒类型，颗粒位宽探测出错
 
-# RK3128/RK322X/RK3368/RK322XH
-
-## 问题：概率性出现颗粒类型，颗粒位宽探测出错
-
-### 关键词：概率性，颗粒类型出错，颗粒位宽出错，W FF != R
+#### 关键词：概率性，颗粒类型出错，颗粒位宽出错，W FF != R
 
 #### 现象描述
 
@@ -528,8 +538,8 @@ memtester和stressapptest均会报错，stressapptest报错的概率更大。
 
 #### 分析过程
 
-1. 使用Inno的ddr phy的平台ddr位宽以及颗粒类型是通过ddr 的read gate training 来探测的， 而3228H上的cs也是通过read gate training来探测的。 发现异常的时候都是read gate trainining得到的值是比较异常的，但是实际PHY 会报回training成功。 如training 实际的值是“0x2D531A1B"  DQS2 和DQS3的结果封边是0x53 0x2d, 与正常的0x1A,0x1B相差甚远，但是phy给的result 仍然是success。
-2. 会误报success的条件均是对应的DQS实际悬空 或者DQS实际没有信号回来的情况下出现错误的结果。 如a.x16位宽的系统DQS2,3 是悬空的当第一次设置成32bit training时 实际DQS2,3没有返回正常read信号。 b.如贴lpddr3的时候，首先会被初始化成ddr3 来training，这时候dqs并不会有正常read信号返回。c.在探测cs1的时候由于cs1上实际没有颗粒时这时候read DQS并不会去有read信号返回。 这些情况下由于phy内部对这些信号的误判，可能上报training 成功，从而引起颗粒类型，位宽 容量的异常。 
+1. 使用Inno的ddr phy的平台ddr位宽以及颗粒类型是通过ddr 的read gate training 来探测的， 而3228H上的cs也是通过read gate training来探测的。 发现异常的时候都是read gate trainining得到的值是比较异常的，但是实际PHY 会报回training成功。 如training 实际的值是"0x2D531A1B"  DQS2 和DQS3的结果封边是0x53 0x2d, 与正常的0x1A,0x1B相差甚远，但是phy给的result 仍然是success。
+2. 会误报success的条件均是对应的DQS实际悬空 或者DQS实际没有信号回来的情况下出现错误的结果。 如a.x16位宽的系统DQS2,3 是悬空的当第一次设置成32bit training时 实际DQS2,3没有返回正常read信号。 b.如贴lpddr3的时候，首先会被初始化成ddr3 来training，这时候dqs并不会有正常read信号返回。c.在探测cs1的时候由于cs1上实际没有颗粒时这时候read DQS并不会去有read信号返回。 这些情况下由于phy内部对这些信号的误判，可能上报training 成功，从而引起颗粒类型，位宽 容量的异常。
 
 #### 问题原因
 
@@ -547,13 +557,11 @@ memtester和stressapptest均会报错，stressapptest报错的概率更大。
 | **rk3368**         | **v2.02** |
 | **rk322xh/rk3328** | **v1.10** |
 
+---
 
+## RK322xH/RK3328
 
-_________
-
-# RK322xH/RK3328
-
-## 问题：颗粒验证时，烧写失败
+### 问题：颗粒验证时，烧写失败
 
 #### 关键词：烧写失败，不能启动
 
@@ -585,11 +593,9 @@ _________
 
 根据芯片型号，选对loader和其他文件，就能解决
 
+### 问题：1Gbx4  8颗组成4GB下载异常
 
-
-## 问题：1Gbx4  8颗组成4GB下载异常
-
-### 关键词：下载失败，ddr初始化报错， 4GB
+#### 关键词：下载失败，ddr初始化报错， 4GB
 
 #### 现象描述
 
@@ -607,11 +613,9 @@ _________
 
 更新loader到v1.09 20171011 后解决该4GB下载失败问题。
 
+### 问题：更新到v1.08的loader后出现死机
 
-
-## 问题：更新到v1.08的loader后出现死机
-
-### 关键词：hynix 2cs lpddr3，odt，rd_gap
+#### 关键词：hynix 2cs lpddr3，odt，rd_gap
 
 #### 现象描述
 
@@ -638,11 +642,9 @@ hynix 该批次的lpddr3 odt设计逻辑上有问题。enable后cs0 会误触发
 1. disable write odt。
 2. 或者将主控端的rd_gap加大。但是这样会影响ddr的访问效率。
 
+### 问题：视频加ddr变频，死机
 
-
-## 问题：视频加ddr变频，死机
-
-### 关键词：死机，视频，变频
+#### 关键词：死机，视频，变频
 
 #### 现象描述
 
@@ -662,11 +664,9 @@ DDR变频都走完了，起CPU多核时，不知道为什么就挂了。而且�
 
 注释掉CPU 1.3GHz这档拷机
 
+### 问题：大唐ddr3 2层板800MHz死机
 
-
-## 问题：大唐ddr3 2层板800MHz死机
-
-### 关键词：跑不了高频，2层板，panic
+#### 关键词：跑不了高频，2层板，panic
 
 #### 现象描述
 
@@ -686,15 +686,13 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 将we信号提前4个de-skew单位后运行稳定。
 
+---
 
+## RK3288
 
-------
+### 问题：ddr变频中函数改为no_inline 死机
 
-# RK3288
-
-## 问题：ddr变频中函数改为no_inline 死机
-
-### 关键词：no inline，ddr变频
+#### 关键词：no inline，ddr变频
 
 #### 现象描述
 
@@ -714,32 +712,28 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 传递给ddr_sre_2_srx 的参数最好设置成全局变量直接引用，而不通过参数传递。
 
+---
 
+## RK3188/RK3026
 
-------
+### 问题：系统死机花屏
 
-# RK3188/RK3026
-
-## 问题：系统死机花屏
-
-### 关键词：重影花屏
+#### 关键词：重影花屏
 
 #### 现象描述
 
-系统开机或者运行过程中系统死机，没有任何一次log直接卡住，同时显示异常呈现竖条纹状重影花屏。
+系统开机或者运行过程中系统死机，没有任何异常log直接卡住，同时显示异常呈现竖条纹状重影花屏。
 
 ![Dual-Display](DDR-Problem-Record\Dual-Display.jpg)
 
 #### 分析过程
 
 1. 出现显示重影，说明这时候ddr里的read出来的数据已经严重出错了。 比如读地址A，可能直接返回的是地址B的数据。
-
-
-1. 这种现象只能是颗粒内部逻辑异常了，所以可以从电源和ddr timing上来跟进。
-2. 从layout上看参考层隔断比较严重， 影响到信号完整性。
-3. 提高vcc_ddr电源到1.6v 解决问题。
-4. 提高尝试修改ddr增大其他timing 无明显改善。
-5. 尝试bypass ddr dll  解决问题。 但是对于dram来说 dll 和odt是挂钩的， 如果dll bypass掉的话 odt也是无法正常工作的， 所以bypass dll 的话 同时也要考虑该频率点下odt关闭是否稳定的问题。
+2. 这种现象只能是颗粒内部逻辑异常了，所以可以从电源和ddr timing上来跟进。
+3. 从layout上看参考层隔断比较严重， 影响到信号完整性。
+4. 提高vcc_ddr电源到1.6v 解决问题。
+5. 提高尝试修改ddr增大其他timing 无明显改善。
+6. 尝试bypass ddr dll  解决问题。 但是对于dram来说 dll 和odt是挂钩的， 如果dll bypass掉的话 odt也是无法正常工作的， 所以bypass dll 的话 同时也要考虑该频率点下odt关闭是否稳定的问题。
 
 #### 问题原因
 
@@ -753,15 +747,13 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 3. 改善layout 上参考层的完整性。
 
+---
 
+## RK3188
 
-------
+### 问题：系统死机
 
-# RK3188
-
-## 问题：系统死机
-
-### 关键词：三星 LPDDR3 pop， RZQ，驱动强度
+#### 关键词：三星 LPDDR3 pop， RZQ，驱动强度
 
 #### 现象描述
 
@@ -783,15 +775,13 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 将驱动强度改为150ohm 或者直接去除RZQ来增强驱动强度。
 
+---
 
+## RK3399
 
------
+### 问题：LPDDR4 reboot报错
 
-# RK3399
-
-## 问题：LPDDR4 reboot报错
-
-### 关键词：LPDDR4， reboot，DDR 报错
+#### 关键词：LPDDR4， reboot，DDR 报错
 
 #### 现象描述
 
@@ -879,6 +869,49 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 - 代码修改要不影响DDR3，因为DDR3也用这个RESET信号。
 
+### 问题：LP4待机唤醒死机
+
+#### 关键词：LP4，LPDDR4，待机死机、唤醒死机，PS019，Z91M
+
+#### 现象描述
+
+客户要使用Spectek的272bll LPDDR4，型号SM512M64Z91MD4BNJ(PS019)，颗粒给我们验证，我们测到待机唤醒后会系统马上crash了。而且发现短时间进入待机，不会有问题；只有长时间进入待机，再唤醒后就会出问题。
+
+#### 分析过程
+
+- 测了tCKELCK，tCKCKEH，都没有问题
+- 测到VDDQ（即VCC_DDRC）在待机后，有断电。
+- 测了VCC_DDRC在待机后和唤醒前，时序是否正常。结果：待机后VCC_DDRC才掉的电，唤醒前VCC_DDRC已经上好了电。所以时序是对的
+- 基于时序和timing都没错，而且要长时间进入待机才会有问题。推断是颗粒问题
+- 换了Samsung颗粒的板子，同样长时间待机，没问题。基本确定是颗粒问题
+- 进一步排查，到底是哪个由VCC_DDRC供电的不能断电。目前有VDDQ、ODT_CA和RZQ。经过逐个排查后，确认只要RZQ不掉电，长时间待机就没问题
+- 3台同样颗粒的机器，都改成RZQ不掉电，长时间拷机待机唤醒。结果都pass
+
+#### 问题原因
+
+只要RZQ不掉电，长时间待机就没问题。
+
+发邮件去问Spectek，他们确认是设计问题。邮件原文如下
+
+```c
+You’re right Canyang. There’s self refresh oscillator sharing on our Z91M DDP/QDP package but it’s fixed in our 100/110/120 series LPDDR4. Please keep this info as Micron proprietary and confidential.
+You can work with your customer to decide which work-around option works best.
+```
+
+#### 解决方法
+
+只能让这个颗粒待机后RZQ不掉电了。
+
+但如果要单独只有RZQ不掉电，还得改原理图，重新画板。
+
+所以，让整个VCC_DDRC都不掉电，是最简单的。
+
+如果说软件发一个补丁，让VCC_DDRC待机不掉电，也可以。但是这种方法做不到，因为VCC_DDRC是PMU自动控制掉电的。
+
+比较简便的方法是：通过硬件去掉如下电阻来实现VCC_DDRC不掉电
+
+![VCC_DDRC_Not_Power_Off](DDR-Problem-Record/VCC_DDRC_Not_Power_Off.jpg)
+
 
 
 
@@ -887,9 +920,9 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 下面作为模版放这，免得格式不同，要新增问题，可以从这里拷贝
 
-## 问题：
+### 问题：
 
-### 关键词：
+#### 关键词：
 
 #### 现象描述
 
