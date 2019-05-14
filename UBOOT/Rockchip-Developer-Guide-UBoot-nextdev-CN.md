@@ -61,6 +61,7 @@
 | 2019-03-25 | V1.23    | 陈健洪/朱志展   | 增加kernel cmdline说明                            |
 | 2019-03-25 | V1.30    | 陈健洪   | 精简和整理文档、纠正排版问题、完善和调整部分章节内容               |
 | 2019-04-23 | V1.31    | 朱志展   | 增加硬件CRYPTO说明                                                 |
+| 2019-05-14 | V1.32    | 朱志展   | 补充kernel cmdline说明                                                 |
 ---
 [TOC]
 ---
@@ -3062,6 +3063,8 @@ U-Boot向kernel传递cmdline的方法是：篡改内核dtb里的/chosen/bootargs
    上述两个接口无法处理长字符串单元。比如无法把“console=ttyFIQ0 androidboot.baseband=N/A androidboot.selinux=permissive“作为一个整体单元进行操作。
 
 #### 5.17.3 cmdline含义
+
+下面列出rockchip常用的cmdlinie参数含义,如有其他需求,可以先参考kernel下的文件Documentation/admin-guide/kernel-parameters.txt的参数定义。
 
 - sdfwupdate：用作sd升级卡升级标志
 - root=PARTUUID：为kernel指定rootfs(system)在存储中的位置，仅GPT表支持
