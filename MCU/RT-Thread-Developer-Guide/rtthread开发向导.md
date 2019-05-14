@@ -28,10 +28,11 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**     |
-| ---------- | -------- | -------- | ---------------- |
-| 2019-02-20 | V1.0     | 陈谋春   | 初始版本         |
-| 2019-04-30 | v1.1     | 陈谋春   | 更新公共驱动路径 |
+| **日期**   | **版本** | **作者** | **修改说明**                   |
+| ---------- | -------- | -------- | ------------------------------ |
+| 2019-02-20 | V1.0     | 陈谋春   | 初始版本                       |
+| 2019-04-30 | v1.1     | 陈谋春   | 更新公共驱动路径               |
+| 2019-05-14 | v1.2     | 陈谋春   | 更新测试用例描述，增加调试说明 |
 
 ---
 
@@ -328,57 +329,265 @@ static void udelay(unsigned long usec) {
 /home1/rockchip/rt-thread/bsp/rockchip-pisces/tests
 ```
 
-   有个简单的测试框架可以用，文件名可以命名为tc_xxx.c，其中xxx是模块名，例如串口可以用tc_uart.c。测试目录下有一个demo可以参考：tc_sample.c。
+   可以把测试程序做成RTT的shell命令，文件名可以命名为tc_xxx.c，其中xxx是模块名，例如串口可以用tc_uart.c。下面是一个简单例子：
 
 ```c
-int _tc_sample()
-{
-    /* set tc cleanup */
-    tc_cleanup(_tc_cleanup);
-    sample_init();
+#include <rthw.h>
+#include <rtthread.h>
 
-    return 25;
+/* 可以沿用驱动的宏定义开关，确保在驱动未启用的时候不会被编译 */
+#ifdef RT_USING_DEMO_TEST
+
+#include <stdint.h>
+
+void demo_test(void)
+{
+    rt_kprintf("this is demo_test\n");
 }
-FINSH_FUNCTION_EXPORT_ALIAS(_tc_sample, __cmd__tc_sample, a thread testcase example.);
+
+#ifdef RT_USING_FINSH
+#include <finsh.h>
+/* 导出finsh shell命令：demo_test, 系统默认是msh shell看不到，推荐使用 */
+FINSH_FUNCTION_EXPORT(demo_test, demo test for driver);
+/* 导出msh shell命令：demo_test, 一般只要导出到一个shell就够了 */
+MSH_CMD_EXPORT(dma_test, demo test for driver);
+#endif
+
+#endif
 ```
 
-   要启动测试程序，可以在控制台上输入如下命令：
+   要启动测试，只需要在命令行按如下命令操作：
 
 ```shell
-msh /> _tc_sample
+msh /> demo_test
+this is demo_test
+msh /> exit
+finsh >> demo_test()
+this is demo_test
 ```
 
-   ==需要注意：输入的命令需要去掉前缀"__cmd\_"，这是msh的命令前缀，用来和finsh风格的命令做区分，具体finsh和msh的区别，请参考RT-Thread官方的指南。==
+   ==注意，默认配置下启用的msh，如果测试用例导出到finsh，需要先通过exit命令推出msh，会自动切到finsh。==
 
-   如果需要传参数，可以这样修改：
+ 测试用例如果需要传参数，可以这样修改：
 
 ```c
-int _tc_sample(int argc, char** argv)
+int demo_test(char* param)
 {
-    printf("argv[0]: %s\n", argv[0]);
-    if (argc > 1)
-    printf("argv[1]: %s\n", argv[1]);
+    printf("%s world\n", param);
     return 0;
 }
-FINSH_FUNCTION_EXPORT_ALIAS(_tc_sample, __cmd__tc_sample, a thread testcase example.);
+FINSH_FUNCTION_EXPORT(demo_test, demo test for driver);
 ```
 
    测试命令如下：
 
 ```shell
-msh /> _tc_sample
-_tc_sample
-msh /> _tc_sample hello
-_tc_sample hello
+msh /> exit
+finsh >> demo_test("hello")
+hello world
 ```
 
-   还可以通过测试框架来调用[^1]：
+   RTT还提供了一个简单的测试框架，通过RT_USING_TC来开启，具体实现在：*/path/to/rt-thread/examples/kernel/tc_comm.c*，方便多个测试用例的集成，下面是一个简单的例子，定义了一个_tc_sample的测试用例，完整代码请参考*/path/to/rt-thread/examples/kernel/tc_sample.c*：
+
+```c
+int _tc_sample()
+{
+    /* 通过测试框架，设置测试用例的清理函数，如内存释放，线程清理等 */
+    tc_cleanup(_tc_cleanup);
+    /* 实际测试用例的实现，可以直接调用，可以创建一个线程调用（比如默认线程的堆栈太小） */
+    sample_init();
+
+    return 25;
+}
+/* 命名必须以_tc_开头，否则测试框架不认 */
+FINSH_FUNCTION_EXPORT_ALIAS(_tc_sample, __cmd__tc_sample, a thread testcase example.);
+```
+
+   下面是通过测试框架来调用的命令：
+
+```shell
+msh /> exit
+finsh >> list_tc()            ； 列出所有测试用例
+__cmd__tc_sample
+finsh >> tc_start("sample")   ； 调用测试用例“sample”
+finsh >> tc_loop("sample")    ;  循环调用测试用例"sample"
+```
+
+   通过测试框架调用测试的时候，不需要给出完整的测试用例名称，例如上面的例子，如果只给"samp"，效果也是一样，所以这里要求我们的测试用例如果调用测试框架，都要遵守如下命名规则：_tc_bsp_module_name，其中bsp表示这是一个bsp测试，module是这个测试的模块如uart、spi等，name则是测试用例的名字。这样就可以用这个实现分级分类调用，例如：
 
 ```shell
 msh /> exit
 finsh >> list_tc()
-__cmd__tc_sample
-finsh >> tc_start("tc_sample")
+_tc_bsp_spi_test1
+_tc_bsp_spi_test2
+_tc_bsp_i2c_test1
+finsh >> tc_start("bsp")      ;  遍历所有bsp测试用例
+finsh >> tc_start("bsp_spi")  ;  遍历所有spi测试用例
 ```
 
-[^1]:  下面这段命令没在实际板子上验证过，只是根据代码分析，后续会找板子实际验证一把
+## 6 调试
+
+### 6.1 内存问题
+
+   针对最常见的两种内存问题：内存泄漏和访问越界，RTT都提供了辅助调试手段，需要打开RT_USING_MEMTRACE开关，具体如下：
+
+![memtrace](./memtrace.png)
+
+   重新编译后，MSH会多出两个命令：memtrace和memcheck，前者可以导出当前系统的动态内存分配情况，包括当前已用内存大小、最大使用内存大小和内存跟踪情况，具体如下：
+
+![memtrace_dump](./memtrace_dump.png)
+
+   根据上面的信息，可以找到哪个线程吃掉太多内存，也可以找到内存泄漏的可疑线程名称和内存块大小，有了这些信息就可以大大缩小排查范围。
+
+   memcheck是用来检查越界访问的情况，下面是一个越界访问的例子：
+
+```c
+void test_mem(void)
+{
+  uint32_t *test = NULL;
+
+  test = (uint32_t *)rt_malloc(16);
+  test[4] = 0x55aa55aa;
+}
+```
+
+   放到shell里执行后，执行memcheck，可以看到如下输出：
+
+```shell
+Memory block wrong:
+address: 0x62028968
+  magic: 0x55aa
+   used: 21930
+  size: 1136
+  thread:
+Prev:
+address: 0x62028948
+  magic: 0x1ea0
+   used: 1
+  size: 16
+  thread: tsh
+Next:
+address: 0x62028de8
+  magic: 0x1ea0
+   used: 1
+  size: 32
+  thread: init
+```
+
+   分析可以得到如下信息：
+
+```shell
+出错地址：0x62028968
+出错原因：magic和used被冲，怀疑前面地址越界访问
+前面地址：0x62028948，大小为16，线程是tsh，根据这些信息可以缩小范围
+```
+
+   ==需要注意的，memcheck只能检查一小部分的内存越界，即刚好冲了内存块管理结构的前12字节才能检查到，所以即使memcheck没检查出错误，也不代表没有越界存在。==
+
+### 6.2 死锁问题
+
+   对于死锁问题，RTT也提供了几个命令，可以列出所有的任务同步和通信的状态，通过这些就可以比较容易定位死锁关系：两个死锁线程的名字，死锁的锁名字，这些信息可以大幅缩小排查范围，具体命令如下：
+
+```shell
+msh >list_msgqueue
+msgqueue entry suspend thread
+-------- ----  --------------
+msh >list_mailbox
+mailbox entry size suspend thread
+------- ----  ---- --------------
+msh >list_mutex
+mutex      owner  hold suspend thread
+-------- -------- ---- --------------
+snorLock (NULL)   0000 0
+msh >list_event
+event      set    suspend thread
+-----  ---------- --------------
+msh >list_sem
+semaphore v   suspend thread
+-------- --- --------------
+shrx     000 0
+heap     001 0
+```
+
+### 6.3 模块调试
+
+   RTT提供了大部分内核模块的调试log开关，默认情况下都是关闭的，开发者可以根据需求打开，具体如下：
+
+```c
+#define RT_DEBUG     // 总开关
+#define RT_DEBUG_COLOR   // log颜色开关，调用dbg_log(level, fmt, ...)等接口，不同level会显示不同颜色
+#define RT_DEBUG_INIT_CONFIG  // 开机初始化调试信息
+#define RT_DEBUG_THREAD_CONFIG   // 线程状态切换信息，包括start，suspend和resume
+#define RT_DEBUG_SCHEDULER_CONFIG    // 调度器调试信息
+#define RT_DEBUG_IPC_CONFIG   // 所有任务同步和通信机制的调试信息，调试死锁的时候可以看看
+#define RT_DEBUG_TIMER_CONFIG  // 定时器相关信息
+#define RT_DEBUG_IRQ_CONFIG   // 调试中断嵌套时可以打开
+#define RT_DEBUG_MEM_CONFIG   // 动态内存分配调试信息
+#define RT_DEBUG_SLAB_CONFIG  // slab分配器调试信息
+#define RT_DEBUG_MEMHEAP_CONFIG   // 内存堆调试信息
+#define RT_DEBUG_MODULE_CONFIG   // 动态模块加载的相关信息
+```
+
+### 6.4 Fault调试
+
+   目前我们默认启用了CMBacktrace，出现Fault后会自动打印堆栈和调用信息，可以用自带的测试命令cmb_test来看dump的格式，具体如下：
+
+```shell
+msh >cmb_test DIVBYZERO
+thread pri  status      sp     stack size max used left tick  error
+------ ---  ------- ---------- ----------  ------  ---------- ---
+tshell  20  ready   0x00000090 0x00001000    06%   0x0000000a 000
+dma     10  suspend 0x0000005c 0x00000100    35%   0x0000000a 000
+tidle   31  ready   0x00000050 0x00000100    43%   0x00000001 000
+Firmware name: rtthread, hardware version: 1.0, software version: 1.0
+Fault on thread tshell
+===== Thread stack information =====
+  addr: 20023040    data: 00000000
+  addr: 20023044    data: 00000000
+  addr: 20023048    data: 040095a6
+  addr: 2002304c    data: 20020910
+  addr: 20023050    data: 80000000
+  addr: 20023054    data: 00000002
+  addr: 20023058    data: 04019f6c
+  addr: 2002305c    data: 04019f00
+  addr: 20023060    data: 04019fd8
+  addr: 20023064    data: deadbeef
+  addr: 20023068    data: 20021fb0
+  addr: 2002306c    data: 0400c329
+  addr: 20023070    data: deadbeef
+  addr: 20023074    data: 0dadbeef
+  addr: 20023078    data: deadbeef
+  addr: 2002307c    data: deadbeef
+  addr: 20023080    data: deadbeef
+  addr: 20023084    data: deadbeef
+  addr: 20023088    data: deadbeef
+  addr: 2002308c    data: deadbeef
+  addr: 20023090    data: deadbeef
+  addr: 20023094    data: deadbeef
+  addr: 20023098    data: deadbeef
+  addr: 2002309c    data: 0400afb1
+====================================
+=================== Registers information ====================
+  R0 : 00000000  R1 : 0401836c  R2 : 0000000a  R3 : 00000000
+  R12: ffffffff  LR : 04010aa1  PC : 04010abe  PSR: 61080000
+==============================================================
+Usage fault is caused by Indicates a divide by zero has taken place (can be set only if DIV_0_TRP is set)
+Show more call stack info by run: addr2line -e rtthread.elf -a -f 04010abe 04010a9d 0400c325 0400afad
+```
+
+   最后一行的命令直接复制到bsp的主目录下执行，就可以看到错误时候的堆栈，从而找到错误位置：
+
+```shell
+cd /path_to_rtthread_home/bsp/rockchip-pisces
+addr2line -e rtthread.elf -a -f 04010abe 04010a9d 0400c325 0400afad
+```
+
+### 6.5 Backtrace
+
+   为了方便调试，我们封装了一个简单的Backtrace，提供打印堆栈和高级ASSERT功能如下：
+
+```c
+void dump_call_stack(void);
+
+#define RT_BACKTRACE_ASSERT(EX)
+```
