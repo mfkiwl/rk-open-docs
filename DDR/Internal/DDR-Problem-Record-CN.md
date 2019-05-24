@@ -923,6 +923,46 @@ Z91M: EOL at 2016 Q3
 
 ![VCC_DDRC_Not_Power_Off](DDR-Problem-Record/VCC_DDRC_Not_Power_Off.jpg)
 
+### 问题：灵优智学kingston LP4颗粒stress报错
+
+#### 关键词：Q5116PH1MDGPAR，Kingston，LP4报错，LPDDR4报错，stress报错
+
+#### 现象描述
+
+灵优智学使用Kingston的LP4，型号Q5116PH1MDGPAR，结果stress很容易报错。1000台出了200台
+
+寄过来的机器看，出错的都是通道0、byte2
+
+![Q5116PH1MDGPAR-Stress-Fail-1](DDR-Problem-Record/Q5116PH1MDGPAR-Stress-Fail-1.jpg)
+
+#### 分析过程
+
+- 更新最新loader、trust，仍然报错
+
+- 扫眼图、read信号挺好。write的byte3有几根不好。但又不是出错的byte2的信号
+
+- cpu定频1GHz，并抬压，测stressapptest。结果也是报错
+
+- vdd_center是0.903V，没问题
+
+- pdds从RZQ/3改成RZQ/1，stressapptest跑16H，出现2个错，但是变成byte3错
+
+- 使用1066MHz的驱动强度和ODT，依然会报错，而且变成channel 1报错
+
+  现象比较乱，强烈怀疑是电源问题
+
+#### 问题原因
+
+![Q5116PH1MDGPAR-Fix](DDR-Problem-Record/Q5116PH1MDGPAR-Fix.jpg)
+
+上图两个电容没有放芯片背面。纹波大了点。
+
+#### 解决方法
+
+在芯片背面，加焊这2个电容。测试pass。
+
+原来纹波35mV，加完电容后，纹波20mV。所以从外面测，看不出纹波太大影响。实际效果很明显。
+
 
 
 
