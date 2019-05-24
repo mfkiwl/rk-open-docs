@@ -712,6 +712,48 @@ kingstom颗粒2层板ddr 800MHz时容易出现死机painc现象
 
 传递给ddr_sre_2_srx 的参数最好设置成全局变量直接引用，而不通过参数传递。
 
+### 问题：每个通道贴2颗512Mbx8bit DDR3，烧写失败
+
+#### 关键词：烧写失败，烧写报错，2颗8bit，row=16
+
+#### 现象描述
+
+客户在3288上，每个通道贴2颗512Mbx8bit的DDR3，总共贴了2个通道，烧写时报如下错
+
+![3288-Download-Fail](DDR-Problem-Record/3288-Download-Fail.jpg)
+
+#### 分析过程
+
+- 按这个报错来看，应该是硬件哪里异常，完全无法工作。让硬件确认DDR的相关电源和器件，都没有问题
+
+- DDR测试工具生成一个客户的双通道，每个通道用2颗512Mbx8bit的配置，测完报BA0、BA1错，如下图
+
+  ![3288-DDR-Tools-Report-Error](DDR-Problem-Record/3288-DDR-Tools-Report-Error.jpg)
+
+- 硬件实测BA0、BA1，没有发现异常
+
+- 加log，发现在探测容量时，调用dram_cfg_rbc()返回错误的。
+
+#### 问题原因
+
+客户每个通道贴2颗512Mbx8bit，相当于是配置bus-width=16bit，col=10，bank=8，row=16，cs=1，这个配置在ddrconfig中找不到，所以报错。因为当bus-width=16bit时，最大row只支持到15。如下
+
+`10 | C CRDR RRRR RRRR RRRR RRBB BCCC CCCC C---`
+
+所以，这个问题，只有在通道贴2颗512Mbx8bit才会有错。可能跟当初3288设计时，认为客户不会用16bit有关系，所以ddrconfig没支持全。
+
+#### 解决方法
+
+本来想，遇到这种情况，只能让客户用到row=15了，相当于容量减一半。
+
+后来看到上面的ddrconfig，在rank上面就是row
+
+`10 | C C[R]DR RRRR RRRR RRRR RRBB BCCC CCCC C---`
+
+所以，想到的最终解决办法是：遇到这种配置，往上报2段不连续的地址，跳过上面ddrconfig=10中的D，用再高位的R，就可以了。
+
+当然代码中对row=16的test()，以及CS1的探测等都必须特殊处理。
+
 ---
 
 ## RK3188/RK3026
