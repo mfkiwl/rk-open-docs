@@ -898,6 +898,17 @@ You’re right Canyang. There’s self refresh oscillator sharing on our Z91M DD
 You can work with your customer to decide which work-around option works best.
 ```
 
+后面又问了Spectek，哪些是Z91M，哪些是100/110/120，回复如下
+
+```c
+Z91M: EOL at 2016 Q3
+100 series: Z0* - Z00M,Z00N,Z0AM,Z0AP,Z01M,etc.
+110 series: Z1* - Z1AM,Z11M,etc.
+120 series: Z2*
+```
+
+经过AVL上型号跟Spectek核对，确认除了PS019，还有366ball的SM512M64Z91MD4BNK(PS004)也是Z19M的，也会有这个问题。
+
 #### 解决方法
 
 只能让这个颗粒待机后RZQ不掉电了。
