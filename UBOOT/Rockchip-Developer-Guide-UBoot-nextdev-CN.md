@@ -63,7 +63,7 @@
 | 2019-04-23 | V1.31    | 朱志展   | 增加硬件CRYPTO说明                                           |
 | 2019-05-14 | V1.32    | 朱志展   | 补充kernel cmdline说明                                       |
 | 2019-05-29 | V1.33    | 朱志展   | 增加MMC命令小节                                              |
-| 2019-05-29 | V1.33    | 朱志展   | 增加AVB与A/B系统说明                                         |
+| 2019-05-29 | V1.33    | 朱志展   | 增加AVB与A/B系统说明，术语说明                                    |
 ---
 [TOC]
 ---
@@ -4714,6 +4714,28 @@ CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x0000600
 ```
 
 ## 附录
+
+### 术语
+
+AOSP：[Android Open-Source Project](https://en.wikipedia.org/wiki/Android_(operating_system)#Open-source_community)
+
+AVB：Android Verified Boot
+
+DTB：[Device Tree Binary](https://en.wikipedia.org/wiki/Device_tree)
+
+DTS：[Device Tree Source](https://en.wikipedia.org/wiki/Device_tree)
+
+Fastboot：[原为Android的一种更新固件方式，现在已被广泛应用于嵌入式领域](https://en.wikipedia.org/wiki/Android_software_development#Fastboot)
+
+GPT：[GUID Partition Table](https://en.wikipedia.org/wiki/Universally_unique_identifier)
+
+MMC：[Multi Media Card](https://en.wikipedia.org/wiki/MultiMediaCard)，包括eMMC，SD卡等
+
+SPL：Secondary Program Loader，具体可以参考U-Boot工程下doc/README.SPL
+
+TPL：Tertiary Program Loader，具体可以参考U-Boot工程下doc/README.TPL
+
+U-Boot：[Universal Boot Loader](https://en.wikipedia.org/wiki/Das_U-Boot)
 
 ### IRAM程序内存分布(SPL/TPL)
 
