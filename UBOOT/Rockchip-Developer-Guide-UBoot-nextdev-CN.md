@@ -1,6 +1,6 @@
 # U-Boot next-dev开发指南
 
-发布版本：1.30
+发布版本：1.33
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -9,7 +9,7 @@
 ​	Chen Liang cl@rock-chips.com
 ​	Ping Lin <hisping.lin@rock-chips.com>
 
-日期：2019.04
+日期：2019.05
 
 文件密级：公开资料
 
@@ -58,10 +58,11 @@
 | 2018-11-06 | V1.20    | 陈健洪   | 增加/更新defconfig/rktest/probe/interrupt/kernel dtb/uart/atags |
 | 2019-01-21 | V1.21    | 陈健洪   | 增加dtbo/amp/dvfs宽温/fdt命令说明                            |
 | 2019-03-05 | V1.22    | 林平     | 增加optee client说明                                         |
-| 2019-03-25 | V1.23    | 陈健洪/朱志展   | 增加kernel cmdline说明                            |
-| 2019-03-25 | V1.30    | 陈健洪   | 精简和整理文档、纠正排版问题、完善和调整部分章节内容               |
-| 2019-04-23 | V1.31    | 朱志展   | 增加硬件CRYPTO说明                                                 |
-| 2019-05-14 | V1.32    | 朱志展   | 补充kernel cmdline说明                                                 |
+| 2019-03-25 | V1.23    | 陈健洪/朱志展   | 增加kernel cmdline说明                                |
+| 2019-03-25 | V1.30    | 陈健洪   | 精简和整理文档、纠正排版问题、完善和调整部分章节内容         |
+| 2019-04-23 | V1.31    | 朱志展   | 增加硬件CRYPTO说明                                           |
+| 2019-05-14 | V1.32    | 朱志展   | 补充kernel cmdline说明                                       |
+| 2019-05-29 | V1.33    | 朱志展   | 增加MMC命令小节                                              |
 ---
 [TOC]
 ---
@@ -551,6 +552,65 @@ NOTE: Dereference aliases by omitting the leading '/', e.g. fdt print ethernet0.
 => fdt addr $fdt_addr_r   // 指定fdt地址
 => fdt print              // 把fdt内容全部打印出来
 ```
+
+##### 2.5.2.6 MMC命令
+
+使能：
+
+```
+CONFIG_CMD_MMC
+```
+
+查看信息：
+
+```
+=> mmc info
+Device: dwmmc@ff0f0000                  //设备节点
+Manufacturer ID: 15
+OEM: 100
+Name: 8GME4
+Timing Interface: High Speed            //速度模式
+Tran Speed: 52000000                    //当前速度
+Rd Block Len: 512
+MMC version 5.1
+High Capacity: Yes
+Capacity: 7.3 GiB                       //存储容量
+Bus Width: 8-bit                        //总线宽度
+Erase Group Size: 512 KiB
+HC WP Group Size: 8 MiB
+User Capacity: 7.3 GiB WRREL
+Boot Capacity: 4 MiB ENH
+RPMB Capacity: 512 KiB ENH
+```
+
+切换MMC设备：
+
+```
+=> mmc dev 0                            //切换到eMMC
+=> mmc dev 1                            //切换到sd卡
+```
+
+MMC设备读写命令：
+
+```
+mmc read addr blk# cnt
+mmc write addr blk# cnt
+mmc erase blk# cnt
+例：
+=> mmc read 0x70000000 0 1              //读取MMC设备第一个block，大小为1 sector的数据到内存0x70000000
+=> mmc write 0x70000000 0 1             //把内存0x70000000起1 sector的数据写到存储第一个block起位置
+=> mmc erase 0 1                        //擦除存储第一个block起1 sector数据
+```
+
+如果MMC设备读写异常，可以通过以下简单步骤快速定位：
+
+1. 把drivers/mmc/dw_mmc.c内的debug改为printf，重新编译下载固件
+
+2. 重启设备，查看MMC设备的打印信息最终打印信息
+
+- 如果最终打印为Sending CMD0，硬件可以检查设备供电，管脚连接，软件可以检查IOMUX是否被其他IP切换
+- 如果最终打印为Sending CMD8，软件需要设置MMC设备允许访问安全存储
+- 如果初始化命令都已通过，最终打印为Sending CMD18，硬件可以检查MMC设备供电，靠近MMC设备供电端的电容是否足够，可以更换大电容，软件可以降低时钟频率，切换MMC设备的速度模式
 
 #### 2.5.3 状态类
 
