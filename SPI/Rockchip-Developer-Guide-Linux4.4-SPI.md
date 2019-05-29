@@ -86,7 +86,6 @@ dma-names = "tx","rx";   			使能DMA模式，一般通讯字节少于32字节�
 		spi-max-frequency = <24000000>;   spi clk输出的时钟频率，不超过50M
 		spi-cpha；  				如果有配，cpha为1
 		spi-cpol；  				如果有配，cpol为1,clk脚保持高电平
-		spi-cs-high； 			如果有配，每传完一个数据，cs都会被拉高，再拉低
 		status = "okay";		 使能设备节点
 	};
 };
