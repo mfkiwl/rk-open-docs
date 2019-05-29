@@ -63,6 +63,7 @@
 | 2019-04-23 | V1.31    | 朱志展   | 增加硬件CRYPTO说明                                           |
 | 2019-05-14 | V1.32    | 朱志展   | 补充kernel cmdline说明                                       |
 | 2019-05-29 | V1.33    | 朱志展   | 增加MMC命令小节                                              |
+| 2019-05-29 | V1.33    | 朱志展   | 增加AVB与A/B系统说明                                         |
 ---
 [TOC]
 ---
@@ -4608,6 +4609,109 @@ Confirm 'vdd_cpu_l' voltage, then hit any key to continue..
 9. ir测试
 
    [TODO]
+
+## 12. AVB
+
+AVB，即Android Verified Boot，支持加载启动安卓格式的固件。具体流程参考《Rockchip-Secure-Boot2.0.md》。
+
+### 12.1 芯片支持
+
+|      芯片      |            Android支持            |Linux支持 |
+| :------------: | :-----------------------------: | :-------------: |
+|    rk3128x     |        Y         |        N        |
+|     rk3126     |        Y         |        N        |
+|     rk322x     |        Y         |        N        |
+|     rk3288     |        Y         |        N        |
+|     rk3368     |        Y         |        N        |
+|     rk3328     |        Y         |        N        |
+|     rk3399     |        Y         |        Y        |
+|     rk3308     |        N         |        Y        |
+|      px30      |        Y         |        N        |
+|     rk3326     |        Y         |        N        |
+
+### 12.2 U-Boot使能
+
+完整性校验使能：
+
+```
+CONFIG_AVB_LIBAVB=y
+CONFIG_AVB_LIBAVB_AB=y
+CONFIG_AVB_LIBAVB_ATX=y
+CONFIG_AVB_LIBAVB_USER=y
+CONFIG_RK_AVB_LIBAVB_USER=y
+CONFIG_ANDROID_AVB=y
+```
+
+安全性校验使能：
+
+```
+CONFIG_AVB_VBMETA_PUBLIC_KEY_VALIDATE=y
+```
+
+如果只需要完整性校验，开启完整性校验使能的CONFIG即可。如果需要再开启安全性校验使能，安全性校验使能的CONFIG需要打开，还需要通过fastboot下载认证证书。具体参考《Rockchip-Secure-Boot2.0.md》。
+
+授权unlock使能：
+
+```
+CONFIG_RK_AVB_LIBAVB_ENABLE_ATH_UNLOCK=y
+```
+
+## 12.3 固件打包
+
+谷歌提供了avbtool来打包符合AVB标准的固件，首先参考《Rockchip-Secure-Boot2.0.md》生成testkey_atx_psk.pem、atx_metadata.bin，然后打包固件，以打包boot.img为例：
+
+```
+avbtool add_hash_footer --image boot.img --partition_size 33554432 --partition_name boot --key testkey_atx_psk.pem --algorithm SHA256_RSA4096
+avbtool make_vbmeta_image --public_key_metadata atx_metadata.bin --include_descriptors_from_image boot.img --algorithm SHA256_RSA4096 --rollback_index 1 --key testkey_atx_psk.pem  --output vbmeta.img
+```
+
+## 13 A/B系统
+
+所谓的A/B System即把系统固件分为两份，系统可以从其中的一个slot上启动。当一份启动失败后可以从另一份启动，同时升级时可以直接将固件拷贝到另一个slot上而无需进入系统升级模式。具体流程参考《Rockchip-Developer-Guide-Linux-AB-System.md》。
+
+### 13.1 芯片支持
+
+|      芯片      |            Android支持            |Linux支持 |
+| :------------: | :-----------------------------: | :-------------: |
+|    rk3128x     |        N        |        Y        |
+|     rk3126     |        N        |        Y        |
+|     rk322x     |        Y        |        Y        |
+|     rk3288     |        N        |        Y        |
+|     rk3368     |        N        |        Y        |
+|     rk3328     |        N        |        Y        |
+|     rk3399     |        N        |        Y        |
+|     rk3308     |        N        |        Y        |
+|      px30      |        Y        |        Y        |
+|     rk3326     |        Y        |        Y        |
+
+### 13.2 U-Boot使能
+
+```
+CONFIG_AVB_LIBAVB=y
+CONFIG_AVB_LIBAVB_AB=y
+CONFIG_AVB_LIBAVB_ATX=y
+CONFIG_AVB_LIBAVB_USER=y
+CONFIG_RK_AVB_LIBAVB_USER=y
+CONFIG_ANDROID_AB=y
+```
+
+### 13.3 分区参考
+
+A/B 系统需要更改分区表信息，对需要支持A/B的分区增加后缀 _a 和 _b。parameter.txt参考如下：
+
+```
+FIRMWARE_VER:8.1
+MACHINE_MODEL:RK3326
+MACHINE_ID:007
+MANUFACTURER: RK3326
+MAGIC: 0x5041524B
+ATAG: 0x00200800
+MACHINE: 3326
+CHECK_MASK: 0x80
+PWR_HLD: 0,0,A,0,1
+TYPE: GPT
+CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00002000@0x00008000(trust_a),0x00002000@0x0000a000(trust_b),0x00001000@0x0000c000(misc),0x00001000@0x0000d000(vbmeta_a),0x00001000@0x0000e000(vbmeta_b),0x00020000@0x0000e000(boot_a),0x00020000@0x0002e000(boot_b),0x00100000@0x0004e000(system_a),0x00300000@0x0032e000(system_b),0x00100000@0x0062e000(vendor_a),0x00100000@0x0072e000(vendor_b),0x00002000@0x0082e000(oem_a),0x00002000@0x00830000(oem_b),0x0010000@0x00832000(factory),0x00008000@0x842000(factory_bootloader),0x00080000@0x008ca000(oem),-@0x0094a000(userdata)
+```
 
 ## 附录
 
