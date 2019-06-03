@@ -1,10 +1,10 @@
 # **DDR颗粒验证流程说明**
 
-发布版本:1.2
+发布版本:1.3
 
 作者邮箱:cym@rock-chips.com
 
-日期:2018.10.11
+日期:2019.06.03
 
 文件密级:公开资料
 
@@ -38,6 +38,7 @@
 | 2017.11.21 | V1.0     | 陈有敏   | 初版                       |
 | 2018.03.22 | V1.1     | 陈有敏   | 公开资料                   |
 | 2018.10.11 | V1.2     | 何智欢   | 增加RK3308颗粒验证流程说明 |
+| 2019.06.03 | V1.3     | 陈有敏   | 修复关于RebootTest和SleepTest的描述错误 |
 
 ---
 
@@ -335,7 +336,7 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 
 ### Linux 3.10 reboot拷机
 
-​	开启计算器 Calculator,输入 "839910906=",点击"RebootTest"，拷机时间12小时以上。
+​	开启计算器 Calculator,输入 "83991906=",点击"RebootTest"，拷机时间12小时以上。
 
 ---
 
@@ -707,11 +708,11 @@ already change to 200000000 done
 
 ​	==为防止做reboot过程机器进入休眠，影响测试，请通过设置 setting->security->set screen lock->None，让机器一开机跳过锁屏界面，直接进入主界面。同时通过设置 Setting->Dsiplay->Sleep->Never sleep让机器保持唤醒状态。==
 
-​	开启计算器 Calculator,输入 "839910906=",点击"RebootTest"，拷机时间12小时以上。
+​	开启计算器 Calculator,输入 "83991906=",点击"RebootTest"，拷机时间12小时以上。
 
 ### Linux 4.4 sleep拷机
 
-​	拔掉连接ADB的USB线，开启计算器 Calculator,输入 "839910906=",点击"SleepTest"，拷机时间12小时以上。3399 LPDDR4，这项测试是必须的；其他DDR类型及其他平台是optional。
+​	拔掉连接ADB的USB线，开启计算器 Calculator,输入 "83991906=",点击"SleepTest"，拷机时间12小时以上。3399 LPDDR4，这项测试是必须的；其他DDR类型及其他平台是optional。
 
 ---
 
