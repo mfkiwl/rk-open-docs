@@ -3471,27 +3471,27 @@ finished. total time: 0.636s
 
 功能：下载数据到设备端内存，内存起始地址为CONFIG_FASTBOOT_BUF_ADDR
 
-举例：fastboot stage atx_permanent_attributes.bin
+举例：fastboot stage permanent_attributes.bin
 
 10. fastboot get_staged [ < filename > ]
 
 功能：从设备端获取数据
 
-举例：fastboot get_staged raw_atx_unlock_challenge.bin
+举例：fastboot get_staged raw_unlock_challenge.bin
 
 11. fastboot oem fuse at-perm-attr
 
-功能：烧写ATX及hash
+功能：烧写permanent_attributes.bin及hash
 
-举例：fastboot stage atx_permanent_attributes.bin
+举例：fastboot stage permanent_attributes.bin
 
 ​           fastboot oem fuse at-perm-attr
 
 12. fastboot oem fuse at-perm-attr-data
 
-功能：只烧写ATX到安全存储区域（RPMB）
+功能：只烧写permanent_attributes.bin到安全存储区域（RPMB）
 
-举例：fastboot stage atx_permanent_attributes.bin
+举例：fastboot stage permanent_attributes.bin
 
 ​           fastboot oem fuse at-perm-attr-data
 
@@ -3510,11 +3510,11 @@ finished. total time: 0.636s
 功能：解锁设备，现支持authenticated unlock
 
 举例：fastboot oem at-get-vboot-unlock-challenge
-​           fastboot get_staged raw_atx_unlock_challenge.bin
+​           fastboot get_staged raw_unlock_challenge.bin
 
 ​           ./make_unlock.sh（见make_unlock.sh参考）
 
-​           fastboot stage atx_unlock_credential.bin
+​           fastboot stage unlock_credential.bin
 ​	   fastboot oem at-unlock-vboot
 
 可以参考《how-to-generate-keys-about-avb.md》
@@ -4658,11 +4658,11 @@ CONFIG_RK_AVB_LIBAVB_ENABLE_ATH_UNLOCK=y
 
 ## 12.3 固件打包
 
-谷歌提供了avbtool来打包符合AVB标准的固件，首先参考《Rockchip-Secure-Boot2.0.md》生成testkey_atx_psk.pem、atx_metadata.bin，然后打包固件，以打包boot.img为例：
+谷歌提供了avbtool来打包符合AVB标准的固件，首先参考《Rockchip-Secure-Boot2.0.md》生成testkey_psk.pem、metadata.bin，然后打包固件，以打包boot.img为例：
 
 ```
-avbtool add_hash_footer --image boot.img --partition_size 33554432 --partition_name boot --key testkey_atx_psk.pem --algorithm SHA256_RSA4096
-avbtool make_vbmeta_image --public_key_metadata atx_metadata.bin --include_descriptors_from_image boot.img --algorithm SHA256_RSA4096 --rollback_index 1 --key testkey_atx_psk.pem  --output vbmeta.img
+avbtool add_hash_footer --image boot.img --partition_size 33554432 --partition_name boot --key testkey_psk.pem --algorithm SHA256_RSA4096
+avbtool make_vbmeta_image --public_key_metadata metadata.bin --include_descriptors_from_image boot.img --algorithm SHA256_RSA4096 --rollback_index 1 --key testkey_psk.pem  --output vbmeta.img
 ```
 
 ## 13 A/B系统
@@ -4769,8 +4769,8 @@ make_unlock.sh参考
 
 ```
 #!/bin/sh
-python avb-challenge-verify.py raw_atx_unlock_challenge.bin atx_product_id.bin
-python avbtool make_atx_unlock_credential --output=atx_unlock_credential.bin --intermediate_key_certificate=atx_pik_certificate.bin --unlock_key_certificate=atx_puk_certificate.bin --challenge=atx_unlock_challenge.bin --unlock_key=testkey_atx_puk.pem
+python avb-challenge-verify.py raw_unlock_challenge.bin product_id.bin
+python avbtool make_atx_unlock_credential --output=unlock_credential.bin --intermediate_key_certificate=pik_certificate.bin --unlock_key_certificate=puk_certificate.bin --challenge=unlock_challenge.bin --unlock_key=testkey_puk.pem
 ```
 
 avb-challenge-verify.py源码
@@ -4792,7 +4792,7 @@ def challenge_verify():
 	try:
 		challenge_file = open(sys.argv[1], 'rb')
 		product_id_file = open(sys.argv[2], 'rb')
-		challenge_random_file = open('atx_unlock_challenge.bin', 'wb')
+		challenge_random_file = open('unlock_challenge.bin', 'wb')
 		challenge_data = challenge_file.read(52)
 		product_id_data = product_id_file.read(16)
 		product_id_hash = sha256(product_id_data).digest()
