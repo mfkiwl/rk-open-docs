@@ -2366,7 +2366,58 @@ static const struct charge_image image[] = {
 
 存储驱动使用标准的存储框架，接口对接到block层支持文件系统。目前支持的存储设备：eMMC、Nand flash、SPI Nand flash、SPI Nor flash。
 
-#### 5.9.1 相关接口
+#### 5.9.1 框架支持
+
+**rknand**
+
+rknand是针对大容量Nand flash设备所设计的存储驱动，通过Nandc host与Nand flash device通信，具体适用颗粒选型参考《RKNandFlashSupportList》，适用以下颗粒：
+
+- SLC、MLC、TLC Nand flash
+
+配置：
+
+```
+CONFIG_RKNAND
+```
+
+驱动文件：
+
+```c
+./drivers/rknand/
+```
+
+**rkflash**
+
+rkflash是针对选用小容量存储的设备所设计的存储驱动，其中Nand flash的支持是通过Nandc host与Nand flash device通信完成，SPI flash的支持是通过SFC host与SPI flash devices通信完成，具体适用颗粒选型参考《RK SpiNor and  SLC Nand SupportList》，适用以下颗粒：
+
+- 128MB、256MB和512MB的SLC Nand flash
+- 部分SPI Nand flash
+- 部分SPI Nor flash颗粒
+
+配置：
+
+```c
+CONFIG_RKFLASH
+
+CONFIG_RKNANDC_NAND  /* 小容量并口Nand flash */
+CONFIG_RKSFC_NOR     /* SPI Nor flash */
+CONFIG_RKSFC_NAND    /* SPI Nand flash */
+```
+
+驱动文件：
+
+```c
+./drivers/rkflash/
+```
+
+注意：
+
+1. SFC（serial flash controller）是rockchip为简便支持spi flash所设计的专用模块；
+2. 由于rknand驱动与rkflash驱动Nand代码中ftl部分不兼容，所以
+   - CONFIG_RKNAND与CONFIG_RKNANDC_NAND 不能同时配置
+   - CONFIG_RKNAND与CONFIG_RKSFC_NAND 不能同时配置
+
+#### 5.9.2 相关接口
 
 获取blk描述符：
 
@@ -2378,9 +2429,9 @@ struct blk_desc *rockchip_get_bootdev(void)
 
 ```c
 unsigned long blk_dread(struct blk_desc *block_dev, lbaint_t start,
-						lbaint_t blkcnt, void *buffer)
+                        lbaint_t blkcnt, void *buffer)
 unsigned long blk_dwrite(struct blk_desc *block_dev, lbaint_t start,
-						lbaint_t blkcnt, const void *buffer)
+                         lbaint_t blkcnt, const void *buffer)
 ```
 
 范例：
@@ -2388,27 +2439,27 @@ unsigned long blk_dwrite(struct blk_desc *block_dev, lbaint_t start,
 ```c
 struct rockchip_image *img;
 
-dev_desc = rockchip_get_bootdev();				// 获取blk描述符
+dev_desc = rockchip_get_bootdev();               // 获取blk描述符
 img = memalign(ARCH_DMA_MINALIGN, RK_BLK_SIZE);
 if (!img) {
 	printf("out of memory\n");
 	return -ENOMEM;
 }
 ...
-ret = blk_dread(dev_desc, 0x2000, 1, img);		//　读操作
+ret = blk_dread(dev_desc, 0x2000, 1, img);       //　读操作
 if (ret != 1) {
 	ret = -EIO;
 	goto err;
 }
 ...
-ret = blk_write(dev_desc, 0x2000, 1, img);		// 写操作
+ret = blk_write(dev_desc, 0x2000, 1, img);       // 写操作
 if (ret != 1) {
 	ret = -EIO;
 	goto err;
 }
 ```
 
-#### 5.9.2 DTS配置
+#### 5.9.3 DTS配置
 
 ```
 &emmc {
@@ -2430,39 +2481,6 @@ if (ret != 1) {
 	status = "okay";
 };
 ```
-
-注意：nandc节点是与nand flash设备通信的控制器节点，sfc节点是与spi flash设备通信的控制器节点，如果只用nand flash设备或只用spi flash设备，可以只使能对应节点，而两个节点都使能也是兼容的。
-
-#### 5.9.3 defconfig配置
-
-**rknand**
-
-rknand通常是指drivers/rknand/目录下的存储驱动，是针对大容量Nand flash设备所设计的存储驱动，通过Nandc host与Nand flash device通信，具体适用颗粒选型参考《RKNandFlashSupportList》，适用以下存储：
-
-- SLC、MLC、TLC Nand flash
-
-```
-CONFIG_RKNAND=y
-```
-
-**rkflash**
-
-rkflash则是drivers/rkflash/目录下的存储驱动，其是针对选用小容量存储的设备所设计的存储驱动，其中Nand flash设备通过Nandc host与Nand flash device通信，SPI flash通过sfc host与SPI flash devices通信，适用的存储设备主要包括：
-
-- 128MB和256MB的SLC Nand flash
-- 部分SPI Nand flash
-- 部分SPI Nor flash颗粒
-
-具体适用颗粒选型参考《RK SpiNor and  SLC Nand SupportList》。
-
-```
-CONFIG_RKFLASH=y
-CONFIG_RKNANDC_NAND=y
-CONFIG_RKSFC_NOR=y
-CONFIG_RKSFC_NAND=y
-```
-
-注意：rknand驱动与rkflash驱动的ftl框架不兼容，所以两个框架无法同时配置使能。
 
 ### 5.10 串口驱动
 
