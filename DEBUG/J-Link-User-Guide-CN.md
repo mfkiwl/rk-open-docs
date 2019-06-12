@@ -143,6 +143,18 @@ H：这个是可以输入命令的控制台，虽然空间小，但是可以定�
 
 这时候系统会停在代码入口处，然后可以单步运行Debug。
 
+* 指定源码文件路径
+
+很多开发者习惯在 Linux 环境下编译代码，然后在 Windows 环境下调试，或者调试运行的 ELF 文件是另外一个开发者编译的，这时候 Ozone 根据 ELF 文件中获取的路径信息就无法找到代码对应的源码文件。
+
+![Source File Not Found](./J-Link/Ozone-FND.png)
+
+如图所示，该 ELF 文件是在 Linux 系统 /home/tzb/inner_projects/rt-thread 目录下编译的，但是这时候 Ozone 运行于 Windows 系统上，自然就无法找到对应的源文件。Ozone 提供了 Project.AddPathSubstitute 命令来解决这个问题。假如现在通过 Samba 服务把 Linux 系统下的 rt-thread 源码目录映射到 Windows 下的 Z:\rt-thread，则可以通过如下命令设置源码路径：`Project.AddPathSubstitute  /home/tzb/inner_projects/ Z:/` 。
+
+![Add File Path](./J-Link/Ozone-APS.png)
+
+如果替换的路径固定，也可以考虑把这个路径写到脚本里面，避免每次都要输入命令。
+
 ## **总结**
 
 J-Link还提供了很多其他功能，比如可以配合GDB使用，Ozone也包含了丰富的功能，甚至可以定制各种脚本。请大家在使用的过程中参考他们的使用手册：
