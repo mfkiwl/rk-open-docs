@@ -1,10 +1,10 @@
 # U-Boot MTD Block Device Design
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：jason.zhu@rock-chips.com
 
-日期：2019.05
+日期：2019.06
 
 文件密级：内部资料
 
@@ -31,6 +31,7 @@ U-Boot下MTD block device设计介绍。
 | **日期**   | **版本** | **作者**  | **修改说明** |
 | ---------- | -------- | --------- | ------------ |
 | 2019-05-20 | V1.0     | Jason Zhu | 初始版本     |
+| 2019-06-18 | V1.1     | Jason Zhu | 修改分区支持,更新step by step章节 |
 
 ------
 
@@ -128,13 +129,11 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ### 4.3 分区表设计
 
-为了兼容原有的block设备分区表，这里不使用mtd part table，在原有的rockchip parameter表基础上支持block设备分区表。原有分区表位置为存储偏移0x2000 sectors位置，这个位置保持不变。
-
-对于MTD设备，在往kernel传递分区表的分区起始地址及大小单位都是byte，所以在U-Boot下对分区表需要做一次转换。当检测到设备为mtd block时，对分区表进行转换。
+兼容GPT分区表，注意nand flash与spi flash尾部需要保留4个blocks用于保存坏块表。
 
 ### 4.4 新增CONFIG
 
-增加CONFIG_MTD_BLK，支持mtd block device。
+增加CONFIG_MTD_BLK、CONFIG_CMD_MTD，支持mtd block device。
 
 ### 4.5 驱动挂接框图
 
@@ -142,4 +141,59 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ## 5 step by step
 
-to-do
+1. 对应的defconfig添加
+
+```
+CONFIG_MTD_BLK=y
+CONFIG_CMD_MTD=y
+```
+
+其他nand的配置可以参考<https://10.10.10.29/#/c/android/rk/u-boot/+/75116/>。
+
+2. 更新支持mtd的laoder，rk3308补丁地址<https://10.10.10.29/#/c/rk/rkbin/+/75644/>。
+3. 编译uboot，例如编译rk3308
+
+```
+./make.sh evb-rk3308
+```
+
+4. 更改支持GPT的parameter.txt，例如：
+
+```
+FIRMWARE_VER:8.1
+MACHINE_MODEL:RK3308
+MACHINE_ID:007
+MANUFACTURER: RK3308
+MAGIC: 0x5041524B
+ATAG: 0x00200800
+MACHINE: 3308
+CHECK_MASK: 0x80
+PWR_HLD: 0,0,A,0,1
+TYPE: GPT
+CMDLINE:mtdparts=rk29xxnand:0x00000800@0x00001000(uboot),0x00000800@0x00000800(trust),0x00000100@0x00002000(pa),0x00000800@0x00003000(misc),0x00007800@0x00003800(recovery),0x00004800@0x0000B000(boot),0x00020000@0x0000F800(rootfs),-@0x0002F800(data:grow)
+```
+
+5. 烧写固件
+
+![mtd-tool](./Rockchip-Developer-Guide-UBoot-MTD-Block-Device-Design/mtd-tool.png)
+
+6. 成功启动log
+
+```
+......
+U-Boot 2017.09-02976-g47b3c04-dirty (Jun 19 2019 - 17:02:46 +0800)
+......
+Device 0: nand_base: Could not find valid JEDEC parameter page; aborting //正常错误打印
+Vendor: 0x2207 Rev: V1.00 Prod: MTD                                      //MTD设备初始化
+            Type: Hard Disk
+            Capacity: 255.5 MB = 0.2 GB (523264 x 512)
+... is now current device
+Bootdev: mtd 0                  //Bootdev为MTD设备
+PartType: EFI                   //使用GPT分区
+......
+Starting kernel ...
+......
+[    0.000000] Kernel command line: storagemedia=mtd androidboot.storagemedia=mtd androidboot.mode=normal  mtdparts=rk-nand:0x200000@0x400000(uboot),0x200000@0x600000(trust),0x100000@0x800000(misc),0xc00000@0x900000(recovery),0x900000@0x1500000(boot),0x2a00000@0x1e00000(rootfs),0x1a00000@0x4800000(oem),-@0x6200000(userdata:grow) androidboot.slot_suffix= androidboot.serialno=c3d9b8674f4b94f6  rootwait earlycon=uart8250,mmio32,0xff0c0000 swiotlb=1 console=ttyFIQ0 ubi.mtd=5 root=ubi0:rootfs rootfstype=ubifs snd_aloop.index=7    //mtdparts为调整过的分区表，单位为Byte
+                                      //ubi.mtd指定分区中rootfs的位置
+......
+```
