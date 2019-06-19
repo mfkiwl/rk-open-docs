@@ -28,11 +28,12 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**                   |
-| ---------- | -------- | -------- | ------------------------------ |
-| 2019-02-20 | V1.0     | 陈谋春   | 初始版本                       |
-| 2019-04-30 | v1.1     | 陈谋春   | 更新公共驱动路径               |
-| 2019-05-14 | v1.2     | 陈谋春   | 更新测试用例描述，增加调试说明 |
+| **日期**   | **版本** | **作者** | **修改说明**                       |
+| ---------- | -------- | -------- | ---------------------------------- |
+| 2019-02-20 | V1.0     | 陈谋春   | 初始版本                           |
+| 2019-04-30 | v1.1     | 陈谋春   | 更新公共驱动路径                   |
+| 2019-05-14 | v1.2     | 陈谋春   | 更新测试用例描述，增加调试说明     |
+| 2019-06-17 | v1.3     | 陈谋春   | 更新模块配置说明，增加编译脚本配置 |
 
 ---
 
@@ -127,7 +128,7 @@ cd bsp/rockchip-pisces
 scons --menuconfig
 ```
 
-   会弹出如下界面，操作方法和Linux是一样，修改配置以后保持退出，重新编译即可：
+   会弹出如下界面，操作方法和Linux是一样，修改配置以后保存退出，这个过程会自动重新生成一个rtconfig.h文件，这个文件包含了我们选中的各种配置，最后重新编译即可：
 
 ![menuconfig](./menuconfig.png)
 
@@ -176,6 +177,143 @@ optional arguments:
 ```
 
    除了上面用到的update外，另外有几个常用：list可以看到当前我们选中的包列表；upgrade用来更新到最新的包列表，以及ENV脚本（pkgs在这里实现）；wizard是用来创建自己的包。
+
+### 3.5 保存配置
+
+   目前RTT的menuconfig有个缺陷：第一次执行menuconfig的时候会从网络上下载Online Package的配置，后续不手动更新的话，这些配置不会变更，这就导致了不同工程师的配置信息可能略有差异，最终导致menuconfig生成的.config和rtconfig.h包含大量无效配置，在提交的时候出现互相覆盖，下面是无效配置的例子：
+
+```shell
+/* RT-Thread online packages */
+
+/* IoT - internet of things */
+
+/* PKG_USING_PAHOMQTT is not set */
+/* PKG_USING_WEBCLIENT is not set */
+/* PKG_USING_WEBNET is not set */
+/* PKG_USING_MONGOOSE is not set */
+/* PKG_USING_WEBTERMINAL is not set */
+/* PKG_USING_CJSON is not set */
+/* PKG_USING_JSMN is not set */
+/* PKG_USING_LJSON is not set */
+/* PKG_USING_EZXML is not set */
+/* PKG_USING_NANOPB is not set */
+```
+
+   可以通过RTT自带的两个命令来去掉这些无效配置，方法如下：
+
+```shell
+scons --genconfig                          ; 根据rtconfig.h生成不含无效配置的.config
+cp .config board/xxx/defconfig             ; 保存配置为板子的默认配置
+scons --useconfig=board/xxx/defconfig      ; 根据保存的配置，生成不含无效配置的rtconfig.h
+```
+
+   从上面我们可以看到SOC的BSP主目录下有一个.config文件，在执行menuconfig的时候会从中读取默认配置，保存退出的同时也会更新这个文件，我们目前用这个文件作为最小配置集合。menuconfig保存退出的时候生成的rtconfig.h实际上是根据这个文件生成的，==提交补丁的同时请不要提交.config和rtconfig.h，以防止引入有冲突的配置导致编译失败==。
+
+### 3.6 Scons编译脚本
+
+   大部分驱动和应用并不需要关心编译脚本，目前的编译脚本会自动搜索驱动、板级配置、应用和测试等目录的所有源文件进行编译，所以即使增加模块，一般也不需要改脚本。只有在目录结构有变更，或者需要修改编译标志的时候会需要改动编译脚本。
+
+   BSP的主目录下有一个rtconfig.py，这里可以修改toolchain和全局的编译链接标志，具体如下：
+
+```python
+if  CROSS_TOOL == 'gcc':
+    PLATFORM    = 'gcc'
+    EXEC_PATH       = '/usr/bin'   # 配置toolchain的路径
+elif CROSS_TOOL == 'keil':
+    PLATFORM    = 'armcc'
+    EXEC_PATH   = 'C:/Keil'
+
+if os.getenv('RTT_EXEC_PATH'):
+    EXEC_PATH = os.getenv('RTT_EXEC_PATH')
+
+#BUILD = 'debug'
+BUILD = 'release'            # 默认是release配置，O2优化级别
+
+if PLATFORM == 'gcc':
+    # toolchains
+    PREFIX = 'arm-none-eabi-'    # 默认toolchain名字
+    CC = PREFIX + 'gcc'
+    AS = PREFIX + 'gcc'
+    AR = PREFIX + 'ar'
+    CXX = PREFIX + 'g++'
+    LINK = PREFIX + 'gcc'
+    TARGET_EXT = 'elf'
+    SIZE = PREFIX + 'size'
+    OBJDUMP = PREFIX + 'objdump'
+    OBJCPY = PREFIX + 'objcopy'
+
+    DEVICE = ' -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffunction-sections -fdata-sections'      # cpu相关的编译选项
+    CFLAGS = DEVICE + ' -g -Wall -Wno-cpp -Werror=maybe-uninitialized -Werror=implicit-function-declaration -Werror=return-type -Werror=address -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast'    # 全局编译标志
+    AFLAGS = ' -c' + DEVICE + ' -x assembler-with-cpp -Wa,-mimplicit-it=thumb -D__ASSEMBLY__ '                              # 全局汇编编译标志
+    LFLAGS = DEVICE + ' -lm -lgcc -lc' + ' -nostartfiles -Wl,--gc-sections,-Map=rtthread.map,-cref,-u,Reset_Handler -T gcc_arm.ld'
+                               # 全局链接标志
+
+    CPATH = ''
+    LPATH = ''
+
+    if BUILD == 'debug':
+        CFLAGS += ' -O0 -gdwarf-2'
+        AFLAGS += ' -gdwarf-2'
+    else:
+        CFLAGS += ' -O2'
+```
+
+   接下来一级的编译脚本是BSP根目录下的SConscript，具体如下：
+
+```python
+import os
+Import('RTT_ROOT')
+
+cwd = str(Dir('#'))
+objs = []
+list = os.listdir(cwd)
+
+# HAL的编译脚本
+objs = SConscript(os.path.join(cwd, 'HalSConscript'), variant_dir = '.', duplicate=0)
+
+# 搜索所有包含SConscript文件的一级子目录，全部都会加入编译
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+# 添加BSP主目录外的模块：公共驱动、测试和examples
+objs = objs + SConscript(os.path.join(RTT_ROOT, 'bsp/rockchip-common/drivers/SConscript'), variant_dir = 'common/drivers', duplicate=0)
+objs = objs + SConscript(os.path.join(RTT_ROOT, 'bsp/rockchip-common/tests/SConscript'), variant_dir = 'common/tests', duplicate=0)
+objs = objs + SConscript(os.path.join(RTT_ROOT, 'examples/kernel/SConscript'), variant_dir = 'examples/kernel', duplicate=0)
+
+Return('objs')
+```
+
+   如果要修改某个子模块的编译标志，可以把这个子模块的编译独立一个GROUP，然后修改局部标志，下面是一个加局部宏定义的例子：
+
+```python
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+CPPPATH = [cwd]                                    # 配置头文件搜索目录，全局有效
+LOCAL_CPPDEFINES = ['BOARD_M1_TEST_MARCO']         # 局部宏定义，局部有效
+
+group = DefineGroup('BoardConfig', src, depend = ['RT_USING_BOARD_RK2108_EVB'], CPPPATH = CPPPATH, LOCAL_CPPDEFINES = LOCAL_CPPDEFINES )     # 这个宏只会在BoardConfig编译的时候生效
+
+Return('group')
+```
+
+   其他一些局部和全部定义，可以参考下面的列表介绍：
+
+```shell
+LOCAL_CCFLAGS                                      # 局部编译标志
+LOCAL_CPPPATH                                      # 局部头文件搜索路径
+LOCAL_CPPDEFINES                                   # 局部宏定义
+LOCAL_ASFLAGS                                      # 局部汇编标志
+CCFLAGS                                            # 全局编译标志
+CPPPATH                                            # 全局头文件搜索路径
+CPPDEFINES                                         # 全局宏定义
+ASFLAGS                                            # 全部汇编标志
+```
 
 ## 4 驱动开发
 
@@ -309,7 +447,9 @@ static void udelay(unsigned long usec) {
 #define INIT_APP_EXPORT(fn)             INIT_EXPORT(fn, "6")
 ```
 
-   如上所示，其初始化顺序是从上到下，大部分设备驱动用INIT_DEVICE_EXPORT就够了，如果需要更前可以加到INIT_PREV_EXPORT或INIT_BOARD_EXPORT，如果两个模块有先后顺序以来，需要自己在代码里去控制，举例，如果有两个模块A和B，A的初始化依赖于B的初始化，则最好只把B的初始化EXPORT出来，然后在B里再去调用A的初始化。当然放到不同EXPORT组去控制先后也是可以的，只是有被别人误改的风险。
+   如上所示，其初始化顺序是从上到下，我们约定BOARD组只放板级的初始化如CLK，需要注意在BOARD组的初始化过程中由于系统调度子系统还没有初始化，不能使用系统的互斥和同步模块，如MUTEX等，此时系统的中断还没有开，所有操作都是串行的，不需要考虑并发和竞争。而PREV组我们可以放一些总线驱动的初始化，如I2C、SDIO等，而大部分设备驱动用INIT_DEVICE_EXPORT就够了。
+
+   如果两个模块有先后顺序以来，可以放到上面的不同初始化组里，来控制顺序。当然也自己在代码里去控制，举例，如果有两个模块A和B，A的初始化依赖于B的初始化，则最好只把B的初始化EXPORT出来，然后在B里再去调用A的初始化。
 
    还有一个提示，目前驱动引用HAL的头文件，只需要加“hal_base.h"，而不需要另外在包含芯片头文件，因为会自动根据"hal_conf.h"的定义来包含芯片头文件，例如：
 
@@ -366,7 +506,7 @@ finsh >> demo_test()
 this is demo_test
 ```
 
-   ==注意，默认配置下启用的msh，如果测试用例导出到finsh，需要先通过exit命令推出msh，会自动切到finsh。==
+   ==注意，默认配置下启用的msh，如果测试用例导出到finsh，需要先通过exit命令推出msh，会自动切到finsh。要重新切回msh，可以输入msh()==
 
  测试用例如果需要传参数，可以这样修改：
 
@@ -385,6 +525,8 @@ FINSH_FUNCTION_EXPORT(demo_test, demo test for driver);
 msh /> exit
 finsh >> demo_test("hello")
 hello world
+finsh >> msh()
+msh />
 ```
 
    RTT还提供了一个简单的测试框架，通过RT_USING_TC来开启，具体实现在：*/path/to/rt-thread/examples/kernel/tc_comm.c*，方便多个测试用例的集成，下面是一个简单的例子，定义了一个_tc_sample的测试用例，完整代码请参考*/path/to/rt-thread/examples/kernel/tc_sample.c*：
