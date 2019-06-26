@@ -1,10 +1,10 @@
 # USB SQ Test Guide
 
-发布版本：1.5
+发布版本：1.6
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2019-01-15
+日期：2019-06-26
 
 文档密级：公开资料
 
@@ -42,6 +42,7 @@ Rockchip SOCs通常内置多个USB控制器，不同控制器之间互相独立�
 | 2018-05-21 | V1.3     | 吴良峰   | 修正USB3.0 测试方法                                  |
 | 2019-01-09 | V1.4     | 吴良峰   | 使用markdownlint修订格式                             |
 | 2019-01-15 | V1.5     | 吴良峰   | 增加RK1808测试命令、修正文档缩进、修正USB3.0测试命令 |
+| 2019-06-26 | V1.6     | 吴良峰   | 增加无法进入Compliance Test的解决方法                |
 
 ---------
 [TOC]
@@ -849,6 +850,53 @@ USB 3.0控制器在link training的Polling.Configuration阶段，如果检测到
 **3). 测试注意事项**
 
 如果是测试 **Type-A USB3.0** 接口，测试前，先将USB 3.0 Disk插入待测试的USB 3.0接口，并通过串口log确认可以识别为“SuperSpeed”，表示测试固件可以正常支持USB3.0，然后拔出USB 3.0 Disk。**如果缺少该步骤，Type-A USB3.0 可能无法进入Loopback mode**。
+
+### 3.4 无法进入Compliance Test的解决方法
+
+#### 3.4.1 无法进入Tx Compliance Test的解决方法
+
+1. USB 3.0 Device VBus 5V自供电导致无法进入Tx测试模式
+
+   正常情况下，USB 3.0 Device不需要输入测试命令，就可以自动进入测试模式。如果无法进入测试模式，建议先测试VBus的电压。USB 3.0 Device Tx测试要求，**VBus 5V不能自供电，否则会导致USB 3.0控制器无法进入Compliance mode**。VBus的供电需要由测试夹具提供，可以通过USB线将测试夹具的USB供电口与示波器或者PC的USB口连接，实现VBus 5V的供电。
+
+2. RK3399 Type-A USB 3.0 Host无法进入Tx测试模式
+
+   测试RK3399 Type-A USB 3.0 Host时，需要增加一个步骤，即在测试前，先将USB 3.0 Disk插入待测试的USB 3.0接口，详细操作见[3.2.8 USB 3.0 Host Tx测试方法](#3.2.8 USB 3.0 Host Tx测试方法) —— USB 3.0 Host Tx 测试注意事项，否则，Type-A USB3.0 可能无法进入测试模式。
+
+   除了上述方法，还可以通过修改软件解决。具体方法是，注释掉
+
+   `arch/arm64/boot/dts/rockchip/rk3399.dtsi` 中usbdrd_dwc3_0和usbdrd_dwc3_1节点的属性“snps,usb3-warm-reset-on-resume-quirk”
+
+3. RK3399 Type-C USB 3.0 Host无法进入Tx测试模式
+
+   正常情况，RK3399 Type-C USB 3.0 Host只要参考[3.2.8 USB 3.0 Host Tx测试方法](#3.2.8 USB 3.0 Host Tx测试方法)，就可以进入Tx测试模式。如果无法进入Tx测试模式，建议先测试VBus的电压，如果VBus为常供电，可能会导致无法进入Tx测试模式。有两种解决方法：
+
+   方法1：将VBus供电配置为软件可控的方式，也即默认不输出5V，当插入Type-C转Type-A线时，才输出5V；
+
+   方法2：将DTS对应的dr_mode属性配置为"host"；
+
+#### 3.4.2 无法进入Rx Compliance Test的解决方法
+
+1. RK3399 Type-A USB 3.0 Host无法进入Loopback mode
+
+   如果是测试 **Type-A USB3.0** 接口，测试前，先将USB 3.0 Disk插入待测试的USB 3.0接口，并通过串口log确认可以识别为“SuperSpeed”，表示测试固件可以正常支持USB3.0，然后拔出USB 3.0 Disk。如果缺少该步骤，Type-A USB3.0 可能无法进入Loopback mode
+
+2. RK1808 Type-A USB 3.0 Host无法进入Loopback mode
+
+   通过修改软件，disable hub autosuspend 功能，修改参考如下：
+
+   ```
+   diff --git a/drivers/usb/core/usb.c b/drivers/usb/core/usb.c
+   index 36e5098..0b2930d 100644
+   --- a/drivers/usb/core/usb.c
+   +++ b/drivers/usb/core/usb.c
+   @@ -66,7 +66,7 @@ int usb_disabled(void)
+    EXPORT_SYMBOL_GPL(usb_disabled);
+
+    #ifdef CONFIG_PM
+   -static int usb_autosuspend_delay = 2;          /* Default delay value,
+   +static int usb_autosuspend_delay = -1;         /* Default delay value,
+   ```
 
 ## 4 USB 3.0 HUB Compliance Test
 
