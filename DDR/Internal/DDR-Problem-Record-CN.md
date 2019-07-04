@@ -754,6 +754,30 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 当然代码中对 row=16 的 test()，以及 CS1 的探测等都必须特殊处理。
 
+### 问题：RK3288 Power domain 驱动 idle port 失败
+
+#### 关键词：RK3288, idle port 失败，单通道
+
+#### 现象描述
+
+开机第一次变频后 power domain 驱动会报 idle port 失败，将 ddr 变频关闭后 idle port 正常。并且在烧写固件再重启能够正常 idle port。
+
+#### 分析过程
+
+- 烧写后重启正常，所以尝试只下载 471，472 并不下载完整 loader 然后通过烧写工具发送重启命令能够正常 idle。或者进入 loader 设备后不做烧写动作直接通过烧写工具重启也能够正常 idle。
+- 正常 idle 进入系统后通过 reboot 命令重启机器，无论如何重启均正常。但是只要硬件复位后马上又 idle port 失败。
+- DDR 初始化代码中正常重启和冷开机的区别在于冷开机时有做容量探测，而热开机时没有做容量探测。
+- 未做容量探测的初始化代码在初始化为空的通道时 dram type 为 DRAM_MAX，这时候如下函数在设置 DLL 用到的频率由于访问溢出 ddr_timing，刚好将 DLL 设置为 bypass 解决了该问题。ddr_set_dll_bypass(ddr_timing[g_ChInfo[ch ? 1 : 0].dramType].pctl_timing.ddrFreq);
+- 在 kernel 的变频代码中对为空通道的 DLL 做 reset 动作就能够正常 idle。
+
+#### 问题原因
+
+3288 只使用一个通道时，为空那个通道由于 DLL 处于 normal 状态，在 DDR 变频时由于没有对为空通道的 DLL 做任何操作，导致 DLL 失锁引起 idle port 失败。
+
+#### 解决方法
+
+初始化时将为空通道的 DLL 设置为 bypass 或者变频时对为空通道也做 DLL reset 操作均能够解决该问题。而在变频代码中添加 DLL reset 操作会增加变频时间，所以最终通过初始化将为空通道的 DLL 设置为 bypass 解决该问题。
+
 ---
 
 ## RK3188/RK3026
@@ -1005,29 +1029,80 @@ Z91M: EOL at 2016 Q3
 
 原来纹波 35mV，加完电容后，纹波 20mV。所以从外面测，看不出纹波太大影响。实际效果很明显。
 
-### 问题：RK3288 Power domain 驱动 idle port 失败
+### 问题：shmoo结果跟sw_training结果不一致
 
-#### 关键词：RK3288, idle port 失败，单通道
+#### 关键词：S5RG2G20CMS-MGCJ、Netsol、开机异常、RISK、no find pass-eye、Channel 1异常
 
 #### 现象描述
 
-开机第一次变频后 power domain 驱动会报 idle port 失败，将 ddr 变频关闭后 idle port 正常。并且在烧写固件再重启能够正常 idle port。
+鑫中宏给他的客户“点量”做的产品，用了Netsol的S5RG2G20CMS-MGCJ。大量贴片后，出问题。有些机器Channel 1直接识别错，剩单通道。还有些能识别到双通道，但是开机log有类似的RISK报错
+
+![Netsol-RISK-Log](DDR-Problem-Record/Netsol-RISK-Log.jpg)
+
+而且这种机器有的开不了机，有的开机能进系统，但是运行某些应用，系统会异常。
 
 #### 分析过程
 
-- 烧写后重启正常，所以尝试只下载 471，472 并不下载完整 loader 然后通过烧写工具发送重启命令能够正常 idle。或者进入 loader 设备后不做烧写动作直接通过烧写工具重启也能够正常 idle。
-- 正常 idle 进入系统后通过 reboot 命令重启机器，无论如何重启均正常。但是只要硬件复位后马上又 idle port 失败。
-- DDR 初始化代码中正常重启和冷开机的区别在于冷开机时有做容量探测，而热开机时没有做容量探测。
-- 未做容量探测的初始化代码在初始化为空的通道时 dram type 为 DRAM_MAX，这时候如下函数在设置 DLL 用到的频率由于访问溢出 ddr_timing，刚好将 DLL 设置为 bypass 解决了该问题。ddr_set_dll_bypass(ddr_timing[g_ChInfo[ch ? 1 : 0].dramType].pctl_timing.ddrFreq);
-- 在 kernel 的变频代码中对为空通道的 DLL 做 reset 动作就能够正常 idle。
+- 从log的RISK入手，把sw_training.c的DEBUG_SW_TRAINING打开，让其打印出training的结果，看到channel 1，cs 1，dq 16的结果竟然真是没找到pass-eye，如下图
+
+![Netsol-DQ16-No-Pass-Eye](DDR-Problem-Record/Netsol-DQ16-No-Pass-Eye.jpg)
+
+- 而且更奇怪的是，channel 1，cs 0的dq16的结果是正常的。只有cs 1的dq16不正常。
+
+- 用DDR测试工具测，没发现焊接问题
+
+- 把config.h的DDR_TEST设置为1，这样开机后，会做shmoo，扫出眼图。最终竟然是有眼图的
+
+  ![Netsol-DQ16-Shmoo-1KB](DDR-Problem-Record/Netsol-DQ16-Shmoo-1KB.jpg)
+
+- 这样变成sw_training的结果跟shmoo的结果相反了，肯定有一个结果是错的。
+
+- 保持config.h的DDR_TEST设置为1，把`src\common\start.s`改成不交织，同时把`src\memtest\memtest.c`的emic_test_main()调用memtest_main()的pbufb地址改到channel 1，cs1去，如下
+
+  `memtest_main((u32*)0xc0000000, (u32*)0xc0200000, 1024*1024, 1);`
+
+  `g_ch_info DCD 0x03040000`
+
+  看memtest_main的结果。
+
+- memtest_main报一堆错，如下，能看到都是DQ16的错。所以，说明sw_training的结果是对的。shmoo的结果是不对的
+
+  ![Netsol-DQ16-Memtest](DDR-Problem-Record/Netsol-DQ16-Memtest.jpg)
+
+  看了下出错地址，结合颗粒信息
+
+  `Bus Width=32 Col=10 Bank=8 Row=15/15 CS=2 Die Bus-Width=16 Size=2048MB`
+
+  可以看到，都是bank0、bank4的column等于如下地址的`10'b1[000000-111111]001`都出错，即如下column地址
+
+  ```c
+  0x201,0x209,0x211,0x219,0x221,0x229,0x231,0x239,
+  0x241,0x249,0x251,0x259,0x261,0x269,0x271,0x279,
+  0x281,0x289,0x291,0x299,0x2a1,0x2a9,0x2b1,0x2b9,
+  0x2c1,0x2c9,0x2d1,0x2d9,0x2e1,0x2e9,0x2f1,0x2f9,
+  0x301,0x309,0x311,0x319,0x321,0x329,0x331,0x339,
+  0x341,0x349,0x351,0x359,0x361,0x369,0x371,0x379,
+  0x381,0x389,0x391,0x399,0x3a1,0x3a9,0x3b1,0x3b9,
+  0x3c1,0x3c9,0x3d1,0x3d9,0x3e1,0x3e9,0x3f1,0x3f9,
+  ```
+
+- 经过排查，找到原因。用于shmoo测试的buffer大小，只用到1KB。而sw_training用的buffer有64KB。
+
+  只要把shmoo的buffer也加大到64KB，就能看到眼图是异常的。如下
+
+  ![Netsol-DQ16-No-Pass-Eye-64KB](DDR-Problem-Record/Netsol-DQ16-No-Pass-Eye-64KB.jpg)
 
 #### 问题原因
 
-3288 只使用一个通道时，为空那个通道由于 DLL 处于 normal 状态，在 DDR 变频时由于没有对为空通道的 DLL 做任何操作，导致 DLL 失锁引起 idle port 失败。
+LPDDR4颗粒有问题，某些地址有固定bit出错
+
+shmoo测试的buffer小，只用到1KB。而sw_training用的buffer有64KB。
+
+只要把shmoo的buffer也加大到64KB，就能看到眼图是异常的
 
 #### 解决方法
 
-初始化时将为空通道的 DLL 设置为 bypass 或者变频时对为空通道也做 DLL reset 操作均能够解决该问题。而在变频代码中添加 DLL reset 操作会增加变频时间，所以最终通过初始化将为空通道的 DLL 设置为 bypass 解决该问题。
+颗粒问题，只能换颗粒
 
 
 
