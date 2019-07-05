@@ -63,7 +63,7 @@ Jenkins 是始于Hudson的一个持续集成工具, 下图是一个通用的开�
 
 1. 开发工程师从服务器获取最新代码；
 2. 本地修改代码后, 把patch通过git commit推送到Gerrit供review；
-3. Jenkins监测到新的提交, 自动出发任务, 把gerrit的提交cherry pick下来；
+3. Jenkins监测到新的提交, 自动触发任务, 把gerrit的提交cherry pick下来；
 4. Jenkins进行Build验证, 如果没有LAVA, 通常是按脚本要求进行全面build;
 5. Jenkins把验证结果返回Gerrit, 得到一个Jenkins Verify +/- 1的comment；
 6. Reviewer查看Gerrit上的代码和jenkins验证结果对patch进行review;
@@ -115,7 +115,7 @@ Dispatcher的流程可参考<http://172.16.10.254/static/docs/v2/dispatcher-desi
     - fastboot, rockusb,
     - android, rockchip, linux固件引导
   - kernel:
-    - 显示, HDMI/
+    - 显示, HDMI
     - 音频
     - 视频
     - USB device/host
