@@ -1005,9 +1005,29 @@ Z91M: EOL at 2016 Q3
 
 原来纹波35mV，加完电容后，纹波20mV。所以从外面测，看不出纹波太大影响。实际效果很明显。
 
+### 问题：RK3288 Power domain驱动idle port失败
 
+#### 关键词：RK3288, idle port失败，单通道
 
+#### 现象描述
 
+开机第一次变频后power domain驱动会报idle port失败，将ddr变频关闭后idle port正常。并且在烧写固件再重启能够正常idle port。
+
+#### 分析过程
+
+- 烧写后重启正常，所以尝试只下载471，472并不下载完整loader然后通过烧写工具发送重启命令能够正常idle。或者进入loader设备后不做烧写动作直接通过烧写工具重启也能够正常idle。
+- 正常idle进入系统后通过reboot命令重启机器，无论如何重启均正常。但是只要硬件复位后马上又idle port失败。
+- DDR初始化代码中正常重启和冷开机的区别在于冷开机时有做容量探测，而热开机时没有做容量探测。
+- 未做容量探测的初始化代码在初始化为空的通道时dram type为DRAM_MAX，这时候如下函数在设置DLL用到的频率由于访问溢出ddr_timing，刚好将DLL设置为bypass解决了该问题。ddr_set_dll_bypass(ddr_timing[g_ChInfo[ch ? 1 : 0].dramType].pctl_timing.ddrFreq);
+- 在kernel的变频代码中对为空通道的DLL做reset动作就能够正常idle。
+
+#### 问题原因
+
+3288只使用一个通道时，为空那个通道由于DLL处于normal状态，在DDR变频时由于没有对为空通道的DLL做任何操作，导致DLL失锁引起idle port失败。
+
+#### 解决方法
+
+初始化时将为空通道的DLL设置为bypass或者变频时对为空通道也做DLL reset操作均能够解决该问题。而在变频代码中添加DLL reset操作会增加变频时间，所以最终通过初始化将为空通道的DLL设置为bypass解决该问题。
 
 
 
