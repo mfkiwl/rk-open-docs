@@ -2,7 +2,7 @@
 
 发布版本：1.0
 
-作者邮箱：cmc@rock-chips.com
+作者邮箱：<cmc@rock-chips.com>
 
 日期：2019.02
 
@@ -34,6 +34,7 @@
 | 2019-04-30 | v1.1     | 陈谋春   | 更新公共驱动路径                   |
 | 2019-05-14 | v1.2     | 陈谋春   | 更新测试用例描述，增加调试说明     |
 | 2019-06-17 | v1.3     | 陈谋春   | 更新模块配置说明，增加编译脚本配置 |
+| 2019-07-08 | v1.4     | 陈谋春   | 增加静态库编译说明                 |
 
 ---
 
@@ -119,7 +120,69 @@ rm -rf build
 scons -h
 ```
 
-### 3.4 模块配置
+### 3.4 静态库编译
+
+   RT-Thread支持静态库编译，==模块可以先剥离成一个独立的Group==，每一个Group都是一个独立的编译单元，可以有自己的编译标志和链接标志，也可以很方便的编译成静态库，下面以FileTest模块为例，先看看这个模块的编译脚本*/path/to/rtthread/examples/file/SConscript*，具体如下：
+
+```python
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+CPPPATH = [cwd, str(Dir('#'))]
+
+group = DefineGroup('FileTest', src, depend = ['RT_USING_FILE_TEST'], CPPPATH = CPPPATH)
+
+Return('group')
+```
+
+   从上面可以看到，==静态库不需要特殊的编译脚本==，也不需要设置标志说明要编译成静态库，是否编译成静态库完全取决于编译命令，例如，要把这个模块编译成一个静态库，只需要在编译的时候用如下命令：
+
+```shell
+scons --buildlib=FileTest      # FileTest即编译脚本中我们定的Group名字
+```
+
+   成功编译的话，会有如下输出：
+
+```shell
+scons: Reading SConscript files ...
+scons: done reading SConscript files.
+scons: Building targets ...
+scons: building associated VariantDir targets: build
+AR libFileTest_gcc.a
+ranlib libFileTest_gcc.a
+Install compiled library... FileTest_gcc
+Copy libFileTest_gcc.a => /home1/rockchip/rt-thread2/examples/file/libFileTest_gcc.a
+scons: done building targets.
+```
+
+   可以看到RTT直接把生成的静态库放到编译脚本的同级目录下，要使用这个静态库也简单，只需要把这个静态库加入到RTT的静态库列表中，路径加入到RTT的静态库搜索路径中，具体如下：
+
+```python
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = []
+CPPPATH = [cwd]
+
+LIBS    = ['libFileTest_gcc.a']
+LIBPATH = []
+
+if GetDepend('SOC_RK2108'):
+    LIBPATH = [cwd + '/rk2108']
+
+elif GetDepend('SOC_RK1808'):
+    LIBPATH = [cwd + '/rk1808']
+
+group = DefineGroup('wlan-wiced', src, depend = ['RT_USING_FILE_TEST'], CPPPATH = CPPPATH, LIBS = LIBS, LIBPATH = LIBPATH)
+```
+
+   所以，一些不想开源的模块，可以按上面的方法做成静态库，以动态库的形式对外发布。
+
+### 3.5 模块配置
 
    RT-Thread沿用了Linux的Kconfig作为模块配置开关，具体命令如下：
 
@@ -178,7 +241,7 @@ optional arguments:
 
    除了上面用到的update外，另外有几个常用：list可以看到当前我们选中的包列表；upgrade用来更新到最新的包列表，以及ENV脚本（pkgs在这里实现）；wizard是用来创建自己的包。
 
-### 3.5 保存配置
+### 3.6 保存配置
 
    目前RTT的menuconfig有个缺陷：第一次执行menuconfig的时候会从网络上下载Online Package的配置，后续不手动更新的话，这些配置不会变更，这就导致了不同工程师的配置信息可能略有差异，最终导致menuconfig生成的.config和rtconfig.h包含大量无效配置，在提交的时候出现互相覆盖，下面是无效配置的例子：
 
@@ -209,7 +272,7 @@ scons --useconfig=board/xxx/defconfig      ; 根据保存的配置，生成不�
 
    从上面我们可以看到SOC的BSP主目录下有一个.config文件，在执行menuconfig的时候会从中读取默认配置，保存退出的同时也会更新这个文件，我们目前用这个文件作为最小配置集合。menuconfig保存退出的时候生成的rtconfig.h实际上是根据这个文件生成的，==提交补丁的同时请不要提交.config和rtconfig.h，以防止引入有冲突的配置导致编译失败==。
 
-### 3.6 Scons编译脚本
+### 3.7 Scons编译脚本
 
    大部分驱动和应用并不需要关心编译脚本，目前的编译脚本会自动搜索驱动、板级配置、应用和测试等目录的所有源文件进行编译，所以即使增加模块，一般也不需要改脚本。只有在目录结构有变更，或者需要修改编译标志的时候会需要改动编译脚本。
 
