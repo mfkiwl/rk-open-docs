@@ -28,27 +28,25 @@
 
 软件开发工程师
 
-
-
 **修订记录**
 
 | **日期**     | **版本** | **作者** | **修改说明** |
 | ---------- | ------ | ------ | -------- |
 | 2017-12-25 | V1.0   | 陈谋春    |          |
 
----
+***
 
 [TOC]
 
----
+***
 
 ## 1 介绍
 
-​   Perf是从Linux 2.6开始引入的一个profiling工具，通过访问包括pmu在内的软硬件性能计数器来分析性能，支持多架构，是目前Kernel的主要性能检测手段，和Kernel代码一起发布，所以兼容性良好。
+   Perf是从Linux 2.6开始引入的一个profiling工具，通过访问包括pmu在内的软硬件性能计数器来分析性能，支持多架构，是目前Kernel的主要性能检测手段，和Kernel代码一起发布，所以兼容性良好。
 
 ## 2 功能
 
-​   性能瓶颈如果要分类的话，大致可以分为几个大类：cpu／gpu／mem／storage，其中gpu用Perf没法探测（这个目前比较好用的工具就只有DS5），storage只能用tracepoint来统计。总的说来，Perf还是侧重于分析cpu的性能，其他功能都不是很好用。
+   性能瓶颈如果要分类的话，大致可以分为几个大类：cpu／gpu／mem／storage，其中gpu用Perf没法探测（这个目前比较好用的工具就只有DS5），storage只能用tracepoint来统计。总的说来，Perf还是侧重于分析cpu的性能，其他功能都不是很好用。
 
 ```shell
 $ perf
@@ -80,7 +78,7 @@ $ perf
  See 'perf help COMMAND' for more information on a specific command.
 ```
 
-​   其中比较常用的功能有几个：
+   其中比较常用的功能有几个：
 
 * record：收集profile数据
 * report：根据profile数据生成统计报告
@@ -89,7 +87,7 @@ $ perf
 
 ## 3 在Android平台使用
 
-##### 3.1 准备工作
+### 3.1 准备工作
 
 1. 首先按Google或芯片厂商的指导，构建一个完整的Android和Kernel的编译环境（如果不关心Kernel可以忽略）, 这样分析的时候符号表才能匹配上。
 
@@ -108,17 +106,17 @@ $ perf
 
 3. 准备符号文件
 
-​   符号文件可以简单分为三类：
+   符号文件可以简单分为三类：
 
    a. 平台native代码，这部分代码在编译的过程中会自动生成符号表，不需要我们干预
 
-​   b. 平台java代码，对于art虚拟机来说（老版本的dalvik就不说了）最终的编译结果是oat文件，这也是正规的elf文件，但是默认是不带debug信息。而新版本的Android也提供了自动生成java符号表的工具：
+   b. 平台java代码，对于art虚拟机来说（老版本的dalvik就不说了）最终的编译结果是oat文件，这也是正规的elf文件，但是默认是不带debug信息。而新版本的Android也提供了自动生成java符号表的工具：
 
   ```shell
 bash art/tools/symbolize.sh
   ```
 
-​   c. 第三方apk，如果是来自开源社区，则可以通过修改makefile和套用Android提供的java符号表工具来生成符号表文件，然后拷贝到Android的符号表目录，==注意路径必须要和设备上的完全一致==，可以通过showmap来获取设备上的路径。
+   c. 第三方apk，如果是来自开源社区，则可以通过修改makefile和套用Android提供的java符号表工具来生成符号表文件，然后拷贝到Android的符号表目录，==注意路径必须要和设备上的完全一致==，可以通过showmap来获取设备上的路径。
 
   ```shell
 ~$ adb shell showmap apk_pid
@@ -147,11 +145,10 @@ CONFIG_PERF_EVENTS=y
 CONFIG_HW_PERF_EVENTS=y
 ```
 
-##### 3.2 获取当前平台支持的事件
+### 3.2 获取当前平台支持的事件
 
 ```shell
-rk3399:/data/local # ./perf list                                                                                                                                                                               
-
+rk3399:/data/local # ./perf list
 List of pre-defined events (to be used in -e):
   cpu-cycles OR cycles                               [Hardware event]
   instructions                                       [Hardware event]
@@ -190,7 +187,7 @@ List of pre-defined events (to be used in -e):
 
 [^1]: 后面也会简单介绍一些Simpleperf
 
-##### 3.3 获取系统热点进程
+### 3.3 获取系统热点进程
 
 Perf中的top工具可以列出当前cpu的热点，还可以附加Kernel的符号表让信息可方便分析。命令如下：
 
@@ -215,7 +212,7 @@ perf top还和系统的top一样可以指定刷新间隔[^2], 以上命令中的
 
 [^2]: 这个是指top统计信息的刷新间隔而不是采样间隔
 
-##### 3.4 获取进程的统计信息
+### 3.4 获取进程的统计信息
 
 perf stat用于获取进程某个时间段内的pmu统计信息，命令如下：
 
@@ -229,7 +226,7 @@ ctrl+c退出，或发信号让Perf进程退出都可以看到统计结果，例�
 
 一些明显的异常值会被标注为红色，例如上图是浏览器跑fishtank时候抓的统计信息，可以看到分支预测的失败率非常高，结合Perf的热点分析工具可以进一步缩小范围找到分支预测失败的原因。
 
-##### 3.5 收集进程的profile数据
+### 3.5 收集进程的profile数据
 
 perf record用于记录详细的profile数据，可以指定记录某个进程，还可以记录调用栈，命令如下：
 
@@ -243,13 +240,13 @@ perf record用于记录详细的profile数据，可以指定记录某个进程�
 # ./perf record -e cache-misses -p 1415
 ```
 
-##### 3.6 分析profile数据
+### 3.6 分析profile数据
 
 perf report用户分析抓到的profile数据，一般会先把数据发到pc上再分析，命令如下：
 
 ```shell
-$ adb pull /data/local/perf.data
-$ perf report --objdump=aarch64-linux-android-objdump --vmlinux=/path/to/vmlinux --symfs $ANDROID_PRODUCT_OUT/symbols -i perf.data
+adb pull /data/local/perf.data
+perf report --objdump=aarch64-linux-android-objdump --vmlinux=/path/to/vmlinux --symfs ANDROID_PRODUCT_OUT/symbols -i perf.data
 ```
 
 结果如图：
@@ -258,14 +255,14 @@ $ perf report --objdump=aarch64-linux-android-objdump --vmlinux=/path/to/vmlinux
 
  上图有‘+’的地方可以用‘enter’键来遍历其调用关系。
 
-###### 3.7 FlameGraph
+### 3.7 FlameGraph
 
 还可以通过一些脚本来方便分析调用关系，Flame Graph就是一个比较好用的可视化分析工具。
 
 下载：
 
 ```shell
-$ git clone https://github.com/brendangregg/FlameGraph.git
+git clone https://github.com/brendangregg/FlameGraph.git
 ```
 
 生成图形：
@@ -274,8 +271,6 @@ $ git clone https://github.com/brendangregg/FlameGraph.git
 perf script --vmlinux=<kernel_folder>/vmlinux --symfs $ANDROID_PRODUCT_OUT/symbols -i perf.data | FlameGraph/stackcollapse-perf.pl | FlameGraph/flamegraph.pl > flamegraph.html
 ```
 
-
-
 ## 4 在Linux平台使用
 
 arm版本的linux发行版很多都没有提供Perf的包，所以需要自己手动编译一个Perf，由于Perf依赖的elfutils/binutils/zlib，所以实际上需要交叉编译四个东西。
@@ -283,8 +278,8 @@ arm版本的linux发行版很多都没有提供Perf的包，所以需要自己�
 首先编译zlib，[源码地址](http://zlib.net/zlib-1.2.11.tar.gz "zlib")
 
 ```shell
-$ CC=aarch64-linux-gnu-gcc ./configure --prefix=/home/cmc/workspace/linaro/toolchain/armlinux/aarch64/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-linux-gnu/aarch64-linux-gnu/libc/usr
-$ make && make install
+CC=aarch64-linux-gnu-gcc ./configure --prefix=/home/cmc/workspace/linaro/toolchain/armlinux/aarch64/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-linux-gnu/aarch64-linux-gnu/libc/usr
+make && make install
 ```
 
 ==Note: prefix要指向你的交叉编译工具的库目录==
@@ -292,15 +287,15 @@ $ make && make install
 编译elfutils，我直接用的最新的版本的：
 
 ```shell
-$ git clone git://sourceware.org/git/elfutils.git
+git clone git://sourceware.org/git/elfutils.git
 ```
 
 配置：
 
 ```shell
-$ cd /path/to/elfutils
-$ mkdir build
-$ ./configure --enable-maintainer-mode --host=aarch64-linux-gnu --prefix=/home/cmc/workspace/linaro/elfutils/build
+cd /path/to/elfutils
+mkdir build
+./configure --enable-maintainer-mode --host=aarch64-linux-gnu --prefix=/home/cmc/workspace/linaro/elfutils/build
 ```
 
 修改Makefile： 删除elfutils根目录下Makefile里面的libcpu
@@ -310,16 +305,16 @@ $ ./configure --enable-maintainer-mode --host=aarch64-linux-gnu --prefix=/home/c
 编译：
 
 ```shell
-$ make && make install
+make && make install
 ```
 
 编译binutils，这个要考虑和gcc版本的兼容，我用的2.28.1的版本，[源代码地址](http://ftp.gnu.org/gnu/binutils/binutils-2.28.1.tar.bz2 "binutils")
 
 ```shell
-$ cd /path/to/binutils
-$ mkdir build
-$ ../configure --target=aarch64-linux-gnu --host=aarch64-linux-gnu --prefix=/home/cmc/workspace/linaro/binutils-2.28.1/build
-$ make && make install
+cd /path/to/binutils
+mkdir build
+../configure --target=aarch64-linux-gnu --host=aarch64-linux-gnu --prefix=/home/cmc/workspace/linaro/binutils-2.28.1/build
+make && make install
 ```
 
 编译Perf，Perf是Kernel一起发布的，所以直接下载一个Kernel就有了，但是交叉编译的话，需要改一些东西：
@@ -336,8 +331,8 @@ NO_LIBPYTHON=1
 编译
 
 ```shell
-$ cd /path/to/kernel/tools/perf
-$ make -f Makefile.perf perf ARCH=arm64 CROSS_COMPILE=/home/cmc/workspace/linaro/toolchain/armlinux/aarch64/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- -j8
+cd /path/to/kernel/tools/perf
+make -f Makefile.perf perf ARCH=arm64 CROSS_COMPILE=/home/cmc/workspace/linaro/toolchain/armlinux/aarch64/gcc-linaro-6.3.1-2017.02-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- -j8
 ```
 
 理论上在arm的linux发行版上直接编译Perf应该也是可以的，但是我没有试过。用法的话和Android是一样的，这里就不叙说了。
@@ -347,21 +342,21 @@ $ make -f Makefile.perf perf ARCH=arm64 CROSS_COMPILE=/home/cmc/workspace/linaro
 Android 7.0开始提供了一个更完整的Perf版本Simpleperf：
 
 ```shell
-$ source build/envsetup.sh
-$ lunch
-$ mmma system/extras/simpleperf
+source build/envsetup.sh
+lunch
+mmma system/extras/simpleperf
 ```
 
 Simpleperf相对之前google移植的Perf有以下改进
 
-- 支持剖析apk中兼容的共享库，从 .gnu_debugdata 段读取符号表和调试信息
-- 提供更方便分析的脚本
-- 纯静态，所以和Android版本无关，只要指令集兼容都能跑
+* 支持剖析apk中兼容的共享库，从 .gnu_debugdata 段读取符号表和调试信息
+* 提供更方便分析的脚本
+* 纯静态，所以和Android版本无关，只要指令集兼容都能跑
 
 ndk r13开始就提供了Simpleperf工具，所以也可以直接下载编译好的工具：
 
 ```shell
-$ git clone https://aosp.tuna.tsinghua.edu.cn/platform/prebuilts/simpleperf
+git clone https://aosp.tuna.tsinghua.edu.cn/platform/prebuilts/simpleperf
 ```
 
 用法上和Perf是类似的，命令基本通用，可以直接参考上面Perf的命令。

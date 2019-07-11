@@ -1,0 +1,1138 @@
+
+cmc@cmc-B150-D3A:~/110/google/aosp/system/extras/ioblame$ 
+cmc@cmc-B150-D3A:~/110/google/aosp/system/extras/ioblame$ 
+cmc@cmc-B150-D3A:~/110/google/aosp/system/extras/ioblame$ 
+cmc@cmc-B150-D3A:~/110/google/aosp/system/extras/ioblame$ ./ioblame.sh -r -w -v
+adbd is already running as root
+Found rk3399_64 Device
+OK to kill sleep when test is done
+Starting: Intent { cmp=com.netease.cloudmusic/.activity.PlayerActivity }
+Status: ok
+Activity: com.netease.cloudmusic/.activity.PlayerActivity
+ThisTime: 1838
+TotalTime: 1838
+WaitTime: 1862
+Complete
+success test is done
+Killing adb shell cat /sys/kernel/debug/tracing/trace_pipe
+Terminated
+
+READS :
+_______
+
+FILE VIEW:
+File: /app/com.netease.cloudmusic-1/base.apk
+            ease.cloudmusic Reads: 832 KB
+            Total Reads: 832 KB i_size: 42420 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libbugrpt.so
+            ease.cloudmusic Reads: 100 KB
+            Total Reads: 100 KB i_size: 97 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libfpGenerate.so
+            GlobalHandlerTh Reads: 888 KB
+            Total Reads: 888 KB i_size: 893 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libijkffmpeg.so
+            GlobalHandlerTh Reads: 748 KB
+            Total Reads: 748 KB i_size: 5635 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libnapmcore.so
+            ease.cloudmusic Reads: 68 KB
+            Total Reads: 68 KB i_size: 65 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libneutil.so
+            ease.cloudmusic Reads: 108 KB
+            Total Reads: 108 KB i_size: 107 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libpoison.so
+            ease.cloudmusic Reads: 224 KB
+            Total Reads: 224 KB i_size: 222 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libtracepath.so
+            pool-9-thread-1 Reads: 56 KB
+            Total Reads: 56 KB i_size: 54 KB
+File: /app/com.netease.cloudmusic-1/lib/arm/libwakeup.so
+            GlobalHandlerTh Reads: 36 KB
+            Total Reads: 36 KB i_size: 33 KB
+File: /app/com.netease.cloudmusic-1/oat/arm/base.art
+            ease.cloudmusic Reads: 416 KB
+            Total Reads: 416 KB i_size: 416 KB
+File: /app/com.netease.cloudmusic-1/oat/arm/base.odex
+            ease.cloudmusic Reads: 14732 KB
+            GlobalHandlerTh Reads: 128 KB
+            h Reads: 96 KB
+            HeapTaskDaemon Reads: 168 KB
+            pool-2-thread-1 Reads: 1908 KB
+            pool-6-thread-1 Reads: 104 KB
+            pool-8-thread-1 Reads: 340 KB
+            Thread-3 Reads: 28 KB
+            Total Reads: 17504 KB i_size: 21404 KB
+File: /bin/am
+            sh Reads: 4 KB
+            Total Reads: 4 KB i_size: 210 bytes
+File: /bin/app_process64
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 18 KB
+File: /bin/linker
+            debuggerd Reads: 240 KB
+            Total Reads: 240 KB i_size: 615 KB
+File: /dalvik-cache/arm64/system@framework@boot-apache-xml.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 144 KB
+File: /dalvik-cache/arm64/system@framework@boot.art
+            app_process Reads: 16 KB
+            main Reads: 436 KB
+            Total Reads: 452 KB i_size: 2704 KB
+File: /dalvik-cache/arm64/system@framework@boot-bouncycastle.art
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 284 KB
+File: /dalvik-cache/arm64/system@framework@boot-conscrypt.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 216 KB
+File: /dalvik-cache/arm64/system@framework@boot-core-junit.art
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 16 KB
+File: /dalvik-cache/arm64/system@framework@boot-core-libart.art
+            app_process Reads: 16 KB
+            main Reads: 184 KB
+            Total Reads: 200 KB i_size: 1528 KB
+File: /dalvik-cache/arm64/system@framework@boot-ext.art
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 268 KB
+File: /dalvik-cache/arm64/system@framework@boot-framework.art
+            app_process Reads: 16 KB
+            main Reads: 812 KB
+            Total Reads: 828 KB i_size: 8000 KB
+File: /dalvik-cache/arm64/system@framework@boot-ims-common.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 52 KB
+File: /dalvik-cache/arm64/system@framework@boot-okhttp.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 232 KB
+File: /dalvik-cache/arm64/system@framework@boot-org.apache.http.legacy.boot.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 160 KB
+File: /dalvik-cache/arm64/system@framework@boot-org.apache.http.legacy.boot.oat
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 60 bytes
+File: /dalvik-cache/arm64/system@framework@boot-telephony-common.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 592 KB
+File: /dalvik-cache/arm64/system@framework@boot-voip-common.art
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 36 KB
+File: /dalvik-cache/arm/system@framework@boot-apache-xml.art
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 100 KB
+File: /dalvik-cache/arm/system@framework@boot-core-junit.art
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 12 KB
+File: /dalvik-cache/arm/system@framework@boot-ims-common.art
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 48 KB
+File: /dalvik-cache/arm/system@framework@boot-telephony-common.art
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 520 KB
+File: /dalvik-cache/arm/system@framework@boot-voip-common.art
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 28 KB
+File: /data/com.netease.cloudmusic/databases/cloudmusic.db
+            GlobalHandlerTh Reads: 48 KB
+            Total Reads: 48 KB i_size: 52 KB
+File: /data/com.netease.cloudmusic/databases/mobidroid.sqlite
+            h Reads: 44 KB
+            Total Reads: 44 KB i_size: 20 KB
+File: /data/com.netease.cloudmusic/databases/netease_apm.db
+            pool-5-thread-1 Reads: 4 KB
+            pool-6-thread-1 Reads: 32 KB
+            Total Reads: 36 KB i_size: 16 KB
+File: /data/com.netease.cloudmusic/files/Session.Account
+            GlobalHandlerTh Reads: 4 KB
+            Total Reads: 4 KB i_size: 125 bytes
+File: /data/com.netease.cloudmusic/files/Session.Profile
+            ease.cloudmusic Reads: 4 KB
+            Total Reads: 4 KB i_size: 1 KB
+File: /data/com.netease.cloudmusic/shared_prefs/abtest_prefer_file.xml
+            SharedPreferenc Reads: 12 KB
+            Total Reads: 12 KB i_size: 9 KB
+File: /data/com.netease.cloudmusic/shared_prefs/bilog_perfer_file_1.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 109 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/cm_cookie_storage.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 2 KB
+File: /data/com.netease.cloudmusic/shared_prefs/com.netease.cloudmusic.preferences.xml
+            SharedPreferenc Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /data/com.netease.cloudmusic/shared_prefs/HTHttpDNS.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 620 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/loading_ad_prefer_file.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 117 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/log_oc_prefer_file.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 350 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/mipush_extra.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 3 KB
+File: /data/com.netease.cloudmusic/shared_prefs/NAPM-SDK.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 126 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/napm.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 210 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/operator_free2.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 277 bytes
+File: /etc/hosts
+            netd Reads: 4 KB
+            Total Reads: 4 KB i_size: 56 bytes
+File: /etc/public.libraries.txt
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 286 bytes
+File: /etc/security/cacerts/399e7759.0
+            pool-2-thread-1 Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /etc/security/cacerts/7999be0d.0
+            Thread-3 Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansCJK-Regular.ttc
+            ease.cloudmusic Reads: 256 KB
+            Total Reads: 256 KB i_size: 18239 KB
+File: /framework/am.jar
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 310 bytes
+File: /framework/apache-xml.jar
+            main Reads: 16 KB
+            Total Reads: 16 KB i_size: 17 KB
+File: /framework/arm64/boot-apache-xml.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 144 KB
+File: /framework/arm64/boot-apache-xml.oat
+            app_process Reads: 64 KB
+            Total Reads: 64 KB i_size: 1501 KB
+File: /framework/arm64/boot.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 2704 KB
+File: /framework/arm64/boot-bouncycastle.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 284 KB
+File: /framework/arm64/boot-bouncycastle.oat
+            app_process Reads: 52 KB
+            Total Reads: 52 KB i_size: 1756 KB
+File: /framework/arm64/boot-conscrypt.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 216 KB
+File: /framework/arm64/boot-conscrypt.oat
+            app_process Reads: 28 KB
+            Total Reads: 28 KB i_size: 832 KB
+File: /framework/arm64/boot-core-junit.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 16 KB
+File: /framework/arm64/boot-core-junit.oat
+            app_process Reads: 20 KB
+            Total Reads: 20 KB i_size: 57 KB
+File: /framework/arm64/boot-core-libart.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 1528 KB
+File: /framework/arm64/boot-core-libart.oat
+            app_process Reads: 132 KB
+            Total Reads: 132 KB i_size: 8054 KB
+File: /framework/arm64/boot-ext.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 268 KB
+File: /framework/arm64/boot-ext.oat
+            app_process Reads: 64 KB
+            Total Reads: 64 KB i_size: 1431 KB
+File: /framework/arm64/boot-framework.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 8000 KB
+File: /framework/arm64/boot-framework.oat
+            app_process Reads: 132 KB
+            Total Reads: 132 KB i_size: 41162 KB
+File: /framework/arm64/boot-ims-common.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 52 KB
+File: /framework/arm64/boot-ims-common.oat
+            app_process Reads: 20 KB
+            Total Reads: 20 KB i_size: 323 KB
+File: /framework/arm64/boot.oat
+            app_process Reads: 132 KB
+            Total Reads: 132 KB i_size: 9729 KB
+File: /framework/arm64/boot-okhttp.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 232 KB
+File: /framework/arm64/boot-okhttp.oat
+            app_process Reads: 28 KB
+            Total Reads: 28 KB i_size: 986 KB
+File: /framework/arm64/boot-org.apache.http.legacy.boot.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 160 KB
+File: /framework/arm64/boot-org.apache.http.legacy.boot.oat
+            app_process Reads: 32 KB
+            Total Reads: 32 KB i_size: 1204 KB
+File: /framework/arm64/boot-telephony-common.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 592 KB
+File: /framework/arm64/boot-telephony-common.oat
+            app_process Reads: 148 KB
+            Total Reads: 148 KB i_size: 5331 KB
+File: /framework/arm64/boot-voip-common.art
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 36 KB
+File: /framework/arm64/boot-voip-common.oat
+            app_process Reads: 20 KB
+            Total Reads: 20 KB i_size: 276 KB
+File: /framework/arm/boot-apache-xml.oat
+            debuggerd Reads: 116 KB
+            Total Reads: 116 KB i_size: 1464 KB
+File: /framework/arm/boot-bouncycastle.oat
+            debuggerd Reads: 28 KB
+            Total Reads: 28 KB i_size: 1675 KB
+File: /framework/arm/boot-core-junit.oat
+            debuggerd Reads: 16 KB
+            Total Reads: 16 KB i_size: 53 KB
+File: /framework/arm/boot-ext.oat
+            debuggerd Reads: 84 KB
+            Total Reads: 84 KB i_size: 1342 KB
+File: /framework/arm/boot-framework.oat
+            ease.cloudmusic Reads: 1792 KB
+            GlobalHandlerTh Reads: 308 KB
+            HeapTaskDaemon Reads: 288 KB
+            Total Reads: 2388 KB i_size: 35315 KB
+File: /framework/arm/boot-ims-common.oat
+            debuggerd Reads: 88 KB
+            Total Reads: 88 KB i_size: 279 KB
+File: /framework/arm/boot.oat
+            debuggerd Reads: 184 KB
+            Total Reads: 184 KB i_size: 8403 KB
+File: /framework/arm/boot-telephony-common.oat
+            debuggerd Reads: 128 KB
+            Total Reads: 128 KB i_size: 4546 KB
+File: /framework/arm/boot-voip-common.oat
+            debuggerd Reads: 60 KB
+            Total Reads: 60 KB i_size: 252 KB
+File: /framework/core-libart.jar
+            main Reads: 12 KB
+            Total Reads: 12 KB i_size: 16 KB
+File: /framework/core-oj.jar
+            main Reads: 32 KB
+            Total Reads: 32 KB i_size: 118 KB
+File: /framework/ext.jar
+            main Reads: 16 KB
+            Total Reads: 16 KB i_size: 1610 KB
+File: /framework/framework-res.apk
+            android.display Reads: 20 KB
+            ease.cloudmusic Reads: 128 KB
+            Total Reads: 148 KB i_size: 32654 KB
+File: /framework/oat/arm64/am.odex
+            main Reads: 240 KB
+            Total Reads: 240 KB i_size: 236 KB
+File: /lib64/libandroidfw.so
+            app_process Reads: 12 KB
+            Total Reads: 12 KB i_size: 266 KB
+File: /lib64/libandroid_runtime.so
+            app_process Reads: 180 KB
+            Total Reads: 180 KB i_size: 1643 KB
+File: /lib64/libandroid.so
+            main Reads: 20 KB
+            Total Reads: 20 KB i_size: 106 KB
+File: /lib64/libart-compiler.so
+            main Reads: 160 KB
+            Total Reads: 160 KB i_size: 3930 KB
+File: /lib64/libart.so
+            app_process Reads: 200 KB
+            Total Reads: 200 KB i_size: 7368 KB
+File: /lib64/libaudioutils.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 33 KB
+File: /lib64/libbacktrace.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 66 KB
+File: /lib64/libbase.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 46 KB
+File: /lib64/libbcinfo.so
+            app_process Reads: 40 KB
+            Total Reads: 40 KB i_size: 306 KB
+File: /lib64/libbinary_parse.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 17 KB
+File: /lib64/libbinder.so
+            app_process Reads: 72 KB
+            Total Reads: 72 KB i_size: 490 KB
+File: /lib64/libcamera2ndk.so
+            main Reads: 16 KB
+            Total Reads: 16 KB i_size: 126 KB
+File: /lib64/libcamera_client.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 338 KB
+File: /lib64/libcamera_metadata.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 34 KB
+File: /lib64/libdng_sdk.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 770 KB
+File: /lib64/libdrmframework.so
+            app_process Reads: 28 KB
+            Total Reads: 28 KB i_size: 154 KB
+File: /lib64/libEGL.so
+            app_process Reads: 20 KB
+            Total Reads: 20 KB i_size: 138 KB
+File: /lib64/libETC1.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 13 KB
+File: /lib64/libexpat.so
+            app_process Reads: 12 KB
+            Total Reads: 12 KB i_size: 149 KB
+File: /lib64/libft2.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 454 KB
+File: /lib64/libGLESv1_CM.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 37 KB
+File: /lib64/libGLESv2.so
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 85 KB
+File: /lib64/libGLESv3.so
+            main Reads: 24 KB
+            Total Reads: 24 KB i_size: 85 KB
+File: /lib64/libgui.so
+            app_process Reads: 104 KB
+            Total Reads: 104 KB i_size: 578 KB
+File: /lib64/libhardware_legacy.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 43 KB
+File: /lib64/libhardware.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 9 KB
+File: /lib64/libharfbuzz_ng.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 338 KB
+File: /lib64/libhwui.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 755 KB
+File: /lib64/libicui18n.so
+            app_process Reads: 148 KB
+            Total Reads: 148 KB i_size: 2226 KB
+File: /lib64/libicuuc.so
+            app_process Reads: 144 KB
+            Total Reads: 144 KB i_size: 1522 KB
+File: /lib64/libimage_type_recognition.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 34 KB
+File: /lib64/libimg_utils.so
+            app_process Reads: 20 KB
+            Total Reads: 20 KB i_size: 82 KB
+File: /lib64/libinputflinger.so
+            app_process Reads: 24 KB
+            Total Reads: 24 KB i_size: 362 KB
+File: /lib64/libinput.so
+            app_process Reads: 44 KB
+            Total Reads: 44 KB i_size: 174 KB
+File: /lib64/libjavacore.so
+            main Reads: 16 KB
+            Total Reads: 16 KB i_size: 240 KB
+File: /lib64/libjnigraphics.so
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 5 KB
+File: /lib64/libjpeghwdec.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 69 KB
+File: /lib64/libjpeg.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 234 KB
+File: /lib64/libLLVM.so
+            app_process Reads: 756 KB
+            Shutdown_thread Reads: 112 KB
+            Total Reads: 868 KB i_size: 18059 KB
+File: /lib64/liblz4.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 54 KB
+File: /lib64/liblzma.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 150 KB
+File: /lib64/libmediadrm.so
+            main Reads: 24 KB
+            Total Reads: 24 KB i_size: 86 KB
+File: /lib64/libmediandk.so
+            main Reads: 8 KB
+            Total Reads: 8 KB i_size: 94 KB
+File: /lib64/libmedia.so
+            app_process Reads: 312 KB
+            Total Reads: 312 KB i_size: 1202 KB
+File: /lib64/libmediautils.so
+            app_process Reads: 12 KB
+            Total Reads: 12 KB i_size: 42 KB
+File: /lib64/libmemtrack.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 10 KB
+File: /lib64/libmemunreachable.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 142 KB
+File: /lib64/libminikin.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 122 KB
+File: /lib64/libmpp.so
+            app_process Reads: 44 KB
+            Total Reads: 44 KB i_size: 834 KB
+File: /lib64/libnativebridge.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 14 KB
+File: /lib64/libnativehelper.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 34 KB
+File: /lib64/libnativeloader.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 42 KB
+File: /lib64/libnbaio.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 46 KB
+File: /lib64/libnetutils.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 26 KB
+File: /lib64/libopenjdkjvm.so
+            main Reads: 16 KB
+            Total Reads: 16 KB i_size: 44 KB
+File: /lib64/libopenjdk.so
+            main Reads: 40 KB
+            Total Reads: 40 KB i_size: 252 KB
+File: /lib64/libOpenMAXAL.so
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 10 KB
+File: /lib64/libOpenSLES.so
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 10 KB
+File: /lib64/libopus.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 306 KB
+File: /lib64/libpdfium.so
+            app_process Reads: 176 KB
+            Total Reads: 176 KB i_size: 4957 KB
+File: /lib64/libpiex.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 41 KB
+File: /lib64/libpng.so
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 205 KB
+File: /lib64/libpowermanager.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 22 KB
+File: /lib64/libprocessgroup.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 10 KB
+File: /lib64/libprotobuf-cpp-lite.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 142 KB
+File: /lib64/libradio_metadata.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 9 KB
+File: /lib64/libradio.so
+            app_process Reads: 24 KB
+            Total Reads: 24 KB i_size: 82 KB
+File: /lib64/libRScpp.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 322 KB
+File: /lib64/libRS_internal.so
+            app_process Reads: 16 KB
+            Total Reads: 16 KB i_size: 314 KB
+File: /lib64/libRS.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 46 KB
+File: /lib64/libsigchain.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 5 KB
+File: /lib64/libskia.so
+            app_process Reads: 296 KB
+            Total Reads: 296 KB i_size: 5665 KB
+File: /lib64/libsonivox.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 359 KB
+File: /lib64/libsoundtrigger.so
+            app_process Reads: 24 KB
+            Total Reads: 24 KB i_size: 82 KB
+File: /lib64/libspeexresampler.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 19 KB
+File: /lib64/libsqlite.so
+            app_process Reads: 60 KB
+            Total Reads: 60 KB i_size: 1008 KB
+File: /lib64/libssl.so
+            app_process Reads: 28 KB
+            Total Reads: 28 KB i_size: 234 KB
+File: /lib64/libstagefright_avc_common.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 33 KB
+File: /lib64/libstagefright_enc_common.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 5 KB
+File: /lib64/libstagefright_foundation.so
+            app_process Reads: 12 KB
+            Total Reads: 12 KB i_size: 178 KB
+File: /lib64/libstagefright_http_support.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 9 KB
+File: /lib64/libstagefright_omx.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 254 KB
+File: /lib64/libstagefright.so
+            app_process Reads: 248 KB
+            Shutdown_thread Reads: 128 KB
+            Total Reads: 376 KB i_size: 1983 KB
+File: /lib64/libstagefright_yuv.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 17 KB
+File: /lib64/libsync.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 5 KB
+File: /lib64/libtiff_directory.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 21 KB
+File: /lib64/libui.so
+            app_process Reads: 20 KB
+            Total Reads: 20 KB i_size: 110 KB
+File: /lib64/libunwind.so
+            app_process Reads: 48 KB
+            Total Reads: 48 KB i_size: 110 KB
+File: /lib64/libusbhost.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 17 KB
+File: /lib64/libutils.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 134 KB
+File: /lib64/libvixl.so
+            main Reads: 68 KB
+            Total Reads: 68 KB i_size: 853 KB
+File: /lib64/libvorbisidec.so
+            app_process Reads: 56 KB
+            Total Reads: 56 KB i_size: 119 KB
+File: /lib64/libvpu.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 45 KB
+File: /lib64/libvulkan.so
+            app_process Reads: 48 KB
+            Total Reads: 48 KB i_size: 118 KB
+File: /lib64/libwebviewchromium_plat_support.so
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 14 KB
+File: /lib64/libwilhelm.so
+            app_process Reads: 68 KB
+            Total Reads: 68 KB i_size: 270 KB
+File: /lib64/libwpa_client.so
+            app_process Reads: 4 KB
+            Total Reads: 4 KB i_size: 18 KB
+File: /lib64/libz.so
+            app_process Reads: 8 KB
+            Total Reads: 8 KB i_size: 86 KB
+File: /lib/hw/gralloc.rk30board.so
+            RenderThread Reads: 4 KB
+            Total Reads: 4 KB i_size: 17 KB
+File: /lib/libart.so
+            debuggerd Reads: 952 KB
+            Total Reads: 952 KB i_size: 5749 KB
+File: /lib/libc.so
+            debuggerd Reads: 232 KB
+            Total Reads: 232 KB i_size: 757 KB
+File: /lib/libdrm_rockchip.so
+            RenderThread Reads: 4 KB
+            Total Reads: 4 KB i_size: 25 KB
+File: /lib/libdrm.so
+            RenderThread Reads: 4 KB
+            Total Reads: 4 KB i_size: 49 KB
+File: /lib/libgralloc_drm.so
+            RenderThread Reads: 12 KB
+            Total Reads: 12 KB i_size: 36 KB
+File: /lib/liblzma.so
+            debuggerd Reads: 32 KB
+            Total Reads: 32 KB i_size: 93 KB
+File: /lib/libm.so
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 129 KB
+File: /lib/libnetd_client.so
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 17 KB
+File: /lib/libskia.so
+            ease.cloudmusic Reads: 128 KB
+            Total Reads: 128 KB i_size: 3782 KB
+File: /lib/libunwind.so
+            debuggerd Reads: 28 KB
+            Total Reads: 28 KB i_size: 85 KB
+File: /user_de/0/com.netease.cloudmusic/code_cache/com.android.opengl.shaders_cache
+            RenderThread Reads: 20 KB
+            Total Reads: 20 KB i_size: 16 KB
+File: /usr/hyphen-data/hyph-as.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 703 bytes
+File: /usr/hyphen-data/hyph-bn.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 703 bytes
+File: /usr/hyphen-data/hyph-cy.hyb
+            debuggerd Reads: 36 KB
+            Total Reads: 36 KB i_size: 35 KB
+File: /usr/hyphen-data/hyph-da.hyb
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /usr/hyphen-data/hyph-de-1901.hyb
+            debuggerd Reads: 108 KB
+            Total Reads: 108 KB i_size: 105 KB
+File: /usr/hyphen-data/hyph-de-1996.hyb
+            debuggerd Reads: 104 KB
+            Total Reads: 104 KB i_size: 103 KB
+File: /usr/hyphen-data/hyph-de-ch-1901.hyb
+            debuggerd Reads: 108 KB
+            Total Reads: 108 KB i_size: 104 KB
+File: /usr/hyphen-data/hyph-en-gb.hyb
+            debuggerd Reads: 48 KB
+            Total Reads: 48 KB i_size: 45 KB
+File: /usr/hyphen-data/hyph-es.hyb
+            debuggerd Reads: 16 KB
+            Total Reads: 16 KB i_size: 14 KB
+File: /usr/hyphen-data/hyph-et.hyb
+            debuggerd Reads: 24 KB
+            Total Reads: 24 KB i_size: 20 KB
+File: /usr/hyphen-data/hyph-eu.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 665 bytes
+File: /usr/hyphen-data/hyph-fr.hyb
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /usr/hyphen-data/hyph-ga.hyb
+            debuggerd Reads: 36 KB
+            Total Reads: 36 KB i_size: 34 KB
+File: /usr/hyphen-data/hyph-gu.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 655 bytes
+File: /usr/hyphen-data/hyph-hi.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 687 bytes
+File: /usr/hyphen-data/hyph-hr.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 2 KB
+File: /usr/hyphen-data/hyph-hu.hyb
+            debuggerd Reads: 128 KB
+            Total Reads: 128 KB i_size: 309 KB
+File: /usr/hyphen-data/hyph-hy.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 605 bytes
+File: /usr/hyphen-data/hyph-kn.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 711 bytes
+File: /usr/hyphen-data/hyph-ml.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 776 bytes
+File: /usr/hyphen-data/hyph-mn-cyrl.hyb
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /usr/hyphen-data/hyph-mr.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 687 bytes
+File: /usr/hyphen-data/hyph-nb.hyb
+            debuggerd Reads: 128 KB
+            Total Reads: 128 KB i_size: 141 KB
+File: /usr/hyphen-data/hyph-nn.hyb
+            debuggerd Reads: 128 KB
+            Total Reads: 128 KB i_size: 141 KB
+File: /usr/hyphen-data/hyph-or.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 647 bytes
+File: /usr/hyphen-data/hyph-pa.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 607 bytes
+File: /usr/hyphen-data/hyph-pt.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 1 KB
+File: /usr/hyphen-data/hyph-sl.hyb
+            debuggerd Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /usr/hyphen-data/hyph-ta.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 554 bytes
+File: /usr/hyphen-data/hyph-te.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 703 bytes
+File: /usr/hyphen-data/hyph-tk.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 2 KB
+File: /usr/hyphen-data/hyph-und-ethi.hyb
+            debuggerd Reads: 4 KB
+            Total Reads: 4 KB i_size: 3 KB
+File: /usr/icu/icudt56l.dat
+            ease.cloudmusic Reads: 64 KB
+            Total Reads: 64 KB i_size: 21681 KB
+File: /vendor/etc/public.libraries.txt
+            main Reads: 4 KB
+            Total Reads: 4 KB i_size: 16 bytes
+File: /vendor/lib64/egl/libGLES_mali.so
+            main Reads: 1364 KB
+            Shutdown_thread Reads: 612 KB
+            Total Reads: 1976 KB i_size: 27563 KB
+File: /vendor/lib/egl/libGLES_mali.so
+            RenderThread Reads: 2156 KB
+            Total Reads: 2156 KB i_size: 26160 KB
+Grand Total File DATA KB Reads 39316
+PID VIEW:
+PID: android.display
+            /framework/framework-res.apk Reads: 20 KB i_size: 32654 KB
+            Total Reads: 20 KB
+PID: app_process
+            /bin/app_process64 Reads: 4 KB i_size: 18 KB
+            /dalvik-cache/arm64/system@framework@boot-apache-xml.art Reads: 4 KB i_size: 144 KB
+            /dalvik-cache/arm64/system@framework@boot.art Reads: 16 KB i_size: 2704 KB
+            /dalvik-cache/arm64/system@framework@boot-bouncycastle.art Reads: 8 KB i_size: 284 KB
+            /dalvik-cache/arm64/system@framework@boot-conscrypt.art Reads: 4 KB i_size: 216 KB
+            /dalvik-cache/arm64/system@framework@boot-core-junit.art Reads: 8 KB i_size: 16 KB
+            /dalvik-cache/arm64/system@framework@boot-core-libart.art Reads: 16 KB i_size: 1528 KB
+            /dalvik-cache/arm64/system@framework@boot-ext.art Reads: 8 KB i_size: 268 KB
+            /dalvik-cache/arm64/system@framework@boot-framework.art Reads: 16 KB i_size: 8000 KB
+            /dalvik-cache/arm64/system@framework@boot-ims-common.art Reads: 4 KB i_size: 52 KB
+            /dalvik-cache/arm64/system@framework@boot-okhttp.art Reads: 4 KB i_size: 232 KB
+            /dalvik-cache/arm64/system@framework@boot-org.apache.http.legacy.boot.art Reads: 4 KB i_size: 160 KB
+            /dalvik-cache/arm64/system@framework@boot-org.apache.http.legacy.boot.oat Reads: 4 KB i_size: 60 bytes
+            /dalvik-cache/arm64/system@framework@boot-telephony-common.art Reads: 4 KB i_size: 592 KB
+            /dalvik-cache/arm64/system@framework@boot-voip-common.art Reads: 4 KB i_size: 36 KB
+            /framework/arm64/boot-apache-xml.art Reads: 16 KB i_size: 144 KB
+            /framework/arm64/boot-apache-xml.oat Reads: 64 KB i_size: 1501 KB
+            /framework/arm64/boot.art Reads: 16 KB i_size: 2704 KB
+            /framework/arm64/boot-bouncycastle.art Reads: 16 KB i_size: 284 KB
+            /framework/arm64/boot-bouncycastle.oat Reads: 52 KB i_size: 1756 KB
+            /framework/arm64/boot-conscrypt.art Reads: 16 KB i_size: 216 KB
+            /framework/arm64/boot-conscrypt.oat Reads: 28 KB i_size: 832 KB
+            /framework/arm64/boot-core-junit.art Reads: 16 KB i_size: 16 KB
+            /framework/arm64/boot-core-junit.oat Reads: 20 KB i_size: 57 KB
+            /framework/arm64/boot-core-libart.art Reads: 16 KB i_size: 1528 KB
+            /framework/arm64/boot-core-libart.oat Reads: 132 KB i_size: 8054 KB
+            /framework/arm64/boot-ext.art Reads: 16 KB i_size: 268 KB
+            /framework/arm64/boot-ext.oat Reads: 64 KB i_size: 1431 KB
+            /framework/arm64/boot-framework.art Reads: 16 KB i_size: 8000 KB
+            /framework/arm64/boot-framework.oat Reads: 132 KB i_size: 41162 KB
+            /framework/arm64/boot-ims-common.art Reads: 16 KB i_size: 52 KB
+            /framework/arm64/boot-ims-common.oat Reads: 20 KB i_size: 323 KB
+            /framework/arm64/boot.oat Reads: 132 KB i_size: 9729 KB
+            /framework/arm64/boot-okhttp.art Reads: 16 KB i_size: 232 KB
+            /framework/arm64/boot-okhttp.oat Reads: 28 KB i_size: 986 KB
+            /framework/arm64/boot-org.apache.http.legacy.boot.art Reads: 16 KB i_size: 160 KB
+            /framework/arm64/boot-org.apache.http.legacy.boot.oat Reads: 32 KB i_size: 1204 KB
+            /framework/arm64/boot-telephony-common.art Reads: 16 KB i_size: 592 KB
+            /framework/arm64/boot-telephony-common.oat Reads: 148 KB i_size: 5331 KB
+            /framework/arm64/boot-voip-common.art Reads: 16 KB i_size: 36 KB
+            /framework/arm64/boot-voip-common.oat Reads: 20 KB i_size: 276 KB
+            /lib64/libandroidfw.so Reads: 12 KB i_size: 266 KB
+            /lib64/libandroid_runtime.so Reads: 180 KB i_size: 1643 KB
+            /lib64/libart.so Reads: 200 KB i_size: 7368 KB
+            /lib64/libaudioutils.so Reads: 4 KB i_size: 33 KB
+            /lib64/libbacktrace.so Reads: 4 KB i_size: 66 KB
+            /lib64/libbase.so Reads: 4 KB i_size: 46 KB
+            /lib64/libbcinfo.so Reads: 40 KB i_size: 306 KB
+            /lib64/libbinary_parse.so Reads: 8 KB i_size: 17 KB
+            /lib64/libbinder.so Reads: 72 KB i_size: 490 KB
+            /lib64/libcamera_client.so Reads: 68 KB i_size: 338 KB
+            /lib64/libcamera_metadata.so Reads: 8 KB i_size: 34 KB
+            /lib64/libdng_sdk.so Reads: 68 KB i_size: 770 KB
+            /lib64/libdrmframework.so Reads: 28 KB i_size: 154 KB
+            /lib64/libEGL.so Reads: 20 KB i_size: 138 KB
+            /lib64/libETC1.so Reads: 4 KB i_size: 13 KB
+            /lib64/libexpat.so Reads: 12 KB i_size: 149 KB
+            /lib64/libft2.so Reads: 68 KB i_size: 454 KB
+            /lib64/libGLESv1_CM.so Reads: 4 KB i_size: 37 KB
+            /lib64/libGLESv2.so Reads: 16 KB i_size: 85 KB
+            /lib64/libgui.so Reads: 104 KB i_size: 578 KB
+            /lib64/libhardware_legacy.so Reads: 4 KB i_size: 43 KB
+            /lib64/libhardware.so Reads: 8 KB i_size: 9 KB
+            /lib64/libharfbuzz_ng.so Reads: 8 KB i_size: 338 KB
+            /lib64/libhwui.so Reads: 68 KB i_size: 755 KB
+            /lib64/libicui18n.so Reads: 148 KB i_size: 2226 KB
+            /lib64/libicuuc.so Reads: 144 KB i_size: 1522 KB
+            /lib64/libimage_type_recognition.so Reads: 4 KB i_size: 34 KB
+            /lib64/libimg_utils.so Reads: 20 KB i_size: 82 KB
+            /lib64/libinputflinger.so Reads: 24 KB i_size: 362 KB
+            /lib64/libinput.so Reads: 44 KB i_size: 174 KB
+            /lib64/libjpeghwdec.so Reads: 8 KB i_size: 69 KB
+            /lib64/libjpeg.so Reads: 8 KB i_size: 234 KB
+            /lib64/libLLVM.so Reads: 756 KB i_size: 18059 KB
+            /lib64/liblz4.so Reads: 8 KB i_size: 54 KB
+            /lib64/liblzma.so Reads: 68 KB i_size: 150 KB
+            /lib64/libmedia.so Reads: 312 KB i_size: 1202 KB
+            /lib64/libmediautils.so Reads: 12 KB i_size: 42 KB
+            /lib64/libmemtrack.so Reads: 4 KB i_size: 10 KB
+            /lib64/libmemunreachable.so Reads: 68 KB i_size: 142 KB
+            /lib64/libminikin.so Reads: 8 KB i_size: 122 KB
+            /lib64/libmpp.so Reads: 44 KB i_size: 834 KB
+            /lib64/libnativebridge.so Reads: 4 KB i_size: 14 KB
+            /lib64/libnativehelper.so Reads: 8 KB i_size: 34 KB
+            /lib64/libnativeloader.so Reads: 8 KB i_size: 42 KB
+            /lib64/libnbaio.so Reads: 8 KB i_size: 46 KB
+            /lib64/libnetutils.so Reads: 4 KB i_size: 26 KB
+            /lib64/libopus.so Reads: 68 KB i_size: 306 KB
+            /lib64/libpdfium.so Reads: 176 KB i_size: 4957 KB
+            /lib64/libpiex.so Reads: 4 KB i_size: 41 KB
+            /lib64/libpng.so Reads: 16 KB i_size: 205 KB
+            /lib64/libpowermanager.so Reads: 8 KB i_size: 22 KB
+            /lib64/libprocessgroup.so Reads: 4 KB i_size: 10 KB
+            /lib64/libprotobuf-cpp-lite.so Reads: 8 KB i_size: 142 KB
+            /lib64/libradio_metadata.so Reads: 4 KB i_size: 9 KB
+            /lib64/libradio.so Reads: 24 KB i_size: 82 KB
+            /lib64/libRScpp.so Reads: 8 KB i_size: 322 KB
+            /lib64/libRS_internal.so Reads: 16 KB i_size: 314 KB
+            /lib64/libRS.so Reads: 4 KB i_size: 46 KB
+            /lib64/libsigchain.so Reads: 4 KB i_size: 5 KB
+            /lib64/libskia.so Reads: 296 KB i_size: 5665 KB
+            /lib64/libsonivox.so Reads: 68 KB i_size: 359 KB
+            /lib64/libsoundtrigger.so Reads: 24 KB i_size: 82 KB
+            /lib64/libspeexresampler.so Reads: 4 KB i_size: 19 KB
+            /lib64/libsqlite.so Reads: 60 KB i_size: 1008 KB
+            /lib64/libssl.so Reads: 28 KB i_size: 234 KB
+            /lib64/libstagefright_avc_common.so Reads: 4 KB i_size: 33 KB
+            /lib64/libstagefright_enc_common.so Reads: 4 KB i_size: 5 KB
+            /lib64/libstagefright_foundation.so Reads: 12 KB i_size: 178 KB
+            /lib64/libstagefright_http_support.so Reads: 4 KB i_size: 9 KB
+            /lib64/libstagefright_omx.so Reads: 68 KB i_size: 254 KB
+            /lib64/libstagefright.so Reads: 248 KB i_size: 1983 KB
+            /lib64/libstagefright_yuv.so Reads: 4 KB i_size: 17 KB
+            /lib64/libsync.so Reads: 4 KB i_size: 5 KB
+            /lib64/libtiff_directory.so Reads: 4 KB i_size: 21 KB
+            /lib64/libui.so Reads: 20 KB i_size: 110 KB
+            /lib64/libunwind.so Reads: 48 KB i_size: 110 KB
+            /lib64/libusbhost.so Reads: 4 KB i_size: 17 KB
+            /lib64/libutils.so Reads: 8 KB i_size: 134 KB
+            /lib64/libvorbisidec.so Reads: 56 KB i_size: 119 KB
+            /lib64/libvpu.so Reads: 4 KB i_size: 45 KB
+            /lib64/libvulkan.so Reads: 48 KB i_size: 118 KB
+            /lib64/libwilhelm.so Reads: 68 KB i_size: 270 KB
+            /lib64/libwpa_client.so Reads: 4 KB i_size: 18 KB
+            /lib64/libz.so Reads: 8 KB i_size: 86 KB
+            Total Reads: 5356 KB
+PID: debuggerd
+            /bin/linker Reads: 240 KB i_size: 615 KB
+            /dalvik-cache/arm/system@framework@boot-apache-xml.art Reads: 4 KB i_size: 100 KB
+            /dalvik-cache/arm/system@framework@boot-core-junit.art Reads: 8 KB i_size: 12 KB
+            /dalvik-cache/arm/system@framework@boot-ims-common.art Reads: 8 KB i_size: 48 KB
+            /dalvik-cache/arm/system@framework@boot-telephony-common.art Reads: 8 KB i_size: 520 KB
+            /dalvik-cache/arm/system@framework@boot-voip-common.art Reads: 8 KB i_size: 28 KB
+            /framework/arm/boot-apache-xml.oat Reads: 116 KB i_size: 1464 KB
+            /framework/arm/boot-bouncycastle.oat Reads: 28 KB i_size: 1675 KB
+            /framework/arm/boot-core-junit.oat Reads: 16 KB i_size: 53 KB
+            /framework/arm/boot-ext.oat Reads: 84 KB i_size: 1342 KB
+            /framework/arm/boot-ims-common.oat Reads: 88 KB i_size: 279 KB
+            /framework/arm/boot.oat Reads: 184 KB i_size: 8403 KB
+            /framework/arm/boot-telephony-common.oat Reads: 128 KB i_size: 4546 KB
+            /framework/arm/boot-voip-common.oat Reads: 60 KB i_size: 252 KB
+            /lib/libart.so Reads: 952 KB i_size: 5749 KB
+            /lib/libc.so Reads: 232 KB i_size: 757 KB
+            /lib/liblzma.so Reads: 32 KB i_size: 93 KB
+            /lib/libm.so Reads: 4 KB i_size: 129 KB
+            /lib/libnetd_client.so Reads: 4 KB i_size: 17 KB
+            /lib/libunwind.so Reads: 28 KB i_size: 85 KB
+            /usr/hyphen-data/hyph-as.hyb Reads: 4 KB i_size: 703 bytes
+            /usr/hyphen-data/hyph-bn.hyb Reads: 4 KB i_size: 703 bytes
+            /usr/hyphen-data/hyph-cy.hyb Reads: 36 KB i_size: 35 KB
+            /usr/hyphen-data/hyph-da.hyb Reads: 8 KB i_size: 6 KB
+            /usr/hyphen-data/hyph-de-1901.hyb Reads: 108 KB i_size: 105 KB
+            /usr/hyphen-data/hyph-de-1996.hyb Reads: 104 KB i_size: 103 KB
+            /usr/hyphen-data/hyph-de-ch-1901.hyb Reads: 108 KB i_size: 104 KB
+            /usr/hyphen-data/hyph-en-gb.hyb Reads: 48 KB i_size: 45 KB
+            /usr/hyphen-data/hyph-es.hyb Reads: 16 KB i_size: 14 KB
+            /usr/hyphen-data/hyph-et.hyb Reads: 24 KB i_size: 20 KB
+            /usr/hyphen-data/hyph-eu.hyb Reads: 4 KB i_size: 665 bytes
+            /usr/hyphen-data/hyph-fr.hyb Reads: 8 KB i_size: 7 KB
+            /usr/hyphen-data/hyph-ga.hyb Reads: 36 KB i_size: 34 KB
+            /usr/hyphen-data/hyph-gu.hyb Reads: 4 KB i_size: 655 bytes
+            /usr/hyphen-data/hyph-hi.hyb Reads: 4 KB i_size: 687 bytes
+            /usr/hyphen-data/hyph-hr.hyb Reads: 4 KB i_size: 2 KB
+            /usr/hyphen-data/hyph-hu.hyb Reads: 128 KB i_size: 309 KB
+            /usr/hyphen-data/hyph-hy.hyb Reads: 4 KB i_size: 605 bytes
+            /usr/hyphen-data/hyph-kn.hyb Reads: 4 KB i_size: 711 bytes
+            /usr/hyphen-data/hyph-ml.hyb Reads: 4 KB i_size: 776 bytes
+            /usr/hyphen-data/hyph-mn-cyrl.hyb Reads: 8 KB i_size: 5 KB
+            /usr/hyphen-data/hyph-mr.hyb Reads: 4 KB i_size: 687 bytes
+            /usr/hyphen-data/hyph-nb.hyb Reads: 128 KB i_size: 141 KB
+            /usr/hyphen-data/hyph-nn.hyb Reads: 128 KB i_size: 141 KB
+            /usr/hyphen-data/hyph-or.hyb Reads: 4 KB i_size: 647 bytes
+            /usr/hyphen-data/hyph-pa.hyb Reads: 4 KB i_size: 607 bytes
+            /usr/hyphen-data/hyph-pt.hyb Reads: 4 KB i_size: 1 KB
+            /usr/hyphen-data/hyph-sl.hyb Reads: 8 KB i_size: 6 KB
+            /usr/hyphen-data/hyph-ta.hyb Reads: 4 KB i_size: 554 bytes
+            /usr/hyphen-data/hyph-te.hyb Reads: 4 KB i_size: 703 bytes
+            /usr/hyphen-data/hyph-tk.hyb Reads: 4 KB i_size: 2 KB
+            /usr/hyphen-data/hyph-und-ethi.hyb Reads: 4 KB i_size: 3 KB
+            Total Reads: 3196 KB
+PID: ease.cloudmusic
+            /app/com.netease.cloudmusic-1/base.apk Reads: 832 KB i_size: 42420 KB
+            /app/com.netease.cloudmusic-1/lib/arm/libbugrpt.so Reads: 100 KB i_size: 97 KB
+            /app/com.netease.cloudmusic-1/lib/arm/libnapmcore.so Reads: 68 KB i_size: 65 KB
+            /app/com.netease.cloudmusic-1/lib/arm/libneutil.so Reads: 108 KB i_size: 107 KB
+            /app/com.netease.cloudmusic-1/lib/arm/libpoison.so Reads: 224 KB i_size: 222 KB
+            /app/com.netease.cloudmusic-1/oat/arm/base.art Reads: 416 KB i_size: 416 KB
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 14732 KB i_size: 21404 KB
+            /data/com.netease.cloudmusic/files/Session.Profile Reads: 4 KB i_size: 1 KB
+            /fonts/NotoSansCJK-Regular.ttc Reads: 256 KB i_size: 18239 KB
+            /framework/arm/boot-framework.oat Reads: 1792 KB i_size: 35315 KB
+            /framework/framework-res.apk Reads: 128 KB i_size: 32654 KB
+            /lib/libskia.so Reads: 128 KB i_size: 3782 KB
+            /usr/icu/icudt56l.dat Reads: 64 KB i_size: 21681 KB
+            Total Reads: 18852 KB
+PID: GlobalHandlerTh
+            /app/com.netease.cloudmusic-1/lib/arm/libfpGenerate.so Reads: 888 KB i_size: 893 KB
+            /app/com.netease.cloudmusic-1/lib/arm/libijkffmpeg.so Reads: 748 KB i_size: 5635 KB
+            /app/com.netease.cloudmusic-1/lib/arm/libwakeup.so Reads: 36 KB i_size: 33 KB
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 128 KB i_size: 21404 KB
+            /data/com.netease.cloudmusic/databases/cloudmusic.db Reads: 48 KB i_size: 52 KB
+            /data/com.netease.cloudmusic/databases/cloudmusic.db-journal Reads: 16 KB i_size: 52 KB
+            /data/com.netease.cloudmusic/files/Session.Account Reads: 4 KB i_size: 125 bytes
+            /framework/arm/boot-framework.oat Reads: 308 KB i_size: 35315 KB
+            Total Reads: 2176 KB
+PID: h
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 96 KB i_size: 21404 KB
+            /data/com.netease.cloudmusic/databases/mobidroid.sqlite Reads: 44 KB i_size: 20 KB
+            /data/com.netease.cloudmusic/databases/mobidroid.sqlite-journal Reads: 16 KB i_size: 20 KB
+            Total Reads: 156 KB
+PID: HeapTaskDaemon
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 168 KB i_size: 21404 KB
+            /framework/arm/boot-framework.oat Reads: 288 KB i_size: 35315 KB
+            Total Reads: 456 KB
+PID: main
+            /dalvik-cache/arm64/system@framework@boot.art Reads: 436 KB i_size: 2704 KB
+            /dalvik-cache/arm64/system@framework@boot-core-libart.art Reads: 184 KB i_size: 1528 KB
+            /dalvik-cache/arm64/system@framework@boot-framework.art Reads: 812 KB i_size: 8000 KB
+            /etc/public.libraries.txt Reads: 4 KB i_size: 286 bytes
+            /framework/am.jar Reads: 4 KB i_size: 310 bytes
+            /framework/apache-xml.jar Reads: 16 KB i_size: 17 KB
+            /framework/core-libart.jar Reads: 12 KB i_size: 16 KB
+            /framework/core-oj.jar Reads: 32 KB i_size: 118 KB
+            /framework/ext.jar Reads: 16 KB i_size: 1610 KB
+            /framework/oat/arm64/am.odex Reads: 240 KB i_size: 236 KB
+            /lib64/libandroid.so Reads: 20 KB i_size: 106 KB
+            /lib64/libart-compiler.so Reads: 160 KB i_size: 3930 KB
+            /lib64/libcamera2ndk.so Reads: 16 KB i_size: 126 KB
+            /lib64/libGLESv3.so Reads: 24 KB i_size: 85 KB
+            /lib64/libjavacore.so Reads: 16 KB i_size: 240 KB
+            /lib64/libjnigraphics.so Reads: 4 KB i_size: 5 KB
+            /lib64/libmediadrm.so Reads: 24 KB i_size: 86 KB
+            /lib64/libmediandk.so Reads: 8 KB i_size: 94 KB
+            /lib64/libopenjdkjvm.so Reads: 16 KB i_size: 44 KB
+            /lib64/libopenjdk.so Reads: 40 KB i_size: 252 KB
+            /lib64/libOpenMAXAL.so Reads: 4 KB i_size: 10 KB
+            /lib64/libOpenSLES.so Reads: 4 KB i_size: 10 KB
+            /lib64/libvixl.so Reads: 68 KB i_size: 853 KB
+            /lib64/libwebviewchromium_plat_support.so Reads: 4 KB i_size: 14 KB
+            /vendor/etc/public.libraries.txt Reads: 4 KB i_size: 16 bytes
+            /vendor/lib64/egl/libGLES_mali.so Reads: 1364 KB i_size: 27563 KB
+            Total Reads: 3532 KB
+PID: netd
+            /etc/hosts Reads: 4 KB i_size: 56 bytes
+            Total Reads: 4 KB
+PID: pool-2-thread-1
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 1908 KB i_size: 21404 KB
+            /etc/security/cacerts/399e7759.0 Reads: 8 KB i_size: 4 KB
+            Total Reads: 1916 KB
+PID: pool-5-thread-1
+            /data/com.netease.cloudmusic/databases/netease_apm.db Reads: 4 KB i_size: 20 KB
+            Total Reads: 4 KB
+PID: pool-6-thread-1
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 104 KB i_size: 21404 KB
+            /data/com.netease.cloudmusic/databases/netease_apm.db Reads: 32 KB i_size: 16 KB
+            /data/com.netease.cloudmusic/databases/netease_apm.db-journal Reads: 16 KB i_size: 16 KB
+            Total Reads: 152 KB
+PID: pool-8-thread-1
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 340 KB i_size: 21404 KB
+            Total Reads: 340 KB
+PID: pool-9-thread-1
+            /app/com.netease.cloudmusic-1/lib/arm/libtracepath.so Reads: 56 KB i_size: 54 KB
+            Total Reads: 56 KB
+PID: RenderThread
+            /lib/hw/gralloc.rk30board.so Reads: 4 KB i_size: 17 KB
+            /lib/libdrm_rockchip.so Reads: 4 KB i_size: 25 KB
+            /lib/libdrm.so Reads: 4 KB i_size: 49 KB
+            /lib/libgralloc_drm.so Reads: 12 KB i_size: 36 KB
+            /user_de/0/com.netease.cloudmusic/code_cache/com.android.opengl.shaders_cache Reads: 20 KB i_size: 16 KB
+            /vendor/lib/egl/libGLES_mali.so Reads: 2156 KB i_size: 26160 KB
+            Total Reads: 2200 KB
+PID: sh
+            /bin/am Reads: 4 KB i_size: 210 bytes
+            Total Reads: 4 KB
+PID: SharedPreferenc
+            /data/com.netease.cloudmusic/shared_prefs/abtest_prefer_file.xml Reads: 12 KB i_size: 9 KB
+            /data/com.netease.cloudmusic/shared_prefs/bilog_perfer_file_1.xml Reads: 4 KB i_size: 109 bytes
+            /data/com.netease.cloudmusic/shared_prefs/cm_cookie_storage.xml Reads: 4 KB i_size: 2 KB
+            /data/com.netease.cloudmusic/shared_prefs/com.netease.cloudmusic.preferences.xml Reads: 8 KB i_size: 4 KB
+            /data/com.netease.cloudmusic/shared_prefs/HTHttpDNS.xml Reads: 4 KB i_size: 620 bytes
+            /data/com.netease.cloudmusic/shared_prefs/loading_ad_prefer_file.xml Reads: 4 KB i_size: 117 bytes
+            /data/com.netease.cloudmusic/shared_prefs/log_oc_prefer_file.xml Reads: 4 KB i_size: 350 bytes
+            /data/com.netease.cloudmusic/shared_prefs/mipush_extra.xml Reads: 4 KB i_size: 3 KB
+            /data/com.netease.cloudmusic/shared_prefs/NAPM-SDK.xml Reads: 4 KB i_size: 126 bytes
+            /data/com.netease.cloudmusic/shared_prefs/napm.xml Reads: 4 KB i_size: 210 bytes
+            /data/com.netease.cloudmusic/shared_prefs/operator_free2.xml Reads: 4 KB i_size: 277 bytes
+            Total Reads: 56 KB
+PID: Shutdown_thread
+            /lib64/libLLVM.so Reads: 112 KB i_size: 18059 KB
+            /lib64/libstagefright.so Reads: 128 KB i_size: 1983 KB
+            /vendor/lib64/egl/libGLES_mali.so Reads: 612 KB i_size: 27563 KB
+            Total Reads: 852 KB
+PID: Thread-3
+            /app/com.netease.cloudmusic-1/oat/arm/base.odex Reads: 28 KB i_size: 21404 KB
+            /etc/security/cacerts/7999be0d.0 Reads: 8 KB i_size: 4 KB
+            Total Reads: 36 KB
+Grand Total File DATA KB Reads 39364
+Total (ALL) Read KB mmcblk1 = 40364
+READ DELTA: Total Blockdev Reads KB - Total File Data Reads KB = 1000 KB
+Total (ALL) Read IOs mmcblk1 = 930
+Debug Grand Total KB READ 39316
+
+Writes :
+_______
+
+FILE VIEW:
+File: /data/com.netease.cloudmusic/databases/mobidroid.sqlite
+            h Writes: 179 KB
+            Total Writes: 179 KB i_size: 20 KB
+File: /data/com.netease.cloudmusic/databases/netease_apm.db
+            pool-5-thread-1 Writes: 24 KB
+            Total Writes: 24 KB i_size: 16 KB
+File: /data/com.netease.cloudmusic/files/Statistic/1358506251
+            StatisticUtils Writes: 2 KB
+            Total Writes: 2 KB i_size: 869 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/abtest_prefer_file.xml
+            pool-1-thread-1 Writes: 9 KB
+            Total Writes: 9 KB i_size: 8 KB
+File: /data/com.netease.cloudmusic/shared_prefs/bilog_perfer_file_1.xml
+            StatisticUtils Writes: 1 KB
+            Total Writes: 1 KB i_size: 0 bytes
+File: /data/com.netease.cloudmusic/shared_prefs/HTHttpDNS.xml
+            Thread-3 Writes: 0 KB
+            Total Writes: 0 KB i_size: 0 bytes
+File: /logs/aplog
+            logcatext Writes: 13 KB
+            Total Writes: 13 KB i_size: 3884 KB
+File: /system/users/0/settings_secure.xml
+            SettingsProvide Writes: 5 KB
+            Total Writes: 5 KB i_size: 4 KB
+File: /tombstones/tombstone_04
+            debuggerd Writes: 114 KB
+            Total Writes: 114 KB i_size: 97 KB
+Grand Total File DATA KB Writes 347
+PID VIEW:
+PID: debuggerd
+            /tombstones/tombstone_04 Writes: 114 KB i_size: 97 KB
+            Total Writes: 114 KB
+PID: h
+            /data/com.netease.cloudmusic/databases/mobidroid.sqlite Writes: 179 KB i_size: 20 KB
+            /data/com.netease.cloudmusic/databases/mobidroid.sqlite-journal Writes: 91 KB i_size: 20 KB
+            Total Writes: 270 KB
+PID: logcatext
+            /logs/aplog Writes: 13 KB i_size: 3884 KB
+            Total Writes: 13 KB
+PID: pool-1-thread-1
+            /data/com.netease.cloudmusic/shared_prefs/abtest_prefer_file.xml Writes: 9 KB i_size: 8 KB
+            Total Writes: 9 KB
+PID: pool-5-thread-1
+            /data/com.netease.cloudmusic/databases/netease_apm.db Writes: 24 KB i_size: 16 KB
+            /data/com.netease.cloudmusic/databases/netease_apm.db-journal Writes: 12 KB i_size: 16 KB
+            Total Writes: 36 KB
+PID: SettingsProvide
+            /system/users/0/settings_secure.xml Writes: 5 KB i_size: 4 KB
+            Total Writes: 5 KB
+PID: StatisticUtils
+            /data/com.netease.cloudmusic/files/Statistic/1358506251 Writes: 2 KB i_size: 869 bytes
+            /data/com.netease.cloudmusic/shared_prefs/bilog_perfer_file_1.xml Writes: 1 KB i_size: 0 bytes
+            Total Writes: 3 KB
+PID: Thread-3
+            /data/com.netease.cloudmusic/shared_prefs/HTHttpDNS.xml Writes: 0 KB i_size: 0 bytes
+            Total Writes: 0 KB
+Grand Total File DATA KB Writes 450
+WRITE DELTA: Total Blockdev Writes KB - Total File Data Writes KB = 982 KB
+Total (ALL) Write IOs mmcblk1 = 225
+cmc@cmc-B150-D3A:~/110/google/aosp/system/extras/ioblame$ 

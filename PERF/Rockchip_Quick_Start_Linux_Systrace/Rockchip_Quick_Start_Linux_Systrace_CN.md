@@ -28,8 +28,6 @@
 
 软件开发工程师
 
-
-
 **修订记录**
 
 | **日期**     | **版本** | **作者** | **修改说明** |
@@ -42,7 +40,7 @@
 
 ---
 
-### 1. 介绍
+## 1. 介绍
 
 ​    Systrace是目前Android上最主要的性能调试手段，有以下优点：
 
@@ -55,11 +53,11 @@
 - 基于tracepoint，所以只会收集你加过trace的函数信息，Android在大部分模块的重要函数里都加了trace了，所以大部分情况下还是够用，同时Android也提供了几个函数方便添加自己的trace。
 - 看不到pmu计数器的信息，也看不到gpu和memory的信息（理论上内核驱动如果定时收集这些信息并加到trace里，systrace应该也能看到）
 
-### 2. 用法
+## 2. 用法
 
 ​    为了更方便介绍Systrace，我这里举一个实际的性能分析例子：fishtank在1000只鱼的情况下帧率很低
 
-#### 准备工作
+### 准备工作
 
 ​    获取systrace有三种方式：
 
@@ -75,7 +73,7 @@
 
    路径：/path_to_android/external/chromium-trace
 
-#### 抓取数据
+### 抓取数据
 
 ​    Systrace的命令格式：
 
@@ -152,8 +150,8 @@ Options:
 Systrace支持的atrace类别有：
 
 ```shell
-$ adb root 
-$ python ./systrace.py -l
+adb root
+python ./systrace.py -l
          gfx - Graphics
        input - Input
         view - View System
@@ -195,13 +193,13 @@ Note: ==有些事件需要设备的root权限才能操作，所以最好先切�
 先在设备上重现问题，然后在host端执行如下命令：
 
 ```shell
-$ cd external/chromium-trace
-$ python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq disk
+cd external/chromium-trace
+python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq disk
 ```
 
 这个fishtank.html即我们抓到的数据。为了方便和本文对照，我上传到[网盘](https://pan.baidu.com/s/1slJUibN "fishtank.html")了。
 
-### 3. 分析
+## 3. 分析
 
 ​    分析数据需要chrome浏览器，版本最好要新一些，太旧可能会有兼容问题，因为这个html并不符合w3c的标准。
 
