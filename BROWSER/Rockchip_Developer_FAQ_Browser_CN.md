@@ -28,27 +28,25 @@
 
 软件开发工程师
 
-
-
 **修订记录**
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
 | 2017-05-17 | V1.0     | 陈谋春   |              |
 
----
+***
 
 [TOC]
 
----
+***
 
 ## 1 Webview & Browser & Chrome
 
-​   在本文开始前，有必要明确一下这三者的差别，Webview是Android框架层的核心组件，所有应用都可以通过内嵌Webview的方式很方便的集成Web功能，而不需要自己去移植庞大复杂的Web Engine；而 Browser则是Andr-oid提供的一个全功能网页浏览器，其本质也是通过Webview来实现的；最后一个Chrome则是基于Chromium开源工程的，和桌面上最流行的Chrome浏览器是同一份代码编译的。
+   在本文开始前，有必要明确一下这三者的差别，Webview是Android框架层的核心组件，所有应用都可以通过内嵌Webview的方式很方便的集成Web功能，而不需要自己去移植庞大复杂的Web Engine；而 Browser则是Andr-oid提供的一个全功能网页浏览器，其本质也是通过Webview来实现的；最后一个Chrome则是基于Chromium开源工程的，和桌面上最流行的Chrome浏览器是同一份代码编译的。
 
 ## 2 HTML5
 
-​   HTML5是W3C最新的Web标准，用来取代之前的 HTML、XHTML 以及 HTML DOM，增加了很多新的特性：
+   HTML5是W3C最新的Web标准，用来取代之前的 HTML、XHTML 以及 HTML DOM，增加了很多新的特性：
 
 - 用于绘画的 canvas 元素
 
@@ -72,12 +70,12 @@
 
   Android的Webview目前有很多发行版，具体如下(只讨论稳定版本)：
 
-  Name | PackageName | 获取方式 | 自动更新[^1] | 稳定性 
-  - | :-: | -: |:-: |:-: 
-  Android WebView | com.android.webview | Android自带 | 否 | 最高 
-  Chrome Stable[^3] | com.android.chrome | Chrome自带 | 可 | 高 
-  Google WebView[^2] | com.google.android.webview | 随GMS包发布 | 可 | 高 
-  Custom Webview | com.android.webview | 自编译 | 否 | 中 
+  Name | PackageName | 获取方式 | 自动更新[^1] | 稳定性
+  - | :-: | -: |:-: |:-:
+  Android WebView | com.android.webview | Android自带 | 否 | 最高
+  Chrome Stable[^3] | com.android.chrome | Chrome自带 | 可 | 高
+  Google WebView[^2] | com.google.android.webview | 随GMS包发布 | 可 | 高
+  Custom Webview | com.android.webview | 自编译 | 否 | 中
 
   从上表可以看出，*Google WebView & Chrome Stable*都可以通过Google Play来升级，通过GMS认证的机器默认就是用的这两种Webview，要升级也最容易，可以直接升级GMS包，也可以单独替换Webview的APK。
   [^1]: 通过Google Play来更新
@@ -88,22 +86,15 @@
 
   Android 5.1开始，Webview具体实现从框架层剥离出来，通过一个包名来控制加载真正的Webview实现，默认的包名是*com.android.webview*，如果要切换到不同的Webview实现，就要先改掉系统默认的包名，具体修改办法如下（如果只升级版本，不切换发行版可跳过这一步）：
 
-  - For android 6.0 & before
+    1. For android 6.0 & before
+   老版本的Android配置文件是/path_to_android/frameworks/base/core/res/res/values/config.xml，其中相关配置如下：
+<string name="config_webViewPackageName" translatable="false">com.android.webview</string>
+   其中com.android.webview可以改成你要切到的发行版包名，例如com.google.android.webview。
+    2. For android 7.0 & after
+       新版本的Android配置文件是/path_to_android/frameworks/base/core/res/res/xml/config_webview_-packages.xml，改成如下配置：
 
-    老版本的Android配置文件是/path_to_android/frameworks/base/core/res/res/values/config.xml，其中相关配置如下：
-
-    ```xml
-    <string name="config_webViewPackageName" translatable="false">com.android.webview</string>
-    ```
-
-    其中*com.android.webview*可以改成你要切到的发行版包名，例如*com.google.android.webview*。
-
-  - For android 7.0 & after
-
-    新版本的Android配置文件是/path_to_android/frameworks/base/core/res/res/xml/config_webview_-packages.xml，改成如下配置：
-
-    ```xml
-    <?xml version="1.0" encoding="utf-8"?>
+```xml
+<?xml version="1.0" encoding="utf-8"?>
     <!-- Copyright 2015 The Android Open Source Project
 
          Licensed under the Apache License, Version 2.0 (the "License");
@@ -124,14 +115,14 @@
         <webviewprovider description="Android WebView" packageName="com.android.webview" availableByDefault="true"></webviewprovider>
         <webviewprovider description="Chrome Stable" packageName="com.android.chrome" availableByDefault="true" />
         <webviewprovider description="Google WebView" packageName="com.google.android.webview" availableByDefault="true" isFallback="true" />
-    </webviewproviders>
-    ```
+</webviewproviders>
+```
 
-    系统在开机过程中会自动根据这个配置文件中的顺序来搜索设备中已安装并启用的包信息，找到以后直接返回，例如上面配置中的三个发行版如果都安装并启用了，则默认的包名是*com.android.webview*。我这里不建议修改这三个发行版的顺序，因为本身已经是按稳定性排序过的了。
+   系统在开机过程中会自动根据这个配置文件中的顺序来搜索设备中已安装并启用的包信息，找到以后直接返回，例如上面配置中的三个发行版如果都安装并启用了，则默认的包名是*com.android.webview*。我这里不建议修改这三个发行版的顺序，因为本身已经是按稳定性排序过的了。
 
 - Step3: 手动安装并测试
 
-  ```shell
+```shell
   # Uninstall any webview updates
   adb uninstall com.google.android.webview  # 失败也没关系
   adb uninstall com.android.webview  # 失败也没关系
@@ -146,7 +137,7 @@
   adb shell start
   Install the built apk.
   adb install -r -d out/Release/apks/SystemWebView.apk
-  ```
+```
 
   安装完成后就可以验证问题是否得到解决，以及是否带来新的问题。
 
@@ -154,9 +145,9 @@
 
   验证ok以后就需要集成到固件中发布，具体如下：
 
-  - For android 5.1
+    1. For android 5.1
 
-    ```shell
+```shell
     # webview_xxx.apk即你要替换的Webview APK
     cp webview_xxx.apk webview.zip
     mv webview_xxx.apk webview.apk
@@ -167,22 +158,22 @@
     # 预制到Android工程
     cp webview.apk vendor/rockchip/common/webkit/
     cp libwebviewchromium.so vendor/rockchip/common/webkit/
-    ```
+```
 
-    修改/path_to_android/vendor/rockchip/common/webkit/webkit.mk，具体如下：
+   修改/path_to_android/vendor/rockchip/common/webkit/webkit.mk，具体如下：
 
-    ```shell
-    PRODUCT_COPY_FILES += \
-            vendor/rockchip/common/webkit/webview.apk:system/app/webview/webview.apk \
-            vendor/rockchip/common/webkit/libwebviewchromium.so:system/lib/libwebviewchromium.so
-    ```
+```shell
+PRODUCT_COPY_FILES += \
+    vendor/rockchip/common/webkit/webview.apk:system/app/webview/webview.apk \
+    vendor/rockchip/common/webkit/libwebviewchromium.so:system/lib/libwebviewchromium.so
+```
 
-  - For android 6.0 and up
+​    2. For android 6.0 and up
 
-    ```shell
-    # webview_xxx.apk即你要替换的Webview APK
-    cp external/chromium-webview/prebuilt/$ARCH/webview.apk
-    ```
+```shell
+# webview_xxx.apk即你要替换的Webview APK
+cp external/chromium-webview/prebuilt/$ARCH/webview.apk
+```
 
 ### 3.2 视频无法播放
 
@@ -226,20 +217,20 @@ webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
   解决办法：
 
-  - 首先要现确认soc是否支持这个视频格式的硬件解码，如果是支持的，则需要查一下Meida框架层是否哪里判断错误或者没实现，目前Webview调用Media只有两种方式：MediaPlayer和MediaCodec，后者是新版本的默认方式。
-  - 如果硬件确实不支持，则可以想办法让网站换个视频格式，目前大部分网站都会通过识别UserAgent，调用HTML5 Audio/Video的[canPlayType()](http://www.w3school.com.cn/tags/av_met_canplaytype.asp)函数等方式来识别本机支持的视频格式。所以这种情况可以先看网站的Javascript源码，即使混淆过，大部分判断逻辑还是能猜出的，如果确实有调用canPlayType则可以先把当前的视频格式从媒体框架的支持列表中去掉，即MediaCodecList[^4]中去掉，可以手写一个简单网页来验证你的修改结果，可在这个[Demo](http://www.w3school.com.cn/tiy/t.asp?f=html5_av_met_canplaytype)基础上修改。如果MediaCodecList修改以后canPlayType返回还是不对，那就要查一下整个调用路径了，因为中间代码有大量的Blacklist的修改，有兴趣可以看其中一部分[代码](https://cs.chromium.org/chromium/src/media/base/android/java/src/org/chromium/media/MediaCodecUtil.java?type=cs&q=isDecoderSupportedForDevice&sq=package:chromium&g=0&l=359)。这里就不详解了。
+    1. 首先要现确认soc是否支持这个视频格式的硬件解码，如果是支持的，则需要查一下Meida框架层是否哪里判断错误或者没实现，目前Webview调用Media只有两种方式：MediaPlayer和MediaCodec，后者是新版本的默认方式。
+    2. 如果硬件确实不支持，则可以想办法让网站换个视频格式，目前大部分网站都会通过识别UserAgent，调用HTML5 Audio/Video的[canPlayType()](http://www.w3school.com.cn/tags/av_met_canplaytype.asp)函数等方式来识别本机支持的视频格式。所以这种情况可以先看网站的Javascript源码，即使混淆过，大部分判断逻辑还是能猜出的，如果确实有调用canPlayType则可以先把当前的视频格式从媒体框架的支持列表中去掉，即MediaCodecList[^4]中去掉，可以手写一个简单网页来验证你的修改结果，可在这个[Demo](http://www.w3school.com.cn/tiy/t.asp?f=html5_av_met_canplaytype)基础上修改。如果MediaCodecList修改以后canPlayType返回还是不对，那就要查一下整个调用路径了，因为中间代码有大量的Blacklist的修改，有兴趣可以看其中一部分[代码](https://cs.chromium.org/chromium/src/media/base/android/java/src/org/chromium/media/MediaCodecUtil.java?type=cs&q=isDecoderSupportedForDevice&sq=package:chromium&g=0&l=359)。这里就不详解了。
 
 - 主动丢帧，有发现一些应用如爱奇艺会主动丢掉一些帧
 
   解决办法：
 
-  - 只有调用MediaCodec或OMX的方式解码，应用才有机会主动丢帧，由于第三方应用并没有源码，这时候通常无法知道应用为什么会主动丢帧，最简单的解决方式就是不让应用主动丢帧，比如丢改MediaCode-c.releaseOutputBuffer(int index, boolean render)，其中render位false就是代码应用要丢帧，不care这个参数即可。
+    1. 只有调用MediaCodec或OMX的方式解码，应用才有机会主动丢帧，由于第三方应用并没有源码，这时候通常无法知道应用为什么会主动丢帧，最简单的解决方式就是不让应用主动丢帧，比如丢改MediaCode-c.releaseOutputBuffer(int index, boolean render)，其中render位false就是代码应用要丢帧，不care这个参数即可。
 
 - 内存带宽不足，整个硬件解码流程可以分三个阶段（这里只讲Webview的方式）：VPU解码、缩放裁剪、GPU贴图，只有中间这个阶段有时候是CPU做的（很多时候有RGA加速），但全程对内存带宽都有一定要求，所以大部分时候瓶颈都在内存带宽上。
 
   解决办法：
 
-  - 提高内存频率验证效果
+    1. 提高内存频率验证效果
 
   [^4]: /path_to_android/frameworks/base/media/java/android/media/MediaCodecList.java
 
@@ -282,7 +273,7 @@ echo 'chrome --user-agent="Mozilla/5.0 (Linux; Android 4.4; Nexus 7 Build/KRT16M
 ```shell
 PRODUCT_COPY_FILES += \
         vendor/rockchip/common/webkit/chrome-command-line:system/etc/chrome-command-line \
-        vendor/rockchip/common/webkit/chrome.sh:system/bin/chrome.sh 
+        vendor/rockchip/common/webkit/chrome.sh:system/bin/chrome.sh
 ```
 
    同时修改/path_to_android/vendor/rockchip/common/webkit/chrome-command-line，替换你想要的UserA-gent。
