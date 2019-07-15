@@ -1,4 +1,4 @@
-# **io-domain 开发指南**
+# **IO-Domain 开发指南**
 
 发布版本: 1.0
 
@@ -60,7 +60,7 @@ drivers/power/avs/rockchip-io-domain.c
 
 - 内核 3.10 版本的 DTS 节点合并：
 
-```
+```c
 io-domains {
         compatible = "rockchip,rk3368-io-voltage-domain";
         rockchip,grf = <&grf>;
@@ -82,7 +82,7 @@ io-domains {
 
 - 内核 4.4 版本的 DTS 节点 GRF 和 PMUGRF 分开：
 
-```
+```c
 &io_domains {
         status = "okay";
         dvp-supply = <&vcc_18>;
@@ -169,9 +169,9 @@ Possible supplies for rk3399 pmu-domains:
 
 仍以 RK3399-EVB 原理图 和 bt656 IO 电源域为例，我们在 rockchip-io-domain.txt 中找到了 bt656 对应的硬件原理图上表示为 APIO2_VDD。所以通过逆向搜索 ‘APIO2_VDD’ 得到 RK3399-EVB 硬件原理图上的 APIO2_VDD 电源是由RK808 下的 VCC1V8_DVP 供给。
 
-![io-domain-1-rk3399-APIO2-hardware](io-domain-1-rk3399-APIO2-hardware.png)
+![io-domain-1-rk3399-APIO2-hardware](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-1-rk3399-APIO2-hardware.png)
 
-![io-domain-2-rk3399-APIO2-supply](io-domain-2-rk3399-APIO2-supply.png)
+![io-domain-2-rk3399-APIO2-supply](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-2-rk3399-APIO2-supply.png)
 
 ### 3. 通过 DTS 配置
 
@@ -189,25 +189,25 @@ Possible supplies for rk3399 pmu-domains:
 
 - TRM 寄存器描述：
 
-![io-domain-3-flash-io-domain-proc](io-domain-3-flash-io-domain-proc.png)
+![io-domain-3-flash-io-domain-proc](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-3-flash-io-domain-proc.png)
 
-![io-domain-4-flash-io-bit-sel](io-domain-4-flash-io-bit-sel.png)
+![io-domain-4-flash-io-bit-sel](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-4-flash-io-bit-sel.png)
 
 - 硬件原理图：
 
-![io-domain-5-rk3368-APIO4-hardware](io-domain-5-rk3368-APIO4-hardware.png)
+![io-domain-5-rk3368-APIO4-hardware](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-5-rk3368-APIO4-hardware.png)
 
-![io-domain-6-rk3368-APIO4-flash-io-sel](io-domain-6-rk3368-APIO4-flash-io-sel.png)
+![io-domain-6-rk3368-APIO4-flash-io-sel](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-6-rk3368-APIO4-flash-io-sel.png)
 
 ---
 
-## DTS 中无定义 regulator 情况处理
+## DTS 中无定义 Regulator 情况处理
 
 在使用的过程中可能会遇到，你找不到相应的regulator来配置，可能项目上面未使用 pmic等电源，只是简单的拉了一个电源过来，dts 上找不到 regulator 的定义，那么你需要在 dts 文件里面增加fixed regulator 的定义，一般 3.3v 和 1.8v 两个 regulator 就够用了。
 
 下面是 rk3229-evb.dts 的配置例子，确定硬件上的电压是用 1.8v 还是 3.3v，配置成相应的 regulator：
 
-```
+```c
         regulators {
                 compatible = "simple-bus";
                 #address-cells = <1>;
@@ -250,17 +250,17 @@ Possible supplies for rk3399 pmu-domains:
 
 - 先确定这个 io 所在的电源域，一般是看硬件原理图或者 Datasheet 来确定。例如，RK3399 下面通过硬件原理如图发现 GPIO2_B1 所在的电源域硬件上表示为 APIO2_VDD，并且 APIO2_VDD 是接的电压是 VCC1V8_DVP 。
 
-![io-domain-1-rk3399-APIO2-hardware](io-domain-1-rk3399-APIO2-hardware.png)
+![io-domain-1-rk3399-APIO2-hardware](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-1-rk3399-APIO2-hardware.png)
 
-![io-domain-2-rk3399-APIO2-supply](io-domain-2-rk3399-APIO2-supply.png)
+![io-domain-2-rk3399-APIO2-supply](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-2-rk3399-APIO2-supply.png)
 
 - 通过 rockchip-io-domain.txt 文档找到对应的名称。例如，在 rockchip-io-domain.txt 文档上找到的电源域对应的名称是 “bt656”。
 
-  ![io-domain-9-rk3399-APIO2-desc](io-domain-9-rk3399-APIO2-desc.png)
+  ![io-domain-9-rk3399-APIO2-desc](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-9-rk3399-APIO2-desc.png)
 
 - 在 TRM 上找到这个寄存器，通过 io 命令或者其他方式读取这个寄存器的值，一般基地址是 GRF 或者 PMUGRF。例如，在 TRM 文档上搜索到 “bt656” 寄存器描述，为 bit0，查看寄存器偏移为 0xe640，GRF 基地址为 0xff770000。在串口终端输入 “io -4 0xff77e640”，得到 io-domain 寄存器值，如果该寄存器值 bit0 为 1，表示 1.8v， 与硬件实际电压 VCC1V8_DVP，dts 中该项配置正确；如果 bit0 为0，则表示3.3v，与硬件实际电压 VCC1V8_DVP 不符，dts 中该项配置不正确。
 
-![io-domain-10-bt565-bit-desc](io-domain-10-bt565-bit-desc.png)
+![io-domain-10-bt565-bit-desc](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-10-bt565-bit-desc.png)
 
 ### 2. io-domain 的寄存器不正确
 
