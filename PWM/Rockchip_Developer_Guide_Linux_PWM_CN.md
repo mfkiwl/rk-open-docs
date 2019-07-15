@@ -86,7 +86,7 @@ DTS 配置参考文档 Documentation/devicetree/bindings/pwm/pwm.txt，主要几
 
 PWM 驱动流程在内核 3.10 版本和内核 4.4 版本两个驱动上大致是一样，上面说了只是接口包装的区别，所以本文只说一个4.4 的流程。
 
-![pwm-flow](pwm-flow.png)
+![pwm-flow](Rockchip_Developer_Guide_PWM/pwm-flow.png)
 
 以上是 Continuous mode 的软件流程，如果还想了解其他，在 TRM 中 PWM 章节部分的 Application Notes 小节，还有各模式下的寄存器配置流程，可以参考，这边就不再详细叙述。
 
@@ -191,7 +191,7 @@ backlight: backlight {
 
 - 通过硬件原理图确认该 PWM pin 的默认上下拉。例如 RK3399 挖掘机板子 PWM2 作为调压功能，在原理图上找到 PWM2 pin 脚: GPIO1_C3/PWM2_d，其中的"d"表示 down 为默认下拉；如果是"u"表示 up 默认上拉。
 
-![pwm-flow](pwm-default-pull.png)
+![pwm-flow](Rockchip_Developer_Guide_PWM/pwm-default-pull.png)
 
 - dtsi 中定义 PWM pull down pinctrl:
 
