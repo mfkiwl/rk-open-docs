@@ -332,15 +332,15 @@ last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 
 启动流程：
 
-![android-ab](Rockchip-Developer-Guide-Linux-AB-System\android-ab.png)
+![android-ab](Rockchip_Developer_Guide_Linux_AB_System\android-ab.png)
 
 AB successful_boot模式数据流程：
 
-![success-boot](Rockchip-Developer-Guide-Linux-AB-System\success-boot.png)
+![success-boot](Rockchip_Developer_Guide_Linux_AB_System\success-boot.png)
 
 AB reset retry模式数据流程：
 
-![reset-retry](Rockchip-Developer-Guide-Linux-AB-System\reset-retry.png)
+![reset-retry](Rockchip_Developer_Guide_Linux_AB_System\reset-retry.png)
 
 ## 7 升级及升级异常处理参考
 
