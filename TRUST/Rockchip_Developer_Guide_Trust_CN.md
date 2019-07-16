@@ -8,7 +8,7 @@
 
 文件密级：公开资料
 
------------
+---
 
 **前言**
 
@@ -36,11 +36,11 @@
 | ---------- | ------ | ------ | -------- |
 | 2017-12-30 | V1.0   | 陈健洪    | 初始版本     |
 
------------
+---
 
 [TOC]
 
-------------------------
+---
 
 ## ARM TrustZone
 
@@ -58,11 +58,9 @@
 
 ​	Rockchip的Trust可以理解为是ARM Trusted Firmware + OP-TEE OS 的功能集合，它实现了安全世界里我们需求的功能以及Secure Monitor(两个世界转换的核心代码)的功能。
 
-![Relationship-1](Rockchip-Developer-Guide-Trust/Secure-and-Non-secure-relationship-1.png)
+![Relationship-1](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_1.png)
 
-
-![Relationship-2](Rockchip-Developer-Guide-Trust/Secure-and-Non-secure-relationship-2.png)
-
+![Relationship-2](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_2.png)
 
 ### 2. CPU特权等级
 
@@ -70,12 +68,9 @@
 
 ​	Rockchip的Trust可以理解为是 EL3 + 安全EL1的功能集合。
 
-![ARM-Exception-levels](Rockchip-Developer-Guide-Trust/ARM-Exception-levels-in-the-Normal-and-Secure-world.JPG)
+![ARM-Exception-levels](Rockchip_Developer_Guide_Trust/ARM_Exception_levels_in_the_Normal_and_Secure_world.JPG)
 
-
-![Relationship-3](Rockchip-Developer-Guide-Trust/Secure-and-Non-secure-relationship-3.jpeg)
-
-------------------------
+![Relationship-3](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_3.jpeg)
 
 ## Rockchip平台的Trust
 
@@ -91,29 +86,28 @@
 
 ​	Android系统的固件启动顺序：
 
-~~~
+```c
 Maskrom -> Loader -> Trust -> U-Boot -> kernel -> Android
-~~~
+```
 
 ![Boot-flow](Rockchip-Developer-Guide-Trust/ARM-Trusted-firmware-boot-flow.png)
-
 
 ### 3. 固件获取
 
 目前只提供binary文件，不提供源代码。Trust的binary文件提交在U-Boot工程里：
 
-~~~
+```c
 ./tools/rk_tools/bin/rk30/
 ./tools/rk_tools/bin/rk31/
 ./tools/rk_tools/bin/rk32/
 ./tools/rk_tools/bin/rk33/
-~~~
+```
 
 当编译某个平台的uboot.img的时候，相应平台的trust.img也会同时打包生成在U-Boot的根目录下。其中binary打包成trust.img的时候是通过ini文件进行索引，ini文件在U-Boot工程里：
 
-~~~
+```c
 tools/rk_tools/RKTRUST/
-~~~
+```
 
 ### 4. DTS使能
 
@@ -123,7 +117,7 @@ tools/rk_tools/RKTRUST/
 
 （1）增加psci节点
 
-~~~
+```c
 psci {
 	compatible      = "arm,psci";
 	method          = "smc";
@@ -132,30 +126,30 @@ psci {
 	cpu_on          = <0x84000003>;
 	affinity_info   = <0x84000004>;
 };
-~~~
+```
 
 （2）在chosen节点或者parameter里增加：psci=enable
 
-~~~
+```c
 chosen {
 	bootargs = "psci=enable vmalloc=496M cma=4M rockchip_jtag";
 };
-~~~
+```
 
 ##### 4.1.2 64位平台
 
 （1）增加psci节点：
 
-~~~
+```c
 psci {
         compatible = "arm,psci-0.2";
         method = "smc";
 };
-~~~
+```
 
 （2）cpu节点下面增加： enable-method = "psci";
 
-~~~
+```c
 cpus {
         #address-cells = <2>;
         #size-cells = <0>;
@@ -191,7 +185,7 @@ cpus {
 
 		.....
 };
-~~~
+```
 
 #### 4.2 内核4.4
 
@@ -199,18 +193,18 @@ cpus {
 
 增加psci节点即可：
 
-~~~
+```c
 psci {
         compatible = "arm,psci-1.0";
         method = "smc";
 };
-~~~
+```
 
 ##### 4.2.2 64位平台
 
 （1）增加psci节点：
 
-```
+```c
 psci {
         compatible = "arm,psci-1.0";
         method = "smc";
@@ -219,7 +213,7 @@ psci {
 
 （2）cpu节点下面增加： enable-method = "psci";
 
-```
+```c
 cpus {
         #address-cells = <2>;
         #size-cells = <0>;
@@ -261,9 +255,9 @@ cpus {
 
 内核Document里提供了关于psci的相关说明：
 
-~~~
+```c
 ./Documentation/devicetree/bindings/arm/psci.txt
-~~~
+```
 
 ### 5. 运行内存和生命周期
 
@@ -290,7 +284,8 @@ Trust自上电初始化之后就始终常驻于内存之中，完成着自己的
 ​	基于上述原因，内核更倾向于把CPU的电源管理放到各SoC厂商自己的firmware里，内核只要专注于CPU控制策略，让内核代码更加高度统一。因此后来内核框架增加了PSCI（Power State Coordination Interface）[3]接口来实现这一目的。
 
 ​	PSCI是一套CPU core电源管理相关的接口，本质上是通过ARM的SMC硬件指令陷入到Trust里完成以上相关的操作: CPU打开、CPU关闭、系统深度休眠、系统复位、系统关机，等等。主要包括：
-~~~
+
+```c
 PSCI_VERSION
 PSCI_FEATURES
 CPU_ON
@@ -301,26 +296,26 @@ AFFINITY_INFO
 SYSTEM_OFF
 SYSTEM_RESET
 ......
-~~~
+```
 
 4.4 内核相关代码路径
 
-~~~
+```c
 ./arch/arm/kvm/psci.c
 ./arch/arm/kernel/smccc-call.S
 ./arch/arm64/kernel/psci.c
 ./arch/arm64/kernel/smccc-call.S
 ./drivers/firmware/psci.c
 ./drivers/firmware/rockchip_sip.c
-~~~
+```
 
 3.10内核相关代码路径
 
-~~~
+```c
 ./arch/arm/kernel/psci.c
 ./arch/arm64/kernel/psci.c
 ./arch/arm/mach-rockchip/psci.c
-~~~
+```
 
 #### 7.2 Secure Monitor
 
@@ -338,17 +333,13 @@ SYSTEM_RESET
 
 ​	安全数据保护。例如：安全支付、数字版权管理 (DRM)、企业服务和基于 Web 的服务等相关安全信息的存储保护。
 
-
-
-------------------------
-
 ## Rockchip 平台的Trust问题处理
 
 ​	目前对外发布的固件只提供Trust的binary文件，不提供源代码。目前对于Trust的调试方式比较少，更多需要借助专门的jtag工具来进行分析，当Trust 出问题的时候普通使用者一般并不具备自行调试和解决问题的能力，所以出现问题时请尽量保护好现场、收集足够多的信息反馈给负责Trust的maintainer。因此通常使用者应当知道哪些是Trust的打印信息、Trust对应的版本号、哪些是Trust的PANIC信息等。
 
 ### 1. 开机log示例
 
-~~~
+```c
 NOTICE:  BL31: v1.3(debug):4c793da
 NOTICE:  BL31: Built : 18:13:44, Dec 25 2017
 NOTICE:  BL31:Rockchip release version: v1.3
@@ -364,7 +355,7 @@ INF [0x0] TEE-CORE:init_teecore:83: teecore inits done
 INFO:    BL31: Preparing for EL3 exit to normal world
 INFO:    Entry point address = 0x200000
 INFO:    SPSR = 0x3c9
-~~~
+```
 
 ### 2. 打印信息识别
 
@@ -374,33 +365,33 @@ ARM Trusted Firmware 打印格式（不带有时间戳）：
 
  ~~~INFO: *********
 INFO: *********
-~~~
+ ~~~
 
 OP-TEE OS打印格式（不带有时间戳）：
 
-~~~
+```c
 INF [0x0] TEE-CORE: *********
-~~~
+```
 
 ### 3. 固件版本号识别
 
 ARM Trusted Firmware的版本号：4c793da。
 
-~~~
+```c
 NOTICE:  BL31: v1.3(debug):4c793da
-~~~
+```
 
 OP-TEE OS的版本号：27532f4（忽略最前面的g）。
 
-~~~
+```c
 INF [0x0] TEE-CORE:init_primary_helper:337: Initializing (1.1.0-127-g27532f4 #54 Mon Dec 18 02:01:14 UTC 2017 aarch64)
-~~~
+```
 
 ### 4. PANIC信息识别
 
 #### 4.1 ARM Trusted Firmware 发生panic
 
-~~~
+```c
 Unhandled Exception in EL3.
 x30 =           0x00000000ff00fff0
 x0 =            0x00000000000101c0
@@ -448,11 +439,11 @@ spsr_el1 =      0x00000000000101c0
 elr_el1 =       0x0000000000000000
 spsr_abt =      0x0000000000000000
 ......
-~~~
+```
 
 #### 4.2 OP-TEE OS发生panic
 
-~~~
+```c
 core data-abort at address 0xc121b16c
 
  fsr 0x00000805  ttbr0 0x6847446a  ttbr1 0x6847006a  cidr 0x2
@@ -464,19 +455,15 @@ core data-abort at address 0xc121b16c
 
 ERR [0x0] TEE-CORE:tee_pager_handle_fault:125: Unexpected page fault! Trap CPU
 PANIC: tee_pager_handle_fault core/arch/arm/include/mm/tee_pager.h:126
-~~~
-
-
-
----------------------
+```
 
 ## 附录参考
 
 [0] 开源代码下载：<br/>
-​	ARM Trusted Firmware：https://github.com/ARM-software/arm-trusted-firmware<br/>
-​	OP-TEE OS：https://github.com/OP-TEE/optee_os<br/>
+​	ARM Trusted Firmware：<https://github.com/ARM-software/arm-trusted-firmware><br/>
+​	OP-TEE OS：<https://github.com/OP-TEE/optee_os><br/>
 [1] ARM TrustZone：<br/>
-​	https://www.arm.com/products/security-on-arm/trustzone<br/>
-​	https://developer.arm.com/technologies/trustzone<br/>
-[2] op-tee官网：https://www.op-tee.org/<br/>
-[3] PSCI：http://infocenter.arm.com/help/topic/com.arm.doc.den0022c/DEN0022C_Power_State_Coordination_Interface.pdf "Power State Coordination Interface PDD (ARM DEN 0022C)"
+​	<https://www.arm.com/products/security-on-arm/trustzone><br/>
+​	<https://developer.arm.com/technologies/trustzone><br/>
+[2] op-tee官网：<https://www.op-tee.org/><br/>
+[3] PSCI：<http://infocenter.arm.com/help/topic/com.arm.doc.den0022c/DEN0022C_Power_State_Coordination_Interface.pdf> "Power State Coordination Interface PDD (ARM DEN 0022C)"

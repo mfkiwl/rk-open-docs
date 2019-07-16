@@ -8,7 +8,7 @@ Date：2017.12
 
 Security Class: Public
 
------------
+---
 
 **Preface**
 
@@ -36,9 +36,9 @@ This document or this guide is mainly suitable for the following engineers：
 | ---------- | ----------- | ------------- | ------------------------ |
 | 2017-12-30 | V1.0        | Jianhong Chen | Initial Release          |
 
-------
+---
 [TOC]
-------
+---
 
 ## ARM TrustZone
 
@@ -56,9 +56,9 @@ The interaction between these two worlds needs to use ARM Trusted Firmware as a 
 
 Rockchip Trust can be understood as a collection of features of ARM Trusted Firmware + OP-TEE OS, which implements functionalities we need in the secure world and functionalities of Secure Monitor (the core code for two world transition).
 
-![Relationship-1](Rockchip-Developer-Guide-Trust/Secure-and-Non-secure-relationship-1.png)
+![Relationship-1](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_1.png)
 
-![Relationship-2](Rockchip-Developer-Guide-Trust/Secure-and-Non-secure-relationship-2.png)
+![Relationship-2](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_2.png)
 
 ### 2. CPU privilege level
 
@@ -66,11 +66,9 @@ From the CPU perspective, the following is a standard CPU privilege mode level a
 
 Rockchip Trust can be understood as features collection of EL3 + Secure EL1.
 
-![ARM-Exception-levels](Rockchip-Developer-Guide-Trust/ARM-Exception-levels-in-the-Normal-and-Secure-world.JPG)
+![ARM-Exception-levels](Rockchip_Developer_Guide_Trust/ARM_Exception_levels_in_the_Normal_and_Secure_world.JPG)
 
-![Relationship-3](Rockchip-Developer-Guide-Trust/Secure-and-Non-secure-relationship-3.jpeg)
-
-------------------------
+![Relationship-3](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_3.jpeg)
 
 ## Trust on Rockchip platform
 
@@ -90,7 +88,7 @@ Android system boot-up sequence:
 Maskrom -> Loader -> Trust -> U-Boot -> kernel -> Android
 ```
 
-![Boot-flow](Rockchip-Developer-Guide-Trust/ARM-Trusted-firmware-boot-flow.png)
+![Boot-flow](Rockchip_Developer_Guide_Trust/ARM_Trusted_firmware_boot_flow.png)
 
 ### 3.Firmware obtain
 
@@ -333,8 +331,6 @@ In addition to the tight integration of Cortex-A processor itself, ARM TrustZone
 
 Security data protection. For example: storage protection for related security information such as secure payments, digital rights management (DRM), enterprise services, and web-based services.
 
-------
-
 ## Trust troubleshooting on the Rockchip platform
 
 At present, the released firmware is only provided with Trust binary files, and the source code is not provided. Currently, there are few debugging methods for Trust. it usually need to use the special jtag tools for analysis. When have Trust issues, customers generally do not have the ability to debug and solve problems by themselves, so please try to protect the scene when issues occur, collect enough information to feed back to the maintainer responsible for Trust. Therefore, users should generally know which is the print information of Trust, the version number corresponding to Trust, and which is PANIC information of Trust.
@@ -393,7 +389,7 @@ INF [0x0] TEE-CORE:init_primary_helper:337: Initializing (1.1.0-127-g27532f4 #54
 
 #### 4.1 ARM Trusted Firmware panic
 
-```
+```c
 Unhandled Exception in EL3.
 x30 =           0x00000000ff00fff0
 x0 =            0x00000000000101c0
@@ -445,7 +441,7 @@ spsr_abt =      0x0000000000000000
 
 #### 4.2 OP-TEE OS panic
 
-```
+```c
 core data-abort at address 0xc121b16c
 
  fsr 0x00000805  ttbr0 0x6847446a  ttbr1 0x6847006a  cidr 0x2
@@ -458,8 +454,6 @@ core data-abort at address 0xc121b16c
 ERR [0x0] TEE-CORE:tee_pager_handle_fault:125: Unexpected page fault! Trap CPU
 PANIC: tee_pager_handle_fault core/arch/arm/include/mm/tee_pager.h:126
 ```
-
-------
 
 ## Appendix Reference
 
