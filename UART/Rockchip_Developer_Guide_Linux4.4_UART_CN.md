@@ -211,7 +211,7 @@ pinctrl-0 = <&uart0xfer &uart0cts &uart0_rts>;
 
 ​	dmas = <&dmac_peri 0>, <&dmac_peri 1>; 这里的0和1是外设和DMAC连接的通道号，DMAC通过这个号来识别外设。通过手册查找Req number，如下图
 
-![dma_map](Rockchip-Developer-Guide-UART\dma_map.jpg)	 
+![dma_map](Rockchip_Developer_Guide_Linux4.4_UART\dma_map.jpg)	 
 
 &dmac_peri要根据手册确认外设属于哪个DMAC，来选择，一般DMAC1是dmac_peri，
 
