@@ -2645,7 +2645,7 @@ vdd_arm: DCDC_REG1 {
 
 把"false"修改"true"可显示各路regulator状态：
 
-![UBoot-nextdev-probe-regulator-list](Rockchip-Developer-Guide-UBoot-nextdev\UBoot-nextdev-probe-regulator-list.png)
+![UBoot_nextdev_probe_regulator_list](Rockchip_Developer_Guide_UBoot_Nextdev\UBoot_nextdev_probe_regulator_list.png)
 
 内容说明：
 
@@ -2941,8 +2941,8 @@ CONFIG_RKSFC_NAND    /* SPI Nand flash */
 
 1. SFC（serial flash controller）是rockchip为简便支持spi flash所设计的专用模块；
 2. 由于rknand驱动与rkflash驱动Nand代码中ftl部分不兼容，所以
-   - CONFIG_RKNAND与CONFIG_RKNANDC_NAND 不能同时配置
-   - CONFIG_RKNAND与CONFIG_RKSFC_NAND 不能同时配置
+- CONFIG_RKNAND与CONFIG_RKNANDC_NAND 不能同时配置
+- CONFIG_RKNAND与CONFIG_RKSFC_NAND 不能同时配置
 
 #### 5.9.2 相关接口
 
@@ -3588,7 +3588,7 @@ amps {
 DTO是Android P后引入且必须强制启用的功能，可让次设备树 Blob（DTBO） 叠加在已有的主设备树Blob 上。DTO 可以维护系统芯片 SoC设备树，并动态叠加针对特定设备的设备树，从而向树中添加节点并对现有树中的属性进行更改。
 
 主设备树Blob（\*.dtb）一般由Vendor厂商提供，次设备树Blob（\*.dtbo）可由ODM/OEM等厂商提供，最后通过bootloader合并后再传递给kernel。如图：
-![UBoot-nextdev-DTO](Rockchip-Developer-Guide-UBoot-nextdev/UBoot-nextdev-DTO.png)
+![UBoot_nextdev_DTO](Rockchip_Developer_Guide_UBoot_Nextdev/UBoot_nextdev_DTO.png)
 
 需要注意：DTO操作使用的DTB和DTBO的编译跟普通的DTB编译有区别，语法上有特殊区别：
 
@@ -4785,11 +4785,11 @@ pre-loader => trust => U-Boot => kernel
 
 RK3326-EVB/PX30-EVB主板上有预留分压电阻，不同的电阻分压有不同的ADC值，这样可以确定不同硬件版本:
 
-![RK3326-PX30-HW-ID1](Rockchip-Developer-Guide-UBoot-nextdev/RK3326-PX30-HW-ID1.png)
+![RK3326_PX30_HW_ID1](Rockchip_Developer_Guide_UBoot_Nextdev/RK3326_PX30_HW_ID1.png)
 
 配套使用的MIPI屏小板预留有另外一颗下拉电阻:
 
-![RK3326-PX30-HW-ID2](Rockchip-Developer-Guide-UBoot-nextdev/RK3326-PX30-HW-ID2.png)
+![RK3326_PX30_HW_ID2](Rockchip_Developer_Guide_UBoot_Nextdev/RK3326_PX30_HW_ID2.png)
 
 不同的mipi屏会配置不同的阻值，配合EVB主板确定一个唯一的ADC参数值。
 
@@ -5916,7 +5916,7 @@ rknand read: size 4MB, used 95ms, speed 43MB/s
 
 打印dts配置和当前实际各路电压情况：
 
-![UBoot-nextdev-rktest-regulator](Rockchip-Developer-Guide-UBoot-nextdev\UBoot-nextdev-rktest-regulator.png)
+![UBoot_nextdev_rktest_regulator](Rockchip_Developer_Guide_UBoot_Nextdev\UBoot_nextdev_rktest_regulator.png)
 
 调压精度测试：
 
@@ -5989,7 +5989,7 @@ CONFIG_AVB_VBMETA_PUBLIC_KEY_VALIDATE=y
 CONFIG_RK_AVB_LIBAVB_ENABLE_ATH_UNLOCK=y
 ```
 
-## 12.3 固件打包
+### 12.3 固件打包
 
 谷歌提供了avbtool来打包符合AVB标准的固件，首先参考《Rockchip-Secure-Boot2.0.md》生成testkey_psk.pem、metadata.bin，然后打包固件，以打包boot.img为例：
 

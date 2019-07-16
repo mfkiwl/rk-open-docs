@@ -8,7 +8,7 @@
 
 文件密级：公开资料
 
------------
+---
 
 **前言**
 
@@ -32,11 +32,11 @@
 | ---------- | ------ | ------ | -------- |
 | 2018-02-28 | V1.0   | 陈健洪    | 初始版本     |
 
------------
+---
 
 [TOC]
 
-------------------------
+---
 
 ## Rockchip U-Boot概况
 
@@ -56,9 +56,7 @@
 - 支持开机logo显示、充电动画显示，低电管理、电源管理；
 - 支持I2C、SPI、PMIC、CHARGE、GUAGE、USB、GPIO、PWM、DMA、GMAC、EMMC、NAND中断等驱动；
 
-
 对于上述的功能和使用方式有兴趣的读者，可以具体请参考《Rockchip U-Boot 开发指南 V3.8-20170214》。
-
 
 ### 2. next-dev概况
 
@@ -90,11 +88,9 @@
 >
 > Device - an instance of a driver, tied to a particular port or peripheral.
 
-
-
 其实DM模型和内核的device-driver框架模型是类似的，它为各类驱动模块指定了一套统一的标准框架。工程师只需要把硬件相关的部分嵌套进这个框架里即可。目前U-Boot支持的框架类型已经比较完整，next-dev分支的驱动基本都是遵循下述已有的框架流程进行实现。例如：
 
-```
+```c
 ./drivers/block/blk-uclass.c
 ./drivers/power/pmic/pmic-uclass.c
 ./drivers/power/regulator/regulator-uclass.c
@@ -117,7 +113,7 @@
 
 #### 3.5 Pre-loader支持
 
-```
+```c
 Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 ```
 
@@ -125,9 +121,7 @@ Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 
 ​	如果客户的产品有代码全开源的需求怎么办？next-dev分支的U-Boot支持SPL/TPL作为Pre-loader引导系统的功能，它可以负载加载Trust和U-Boot。SPL/TPL本身就是U-Boot自身提供的一个功能，只是在rkdevelop没有被使用。
 
-	其中TPL主要功能是DDR初始化, SPL主要功能是加载和引导trust/U-Boot两个模块.
-
-	rkdevelop仅支持Rockchip miniloader作为pre-loader；
+其中TPL主要功能是DDR初始化, SPL主要功能是加载和引导trust/U-Boot两个模块.rkdevelop仅支持Rockchip miniloader作为pre-loader；
 ​	next-dev上各芯片平台都支持两种启动方式：SPL/TPL和Rockchip miniloader。
 
 #### 3.6. 分区支持
@@ -165,7 +159,7 @@ rkdevelop支持上述1. 2. 两种命令启动固件，但是两种功能的代�
 
 rkdevelop的U-Boot工程里存放了许多bin文件和脚本工具。存放路径如下：
 
-```
+```c
 tools/rk_tools/bin/
 tools/rk_tools/RKBOOT/
 tools/rk_tools/RKTRUST/
