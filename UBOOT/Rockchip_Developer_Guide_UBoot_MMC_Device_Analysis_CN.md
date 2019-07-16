@@ -184,7 +184,7 @@ mmc_complete_init：初始化设备，获取设备信息。
 
 mmc挂载在block下，框架如下：
 
-![block设备框图](Rockchip-Developer-Guide-Uboot-mmc-device-driver-analysis/block-framework.jpg)
+![block设备框图](./Rockchip_Developer_Guide_UBoot_MMC_Device_Analysis/block-framework.jpg)
 
 U-Boot下读写擦除调用：
 
@@ -219,8 +219,3 @@ unsigned long blk_derase(struct blk_desc *block_dev, lbaint_t start,lbaint_t blk
 4. 当U-Boot作为pre-loader或usbplug使用时，emmc初始化失败，命令停留在CMD8
 
 - Rockchip平台SDRAM的前1MB位置为安全区域，加载起来的pre-loader或usbplug在此区域运行，而emmc为非安全的IP，是无法访问该区域，需要配置允许emmc读数据到该区域，才能初始化成功。
-
-
-
-
-
