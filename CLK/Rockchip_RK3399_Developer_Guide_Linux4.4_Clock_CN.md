@@ -20,7 +20,6 @@
 | -------- | -------- |
 | RK3399   | 4.4      |
 
-
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
@@ -29,28 +28,27 @@
 
 软件开发工程师
 
-
 **修订记录**
 
 | **日期**     | **版本** | **作者** | **修改说明**       |
 | ---------- | ------ | ------ | -------------- |
 | 2018-06-08 | V1.0   | Elaine | 第一次临时版本发布      |
 
-----------
+---
 
 [TOC]
 
------------------------
+---
 
-# 1 时钟配置
+## 1 时钟配置
 
-## 1.1  CRU时钟配置
+### 1.1  CRU时钟配置
 
-### 1.1.1  CRU时钟树
+#### 1.1.1  CRU时钟树
 
 时钟树太长，不做说明，详细cat /sys/kernel/debug/clk/clk_summary
 
-### 1.1.2  配置一些时钟常开
+#### 1.1.2  配置一些时钟常开
 
 对于调试过程中，想把某些时钟设置成常开的，可以修改rk3399_cru_critical_clocks这个结构体,按照现有增加时钟名字即可：
 
@@ -72,16 +70,17 @@ drivers/clk/rockchip/clk-rk3399.c
 	};
 ```
 
-### 1.1.3  CLK ID获取
+#### 1.1.3  CLK ID获取
 
 4.4的内核dts引用时钟，是根据clk id，不像3.10通过clk name索引。
 CLK ID获取，详细见文档《Rockchip Clock 开发指南》中2.3.2章节。
 
-### 1.1.4  PLL时钟配置
+#### 1.1.4  PLL时钟配置
 
 PLL锁相环详细介绍见文档《Rockchip Clock 开发指南》中1.3和2.2.1章节中。一般PLL不需要修改，尤其是下面挂了显示相关时钟的，PLL最好不要重现设置否则会有抖动问题。PLL的设置可以在UBOOT中，也可以直接在cru节点里面设置。
 
 1. dts中设置
+
 但是只在节点初始化的时候调用一次。
 
 ```c
@@ -102,6 +101,7 @@ PLL锁相环详细介绍见文档《Rockchip Clock 开发指南》中1.3和2.2.1
 | 1200 | 900 | 900 | 600 | 800 | 1200 | 1000 | 480| 700|
 
 2. PLL计算公式
+
 　　　RK平台目前有两种类型PLL，一种是NR\NF\NO（RK3066、RK3188、RK3288），一种REF\POSTDIV1\POSTDIV2（RK3036、RK312X、RK322X、RK332X、RK336X、RK3399）
 　　　1)NR、NF、NO类型，只有整数分频
 　　　FREF = FIN / NR
@@ -156,7 +156,8 @@ PLL频率尽量设置大一些，然后通过后端分频。如：DCLK 50M，可
 可以修改表中的频率对应的_refdiv, _fbdiv, _postdiv1, _postdiv2，以达到比较合适的VCO。
 （对应3.10内核的处理方式请参考文档Rockchip Clock 开发指南中3.1章节）
 
-### 1.1.5  CLK_TIMER时钟配置
+#### 1.1.5  CLK_TIMER时钟配置
+
 　　　Timer的时钟都是从24M直接经过gating bypass过来的。所以没有频率设置的概念，只有开关时钟的说法。如果想把clk配置成常开，请参考本文1.1.2.
 如果驱动自己控制可以如下操作：
 
@@ -166,7 +167,8 @@ PLL频率尽量设置大一些，然后通过后端分频。如：DCLK 50M，可
 	clk_prepare_enable(clk);
 ```
 
-### 1.1.6  总线时钟配置
+#### 1.1.6  总线时钟配置
+
 　　　总线时钟分为高速跟低速的， 高速时钟aclk_perihp、hclk_perihp、pclk_perihp，低速时钟是aclk_perilp0、hclk_perilp0、pclk_perilp0和hclk_perilp1、pclk_perilp1是可以配置时钟频率的，但是时钟树上这些时钟其下面的子时钟都是gating，只能开关，不能设置频率，如果希望修改频率，只能修改父时钟的频率。CCI做核间通信的总线时钟ACLK_CCI。DDR总线ACLK_CENTER。
 
 **频率设置方法**
@@ -206,10 +208,10 @@ dts中设置(但是只在节点初始化的时候调用一次)
 | HCLK_PERILP1 | 150M    | PCLK_PERILP1 | 150M    |
 | CCI          | 600M    | ACLK_CENTER  | 300M    |
 
-
 如果超频需要考虑加压（logic路加压）
 
-### 1.1.7  FCLK_CM0S时钟配置
+#### 1.1.7  FCLK_CM0S时钟配置
+
 　　　fclk_cm0s是在cru而fclk_cm0s_src_pmu是在pmucru的，两个时钟设置是有差异的。Pmucru请看本章节中1.2.4.fclk_cm0s是可以配置时钟的，其下面的时钟都是gating(hclk_m0_perilp_noc\clk_m0_perilp_dec\dclk_m0_perilp\hclk_m0_perilp\sclk_m0_perilp)，只能开关，不能设置频率，如果希望修改频率，只能修改fclk_cm0s的频率。而且频率只能从GPLL或者CPLL分频下来。
 
 **频率设置方法**
@@ -237,7 +239,8 @@ dts中设置，但是只在节点初始化的时候调用一次。
 
 M0设计的频率是100M，如果超频需要考虑加压（logic路加压）
 
-### 1.1.8  CLK_I2C时钟配置
+#### 1.1.8  CLK_I2C时钟配置
+
 　　　需要注意I2c1、2、3、5、6、7在cru模块中（I2C0、4、8在pmucru设置频率参考本章节1.2.5），3399的芯片i2c有两个时钟，一个控制时钟clk_i2c1一个配置时钟pclk_i2c1。控制时钟的频率只能从CPLL、GPLL分频，配置时钟频率是从pclk_perilp1来，自身只是gating不能修改频率，如果修改频率就要修改pclk_perilp1（见1.1.5）。
 
 **频率设置方法（以i2c1为例)**
@@ -268,7 +271,8 @@ M0设计的频率是100M，如果超频需要考虑加压（logic路加压）
 
 一般使用控制时钟频率不超过100M，配置时钟不超过100M。如果超频需要考虑加压（logic路加压）
 
-### 1.1.9  CLK_SPI时钟配置
+#### 1.1.9  CLK_SPI时钟配置
+
 　　　需要注意spi0、1、2、4、5在cru模块中（spi3在pmucru设置频率参考本章节1.2.6），3399的芯片spi有两个时钟，一个控制时钟clk_spi0一个配置时钟pclk_spi0。控制时钟的频率只能从CPLL、GPLL分频，配置时钟频率是spi0、1、2、4是从pclk_perilp1，spi5从hclk_perilp1，自身只是gating不能修改频率，如果修改频率就要修改pclk_perilp1和hclk_perilp1（见1.1.5）。
 
 **频率设置方法**
@@ -300,7 +304,8 @@ SPI的驱动文件drivers/spi/spi-rockchip.c中：
 
 一般使用控制时钟频率不超过50M，配置时钟不超过50M。如果超频需要考虑加压（logic路加压）
 
-### 1.1.10  CLK_UART时钟配置
+#### 1.1.10  CLK_UART时钟配置
+
 　　　需要注意uart0、1、2、3在cru模块中（uart4在pmucru设置频率参考本章节1.2.8），3399的芯片uart有两个时钟，一个控制时钟clk_uart0一个配置时钟pclk_uart0。控制时钟支持小数分频和整数分频。clk_uart0_div由CPLL、GPLL、USB480M整数分频得到，clk_uart0_frac是由clk_uart0_div做输入时钟然后使用小数分频器分频的（小数分频需要注意输入时钟要是输出时钟的20倍以上，否则时钟Jitter很差）。具体使用时整数分频能满足走整数分频，整数分频不能满足走小数分频。配置时钟频率是从pclk_perilp1来，自身只是gating不能修改频率，如果修改频率就要修改pclk_perilp1（见1.1.5）。
 
 **频率设置方法**
@@ -332,7 +337,8 @@ UART的驱动文件drivers/tty/serial/8250/8250_dw.c
 
 这个主要看uart要求的波特率是多少，一般uart的频率是波特率 * 16（HZ），一般我们平台默认支持115200、1500000两种，其他波特率要具体看PLL的频率是否可以分到。
 
-### 1.1.11  CLK_EMMC、CLK_SDIO、CLK_SDMMC时钟配置
+#### 1.1.11  CLK_EMMC、CLK_SDIO、CLK_SDMMC时钟配置
+
 　　　这几个比较特殊，由于内部是双边沿采集数据，所以要求时钟的占空比是50%,也就要求必须是偶数分频。Emmc有两个时钟，clk_emmc是控制器时钟，要求偶数分频的。Aclk_emmc是数据传输和配置时钟。SDIO有有两个时钟，clk_sdio是控制器时钟，要求偶数分频的。hclk_sdio是配置时钟。SDMMC有有两个时钟，clk_sdmmc是控制器时钟，要求偶数分频的。hclk_sdmmc是配置时钟。控制时钟都是可以配置频率的，aclk_emmc、hclk_sdmmc也是可以单独配置频率，hclk_sdio是一个gating是从hclk_perilp1来，需要修改Hclk_sdio只能修改hclk_perilp1(见1.1.5).
 
 **频率设置方法**
@@ -385,9 +391,10 @@ EMMC的驱动文件drivers/mmc/host/Sdhci-of-arasan.c
 | SDMMC/SDIO   | 300/240M（<=300M) |
 
 **注意**
-　　　对于频率设置需要说明，EMMC、SDIO、SDMMC的控制时钟的parent一般有CPLL、GPLL、NPLL、PPLL、UPLL。一般这些PLL中，CPLL被显示独占，如果EMMC需要200M频率，那么要求PLL频率是400M\800M\1200M,所以控制时钟能分到的频率要看PLL的频率是多少？一定是偶数分频得到的频率才可以（如果PLL只有600M和800M， 那么只能分出150\200\300\400M,实际在控制器输出频率只能那个有75、100、150、200M）。 
+　　　对于频率设置需要说明，EMMC、SDIO、SDMMC的控制时钟的parent一般有CPLL、GPLL、NPLL、PPLL、UPLL。一般这些PLL中，CPLL被显示独占，如果EMMC需要200M频率，那么要求PLL频率是400M\800M\1200M,所以控制时钟能分到的频率要看PLL的频率是多少？一定是偶数分频得到的频率才可以（如果PLL只有600M和800M， 那么只能分出150\200\300\400M,实际在控制器输出频率只能那个有75、100、150、200M）。
 
-### 1.1.12  显示相关VOP、HDCP、EDP跟ISP时钟配置
+#### 1.1.12  显示相关VOP、HDCP、EDP跟ISP时钟配置
+
 　　　显示相关的时钟需求比较多，dclk一般要求任意频率，因为显示的分辨率不同dclk频率不同。而aclk跟Hclk做为数据传输和寄存器配置时钟一般是固定在一个值上，不会变化，一旦显示情况下修改aclk很hclk可能会造成显示抖动等。
 
 **DCLK**
@@ -521,8 +528,7 @@ Drivers/clk/rockchip/clk-rk3399.c
 | CLK_VOP0/1_PWM | 200M    | CLK_EDP     | 200M    |
 | ACLK_HDCP      | 400M    |             |         |
 
-
-### 1.1.13  视频编解码VDU、RGA、CODEC、IEP相关时钟配置
+#### 1.1.13  视频编解码VDU、RGA、CODEC、IEP相关时钟配置
 
 　　　主要是VDU、RGA、CODEC、IEP相关的时钟配置。
 
@@ -579,8 +585,7 @@ VCODEC的驱动文件drivers/video/rockchip/vcodec/vcodec_service.c
 | CLK_VDU_CORE | 300M    | CLK_RGA_CORE | 400M    |
 | CLK_VDU_CA   | 300M    |              |         |
 
-
-### 1.1.14  USB相关时钟配置
+#### 1.1.14  USB相关时钟配置
 
 　　　USB主要包括aclk、Host、otg还有就是usb内部phy。
 
@@ -643,7 +648,8 @@ VCODEC的驱动文件drivers/usb/dwc3/dwc3-rockchip.c
 
 而对于对应的频率范围（如果USB有大数据拷贝等可以相应提高ACLK的频率，但是要注意电压是不是够是否需要提压）,ACLK_USB的SIZEOFF频率400M。
 
-### 1.1.15  CIF相关时钟配置
+#### 1.1.15  CIF相关时钟配置
+
 　　　Cif主要是SCLK_CIF_OUT，可能有24M或者27M这样的时钟要求。这个时钟源可以直接选择24M进行分频也可以选择CPLL、GPLL、NPLL然后再分频。
 
 **频率设置方法**
@@ -659,15 +665,17 @@ VCODEC的驱动文件drivers/usb/dwc3/dwc3-rockchip.c
 
 可以放在cru节点，也可以放在设备的节点里面(其他模块类似处理)。
 
-## 1.2  PMUCRU时钟配置
+### 1.2  PMUCRU时钟配置
 
-### 1.2.1  PMUCRU时钟树
-![clk-pmucru-tree](RK3399-Clock-Guide-linux4.4/clk-pmucru-tree.png)
+#### 1.2.1  PMUCRU时钟树
+
+![clk-pmucru-tree](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-pmucru-tree.png)
 
 **注意**
 　　　上述时钟控制都是在pmucru寄存器。
 
-### 1.2.2  配置一些时钟常开
+#### 1.2.2  配置一些时钟常开
+
 　　　对于调试过程中，想把某些时钟设置成常开的，
 
 可以修改rk3399_pmucru_critical_clocks这个结构体中，按照现有增加时钟名字即可。
@@ -682,7 +690,8 @@ Drivers/clk/rockchip/clk-rk3399.c
 
 这个结构中的clk在系统开机，clk初始化的时候会默认调用clk_set_enable接口。
 
-### 1.2.3  PCLK_PMU总线时钟配置
+#### 1.2.3  PCLK_PMU总线时钟配置
+
 　　　总线时钟只有pclk_pmu_src是可以配置时钟的，其下面的时钟都是gating(pclk_wdt_m0_pmu\pclk_uart4_pmu\pclk_mailbox_pmu\pclk_timer_pmu\pclk_spi3_pmu\pclk_rkpwm_pmu\pclk_i2c8_pmu\pclk_i2c4_pmu\pclk_i2c0_pmu\pclk_noc_pmu\pclk_sgrf_pmu\pclk_gpio1_pmu\pclk_gpio0_pmu\pclk_intmem1_pmu\pclk_pmugrf_pmu\pclk_pmu)，只能开关，不能设置频率，如果希望修改频率，只能修改pclk_pmu_src的频率。而且频率只能从PPLL分频下来（676M整除出来的频率）。
 
 **频率设置方法**
@@ -712,7 +721,8 @@ Drivers/clk/rockchip/clk-rk3399.c
 
 IC设计的频率是50M，如果超频需要考虑加压（logic路加压）
 
-### 1.2.4  PMU_M0时钟配置
+#### 1.2.4  PMU_M0时钟配置
+
 　　　总线时钟只有PCLK_SRC_PMUfclk_cm0s_src_pmu是可以配置时钟的，其下面的时钟都是gating(hclk_noc_pmu\dclk_cm0s_pmu\hclk_cm0s_pmu\sclk_cm0s_pmu\fclk_cm0s_pmu)，只能开关，不能设置频率，如果希望修改频率，只能修改fclk_cm0s_src_pmu的频率。而且频率只能从PPLL或者24M分频下来。
 
 **频率设置方法**
@@ -742,7 +752,8 @@ IC设计的频率是50M，如果超频需要考虑加压（logic路加压）
 
 IC设计的频率是100M，如果超频需要考虑加压（logic路加压）
 
-### 1.2.5  PMU总线时钟配置
+#### 1.2.5  PMU总线时钟配置
+
 　　　总线时钟只有PCLK_SRC_PMU是可以配置时钟的，其下面的时钟都是gating(详细见时钟树)，只能开关，不能设置频率，如果希望修改频率，只能修改PCLK_SRC_PMU的频率。而且频率只能从PPLL分频下来。
 
 **频率设置方法**
@@ -762,7 +773,8 @@ IC设计的频率是100M，如果超频需要考虑加压（logic路加压）
 
 IC设计的频率是100M，如果超频需要考虑加压（logic路加压）
 
-### 1.2.6  PMU_I2C时钟配置
+#### 1.2.6  PMU_I2C时钟配置
+
 　　　需要注意I2c0\4\8在pmucru模块中，3399的芯片i2c有两个时钟，一个控制时钟clk_i2c0_pmu一个配置时钟pclk_i2c0_pmu。控制时钟的频率只能从PPLL（676M）分频，配置时钟频率是从pclk_pmu_src来，自身只是gating不能修改频率，如果修改频率就要修改pclk_pmu_src（见1.2.1）。
 
 **频率设置方法（以i2c0为例）**
@@ -794,7 +806,8 @@ I2C的驱动文件drivers/i2c/busses/i2c-rk3x.c中：
 
 一般使用控制时钟频率不超过100M，配置时钟不超过100M。如果超频需要考虑加压（logic路加压）
 
-### 1.2.7  PMU_SPI时钟配置
+#### 1.2.7  PMU_SPI时钟配置
+
 　　　需要注意spi3在pmucru模块中，3399的芯片spi有两个时钟，一个控制时钟clk_spi3_pmu一个配置时钟pclk_spi3_pmu。控制时钟的频率只能从PPLL（676M）分频，配置时钟频率是从pclk_pmu_src来，自身只是gating不能修改频率，如果修改频率就要修改pclk_pmu_src（见1.2.1）。
 
 **频率设置方法**
@@ -826,7 +839,8 @@ SPI的驱动文件drivers/spi/spi-rockchip.c中：
 
 一般使用控制时钟频率不超过50M，配置时钟不超过50M。如果超频需要考虑加压（logic路加压）
 
-### 1.2.8  PMU_WIFI时钟配置
+#### 1.2.8  PMU_WIFI时钟配置
+
 　　　需要注意WIFI在pmucru模块中，3399的芯片wifi支持小数分频和整数分频。clk_wifi_div由PPLL整数分频得到，clk_wifi_frac是由clk_wifi_div做输入时钟然后使用小数分频器分频的（小数分频需要注意输入时钟要是输出时钟的20倍以上，否则时钟Jitter很差）。具体使用时整数分频能满足走整数分频，整数分频不能满足走小数分频。
 
 **频率设置方法**
@@ -855,7 +869,8 @@ SPI的驱动文件drivers/spi/spi-rockchip.c中：
 
 这个主要看wifi模组使用是什么晶振，一般常见的24M 26M 37.4M 40M。
 
-### 1.2.9  PMU_UART4时钟配置
+#### 1.2.9  PMU_UART4时钟配置
+
 　　　需要注意uart4在pmucru模块中，3399的芯片uarti有两个时钟，一个控制时钟clk_uart4_pmu一个配置时钟pclk_uart4_pmu。控制时钟支持小数分频和整数分频。clk_uart4_div由PPLL整数分频得到，clk_uart4_frac是由clk_uart4_div做输入时钟然后使用小数分频器分频的（小数分频需要注意输入时钟要是输出时钟的20倍以上，否则时钟Jitter很差）。具体使用时整数分频能满足走整数分频，整数分频不能满足走小数分频。配置时钟频率是从pclk_uart4_pmu来，自身只是gating不能修改频率，如果修改频率就要修改pclk_pmu_src（见1.2.1）。
 
 **频率设置方法**
@@ -887,24 +902,26 @@ UART的驱动文件drivers/tty/serial/8250/8250_dw.c
 
 这个主要看uart要求的波特率是多少，一般uart的频率是波特率 * 16（HZ），一般我们平台默认支持115200、1500000两种，其他波特率要具体看PLL的频率是否可以分到。
 
-# 2  时钟间依赖关系
+## 2  时钟间依赖关系
 
-## 2.1  普通的父子关系
+### 2.1  普通的父子关系
 
 时钟结构图及时钟树如下：
-![clk-parent-child-ie](RK3399-Clock-Guide-linux4.4/clk-parent-child-ie.png)
+![clk-parent-child-ie](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-parent-child-ie.png)
 
 普通的父子关系的依赖关系就是，子时钟开启的时候需要开启父时钟，时钟结构会保证此操作，只需要开启子时钟即可，时钟结构会自动索引其父时钟并开启。只要其子时钟有在工作，父时钟就不能关闭，正常情况时钟的开关是有引用计数，如上图中的enable_cnt，子时钟或者本身时钟被enable后计数加一，disable的时候计数减一，直到计数减为零，时钟才会被关闭。
 
-## 2.2  不同模块间NOC复用
+### 2.2  不同模块间NOC复用
+
 　　　在设计NOC的时候，有一些模块之间的Noc是复用，这就要求任何一个模块在使用的时候，NOC时钟都要开启，而且NOC的父时钟的整个时钟通路都要开启。
 有这种特殊要求的有如下时钟（目前代码中都已经处理，保证NOC时钟常开）：
 
-![clk-noc-1](RK3399-Clock-Guide-linux4.4/clk-noc-1.png)
+![clk-noc-1](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-noc-1.png)
 
-![clk-noc-2](RK3399-Clock-Guide-linux4.4/clk-noc-2.png)
+![clk-noc-2](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-noc-2.png)
 
-## 2.3  不同模块间GRF复用
+### 2.3  不同模块间GRF复用
+
 　　　在设计GRF的时候，有一些模块之间的GRF时钟是复用，这就要求任何一个模块在GRF寄存器读写的时候，公用的GRF时钟都要开启，而且GRF的父时钟的整个时钟通路都要开启。
 有这种特殊要求的有如下时钟（目前代码中都已经处理，保证GRF时钟常开）：
 
@@ -929,10 +946,9 @@ UART的驱动文件drivers/tty/serial/8250/8250_dw.c
 | aclk_usb3_grf   | grf_sta_usb3otg       | aclk_gpu_grf    | grf_gpu_perf     |
 | aclk_usb3_grf   | grf_usb3_perf         |                 |                  |
 
+## 3  时钟频率值
 
-# 3  时钟频率值
-
-## 3.1  可设置的时钟频率
+### 3.1  可设置的时钟频率
 
 | 时钟名称       | 最高频率     | 可以设置频率                             |
 | -------------- | ------------ | ---------------------------------------- |
