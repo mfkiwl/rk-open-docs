@@ -74,7 +74,7 @@ sudo vim 000-default.conf
 
 找到DocumentRoot ，配置自己想设置的路径，例如
 
-![documentroot](documentroot.png)
+![documentroot](./Rockchip_Developer_Guide_Apache2_Deploy/documentroot.png)
 
 输入
 
@@ -105,7 +105,7 @@ sudo vim apache2.conf
 
 修改如下：
 
-![auth](auth.png)
+![auth](./Rockchip_Developer_Guide_Apache2_Deploy/auth.png)
 
 输入
 
