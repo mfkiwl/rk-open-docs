@@ -44,7 +44,7 @@
 
 HiFive插到电脑，windows默认把FTDI识别成两个UART，如下：
 
-![uart](./Rockchip-Developer-Guide-RISCV-FreedomStudio/uart.png)
+![uart](./Rockchip_Developer_Guide_RISCV_FreedomStudio/uart.png)
 
 这会导致IDE无法连接设备进行调试，需要把其中一个Dial RS232-HS，解决方法如下：
 
@@ -53,13 +53,13 @@ HiFive插到电脑，windows默认把FTDI识别成两个UART，如下：
 3. 在安装目录下找到libusbK-inf-wizard.exe，运行。
 4. 选择安装的libusbk，下一步
 
-![usb](./Rockchip-Developer-Guide-RISCV-FreedomStudio/usb.png)
+![usb](./Rockchip_Developer_Guide_RISCV_FreedomStudio/usb.png)
 
 5. 选中Show All Device，可以看到三个Dual RS232-HS。 第一个是父节点， 第二和第三个是两个子节点。如果选中父节点， 则生成的驱动会应用到父节点上。 如果选中某个子节点， 则生成的驱动只应用到相应的子节点上。 HiFive1的第一个FTDI口用作JTAG， 第二个FTDI口作UART。 所以生成驱动时，选择第一个子节点就可以。
 6. 运行生成目录Dual_RS232-HS_Interface_0下的InstallDriver.exe
 7. 最后可以在设备管理器上查找到对应的设备，如下：
 
-![dual-usb](./Rockchip-Developer-Guide-RISCV-FreedomStudio/dual-usb.png)
+![dual-usb](./Rockchip_Developer_Guide_RISCV_FreedomStudio/dual-usb.png)
 
 至此，驱动安装完成。
 
@@ -67,31 +67,31 @@ HiFive插到电脑，windows默认把FTDI识别成两个UART，如下：
 
 1.File->New->Project->C Project
 
-![c-project](./Rockchip-Developer-Guide-RISCV-FreedomStudio/c-project.png)
+![c-project](./Rockchip_Developer_Guide_RISCV_FreedomStudio/c-project.png)
 
 2.点开C Project，选择SiFive C/C++ Project，Project name输入工程名，如hello_fifive：
 
-![hello_sifive](./Rockchip-Developer-Guide-RISCV-FreedomStudio/hello_sifive.png)
+![hello_sifive](./Rockchip_Developer_Guide_RISCV_FreedomStudio/hello_sifive.png)
 
 3.点击next
 
-![hello_sifive1](./Rockchip-Developer-Guide-RISCV-FreedomStudio/hello_sifive1.png)
+![hello_sifive1](./Rockchip_Developer_Guide_RISCV_FreedomStudio/hello_sifive1.png)
 
 4.后续都采用默认操作，点击next，最后点击finish。
 
-![hello_project2](./Rockchip-Developer-Guide-RISCV-FreedomStudio/hello_project2.png)
+![hello_project2](./Rockchip_Developer_Guide_RISCV_FreedomStudio/hello_project2.png)
 
 5.点击hello_sifive，右键点击build project，编译工程。
 
-![compile_result](./Rockchip-Developer-Guide-RISCV-FreedomStudio/compile_result.png)
+![compile_result](./Rockchip_Developer_Guide_RISCV_FreedomStudio/compile_result.png)
 
 6.调试：连接板子，点击hello_sifive，右键点击Debug configurations
 
-![debug_configure](./Rockchip-Developer-Guide-RISCV-FreedomStudio/debug_configure.png)
+![debug_configure](./Rockchip_Developer_Guide_RISCV_FreedomStudio/debug_configure.png)
 
 7.点击debug，调试工程。
 
-![debug](./Rockchip-Developer-Guide-RISCV-FreedomStudio/debug.png)
+![debug](./Rockchip_Developer_Guide_RISCV_FreedomStudio/debug.png)
 
 ## SCR1调试
 
@@ -103,42 +103,42 @@ HiFive插到电脑，windows默认把FTDI识别成两个UART，如下：
 
 1.File->New->Project->C Project，Project name输入hello_scr1，选择Hello World RISC-V C Project
 
-![hello_scr1](./Rockchip-Developer-Guide-RISCV-FreedomStudio/hello_scr1.png)
+![hello_scr1](./Rockchip_Developer_Guide_RISCV_FreedomStudio/hello_scr1.png)
 
 2.一直点击next，finish
 
-![hello_scr2](./Rockchip-Developer-Guide-RISCV-FreedomStudio/hello_scr2.png)
+![hello_scr2](./Rockchip_Developer_Guide_RISCV_FreedomStudio/hello_scr2.png)
 
 3.拷贝hello_ncore内的include与lib文件夹到工程目录src下，然后点击右键Refresh
 
-![hello_scr3](./Rockchip-Developer-Guide-RISCV-FreedomStudio/hello_scr3.png)
+![hello_scr3](./Rockchip_Developer_Guide_RISCV_FreedomStudio/hello_scr3.png)
 
 4.点击工程名右键Properties，选择C/C++ Build->Settings，如下配置Target Processor
 
-![c_build](./Rockchip-Developer-Guide-RISCV-FreedomStudio/c_build.png)
+![c_build](./Rockchip_Developer_Guide_RISCV_FreedomStudio/c_build.png)
 
 5.选择GNU RISC-V Cross C Compiler->Includes，配置如下
 
-![c_build1](./Rockchip-Developer-Guide-RISCV-FreedomStudio/c_build1.png)
+![c_build1](./Rockchip_Developer_Guide_RISCV_FreedomStudio/c_build1.png)
 
 6.选择GNU RISC-V Cross C Linker->General，配置如下
 
-![c_build3](./Rockchip-Developer-Guide-RISCV-FreedomStudio/c_build3.png)
+![c_build3](./Rockchip_Developer_Guide_RISCV_FreedomStudio/c_build3.png)
 
-![c_build4](./Rockchip-Developer-Guide-RISCV-FreedomStudio/c_build4.png)
+![c_build4](./Rockchip_Developer_Guide_RISCV_FreedomStudio/c_build4.png)
 
 7.选择GNU RISC-V Cross C Linker->Miscellaneous
 
-![c_build5](./Rockchip-Developer-Guide-RISCV-FreedomStudio/c_build5.png)
+![c_build5](./Rockchip_Developer_Guide_RISCV_FreedomStudio/c_build5.png)
 
 8.将main.c中的printf改为sc_printf, 同时添加**#include** "sc_print.h"，编译成功。
 
 9.调试：连接板子，点击hello_scr1，右键点击Debug configurations
 
-![debug_scr1](./Rockchip-Developer-Guide-RISCV-FreedomStudio/debug_scr1.png)
+![debug_scr1](./Rockchip_Developer_Guide_RISCV_FreedomStudio/debug_scr1.png)
 
 如果连接错误，可以尝试使用绝对路径，配置如下：
 
-![debug_scr2](./Rockchip-Developer-Guide-RISCV-FreedomStudio/debug_scr2.png)
+![debug_scr2](./Rockchip_Developer_Guide_RISCV_FreedomStudio/debug_scr2.png)
 
 10.Debug
