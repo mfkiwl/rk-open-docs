@@ -1,10 +1,10 @@
 # Rockchip Secure Boot
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：jason.zhu@rock-chips.com
 
-日期：2019.01
+日期：2019.06
 
 文件密级：公开资料
 
@@ -88,7 +88,7 @@ ProductUnlock Key (PUK)：用于解锁设备
 
 上面提及的DES算法可以更换其他算法，如RSA加密算法， 流程如下：
 
-![secure-communicate](Rockchip-Secure-Boot2.0\secure-communicate.png)
+![secure-communicate](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/secure-communicate.png)
 
 ## 5 AVB
 
@@ -148,7 +148,7 @@ python avbtool make_vbmeta_image --public_key_metadata metadata.bin --include_de
 
 通过SecureBootTool生成PrivateKey.pem和PublicKey.pem。
 
-![rootkey-generate](Rockchip-Secure-Boot2.0\rootkey-generate.png)
+![rootkey-generate](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/rootkey-generate.png)
 
 对permanent_attributes.bin进行签名：
 
@@ -168,7 +168,7 @@ fastboot reboot
 
 整个签名流程：
 
-![general_key_cer](Rockchip-Secure-Boot2.0\general_key_cer.png)
+![general_key_cer](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/general_key_cer.png)
 
 ### 5.3 AVB lock
 
@@ -209,7 +209,7 @@ fastboot oem at-unlock-vboot
 
 最后设备解锁流程：
 
-![uthenticated-unlock](Rockchip-Secure-Boot2.0/authenticated-unlock.jpg)
+![uthenticated-unlock](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/authenticated-unlock.jpg)
 
 最后操作流程如下：
 
@@ -745,25 +745,25 @@ fastboot oem fuse at-bootloader-vboot-key
 
 ## 8 固件烧写（windows）
 
-![firmware-download](Rockchip-Secure-Boot2.0\firmware-download.png)
+![firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/firmware-download.png)
 
 A/B System烧写
 
-![AB-firmware-download](Rockchip-Secure-Boot2.0\AB-firmware-download.png)
+![AB-firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/AB-firmware-download.png)
 
 ## 9 pre loader verified
 
 参见《Rockchip-Secure-Boot-Application-Note.md》
 
-![1-3MaskRom-to-loader-sequence](Rockchip-Secure-Boot2.0\1-3MaskRom-to-loader-sequence.png)
+![1-3MaskRom-to-loader-sequence](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/1-3MaskRom-to-loader-sequence.png)
 
 ## 10 U-boot verified
 
-![uboot-verify](Rockchip-Secure-Boot2.0\uboot-verify.png)
+![uboot-verify](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/uboot-verify.png)
 
 ## 11 系统校验启动
 
-![system-verify-boot](Rockchip-Secure-Boot2.0\system-verify-boot.png)
+![system-verify-boot](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/system-verify-boot.png)
 
 系统启动到kernel，kernel首先解析U-Boot传递的cmdline参数，确认系统启动是否使用dm-verify。然后加载启用system的fs_mgr服务。fs_mgr依据fsmgr_flags的参数来校验加载固件，固件hash & hash tree存放于vbmeta.img。主要有如下参数：
 
@@ -847,6 +847,8 @@ fastboot oem fuse at-rsa-perm-attr
 
 9. efuse烧写（efuse工具目前只有windows版本），选择特定的loader，选择对应的设备，点击启动烧写。
 
-![efuse-tool](Rockchip-Secure-Boot2.0\efuse-tool.png)
+![efuse-tool](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/efuse-tool.png)
 
 ### 12.2 验证流程
+
+to-do.
