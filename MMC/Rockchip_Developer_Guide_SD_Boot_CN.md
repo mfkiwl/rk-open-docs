@@ -53,7 +53,7 @@ update.img为Rockchip提供整套固件的一个合集，它不仅包含了完�
 
 Rockchip提供了专门的工具来制作update.img，如果使用Rockchip sdk，可以进入`RKTools/linux/Linux_Pack_Firmware/rockdev/`目录，如下：
 
-![rockdev-file-structure](Rockchip-Developer-Guide-SD-Boot\rockdev-file-structure.jpg)
+![rockdev-file-structure](./Rockchip_Developer_Guide_SD_Boot/rockdev-file-structure.jpg)
 
 我们可以通过修改package-file来打包需要生成的update.img。package-file文件内容如下：
 
@@ -100,7 +100,7 @@ SD卡升级卡是通过RK的工具制作，实现通过SD卡对本地存储(如e
 
 制作SD升级卡流程如下：
 
-![sd-boot-tool](Rockchip-Developer-Guide-SD-Boot\sd-boot-tool.jpg)
+![sd-boot-tool](./Rockchip_Developer_Guide_SD_Boot/sd-boot-tool.jpg)
 
 操作步骤如下：
 
@@ -140,7 +140,7 @@ SD引导升级卡格式(非GPT，目前不支持GPT，所以**U-Boot需要配置
 SD启动卡是通过RK的工具制作，实现设备系统直接从SD卡启动，极大的方便用户更新启动新编译的固件而不用非常麻烦地烧写固件到设备存储内。其具体实现是将固件烧写到SD卡中，把SD卡当作主存储使用。主控从SD卡启动时，固件以及临时文件都存放在SD卡上，有没有本地主存储都可以正常工作。目前主要用于设备系统从SD卡启动，或用于PCBA测试。**注意**：PCBA测试只是recovery下面的一个功能项，可用于升级卡与启动卡。
 制作启动卡流程如下：
 
-![sd-start-up](Rockchip-Developer-Guide-SD-Boot\sd-start-up.jpg)
+![sd-start-up](./Rockchip_Developer_Guide_SD_Boot/sd-start-up.jpg)
 
 1. 选择可移动磁盘设备
 
@@ -193,7 +193,7 @@ SD引导启动卡格式(GPT)
 SD卡运行功能，类似于SD卡升级功能，但固件升级发生pre-loader（miniloader）的SD卡升级代码。首先工具会将启动代码写到SD卡的保留区，然后将固件拷贝到SD卡可见分区上，主控从SD卡启动时，SD卡升级代码将固件升级到本地主存储中。主要用于设备固件损坏，SD卡可以修复设备。
 制作修复卡流程如下：
 
-![sd-repair](Rockchip-Developer-Guide-SD-Boot\sd-repair.jpg)
+![sd-repair](./Rockchip_Developer_Guide_SD_Boot/sd-repair.jpg)
 
 1. 选择可移动磁盘设备
 
@@ -256,11 +256,11 @@ SD卡作为各种不同功能的卡，会在sd卡内做一些标志。
 
 SD卡的boot流程可分为pre-loader启动流程与uboot启动流程，这两个流程都需要加载检测SD卡及SD卡内IDB Block内Startup Flag标志，并且会依据这些标志执行不同的功能。流程如下：
 
-![sd-system-bringup-frame](Rockchip-Developer-Guide-SD-Boot\sd-system-bringup-frame.jpg)
+![sd-system-bringup-frame](./Rockchip_Developer_Guide_SD_Boot/sd-system-bringup-frame.jpg)
 
 ### 5.1 pre-loader启动流程
 
-![loader-flow](Rockchip-Developer-Guide-SD-Boot\loader-flow.jpg)
+![loader-flow](./Rockchip_Developer_Guide_SD_Boot/loader-flow.jpg)
 
 maskrom首先先找到一份可用的miniloader固件（可以从TRM确定Maskrom支持的启动存储介质和优先顺序，maskrom会依次扫描可用存储里的固件），然后跳转到miniloader。miniloader重新查找存储设备，如果检测到SD卡，检测SD卡是否包含IDB格式固件。如果是，再判断卡标志。如果SD卡可用且标志位为 '0' 或 ‘1’，则从SD卡内读取U-Boot固件，加载启动U-Boot。如果标志为‘2’，则进入修复卡流程，在loader下更新固件。正常启动流程为扫描其他存储，加载启动下级loader。
 
