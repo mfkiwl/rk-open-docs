@@ -137,7 +137,7 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ### 4.5 驱动挂接框图
 
-![mtd-block](.\Rockchip-Developer-Guide-UBoot-MTD-Block-Device-Design\mtd-block.png)
+![mtd-block](.\Rockchip_Developer_Guide_UBoot_MTD_Block_Device_Design\mtd-block.png)
 
 ## 5 step by step
 
@@ -175,7 +175,7 @@ CMDLINE:mtdparts=rk29xxnand:0x00000800@0x00001000(uboot),0x00000800@0x00000800(t
 
 5. 烧写固件
 
-![mtd-tool](./Rockchip-Developer-Guide-UBoot-MTD-Block-Device-Design/mtd-tool.png)
+![mtd-tool](./Rockchip_Developer_Guide_UBoot_MTD_Block_Device_Design/mtd-tool.png)
 
 6. 成功启动log
 
