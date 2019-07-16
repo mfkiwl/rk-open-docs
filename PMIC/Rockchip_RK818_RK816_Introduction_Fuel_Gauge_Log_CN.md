@@ -34,53 +34,52 @@
 | ---------- | ------ | ------ | -------- |
 | 2018.05.28 | V1.0   | 陈健洪    | 初始版本     |
 
--------------------------
-
+---
 
 [TOC]
 
--------
+---
 
 ## 1 充电器/OTG检测
 
 ### 1.1 驱动文件
 
-```
+```c
 drivers/power/rk818_charger.c
 ```
 
 本驱动主要实现了充电器/OTG拔插事件的检测和充电电流的配置。打印信息都以 "rk818-charger: " 作为前缀方便识别，打印中出现的 "ac"、"usb"、"dc"、"otg" 分别代表了不同的设备，1表示当前处于连接状态，0表示断开连接。需要注意的是：PMIC本身没有能力检测充电器/OTG拔插事件，所以对于充电类型的检测实际上都是依赖USB的通知链消息。
 
-
 ### 1.2 probe阶段
+
 DC充电器注册情况：
 
-```
+```c
 rk818-charger: support dc
 rk818-charger: not support dc
 ```
 
 注册type-c口充电器的通知链：
 
-```
+```c
 rk818-charger: register typec extcon evt notifier
 ```
 
 注册传统usb口充电器的通知链：
 
-```
+```c
 rk818-charger: register bc evt notifier
 ```
 
 probe结束时各设备连接状态：
 
-```
+```c
 rk818-charger: ac=1, usb=0, dc=0, otg=0
 ```
 
 驱动版本号：
 
-```
+```c
 rk818-charger: driver version: 2.0
 ```
 
@@ -88,7 +87,7 @@ rk818-charger: driver version: 2.0
 
 来自于USB通知链的充电器/OTG设备插拔消息：
 
-```
+```c
 rk818-charger: receive bc notifier event: DISCNT	// 充电器拔出
 rk818-charger: receive bc notifier event: USB		// 电脑充电插入
 rk818-charger: receive bc notifier event: AC		// 标准充电器插入
@@ -102,21 +101,21 @@ rk818-charger: detect dc charger out				// DC拔出
 
 PMIC本身无法判断充电器类型，但是可以判断是否有充电设备插入：
 
-```
+```c
 rk818-charger: pmic: plug out
 rk818-charger: pmic: plug in
 ```
 
 拔插OTG设备时，5V供电变化情况：
 
-```
+```c
 rk818-charger: disable otg5v
 rk818-charger: enable otg5v
 ```
 
 每次插拔充电器/OTG后都会更新设备和电流信息：
 
-```
+```c
 rk818-charger: ac=1 usb=0 dc=0 otg=0 v=4200 chrg=1000 input=1800 virt=0
 ```
 
@@ -124,7 +123,7 @@ rk818-charger: ac=1 usb=0 dc=0 otg=0 v=4200 chrg=1000 input=1800 virt=0
 
 suspend时OTG设备的5V供电变化情况：
 
-```
+```c
 rk818-charger: suspend: otg 5v on
 rk818-charger: suspend: otg 5v off
 ```
@@ -133,16 +132,15 @@ rk818-charger: suspend: otg 5v off
 
 shutdown时当前各设备的连接情况：
 
-```
+```c
 rk818-charger: shutdown: ac=1 usb=0 dc=0 otg=0
 ```
-
 
 ## 2 电池电量检测
 
 ### 2.1 驱动文件
 
-```
+```c
 drivers/power/rk818_battery.c
 drivers/power/rk818_battery.h
 ```
@@ -153,31 +151,31 @@ drivers/power/rk818_battery.h
 
 当接电池后第一次上电开机，会有 "first on" 的提示：
 
-```
+```c
 rk818-bat: first on: dsoc=24, rsoc=24 cap=960, fcc=4000, ov=3840
 ```
 
 当异常关机（比如：死机后持续耗电）导致库仑计出现异常时，再次开机会进行库仑计的强制校正：
 
-```
+```c
 rk818-bat: system halt last time... cap: pre=2400, now=120
 ```
 
 当U-Boot已经初始化过电量计时，内核电量计驱动可以跳过部分初始化流程，防止重复初始化：
 
-```
+```c
 rk818-bat: initialized yet..
 ```
 
 probe阶段的库仑计初始状态：
 
-```
+```c
 rk818-bat: dsoc=32 cap=1000 v=3780 ov=3900 rv=3890 min=25 psoc=32 pcap=1000
 ```
 
 电量计版本号:
 
-```
+```c
 rk818-bat: driver version 7.1
 ```
 
@@ -185,7 +183,7 @@ rk818-bat: driver version 7.1
 
 每次电量变化的时候驱动向框架上报电量时都有如下打印，第一句话表示各参数的实时状态；第二句话表示开机初始化时的参数状态量，主要用于debug
 
-```
+```c
 rk818-bat: changed: dsoc=22, rsoc=24, v=3820, ov=3770 c=1018, cap=960, f=4000, st=cc cv, hotdie=0
 rk818-bat: dl=10, rl=12, v=3670, halt=0, halt_n=0, max=0, init=0, sw=0, calib=0, below0=0, force=0
 ```
@@ -194,7 +192,7 @@ rk818-bat: dl=10, rl=12, v=3670, halt=0, halt_n=0, max=0, init=0, sw=0, calib=0,
 
 系统进入深度休眠后，如果待机过长时间后导致电池低电至关机电压以下，则会产生一个PMIC唤醒的中断，然后关机：
 
-```
+```c
 rk818-bat: lower power yet, power off system! v=3350, c=-125, dsoc=0
 ```
 
@@ -202,15 +200,16 @@ rk818-bat: lower power yet, power off system! v=3350, c=-125, dsoc=0
 
 shutdown的时候显示相关重要信息：
 
-```
+```c
 rk818-bat: shutdown: dl=0 rl=2 c=-1220 v=3460 cap=88 f=4000 ch=1 n=0 mode=1 rest=128
 打印含义：<显示soc> <真实soc> <电流> <电压> <剩余容量> <满充容量> <是否有charger> <其余忽略....>
 ```
+
 ## 3 关于RK816电量计
 
 RK816电量计的功能实现基本和RK818差别不大，把充电器识别和电量计改动都统一在：
 
-```
+```c
 drivers/power/rk816_battery.c
 ```
 
