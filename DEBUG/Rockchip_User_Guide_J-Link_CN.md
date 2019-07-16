@@ -21,14 +21,14 @@
 | 2019-05-16 | V1.0     | Andy Yan | 初始版本     |
 
 ---
-
 [TOC]
+---
 
 ## **简介**
 
 J-Link 是德国 [SEGGER](<https://www.segger.com/products/debug-probes/j-link/>) 公司出品的一款 Debug 工具，能够支持 ARM7/9/11，Cortex-M/R/A，RISC-V 等大量嵌入式目标平台，与之配合的 PC 端软件能够运行于 Window/Linux/Mac 等系统上。
 
-![J-Link](J-Link/J-Link.jpg)
+![J-Link](Rockchip_User_Guide_J-Link/J-Link.jpg)
 
 J-Link主要提供两个功能：
 
@@ -45,19 +45,19 @@ SEGGER提供了跨平台的命令行工具，只要下载安装了J-Link Softwar
 
 * **启动**
 
-![](J-Link/JLink-cmd.png)
+![](Rockchip_User_Guide_J-Link/JLink-cmd.png)
 
 在命令行输入 "?" 可以列出所有支持的命令。
 
 * **连接**
 
-  ![](J-Link/JLink-connect.png)
+  ![](Rockchip_User_Guide_J-Link/JLink-connect.png)
 
 输入connect命令进行连接，然后回车选"SWD"，再回车，可以看到芯片被识别到的信息。
 
 * **加载程序并运行**
 
-  ![](J-Link/Jlink-Run.png)
+  ![](Rockchip_User_Guide_J-Link/Jlink-Run.png)
 
 利用loadefile或者loadbin命令加载程序，注意要指定加载地址。
 
@@ -71,7 +71,7 @@ Ozone是SEGGER推出的与J-Link配合的Debug和性能分析工具，跨平台(
 
 * **启动**
 
-![Ozone-startup](J-Link/Ozone-startup.png)
+![Ozone-startup](Rockchip_User_Guide_J-Link/Ozone-startup.png)
 
 Device：根据目标板芯片的内核选择，Cortex-M3/Cortex-M4
 
@@ -79,7 +79,7 @@ Peripherals：根据目标板芯片进行选择对应的svd文件，其实这个
 
 * **J-Link设置**
 
-![Ozone-Jlink](J-Link/Ozone-JLink.png)
+![Ozone-Jlink](Rockchip_User_Guide_J-Link/Ozone-JLink.png)
 
 Target Interface：我们芯片的JTAG口一般都用两线模式，所以选SWD
 
@@ -91,13 +91,13 @@ Serial No：这个是在PC连接了多个J-Link的情况下用的，一般这里
 
 * **选择待调试的程序**
 
-  ![](J-Link/Ozone-elf.png)
+  ![](Rockchip_User_Guide_J-Link/Ozone-elf.png)
 
  这里我们一般选择ELF格式的符号表。
 
 * **进入主界面**
 
-  ![](J-Link/Ozone-Window.png)
+  ![](Rockchip_User_Guide_J-Link/Ozone-Window.png)
 
 左上角电源标识形状的那个是Debug开关按钮
 
@@ -117,15 +117,15 @@ H：这个是可以输入命令的控制台，虽然空间小，但是可以定�
 
 * **命令行**
 
-  ![](J-Link/OZone-command.png)
+![](Rockchip_User_Guide_J-Link/OZone-command.png)
 
 输入help可以看到支持的各种命令
 
 * **程序下载运行**
 
-![](J-Link/Ozone-Download.png)
+![](Rockchip_User_Guide_J-Link/Ozone-Download.png)
 
-![](J-Link/Ozone-attach.png)
+![](Rockchip_User_Guide_J-Link/Ozone-attach.png)
 
 选择Download & Reset Program，Ozone会解析elf文件中的程序运行地址并将其加载到内存中对应的位置，并跳过去开始执行，然后默认停在main函数的入口。然后可以控制单步执行或者设置断点。
 
@@ -135,11 +135,11 @@ H：这个是可以输入命令的控制台，虽然空间小，但是可以定�
 
 以Attach & Halt Program的模式连接：
 
-![](J-Link/Ozone-Attach-Halt.png)
+![](Rockchip_User_Guide_J-Link/Ozone-Attach-Halt.png)
 
 在命令行窗口执行Debug.Download命令：
 
-![](J-Link/Ozone-cmd-download.png)
+![](Rockchip_User_Guide_J-Link/Ozone-cmd-download.png)
 
 这时候系统会停在代码入口处，然后可以单步运行Debug。
 
@@ -147,11 +147,11 @@ H：这个是可以输入命令的控制台，虽然空间小，但是可以定�
 
 很多开发者习惯在 Linux 环境下编译代码，然后在 Windows 环境下调试，或者调试运行的 ELF 文件是另外一个开发者编译的，这时候 Ozone 根据 ELF 文件中获取的路径信息就无法找到代码对应的源码文件。
 
-![Source File Not Found](./J-Link/Ozone-FND.png)
+![Source File Not Found](Rockchip_User_Guide_J-Link/Ozone-FND.png)
 
 如图所示，该 ELF 文件是在 Linux 系统 /home/tzb/inner_projects/rt-thread 目录下编译的，但是这时候 Ozone 运行于 Windows 系统上，自然就无法找到对应的源文件。Ozone 提供了 Project.AddPathSubstitute 命令来解决这个问题。假如现在通过 Samba 服务把 Linux 系统下的 rt-thread 源码目录映射到 Windows 下的 Z:\rt-thread，则可以通过如下命令设置源码路径：`Project.AddPathSubstitute  /home/tzb/inner_projects/ Z:/` 。
 
-![Add File Path](./J-Link/Ozone-APS.png)
+![Add File Path](Rockchip_User_Guide_J-Link/Ozone-APS.png)
 
 如果替换的路径固定，也可以考虑把这个路径写到脚本里面，避免每次都要输入命令。
 

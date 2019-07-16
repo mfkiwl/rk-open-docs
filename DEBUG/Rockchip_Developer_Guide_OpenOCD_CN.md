@@ -60,7 +60,7 @@ STM32F103开发板
 
 FT2232HL仿真器
 
-![FT2232HL-board](./Rockchip-Developer-Guide-OpenOCD/FT2232HL-board.png)
+![FT2232HL-board](./Rockchip_Developer_Guide_OpenOCD/FT2232HL-board.png)
 
 J-Link仿真器
 
@@ -74,23 +74,23 @@ J-Link仿真器
 
 1. FT2232HL调试板与电脑连接，会显示如下两个串口：
 
-![serial](./Rockchip-Developer-Guide-OpenOCD/serial.png)
+![serial](./Rockchip_Developer_Guide_OpenOCD/serial.png)
 
 如果未出现可以[FTDI](https://www.ftdichip.com/)官网下载对应驱动。
 
 2. 安装FT_Prog.exe并运行：
 
-![ft_prog](./Rockchip-Developer-Guide-OpenOCD/ft_prog.png)
+![ft_prog](./Rockchip_Developer_Guide_OpenOCD/ft_prog.png)
 
 如上选择后，下载固件到FT2232HL调试板。
 
 3. 运行UsbDriverTool.exe（可以网上下载）：
 
-![usb_serial_tool](./Rockchip-Developer-Guide-OpenOCD/usb_serial_tool.png)
+![usb_serial_tool](./Rockchip_Developer_Guide_OpenOCD/usb_serial_tool.png)
 
 选择USB Serial Converter B，双击会弹出如下显示框：
 
-![WinUSB](./Rockchip-Developer-Guide-OpenOCD/WinUSB.png)
+![WinUSB](./Rockchip_Developer_Guide_OpenOCD/WinUSB.png)
 
 安装WinUSB驱动。
 
@@ -117,7 +117,7 @@ openocd -f ftdi.cfg -f stm32f1x.cfg -c "halt" -c "flash write_image erase u-boot
 
 log如下：
 
-![win_openocd_link_log](./Rockchip-Developer-Guide-OpenOCD/win_openocd_link_log.png)
+![win_openocd_link_log](./Rockchip_Developer_Guide_OpenOCD/win_openocd_link_log.png)
 
 表示能够正常连接设备。
 
@@ -133,7 +133,7 @@ openocd -f ftdi.cfg -f stm32f1x.cfg -c init -c "halt"  -c "flash write_image era
 
 log如下：
 
-![linux_openocd_link_log](./Rockchip-Developer-Guide-OpenOCD/linux_openocd_link_log.png)
+![linux_openocd_link_log](./Rockchip_Developer_Guide_OpenOCD/linux_openocd_link_log.png)
 
 ### 7.2 结合telnet调试
 
@@ -348,7 +348,7 @@ xPSR: 0x61000000 pc: 0x2000003a msp: 0xffffffe4
 
 效果：
 
-![gdb-debug](./Rockchip-Developer-Guide-OpenOCD/gdb-debug.png)
+![gdb-debug](./Rockchip_Developer_Guide_OpenOCD/gdb-debug.png)
 
 ## 8 J-Link支持
 
@@ -360,7 +360,7 @@ openocd -f jlink.cfg -f stm32f1x.cfg -c init -c "halt"  -c "flash write_image er
 
 log如下：
 
-![j-link-openocd-link-log](./Rockchip-Developer-Guide-OpenOCD/j-link-openocd-link-log.png)
+![j-link-openocd-link-log](./Rockchip_Developer_Guide_OpenOCD/j-link-openocd-link-log.png)
 
 其他命令操作同章节7 FT2232HL Linux调试。
 
@@ -407,11 +407,11 @@ For bug reports, read
 
 连接测试板log：
 
-![board_link](./Rockchip-Developer-Guide-OpenOCD/board_link.png)
+![board_link](./Rockchip_Developer_Guide_OpenOCD/board_link.png)
 
 未连接测试板log：
 
-![board_unlink](./Rockchip-Developer-Guide-OpenOCD/board_unlink.png)
+![board_unlink](./Rockchip_Developer_Guide_OpenOCD/board_unlink.png)
 
 4. -d
 
