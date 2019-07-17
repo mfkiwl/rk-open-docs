@@ -1,6 +1,6 @@
 # **Rockchip SPI 开发指南**
 
-发布版本：1.00
+发布版本：1.0
 
 作者邮箱：hhb@rock-chips.com
 
@@ -28,7 +28,6 @@
 
 软件开发工程师
 
-
 **修订记录**
 
 | **日期**     | **版本** | **作者** | **修改说明** |
@@ -49,33 +48,29 @@ SPI （serial peripheral interface），以下是linux 4.4 spi驱动支持的一
 * 支持SPI 4种传输模式配置
 * 每个SPI控制器支持一个到两个片选
 
----
-
-
-
 ## 2 内核软件
 
 ### 2.1 代码路径
 
-~~~
+```c
 drivers/spi/spi.c    		 spi驱动框架
 drivers/spi/spi-rockchip.c   rk spi各接口实现
 drivers/spi/spidev.c   		 创建spi设备节点，用户态使用。
 drivers/spi/spi-rockchip-test.c  spi测试驱动，需要自己手动添加到Makefile编译
 Documentation/spi/spidev_test.c  用户态spi测试工具
-~~~
+```
 
 ### 2.2 内核配置
 
-~~~
+```c
 Device Drivers  --->
 	[*] SPI support  --->
 		<*>   Rockchip SPI controller driver
-~~~
+```
 
 ### 2.3 DTS节点配置
 
-~~~
+```c
 &spi1 {     						引用spi 控制器节点
 status = "okay";
 max-freq = <48000000>; 				spi内部工作时钟
@@ -89,9 +84,10 @@ dma-names = "tx","rx";   			使能DMA模式，一般通讯字节少于32字节�
 		status = "okay";		 使能设备节点
 	};
 };
-~~~
+```
 
 一般只需配置以下几个属性就能工作了。
+
 ```
 		spi_test@11 {
 				compatible ="rockchip,spi_test_bus1_cs1";
@@ -100,18 +96,18 @@ dma-names = "tx","rx";   			使能DMA模式，一般通讯字节少于32字节�
 				status = "okay";
 		};
 ```
+
 max-freq 和 spi-max-frequency的配置说明：
 
 * spi-max-frequency 是SPI的输出时钟，是max-freq分频后输出的，关系是max-freq >= 2*spi-max-frequency。
 * max-freq 不要低于24M，否则可能有问题。
 * 如果需要配置spi-cpha的话， max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
 
-
-
 ### 2.3 SPI设备驱动
 
 设备驱动注册:
-```
+
+```c
 static int spi_test_probe(struct spi_device *spi)
 {
 		int ret;
@@ -159,18 +155,17 @@ static void __exit spi_test_exit(void)
 }
 module_exit(spi_test_exit);
 ```
+
 对spi读写操作请参考include/linux/spi/spi.h，以下简单列出几个
 
-~~~
+```c
 static inline int
 spi_write(struct spi_device *spi,const void *buf, size_t len)
 static inline int
 spi_read(struct spi_device *spi,void *buf, size_t len)
 static inline int
 spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
-~~~
-
-
+```
 
 ### 2.4 User mode SPI device配置说明
 
@@ -180,15 +175,15 @@ User mode SPI device 指的是用户空间直接操作SPI接口，这样方便�
 
 #### 2.4.1 内核配置
 
-~~~
+```c
 Device Drivers  --->
 	[*] SPI support  --->
 		[*]   User mode SPI device driver support
-~~~
+```
 
 #### 2.4.2 DTS配置
 
-~~~
+```c
 &spi0 {
 	status = "okay";
 	max-freq = <50000000>;
@@ -198,11 +193,11 @@ Device Drivers  --->
 		spi-max-frequency = <5000000>;
 	};
 };
-~~~
+```
 
 #### 2.4.3 内核补丁
 
-~~~
+```c
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
 index d0e7dfc..b388c32 100644
 --- a/drivers/spi/spidev.c
@@ -215,23 +210,23 @@ static const struct of_device_id spidev_dt_ids[] = {
         {},
 };
 MODULE_DEVICE_TABLE(of, spidev_dt_ids);
-~~~
+```
 
 说明：较旧的内核可能没有2.4.1 和2.4.3 ，需要手动添加，如果已经包含这两个的内核，只要添加2.4.2即可。
 
 #### 2.4.4 使用说明
 
-​	驱动设备加载注册成功后，会出现类似这个名字的设备：/dev/spidev1.1
+驱动设备加载注册成功后，会出现类似这个名字的设备：/dev/spidev1.1
 
-​	请参照Documentation/spi/spidev_test.c
+请参照Documentation/spi/spidev_test.c
 
 #### 2.5 SPI 做slave
 
-​	使用的接口和master模式一样，都是spi_read和spi_write。
+使用的接口和master模式一样，都是spi_read和spi_write。
 
 内核补丁，请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
 
-~~~
+```c
 diff --git a/drivers/spi/spi-rockchip.c b/drivers/spi/spi-rockchip.c
 index 060806e..38eecdc 100644
 --- a/drivers/spi/spi-rockchip.c
@@ -279,10 +274,11 @@ index cce80e6..ce2cec6 100644
         int                     irq;
         void                    *controller_state;
         void                    *controller_data;
-~~~
+```
 
 dts配置：
 
+```c
     &spi0 {
         max-freq = <48000000>;   //spi internal clk, don't modify
         spi_test@01 {
@@ -295,6 +291,8 @@ dts配置：
                 spi-slave-mode; 使能slave 模式， 只需改这里就行。
         };
     };
+```
+
 注意：max-freq 必须是master clk的6倍以上，比如max-freq = <48000000>; master给过来的时钟必须小于8M。
 
 测试：
@@ -311,22 +309,20 @@ slave write，master read也是需要先启动slave write，因为只有master�
 
 再slave:  `echo read 0 1 16 > /dev/spi_misc_test`
 
-
-
 ## 3 SPI 内核测试驱动
 
 ### 3.1 内核驱动
 
-~~~
+```c
 drivers/spi/spi-rockchip-test.c
 需要手动添加编译：
 drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
-~~~
+```
 
 ### 3.2 DTS配置
 
-~~~
+```c
 &spi0 {
         status = "okay";
         max-freq = <48000000>;   //spi internal clk, don't modify
@@ -352,11 +348,11 @@ drivers/spi/Makefile
                 spi-slave-mode; 使能slave 模式， 只需改这里就行。
         };
 };
-~~~
+```
 
 ### 3.3 驱动log
 
-~~~
+```c
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
 [    0.530774] spi_test spi32766.0: fail to get type, default set 0
 [    0.531342] spi_test spi32766.0: fail to get enable_dma, default set 0
@@ -364,17 +360,17 @@ drivers/spi/Makefile
 [	 0.531929]   rockchip_spi_test_probe:name=spi_test_bus1_cs0,bus_num=32766,cs=0,mode=0,speed=5000000
 [    0.532711] rockchip_spi_test_probe:poll_mode=0, type=0, enable_dma=0
 这是驱动注册成功的标志
-~~~
+```
 
 ### 3.4 测试命令
 
-~~~
+```c
 echo write 0 10 255 > /dev/spi_misc_test
 echo write 0 10 255 init.rc > /dev/spi_misc_test
 echo read 0 10 255 > /dev/spi_misc_test
 echo loop 0 10 255 > /dev/spi_misc_test
 echo setspeed 0 1000000 > /dev/spi_misc_test
-~~~
+```
 
 echo 类型  id  循环次数 传输长度 > /dev/spi_misc_test
 
