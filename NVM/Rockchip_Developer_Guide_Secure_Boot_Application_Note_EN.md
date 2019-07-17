@@ -9,7 +9,8 @@ Date:2017.11
 Classification level:Publicity
 
 ---
-##Preface
+
+**Preface**
 
 **Terms**
 
@@ -39,30 +40,23 @@ Features of secure boot:
 
 - Support SHA256
 
+- Support RSA2048
 
--  Support RSA2048
-
-
--  Support eFuse hash to verify public key
+- Support eFuse hash to verify public key
 
 The relative tool and loader revision:
 
--  MiniloaderV2.19 or the latest revision
+- MiniloaderV2.19 or the latest revision
 
+- Uboot V2.17or the latest revision
 
--  Uboot V2.17or the latest revision
+- Efuse tool V1.35 or the latest revision
 
+- SecureBootTool 1.79 or the latest revision
 
--  Efuse tool V1.35 or the latest revision
+- RKBatchTool 1.8 or the latest revision(deprecated, Use FactoryTool instead)
 
-
--  SecureBootTool 1.79 or the latest revision
-
-
--  RKBatchTool 1.8 or the latest revision(deprecated, Use FactoryTool instead)
-
-
--  FactoryTool 1.39 or the latest revision
+- FactoryTool 1.39 or the latest revision
 
 **History**
 
@@ -84,27 +78,25 @@ The relative tool and loader revision:
 
 [TOC]
 
-
-
 ---
 
 ## 1 Architecture
 
 ### 1.1 Secure Boot Process
 
-![1-1Secure-boot-process](Rockchip-Secure-Boot-Application-Note/1-1Secure-boot-process.png)
+![1-1Secure-boot-process](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-1Secure-boot-process.png)
 
 Figure 1-1 Secure boot process
 
 ### 1.2 Secure Boot Sequence
 
-![1-2Secure-boot-sequence](Rockchip-Secure-Boot-Application-Note/1-2Secure-boot-sequence.png)
+![1-2Secure-boot-sequence](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-2Secure-boot-sequence.png)
 
 Figure 1-2 Secure boot sequence
 
 ### 1.3 MaskRom Boot to the First Loader (RKminiLoader/U-Boot)
 
-![1-3MaskRom-to-loader-sequence](Rockchip-Secure-Boot-Application-Note/1-3MaskRom-to-loader-sequence.png)
+![1-3MaskRom-to-loader-sequence](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-3MaskRom-to-loader-sequence.png)
 
 Figure 1-3 MaskRom to loader sequence
 
@@ -124,11 +116,9 @@ Table 1-1 First loader data layout
 | 2048-4095                          | public key and digital signature |
 | 4096 -                             | raw binary                       |
 
-
-
 The structure of public key and digital signature layout at address 2048 to 4095:
 
-![1-4Second_loader_hdr-struct](Rockchip-Secure-Boot-Application-Note/1-4Second_loader_hdr-struct.png)
+![1-4Second_loader_hdr-struct](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-4Second_loader_hdr-struct.png)
 
 Figure 1-4 Second_loader_hdr struct
 
@@ -142,7 +132,7 @@ l Step 3: Calculate the hash(SHA256) of raw binary and compare it with RSA2048 e
 
 ### 1.4 U-Boot Boot to Boot Image with Linux kernel)
 
-![1-5-UBoot to boot sequence](Rockchip-Secure-Boot-Application-Note/1-5-UBoot to boot sequence.png)
+![1-5-UBoot to boot sequence](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-5-UBoot to boot sequence.png)
 
 Figure 1-5 U-Boot to boot sequence
 
@@ -155,11 +145,9 @@ Table 1-2 Boot data layout
 | …         |                     |        |
 |           |                     |        |
 
-
-
 The structure of layout 0-2047(header):
 
-![1-6-Boot_img_hdr struct](Rockchip-Secure-Boot-Application-Note/1-6-Boot_img_hdr struct.png)
+![1-6-Boot_img_hdr struct](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-6-Boot_img_hdr struct.png)
 
 Figure 1-6 Boot_img_hdr struct
 
@@ -174,8 +162,6 @@ l Step 3: Hash(SHA256) of raw binary and compare it with RSA2048 encryption(usin
 ### 1.5 U-Boot Boot to Recovery
 
 The same as boot to boot image, detail please refer to chapter1.4.
-
----
 
 ## 2 eFuse Layout
 
@@ -196,8 +182,6 @@ Table 2-1 eFuse data layout
 | 0x1E                       | Reserved                                 |
 | 0x1F                       | eFuse write lock bits                    |
 
-
-
 RK3228H and RK3328 used 7680 bits OTP for secure boot, data layout:
 
 Table 2-2 OTP data layout
@@ -211,45 +195,31 @@ Table 2-2 OTP data layout
 | 130-131                    | Non-trusted Firmware revocation counter (ID #1) |
 | 132-239                    | Reserved                                 |
 
----
-
 ## 3 Overall Operation Flow
 
-![3-1Secure-boot-operation-process](Rockchip-Secure-Boot-Application-Note/3-1Secure-boot-operation-process.png)
+![3-1Secure-boot-operation-process](Rockchip_Developer_Guide_Secure_Boot_Application_Note/3-1Secure-boot-operation-process.png)
 
 Figure 3-1 Secure boot operation process
-
-
 
 ### 3.1 Make Update.img
 
 [See Make update.img](#_Make_update.img)
 
-
-
 ### 3.2 Firmware Sign
 
 [See Firmware Sign Flow](#_Firmware_Sign_Flow)
-
-
 
 ### 3.3 Programming eFuse
 
 [See Programming eFuse](#_Programming_EFUSE)
 
-
-
 ### 3.4 Firmware Upgrade
 
 [See Firmware Upgrade](#_Firmware_Upgrade)
 
-
-
 ### 3.5 Ensure that Secure Boot has been Enabled
 
 [See Verification](#_Verification_1)
-
----
 
 ## 4 Make Update.img
 
@@ -259,7 +229,7 @@ After build Android,use the following script to generate images:
 
 ./mkimage.sh ota
 
-![4-1Script-to-generate-images](Rockchip-Secure-Boot-Application-Note/4-1Script-to-generate-images.png)
+![4-1Script-to-generate-images](Rockchip_Developer_Guide_Secure_Boot_Application_Note/4-1Script-to-generate-images.png)
 
 Figure 4-1 Script to generate images
 
@@ -269,17 +239,13 @@ Refer to RKTools/windows/AndroidTool/rockdev/package-file. This file controls wh
 
 Take RK3288, for example. Change bootloader path, commentaries resource and kernel lines, set backup to RESERVED.
 
-![4-2Package-file to-control-the-packaging](Rockchip-Secure-Boot-Application-Note/4-2Package-file to-control-the-packaging.png)
+![4-2Package-file to-control-the-packaging](Rockchip_Developer_Guide_Secure_Boot_Application_Note/4-2Package-file to-control-the-packaging.png)
 
 Figure 4-2 Package-file to control the packaging
 
 Copy RKTools/windows folders to windows system, then run AndroidTool/rockdev/mkupdate.bat to generate the update.img.
 
-![4-3Script-to-generate-images](Rockchip-Secure-Boot-Application-Note/4-3Script-to-generate-images.png)Figure 4-3 Script-to-generate-images
-
-
-
----
+![4-3Script-to-generate-images](Rockchip_Developer_Guide_Secure_Boot_Application_Note/4-3Script-to-generate-images.png)Figure 4-3 Script-to-generate-images
 
 ## 5 Firmware Sign Flow
 
@@ -287,7 +253,7 @@ This instruction is for Windows tools, while Linux has its own.
 
 ### 5.1 Generating RSA key
 
- ![5-1SecureBootTool generates-RSA-key](Rockchip-Secure-Boot-Application-Note/5-1SecureBootTool generates-RSA-key.png)
+ ![5-1SecureBootTool generates-RSA-key](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-1SecureBootTool generates-RSA-key.png)
 
 Figure 5-1 SecureBootTool generates RSA key
 
@@ -297,39 +263,37 @@ This key will be used for signed firmware and for OTA, please back up to a secur
 
 NOTE: The keypair is VERY important! Make sure to save it securely. Once you lost it or leak it, your product will be exposed in high risk, also the old device will be unable to be updated anymore.It should be maintained through the whole product life cycle
 
-![5-2SecureBootTool-saves-RSA-key](Rockchip-Secure-Boot-Application-Note/5-2SecureBootTool-saves-RSA-key.png)
-
-
+![5-2SecureBootTool-saves-RSA-key](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-2SecureBootTool-saves-RSA-key.png)
 
 Figure 5-2 SecureBootTool saves RSA key
 
 ### 5.3 Loading RSA key
 
- ![5-3SecureBootTool-loads-RSA-key](Rockchip-Secure-Boot-Application-Note/5-3SecureBootTool-loads-RSA-key.png)
+ ![5-3SecureBootTool-loads-RSA-key](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-3SecureBootTool-loads-RSA-key.png)
 
 Figure 5-3 SecureBootTool loads RSA key
 
 ### 5.4 Configuration
 
-![5-4-000](Rockchip-Secure-Boot-Application-Note/5-4-000.png)
+![5-4-000](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-4-000.png)
 
 Choose SOC platform
 
-![5-4-001](Rockchip-Secure-Boot-Application-Note/5-4-001.png):
+![5-4-001](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-4-001.png):
 
 Option ‘efuse’ means using eFuse to store the hash of the RSA public key, and will enable secure boot ROM(recommended).
 
 Option ‘soft’ is for some special applications, will not enable secure boot ROM, used RSA1024 and SHA160.
 
-![5-4-002](Rockchip-Secure-Boot-Application-Note/5-4-002.png)
+![5-4-002](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-4-002.png)
 
 Every product model will generate RSA KEY only once, please backup in case that you cannot upgrade firmware or OTA again.
 
-![5-4-002](Rockchip-Secure-Boot-Application-Note/5-4-003.png)
+![5-4-002](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-4-003.png)
 
 Loading backup RSA key (support ‘.pem’ file format generated by openssl)
 
-![5-4-002](Rockchip-Secure-Boot-Application-Note/5-4-004.png)
+![5-4-002](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-4-004.png)
 
 Sign firmware
 
@@ -339,23 +303,21 @@ Make sure the ‘boot.img’ and the ‘recovery.img’ are included in the kern
 
 Refer to the pack command:
 
-![5-4-Images-pack-command](Rockchip-Secure-Boot-Application-Note/5-4-Images-pack-command.png)
+![5-4-Images-pack-command](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-4-Images-pack-command.png)
 
 Figure 5-4 Images’pack command
 
 Open firmware image:
 
-![5-5SecureBootTool-selects-firmware](Rockchip-Secure-Boot-Application-Note/5-5SecureBootTool-selects-firmware.png)
+![5-5SecureBootTool-selects-firmware](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-5SecureBootTool-selects-firmware.png)
 
 Figure 5-5 SecureBootTool selects firmware
 
 Signed firmware:
 
- ![5-6SecureBootTool-signed firmware](Rockchip-Secure-Boot-Application-Note/5-6SecureBootTool-signed firmware.png)
+ ![5-6SecureBootTool-signed firmware](Rockchip_Developer_Guide_Secure_Boot_Application_Note/5-6SecureBootTool-signed firmware.png)
 
 Figure 5-6 Secure Boot Tool-signed firmware
-
----
 
 ## 6 Programming eFuse
 
@@ -418,7 +380,7 @@ b) RK3228/RK3229's eFuse power supply is suggest to be adjusted to 1.55-1.6V, to
 
 c) If the device uses onboard power supply mode, please make sure eFuse_PWREN, which is in the following diagram be distributed an independent GPIO to control the LDO. It must make sure there is no power output on VCC_eFuse PIN in normal work condition. Details refer to reference schematic that RK released, if there is no GPIO distributed, contact us or use external power supply mode.
 
-![6-1eFuse-circuit](Rockchip-Secure-Boot-Application-Note/6-1eFuse-circuit.png)
+![6-1eFuse-circuit](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-1eFuse-circuit.png)
 
 Figure 6-1 eFuse circuit
 
@@ -426,41 +388,35 @@ Figure 6-1 eFuse circuit
 
 RK3328 and RK3228H support OTP programming mode, this mode is no need external power supply circuit, OTP_VCC18(PIN16) is always powered by VCC_18. you only need to run the special time sequence for OTP programming, not need the additional changes aboout hardware.
 
-
-
-![6-2OTP-circuit](Rockchip-Secure-Boot-Application-Note/6-2OTP-circuit.png)
+![6-2OTP-circuit](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-2OTP-circuit.png)
 
 Figure 6-2 OTP circuit
 
 ### 6.2 Tool UI
 
-![6-3eFuse-tool-UI](Rockchip-Secure-Boot-Application-Note/6-3eFuse-tool-UI.png)
+![6-3eFuse-tool-UI](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-3eFuse-tool-UI.png)
 
 Figure 6-3 eFuse tool UI
 
-
-
 ### 6.3 Load the Signed Firmware
 
-![6-4Load-signed-firmware](Rockchip-Secure-Boot-Application-Note/6-4Load-signed-firmware.png)
+![6-4Load-signed-firmware](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-4Load-signed-firmware.png)
 
 Figure 6-4 Load signed firmware
 
 ### 6.4 Click 'run' Button to Start
 
-![6-5Programming-the-chip](Rockchip-Secure-Boot-Application-Note/6-5Programming-the-chip.png)
+![6-5Programming-the-chip](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-5Programming-the-chip.png)
 
 Figure 6-5 Programming the chip
 
 ### 6.5 Programming eFuse
 
-Connect the device to the PC by USB cable; the tool will program the hash of RSA public key to eFuse automatically. 
+Connect the device to the PC by USB cable; the tool will program the hash of RSA public key to eFuse automatically.
 
 Programming eFuse needs an external power supply, the detail information please refer to SOC's DATASHEET.
 
 Notice: RK3228H and RK3328 don’t need step [6.2](#_Tool_UI) to [6.4](#_Click'run'_Button_to). Programming will be done by upgrading firmware which has been signed.
-
----
 
 ## 7 Firmware Upgrade
 
@@ -468,17 +424,15 @@ Notice: RK3228H and RK3328 don’t need step [6.2](#_Tool_UI) to [6.4](#_Click'r
 
 Open the signed firmware and connect the device which has programmed eFuse to the PC by USB cable:
 
-![7-1Upgrade-tool-1](Rockchip-Secure-Boot-Application-Note/7-1Upgrade-tool-1.png)
+![7-1Upgrade-tool-1](Rockchip_Developer_Guide_Secure_Boot_Application_Note/7-1Upgrade-tool-1.png)
 
 Figure 7-1 Upgrade tool 1
 
 Click the ‘Upgrade’ button to start firmware upgrade and wait it to be completed:
 
-![7-2Upgrade-tool 2](Rockchip-Secure-Boot-Application-Note/7-2Upgrade-tool 2.png)
+![7-2Upgrade-tool 2](Rockchip_Developer_Guide_Secure_Boot_Application_Note/7-2Upgrade-tool 2.png)
 
 Figure 7-2 Upgrade tool 2
-
----
 
 ## 8 Verification
 
@@ -490,7 +444,7 @@ Secure Boot Mode: 0x1
 
 SecureBootEn = 1, SecureBootLock = 1
 
-![8-1log-of-system-boot](Rockchip-Secure-Boot-Application-Note/8-1log-of-system-boot.png)
+![8-1log-of-system-boot](Rockchip_Developer_Guide_Secure_Boot_Application_Note/8-1log-of-system-boot.png)
 
 Figure 8-1 Log of system boot
 
@@ -504,12 +458,12 @@ And upgrade matched signed firmware will boot success.
 
 SOC RK3128 and RK3126 will fail at “wait for loader”:
 
-![8-2Upgrade-fail-1](Rockchip-Secure-Boot-Application-Note/8-2Upgrade-fail-1.png)
+![8-2Upgrade-fail-1](Rockchip_Developer_Guide_Secure_Boot_Application_Note/8-2Upgrade-fail-1.png)
 
 Figure 8-2 Upgrade fail 1
 
 Other SOC will fail at “Download Boot”:
 
-![8-3Upgrade-fail-2](Rockchip-Secure-Boot-Application-Note/8-3Upgrade-fail-2.png)
+![8-3Upgrade-fail-2](Rockchip_Developer_Guide_Secure_Boot_Application_Note/8-3Upgrade-fail-2.png)
 
 Figure 8-3 Upgrade fail 2
