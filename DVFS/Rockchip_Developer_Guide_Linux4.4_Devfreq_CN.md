@@ -1,5 +1,3 @@
-
-
 # **Devfreq开发指南**
 
 发布版本：1.0
@@ -10,7 +8,7 @@
 
 文档密级：公开资料
 
------
+---
 
 **前言**
 
@@ -36,11 +34,11 @@
 | ---------- | ---- | ---- | -------- |
 | 2018-09-14 | V1.0 | 肖锋 | 初始版本 |
 
------
+---
 
 [TOC]
 
------
+---
 
 ## 1 概述
 
@@ -50,7 +48,7 @@
 
 要动态调频调压的模块。Devfreq framework由governor、core、driver、event组成，软件框架如下：
 
-![](./Rockchip-Developer-Guide-Linux4.4-Devfreq/devfreq-framwork.png)
+![](./Rockchip_Developer_Guide_Linux4.4_Devfreq/devfreq-framwork.png)
 
 ​	Devfreq governor：用于升降频检测，决定频率。目前Linux4.4内核中包含了如下几种governor：
 
@@ -60,14 +58,11 @@
 - performance：性能优先，始终将频率设置为最高值。
 - dmc ondemand：simple ondemand的基础上，增加场景变频的支持，DDR变频专用。
 
-
 ​	Devfreq core： 对devfreq governors和devfreq driver进行了封装和抽象，并定义了清晰的接口。
 
 ​	Devfreq driver：用于初始化设备的频率电压表，设置具体设备的频率。
 
 ​	Devfreq event：用于监控设备的负载信息。
-
------
 
 ## 2 代码路径
 
@@ -106,8 +101,6 @@ drivers/devfreq/rockchip_bus.c                                     /* bus driver
 drivers/soc/rockchip/rockchip_opp_select.c                    /* 修改电压表相关接口 */
 ```
 
------
-
 ## 3 Menuconfig配置
 
 ```c
@@ -129,8 +122,6 @@ Device Drivers  --->
 ```
 
 ​	不同的平台可根据实际情况修改配置。
-
------
 
 ## 4 Device Tree配置方法
 
@@ -519,8 +510,6 @@ gpu: gpu@ffa30000 {
 	...
 }
 ```
-
------
 
 ### 4.2 DMC DVFS配置方法
 
@@ -947,8 +936,6 @@ SYS_STATUS_ISP场景下DDR频率是固定的。
 };
 ```
 
------
-
 ### 4.3 BUS DVFS配置方法
 
 ​	除了GPU、DMC外，还有一些模块也需要动态调频调压，比如PLL、CCI等，我们将他们统一归类到BUS
@@ -1032,8 +1019,6 @@ bus_apll_opp_table: bus-apll-opp-table {
 };
 ```
 
------
-
 ## 5 用户态接口介绍
 
 ​	设备成功注册devfreq后，会在/sys/class/devfreq/目录下生成一个包含用户态接口的子目录，比如
@@ -1052,8 +1037,6 @@ polling_interval             /* 检测负载的间隔时间 */
 target_freq                  /* 软件上最后一次设置的频率 */
 trans_stat                   /* 每个频率上的变频次数和运行时间 */
 ```
-
------
 
 ## 6 常见问题
 
@@ -1085,8 +1068,6 @@ cat /sys/kernel/debug/opp/opp_summary
                      1008000000       950000      950000      950000
                      1512000000      1000000     1000000     1000000
 ```
-
------
 
 ### 6.2 如何定频
 

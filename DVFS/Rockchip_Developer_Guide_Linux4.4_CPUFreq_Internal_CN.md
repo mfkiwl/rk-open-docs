@@ -1,5 +1,3 @@
-
-
 # **CPUFreq内部开发指南**
 
 发布版本：1.0
@@ -48,7 +46,7 @@
 
 构如下：
 
-![](./Rockchip-Developer-Guide-Linux4.4-CPUFreq/cpufreq-framework.png)
+![](./Rockchip_Developer_Guide_Linux4.4_CPUFreq/cpufreq-framework.png)
 
 ​	CPUFreq governor：用于CPU升降频检测，根据系统负载，决定CPU频率。目前Linux4.4内核中包含了如下
 
@@ -962,6 +960,7 @@ opp-816000000 {
 	opp-suspend;
 };
 ```
+
 ​	修改后如下：
 
 ```c
@@ -977,6 +976,7 @@ opp-816000000 {
 	opp-suspend;
 };
 ```
+
 ​	方法二：通过修改IR-Drop的配置调整电压，具体参考3.7章节的介绍。以CPU 408MHz以下的频率全部抬压
 
 25000uV为例。
