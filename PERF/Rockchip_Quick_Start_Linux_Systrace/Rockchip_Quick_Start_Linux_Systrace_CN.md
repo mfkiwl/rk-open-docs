@@ -1,4 +1,4 @@
-# **Systrace使用说明**
+# **Systrace 使用说明**
 
 发布版本：1.0
 
@@ -42,24 +42,24 @@
 
 ## 1. 介绍
 
-​    Systrace是目前Android上最主要的性能调试手段，有以下优点：
+​    Systrace 是目前 Android 上最主要的性能调试手段，有以下优点：
 
 - 完全免费，安装和使用都比较简便
-- 由于不需要在设备端运行监控程序，所以不需要root权限[^1]
+- 由于不需要在设备端运行监控程序，所以不需要 root 权限[^1]
 - 界面友好
 
 ​    同时也有一些缺点：
 
-- 基于tracepoint，所以只会收集你加过trace的函数信息，Android在大部分模块的重要函数里都加了trace了，所以大部分情况下还是够用，同时Android也提供了几个函数方便添加自己的trace。
-- 看不到pmu计数器的信息，也看不到gpu和memory的信息（理论上内核驱动如果定时收集这些信息并加到trace里，systrace应该也能看到）
+- 基于 tracepoint，所以只会收集你加过 trace 的函数信息，Android 在大部分模块的重要函数里都加了 trace 了，所以大部分情况下还是够用，同时 Android 也提供了几个函数方便添加自己的 trace。
+- 看不到 pmu 计数器的信息，也看不到 gpu 和 memory 的信息（理论上内核驱动如果定时收集这些信息并加到 trace 里，systrace 应该也能看到）
 
 ## 2. 用法
 
-​    为了更方便介绍Systrace，我这里举一个实际的性能分析例子：fishtank在1000只鱼的情况下帧率很低
+​    为了更方便介绍 Systrace，我这里举一个实际的性能分析例子：fishtank 在 1000 只鱼的情况下帧率很低
 
 ### 准备工作
 
-​    获取systrace有三种方式：
+​    获取 systrace 有三种方式：
 
 1. 下载[Android_Sdk_Tool](https://dl.google.com/Android/repository/sdk-tools-linux-3859397.zip "sdk-tools-linux")
 
@@ -67,15 +67,15 @@
 
 2. 下载[Android Studio](https://dl.google.com/dl/android/studio/ide-zips/3.0.0.18/android-studio-ide-171.4408382-linux.zip "android_studio_ide_linux")
 
-   提供了图形化抓取功能，实际上也是嗲用sdk里的systrace
+   提供了图形化抓取功能，实际上也是嗲用 sdk 里的 systrace
 
-3. 直接用Android源码里的
+3. 直接用 Android 源码里的
 
    路径：/path_to_android/external/chromium-trace
 
 ### 抓取数据
 
-​    Systrace的命令格式：
+​    Systrace 的命令格式：
 
 ```shell
 $ cd external/chromium-trace/
@@ -147,7 +147,7 @@ Options:
                         e.g. --ftrace-categories=cat1,cat2,cat3
 ```
 
-Systrace支持的atrace类别有：
+Systrace 支持的 atrace 类别有：
 
 ```shell
 adb root
@@ -184,30 +184,30 @@ python ./systrace.py -l
 NOTE: more categories may be available with adb root
 ```
 
-Note: ==有些事件需要设备的root权限才能操作，所以最好先切到root权限==
+Note: ==有些事件需要设备的 root 权限才能操作，所以最好先切到 root 权限==
 
-除了支持Android在ftrace基础上扩展的atrace，Systrace也是支持kernel原生的ftrace的，还支持单独抓取某个kernel函数，当然前提是这个函数本身有tracepoint，具体可以参见上面的命令帮助信息。还可以直接用trace文件做输入，这种离线分析功能应该在分析Android引导过程的时候比较有用。
+除了支持 Android 在 ftrace 基础上扩展的 atrace，Systrace 也是支持 kernel 原生的 ftrace 的，还支持单独抓取某个 kernel 函数，当然前提是这个函数本身有 tracepoint，具体可以参见上面的命令帮助信息。还可以直接用 trace 文件做输入，这种离线分析功能应该在分析 Android 引导过程的时候比较有用。
 
-在抓取前要先大致确定这个场景涉及到哪些模块，再回到我们这次要分析的场景是：浏览器跑fishtank中开启1000只鱼的时候帧率很低；第一时间能想到的模块有：gfx webview sched freq load workq disk
+在抓取前要先大致确定这个场景涉及到哪些模块，再回到我们这次要分析的场景是：浏览器跑 fishtank 中开启 1000 只鱼的时候帧率很低；第一时间能想到的模块有：gfx webview sched freq load workq disk
 
-先在设备上重现问题，然后在host端执行如下命令：
+先在设备上重现问题，然后在 host 端执行如下命令：
 
 ```shell
 cd external/chromium-trace
 python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq disk
 ```
 
-这个fishtank.html即我们抓到的数据。为了方便和本文对照，我上传到[网盘](https://pan.baidu.com/s/1slJUibN "fishtank.html")了。
+这个 fishtank.html 即我们抓到的数据。为了方便和本文对照，我上传到[网盘](https://pan.baidu.com/s/1slJUibN "fishtank.html")了。
 
 ## 3. 分析
 
-​    分析数据需要chrome浏览器，版本最好要新一些，太旧可能会有兼容问题，因为这个html并不符合w3c的标准。
+​    分析数据需要 chrome 浏览器，版本最好要新一些，太旧可能会有兼容问题，因为这个 html 并不符合 w3c 的标准。
 
-​    用chrome打开以后，界面如下：
+​    用 chrome 打开以后，界面如下：
 
 <img src="./view_1.jpg"></img>
 
-左列是抓取的线程名或trace名，既然是绘制问题，我们第一个要看肯定是绘制的线程，Android 5.0以前是在ui线程做绘制的，以后的版本都是在render线程做绘制，所以我们先拉到render线程，可以看到如下：
+左列是抓取的线程名或 trace 名，既然是绘制问题，我们第一个要看肯定是绘制的线程，Android 5.0 以前是在 ui 线程做绘制的，以后的版本都是在 render 线程做绘制，所以我们先拉到 render 线程，可以看到如下：
 
 <img src="./view_2.jpg"></img>
 
@@ -215,27 +215,27 @@ python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq di
 
 <img src="./button.jpg"></img>
 
-先用”时间线“模式拉个1s左右的时间线，然后切到“选择”模式，选择这段时间线内render线程的区域，会自动在下方列出这个区域的函数统计：
+先用”时间线“模式拉个 1s 左右的时间线，然后切到“选择”模式，选择这段时间线内 render 线程的区域，会自动在下方列出这个区域的函数统计：
 
 <img src="./slice.jpg"></img>
 
-可以看到帧率确实很低，这段时间的绘制只有9次（drawgl次数），平均耗时29ms，平均间隔是111ms，所以主要原因是绘制间隔太大。继续往下分析就要根据浏览器的渲染模型了，我们知道chromium里是由光栅化和canvas线程完成实际绘制的（内部叫paint），而ui线程或render线程来完成贴图（内部叫draw）。因为这个网页用的canvas，所以我们先用“时间线”模式拉出绘制间隔，然后顺着时间线往下找绘制线程如下：
+可以看到帧率确实很低，这段时间的绘制只有 9 次（drawgl 次数），平均耗时 29ms，平均间隔是 111ms，所以主要原因是绘制间隔太大。继续往下分析就要根据浏览器的渲染模型了，我们知道 chromium 里是由光栅化和 canvas 线程完成实际绘制的（内部叫 paint），而 ui 线程或 render 线程来完成贴图（内部叫 draw）。因为这个网页用的 canvas，所以我们先用“时间线”模式拉出绘制间隔，然后顺着时间线往下找绘制线程如下：
 
 <img src="./js_paint.jpg"></img>
 
-可以看到最近这一次的绘制耗时124ms，拉开看一下具体耗时：
+可以看到最近这一次的绘制耗时 124ms，拉开看一下具体耗时：
 
 <img src="./js_slice.jpg"></img>
 
-刚好有1000个绘制，这里会不会就是那1000只鱼，通过查看网页源码，可以确认：
+刚好有 1000 个绘制，这里会不会就是那 1000 只鱼，通过查看网页源码，可以确认：
 
 <img src="./js_src_1.jpg"></img>
 
 <img src="./js_src_2.jpg"></img>
 
-javascript是单线程运行的，所以这里无法用到多核，javascript worker技术是让js跑多线程，但是这个网页并没有用到这个技术。
+javascript 是单线程运行的，所以这里无法用到多核，javascript worker 技术是让 js 跑多线程，但是这个网页并没有用到这个技术。
 
-要解决这个问题，要么改网页代码，启用javascript worker技术，这样应该能让帧率提升不少；还有一种办法就是启用chromium的gpu光栅化技术，即不调用skia做2d绘制，直接用gpu来绘制，但是目前这个技术缺陷较多，会导致某些场景下闪屏。
+要解决这个问题，要么改网页代码，启用 javascript worker 技术，这样应该能让帧率提升不少；还有一种办法就是启用 chromium 的 gpu 光栅化技术，即不调用 skia 做 2d 绘制，直接用 gpu 来绘制，但是目前这个技术缺陷较多，会导致某些场景下闪屏。
 
 [^1]: 有一些kernel的trace需要root权限操作trace节点
 

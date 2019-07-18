@@ -1,4 +1,4 @@
-# GDB Over ADB使用指南
+# GDB Over ADB 使用指南
 
 发布版本：1.0
 
@@ -14,7 +14,7 @@
 
 **概述**
 
-GDB Over ADB使用指南。
+GDB Over ADB 使用指南。
 
 **读者对象**
 
@@ -38,35 +38,35 @@ GDB Over ADB使用指南。
 
 ------
 
-## Buildroot配置
+## Buildroot 配置
 
-配置使能gdb主机程序
+配置使能 gdb 主机程序
 
 ![menuconfig-1](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-1.png)
 
-配置gdbserver程序
+配置 gdbserver 程序
 
 ![menuconfig-2](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-2.png)
 
-这里选择gdbserver够用即可
+这里选择 gdbserver 够用即可
 
 ![menuconfig-3](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-3.png)
 
-配置编译buildroot包带调试信息，如果buildroot有配置"strip target binaries"，那么不影响最终打包到target的包，仅影响staging目录，相当于android的symbol目录和最终目录。
+配置编译 buildroot 包带调试信息，如果 buildroot 有配置"strip target binaries"，那么不影响最终打包到 target 的包，仅影响 staging 目录，相当于 android 的 symbol 目录和最终目录。
 
 ![menuconfig-4](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-4.png)
 
-## 启动GDB over ADB
+## 启动 GDB over ADB
 
-1. 配置ADB端口转发
+1. 配置 ADB 端口转发
 
    ```console
    adb forward tcp:1337 tcp:1337
    ```
 
-2. 启动GDB Server程序
+2. 启动 GDB Server 程序
 
-   在adb shell或者串口控制台执行
+   在 adb shell 或者串口控制台执行
 
    ```console
    gdbserver :1337 --attach COM PID # COM是要执行的程序完整目录和参数，PID是进程ID
@@ -92,7 +92,7 @@ GDB Over ADB使用指南。
    Child exited with status 0
    ```
 
-3. GDB客户端调试
+3. GDB 客户端调试
 
    ```
    $ ./buildroot/output/rockchip_puma/host/bin/arm-buildroot-linux-gnueabihf-gdb

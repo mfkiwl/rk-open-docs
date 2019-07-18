@@ -11,9 +11,9 @@
 ------
 **概述**
 
-本文档提供 Rockchip 平台基于 Linux4.4 内核的 USB Gadget UAC（USB Audio Class）驱动的使用方法。Rockchip 平台可以支持 UAC1（兼容USB Audio Class specification 1.0）和 UAC2（兼容USB Audio Class specification 2.0）驱动，并且，这两个驱动都可以支持基础的录音和放音功能。此外，Rockchip 平台还提供了 UAC1 Legacy （需要实际的声卡支持，只支持放音功能）和 Audio Source（只支持录音功能，但可以支持多达15种不同的采样率）。开发人员可以根据产品的实际需求来选择合适的UAC驱动。
+本文档提供 Rockchip 平台基于 Linux4.4 内核的 USB Gadget UAC（USB Audio Class）驱动的使用方法。Rockchip 平台可以支持 UAC1（兼容 USB Audio Class specification 1.0）和 UAC2（兼容 USB Audio Class specification 2.0）驱动，并且，这两个驱动都可以支持基础的录音和放音功能。此外，Rockchip 平台还提供了 UAC1 Legacy （需要实际的声卡支持，只支持放音功能）和 Audio Source（只支持录音功能，但可以支持多达 15 种不同的采样率）。开发人员可以根据产品的实际需求来选择合适的 UAC 驱动。
 
-如果要支持音量调节/静音功能，需要添加HID的控制，目前发布的SDK还没有支持。开发人员可以参考如下的文档，进行HID功能的开发。
+如果要支持音量调节/静音功能，需要添加 HID 的控制，目前发布的 SDK 还没有支持。开发人员可以参考如下的文档，进行 HID 功能的开发。
 
 Kernel/Documentation/usb/gadget-testing.txt （参考 6. HID function）
 
@@ -57,8 +57,8 @@ Kernel/Documentation/ABI/testing/configfs-usb-gadget-hid
 问题描述:
 Kernel-4.4 的 USB Gadget UAC1/UAC2 驱动存在如下的问题:
 
-- UAC1只支持放音功能，并且需要实际声卡配合使用
-- UAC2无法兼容Windows，虽然可以支持录音和放音，但是功能不完善
+- UAC1 只支持放音功能，并且需要实际声卡配合使用
+- UAC2 无法兼容 Windows，虽然可以支持录音和放音，但是功能不完善
 
 补丁列表：
 
@@ -145,7 +145,7 @@ CONFIG_USB_CONFIGFS_F_AUDIO_SRC (enable Audio Source Function)
 
 **Note：**
 
-*USB Audio 1.0 Specification在 USB 2.0 core Specification之前完成，因此 USB Audio 1.0 Specification没有高速模式(High Speed)这一概念。可以通过一些经验规则使得 Audio 1.0兼容设备在特定的操作系统上实现高速模式。比如修改 isochronous endpoint descriptor 的 **bInterval=4**。目前尚没有详尽的经验规则保证在所有的操作系统上都能正常工作在高速模式下。*
+*USB Audio 1.0 Specification 在 USB 2.0 core Specification 之前完成，因此 USB Audio 1.0 Specification 没有高速模式(High Speed)这一概念。可以通过一些经验规则使得 Audio 1.0 兼容设备在特定的操作系统上实现高速模式。比如修改 isochronous endpoint descriptor 的 **bInterval=4**。目前尚没有详尽的经验规则保证在所有的操作系统上都能正常工作在高速模式下。*
 
 Rockchip 平台 UAC1 驱动支持 USB Audio Class specification 1.0，支持录音和放音，并且**不需要实际的声卡**。
 
@@ -163,7 +163,7 @@ UAC1 驱动设置 bInterval=4。
 
 **UAC1 使用方法如下：**
 
-添加 CONFIG_USB_CONFIGFS_F_UAC1=y 到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_UAC1=y 到内核的 defconfig
 
 以 3308 EVB 为例
 
@@ -212,21 +212,21 @@ echo ff400000.usb > ../../UDC
 
 *Windows 会对设备驱动记忆，更改配置后最好卸载驱动，让 Windows 重新识别设备*
 
-配置脚本执行成功后，连接USB到PC，PC端可以识别到USB Audio设备，如下图2-1 Windows-USB-Audio-Class1，图2-2 Ubuntu-USB-Audio-Class1-Output和图2-3 Ubuntu-USB-Audio-Class1-Input。
+配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如下图 2-1 Windows-USB-Audio-Class1，图 2-2 Ubuntu-USB-Audio-Class1-Output 和图 2-3 Ubuntu-USB-Audio-Class1-Input。
 
 ![Windows-USB-Audio-Class1](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Class1.png)
 
-图2-1 Windows-USB-Audio-Class1
+图 2-1 Windows-USB-Audio-Class1
 
 ![Ubuntu-USB-Audio-Class1-Output](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Output.png)
 
-图2-2 Ubuntu-USB-Audio-Class1-Output
+图 2-2 Ubuntu-USB-Audio-Class1-Output
 
 ![Ubuntu-USB-Audio-Class1-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
 
-图2-3 Ubuntu-USB-Audio-Class1-Input
+图 2-3 Ubuntu-USB-Audio-Class1-Input
 
-3308 端的串口打印如下USB UAC1正常枚举的日志：
+3308 端的串口打印如下 USB UAC1 正常枚举的日志：
 
 ```
 dwc2 ff400000.usb: new device is high-speed
@@ -238,7 +238,7 @@ android_work: sent uevent USB_STATE=CONFIGURED
 
 UAC1 驱动提供如下的配置接口：
 
-如下**配置无法动态生效**，也即必须添加在UAC的配置脚本中执行。
+如下**配置无法动态生效**，也即必须添加在 UAC 的配置脚本中执行。
 
 ```shell
 # ls -lh /sys/kernel/config/usb_gadget/rockchip/functions/uac1.gs0
@@ -262,7 +262,7 @@ req_number - the number of pre-allocated request for both capture and playback
 
 查看 UAC1 声卡信息的方法：
 
-如下显示的结果，UAC1 对应 card2 （UAC1Gadget），具有一个playback设备节点 - pcmC2D0p 和一个capture设备节点 - pcmC2D0c。
+如下显示的结果，UAC1 对应 card2 （UAC1Gadget），具有一个 playback 设备节点 - pcmC2D0p 和一个 capture 设备节点 - pcmC2D0c。
 
 ```shell
 # cat /proc/asound/cards
@@ -290,11 +290,11 @@ controlC2  pcmC0D0p   pcmC2D0c   pcmC7D0p   timer
 
 #### 2.2.1 UAC1 Test on Windows
 
-打开Windows声音设置，如下图2-4 Windows-Audio-Setting，分别选择USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
+打开 Windows 声音设置，如下图 2-4 Windows-Audio-Setting，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
 
 ![Windows-Audio-Setting](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Audio-Setting.png)
 
-图2-4 Windows-Audio-Setting
+图 2-4 Windows-Audio-Setting
 
 **测试 Windows UAC1 放音功能：**
 
@@ -304,57 +304,57 @@ controlC2  pcmC0D0p   pcmC2D0c   pcmC7D0p   timer
 arecord -f dat -t wav -r 48000 -c 2 -D hw:2,0 | aplay -f dat -r 48000 -c 2 -D hw:0,0
 ```
 
-上述命令表示从Card2（USB Audio）录音，然后从本地声卡Card0播放声音
+上述命令表示从 Card2（USB Audio）录音，然后从本地声卡 Card0 播放声音
 
-执行完命令后，Windows PC端播放音乐，3308 本地声卡可以实时放音。
+执行完命令后，Windows PC 端播放音乐，3308 本地声卡可以实时放音。
 
 **测试 Windows UAC1 录音功能：**
 
 测试录音功能，需要使用可以播放的音频文件。通过 ADB push 或者 arecord 的方法，保存测试使用的音频文件（要求 48KHz，2 channels，16 bits）
 
-比如，3308 端的串口执行 arecord 命令，保存测试使用的音频文件test.wav
+比如，3308 端的串口执行 arecord 命令，保存测试使用的音频文件 test.wav
 
 ```
 arecord -f dat -t wav -r 48000 -c 2 -D hw:2,0 /tmp/test.wav
 ```
 
-保存音频文件test.wav成功后，再执行如下的 UAC1 录音命令：
+保存音频文件 test.wav 成功后，再执行如下的 UAC1 录音命令：
 
 ```
 aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 ```
 
-执行完上述命令后，PC端可以使用Windows自带的 “Voice Recorder”软件保存录音文件，如下图2-5 Windows-Voice-Recorder。
+执行完上述命令后，PC 端可以使用 Windows 自带的 “Voice Recorder”软件保存录音文件，如下图 2-5 Windows-Voice-Recorder。
 
 ![Windows-Voice-Recorder](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Voice-Recorder.png)
 
-图2-5 Windows-Voice-Recorder
+图 2-5 Windows-Voice-Recorder
 
-除了上述的录音测试方法，也可以使用Windows的录音侦听功能，实时播放录音的音频，方法如下：
+除了上述的录音测试方法，也可以使用 Windows 的录音侦听功能，实时播放录音的音频，方法如下：
 
 打开“声音设置” --> “声音控制面板” --> "录制" --> “属性” --> "侦听" ，勾选“侦听此设备”，并选择播放的扬声器。
 
-如下图2-6 Windows-Capture-Listen-1 和图2-7 Windows-Capture-Listen-2。
+如下图 2-6 Windows-Capture-Listen-1 和图 2-7 Windows-Capture-Listen-2。
 
 ![Windows-Capture-Listen-1](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Capture-Listen-1.png)
 
-图2-6 Windows-Capture-Listen-1
+图 2-6 Windows-Capture-Listen-1
 
 ![Windows-Capture-Listen-2](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Capture-Listen-2.png)
 
-图2-6 Windows-Capture-Listen-2
+图 2-6 Windows-Capture-Listen-2
 
 #### 2.2.2 UAC1 Test on Ubuntu
 
-打开Ubuntu声音设置，如下图2-7 Ubuntu-Audio-Setting-Output 和图2-8 Ubuntu-Audio-Setting-Input，分别选择USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
+打开 Ubuntu 声音设置，如下图 2-7 Ubuntu-Audio-Setting-Output 和图 2-8 Ubuntu-Audio-Setting-Input，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
 
 ![Ubuntu-Audio-Setting-Output](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-Audio-Setting-Output.png)
 
-图2-7 Ubuntu-Audio-Setting-Output
+图 2-7 Ubuntu-Audio-Setting-Output
 
 ![Ubuntu-Audio-Setting-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-Audio-Setting-Input.png)
 
-图2-8 Ubuntu-Audio-Setting-Input
+图 2-8 Ubuntu-Audio-Setting-Input
 
 **测试 Ubuntu UAC1 放音功能：**
 
@@ -364,27 +364,27 @@ aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 arecord -f dat -t wav -r 48000 -c 2 -D hw:2,0 | aplay -f dat -r 48000 -c 2 -D hw:0,0
 ```
 
-上述命令表示从Card2（USB Audio）录音，然后从本地声卡Card0播放声音
+上述命令表示从 Card2（USB Audio）录音，然后从本地声卡 Card0 播放声音
 
-执行完命令后，Ubuntu PC端播放音乐，3308 本地声卡可以实时放音。
+执行完命令后，Ubuntu PC 端播放音乐，3308 本地声卡可以实时放音。
 
 **测试 Ubuntu UAC1 录音功能：**
 
 测试录音功能，需要使用可以播放的音频文件。通过 ADB push 或者 arecord 的方法，保存测试使用的音频文件（要求 48KHz，2 channels，16 bits）
 
-比如，3308 端的串口执行 arecord 命令，保存测试使用的音频文件test.wav
+比如，3308 端的串口执行 arecord 命令，保存测试使用的音频文件 test.wav
 
 ```
 arecord -f dat -t wav -r 48000 -c 2 -D hw:2,0 /tmp/test.wav
 ```
 
-保存音频文件test.wav成功后，再执行如下的 UAC1 录音命令：
+保存音频文件 test.wav 成功后，再执行如下的 UAC1 录音命令：
 
 ```
 aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 ```
 
-执行完上述命令后，在Ubuntu端打开录音软件，如“audacity”，进行录音功能测试。
+执行完上述命令后，在 Ubuntu 端打开录音软件，如“audacity”，进行录音功能测试。
 
 audacity 安装命令：
 
@@ -392,11 +392,11 @@ audacity 安装命令：
 sudo apt install audacity
 ```
 
-audacity 录音界面如下图2-9所示。
+audacity 录音界面如下图 2-9 所示。
 
 ![Ubuntu-audacity](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-audacity.png)
 
-图2-9 Ubuntu-audacity
+图 2-9 Ubuntu-audacity
 
 ## 3 UAC2 Usage and Test
 
@@ -423,7 +423,7 @@ audacity 录音界面如下图2-9所示。
 
 **Note：**
 
-*从Windows 10（1703版）开始，Windows才默认支持UAC 2.0驱动程序。*
+*从 Windows 10（1703 版）开始，Windows 才默认支持 UAC 2.0 驱动程序。*
 
 *Windows 和 Linux 对音频事件的响应流程稍有不同，要做兼容性处理，Linux 和 Android 一样。*
 
@@ -443,7 +443,7 @@ Rockchip 平台 UAC2 驱动支持 USB Audio Class specification 2.0，支持录�
 
 **UAC2 使用方法如下：**
 
-添加 CONFIG_USB_CONFIGFS_F_UAC2=y 到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_UAC2=y 到内核的 defconfig
 
 以 3308 EVB 为例
 
@@ -492,21 +492,21 @@ echo ff400000.usb > ../../UDC
 
 *Windows 会对设备驱动记忆，更改配置后最好卸载驱动，让 Windows 重新识别设备*
 
-配置脚本执行成功后，连接USB到PC，PC端可以识别到USB Audio设备，如下图3-1 Windows-USB-Audio-Class2，图3-2 Ubuntu-USB-Audio-Class2-Output和图3-3 Ubuntu-USB-Audio-Class2-Input。
+配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如下图 3-1 Windows-USB-Audio-Class2，图 3-2 Ubuntu-USB-Audio-Class2-Output 和图 3-3 Ubuntu-USB-Audio-Class2-Input。
 
 ![Windows-USB-Audio-Class2](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Class2.png)
 
-图3-1 Windows-USB-Audio-Class2
+图 3-1 Windows-USB-Audio-Class2
 
 ![Ubuntu-USB-Audio-Class2-Output](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Output.png)
 
-图3-2 Ubuntu-USB-Audio-Class2-Output
+图 3-2 Ubuntu-USB-Audio-Class2-Output
 
 ![Ubuntu-USB-Audio-Class2-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
 
-图3-3 Ubuntu-USB-Audio-Class2-Input
+图 3-3 Ubuntu-USB-Audio-Class2-Input
 
-3308 端的串口打印如下USB UAC2正常枚举的日志：
+3308 端的串口打印如下 USB UAC2 正常枚举的日志：
 
 ```
 dwc2 ff400000.usb: new device is high-speed
@@ -518,9 +518,9 @@ android_work: sent uevent USB_STATE=CONFIGURED
 
 UAC2 驱动提供如下的配置接口：
 
-如下**配置无法动态生效**，也即必须添加在UAC的配置脚本中执行。
+如下**配置无法动态生效**，也即必须添加在 UAC 的配置脚本中执行。
 
-比如，配置 c_srate 为 48KHz的命令为：
+比如，配置 c_srate 为 48KHz 的命令为：
 
 echo 48000 > /sys/kernel/config/usb_gadget/rockchip/functions/uac2.gs0/c_srate
 
@@ -546,7 +546,7 @@ req_number - the number of pre-allocated request for both capture and playback
 
 查看 UAC2 声卡信息的方法：
 
-如下显示的结果，UAC2 对应 card2 （UAC2Gadget），具有一个playback设备节点 - pcmC2D0p 和一个capture设备节点 - pcmC2D0c。
+如下显示的结果，UAC2 对应 card2 （UAC2Gadget），具有一个 playback 设备节点 - pcmC2D0p 和一个 capture 设备节点 - pcmC2D0c。
 
 ```shell
 # cat /proc/asound/cards
@@ -574,7 +574,7 @@ controlC2  pcmC0D0p   pcmC2D0c   pcmC7D0p   timer
 
 #### 3.2.1 UAC2 Test on Windows
 
-Windows PC端的设置请参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
+Windows PC 端的设置请参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
 
 **测试 Windows UAC2 放音功能：**
 
@@ -584,41 +584,41 @@ Windows PC端的设置请参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on 
 arecord -f dat -t wav -r 64000 -c 2 -D hw:2,0 | aplay -f dat -r 64000 -c 2 -D hw:0,0
 ```
 
-上述命令表示从Card2（USB Audio）录音，然后从本地声卡Card0播放声音，采样率为64KHz（默认）。
+上述命令表示从 Card2（USB Audio）录音，然后从本地声卡 Card0 播放声音，采样率为 64KHz（默认）。
 
-如果通过UAC1驱动提供的内核接口，配置采样率为48KHz，则放音命令为：
+如果通过 UAC1 驱动提供的内核接口，配置采样率为 48KHz，则放音命令为：
 
 ```shell
 arecord -f dat -t wav -r 48000 -c 2 -D hw:2,0 | aplay -f dat -r 48000 -c 2 -D hw:0,0
 ```
 
-执行完命令后，Windows PC端播放音乐，3308 本地声卡可以实时放音。
+执行完命令后，Windows PC 端播放音乐，3308 本地声卡可以实时放音。
 
 **测试 Windows UAC2 录音功能：**
 
 测试录音功能，需要使用可以播放的音频文件。通过 ADB push 或者 arecord 的方法，保存测试使用的音频文件（要求 48KHz，2 channels，16 bits）
 
-比如，3308 端的串口执行 arecord 命令，保存测试使用的音频文件test.wav
+比如，3308 端的串口执行 arecord 命令，保存测试使用的音频文件 test.wav
 
-（以录音和放音的采样率都为48KHz的配置为例）
+（以录音和放音的采样率都为 48KHz 的配置为例）
 
 ```
 arecord -f dat -t wav -r 48000 -c 2 -D hw:2,0 /tmp/test.wav
 ```
 
-保存音频文件test.wav成功后，再执行如下的 UAC1 录音命令：
+保存音频文件 test.wav 成功后，再执行如下的 UAC1 录音命令：
 
 ```
 aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 ```
 
-执行完上述命令后，PC端可以使用Windows自带的 “Voice Recorder”软件保存录音文件，使用方法参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
+执行完上述命令后，PC 端可以使用 Windows 自带的 “Voice Recorder”软件保存录音文件，使用方法参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
 
 #### 3.2.2 UAC2 Test on Ubuntu
 
-Ubuntu PC端的设置请参考[2.2.2 UAC1 Test on Ubuntu](#2.2.2 UAC1 Test on Ubuntu)
+Ubuntu PC 端的设置请参考[2.2.2 UAC1 Test on Ubuntu](#2.2.2 UAC1 Test on Ubuntu)
 
-Ubuntu PC环境下， 3308 端的 UAC2 录音和放音测试命令，请直接参考[3.2.1 UAC2 Test on Windows](#3.2.1 UAC2 Test on Windows)
+Ubuntu PC 环境下， 3308 端的 UAC2 录音和放音测试命令，请直接参考[3.2.1 UAC2 Test on Windows](#3.2.1 UAC2 Test on Windows)
 
 ## 4 UAC1 Legacy Usage and Test
 
@@ -638,7 +638,7 @@ Rockchip 平台 UAC1 Legacy 驱动兼容 USB Audio Class specification 1.0，但
 
 **UAC1 Legacy 使用方法如下：**
 
-添加 CONFIG_USB_CONFIGFS_F_UAC1_LEGACY=y  到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_UAC1_LEGACY=y  到内核的 defconfig
 
 以 3308 EVB 为例
 
@@ -687,11 +687,11 @@ echo ff400000.usb > ../../UDC
 
 *Windows 会对设备驱动记忆，更改配置后最好卸载驱动，让 Windows 重新识别设备*
 
-配置脚本执行成功后，连接USB到PC，PC端可以识别到USB Audio设备，如图4-1
+配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如图 4-1
 
 ![Windows-USB-Audio-Class1-Legacy](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Class1-Legacy.png)
 
-图4-1 Windows-USB-Audio-Class1-Legacy
+图 4-1 Windows-USB-Audio-Class1-Legacy
 
 3308 端的串口打印如下 USB UAC1 Legacy 正常枚举的日志：
 
@@ -707,7 +707,7 @@ android_work: sent uevent USB_STATE=CONFIGURED
 
 UAC1 Legacy 驱动提供如下的配置接口：
 
-如下**配置无法动态生效**，也即必须添加在UAC的配置脚本中执行。
+如下**配置无法动态生效**，也即必须添加在 UAC 的配置脚本中执行。
 
 ```shell
 # ls -lh /sys/kernel/config/usb_gadget/g1/functions/uac1_legacy.gs0/
@@ -726,7 +726,7 @@ req_buf_size - ISO OUT endpoint request buffer size 默认设置为 200
 req_count - ISO OUT endpoint request count 默认设置为 256
 ```
 
-UAC1 Legacy 不会在3308端创建对应的声卡设备节点。
+UAC1 Legacy 不会在 3308 端创建对应的声卡设备节点。
 
 ### 4.2 UAC1 Legacy Test
 
@@ -746,7 +746,7 @@ Rockchip 平台 Audio Source 驱动兼容 USB Audio Class specification 1.0，�
 
 速率：High Speed
 
-采样率：playback 默认使用44.1KHz，总共支持如下15种不同的采样率，PC端可以动态配置
+采样率：playback 默认使用 44.1KHz，总共支持如下 15 种不同的采样率，PC 端可以动态配置
 
 ```
 8000, 11025, 16000, 22050, 24000,
@@ -760,9 +760,9 @@ Rockchip 平台 Audio Source 驱动兼容 USB Audio Class specification 1.0，�
 
 **Audio Source 使用方法如下：**
 
-添加 CONFIG_USB_CONFIGFS_F_ACC=y（Audio Source depends on it）到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_ACC=y（Audio Source depends on it）到内核的 defconfig
 
-添加 CONFIG_USB_CONFIGFS_F_AUDIO_SRC=y  到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_AUDIO_SRC=y  到内核的 defconfig
 
 以 3308 EVB 为例
 
@@ -810,17 +810,17 @@ echo ff400000.usb > ../../UDC
 
 *Windows 会对设备驱动记忆，更改配置后最好卸载驱动，让 Windows 重新识别设备*
 
-配置脚本执行成功后，连接USB到PC，PC端可以识别到USB Audio设备，如下图5-1 Windows-USB-Audio-Source 和图5-2 Ubuntu-USB-Audio-Source
+配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如下图 5-1 Windows-USB-Audio-Source 和图 5-2 Ubuntu-USB-Audio-Source
 
 ![Windows-USB-Audio-Source](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Source.png)
 
-图5-1 Windows-USB-Audio-Source
+图 5-1 Windows-USB-Audio-Source
 
 ![Ubuntu-USB-Audio-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
 
-图5-2 Ubuntu-USB-Audio-Source
+图 5-2 Ubuntu-USB-Audio-Source
 
-3308 端的串口打印如下USB Audio Source正常枚举的日志：
+3308 端的串口打印如下 USB Audio Source 正常枚举的日志：
 
 ```
 dwc2 ff400000.usb: new device is high-speed
@@ -834,7 +834,7 @@ Audio Source 驱动没有提供可配置的内核接口。
 
 查看 Audio Source 信息的方法：
 
-如下显示的结果，Audio Source 对应 card2 （audiosource），只有一个playback设备节点 - pcmC2D0p。
+如下显示的结果，Audio Source 对应 card2 （audiosource），只有一个 playback 设备节点 - pcmC2D0p。
 
 ```shell
 # cat /proc/asound/cards
@@ -860,11 +860,11 @@ controlC1  controlC7  pcmC0D0p   pcmC1D0p   pcmC7D0c   pcmC7D1c   timer
 
 **测试 Audio Source 录音功能：**
 
-Windows PC端的录音设置请参考 [2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
+Windows PC 端的录音设置请参考 [2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
 
-Ubuntu PC端的录音设置请参考 [2.2.2 UAC1 Test on Ubuntu](#2.2.2 UAC1 Test on Ubuntu)
+Ubuntu PC 端的录音设置请参考 [2.2.2 UAC1 Test on Ubuntu](#2.2.2 UAC1 Test on Ubuntu)
 
-3308 端的测试命令（假设采样率使用默认的44.1KHz）：
+3308 端的测试命令（假设采样率使用默认的 44.1KHz）：
 
 ```shell
 aplay /tmp/test.wav -r 44100 -c 2 -D hw:2,0
@@ -874,15 +874,15 @@ aplay /tmp/test.wav -r 44100 -c 2 -D hw:2,0
 
 *测试使用的音频文件 test.wav 的采样率，应与录音的采样率一致，否则，测试时可能出现杂音或者无声音*
 
-此外，因为Audio Source支持15种不同的采样率，所以PC端可以动态配置采样率，方法如下：
+此外，因为 Audio Source 支持 15 种不同的采样率，所以 PC 端可以动态配置采样率，方法如下：
 
 打开“声音设置” --> “声音控制面板” --> "录制" --> “属性” --> “高级”，选择对应的采样率。
 
-如下图5-3 所示。
+如下图 5-3 所示。
 
 ![Windows-USB-Audio-Source-Setting](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Source-Setting.png)
 
-图5-3 Windows-USB-Audio-Source-Setting
+图 5-3 Windows-USB-Audio-Source-Setting
 
 ## 6 UAC1 Legacy and Audio Source Composite Usage and Test
 
@@ -890,13 +890,13 @@ aplay /tmp/test.wav -r 44100 -c 2 -D hw:2,0
 
 **UAC1 Legacy +  Audio Source 使用方法如下：**
 
-UAC1 Legacy 和 Audio Source 可以组合为一个USB 复合设备，支持录音和放音功能。
+UAC1 Legacy 和 Audio Source 可以组合为一个 USB 复合设备，支持录音和放音功能。
 
-添加 CONFIG_USB_CONFIGFS_F_UAC1_LEGACY=y  到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_UAC1_LEGACY=y  到内核的 defconfig
 
-添加 CONFIG_USB_CONFIGFS_F_ACC=y（Audio Source depends on it）到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_ACC=y（Audio Source depends on it）到内核的 defconfig
 
-添加 CONFIG_USB_CONFIGFS_F_AUDIO_SRC=y  到内核的defconfig
+添加 CONFIG_USB_CONFIGFS_F_AUDIO_SRC=y  到内核的 defconfig
 
 此外，需要单独更新补丁“**support_uac1_legacy_and_audio_source.patch**”。
 
@@ -933,9 +933,9 @@ echo ff400000.usb > /sys/kernel/config/usb_gadget/rockchip/UDC
 
 ## 7 Composite with ADB
 
-当 UAC1 和 ADB 一起使用时，UAC1 必须放在前面。否则，可能会导致在Windows系统上，UAC设备驱动无法识别的问题。
+当 UAC1 和 ADB 一起使用时，UAC1 必须放在前面。否则，可能会导致在 Windows 系统上，UAC 设备驱动无法识别的问题。
 
-比如：UAC1，ADB同时使用时，脚本的link顺序应该为：UAC1，ADB
+比如：UAC1，ADB 同时使用时，脚本的 link 顺序应该为：UAC1，ADB
 
 ```sh
 ln -s /sys/kernel/config/usb_gadget/rockchip/functions/uac1.gs0 /sys/kernel/config/usb_gadget/rockchip/configs/b.1/uac1.gs0

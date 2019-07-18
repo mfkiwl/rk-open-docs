@@ -11,18 +11,18 @@
 ---
 
 **前言**
-ROCKCHIP系列芯片为客户提供了标准I2C 总线，方便客户实现对不同外接设备的控制和访问。I2C总线控制器通过串行数据（SDA）线和串行时钟 （SCL）线在连接到总线的器件间传递信息。每个器件都有一个唯一的地址识别（无论是微控制器——MCU、LCD 驱动器、存储器或键盘接口），而且都可以作为一个发送器或接收器（由器件的功能决定）。
+ROCKCHIP 系列芯片为客户提供了标准 I2C 总线，方便客户实现对不同外接设备的控制和访问。I2C 总线控制器通过串行数据（SDA）线和串行时钟 （SCL）线在连接到总线的器件间传递信息。每个器件都有一个唯一的地址识别（无论是微控制器——MCU、LCD 驱动器、存储器或键盘接口），而且都可以作为一个发送器或接收器（由器件的功能决定）。
 Rockchip I2C 控制器支持下列功能︰
 
 - 兼容 I2C 与 SMBus 总线
 - 仅支持主模式下的 I2C 总线
-- 软件可编程时钟频率支持到400kbps,部分芯片可高达 1000kbps
+- 软件可编程时钟频率支持到 400kbps,部分芯片可高达 1000kbps
 - 支持 7 位和 10 位寻址模式
-- 一次中断或轮询至多32个字节的数据传输
+- 一次中断或轮询至多 32 个字节的数据传输
 
-下图为I2C总线的硬件连接方式，需要上拉电阻，改变上拉电阻大小可调节I2C总线的上拉强度。
+下图为 I2C 总线的硬件连接方式，需要上拉电阻，改变上拉电阻大小可调节 I2C 总线的上拉强度。
 ![1.i2c 总线硬件连接图](Rockchip_Developer_Guide_Linux_I2C/1.i2c 总线硬件连接图.png)
-ROCKCHIP I2C在不同芯片，不同内核版本上的驱动不一样，I2C可以跑的最高频率也有区别。
+ROCKCHIP I2C 在不同芯片，不同内核版本上的驱动不一样，I2C 可以跑的最高频率也有区别。
 
 **产品版本**
 
@@ -68,7 +68,7 @@ ROCKCHIP I2C在不同芯片，不同内核版本上的驱动不一样，I2C可�
 
 ## I2C 流程
 
-I2C 的流程在两个驱动上大致是一样，写是单纯的 TX 模式 (I2C_CON[1:0]=2’b00)，而读一般使用TRX 模式(I2C_CON[1:0]=2’b01)。下面的 I2C 控制器操作流程图是描述软件如何通过这个 I2C 控制器寄存器来配置和执行 I2C 任务。描述分为3部分,传输模式，混合模式和接收模式。
+I2C 的流程在两个驱动上大致是一样，写是单纯的 TX 模式 (I2C_CON[1:0]=2’b00)，而读一般使用 TRX 模式(I2C_CON[1:0]=2’b01)。下面的 I2C 控制器操作流程图是描述软件如何通过这个 I2C 控制器寄存器来配置和执行 I2C 任务。描述分为 3 部分,传输模式，混合模式和接收模式。
 
 ### 1. Trasmint only mode(I2C_CON[1:0]=2’b00)
 
@@ -98,9 +98,9 @@ I2C 的驱动 i2c-rk3x.c 与 i2c-rockchip.c 两个配置方式是不一样的，
 
 ### 1. i2c-rk3x.c 配置
 
-i2c-rk3x.c 驱动的配置都在 DTS，参考文件Documentation/devicetree/bindings/i2c/i2c-rk3x.txt。重点说明其中配置项，i2c-scl-rising-time-ns，i2c-scl-falling-time-ns：
+i2c-rk3x.c 驱动的配置都在 DTS，参考文件 Documentation/devicetree/bindings/i2c/i2c-rk3x.txt。重点说明其中配置项，i2c-scl-rising-time-ns，i2c-scl-falling-time-ns：
 
-- clock-frequency： 默认frequency 为100k 可不配置，其它 I2C 频率需要配置，最大可配置频率由 i2c-scl-rising-time-ns 决定；例如配置400k，clock-frequency=<400000>。
+- clock-frequency： 默认 frequency 为 100k 可不配置，其它 I2C 频率需要配置，最大可配置频率由 i2c-scl-rising-time-ns 决定；例如配置 400k，clock-frequency=<400000>。
 - i2c-scl-rising-time-ns：SCL 上升沿时间由硬件决定，改变上拉电阻可调节该时间，需通过示波器量测，参考上图；例如测得 SCL 上升沿 365ns，i2c-scl-rising-time-ns=<365>。(默认可以不配置，但必须保证当前的上升沿时间不能超过所配置频率下的 I2C 标准所定义的最大上升沿时间)
 - i2c-scl-falling-time-ns:  SCL 下降沿时间, 一般不变, 等同于 i2c-sda-falling-time-ns。(默认也可以不配置）
 
@@ -125,7 +125,7 @@ i2c-rk3x.c 驱动的配置都在 DTS，参考文件Documentation/devicetree/bind
 
 ### 2. i2c-rockchip.c 配置
 
-i2c-rockchip.c 驱动仍然遵循 I2C frequency 与 SCL 上升沿的约束关系，能否用更高的频率取决于 i2c-scl-rising-time-ns；I2C 频率在代码上面配置，直接配置 i2c_msg 结构体上的 scl_rate 成员， 默认 frequency 仍为100k，例如下面的 200K 配置配置：
+i2c-rockchip.c 驱动仍然遵循 I2C frequency 与 SCL 上升沿的约束关系，能否用更高的频率取决于 i2c-scl-rising-time-ns；I2C 频率在代码上面配置，直接配置 i2c_msg 结构体上的 scl_rate 成员， 默认 frequency 仍为 100k，例如下面的 200K 配置配置：
 
 ```c
         struct i2c_msg xfer_msg;
@@ -204,55 +204,55 @@ Documentation/devicetree/bindings/i2c/i2c-gpio.txt
 
 因为我们有两个 i2c 驱动，所以仍然分两部分：
 
-### 1. i2c-rk3x.c 驱动：
+### 1. i2c-rk3x.c 驱动
 
 如果调用 I2C 传输接口返回值为 -6(-ENXIO)时候，表示为 NACK 错误，即对方设备无应答响应，这种情况一般为外设的问题，常见的有以下几种情况：
 
 - I2C 地址错误；
 - I2C slave 设备处于不正常工作状态，比如没有上电，错误的上电时序以及设备异常等；
-- I2C 时序不符合slave设备所要求也会产生 NACK 信号，比如 slave 设备需要的是 stop 信号,而不是 repeat start 信号的时候；
-- I2C 总线受外部干扰导致的，用示波器测量可以看到是一个ACK波形。
+- I2C 时序不符合 slave 设备所要求也会产生 NACK 信号，比如 slave 设备需要的是 stop 信号,而不是 repeat start 信号的时候；
+- I2C 总线受外部干扰导致的，用示波器测量可以看到是一个 ACK 波形。
 
 当出现 I2C 的 log："timeout, ipd: 0x00, state: 1"时，此时 I2C 控制器工作异常，无法产生中断状态，start 时序无法发出，有以下几种可能：
 
-- I2C SCL或者SDA Pin 脚iomux错误；
+- I2C SCL 或者 SDA Pin 脚 iomux 错误；
 - I2C 的上拉电压不对，如电压不够或者上拉电源没有等；
 - I2C Pin 脚被外设拉住，电压不对；
 - I2C 时钟未开，或者时钟源太小；
-- I2C 同时配置了CON_START 和 CON_STOP 位。
+- I2C 同时配置了 CON_START 和 CON_STOP 位。
 
-当出现 I2C 的 log："timeout, ipd: 0x10, state: 1"时，此时 I2C 控制器工作正常，但是 cpu 无法响应 I2C 中断，此时可能cpu0被阻塞了（一般 I2C 中断都在 cpu0上面，通过cat /proc/interrups 可以查看），或者可能是 I2C 中断位被关闭了。
+当出现 I2C 的 log："timeout, ipd: 0x10, state: 1"时，此时 I2C 控制器工作正常，但是 cpu 无法响应 I2C 中断，此时可能 cpu0 被阻塞了（一般 I2C 中断都在 cpu0 上面，通过 cat /proc/interrups 可以查看），或者可能是 I2C 中断位被关闭了。
 
 当出现 I2C 的 log 类似："timeout, ipd: 0x80, state: 1"时，看到 ipd 为 0x80 打印，可以说明当前 SCL 被 slave 拉住，要判断被哪个 slave 拉住：
 
 - 一是排除法，适用于外设不多的情况，而且复现概率高；
-- 二是需要修改硬件，在 SCL 总线上串入电阻，通过电阻两端产生的压差来确定，电压更低的那端外设为拉低的 slave，电阻的选取以不影响 I2C 传输且可以看出压差为标准，一般上拉电阻的1/20 以上都可以，如果是 host 拉低也可以看出。另外在此基础上通过示波器来抓取波形更加直观，比较不同 slave 和 host 的低电平大小，与最后出问题时的低电平大小比较，相等的就是拉低总线的”元凶“。
+- 二是需要修改硬件，在 SCL 总线上串入电阻，通过电阻两端产生的压差来确定，电压更低的那端外设为拉低的 slave，电阻的选取以不影响 I2C 传输且可以看出压差为标准，一般上拉电阻的 1/20 以上都可以，如果是 host 拉低也可以看出。另外在此基础上通过示波器来抓取波形更加直观，比较不同 slave 和 host 的低电平大小，与最后出问题时的低电平大小比较，相等的就是拉低总线的”元凶“。
 
-常见的情况是sda被拉低，证明是谁拉低的，同样参考上面 “SCL 被拉低" 的方法两种。
+常见的情况是 sda 被拉低，证明是谁拉低的，同样参考上面 “SCL 被拉低" 的方法两种。
 
-### 2. i2c-rockchip.c 驱动：
+### 2. i2c-rockchip.c 驱动
 
 如果调用 I2C 传输接口返回值为 -11(-EAGAIN )时候，表示为 NACK 错误，即对方设备无应答响应，这种情况一般为外设的问题，常见的有以下几种情况：
 
 - I2C 地址错误；
 - I2C slave 设备处于不正常工作状态，比如没有上电，错误的上电时序以及设备异常等；
-- I2C 时序不符合slave设备所要求也会产生 NACK 信号，比如 slave 设备需要的是 stop 信号,而不是 repeat start 信号的时候；
+- I2C 时序不符合 slave 设备所要求也会产生 NACK 信号，比如 slave 设备需要的是 stop 信号,而不是 repeat start 信号的时候；
 - I2C 总线受外部干扰导致的，用示波器测量可以看到是一个 ACK 波形。
 
 当出现 I2C 的 log："timeout, ipd: 0x00, state: 1"时，此时 I2C 控制器工作异常，无法产生中断状态，start 时序无法发出，有以下几种可能：
 
-- I2C SCL或者SDA Pin 脚iomux错误；
+- I2C SCL 或者 SDA Pin 脚 iomux 错误；
 - I2C 的上拉电压不对，如电压不够或者上拉电源没有等；
 - I2C Pin 脚被外设拉住，电压不对；
 - I2C 时钟未开，或者时钟源太小；
-- I2C 同时配置了CON_START 和 CON_STOP位。
+- I2C 同时配置了 CON_START 和 CON_STOP 位。
 
 **当出现 I2C 的 log**："timeout, ipd: 0x10, state: 1"时，此时 I2C 控制器工作正常，但是 cpu 无法响应 I2C 中断，此时可能 cpu0 被阻塞了（一般 I2C 中断都在 cpu0 上面，通过 cat /proc/interrups 可以查看），或者可能是 I2C 中断位被关闭了。
 
-**当出现 I2C 的log类似**："timeout, ipd: 0x80, state: 1"时，看到 ipd 为 0x80 打印，或者看到"scl  was hold by slave”的打印，可以说明当前 SCL 被 slave 拉住，要判断被哪个 slave 拉住：
+**当出现 I2C 的 log 类似**："timeout, ipd: 0x80, state: 1"时，看到 ipd 为 0x80 打印，或者看到"scl  was hold by slave”的打印，可以说明当前 SCL 被 slave 拉住，要判断被哪个 slave 拉住：
 
 一是排除法，适用于外设不多的情况，而且复现概率高；
-二是需要修改硬件，在 SCL 总线上串入电阻，通过电阻两端产生的压差来确定，电压更低的那端外设为拉低的slave，电阻的选取以不影响 I2C 传输且可以看出压差为标准，一般上拉电阻的1/20以上都可以，如果是 host 拉低也可以看出。另外在此基础上通过示波器来抓取波形更加直观，比较不同 slave 和 host 的低电平大小，与最后出问题时的低电平大小比较，相等的就是拉低总线的”元凶“。
+二是需要修改硬件，在 SCL 总线上串入电阻，通过电阻两端产生的压差来确定，电压更低的那端外设为拉低的 slave，电阻的选取以不影响 I2C 传输且可以看出压差为标准，一般上拉电阻的 1/20 以上都可以，如果是 host 拉低也可以看出。另外在此基础上通过示波器来抓取波形更加直观，比较不同 slave 和 host 的低电平大小，与最后出问题时的低电平大小比较，相等的就是拉低总线的”元凶“。
 
 常见的情况是 SDA 被拉低，证明是谁拉低的，同样参考上面 “ scl  was hold by slave"的方法两种。
 
@@ -262,6 +262,6 @@ Documentation/devicetree/bindings/i2c/i2c-gpio.txt
 - “state=2” 表示 SCL 为低；
 - “state=3” 表示 SCL 和 SDA 都为低。
 
-### 3. Debug 之 I2C 波形：
+### 3. Debug 之 I2C 波形
 
 如果遇到的 I2C 问题以上情况都不是，最好的办法是抓取 I2C  出错时候的波形，通过波形来分析 I2C 问题，I2C 的波形非常有用，大部分的问题都能分析出来；可以在出错的地方让 cpu 卡住（比如 while(1) 等），不发起新的 I2C 任务，最后抓到的波形应该就是出错的波形，如果需要过滤还可以加入设备 I2C 地址的判断条件等。

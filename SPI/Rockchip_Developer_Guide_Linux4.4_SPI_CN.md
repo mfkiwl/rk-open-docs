@@ -18,7 +18,7 @@
 
 | **芯片名称**        | **内核版本** |
 | --------------- | -------- |
-| 采用linxu4.4的所有芯片 | Linux4.4 |
+| 采用 linxu4.4 的所有芯片 | Linux4.4 |
 
 **读者对象**
 
@@ -38,15 +38,15 @@
 [TOC]
 ---
 
-## 1 Rockchip SPI功能特点
+## 1 Rockchip SPI 功能特点
 
-SPI （serial peripheral interface），以下是linux 4.4 spi驱动支持的一些特性︰
+SPI （serial peripheral interface），以下是 linux 4.4 spi 驱动支持的一些特性︰
 
-* 默认采用摩托罗拉 SPI协议
-* 支持8位和16位
-* 软件可编程时钟频率和传输速率高达50MHz
-* 支持SPI 4种传输模式配置
-* 每个SPI控制器支持一个到两个片选
+* 默认采用摩托罗拉 SPI 协议
+* 支持 8 位和 16 位
+* 软件可编程时钟频率和传输速率高达 50MHz
+* 支持 SPI 4 种传输模式配置
+* 每个 SPI 控制器支持一个到两个片选
 
 ## 2 内核软件
 
@@ -68,7 +68,7 @@ Device Drivers  --->
 		<*>   Rockchip SPI controller driver
 ```
 
-### 2.3 DTS节点配置
+### 2.3 DTS 节点配置
 
 ```c
 &spi1 {     						引用spi 控制器节点
@@ -97,13 +97,13 @@ dma-names = "tx","rx";   			使能DMA模式，一般通讯字节少于32字节�
 		};
 ```
 
-max-freq 和 spi-max-frequency的配置说明：
+max-freq 和 spi-max-frequency 的配置说明：
 
-* spi-max-frequency 是SPI的输出时钟，是max-freq分频后输出的，关系是max-freq >= 2*spi-max-frequency。
-* max-freq 不要低于24M，否则可能有问题。
-* 如果需要配置spi-cpha的话， max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
+* spi-max-frequency 是 SPI 的输出时钟，是 max-freq 分频后输出的，关系是 max-freq >= 2*spi-max-frequency。
+* max-freq 不要低于 24M，否则可能有问题。
+* 如果需要配置 spi-cpha 的话， max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
 
-### 2.3 SPI设备驱动
+### 2.3 SPI 设备驱动
 
 设备驱动注册:
 
@@ -156,7 +156,7 @@ static void __exit spi_test_exit(void)
 module_exit(spi_test_exit);
 ```
 
-对spi读写操作请参考include/linux/spi/spi.h，以下简单列出几个
+对 spi 读写操作请参考 include/linux/spi/spi.h，以下简单列出几个
 
 ```c
 static inline int
@@ -167,9 +167,9 @@ static inline int
 spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
 ```
 
-### 2.4 User mode SPI device配置说明
+### 2.4 User mode SPI device 配置说明
 
-User mode SPI device 指的是用户空间直接操作SPI接口，这样方便众多的SPI外设驱动跑在用户空间，
+User mode SPI device 指的是用户空间直接操作 SPI 接口，这样方便众多的 SPI 外设驱动跑在用户空间，
 
 不需要改到内核，方便驱动移植开发。
 
@@ -181,7 +181,7 @@ Device Drivers  --->
 		[*]   User mode SPI device driver support
 ```
 
-#### 2.4.2 DTS配置
+#### 2.4.2 DTS 配置
 
 ```c
 &spi0 {
@@ -212,17 +212,17 @@ static const struct of_device_id spidev_dt_ids[] = {
 MODULE_DEVICE_TABLE(of, spidev_dt_ids);
 ```
 
-说明：较旧的内核可能没有2.4.1 和2.4.3 ，需要手动添加，如果已经包含这两个的内核，只要添加2.4.2即可。
+说明：较旧的内核可能没有 2.4.1 和 2.4.3 ，需要手动添加，如果已经包含这两个的内核，只要添加 2.4.2 即可。
 
 #### 2.4.4 使用说明
 
 驱动设备加载注册成功后，会出现类似这个名字的设备：/dev/spidev1.1
 
-请参照Documentation/spi/spidev_test.c
+请参照 Documentation/spi/spidev_test.c
 
-#### 2.5 SPI 做slave
+#### 2.5 SPI 做 slave
 
-使用的接口和master模式一样，都是spi_read和spi_write。
+使用的接口和 master 模式一样，都是 spi_read 和 spi_write。
 
 内核补丁，请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
 
@@ -276,7 +276,7 @@ index cce80e6..ce2cec6 100644
         void                    *controller_data;
 ```
 
-dts配置：
+dts 配置：
 
 ```c
     &spi0 {
@@ -293,21 +293,21 @@ dts配置：
     };
 ```
 
-注意：max-freq 必须是master clk的6倍以上，比如max-freq = <48000000>; master给过来的时钟必须小于8M。
+注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
 
 测试：
 
-spi 做slave， 要先启动slave read，再启动master write，不然会导致slave还没读完，master已经写完了。
+spi 做 slave， 要先启动 slave read，再启动 master write，不然会导致 slave 还没读完，master 已经写完了。
 
-slave write，master read也是需要先启动slave write，因为只有master送出clk后，slave才会工作，同时master
+slave write，master read 也是需要先启动 slave write，因为只有 master 送出 clk 后，slave 才会工作，同时 master
 
 会立即发送或接收数据。
 
 在第三章节的基础上：
 
-先master : `echo write 0 1 16 > /dev/spi_misc_test`
+先 master : `echo write 0 1 16 > /dev/spi_misc_test`
 
-再slave:  `echo read 0 1 16 > /dev/spi_misc_test`
+再 slave:  `echo read 0 1 16 > /dev/spi_misc_test`
 
 ## 3 SPI 内核测试驱动
 
@@ -320,7 +320,7 @@ drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
 ```
 
-### 3.2 DTS配置
+### 3.2 DTS 配置
 
 ```c
 &spi0 {
@@ -350,7 +350,7 @@ drivers/spi/Makefile
 };
 ```
 
-### 3.3 驱动log
+### 3.3 驱动 log
 
 ```c
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
@@ -374,13 +374,13 @@ echo setspeed 0 1000000 > /dev/spi_misc_test
 
 echo 类型  id  循环次数 传输长度 > /dev/spi_misc_test
 
-echo setspeed id 频率（单位Hz） > /dev/spi_misc_test
+echo setspeed id 频率（单位 Hz） > /dev/spi_misc_test
 
-如果需要，可以自己修改测试case。
+如果需要，可以自己修改测试 case。
 
 ## 4 常见问题
 
 * 调试前确认驱动有跑起来
-* 确保SPI 4个引脚的IOMUX配置无误
-* 确认TX送时，TX引脚有正常的波形，CLK 有正常的CLOCK信号，CS信号有拉低
-* 如果clk频率较高，可以考虑提高驱动强度来改善信号
+* 确保 SPI 4 个引脚的 IOMUX 配置无误
+* 确认 TX 送时，TX 引脚有正常的波形，CLK 有正常的 CLOCK 信号，CS 信号有拉低
+* 如果 clk 频率较高，可以考虑提高驱动强度来改善信号

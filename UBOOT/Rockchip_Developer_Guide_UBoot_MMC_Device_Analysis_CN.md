@@ -14,7 +14,7 @@
 
 **概述**
 
-该文档介绍Rockchip U-Boot next-dev的MMC驱动，包括协议层，驱动层介绍，DTS配置。
+该文档介绍 Rockchip U-Boot next-dev 的 MMC 驱动，包括协议层，驱动层介绍，DTS 配置。
 
 **读者对象**
 
@@ -38,23 +38,23 @@
 
 ------
 
-## MMC设备简介
+## MMC 设备简介
 
-MMC为MultiMedia Card，多媒体存储卡，但后续泛指一个接口协定（一种卡式），能符合这接口的内存器都可称作mmc储存体。可以分为三类：
+MMC 为 MultiMedia Card，多媒体存储卡，但后续泛指一个接口协定（一种卡式），能符合这接口的内存器都可称作 mmc 储存体。可以分为三类：
 
-- mmc type card ：1.标准mmc卡：闪存卡的一种，使用mmc标准；2. emmc：Embedded MultiMediaCard，是MMC协会所制定的内嵌式存储器标准规格，带有mmc接口，是具备mmc协议的芯片。
-- sd type card：SD卡为Secure Digital Memory Card, 即安全数码卡。它在MMC的基础上发展而来，增加了两个主要特色：SD卡强调数据的安全安全，可以设定所储存的使用权限，防止数据被他人复制。兼容mmc接口规范。
-- sdio type card：SDIO是在SD标准上定义了一种外设接口，它和SD卡规范间的一个重要区别是增加了低速标准。在SDIO卡只需要SPI和1位SD传输模式。低速卡的目标应用是以最小的硬件开销支持低速IO能力。常见的sdio设备有Wi-Fi card、Bluetooth card等等。
+- mmc type card ：1.标准 mmc 卡：闪存卡的一种，使用 mmc 标准；2. emmc：Embedded MultiMediaCard，是 MMC 协会所制定的内嵌式存储器标准规格，带有 mmc 接口，是具备 mmc 协议的芯片。
+- sd type card：SD 卡为 Secure Digital Memory Card, 即安全数码卡。它在 MMC 的基础上发展而来，增加了两个主要特色：SD 卡强调数据的安全安全，可以设定所储存的使用权限，防止数据被他人复制。兼容 mmc 接口规范。
+- sdio type card：SDIO 是在 SD 标准上定义了一种外设接口，它和 SD 卡规范间的一个重要区别是增加了低速标准。在 SDIO 卡只需要 SPI 和 1 位 SD 传输模式。低速卡的目标应用是以最小的硬件开销支持低速 IO 能力。常见的 sdio 设备有 Wi-Fi card、Bluetooth card 等等。
 
-目前MMC设备的可运行的电压有三种：3V、1.8V、1.2V。工作时钟频率范围为0～200 MHz。
+目前 MMC 设备的可运行的电压有三种：3V、1.8V、1.2V。工作时钟频率范围为 0～200 MHz。
 
-本文主要介绍U-Boot下的MMC设备驱动。
+本文主要介绍 U-Boot 下的 MMC 设备驱动。
 
-## DTS配置说明
+## DTS 配置说明
 
-U-Boot下的MMC设备驱动支持设备树，驱动的硬件配置需要在对应的dtsi & dts内配置。
+U-Boot 下的 MMC 设备驱动支持设备树，驱动的硬件配置需要在对应的 dtsi & dts 内配置。
 
-dtsi的配置及说明：
+dtsi 的配置及说明：
 
 ```c
 emmc: dwmmc@ff390000 {
@@ -71,7 +71,7 @@ emmc: dwmmc@ff390000 {
 };
 ```
 
-板级dts配置及说明：
+板级 dts 配置及说明：
 
 ```c
 &emmc {
@@ -89,14 +89,14 @@ emmc: dwmmc@ff390000 {
 };
 ```
 
-## MMC初始化
+## MMC 初始化
 
-MMC初始化主要分为两个部分：1，MMC控制器初始化；2，MMC设备初始化。
+MMC 初始化主要分为两个部分：1，MMC 控制器初始化；2，MMC 设备初始化。
 
-### 1. MMC控制器初始化
+### 1. MMC 控制器初始化
 
-Rockchip在`uboot/arch/arm/mach-rockchip/board.c`调用mmc_initialize(gd->bd)。
-mmc_initialize(gd->bd)，为硬件驱动probe过程，函数位于`uboot/drivers/mmc/mmc.c`。代码如下：
+Rockchip 在`uboot/arch/arm/mach-rockchip/board.c`调用 mmc_initialize(gd->bd)。
+mmc_initialize(gd->bd)，为硬件驱动 probe 过程，函数位于`uboot/drivers/mmc/mmc.c`。代码如下：
 
 ```c
 int mmc_initialize(bd_t *bis)
@@ -127,27 +127,27 @@ int mmc_initialize(bd_t *bis)
 
 mmc_probe(bis)主要做了：
 
-- MMC控制器的初始化及获取MMC设备配置
+- MMC 控制器的初始化及获取 MMC 设备配置
 - 时钟初始化
-- GPIO初始化
+- GPIO 初始化
 
-MMC控制器公用代码位于`uboot/drivers/mmc/dw_mmc.c`，平台代码位于`uboot/drivers/mmc/rockchip_dw_mmc.c`。
+MMC 控制器公用代码位于`uboot/drivers/mmc/dw_mmc.c`，平台代码位于`uboot/drivers/mmc/rockchip_dw_mmc.c`。
 
 时钟框架代码位于`uboot/drivers/clk/rockchip/clk_xxx.c`，每个平台有自己的时钟框架，对应不同文件。
 
-目前Rockchip平台只做了MMC控制器的初始化及时钟初始化，GPIO使用pre-loader的配置。
+目前 Rockchip 平台只做了 MMC 控制器的初始化及时钟初始化，GPIO 使用 pre-loader 的配置。
 
-defconfig内会有CONFIG_OF_SPL_REMOVE_PROPS的配置，为移除DTS内的某些配置。当驱动probe时，移除的配置就不会初始化。示例如下：
+defconfig 内会有 CONFIG_OF_SPL_REMOVE_PROPS 的配置，为移除 DTS 内的某些配置。当驱动 probe 时，移除的配置就不会初始化。示例如下：
 
 ```c
 CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
 ```
 
-mmc_do_preinit()主要做了static struct mmc mmc_static初始化，注册MMC设备。
+mmc_do_preinit()主要做了 static struct mmc mmc_static 初始化，注册 MMC 设备。
 
-### 2. MMC设备初始化
+### 2. MMC 设备初始化
 
-MMC控制器初始化，调用mmc_init对MMC卡做初始化，运行到相应的模式。函数位于`uboot/drivers/mmc/mmc.c`。
+MMC 控制器初始化，调用 mmc_init 对 MMC 卡做初始化，运行到相应的模式。函数位于`uboot/drivers/mmc/mmc.c`。
 
 ```c
 int mmc_init(struct mmc *mmc)
@@ -176,17 +176,17 @@ int mmc_init(struct mmc *mmc)
 }
 ```
 
-mmc_start_init：MMC有多种类型，该函数为查询是哪个类型的MMC设备。
+mmc_start_init：MMC 有多种类型，该函数为查询是哪个类型的 MMC 设备。
 
 mmc_complete_init：初始化设备，获取设备信息。
 
-## MMC设备读写调用
+## MMC 设备读写调用
 
-mmc挂载在block下，框架如下：
+mmc 挂载在 block 下，框架如下：
 
 ![block设备框图](./Rockchip_Developer_Guide_UBoot_MMC_Device_Analysis/block-framework.jpg)
 
-U-Boot下读写擦除调用：
+U-Boot 下读写擦除调用：
 
 ```c
 struct blk_desc *dev_desc;
@@ -198,24 +198,24 @@ unsigned long blk_derase(struct blk_desc *block_dev, lbaint_t start,lbaint_t blk
 
 ## 常见问题排查
 
-1. U-Boot下如何配置使用MMC设备
+1. U-Boot 下如何配置使用 MMC 设备
 
-- **请先按照DTS配置说明进行配置**
-- MMC HS200模式，注意CONFIG_OF_SPL_REMOVE_PROPS的配置，需要remove clock-names。高速模式、SDR52，DDR52无需remove clock-names。
+- **请先按照 DTS 配置说明进行配置**
+- MMC HS200 模式，注意 CONFIG_OF_SPL_REMOVE_PROPS 的配置，需要 remove clock-names。高速模式、SDR52，DDR52 无需 remove clock-names。
 
-2. 初始化MMC设备失败
+2. 初始化 MMC 设备失败
 
-- 先查看MMC device端的电压是否正常，控制器的logic电压是否在1.0V以上
+- 先查看 MMC device 端的电压是否正常，控制器的 logic 电压是否在 1.0V 以上
 - 查看寄存器配置是否正确
-- 查看时钟配置是否正确，可以在clock模块内打印出相应的时钟配置
+- 查看时钟配置是否正确，可以在 clock 模块内打印出相应的时钟配置
 
 3. 初始化成功，但读取固件失败
 
-- 先查看MMC device端的电压是否正常，控制器的logic电压是否在1.0以上。
-- 查看时钟配置是否正确，可以在clock模块内打印出相应的时钟配置
-- MMC HS200模式，查看max-frequency是否过高。
+- 先查看 MMC device 端的电压是否正常，控制器的 logic 电压是否在 1.0 以上。
+- 查看时钟配置是否正确，可以在 clock 模块内打印出相应的时钟配置
+- MMC HS200 模式，查看 max-frequency 是否过高。
 - 硬件是否虚焊
 
-4. 当U-Boot作为pre-loader或usbplug使用时，emmc初始化失败，命令停留在CMD8
+4. 当 U-Boot 作为 pre-loader 或 usbplug 使用时，emmc 初始化失败，命令停留在 CMD8
 
-- Rockchip平台SDRAM的前1MB位置为安全区域，加载起来的pre-loader或usbplug在此区域运行，而emmc为非安全的IP，是无法访问该区域，需要配置允许emmc读数据到该区域，才能初始化成功。
+- Rockchip 平台 SDRAM 的前 1MB 位置为安全区域，加载起来的 pre-loader 或 usbplug 在此区域运行，而 emmc 为非安全的 IP，是无法访问该区域，需要配置允许 emmc 读数据到该区域，才能初始化成功。

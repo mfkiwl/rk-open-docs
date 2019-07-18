@@ -71,9 +71,9 @@ drivers/pwm/pwm-rockchip.c
 内核 3.10 版本和 4.4 版本的 DTS 节点，略有不同的地方在配置的参数个数上，内核 3.10 版本配置的参数数目为 2，内核 4.4 版本配置的参数数目为 2 或者 3；参数数目与 PWM 节点中的 “pwm-cells” 对应，如果 “pwm-cells” 配置是 3，则需要配置可选的极性；如果是 2，就不需要配置极性。
 DTS 配置参考文档 Documentation/devicetree/bindings/pwm/pwm.txt，主要几个参数说明下:
 
-- 参数1，表示 index  (per-chip index of the PWM to request)，一般是 0，因为我们 Rockchip PWM 每个 chip 只有一个。
-- 参数2，表示  PWM 输出波形的时间周期，单位是 ns；例如下面配置的 25000 就是表示想要得到的 PWM 输出周期是 40K 赫兹。
-- 参数3，表示极性，为可选参数；下面例子中的配置为负极性。
+- 参数 1，表示 index  (per-chip index of the PWM to request)，一般是 0，因为我们 Rockchip PWM 每个 chip 只有一个。
+- 参数 2，表示  PWM 输出波形的时间周期，单位是 ns；例如下面配置的 25000 就是表示想要得到的 PWM 输出周期是 40K 赫兹。
+- 参数 3，表示极性，为可选参数；下面例子中的配置为负极性。
 
 ```c
         bl: backlight {
@@ -84,7 +84,7 @@ DTS 配置参考文档 Documentation/devicetree/bindings/pwm/pwm.txt，主要几
 
 ## PWM 流程
 
-PWM 驱动流程在内核 3.10 版本和内核 4.4 版本两个驱动上大致是一样，上面说了只是接口包装的区别，所以本文只说一个4.4 的流程。
+PWM 驱动流程在内核 3.10 版本和内核 4.4 版本两个驱动上大致是一样，上面说了只是接口包装的区别，所以本文只说一个 4.4 的流程。
 
 ![pwm-flow](Rockchip_Developer_Guide_PWM/pwm-flow.png)
 
@@ -92,12 +92,12 @@ PWM 驱动流程在内核 3.10 版本和内核 4.4 版本两个驱动上大致�
 
 ## PWM 使用
 
-对于 PWM 的 kernel 和 user space 使用说明在 Documentation/pwm.txt 有说明，下面重点提下 user space 部分。就像 pwm.txt 文档里面说的，PWM 提供了用户层的接口，在 /sys/class/pwm/ 节点下面，PWM 驱动加载成功后，会在 /sys/class/pwm/ 目录下产生 pwmchip0 目录；向 export 文件写入 0，就是打开 pwm定时器 0，会产生一个 pwm0 目录，相反的往 unexport 写入 0 就会关闭 pwm 定时器了，同时 pwm0 目录会被删除,该目录下有以下几个文件：
+对于 PWM 的 kernel 和 user space 使用说明在 Documentation/pwm.txt 有说明，下面重点提下 user space 部分。就像 pwm.txt 文档里面说的，PWM 提供了用户层的接口，在 /sys/class/pwm/ 节点下面，PWM 驱动加载成功后，会在 /sys/class/pwm/ 目录下产生 pwmchip0 目录；向 export 文件写入 0，就是打开 pwm 定时器 0，会产生一个 pwm0 目录，相反的往 unexport 写入 0 就会关闭 pwm 定时器了，同时 pwm0 目录会被删除,该目录下有以下几个文件：
 
 - enable：写入 1 使能 pwm，写入 0 关闭 pwm；
 - polarity：有 normal 或 inversed 两个参数选择，表示输出引脚电平翻转；
-- duty_cycle：在normal模式下，表示一个周期内高电平持续的时间（单位：纳秒），在 reversed 模式下，表示一个周期中低电平持续的时间（单位：纳秒)；
-- period：表示pwm波的周期(单位：纳秒)；
+- duty_cycle：在 normal 模式下，表示一个周期内高电平持续的时间（单位：纳秒），在 reversed 模式下，表示一个周期中低电平持续的时间（单位：纳秒)；
+- period：表示 pwm 波的周期(单位：纳秒)；
 
 以下是 pwmchip0 的例子，设置 pwm0 输出频率 100K，占空比 50%, 极性为正极性：
 
@@ -113,7 +113,7 @@ echo 1 > enable
 
 ## PWM Backlight
 
-PWM的连续模式使用最多，且背光使用较为频繁。
+PWM 的连续模式使用最多，且背光使用较为频繁。
 
 ### 1. Backlight DTS
 
@@ -165,12 +165,12 @@ backlight: backlight {
 - brightness-levels 数组，我们一般以值 255 为一个 scale，所以一般的 brightness-levels 为 256 个元素的数组。当 PWM 设置为正极性时，从 0~255 表示背光为正极，占空比从 0%~100% 变化，255~0 位负极性，占空比从 100%~0% 变化；当 PWM 设置为负极性时，反之。
 
 - default-brightness-level 表示默认的背光，它存在于开机时候，如背光驱动初始化到安卓用户层设置下来新的背光这段时间，表示为第 200 个元素的背光亮度。
-- enable-gpios 表示背光使能脚，这个根据电路原理图配置即可；有的硬件没有这个背光使能脚，那么将这个配置删除，背光驱动通过配置 brightness-levels 数组的第0个元素将背光关闭。
+- enable-gpios 表示背光使能脚，这个根据电路原理图配置即可；有的硬件没有这个背光使能脚，那么将这个配置删除，背光驱动通过配置 brightness-levels 数组的第 0 个元素将背光关闭。
 
 ### 2. PWM Backlight 调试
 
 如何确定背光灭的 brightness-level 值，通过命令行调试背光亮度， echo xxx > sys/class/backlight/backlight/brightness。
-当 PWM 设置为正极性时，可以通过 echo xxx > sys/class/backlight/backlight/brightness 到背光节点，xxx 的范围为 0~255，这时观察亮度变化，如 x 为背光亮度为 0 的点，y 为客户接受的背光最亮的点。这时重新调整brightness-level表，就可以将数组第一个值改为 x，最大值改为 y，中间值需均匀变化，凑成 256个 元素，且有一个元素值为 255。当PWM为负极性时，则反之。
+当 PWM 设置为正极性时，可以通过 echo xxx > sys/class/backlight/backlight/brightness 到背光节点，xxx 的范围为 0~255，这时观察亮度变化，如 x 为背光亮度为 0 的点，y 为客户接受的背光最亮的点。这时重新调整 brightness-level 表，就可以将数组第一个值改为 x，最大值改为 y，中间值需均匀变化，凑成 256 个 元素，且有一个元素值为 255。当 PWM 为负极性时，则反之。
 
 ## 常见问题
 
@@ -219,7 +219,7 @@ backlight: backlight {
 - 先检查 PWM Counter Register 寄存器的值是否在变化，如果有变化说明 PWM 在工作 (注意，如果用 io 命令来读取寄存器，在产品文档的表格中 RK3328 和它之后的芯片需要再关闭 pclk 的 gating，因为这些芯片 pclk 和工作时钟是分开的)；如果该寄存器的值没有发生变化，则说明 PWM 工作异常。一般，这些异常分为以下几个方面：
 
   1. 时钟问题；
-  2. PWM 本身寄存器配置问题,PWM未使能或者 duty 配置的值大于period等；
+  2. PWM 本身寄存器配置问题,PWM 未使能或者 duty 配置的值大于 period 等；
   3. RK3368 芯片需要额外配置 GRF 中 GRF_SOC_CON15 寄存器的 bit12 为 1。
 
 - 如果读出来的 Counter Register 寄存器的值在发生变化,则说明 PWM 工作正常，但是仍量不到信号，应该是 pin 脚的问题，一般也分为以下几个可能：

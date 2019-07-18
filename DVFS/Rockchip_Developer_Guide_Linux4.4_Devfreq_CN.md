@@ -1,4 +1,4 @@
-# **Devfreq开发指南**
+# **Devfreq 开发指南**
 
 发布版本：1.0
 
@@ -14,7 +14,7 @@
 
 **概述**
 
-主要描述devfreq的相关概念、配置方法和用户态接口。
+主要描述 devfreq 的相关概念、配置方法和用户态接口。
 
 **产品版本**
 
@@ -42,23 +42,23 @@
 
 ## 1 概述
 
-​	Devfreq是内核开发者定义的一套支持根据指定的governor动态调整频率和电压的框架模型，它能有效地降
+​	Devfreq 是内核开发者定义的一套支持根据指定的 governor 动态调整频率和电压的框架模型，它能有效地降
 
-低的功耗，同时兼顾性能。Devfreq类似CPUFreq，不过CPUFreq只适用于CPU，devfreq用于除了CPU外，也需
+低的功耗，同时兼顾性能。Devfreq 类似 CPUFreq，不过 CPUFreq 只适用于 CPU，devfreq 用于除了 CPU 外，也需
 
-要动态调频调压的模块。Devfreq framework由governor、core、driver、event组成，软件框架如下：
+要动态调频调压的模块。Devfreq framework 由 governor、core、driver、event 组成，软件框架如下：
 
 ![](./Rockchip_Developer_Guide_Linux4.4_Devfreq/devfreq-framwork.png)
 
-​	Devfreq governor：用于升降频检测，决定频率。目前Linux4.4内核中包含了如下几种governor：
+​	Devfreq governor：用于升降频检测，决定频率。目前 Linux4.4 内核中包含了如下几种 governor：
 
 - simple ondemand：根据负载动态调频。
 - userspace：提供相应接口供用户态应用程序调整频率。
 - powersave：功耗优先，始终将频率设置在最低值。
 - performance：性能优先，始终将频率设置为最高值。
-- dmc ondemand：simple ondemand的基础上，增加场景变频的支持，DDR变频专用。
+- dmc ondemand：simple ondemand 的基础上，增加场景变频的支持，DDR 变频专用。
 
-​	Devfreq core： 对devfreq governors和devfreq driver进行了封装和抽象，并定义了清晰的接口。
+​	Devfreq core： 对 devfreq governors 和 devfreq driver 进行了封装和抽象，并定义了清晰的接口。
 
 ​	Devfreq driver：用于初始化设备的频率电压表，设置具体设备的频率。
 
@@ -66,7 +66,7 @@
 
 ## 2 代码路径
 
-​	Governor相关代码：
+​	Governor 相关代码：
 
 ```c
 drivers/devfreq/governor_simpleondemand.c        /* simple ondemand调频策略 */
@@ -75,7 +75,7 @@ drivers/devfreq/governor_powersave.c             /* powersave调频策略 */
 drivers/devfreq/governor_userspace.c             /* userspace调频策略 */
 ```
 
-​	Event相关代码：
+​	Event 相关代码：
 
 ```c
 drivers/devfreq/devfreq-event.c
@@ -83,13 +83,13 @@ drivers/devfreq/event/rockchip-dfi.c             /* 用于监控DDR的读写cycl
 drivers/devfreq/event/rockchip-nocp.c            /* 用于监控各个模块访问DDR的字节数 */
 ```
 
-​	Core相关代码：
+​	Core 相关代码：
 
 ```c
 drivers/devfreq/devfreq.c
 ```
 
-​	Driver相关代码：
+​	Driver 相关代码：
 
 ```c
 drivers/devfreq/rockchip_dmc.c                 /* dmc ondemand调频策略和DMC driver */
@@ -101,7 +101,7 @@ drivers/devfreq/rockchip_bus.c                                     /* bus driver
 drivers/soc/rockchip/rockchip_opp_select.c                    /* 修改电压表相关接口 */
 ```
 
-## 3 Menuconfig配置
+## 3 Menuconfig 配置
 
 ```c
 Device Drivers  --->
@@ -123,15 +123,15 @@ Device Drivers  --->
 
 ​	不同的平台可根据实际情况修改配置。
 
-## 4 Device Tree配置方法
+## 4 Device Tree 配置方法
 
-### 4.1 GPU DVFS配置方法
+### 4.1 GPU DVFS 配置方法
 
-#### 4.1.1 Clock配置
+#### 4.1.1 Clock 配置
 
-​	根据平台的实际情况，在GPU节点下增加“clock”和“clock-names”属性，一般在DTSI文件中。Clock的详细配
+​	根据平台的实际情况，在 GPU 节点下增加“clock”和“clock-names”属性，一般在 DTSI 文件中。Clock 的详细配
 
-置说明，请参考clock相关的开发文档。以RK3399为例：
+置说明，请参考 clock 相关的开发文档。以 RK3399 为例：
 
 ```c
 gpu: gpu@ff9a0000 {
@@ -146,11 +146,11 @@ gpu: gpu@ff9a0000 {
 };
 ```
 
-#### 4.1.2 Regulator配置
+#### 4.1.2 Regulator 配置
 
-​	根据实际产品硬件使用的电源方案，在GPU节点下增加“mali-supply”属性，一般在板级DTS文件中。
+​	根据实际产品硬件使用的电源方案，在 GPU 节点下增加“mali-supply”属性，一般在板级 DTS 文件中。
 
-Regulator的详细配置说明，请参考regulator和PMIC相关的开发文档。以RK3399为例：
+Regulator 的详细配置说明，请参考 regulator 和 PMIC 相关的开发文档。以 RK3399 为例：
 
 ```c
 &i2c0 {
@@ -182,24 +182,24 @@ Regulator的详细配置说明，请参考regulator和PMIC相关的开发文档�
 };
 ```
 
-#### 4.1.3 OPP Table配置
+#### 4.1.3 OPP Table 配置
 
-​	Linux4.4内核将频率、电压相关的配置放在了devicetree中，我们将这些配置信息组成的节点，称之为
+​	Linux4.4 内核将频率、电压相关的配置放在了 devicetree 中，我们将这些配置信息组成的节点，称之为
 
-OPP Table。OPP Table节点包含描述频率和电压的OPP节点、leaakge相关配置属性、PVTM相关配置属性等。
+OPP Table。OPP Table 节点包含描述频率和电压的 OPP 节点、leaakge 相关配置属性、PVTM 相关配置属性等。
 
-OPP的详细配置说明，可以参考如下文档：
+OPP 的详细配置说明，可以参考如下文档：
 
 ```c
 Documentation/devicetree/bindings/opp/opp.txt
 Documentation/power/opp.txt
 ```
 
-##### 4.1.3.1 增加OPP Table
+##### 4.1.3.1 增加 OPP Table
 
-​	根据平台的实际情况，增加一个OPP Table节点，并在GPU节点下增加“operating-points-v2”属性，一般在
+​	根据平台的实际情况，增加一个 OPP Table 节点，并在 GPU 节点下增加“operating-points-v2”属性，一般在
 
-DTSI文件中。以RK3399为例：
+DTSI 文件中。以 RK3399 为例：
 
 ```c
 &gpu {
@@ -221,11 +221,11 @@ gpu_opp_table: opp-table2 {
 }
 ```
 
-##### 4.1.3.2 删除OPP
+##### 4.1.3.2 删除 OPP
 
 ​	如果开发者需要删除某些频点，可以使用如下方法。
 
-​	方法一：直接在对应OPP节点下增加“status = "disabeld";”，比如：
+​	方法一：直接在对应 OPP 节点下增加“status = "disabeld";”，比如：
 
 ```c
 gpu_opp_table: opp-table2 {
@@ -244,7 +244,7 @@ gpu_opp_table: opp-table2 {
 }
 ```
 
-​	方法二：在板级DTSI中重新引用OPP Table节点，并在对应OPP节点下增加“status = "disabeld";”，比如：
+​	方法二：在板级 DTSI 中重新引用 OPP Table 节点，并在对应 OPP 节点下增加“status = "disabeld";”，比如：
 
 ```c
 &gpu_opp_table {
@@ -254,31 +254,31 @@ gpu_opp_table: opp-table2 {
 };
 ```
 
-#### 4.1.4 根据leakage调整OPP Table
+#### 4.1.4 根据 leakage 调整 OPP Table
 
-​	IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指CMOS电路静态时从电源获取的电
+​	IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指 CMOS 电路静态时从电源获取的电
 
-流，我们也称之为leakage。GPU的leakage指给GPU提供特定的电压，测得的静态电流值，如果GPU在VD logic
+流，我们也称之为 leakage。GPU 的 leakage 指给 GPU 提供特定的电压，测得的静态电流值，如果 GPU 在 VD logic
 
-下，GPU的leakage等同于logic的leakage，即给logic提供特定的电压，测得的静态电流值。在芯片生产过程中，
+下，GPU 的 leakage 等同于 logic 的 leakage，即给 logic 提供特定的电压，测得的静态电流值。在芯片生产过程中，
 
-会将leakage写到eFuse或者OTP中。
+会将 leakage 写到 eFuse 或者 OTP 中。
 
-##### 4.1.4.1 根据leakage调整电压
+##### 4.1.4.1 根据 leakage 调整电压
 
-​	背景：通过测试芯片的Vmin，发现相同频率下，小leakage的芯片Vmin比较大，大leakage的芯片Vmin比较
+​	背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较
 
-小，通过这一特性可以根据leakage值降低大leakage芯片的电压，以降低功耗和提高性能。
+小，通过这一特性可以根据 leakage 值降低大 leakage 芯片的电压，以降低功耗和提高性能。
 
-​	功能说明：从eFuse或OTP中获取该芯片的GPU leakage值，通过查表得到对应的档位，然后在每个OPP中选
+​	功能说明：从 eFuse 或 OTP 中获取该芯片的 GPU leakage 值，通过查表得到对应的档位，然后在每个 OPP 中选
 
 择对应档位的电压，作为该频点的电压。
 
-​	配置方法：首先需要增加eFuse或者OTP的支持，具体方法请参考eFuse和OTP的相关文档。然后在OPP
+​	配置方法：首先需要增加 eFuse 或者 OTP 的支持，具体方法请参考 eFuse 和 OTP 的相关文档。然后在 OPP
 
-Table节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvmem-cell-names”三个属性，同时OPP节点
+Table 节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvmem-cell-names”三个属性，同时 OPP 节点
 
-根据实际情况增加“opp-microvolt-\<name\>”属性，这些配置一般都在DTSI文件中。以RK3328为例：
+根据实际情况增加“opp-microvolt-\<name\>”属性，这些配置一般都在 DTSI 文件中。以 RK3328 为例：
 
 ```c
 gpu_opp_table: gpu-opp-table {
@@ -318,31 +318,31 @@ gpu_opp_table: gpu-opp-table {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用opp-microvolt指定的电压。
+​	如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
-#### 4.1.5 根据PVTM调整OPP Table
+#### 4.1.5 根据 PVTM 调整 OPP Table
 
-​	GPU PVTM(Process-Voltage-Temperature Monitor)是一个位于GPU附近，能反应出不同芯片之间性能差异
+​	GPU PVTM(Process-Voltage-Temperature Monitor)是一个位于 GPU 附近，能反应出不同芯片之间性能差异
 
 的模块，它受工艺、电压、温度的影响。
 
-##### 4.1.5.1 根据PVTM调整电压
+##### 4.1.5.1 根据 PVTM 调整电压
 
-​	背景：通过测试芯片的Vmin，发现相同频率和电压下，PVTM值小的芯片Vmin比较大，PVTM值大的芯片
+​	背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片
 
-Vmin比较小，通过这一特性可以根据PVTM值降低大PVTM芯片的电压，以降低功耗和提高性能。
+Vmin 比较小，通过这一特性可以根据 PVTM 值降低大 PVTM 芯片的电压，以降低功耗和提高性能。
 
-​	功能说明：在指定的电压和频率下获取PVTM值，并转换成参考温度下的PVTM值，然后查表得到对应的档
+​	功能说明：在指定的电压和频率下获取 PVTM 值，并转换成参考温度下的 PVTM 值，然后查表得到对应的档
 
-位，最后在每个OPP中选择对应档位的电压，作为该频点的电压。
+位，最后在每个 OPP 中选择对应档位的电压，作为该频点的电压。
 
-​	配置方法：首先需要先增加PVTM的支持，具体方法请参考PVTM的相关文档。然后在OPP Table节点增加
+​	配置方法：首先需要先增加 PVTM 的支持，具体方法请参考 PVTM 的相关文档。然后在 OPP Table 节点增加
 
 “rockchip,pvtm-voltage-sel”、“rockchip,thermal-zone”和“rockchip,pvtm-\<name\>”属性，多种工艺的情况还需要
 
-增加“nvmem-cells”和“nvmem-cell-names”属性，OPP节点根据实际情况增加“opp-microvolt-\<name\>”属性。这
+增加“nvmem-cells”和“nvmem-cell-names”属性，OPP 节点根据实际情况增加“opp-microvolt-\<name\>”属性。这
 
-些配置一般都在DTSI文件中。以RK3399为例：
+些配置一般都在 DTSI 文件中。以 RK3399 为例：
 
 ```c
 gpu_opp_table: opp-table2 {
@@ -394,27 +394,27 @@ gpu_opp_table: opp-table2 {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用opp-microvolt指定的电压。
+​	如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
-#### 4.1.6 根据IR-Drop调整OPP Table
+#### 4.1.6 根据 IR-Drop 调整 OPP Table
 
-​	IR-Drop是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、
+​	IR-Drop 是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、
 
 电路板布线等因素导致的压降。
 
-​	背景：实测发现有些客户的板子电源纹波比较差，使用和EVB板相同的电压表，某些频点的电压偏低，导致系
+​	背景：实测发现有些客户的板子电源纹波比较差，使用和 EVB 板相同的电压表，某些频点的电压偏低，导致系
 
-统运行不稳定，这种情况需要根据IR-Drop调整调整OPP Ttable。
+统运行不稳定，这种情况需要根据 IR-Drop 调整调整 OPP Ttable。
 
-​	功能说明：将样机板每个频点的纹波减去EVB板的纹波，得到的差值就是该频点所需要增加的电压，如果最终
+​	功能说明：将样机板每个频点的纹波减去 EVB 板的纹波，得到的差值就是该频点所需要增加的电压，如果最终
 
 电压超过了允许设置的最高电压，该频点将会被删除。
 
-​	配置方法：需要在OPP Table节点增加“rockchip,max-volt ”、“rockchip,evb-irdrop”和
+​	配置方法：需要在 OPP Table 节点增加“rockchip,max-volt ”、“rockchip,evb-irdrop”和
 
-“rockchip,board-irdrop”属性，其中“rockchip,board-irdrop”一般在板级DTS文件中配置，其他在DTSI文件中配
+“rockchip,board-irdrop”属性，其中“rockchip,board-irdrop”一般在板级 DTS 文件中配置，其他在 DTSI 文件中配
 
-置。以RK3326为例，DTSI中配置如下：
+置。以 RK3326 为例，DTSI 中配置如下：
 
 ```c
 gpu_opp_table: gpu-opp-table {
@@ -427,7 +427,7 @@ gpu_opp_table: gpu-opp-table {
 }
 ```
 
-​	板级DTS文件中配置如下：
+​	板级 DTS 文件中配置如下：
 
 ```c
 &gpu_opp_table {
@@ -457,11 +457,11 @@ gpu_opp_table: gpu-opp-table {
 
 ​	功能说明：当系统检测到温度低于一定程度后，对各个频点进行抬压。
 
-​	配置方法：在OPP Table节点增加“rockchip,temp-hysteresis”、“rockchip,low-temp“、
+​	配置方法：在 OPP Table 节点增加“rockchip,temp-hysteresis”、“rockchip,low-temp“、
 
 ”rockchip,low-temp-min-volt“、“rockchip,low-temp-adjust-volt”、“rockchip,max-volt”属性。这些配置一般都在
 
-DTSI文件中，以RK3399为例：
+DTSI 文件中，以 RK3399 为例：
 
 ```c
 gpu_opp_table: opp-table2 {
@@ -485,17 +485,17 @@ gpu_opp_table: opp-table2 {
 
 #### 4.1.8 升降频负载配置
 
-​	背景：Simple ondemand调频策略有两个参数可以配置upthreshold和downdifferential，默认值分别是90
+​	背景：Simple ondemand 调频策略有两个参数可以配置 upthreshold 和 downdifferential，默认值分别是 90
 
-和5。当负载超过90%时，调到最高频，当负载小于90%且大于90%-5%是维持当前频率，当负载小于90%-5%，会
+和 5。当负载超过 90%时，调到最高频，当负载小于 90%且大于 90%-5%是维持当前频率，当负载小于 90%-5%，会
 
-调到一个频率，使得负载差不多为90%-5%/2。使用默认的配置，某些平台在某些场景下会出现GPU提频不及时或
+调到一个频率，使得负载差不多为 90%-5%/2。使用默认的配置，某些平台在某些场景下会出现 GPU 提频不及时或
 
 不提频，导致丢帧，所以需要支持修改配置。
 
-​	配置方法：在GPU节点增加“upthreshold”、downdifferential“属性，这些配置一般都在DTSI文件中，以
+​	配置方法：在 GPU 节点增加“upthreshold”、downdifferential“属性，这些配置一般都在 DTSI 文件中，以
 
-RK3288为例：
+RK3288 为例：
 
 ```c
 gpu: gpu@ffa30000 {
@@ -511,15 +511,15 @@ gpu: gpu@ffa30000 {
 }
 ```
 
-### 4.2 DMC DVFS配置方法
+### 4.2 DMC DVFS 配置方法
 
-​	DMC（Dynamic Memory Controller） DVFS，即DDR变频。
+​	DMC（Dynamic Memory Controller） DVFS，即 DDR 变频。
 
-#### 4.2.1 Clock配置
+#### 4.2.1 Clock 配置
 
-​	根据平台的实际情况，在DMC节点下增加“clock”属性，一般在DTSI文件中。Clock的详细配置说明，请参考
+​	根据平台的实际情况，在 DMC 节点下增加“clock”属性，一般在 DTSI 文件中。Clock 的详细配置说明，请参考
 
-clock相关的开发文档。以RK3399为例：
+clock 相关的开发文档。以 RK3399 为例：
 
 ```c
 dmc: dmc {
@@ -531,11 +531,11 @@ dmc: dmc {
 };
 ```
 
-#### 4.2.2 Regulator配置
+#### 4.2.2 Regulator 配置
 
-​	根据实际产品硬件使用的电源方案，在DMC节点下增加“center-supply”属性，一般在板级DTS文件中。
+​	根据实际产品硬件使用的电源方案，在 DMC 节点下增加“center-supply”属性，一般在板级 DTS 文件中。
 
-Regulator的详细配置说明，请参考regulator和PMIC相关的开发文档。以RK3399为例：
+Regulator 的详细配置说明，请参考 regulator 和 PMIC 相关的开发文档。以 RK3399 为例：
 
 ```c
 &i2c0 {
@@ -564,24 +564,24 @@ Regulator的详细配置说明，请参考regulator和PMIC相关的开发文档�
 };
 ```
 
-#### 4.2.3 OPP Table配置
+#### 4.2.3 OPP Table 配置
 
-​	Linux4.4内核将频率、电压相关的配置放在了devicetree中，我们将这些配置信息组成的节点，称之为
+​	Linux4.4 内核将频率、电压相关的配置放在了 devicetree 中，我们将这些配置信息组成的节点，称之为
 
-OPP Table。OPP Table节点包含描述频率和电压的OPP节点、leaakge相关配置属性、PVTM相关配置属性等。
+OPP Table。OPP Table 节点包含描述频率和电压的 OPP 节点、leaakge 相关配置属性、PVTM 相关配置属性等。
 
-OPP的详细配置说明，可以参考如下文档：
+OPP 的详细配置说明，可以参考如下文档：
 
 ```c
 Documentation/devicetree/bindings/opp/opp.txt
 Documentation/power/opp.txt
 ```
 
-##### 4.2.3.1 增加OPP Table
+##### 4.2.3.1 增加 OPP Table
 
-​	根据平台的实际情况，增加一个OPP Table节点，并在每个DMC节点下增加“operating-points-v2”属性，
+​	根据平台的实际情况，增加一个 OPP Table 节点，并在每个 DMC 节点下增加“operating-points-v2”属性，
 
-一般在DTSI文件中。以RK3399为例：
+一般在 DTSI 文件中。以 RK3399 为例：
 
 ```c
 &dmc {
@@ -603,11 +603,11 @@ dmc_opp_table: opp-table3 {
 };
 ```
 
-##### 4.2.3.2 删除OPP
+##### 4.2.3.2 删除 OPP
 
 ​	如果开发者需要删除某些频点，可以使用如下方法。
 
-​	方法一：直接在对应OPP节点下增加“status = "disabeld";”，比如：
+​	方法一：直接在对应 OPP 节点下增加“status = "disabeld";”，比如：
 
 ```c
 dmc_opp_table: opp-table3 {
@@ -626,7 +626,7 @@ dmc_opp_table: opp-table3 {
 }
 ```
 
-​	方法二：在板级DTS中重新引用OPP Table节点，并在对应OPP节点下增加“status = "disabeld";”，比如：
+​	方法二：在板级 DTS 中重新引用 OPP Table 节点，并在对应 OPP 节点下增加“status = "disabeld";”，比如：
 
 ```c
 &dmc_opp_table {
@@ -636,31 +636,31 @@ dmc_opp_table: opp-table3 {
 };
 ```
 
-#### 4.2.4 根据leakage调整OPP Table
+#### 4.2.4 根据 leakage 调整 OPP Table
 
-​	IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指CMOS电路静态时从电源获取的电
+​	IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指 CMOS 电路静态时从电源获取的电
 
-流，我们也称之为leakage。DDR的leakage指给ddr提供特定的电压，测得的静态电流值，如果DDR在VD logic
+流，我们也称之为 leakage。DDR 的 leakage 指给 ddr 提供特定的电压，测得的静态电流值，如果 DDR 在 VD logic
 
-下，DDR的leakage等同于logic的leakage，即给logic提供特定的电压，测得的静态电流值。在芯片生产过程中，
+下，DDR 的 leakage 等同于 logic 的 leakage，即给 logic 提供特定的电压，测得的静态电流值。在芯片生产过程中，
 
-会将leakage写到eFuse或者OTP中。
+会将 leakage 写到 eFuse 或者 OTP 中。
 
-##### 4.2.4.1 根据leakage调整电压
+##### 4.2.4.1 根据 leakage 调整电压
 
-​	背景：通过测试芯片的Vmin，发现相同频率下，小leakage的芯片Vmin比较大，大leakage的芯片Vmin比较
+​	背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较
 
-小，通过这一特性可以根据leakage值降低大leakage芯片的电压，以降低功耗和提高性能。
+小，通过这一特性可以根据 leakage 值降低大 leakage 芯片的电压，以降低功耗和提高性能。
 
-​	功能说明：从eFuse或OTP中获取该芯片的DDR leakage值，通过查表得到对应的档位，然后在每个OPP中选
+​	功能说明：从 eFuse 或 OTP 中获取该芯片的 DDR leakage 值，通过查表得到对应的档位，然后在每个 OPP 中选
 
 择对应档位的电压，作为该频点的电压。
 
-​	配置方法：首先需要增加eFuse或者OTP的支持，具体方法请参考eFuse和OTP的相关文档。然后在OPP
+​	配置方法：首先需要增加 eFuse 或者 OTP 的支持，具体方法请参考 eFuse 和 OTP 的相关文档。然后在 OPP
 
-Table节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvmem-cell-names”三个属性，同时OPP节点
+Table 节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvmem-cell-names”三个属性，同时 OPP 节点
 
-根据实际情况增加“opp-microvolt-\<name\>”属性，这些配置一般都在DTSI文件中。以RK3328为例：
+根据实际情况增加“opp-microvolt-\<name\>”属性，这些配置一般都在 DTSI 文件中。以 RK3328 为例：
 
 ```c
 dmc_opp_table: dmc-opp-table {
@@ -700,27 +700,27 @@ dmc_opp_table: dmc-opp-table {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用opp-microvolt指定的电压。
+​	如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
-#### 4.2.5 根据PVTM调整OPP Table
+#### 4.2.5 根据 PVTM 调整 OPP Table
 
-##### 4.2.5.1 根据PVTM调整电压
+##### 4.2.5.1 根据 PVTM 调整电压
 
-​	背景：通过测试芯片的Vmin，发现相同频率和电压下，PVTM值小的芯片Vmin比较大，PVTM值大的芯片
+​	背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片
 
-Vmin比较小，通过这一特性可以根据PVTM值降低大PVTM芯片的电压，以降低功耗和提高性能。
+Vmin 比较小，通过这一特性可以根据 PVTM 值降低大 PVTM 芯片的电压，以降低功耗和提高性能。
 
-​	功能说明：在指定的电压和频率下获取PVTM值，并转换成参考温度下的PVTM值，然后查表得到对应的档
+​	功能说明：在指定的电压和频率下获取 PVTM 值，并转换成参考温度下的 PVTM 值，然后查表得到对应的档
 
-位，最后在每个OPP中选择对应档位的电压，作为该频点的电压。
+位，最后在每个 OPP 中选择对应档位的电压，作为该频点的电压。
 
-​	配置方法：首先需要先增加PVTM的支持，具体方法请参考PVTM的相关文档。然后在OPP Table节点增加
+​	配置方法：首先需要先增加 PVTM 的支持，具体方法请参考 PVTM 的相关文档。然后在 OPP Table 节点增加
 
 “rockchip,pvtm-voltage-sel”、“rockchip,thermal-zone”和“rockchip,pvtm-\<name\>”属性，多种工艺的情况还需要
 
-增加“nvmem-cells”和“nvmem-cell-names”属性，OPP节点根据实际情况增加“opp-microvolt-\<name\>”属性。这
+增加“nvmem-cells”和“nvmem-cell-names”属性，OPP 节点根据实际情况增加“opp-microvolt-\<name\>”属性。这
 
-些配置一般都在DTSI文件中。以PX30为例：
+些配置一般都在 DTSI 文件中。以 PX30 为例：
 
 ```c
 dmc_opp_table: dmc-opp-table {
@@ -764,27 +764,27 @@ dmc_opp_table: dmc-opp-table {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用opp-microvolt指定的电压。
+​	如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
-#### 4.2.6 根据IR-Drop调整OPP Table
+#### 4.2.6 根据 IR-Drop 调整 OPP Table
 
-​	IR-Drop是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、
+​	IR-Drop 是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、
 
 电路板布线等因素导致的压降。
 
-​	背景：实测发现有些客户的板子电源纹波比较差，使用和EVB板相同的电压表，某些频点的电压偏低，导致系
+​	背景：实测发现有些客户的板子电源纹波比较差，使用和 EVB 板相同的电压表，某些频点的电压偏低，导致系
 
-统运行不稳定，这种情况需要根据IR-Drop调整调整OPP Table。
+统运行不稳定，这种情况需要根据 IR-Drop 调整调整 OPP Table。
 
-​	功能说明：将样机板每个频点的纹波减去EVB板的纹波，得到的差值就是该频点所需要增加的电压，如果最终
+​	功能说明：将样机板每个频点的纹波减去 EVB 板的纹波，得到的差值就是该频点所需要增加的电压，如果最终
 
 电压超过了允许设置的最高电压，该频点将会被删除。
 
-​	配置方法：需要在OPP Table节点增加“rockchip,max-volt ”、“rockchip,evb-irdrop”和“rockchip,board-
+​	配置方法：需要在 OPP Table 节点增加“rockchip,max-volt ”、“rockchip,evb-irdrop”和“rockchip,board-
 
-irdrop”属性，其中“rockchip,board-irdrop”一般在板级DTS文件中配置，其他在DTSI文件中配置。以RK3326为
+irdrop”属性，其中“rockchip,board-irdrop”一般在板级 DTS 文件中配置，其他在 DTSI 文件中配置。以 RK3326 为
 
-例，DTSI中配置如下：
+例，DTSI 中配置如下：
 
 ```c
 dmc_opp_table: dmc-opp-table {
@@ -797,7 +797,7 @@ dmc_opp_table: dmc-opp-table {
 }
 ```
 
-​	板级DTS文件中配置如下：
+​	板级 DTS 文件中配置如下：
 
 ```c
 &dmc_opp_table {
@@ -819,19 +819,19 @@ dmc_opp_table: dmc-opp-table {
 
 #### 4.2.7 场景变频配置
 
-​	背景：如果DDR固定频率，频率高了，功耗大，频率低了，性能差，很难满足产品需求。针对某些对DDR的
+​	背景：如果 DDR 固定频率，频率高了，功耗大，频率低了，性能差，很难满足产品需求。针对某些对 DDR 的
 
-需求比较明确的场景，比如跑分，视频，待机等，动态提高或者降低DDR频率，可以满足他们对性能或者功耗的
+需求比较明确的场景，比如跑分，视频，待机等，动态提高或者降低 DDR 频率，可以满足他们对性能或者功耗的
 
 不同需求。
 
-​	功能说明：当系统进入某些特殊的场景时，将DDR频率调整到该场景指定的频率，如果同时进入多个场景，
+​	功能说明：当系统进入某些特殊的场景时，将 DDR 频率调整到该场景指定的频率，如果同时进入多个场景，
 
-最终频率取最大值，需要注意的是在SYS_STATUS_DUALVIEW和SYS_STATUS_DUALVIEW场景下，不支持DDR变
+最终频率取最大值，需要注意的是在 SYS_STATUS_DUALVIEW 和 SYS_STATUS_DUALVIEW 场景下，不支持 DDR 变
 
-频，所以进入这两个场景后，即使再进入更高DDR频率的场景，DDR频率依然不变，直达退出这两个场景。
+频，所以进入这两个场景后，即使再进入更高 DDR 频率的场景，DDR 频率依然不变，直达退出这两个场景。
 
-​	配置方法：在DMC节点增加“system-status-freq ”属性，以RK3399为例：
+​	配置方法：在 DMC 节点增加“system-status-freq ”属性，以 RK3399 为例：
 
 ```c
 &dmc {
@@ -855,19 +855,19 @@ dmc_opp_table: dmc-opp-table {
 
 #### 4.2.8 负载变频配置
 
-​	背景：场景变频只能覆盖很少一部分场景，除此之外的场景需要根据DDR的利用率动态调整DDR频率，以优
+​	背景：场景变频只能覆盖很少一部分场景，除此之外的场景需要根据 DDR 的利用率动态调整 DDR 频率，以优
 
 化性能和功耗。
 
-​	功能说明：定时检测DDR的利用率，根据simple ondeman的算法选择一个目标频率，并考虑特定场景对
+​	功能说明：定时检测 DDR 的利用率，根据 simple ondeman 的算法选择一个目标频率，并考虑特定场景对
 
-DDR带宽的需求，最终选择一个最大值。需要注意的是，和场景变频一样，SYS_STATUS_DUALVIEW和
+DDR 带宽的需求，最终选择一个最大值。需要注意的是，和场景变频一样，SYS_STATUS_DUALVIEW 和
 
-SYS_STATUS_ISP场景下DDR频率是固定的。
+SYS_STATUS_ISP 场景下 DDR 频率是固定的。
 
-​	配置方法：在DMC节点增加“devfreq-events ”，“upthreshold”，“downdifferential”，
+​	配置方法：在 DMC 节点增加“devfreq-events ”，“upthreshold”，“downdifferential”，
 
-“system-status-freq”，“auto-min-freq”和“auto-freq-en”属性，以RK3399为例：
+“system-status-freq”，“auto-min-freq”和“auto-freq-en”属性，以 RK3399 为例：
 
 ```c
 &dmc {
@@ -901,17 +901,17 @@ SYS_STATUS_ISP场景下DDR频率是固定的。
 };
 ```
 
-#### 4.2.9 根据VOP带宽变频
+#### 4.2.9 根据 VOP 带宽变频
 
 ​	背景：开启负载变频后，需要增加“auto-min-freq”属性限制最低频率，防止某些场景下提频不及导致闪屏，
 
-所以这些场景的功耗仍然有优化的空间，因此引入根据VOP带宽调整DDR频率。
+所以这些场景的功耗仍然有优化的空间，因此引入根据 VOP 带宽调整 DDR 频率。
 
-​	功能说明：每一帧显示之前，VOP驱动先计算出这一帧的DDR带宽需求，然后根据带宽需求修改DDR频率的
+​	功能说明：每一帧显示之前，VOP 驱动先计算出这一帧的 DDR 带宽需求，然后根据带宽需求修改 DDR 频率的
 
 最低值。
 
-​	配置方法：在DMC节点增加"vop-bw-dmc-freq"属性，以RK3399为例：
+​	配置方法：在 DMC 节点增加"vop-bw-dmc-freq"属性，以 RK3399 为例：
 
 ```c
 &dmc {
@@ -936,19 +936,19 @@ SYS_STATUS_ISP场景下DDR频率是固定的。
 };
 ```
 
-### 4.3 BUS DVFS配置方法
+### 4.3 BUS DVFS 配置方法
 
-​	除了GPU、DMC外，还有一些模块也需要动态调频调压，比如PLL、CCI等，我们将他们统一归类到BUS
+​	除了 GPU、DMC 外，还有一些模块也需要动态调频调压，比如 PLL、CCI 等，我们将他们统一归类到 BUS
 
 DVFS。
 
-#### 4.3.1 PLL DVFS配置
+#### 4.3.1 PLL DVFS 配置
 
-​	背景：在某些平台发现PLL的频率超过一定值后，PLL所在的电压域需要提高电压，因此需要根据PLL的频率调
+​	背景：在某些平台发现 PLL 的频率超过一定值后，PLL 所在的电压域需要提高电压，因此需要根据 PLL 的频率调
 
 整电压。
 
-​	功能说明：通过注册clock notifier，监控PLL频率的变化，如果PLL是升频，先抬压再提频，如果PLL是降频，
+​	功能说明：通过注册 clock notifier，监控 PLL 频率的变化，如果 PLL 是升频，先抬压再提频，如果 PLL 是降频，
 
 先降频再降压。
 
@@ -956,7 +956,7 @@ DVFS。
 
 “bus-supply”属性。
 
-​	以PX30为例，DTSI文件配置如下：
+​	以 PX30 为例，DTSI 文件配置如下：
 
 ```c
 bus_apll: bus-apll {
@@ -1021,9 +1021,9 @@ bus_apll_opp_table: bus-apll-opp-table {
 
 ## 5 用户态接口介绍
 
-​	设备成功注册devfreq后，会在/sys/class/devfreq/目录下生成一个包含用户态接口的子目录，比如
+​	设备成功注册 devfreq 后，会在/sys/class/devfreq/目录下生成一个包含用户态接口的子目录，比如
 
-ff9a0000.gpu，通过用户态接口可以切换governor，查看当前频率，修改频率等，具体如下：
+ff9a0000.gpu，通过用户态接口可以切换 governor，查看当前频率，修改频率等，具体如下：
 
 ```c
 available_frequencies        /* 系统支持的频率 */
@@ -1048,7 +1048,7 @@ trans_stat                   /* 每个频率上的变频次数和运行时间 */
 cat /sys/kernel/debug/opp/opp_summary
 ```
 
-​	以PX30为例：
+​	以 PX30 为例：
 
 ```c
  device                rate(Hz)    target(uV)    min(uV)    max(uV)
@@ -1071,9 +1071,9 @@ cat /sys/kernel/debug/opp/opp_summary
 
 ### 6.2 如何定频
 
-​	方法一：将OPP Table中不想要的频率全部disable掉，只留一个想要的频率即可。以PX30为例，GPU定频
+​	方法一：将 OPP Table 中不想要的频率全部 disable 掉，只留一个想要的频率即可。以 PX30 为例，GPU 定频
 
-400MHz的配置如下：
+400MHz 的配置如下：
 
 ```c
 gpu_opp_table: gpu-opp-table {
@@ -1117,7 +1117,7 @@ gpu_opp_table: gpu-opp-table {
 };
 ```
 
-​	方法二：开机后通过命令定频。以PX30为例，GPU定频400MHz的命令如下：
+​	方法二：开机后通过命令定频。以 PX30 为例，GPU 定频 400MHz 的命令如下：
 
 ```c
 /* 切换到userspace，不一定是ff400000.gpu，根据不同的平台修改 */
@@ -1130,7 +1130,7 @@ cat /sys/class/devfreq/ff400000.gpu/cur_freq
 
 ### 6.3 如何查看当前频率
 
-​	可以通过devfreq的用户接口和clock的debug接口两种方法查看频率。以PX30为例，查看GPU的频率，命
+​	可以通过 devfreq 的用户接口和 clock 的 debug 接口两种方法查看频率。以 PX30 为例，查看 GPU 的频率，命
 
 令如下：
 
@@ -1144,7 +1144,7 @@ cat /sys/kernel/debug/clk/aclk_gpu/clk_rate
 
 ### 6.4 如何查看当前电压
 
-​	可以通过regulator的debug接口查看电压。以PX30为例，查看GPU的电压，命令如下：
+​	可以通过 regulator 的 debug 接口查看电压。以 PX30 为例，查看 GPU 的电压，命令如下：
 
 ```c
 /* 不一定是vdd_logic，根据实际的regulator配置修改 */
@@ -1153,7 +1153,7 @@ cat /sys/kernel/debug/regulator/vdd_logic/voltage
 
 ### 6.5 如何单独调频调压
 
-​	以PX30 GPU为例，设置频率为400MHz，电压1000mV。
+​	以 PX30 GPU 为例，设置频率为 400MHz，电压 1000mV。
 
 ```c
 /* 关闭自动变频，不一定是ff400000.gpu，根据不同的平台修改 */
@@ -1172,13 +1172,13 @@ cat /sys/kernel/debug/regulator/vdd_logic/voltage
 
 ### 6.6 如何查看当前电压的档位
 
-​	如果是通过PVTM调压，执行如下命令
+​	如果是通过 PVTM 调压，执行如下命令
 
 ```c
 dmesg | grep pvtm
 ```
 
-​	以RK3399 GPU为例，会打印出如下信息：
+​	以 RK3399 GPU 为例，会打印出如下信息：
 
 ```c
 [    0.669456] cpu cpu0: temp=22222, pvtm=138792 (140977 + -2185)
@@ -1191,13 +1191,13 @@ dmesg | grep pvtm
 [    3.366915] mali ff9a0000.gpu: pvtm-volt-sel=0
 ```
 
-​	同理如果是通过leakage调压，则执行如下命令，也有类似打印输出。
+​	同理如果是通过 leakage 调压，则执行如下命令，也有类似打印输出。
 
 ```c
 dmesg | grep leakage
 ```
 
-### 6.7 如何查看leakage
+### 6.7 如何查看 leakage
 
 ​	执行如下命令
 
@@ -1205,7 +1205,7 @@ dmesg | grep leakage
 dmesg | grep leakage
 ```
 
-​	以RK3399 GPU为例，会有如下打印：
+​	以 RK3399 GPU 为例，会有如下打印：
 
 ```c
 [    0.656175] cpu cpu0: leakage=10
@@ -1217,9 +1217,9 @@ dmesg | grep leakage
 
 ### 6.8 如何修改电压
 
-​	方法一：直接修改电压表，以GPU 200MHz抬压25000uV为例。
+​	方法一：直接修改电压表，以 GPU 200MHz 抬压 25000uV 为例。
 
-​	假设默认200MHz的OPP节点如下：
+​	假设默认 200MHz 的 OPP 节点如下：
 
 ```c
 opp-200000000 {
@@ -1246,9 +1246,9 @@ opp-200000000 {
 };
 ```
 
-​	方法二：通过修改IR-Drop的配置，调整电压。以GPU 200MHz抬压25000uV为例。
+​	方法二：通过修改 IR-Drop 的配置，调整电压。以 GPU 200MHz 抬压 25000uV 为例。
 
-​	假设IR-Drop默认配置如下：
+​	假设 IR-Drop 默认配置如下：
 
 ```c
 &gpu_opp_table {

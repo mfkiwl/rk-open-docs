@@ -30,13 +30,13 @@
 | **日期**   | **版本** | **作者** | **修改说明**             |
 | ---------- | -------- | -------- | ------------------------ |
 | 2018-07-02 | V1.0     | 吴良峰   | 初始版本                 |
-| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式 |
 
 ------
 [TOC]
 ------
 
-## 测试Demo源码
+## 测试 Demo 源码
 
 1. Simple-Demo: kernel/tools/usb/ffs-aio-example/simple
 2. Multibuf-Demo: kernel/tools/usb/ffs-aio-example/multibuff
@@ -50,17 +50,17 @@ Note:
 - It needs libaio library on the device, and libusb library on host.
 - Only support USB2.0
 
-## Toolchain下载地址（ARCH=arm64）
+## Toolchain 下载地址（ARCH=arm64）
 
 `ssh://wulf@10.10.10.29:29418/rk/prebuilts/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu`
 
-Note: "wulf"请修改为自己的Gerrit用户名
+Note: "wulf"请修改为自己的 Gerrit 用户名
 
-## Libaio下载地址
+## Libaio 下载地址
 
 <https://pagure.io/libaio.git>
 
-## Libaio库的编译
+## Libaio 库的编译
 
 ​	进入 libaio/src 目录下，修改 Makefile 的 “CC”和“AR”
 
@@ -87,15 +87,15 @@ make ARCH=arm64  CROSS_COMPILE=../..toolchain/gcc-linaro-6.3.1-2017.05-x86_64_aa
 
 ​	生成动态库：libaio.so.1.0.1
 
-​	建议使用静态库 libaio.a 来编译 FFS测试Demo
+​	建议使用静态库 libaio.a 来编译 FFS 测试 Demo
 
-## 测试Demo的编译
+## 测试 Demo 的编译
 
-### Device_app的编译
+### Device_app 的编译
 
 1. 将 libaio/src/libaio.h 拷贝到 kernel/tools/include/tools/.
 
-2. 将静态库 libaio.a 分别拷贝到 kernel/tools/usb/ffs-aio-example/multibuff/device_app/. 和kernel/tools/usb/ffs-aio-example/simple/device_app/.
+2. 将静态库 libaio.a 分别拷贝到 kernel/tools/usb/ffs-aio-example/multibuff/device_app/. 和 kernel/tools/usb/ffs-aio-example/simple/device_app/.
 
 3. 修改 aio_multibuff.c 和 aio_simple.c 的头文件
 
@@ -174,7 +174,7 @@ make ARCH=arm64  CROSS_COMPILE=../..toolchain/gcc-linaro-6.3.1-2017.05-x86_64_aa
 
    在 ffs-aio-example/simple/device_app 和 ffs-aio-example/multibuff/device_app 目录下，分别执行上述的 make 命令，编译成功后，得到 ARM64 平台的可执行文件 “aio_simple” 和“aio_multibuff”。
 
-### Host_app的编译
+### Host_app 的编译
 
 ​	Host_app 可以运行于 PC Ubuntu，编译时不需要对源码做任何改动，只要在 kernel/tools/usb/ffs-aio-example/simple/host_app 和 kernel/tools/usb/ffs-aio-example/multibuff/host_app 目录下执行 make 命令即可，得到可执行文件“test”。
 
@@ -184,9 +184,9 @@ make ARCH=arm64  CROSS_COMPILE=../..toolchain/gcc-linaro-6.3.1-2017.05-x86_64_aa
 
    并设置可执行的权限。
 
-2. **断开测试平台USB与PC的连接**。
+2. **断开测试平台 USB 与 PC 的连接**。
 
-3. **配置Configfs和Function FS Gadget**
+3. **配置 Configfs 和 Function FS Gadget**
 
    1.1 通用的配置方法
 
@@ -271,17 +271,17 @@ make ARCH=arm64  CROSS_COMPILE=../..toolchain/gcc-linaro-6.3.1-2017.05-x86_64_aa
 
    如果执行成功，可以在 /dev/usb-ffs/test 目录下，查看到 ep0/ep1/ep2 三个设备端点。
 
-5. 使能USB控制器
+5. 使能 USB 控制器
 
    `echo  fe800000.dwc3 >/config/usb_gadget/g1/UDC`
 
-6. 连接 USB 到PC ubuntu的USB接口，然后执行 lsusb，查看是否有USB设备 “1d6b:0105 Linux Foundation FunctionFS Gadget”，如果存在，则表明 USB FFS Gadget  枚举成功。
+6. 连接 USB 到 PC ubuntu 的 USB 接口，然后执行 lsusb，查看是否有 USB 设备 “1d6b:0105 Linux Foundation FunctionFS Gadget”，如果存在，则表明 USB FFS Gadget  枚举成功。
 
-7. 在 PC ubuntu上，执行host端的测试app“test”，则会通过 libusb 主动搜索ID为 “1d6b:0105” 的USB设备，并进行USB传输测试。
+7. 在 PC ubuntu 上，执行 host 端的测试 app“test”，则会通过 libusb 主动搜索 ID 为 “1d6b:0105” 的 USB 设备，并进行 USB 传输测试。
 
-## 测试Demo USB 3.0 的支持
+## 测试 Demo USB 3.0 的支持
 
-​	Kernel tools 源码提供的 USB FFS 测试Demo最高只能支持USB 2.0，不能支持USB 3.0，如果要支持USB 3.0 ，需要更新如下的补丁，测试方法与USB 2.0一样。
+​	Kernel tools 源码提供的 USB FFS 测试 Demo 最高只能支持 USB 2.0，不能支持 USB 3.0，如果要支持 USB 3.0 ，需要更新如下的补丁，测试方法与 USB 2.0 一样。
 
 ```
 diff --git a/tools/usb/ffs-aio-example/multibuff/device_app/aio_multibuff.c b/tools/usb/ffs-aio-example/multibuff/device_app/aio_multibuff.c

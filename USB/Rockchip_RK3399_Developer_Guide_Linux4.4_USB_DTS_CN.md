@@ -11,7 +11,7 @@
 ---------
 **概述**
 
-本文档提供RK3399 USB DTS的配置方法。RK3399支持两个Type-C USB 3.0(Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY)和两个USB 2.0 Host。其中，两个Type-C USB 3.0控制器硬件都可以支持OTG(USB Peripheral和USB Host)，并且向下兼容USB2.0/1.1/1.0。此外，Type-C USB 3.0可以根据实际的应用需求，将物理接口简化设计为Type-A USB 3.0/2.0，Micro USB 3.0/2.0等多种接口类型，内核USB驱动已经兼容这几种不同类型的USB接口，只需要根据实际的硬件设计修改对应的板级DTS配置，就可以使能相应的USB接口。
+本文档提供 RK3399 USB DTS 的配置方法。RK3399 支持两个 Type-C USB 3.0(Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY)和两个 USB 2.0 Host。其中，两个 Type-C USB 3.0 控制器硬件都可以支持 OTG(USB Peripheral 和 USB Host)，并且向下兼容 USB2.0/1.1/1.0。此外，Type-C USB 3.0 可以根据实际的应用需求，将物理接口简化设计为 Type-A USB 3.0/2.0，Micro USB 3.0/2.0 等多种接口类型，内核 USB 驱动已经兼容这几种不同类型的 USB 接口，只需要根据实际的硬件设计修改对应的板级 DTS 配置，就可以使能相应的 USB 接口。
 
 **产品版本**
 
@@ -28,37 +28,37 @@
 | **日期**   | **版本** | **作者** | **修改说明**                                                 |
 | ---------- | -------- | -------- | ------------------------------------------------------------ |
 | 2018-03-01 | V1.0     | 吴良峰   | 初始版本                                                     |
-| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式                                     |
-| 2019-06-25 | V1.2     | 吴良峰   | 1. 增加Type-C to Type-A USB 2.0说明<br />2. 增加VBUS供电说明<br />3. 更新文档目录名称<br />4. 参考示例由EVB改为Sapphire Excavator Board<br />5. 修订一些错误 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式                                     |
+| 2019-06-25 | V1.2     | 吴良峰   | 1. 增加 Type-C to Type-A USB 2.0 说明<br />2. 增加 VBUS 供电说明<br />3. 更新文档目录名称<br />4. 参考示例由 EVB 改为 Sapphire Excavator Board<br />5. 修订一些错误 |
 
 ---------
 [TOC]
 
 ## 1 Type-C0/1 USB 3.0 DTS
 
-Type-C 的接口类型如下图1-1所示。
+Type-C 的接口类型如下图 1-1 所示。
 
 ![ Type-C接口类型](RK3399-USB-DTS/Type-C-inerface.png)
 
-​								图1-1 Type-C 接口类型示意图
+​								图 1-1 Type-C 接口类型示意图
 
-RK3399 SoC内部4个USB控制器与USB PHY的连接如下图1-2所示。
+RK3399 SoC 内部 4 个 USB 控制器与 USB PHY 的连接如下图 1-2 所示。
 
-其中，DP是指Display Port控制器，DP与USB 3.0共用Type-C PHY。如图1-2所示，一个完整的Type-C功能，是由Type-C USB 3.0 PHY & DP PHY和USB 2.0 OTG PHY两部分组成的，这两部分PHY在芯片内部的硬件模块是独立的，供电也是独立的。
+其中，DP 是指 Display Port 控制器，DP 与 USB 3.0 共用 Type-C PHY。如图 1-2 所示，一个完整的 Type-C 功能，是由 Type-C USB 3.0 PHY & DP PHY 和 USB 2.0 OTG PHY 两部分组成的，这两部分 PHY 在芯片内部的硬件模块是独立的，供电也是独立的。
 
 ![RK3399-USB-interconnect](RK3399-USB-DTS/RK3399-USB-interconnect.png)
 
-​							图1-2 RK3399 USB控制器&PHY连接示意图
+​							图 1-2 RK3399 USB 控制器&PHY 连接示意图
 
-RK3399 SDK DTS的默认配置，支持Type-C0 USB 3.0 OTG功能，Type-C1 USB 3.0 Host功能。DTS的配置主要包括DWC3控制器、Type-C USB 3.0 PHY以及USB 2.0 PHY。
+RK3399 SDK DTS 的默认配置，支持 Type-C0 USB 3.0 OTG 功能，Type-C1 USB 3.0 Host 功能。DTS 的配置主要包括 DWC3 控制器、Type-C USB 3.0 PHY 以及 USB 2.0 PHY。
 
 ### 1.1 Type-C0 /1 USB Controller DTS
 
-Type-C0/1 USB控制器硬件都支持USB 3.0 OTG（USB Peripheral和USB Host）功能，并且向下兼容USB 2.0/1.1/1.0。但由于当前内核的USB 框架只支持一个USB 口作为Peripheral功能，所以SDK默认配置Type-C0支持OTG mode，而Type-C1仅支持Host mode。如果要配置Type-C1支持OTG mode，请参考：
+Type-C0/1 USB 控制器硬件都支持 USB 3.0 OTG（USB Peripheral 和 USB Host）功能，并且向下兼容 USB 2.0/1.1/1.0。但由于当前内核的 USB 框架只支持一个 USB 口作为 Peripheral 功能，所以 SDK 默认配置 Type-C0 支持 OTG mode，而 Type-C1 仅支持 Host mode。如果要配置 Type-C1 支持 OTG mode，请参考：
 
 [1.3 Type-C1 USB OTG Mode DTS](#1.3 Type-C1 USB OTG Mode DTS)
 
-以RK3399 Sapphire Excavator Board 的 Type-C0/C1 USB 3.0 控制器DTS配置为例：
+以 RK3399 Sapphire Excavator Board 的 Type-C0/C1 USB 3.0 控制器 DTS 配置为例：
 
 `arch/arm64/boot/dts/rockchip/rk3399.dtsi`
 
@@ -155,11 +155,11 @@ usbdrd3_1: usb1 { /* Type-C1 USB3.0 控制器DTS配置*/
 
 ### 1.2 Type-C0 /1 USB PHY DTS
 
-Type-C0/1 USB PHY的硬件由USB 3.0 PHY（只支持Super-speed）和USB 2.0 PHY（支持High-speed/Full-speed/Low-speed）两部分组成。所以，对应的USB PHY DTS也包括USB 3.0 PHY和USB 2.0 PHY两部分。
+Type-C0/1 USB PHY 的硬件由 USB 3.0 PHY（只支持 Super-speed）和 USB 2.0 PHY（支持 High-speed/Full-speed/Low-speed）两部分组成。所以，对应的 USB PHY DTS 也包括 USB 3.0 PHY 和 USB 2.0 PHY 两部分。
 
 #### 1.2.1 Type-C0 /1 USB 3.0 PHY DTS
 
-以RK3399 Sapphire Excavator Board Type-C0 /1 USB 3.0 PHY DTS配置为例：
+以 RK3399 Sapphire Excavator Board Type-C0 /1 USB 3.0 PHY DTS 配置为例：
 
 `arch/arm64/boot/dts/rockchip/rk3399.dtsi`
 
@@ -272,9 +272,9 @@ tcphy1: phy@ff800000 {
 
 #### 1.2.2 Type-C0 /1 USB 2.0 PHY DTS
 
-RK3399 有两个 USB 2.0 combphy（一个PHY支持两个port，一个port连接OTG，连接port连接Host），本文档称之为USB 2.0 PHY0和PHY1（参考图1-2）。其中，PHY0的port0作为Type-C0 USB的USB 2.0 PHY，PHY1的port0作为Type-C1 USB的USB 2.0 PHY。
+RK3399 有两个 USB 2.0 combphy（一个 PHY 支持两个 port，一个 port 连接 OTG，连接 port 连接 Host），本文档称之为 USB 2.0 PHY0 和 PHY1（参考图 1-2）。其中，PHY0 的 port0 作为 Type-C0 USB 的 USB 2.0 PHY，PHY1 的 port0 作为 Type-C1 USB 的 USB 2.0 PHY。
 
-以RK3399 Sapphire Excavator Board  Type-C0 /1 USB2.0 PHY DTS配置为例：
+以 RK3399 Sapphire Excavator Board  Type-C0 /1 USB2.0 PHY DTS 配置为例：
 
 `arch/arm64/boot/dts/rockchip/rk3399.dtsi`
 
@@ -354,9 +354,9 @@ grf: syscon@ff770000 {
 
 ### 1.3 Type-C1 USB OTG Mode DTS
 
-在[1.1 Type-C0 /1 USB Controller DTS](#1.1 Type-C0 /1 USB Controller DTS)中已经提到，由于当前的内核USB框架只能支持一个USB 口作为Peripheral功能，所以RK3399 SDK默认配置Type-C0作为OTG mode 支持USB Peripheral功能，而Type-C1只支持Host mode。实际产品中，可以根据应用需求，配置Type-C1为OTG mode，支持USB Peripheral功能，需要修改的地方有两个：
+在[1.1 Type-C0 /1 USB Controller DTS](#1.1 Type-C0 /1 USB Controller DTS)中已经提到，由于当前的内核 USB 框架只能支持一个 USB 口作为 Peripheral 功能，所以 RK3399 SDK 默认配置 Type-C0 作为 OTG mode 支持 USB Peripheral 功能，而 Type-C1 只支持 Host mode。实际产品中，可以根据应用需求，配置 Type-C1 为 OTG mode，支持 USB Peripheral 功能，需要修改的地方有两个：
 
-- DTS的“dr_mode”属性
+- DTS 的“dr_mode”属性
 
   ```
   &usbdrd_dwc3_1 {
@@ -366,33 +366,33 @@ grf: syscon@ff770000 {
   };
   ```
 
-- init.rk30board.usb.rc 的USB控制器地址 （适用于Android平台）
+- init.rk30board.usb.rc 的 USB 控制器地址 （适用于 Android 平台）
 
-  设置USB控制器的地址为Type-C1 USB控制器的基地址：
+  设置 USB 控制器的地址为 Type-C1 USB 控制器的基地址：
 
   `setprop sys.usb.controller "fe900000.dwc3"`
 
 ## 2 Type-C to Type-A USB 3.0 Host DTS
 
-Type-A USB 3.0的接口类型如下图2-1所示。
+Type-A USB 3.0 的接口类型如下图 2-1 所示。
 
 ![Type-A-interface](RK3399-USB-DTS/Type-A-interface.png)
 
-​								图2-1 Type-A USB3.0接口类型示意图
+​								图 2-1 Type-A USB3.0 接口类型示意图
 
-Type-C USB可以配置为Type-A USB使用。如RK3399 Sapphire Excavator Board 平台的Type-C1 USB默认设计为Type-A USB 3.0 Host。这种设计，USB Vbus 5V一般为常供电，不需要单独的GPIO控制，也不需要fusb302芯片，但Type-C的三路供电需要正常开启，如下图2-2所示，才能支持USB 3.0 Super-speed。
+Type-C USB 可以配置为 Type-A USB 使用。如 RK3399 Sapphire Excavator Board 平台的 Type-C1 USB 默认设计为 Type-A USB 3.0 Host。这种设计，USB Vbus 5V 一般为常供电，不需要单独的 GPIO 控制，也不需要 fusb302 芯片，但 Type-C 的三路供电需要正常开启，如下图 2-2 所示，才能支持 USB 3.0 Super-speed。
 
 ![Type-C-power-supply](RK3399-USB-DTS/Type-C-power-supply.png)
 
-​									图2-2 Type-C 供电电路
+​									图 2-2 Type-C 供电电路
 
-Type-A USB3.0 Host DTS配置的注意点如下：
+Type-A USB3.0 Host DTS 配置的注意点如下：
 
-- 对应的fusb节点不要配置，因为Type-A USB3.0不需要fusb302芯片
-- 对应的USB控制器父节点（usbdrd3）和PHY的节点（tcphy和u2phy）都要删除extcon属性
-- 对应的USB控制器子节点（usbdrd_dwc3）的dr_mode属性要配置为"host"
+- 对应的 fusb 节点不要配置，因为 Type-A USB3.0 不需要 fusb302 芯片
+- 对应的 USB 控制器父节点（usbdrd3）和 PHY 的节点（tcphy 和 u2phy）都要删除 extcon 属性
+- 对应的 USB 控制器子节点（usbdrd_dwc3）的 dr_mode 属性要配置为"host"
 
-以RK3399 Sapphire Excavator Board 平台为例（Type-C0 配置为Type-C接口，Type-C1配置为Type-A USB 3.0 接口），Type-A USB 3.0 Host DTS对应的配置方法如下：
+以 RK3399 Sapphire Excavator Board 平台为例（Type-C0 配置为 Type-C 接口，Type-C1 配置为 Type-A USB 3.0 接口），Type-A USB 3.0 Host DTS 对应的配置方法如下：
 
 `arch/arm64/boot/dts/rockchip/rk3399-sapphire.dtsi`
 
@@ -428,24 +428,24 @@ Type-A USB3.0 Host DTS配置的注意点如下：
 
 ## 3 Type-C to Micro USB 3.0 OTG Mode DTS
 
-Micro USB 3.0 OTG的接口类型如下图3-1所示。
+Micro USB 3.0 OTG 的接口类型如下图 3-1 所示。
 
 ![Micro-USB3-interface](RK3399-USB-DTS/Micro-USB3-interface.png)
 
-​							图3-1 Micro USB3.0 OTG接口类型示意图
+​							图 3-1 Micro USB3.0 OTG 接口类型示意图
 
-为了节省硬件成本，Type-C USB可以配置为Micro USB 3.0 OTG使用。这种设计，硬件上不需要fusb302芯片，USB Vbus 5V一般由GPIO控制，Type-C的三路供电与[2 Type-C to Type-A USB 3.0 Host DTS](#2 Type-C to Type-A USB 3.0 Host DTS)的硬件电路一样，需要正常开启。
+为了节省硬件成本，Type-C USB 可以配置为 Micro USB 3.0 OTG 使用。这种设计，硬件上不需要 fusb302 芯片，USB Vbus 5V 一般由 GPIO 控制，Type-C 的三路供电与[2 Type-C to Type-A USB 3.0 Host DTS](#2 Type-C to Type-A USB 3.0 Host DTS)的硬件电路一样，需要正常开启。
 
-Micro USB3.0 OTG DTS配置的注意点如下：
+Micro USB3.0 OTG DTS 配置的注意点如下：
 
-- 对应的fusb节点不要配置，因为Micro USB3.0不需要fusb302芯片
-- 对应的USB PHY节点（tcphy和u2phy）都要删除extcon属性
-- 对应的USB控制器父节点（usbdrd3）中，extcon属性引用为u2phy的节点
-- 对应的USB控制器子节点（usbdrd_dwc3）的dr_mode属性要配置为"otg"
-- 对应的USB2 PHY节点（u2phy）中，配置Vbus regulator
-- Micro USB 3.0 OTG 是根据ID脚的电平变化（与Micro USB 2.0 OTG相同）来切换Peripheral mode和Host mode
+- 对应的 fusb 节点不要配置，因为 Micro USB3.0 不需要 fusb302 芯片
+- 对应的 USB PHY 节点（tcphy 和 u2phy）都要删除 extcon 属性
+- 对应的 USB 控制器父节点（usbdrd3）中，extcon 属性引用为 u2phy 的节点
+- 对应的 USB 控制器子节点（usbdrd_dwc3）的 dr_mode 属性要配置为"otg"
+- 对应的 USB2 PHY 节点（u2phy）中，配置 Vbus regulator
+- Micro USB 3.0 OTG 是根据 ID 脚的电平变化（与 Micro USB 2.0 OTG 相同）来切换 Peripheral mode 和 Host mode
 
-以Type-C0 USB配置为Micro USB 3.0 OTG为例：
+以 Type-C0 USB 配置为 Micro USB 3.0 OTG 为例：
 
 ```
 /* Enable Type-C0 USB 3.0 PHY */
@@ -482,7 +482,7 @@ Micro USB3.0 OTG DTS配置的注意点如下：
 
 *Note1.*
 
-Kernel 4.4最新的代码，已经将OTG USB Vbus的控制改为regulator的方式，对应的提交信息如下：
+Kernel 4.4 最新的代码，已经将 OTG USB Vbus 的控制改为 regulator 的方式，对应的提交信息如下：
 
 commit a1ca1be8f6ed “phy: rockchip-inno-usb2: use fixed-regulator for vbus power”
 
@@ -490,7 +490,7 @@ commit a1ca1be8f6ed “phy: rockchip-inno-usb2: use fixed-regulator for vbus pow
 
 Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb2.txt
 
-DTS中对USB Vbus的控制，应该改为：
+DTS 中对 USB Vbus 的控制，应该改为：
 
 ```
 vcc_otg_vbus: otg-vbus-regulator {
@@ -526,23 +526,23 @@ vcc_otg_vbus: otg-vbus-regulator {
 
 ## 4 Type-C to Micro USB 2.0 OTG Mode DTS
 
-Micro USB 2.0 OTG的接口类型如下图4-1所示。
+Micro USB 2.0 OTG 的接口类型如下图 4-1 所示。
 
 ![Micro-USB2-interface](RK3399-USB-DTS/Micro-USB2-interface.png)
 
-​								图4-1 Micro USB2.0 OTG接口类型示意图
+​								图 4-1 Micro USB2.0 OTG 接口类型示意图
 
-为了节省硬件成本，Type-C USB可以配置为Micro USB 2.0 OTG使用。这种设计，硬件上不需要fusb302芯片，USB Vbus 5V一般由GPIO控制，因为不需要支持USB3.0，所以对应的Type-C三路供电（USB_AVDD_0V9，USB_AVDD_1V8，USB_AVDD_3V3）可以关闭。
+为了节省硬件成本，Type-C USB 可以配置为 Micro USB 2.0 OTG 使用。这种设计，硬件上不需要 fusb302 芯片，USB Vbus 5V 一般由 GPIO 控制，因为不需要支持 USB3.0，所以对应的 Type-C 三路供电（USB_AVDD_0V9，USB_AVDD_1V8，USB_AVDD_3V3）可以关闭。
 
-Micro USB2.0 OTG DTS配置的注意点如下:
+Micro USB2.0 OTG DTS 配置的注意点如下:
 
-- 对应的fusb节点不要配置，因为Micro USB2.0不需要fusb302芯片
-- Disable对应的USB3 PHY节点（tcphy）
-- 对应的USB2 PHY节点（u2phy）要删除extcon属性，并且配置Vbus regulator
-- 对应的USB控制器父节点（usbdrd3）中，extcon属性引用为u2phy
-- 对应的USB控制器子节点（usbdrd_dwc3）的dr_mode属性要配置为"otg"，maximum-speed 属性配置为high-speed，phys 属性只引用USB2 PHY节点
+- 对应的 fusb 节点不要配置，因为 Micro USB2.0 不需要 fusb302 芯片
+- Disable 对应的 USB3 PHY 节点（tcphy）
+- 对应的 USB2 PHY 节点（u2phy）要删除 extcon 属性，并且配置 Vbus regulator
+- 对应的 USB 控制器父节点（usbdrd3）中，extcon 属性引用为 u2phy
+- 对应的 USB 控制器子节点（usbdrd_dwc3）的 dr_mode 属性要配置为"otg"，maximum-speed 属性配置为 high-speed，phys 属性只引用 USB2 PHY 节点
 
-以Type-C0 USB配置为Micro USB2.0 OTG为例：
+以 Type-C0 USB 配置为 Micro USB2.0 OTG 为例：
 
 ```
 /* Disable Type-C0 USB 3.0 PHY */
@@ -580,15 +580,15 @@ Micro USB2.0 OTG DTS配置的注意点如下:
 
 *Note1.*
 
-Kernel 4.4最新的代码，已经将OTG USB Vbus的控制改为regulator的方式（commit a1ca1be8f6ed “phy: rockchip-inno-usb2: use fixed-regulator for vbus power”），参考文档：
+Kernel 4.4 最新的代码，已经将 OTG USB Vbus 的控制改为 regulator 的方式（commit a1ca1be8f6ed “phy: rockchip-inno-usb2: use fixed-regulator for vbus power”），参考文档：
 
 Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb2.txt
 
-所以，DTS中对OTG USB Vbus的控制，请参考[3 Type-C to Micro USB 3.0 OTG Mode DTS](#3 Type-C to Micro USB 3.0 OTG Mode DTS)中Vbus regulator的配置方法。
+所以，DTS 中对 OTG USB Vbus 的控制，请参考[3 Type-C to Micro USB 3.0 OTG Mode DTS](#3 Type-C to Micro USB 3.0 OTG Mode DTS)中 Vbus regulator 的配置方法。
 
 ## 5 Type-C to Type-A USB 2.0
 
-Type-C to Type-A USB 2.0的硬件设计方案（ ID脚悬空），可以细化为三种不同的实现形式，分别是：
+Type-C to Type-A USB 2.0 的硬件设计方案（ ID 脚悬空），可以细化为三种不同的实现形式，分别是：
 
 1. Type-C to Type-A USB 2.0 OTG mode DTS
 
@@ -596,13 +596,13 @@ Type-C to Type-A USB 2.0的硬件设计方案（ ID脚悬空），可以细化�
 
 3. Type-C to Type-A USB 2.0 OTG mode DTS and Support DP 4 Lane
 
-以下章节详细说明上述三种Type-C to Type-A USB 2.0方案的DTS配置。
+以下章节详细说明上述三种 Type-C to Type-A USB 2.0 方案的 DTS 配置。
 
 ### 5.1 Type-C to Type-A USB 2.0 OTG mode DTS
 
-该方案的特点是，支持USB 2.0 OTG功能，Vbus为常供电或者通过GPIO/PMIC控制。系统启功后，需要应用层通过内核的接口设置USB控制器工作于Host mode。Type-C的三路供电（见图2-2）可以关闭。
+该方案的特点是，支持 USB 2.0 OTG 功能，Vbus 为常供电或者通过 GPIO/PMIC 控制。系统启功后，需要应用层通过内核的接口设置 USB 控制器工作于 Host mode。Type-C 的三路供电（见图 2-2）可以关闭。
 
-以Type-C0 USB配置为Type-C to Type-A USB 2.0 OTG mode为例，其中，Vbus通过GPIO3_PC6控制
+以 Type-C0 USB 配置为 Type-C to Type-A USB 2.0 OTG mode 为例，其中，Vbus 通过 GPIO3_PC6 控制
 
 ```
 /* Disable Type-C0 USB 3.0 PHY */
@@ -659,7 +659,7 @@ vcc_otg_vbus: otg-vbus-regulator {
 
 *Note1*
 
-假如Vbus为常供电（也即系统开机后，Vbus一直为高），则不需要配置“vbus-supply”属性，但需要增加如下的DTS属性，否则，会出现USB ADB无法正常连接的情况。
+假如 Vbus 为常供电（也即系统开机后，Vbus 一直为高），则不需要配置“vbus-supply”属性，但需要增加如下的 DTS 属性，否则，会出现 USB ADB 无法正常连接的情况。
 
 ```
 &u2phy0_otg {
@@ -669,7 +669,7 @@ vcc_otg_vbus: otg-vbus-regulator {
 
 *Note2*
 
-内核中切换USB控制器工作在Peripheral mode或Host mode的接口：
+内核中切换 USB 控制器工作在 Peripheral mode 或 Host mode 的接口：
 
 旧的接口使用方法：
 
@@ -691,9 +691,9 @@ vcc_otg_vbus: otg-vbus-regulator {
 
 ### 5.2 Type-C to Type-A USB 2.0 Host only mode DTS
 
-该方案的特点是，只支持Host 功能，Vbus为常供电，进系统后不需要Device功能，但可以支持固件烧录。Type-C的三路供电（见图2-2）可以关闭。
+该方案的特点是，只支持 Host 功能，Vbus 为常供电，进系统后不需要 Device 功能，但可以支持固件烧录。Type-C 的三路供电（见图 2-2）可以关闭。
 
-以Type-C0 USB配置为Type-C to Type-A USB 2.0 Host mode为例，其中，Vbus为常供电，不需要软件控制
+以 Type-C0 USB 配置为 Type-C to Type-A USB 2.0 Host mode 为例，其中，Vbus 为常供电，不需要软件控制
 
 ```
 /* Disable Type-C0 USB 3.0 PHY */
@@ -729,9 +729,9 @@ vcc_otg_vbus: otg-vbus-regulator {
 
 ### 5.3 Type-C to Type-A USB 2.0 OTG mode DTS and Support DP 4 Lane
 
-该方案的特点是，支持USB 2.0 OTG功能，同时USB 3.0的Tx和Rx配置给DP使用，以支持DP 4 lanes的功能。Type-C的三路供电（见图2-2）需要正常开启。Rockchip SDK Kernel默认没有支持该方案，如果要支持该方案，需要正确配置DTS，同时，还要增加新的驱动`drivers/extcon/extcon-pd-virtual.c`，该驱动的作用是替代fusb302驱动，发通知给Type-C PHY驱动和DP驱动，以配置DP 4 lanes。如果有该功能需求，请提交Issue到Rockchip的Redmine平台，或者发邮件给本文档的作者wulf@rock-chips.com
+该方案的特点是，支持 USB 2.0 OTG 功能，同时 USB 3.0 的 Tx 和 Rx 配置给 DP 使用，以支持 DP 4 lanes 的功能。Type-C 的三路供电（见图 2-2）需要正常开启。Rockchip SDK Kernel 默认没有支持该方案，如果要支持该方案，需要正确配置 DTS，同时，还要增加新的驱动`drivers/extcon/extcon-pd-virtual.c`，该驱动的作用是替代 fusb302 驱动，发通知给 Type-C PHY 驱动和 DP 驱动，以配置 DP 4 lanes。如果有该功能需求，请提交 Issue 到 Rockchip 的 Redmine 平台，或者发邮件给本文档的作者 wulf@rock-chips.com
 
-DTS配置参考如下：
+DTS 配置参考如下：
 
 ```
 /* 配置VPD驱动，用于发送通知给Type-C PHY驱动和DP驱动，以配置DP 4 lanes */
@@ -806,17 +806,17 @@ vpd0:virtual-pd0{
 
 *Note1*
 
-如果用Type-A接口，系统启动后，需要应用层通过内核提供的OTG mode切换节点，配置USB控制器工作Peripheral mode或者Host mode。配置方法参考[5.1 Type-C to Type-A USB 2.0 OTG mode DTS](#5.1 Type-C to Type-A USB 2.0 OTG mode DTS)
+如果用 Type-A 接口，系统启动后，需要应用层通过内核提供的 OTG mode 切换节点，配置 USB 控制器工作 Peripheral mode 或者 Host mode。配置方法参考[5.1 Type-C to Type-A USB 2.0 OTG mode DTS](#5.1 Type-C to Type-A USB 2.0 OTG mode DTS)
 
 ## 6 USB 2.0 Host DTS
 
-RK3399 支持两个USB2.0 Host接口，对应的USB控制器为EHCI&OHCI，相比Type-C接口的多种硬件设计方案，USB2.0 Host的接口一般只有一种设计方案，即Type-A USB2.0 Host接口，对应的DTS配置，包括控制器DTS配置和PHY DTS配置。
+RK3399 支持两个 USB2.0 Host 接口，对应的 USB 控制器为 EHCI&OHCI，相比 Type-C 接口的多种硬件设计方案，USB2.0 Host 的接口一般只有一种设计方案，即 Type-A USB2.0 Host 接口，对应的 DTS 配置，包括控制器 DTS 配置和 PHY DTS 配置。
 
-实际方案中，用户一般不用重新配置Host Controller DTS，只需要根据实际硬件电路的USB VBUS设计，修改Host PHY DTS的 “phy-supply ” 属性。
+实际方案中，用户一般不用重新配置 Host Controller DTS，只需要根据实际硬件电路的 USB VBUS 设计，修改 Host PHY DTS 的 “phy-supply ” 属性。
 
 ### 6.1 USB 2.0 Host Controller DTS
 
-以RK3399 Sapphire Excavator Board  USB2.0 Host 控制器 DTS配置为例:
+以 RK3399 Sapphire Excavator Board  USB2.0 Host 控制器 DTS 配置为例:
 
 `arch/arm64/boot/dts/rockchip/rk3399.dtsi`
 
@@ -897,7 +897,7 @@ usb_host1_ohci: usb@fe3e0000 {
 
 ### 6.2 USB 2.0 Host PHY DTS
 
-以RK3399 Sapphire Excavator Board USB2.0 Host PHY DTS配置为例:
+以 RK3399 Sapphire Excavator Board USB2.0 Host PHY DTS 配置为例:
 
 `arch/arm64/boot/dts/rockchip/rk3399.dtsi`
 
@@ -991,29 +991,29 @@ vcc5v0_host: vcc5v0-host-regulator {
 
 ## 7 USB 3.0 force to USB 2.0
 
-该功能是指在USB 3.0 Tx/Rx连接的情况下 ，要强制让USB运行在USB 2.0的速率。这种应用场景，一般用于硬件设计问题导致USB 3.0工作异常或者某些特殊的场景需求，需要去掉USB 3.0功能，只要支持USB 2.0。 由于这不是常规功能，所以SDK驱动默认没有支持该功能。Rockchip以独立的补丁形式，发布给有这类需求的客户。如果有该功能需求，请提交Issue到Rockchip的Redmine平台，或者发邮件给本文档的作者wulf@rock-chips.com
+该功能是指在 USB 3.0 Tx/Rx 连接的情况下 ，要强制让 USB 运行在 USB 2.0 的速率。这种应用场景，一般用于硬件设计问题导致 USB 3.0 工作异常或者某些特殊的场景需求，需要去掉 USB 3.0 功能，只要支持 USB 2.0。 由于这不是常规功能，所以 SDK 驱动默认没有支持该功能。Rockchip 以独立的补丁形式，发布给有这类需求的客户。如果有该功能需求，请提交 Issue 到 Rockchip 的 Redmine 平台，或者发邮件给本文档的作者 wulf@rock-chips.com
 
-## 8 关于USB VBUS供电的说明
+## 8 关于 USB VBUS 供电的说明
 
-RK3399 平台的USB Vbus供电硬件电路设计，主要有三种方案：
+RK3399 平台的 USB Vbus 供电硬件电路设计，主要有三种方案：
 
-1. 使用GPIO控制电源稳压芯片输出Vbus 5V供电电压；
+1. 使用 GPIO 控制电源稳压芯片输出 Vbus 5V 供电电压；
 
-   方案1是Rockchip平台常用的方案，可以用于Type-C USB 接口，Type-A USB接口，Micro USB接口等，不同接口，对应的DTS配置方案不同，具体如下：
+   方案 1 是 Rockchip 平台常用的方案，可以用于 Type-C USB 接口，Type-A USB 接口，Micro USB 接口等，不同接口，对应的 DTS 配置方案不同，具体如下：
 
-   （1）Type-C USB接口的Vbus GPIO配置，参考[1.2.1 Type-C0 /1 USB 3.0 PHY DTS](#1.2.1 Type-C0 /1 USB 3.0 PHY DTS)中“vbus-5v-gpios”属性的配置；
+   （1）Type-C USB 接口的 Vbus GPIO 配置，参考[1.2.1 Type-C0 /1 USB 3.0 PHY DTS](#1.2.1 Type-C0 /1 USB 3.0 PHY DTS)中“vbus-5v-gpios”属性的配置；
 
-   （2）Type-A USB接口的Vbus GPIO配置，参考[6.2 USB 2.0 Host PHY DTS](#6.2 USB 2.0 Host PHY DTS)
+   （2）Type-A USB 接口的 Vbus GPIO 配置，参考[6.2 USB 2.0 Host PHY DTS](#6.2 USB 2.0 Host PHY DTS)
 
-   （3）Micro USB的Vbus GPIO配置，参考[3 Type-C to Micro USB 3.0 OTG Mode DTS](#3 Type-C to Micro USB 3.0 OTG Mode DTS)
+   （3）Micro USB 的 Vbus GPIO 配置，参考[3 Type-C to Micro USB 3.0 OTG Mode DTS](#3 Type-C to Micro USB 3.0 OTG Mode DTS)
 
-2. 使用PMIC（如RK817/RK818）输出Vbus 5V供电电压；
+2. 使用 PMIC（如 RK817/RK818）输出 Vbus 5V 供电电压；
 
-   （1）如果PMIC使用的是RK8xx（RK809除外），DTS不用配置Vbus的属性，如果配置，反而可能会导致Vbus供电异常。这种方案，驱动会通过发送 EXTCON_USB_VBUS_EN 的通知给PMIC驱动，以控制Vbus的供电。
+   （1）如果 PMIC 使用的是 RK8xx（RK809 除外），DTS 不用配置 Vbus 的属性，如果配置，反而可能会导致 Vbus 供电异常。这种方案，驱动会通过发送 EXTCON_USB_VBUS_EN 的通知给 PMIC 驱动，以控制 Vbus 的供电。
 
-   （2）如果PMIC使用的是其他Vendor的芯片，请参考驱动 drivers/power/rk818_charger.c实现接收EXTCON_USB_VBUS_EN 通知的逻辑。
+   （2）如果 PMIC 使用的是其他 Vendor 的芯片，请参考驱动 drivers/power/rk818_charger.c 实现接收 EXTCON_USB_VBUS_EN 通知的逻辑。
 
-   （3）如果PMIC使用的是RK809，由于该PMIC只有Vbus输出5V的供电功能，没有充电功能，所以不适用于使用发送EXTCON_USB_VBUS_EN 的通知的方法。可参考：
+   （3）如果 PMIC 使用的是 RK809，由于该 PMIC 只有 Vbus 输出 5V 的供电功能，没有充电功能，所以不适用于使用发送 EXTCON_USB_VBUS_EN 的通知的方法。可参考：
 
    `arch/arm64/boot/dts/rockchip/rk3326-evb-ai-va-v11.dts`
 
@@ -1037,7 +1037,7 @@ RK3399 平台的USB Vbus供电硬件电路设计，主要有三种方案：
    };
    ```
 
-3. 开机后，硬件直接输出Vbus 5V供电电压，不需要软件控制，一般用于USB Host接口；
+3. 开机后，硬件直接输出 Vbus 5V 供电电压，不需要软件控制，一般用于 USB Host 接口；
 
 ## 9 参考文档
 

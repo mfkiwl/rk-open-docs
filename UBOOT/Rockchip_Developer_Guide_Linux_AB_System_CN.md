@@ -14,7 +14,7 @@
 
 **概述**
 
-Linux A/B System介绍。
+Linux A/B System 介绍。
 
 **读者对象**
 
@@ -50,11 +50,11 @@ Linux A/B System介绍。
 
 ## 3 简介
 
-所谓的A/B System即把系统固件分为两份，系统可以从其中的一个slot上启动。当一份启动失败后可以从另一份启动，同时升级时可以直接将固件拷贝到另一个slot上而无需进入系统升级模式。
+所谓的 A/B System 即把系统固件分为两份，系统可以从其中的一个 slot 上启动。当一份启动失败后可以从另一份启动，同时升级时可以直接将固件拷贝到另一个 slot 上而无需进入系统升级模式。
 
-## 4 AB数据格式及存储
+## 4 AB 数据格式及存储
 
-存储位置为misc分区偏移2KB位置。
+存储位置为 misc 分区偏移 2KB 位置。
 
 ```c
 /* Magic for the A/B struct when serialized. */
@@ -118,9 +118,9 @@ typedef struct AvbABData {
 } AVB_ATTR_PACKED AvbABData;
 ```
 
-对于小容量存储，没有misc分区，有vendor分区，可以考虑存储到vendor。
+对于小容量存储，没有 misc 分区，有 vendor 分区，可以考虑存储到 vendor。
 
-在此基础上增加lastboot，标记最后一个可启动固件。主要应用于低电情况或工厂生产测试时retry次数用完，而还没有进入系统调用boot_ctrl服务。
+在此基础上增加 lastboot，标记最后一个可启动固件。主要应用于低电情况或工厂生产测试时 retry 次数用完，而还没有进入系统调用 boot_ctrl 服务。
 
 参考如下：
 
@@ -149,7 +149,7 @@ typedef struct AvbABData {
 } AVB_ATTR_PACKED AvbABData;
 ```
 
-同时在AvbABSlotData中增加is_update标志位，标志系统升级的状态，更改如下：
+同时在 AvbABSlotData 中增加 is_update 标志位，标志系统升级的状态，更改如下：
 
 ```c
 typedef struct AvbABSlotData {
@@ -181,10 +181,10 @@ AvbABData：
 
 | **参数**        | **含义**                                                     |
 | --------------- | ------------------------------------------------------------ |
-| priority        | 标志slot优先级，0为不可启动，15为最高优先级                  |
-| tries_remaining | 尝试启动次数，设置为7次                                      |
-| successful_boot | 系统启动成功后会配置该参数，1：该slot成功启动，0：该slot未成功启动 |
-| is_update       | 标记该slot的升级状态，1：该slot正在升级，0：该slot未升级或升级成功 |
+| priority        | 标志 slot 优先级，0 为不可启动，15 为最高优先级                  |
+| tries_remaining | 尝试启动次数，设置为 7 次                                      |
+| successful_boot | 系统启动成功后会配置该参数，1：该 slot 成功启动，0：该 slot 未成功启动 |
+| is_update       | 标记该 slot 的升级状态，1：该 slot 正在升级，0：该 slot 未升级或升级成功 |
 
 AvbABSlotData：
 
@@ -193,17 +193,17 @@ AvbABSlotData：
 | magic         | 结构体头部信息：\0AB0                                        |
 | version_major | 主版本信息                                                   |
 | version_minor | 次版本信息                                                   |
-| slots         | slot引导信息，参见AvbABData                                  |
-| last_boot     | 上一次成功启动的slot，0：slot A上次成功启动，1：slot B上次成功启动 |
+| slots         | slot 引导信息，参见 AvbABData                                  |
+| last_boot     | 上一次成功启动的 slot，0：slot A 上次成功启动，1：slot B 上次成功启动 |
 | crc32         | 数据校验                                                     |
 
 ## 5 启用配置
 
-### 5.1 pre-loader说明
+### 5.1 pre-loader 说明
 
-目前pre-loader支持A/B slot分区和单slot分区。
+目前 pre-loader 支持 A/B slot 分区和单 slot 分区。
 
-### 5.2 uboot配置
+### 5.2 uboot 配置
 
 ```
 CONFIG_AVB_LIBAVB=y
@@ -214,13 +214,13 @@ CONFIG_RK_AVB_LIBAVB_USER=y
 CONFIG_ANDROID_AB=y
 ```
 
-### 5.2 system bootctrl参考
+### 5.2 system bootctrl 参考
 
-目前system bootctrl设计两套控制逻辑，bootloader全支持这两种逻辑启动。
+目前 system bootctrl 设计两套控制逻辑，bootloader 全支持这两种逻辑启动。
 
-#### 5.2.1 successful_boot模式
+#### 5.2.1 successful_boot 模式
 
-正常进入系统后，boot_ctrl依据androidboot.slot_suffix，设置当前slot的变量：
+正常进入系统后，boot_ctrl 依据 androidboot.slot_suffix，设置当前 slot 的变量：
 
 ```
 successful_boot = 1;
@@ -230,7 +230,7 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-升级系统中，boot_ctrl设置：
+升级系统中，boot_ctrl 设置：
 
 ```
 升级的slot设置：
@@ -248,7 +248,7 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-升级系统完成，boot_ctrl设置：
+升级系统完成，boot_ctrl 设置：
 
 ```
 升级的slot设置：
@@ -266,9 +266,9 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-#### 5.2.2 reset retry模式
+#### 5.2.2 reset retry 模式
 
-正常进入系统后，boot_ctrl依据androidboot.slot_suffix，设置当前slot的变量：
+正常进入系统后，boot_ctrl 依据 androidboot.slot_suffix，设置当前 slot 的变量：
 
 ```
 successful_boot = 0;
@@ -278,7 +278,7 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-升级系统中，boot_ctrl设置：
+升级系统中，boot_ctrl 设置：
 
 ```
 升级的slot设置：
@@ -296,7 +296,7 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-升级系统完成，boot_ctrl设置：
+升级系统完成，boot_ctrl 设置：
 
 ```
 升级的slot设置：
@@ -316,15 +316,15 @@ last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 
 #### 5.2.3 两种模式的优缺点
 
-1. successful_boot模式
+1. successful_boot 模式
 
-优点：只要正常启动系统，不会回退到旧版本固件，除非system bootctrl配置
+优点：只要正常启动系统，不会回退到旧版本固件，除非 system bootctrl 配置
 
 缺点：设备长时间工作后，如果存储某些颗粒异常，会导致系统一直重启
 
-2. reset retry模式
+2. reset retry 模式
 
-优点：始终保持retry机制，可以应对存储异常问题
+优点：始终保持 retry 机制，可以应对存储异常问题
 
 缺点：会回退到旧版本固件
 
@@ -334,11 +334,11 @@ last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 
 ![android-ab](Rockchip_Developer_Guide_Linux_AB_System\android-ab.png)
 
-AB successful_boot模式数据流程：
+AB successful_boot 模式数据流程：
 
 ![success-boot](Rockchip_Developer_Guide_Linux_AB_System\success-boot.png)
 
-AB reset retry模式数据流程：
+AB reset retry 模式数据流程：
 
 ![reset-retry](Rockchip_Developer_Guide_Linux_AB_System\reset-retry.png)
 
@@ -348,9 +348,9 @@ AB reset retry模式数据流程：
 
 参考《Rockchip Linux 升级方案开发指南》。
 
-### 7.2 从recovery升级
+### 7.2 从 recovery 升级
 
-AB system不考虑支持recovery升级。
+AB system 不考虑支持 recovery 升级。
 
 ## 8 分区参考
 
@@ -370,19 +370,19 @@ CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x0000600
 
 ## 9 测试
 
-准备一套可测试AB的固件。
+准备一套可测试 AB 的固件。
 
-### 9.1 successful_boot模式
+### 9.1 successful_boot 模式
 
-1. 只烧写slot A，系统从slot A启动。设置从slot B启动，系统从slot A启动。测试完成，清空misc分区
-2. 烧写slot A与slot B，启动系统，当前系统为slot A。设置系统从slot B启动，reboot系统，当前系统为slot B。测试完成，清空misc分区
-3. 烧写slot A与slot B，迅速reset系统14次后，retry counter用完，还能从last_boot指定的系统启动，即能正常从slot A启动。测试完成，清空misc分区
-4. 烧写slot A与slot B，启动系统，当前系统为slot A。设置系统从slot B启动，reboot系统，当前系统为slot B。设置系统从slot A启动，reboot系统，当前系统为slot A。测试完成，清空misc分区
+1. 只烧写 slot A，系统从 slot A 启动。设置从 slot B 启动，系统从 slot A 启动。测试完成，清空 misc 分区
+2. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。测试完成，清空 misc 分区
+3. 烧写 slot A 与 slot B，迅速 reset 系统 14 次后，retry counter 用完，还能从 last_boot 指定的系统启动，即能正常从 slot A 启动。测试完成，清空 misc 分区
+4. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。设置系统从 slot A 启动，reboot 系统，当前系统为 slot A。测试完成，清空 misc 分区
 
-### 9.2 reset retry模式：
+### 9.2 reset retry 模式
 
-1. 只烧写slot A，系统从slot A启动。设置从slot B启动，系统从slot A启动。测试完成，清空misc分区
-2. 烧写slot A与slot B，启动系统，当前系统为slot A。设置系统从slot B启动，reboot系统，当前系统为slot B。测试完成，清空misc分区
-3. 烧写slot A与slot B，迅速reset系统14次后，retry counter用完，还能从last_boot指定的系统启动，即能正常从slot A启动。测试完成，清空misc分区
-4. 烧写slot A与slot B，其中slot B的boot.img损坏，启动系统，当前系统为slot A。设置系统从slot B启动，reboot系统，系统会重启7次后，从slot A正常启动系统。测试完成，清空misc分区
-5. 烧写slot A与slot B，启动系统，当前系统为slot A。设置系统从slot B启动，reboot系统，当前系统为slot B。设置系统从slot A启动，reboot系统，当前系统为slot A。测试完成，清空misc分区
+1. 只烧写 slot A，系统从 slot A 启动。设置从 slot B 启动，系统从 slot A 启动。测试完成，清空 misc 分区
+2. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。测试完成，清空 misc 分区
+3. 烧写 slot A 与 slot B，迅速 reset 系统 14 次后，retry counter 用完，还能从 last_boot 指定的系统启动，即能正常从 slot A 启动。测试完成，清空 misc 分区
+4. 烧写 slot A 与 slot B，其中 slot B 的 boot.img 损坏，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，系统会重启 7 次后，从 slot A 正常启动系统。测试完成，清空 misc 分区
+5. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。设置系统从 slot A 启动，reboot 系统，当前系统为 slot A。测试完成，清空 misc 分区

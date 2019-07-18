@@ -14,7 +14,7 @@
 
 **概述**
 
-本章主要描述CPUFreq-DVFS的相关的重要概念、配置方法和调试接口。
+本章主要描述 CPUFreq-DVFS 的相关的重要概念、配置方法和调试接口。
 
 **产品版本**
 
@@ -53,19 +53,19 @@
 
 ![power-formula](Rockchip_Developer_Guide_Linux3.10_CPUFreq_DVFS/power-formula.png)
 
-其中 C 代表负载电容的容值，V 是工作电压，α 是当前频率下的翻转率，f为工作频率，I\_dq 代表静态电流。公式的前部分代表的是动态功率消耗，后部分则代表的是静态功率消耗。从公式中可以看出，想要降低动态功率消耗可以从C、V、α、f着手，对于软件来讲常用的调节方式只涉及到V、f 两个因素。
+其中 C 代表负载电容的容值，V 是工作电压，α 是当前频率下的翻转率，f 为工作频率，I\_dq 代表静态电流。公式的前部分代表的是动态功率消耗，后部分则代表的是静态功率消耗。从公式中可以看出，想要降低动态功率消耗可以从 C、V、α、f 着手，对于软件来讲常用的调节方式只涉及到 V、f 两个因素。
 
-DVFS（Dynamic Voltage and Frequency Scaling）动态电压频率调节，是一种实时的电压和频率调节技术。目前Rockchip Linux3.10内核中支持DVFS的模块有CPU、GPU、DDR。
+DVFS（Dynamic Voltage and Frequency Scaling）动态电压频率调节，是一种实时的电压和频率调节技术。目前 Rockchip Linux3.10 内核中支持 DVFS 的模块有 CPU、GPU、DDR。
 
-CPUFreq是内核开发者定义的一套支持动态调整CPU频率的框架模型。它能有效的降低CPU的功耗，同时兼顾CPU的性能。
+CPUFreq 是内核开发者定义的一套支持动态调整 CPU 频率的框架模型。它能有效的降低 CPU 的功耗，同时兼顾 CPU 的性能。
 
-CPUFreq通过不同的变频管理器，选择一个合适的频率供CPU使用，目前的内核版本提供了以下几种变频管理器：
+CPUFreq 通过不同的变频管理器，选择一个合适的频率供 CPU 使用，目前的内核版本提供了以下几种变频管理器：
 
-- interactive：根据CPU负载动态调频调压；
+- interactive：根据 CPU 负载动态调频调压；
 
 - conservative：保守策略，逐级调整频率和电压；
 
-- ondemand：根据CPU负载动态调频调压，比interactive策略反应慢；
+- ondemand：根据 CPU 负载动态调频调压，比 interactive 策略反应慢；
 
 - userspace：用户自己设置电压和频率，系统不会自动调整；
 
@@ -73,31 +73,31 @@ CPUFreq通过不同的变频管理器，选择一个合适的频率供CPU使用�
 
 - performance：性能优先，始终将频率设置为最高值。
 
-DVFS为CPUFreq提供了底层驱动，CPUFreq-DVFS framework如下：
+DVFS 为 CPUFreq 提供了底层驱动，CPUFreq-DVFS framework 如下：
 
 ![DVFS-framework](Rockchip_Developer_Guide_Linux3.10_CPUFreq_DVFS/DVFS-framework.png)
 
-Voltage domain表示电压域，可以独立调节电压，简称VD。
+Voltage domain 表示电压域，可以独立调节电压，简称 VD。
 
-Power domain 表示电源域，只能开关，电压大小等于VD的电压，简称PD。一个VD包括一个或多个PD，一个PD又包含一个或多个Module。
+Power domain 表示电源域，只能开关，电压大小等于 VD 的电压，简称 PD。一个 VD 包括一个或多个 PD，一个 PD 又包含一个或多个 Module。
 
-Opp-table 表示频率电压表，支持DVFS的模块都有一个opp-table来描述各个频率点需要的运行电压。
+Opp-table 表示频率电压表，支持 DVFS 的模块都有一个 opp-table 来描述各个频率点需要的运行电压。
 
-Voltage/power domain framework如下：
+Voltage/power domain framework 如下：
 
 ![Voltage-power-domain-framework](Rockchip_Developer_Guide_Linux3.10_CPUFreq_DVFS/Voltage-power-domain-framework.jpg)
 
 ## 配置方法
 
-### DVFS节点介绍
+### DVFS 节点介绍
 
-DVFS的主要设计思路是：一个VD下面可以包括多个PD，一个PD下面可以包含多个CLK，每个CLK对应的模块，都有一个需求电压，但是一个VD最终只有一个电压值，为了满足它下面所以模块的需求，调节电压时，需要遍历VD下面的所有模块，找到最大电压值。
+DVFS 的主要设计思路是：一个 VD 下面可以包括多个 PD，一个 PD 下面可以包含多个 CLK，每个 CLK 对应的模块，都有一个需求电压，但是一个 VD 最终只有一个电压值，为了满足它下面所以模块的需求，调节电压时，需要遍历 VD 下面的所有模块，找到最大电压值。
 
-目前常用的VD有三种：vdd\_arm、vdd\_gpu和vdd\_logic，vdd\_arm给arm核供电，vdd\_gpu给gpu供电，vdd\_logic给soc的各个外设供电，包括DDR\\I2C\\USB\\GMAC等。由于电源设计方案的不同，可能会把这三个VD合并在一起，在配置DVFS节点的时候，常见的有如下几种情况：
+目前常用的 VD 有三种：vdd\_arm、vdd\_gpu 和 vdd\_logic，vdd\_arm 给 arm 核供电，vdd\_gpu 给 gpu 供电，vdd\_logic 给 soc 的各个外设供电，包括 DDR\\I2C\\USB\\GMAC 等。由于电源设计方案的不同，可能会把这三个 VD 合并在一起，在配置 DVFS 节点的时候，常见的有如下几种情况：
 
-#### CPU、GPU、DDR三路分开供电
+#### CPU、GPU、DDR 三路分开供电
 
-比如RK3288上，CPU使用vdd\_arm供电，GPU使用vdd\_gpu供电，DDR使用vdd\_logic供电，所以dvfs节点下有三个并列的子节点，如下：
+比如 RK3288 上，CPU 使用 vdd\_arm 供电，GPU 使用 vdd\_gpu 供电，DDR 使用 vdd\_logic 供电，所以 dvfs 节点下有三个并列的子节点，如下：
 
 ```c
 arch/arm/boot/dts/rk3288.dtsi
@@ -127,9 +127,9 @@ dvfs {
 
 ```
 
-#### CPU单独供电，GPU和DDR共用一路供电
+#### CPU 单独供电，GPU 和 DDR 共用一路供电
 
-比如RK312X上，CPU使用vdd\_arm供电，GPU和DDR共同使用vdd\_logic供电，如下：
+比如 RK312X 上，CPU 使用 vdd\_arm 供电，GPU 和 DDR 共同使用 vdd\_logic 供电，如下：
 
 ```c
 dvfs {
@@ -155,7 +155,7 @@ dvfs {
 
 ```
 
-#### CPU、GPU和DDR三路共用一路供电
+#### CPU、GPU 和 DDR 三路共用一路供电
 
 ```c
 比如RK3126 86V的样机上，CPU、GPU和DDR共同使用vdd\_arm供电，如下：
@@ -180,9 +180,9 @@ dvfs {
 
 ```
 
-### CPU DVFS节点配置
+### CPU DVFS 节点配置
 
-CPU DVFS节点包含频率电压表、leakage调压（可选）、pvtm调压（可选）和温控。
+CPU DVFS 节点包含频率电压表、leakage 调压（可选）、pvtm 调压（可选）和温控。
 
 ```c
 clk_core_dvfs_table: clk_core {
@@ -262,9 +262,9 @@ clk_core_dvfs_table: clk_core {
 
 ```
 
-### GPU DVFS节点配置
+### GPU DVFS 节点配置
 
-GPU也可以支持leakage调压，pvtm调压，不过电压的收益很小，一直没用。GPU温控对GPU性能也有影响，一般也不建议开启。所以GPU的DVFS节点一般只有频率电压表。
+GPU 也可以支持 leakage 调压，pvtm 调压，不过电压的收益很小，一直没用。GPU 温控对 GPU 性能也有影响，一般也不建议开启。所以 GPU 的 DVFS 节点一般只有频率电压表。
 
 ```c
 clk_gpu_dvfs_table: clk_gpu{
@@ -279,9 +279,9 @@ clk_gpu_dvfs_table: clk_gpu{
 
 ```
 
-### DDR DVFS节点配置
+### DDR DVFS 节点配置
 
-DDR部分包含频率电压表、场景变频（可选）、负载变频（可选）。
+DDR 部分包含频率电压表、场景变频（可选）、负载变频（可选）。
 
 ```c
 clk_gpu_dvfs_table: clk_gpu{
@@ -333,7 +333,7 @@ clk_gpu_dvfs_table: clk_gpu{
 
 ## 代码使用接口
 
-DVFS接口函数定义在include/linux/rockchip/dvfs.h，常用的函数如下：
+DVFS 接口函数定义在 include/linux/rockchip/dvfs.h，常用的函数如下：
 
 ```c
 /* 获取一个clk的DVFS节点*/
@@ -358,9 +358,9 @@ int dvfs_clk_set_rate(struct dvfs_node *clk_dvfs_node, unsigned long rate);
 
 ## 调试接口
 
-### dvfs\_tree查看
+### dvfs\_tree 查看
 
-通过命令cat /sys/dvfs/dvfs\_tree可以查看当前频率电压的相关信息。
+通过命令 cat /sys/dvfs/dvfs\_tree 可以查看当前频率电压的相关信息。
 
 ```c
  -------------DVFS TREE-----------
@@ -406,9 +406,9 @@ int dvfs_clk_set_rate(struct dvfs_node *clk_dvfs_node, unsigned long rate);
 
 ```
 
-### pm\_tests节点使用方法
+### pm\_tests 节点使用方法
 
-make ARCH=arm64 menuconfig 或者make menuconfig
+make ARCH=arm64 menuconfig 或者 make menuconfig
 
 ![platform-selection](Rockchip_Developer_Guide_Linux3.10_CPUFreq_DVFS/platform-selection.png)
 
@@ -449,17 +449,17 @@ echo get vdd_arm> /sys/pm_tests/clk_volt
 
 需要注意：
 
-1、clk 和vdd的名字不同的平台可能不一样，根据实际情况修改。比如RK3368上，大核A53的clk名字是clk\_core\_b，小核A53的是clk\_core\_l。
+1、clk 和 vdd 的名字不同的平台可能不一样，根据实际情况修改。比如 RK3368 上，大核 A53 的 clk 名字是 clk\_core\_b，小核 A53 的是 clk\_core\_l。
 
-2、测试的过程中，如果是升频，需要先提高clk对应的vdd的电压。
+2、测试的过程中，如果是升频，需要先提高 clk 对应的 vdd 的电压。
 
-### cpufreq节点使用方法
+### cpufreq 节点使用方法
 
-在/sys/devices/system/cpu/下有每个cpu对应的节点，如cpu0/cpufreq/、cpu1/cpufreq/等等。
+在/sys/devices/system/cpu/下有每个 cpu 对应的节点，如 cpu0/cpufreq/、cpu1/cpufreq/等等。
 
-目前有的芯片支持大小核的架构，如RK3368，芯片内包含两个cluster（即包含两组cpu）。有的芯片不支持大小核架构，即只有一个cluster，比如RK312x、RK3288。每个cluster下的cpu共用一个clk，所以只要对同个cluster下的其中一个cpu操作即可。对于RK3288，只要操作cpu0即可。对于RK3368，可以分别操作cpu0（小核）和cpu4（大核）。
+目前有的芯片支持大小核的架构，如 RK3368，芯片内包含两个 cluster（即包含两组 cpu）。有的芯片不支持大小核架构，即只有一个 cluster，比如 RK312x、RK3288。每个 cluster 下的 cpu 共用一个 clk，所以只要对同个 cluster 下的其中一个 cpu 操作即可。对于 RK3288，只要操作 cpu0 即可。对于 RK3368，可以分别操作 cpu0（小核）和 cpu4（大核）。
 
-每个cpufreq节点下有如下子节点：
+每个 cpufreq 节点下有如下子节点：
 
 ```c
 related_cpus          /* 同个cluster下的所有cpu */
@@ -487,7 +487,7 @@ cd sys/devices/system/cpu/cpu0/cpufreq/
 catscaling_available_frequencies
 ```
 
-2、cpu定频，如cpu0定频216MHz，在串口中输入如下命令：
+2、cpu 定频，如 cpu0 定频 216MHz，在串口中输入如下命令：
 
 ```c
 cd sys/devices/system/cpu/cpu0/cpufreq/
@@ -502,7 +502,7 @@ echo 216000 > scaling_setspeed
 cat scaling_cur_freq
 ```
 
-3、限制最高最低频，如限制cpu最高频1200MHz，最低频216MHz，在串口中输入如下命令：
+3、限制最高最低频，如限制 cpu 最高频 1200MHz，最低频 216MHz，在串口中输入如下命令：
 
 ```c
 cd sys/devices/system/cpu/cpu0/cpufreq/
@@ -520,7 +520,7 @@ cat scaling_max_freq
 
 ### 调试方法
 
-软件上调试主要开启打印。将include/linux/rockchip/dvfs.h中的DVFS\_DBG开启。
+软件上调试主要开启打印。将 include/linux/rockchip/dvfs.h 中的 DVFS\_DBG 开启。
 
 ```c
 #if 1
@@ -531,21 +531,21 @@ cat scaling_max_freq
 
 ```
 
-若确定死机与dvfs有关，注意采集现场信息，包括：
+若确定死机与 dvfs 有关，注意采集现场信息，包括：
 
-当前arm电压、log电压、ddr电压；
+当前 arm 电压、log 电压、ddr 电压；
 
 死机画面表现；
 
 死机操作步骤以及概率，场景；
 
-记录当前的固件所使用的dvfs列表（arm、gpu、ddr）；
+记录当前的固件所使用的 dvfs 列表（arm、gpu、ddr）；
 
 若及时发现死机，那么注意触摸下主控，确定温度是否过高（注意安全）；
 
 ### 各产品最高主频
 
-| **产品名称** | **ARM核** | **最高主频**                     |
+| **产品名称** | **ARM 核** | **最高主频**                     |
 | -------- | -------- | ---------------------------- |
 | RK312x   | 4 * A7   | 1200MHz                      |
 | RK322x   | 4 * A7   | 1464MHz                      |

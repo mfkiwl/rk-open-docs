@@ -14,7 +14,7 @@
 
 **概述**
 
-U-Boot下MTD block device设计介绍。
+U-Boot 下 MTD block device 设计介绍。
 
 **读者对象**
 
@@ -31,7 +31,7 @@ U-Boot下MTD block device设计介绍。
 | **日期**   | **版本** | **作者**  | **修改说明** |
 | ---------- | -------- | --------- | ------------ |
 | 2019-05-20 | V1.0     | Jason Zhu | 初始版本     |
-| 2019-06-18 | V1.1     | Jason Zhu | 修改分区支持,更新step by step章节 |
+| 2019-06-18 | V1.1     | Jason Zhu | 修改分区支持,更新 step by step 章节 |
 
 ------
 
@@ -47,21 +47,21 @@ U-Boot下MTD block device设计介绍。
 
 ## 2 术语
 
-MTD：Memory Technology Device即内存技术设备。
+MTD：Memory Technology Device 即内存技术设备。
 
 ## 3 简介
 
-设计MTD block层，兼容目前block设备接口。
+设计 MTD block 层，兼容目前 block 设备接口。
 
 ## 4 设计
 
-### 4.1 MTD block设计
+### 4.1 MTD block 设计
 
-设计mtd bread & bwrite & berase三个函数，通过desc->devnum来区分挂接的不同MTD设备，这样上层可以直接调用blk_dread & blk_dwrite & blk_derase操作MTD设备。代码位于drivers/mtd/mtd_blk.c。
+设计 mtd bread & bwrite & berase 三个函数，通过 desc->devnum 来区分挂接的不同 MTD 设备，这样上层可以直接调用 blk_dread & blk_dwrite & blk_derase 操作 MTD 设备。代码位于 drivers/mtd/mtd_blk.c。
 
 ### 4.2 多设备挂接设计
 
-对于block设备，会依据if_type与devnum来找挂接在block设备下的驱动。对于挂接在block设备下的MTD驱动，定义if_type为IF_TYPE_MTD。devnum在设备驱动在与block层bind时传递。例：
+对于 block 设备，会依据 if_type 与 devnum 来找挂接在 block 设备下的驱动。对于挂接在 block 设备下的 MTD 驱动，定义 if_type 为 IF_TYPE_MTD。devnum 在设备驱动在与 block 层 bind 时传递。例：
 
 ```c
 static int rockchip_nandc_bind(struct udevice *udev)
@@ -73,9 +73,9 @@ static int rockchip_nandc_bind(struct udevice *udev)
 ｝
 ```
 
-devnum为不同设备，目前nand设备有nand，spi nand, spi nor分别为0，1，2。
+devnum 为不同设备，目前 nand 设备有 nand，spi nand, spi nor 分别为 0，1，2。
 
-MTD block不同设备间切换：
+MTD block 不同设备间切换：
 
 ```
 mtd dev <devnum>
@@ -129,11 +129,11 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ### 4.3 分区表设计
 
-兼容GPT分区表，注意nand flash与spi flash尾部需要保留4个blocks用于保存坏块表。
+兼容 GPT 分区表，注意 nand flash 与 spi flash 尾部需要保留 4 个 blocks 用于保存坏块表。
 
-### 4.4 新增CONFIG
+### 4.4 新增 CONFIG
 
-增加CONFIG_MTD_BLK、CONFIG_CMD_MTD，支持mtd block device。
+增加 CONFIG_MTD_BLK、CONFIG_CMD_MTD，支持 mtd block device。
 
 ### 4.5 驱动挂接框图
 
@@ -141,23 +141,23 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ## 5 step by step
 
-1. 对应的defconfig添加
+1. 对应的 defconfig 添加
 
 ```
 CONFIG_MTD_BLK=y
 CONFIG_CMD_MTD=y
 ```
 
-其他nand的配置可以参考<https://10.10.10.29/#/c/android/rk/u-boot/+/75116/>。
+其他 nand 的配置可以参考<https://10.10.10.29/#/c/android/rk/u-boot/+/75116/>。
 
-2. 更新支持mtd的laoder，rk3308补丁地址<https://10.10.10.29/#/c/rk/rkbin/+/75644/>。
-3. 编译uboot，例如编译rk3308
+2. 更新支持 mtd 的 laoder，rk3308 补丁地址<https://10.10.10.29/#/c/rk/rkbin/+/75644/>。
+3. 编译 uboot，例如编译 rk3308
 
 ```
 ./make.sh evb-rk3308
 ```
 
-4. 更改支持GPT的parameter.txt，例如：
+4. 更改支持 GPT 的 parameter.txt，例如：
 
 ```
 FIRMWARE_VER:8.1
@@ -177,7 +177,7 @@ CMDLINE:mtdparts=rk29xxnand:0x00000800@0x00001000(uboot),0x00000800@0x00000800(t
 
 ![mtd-tool](./Rockchip_Developer_Guide_UBoot_MTD_Block_Device_Design/mtd-tool.png)
 
-6. 成功启动log
+6. 成功启动 log
 
 ```
 ......

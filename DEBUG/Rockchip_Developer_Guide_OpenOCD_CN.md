@@ -1,4 +1,4 @@
-# OpenOCD使用指南
+# OpenOCD 使用指南
 
 发布版本：1.0
 
@@ -14,7 +14,7 @@
 
 **概述**
 
-OpenOCD使用指南。
+OpenOCD 使用指南。
 
 **读者对象**
 
@@ -46,57 +46,57 @@ OpenOCD使用指南。
 
 ## 2 术语
 
-OpenOCD：OpenOCD是一个用于JTAG调试的软件，可以用于不同调试器和CPU，还可以与GDB配合，开源。
+OpenOCD：OpenOCD 是一个用于 JTAG 调试的软件，可以用于不同调试器和 CPU，还可以与 GDB 配合，开源。
 
-FT2232HL：FTDI生产的芯片，它可以实现USB到两个串行UART、FIFO、Bit-Bang IO接口，并且还可以配成MPSSE，I2C，JTAG及SPI总线。
+FT2232HL：FTDI 生产的芯片，它可以实现 USB 到两个串行 UART、FIFO、Bit-Bang IO 接口，并且还可以配成 MPSSE，I2C，JTAG 及 SPI 总线。
 
-J-Link：SEGGER公司为支持仿真ARM内核芯片推出的JTAG仿真器。
+J-Link：SEGGER 公司为支持仿真 ARM 内核芯片推出的 JTAG 仿真器。
 
-GDB：[The GNU Project Debugger](http://www.gnu.org/software/gdb/)，GNU开源组织发布的一个强大的UNIX下的程序调试工具。
+GDB：[The GNU Project Debugger](http://www.gnu.org/software/gdb/)，GNU 开源组织发布的一个强大的 UNIX 下的程序调试工具。
 
 ## 3 测试平台
 
-STM32F103开发板
+STM32F103 开发板
 
-FT2232HL仿真器
+FT2232HL 仿真器
 
 ![FT2232HL-board](./Rockchip_Developer_Guide_OpenOCD/FT2232HL-board.png)
 
-J-Link仿真器
+J-Link 仿真器
 
 ## 4 简介
 
-本文介绍如何通过OpenOCD调试开发板，仿真器包括FT2232HL仿真器与J-Link。
+本文介绍如何通过 OpenOCD 调试开发板，仿真器包括 FT2232HL 仿真器与 J-Link。
 
 ## 5 驱动安装
 
-### 5.1 FT2232HL Windows驱动安装
+### 5.1 FT2232HL Windows 驱动安装
 
-1. FT2232HL调试板与电脑连接，会显示如下两个串口：
+1. FT2232HL 调试板与电脑连接，会显示如下两个串口：
 
 ![serial](./Rockchip_Developer_Guide_OpenOCD/serial.png)
 
 如果未出现可以[FTDI](https://www.ftdichip.com/)官网下载对应驱动。
 
-2. 安装FT_Prog.exe并运行：
+2. 安装 FT_Prog.exe 并运行：
 
 ![ft_prog](./Rockchip_Developer_Guide_OpenOCD/ft_prog.png)
 
-如上选择后，下载固件到FT2232HL调试板。
+如上选择后，下载固件到 FT2232HL 调试板。
 
-3. 运行UsbDriverTool.exe（可以网上下载）：
+3. 运行 UsbDriverTool.exe（可以网上下载）：
 
 ![usb_serial_tool](./Rockchip_Developer_Guide_OpenOCD/usb_serial_tool.png)
 
-选择USB Serial Converter B，双击会弹出如下显示框：
+选择 USB Serial Converter B，双击会弹出如下显示框：
 
 ![WinUSB](./Rockchip_Developer_Guide_OpenOCD/WinUSB.png)
 
-安装WinUSB驱动。
+安装 WinUSB 驱动。
 
-### 5.2 FT2232HL Linux驱动安装
+### 5.2 FT2232HL Linux 驱动安装
 
-新建文件99-openocd.rules，写入如下内容：
+新建文件 99-openocd.rules，写入如下内容：
 
 ```
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403",ATTRS{idProduct}=="6010", MODE="664", GROUP="plugdev"
@@ -107,37 +107,37 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="15ba",ATTR{idProduct}=="002a", MODE="664", GR
 
 把该文件拷贝到/etc/udev/rules.d/目录下。
 
-## 6 FT2232HL Windows调试
+## 6 FT2232HL Windows 调试
 
-在PowerShell下输入：
+在 PowerShell 下输入：
 
 ```
 openocd -f ftdi.cfg -f stm32f1x.cfg -c "halt" -c "flash write_image erase u-boot.bin 0x08000000 bin" -c "reset"
 ```
 
-log如下：
+log 如下：
 
 ![win_openocd_link_log](./Rockchip_Developer_Guide_OpenOCD/win_openocd_link_log.png)
 
 表示能够正常连接设备。
 
-## 7 FT2232HL Linux调试
+## 7 FT2232HL Linux 调试
 
 ### 7.1 程序下载
 
-在shell输入：
+在 shell 输入：
 
 ```
 openocd -f ftdi.cfg -f stm32f1x.cfg -c init -c "halt"  -c "flash write_image erase u-boot.bin 0x08000000 bin" -c "reset"
 ```
 
-log如下：
+log 如下：
 
 ![linux_openocd_link_log](./Rockchip_Developer_Guide_OpenOCD/linux_openocd_link_log.png)
 
-### 7.2 结合telnet调试
+### 7.2 结合 telnet 调试
 
-在shell内输入：
+在 shell 内输入：
 
 ```
 => openocd -f ftdi.cfg -f stm32f1x.cfg
@@ -161,7 +161,7 @@ Info : Listening on port 3333 for gdb connections
 Info : accepting 'telnet' connection on tcp/4444
 ```
 
-在另一个shell输入：
+在另一个 shell 输入：
 
 ```
 => telnet localhost 4444
@@ -172,7 +172,7 @@ Open On-Chip Debugger
 >
 ```
 
-输入help，可以查看支持命令帮助：
+输入 help，可以查看支持命令帮助：
 
 ```
 > help
@@ -204,9 +204,9 @@ add_usage_text command_name usage_string
       valid any time)
 ```
 
-### 7.3 结合gdb调试程序
+### 7.3 结合 gdb 调试程序
 
-在shell内输入：
+在 shell 内输入：
 
 ```
 => openocd -f ftdi.cfg -f stm32f1x.cfg
@@ -230,7 +230,7 @@ Info : Listening on port 3333 for gdb connections
 Info : accepting 'telnet' connection on tcp/4444
 ```
 
-在另一个shell输入：
+在另一个 shell 输入：
 
 ```
 => arm-none-eabi-gdb LED_project.elf
@@ -252,7 +252,7 @@ Reading symbols from LED_project.elf...done.
 (gdb)
 ```
 
-输入target remote localhost:3333：
+输入 target remote localhost:3333：
 
 ```
 (gdb) target remote localhost:3333
@@ -286,7 +286,7 @@ Transfer rate: 4 KB/sec, 962 bytes/write.
 (gdb)
 ```
 
-gdb调试：
+gdb 调试：
 
 ```
 (gdb) c
@@ -299,7 +299,7 @@ Program received signal SIGINT, Interrupt.
 (gdb)
 ```
 
-另一个shell的打印：
+另一个 shell 的打印：
 
 ```
 Open On-Chip Debugger 0.10.0+dev-g672ef66-dirty (2019-03-06-06:00)
@@ -350,23 +350,23 @@ xPSR: 0x61000000 pc: 0x2000003a msp: 0xffffffe4
 
 ![gdb-debug](./Rockchip_Developer_Guide_OpenOCD/gdb-debug.png)
 
-## 8 J-Link支持
+## 8 J-Link 支持
 
-Linux shell输入：
+Linux shell 输入：
 
 ```
 openocd -f jlink.cfg -f stm32f1x.cfg -c init -c "halt"  -c "flash write_image erase u-boot.bin 0x08000000 bin" -c "reset"
 ```
 
-log如下：
+log 如下：
 
 ![j-link-openocd-link-log](./Rockchip_Developer_Guide_OpenOCD/j-link-openocd-link-log.png)
 
-其他命令操作同章节7 FT2232HL Linux调试。
+其他命令操作同章节 7 FT2232HL Linux 调试。
 
-## 9 OpenOCD命令
+## 9 OpenOCD 命令
 
-shell下输入openocd --help，查看支持的命令，log如下：
+shell 下输入 openocd --help，查看支持的命令，log 如下：
 
 ```
 Open On-Chip Debugger 0.10.0+dev-g672ef66-dirty (2019-03-06-06:00)
@@ -387,11 +387,11 @@ Licensed under GNU GPL v2
 
 1. -h
 
-查看OpenOCD的命令帮助。
+查看 OpenOCD 的命令帮助。
 
 2. -v
 
-查看OpenOCD的版本，例：
+查看 OpenOCD 的版本，例：
 
 ```
 => openocd -v
@@ -405,11 +405,11 @@ For bug reports, read
 
 后面跟随配置文件，可以用于探测是否有板子连接，例：
 
-连接测试板log：
+连接测试板 log：
 
 ![board_link](./Rockchip_Developer_Guide_OpenOCD/board_link.png)
 
-未连接测试板log：
+未连接测试板 log：
 
 ![board_unlink](./Rockchip_Developer_Guide_OpenOCD/board_unlink.png)
 
@@ -419,7 +419,7 @@ For bug reports, read
 
 5. -l
 
-后面跟随log输出文件。
+后面跟随 log 输出文件。
 
 6. -c
 
@@ -429,10 +429,10 @@ For bug reports, read
 openocd -f jlink.cfg -f stm32f1x.cfg -c init -c "halt"  -c "flash write_image erase u-boot.bin 0x08000000 bin" -c "reset"
 ```
 
-## 10 eclips支持
+## 10 eclips 支持
 
 to-do
 
-## 11 Rockchip芯片支持
+## 11 Rockchip 芯片支持
 
 to-do

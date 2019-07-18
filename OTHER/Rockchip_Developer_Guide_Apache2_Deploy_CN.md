@@ -14,7 +14,7 @@
 
 **概述**
 
-​	搭建FTTP文档服务器。
+​	搭建 FTTP 文档服务器。
 
 **读者对象**
 
@@ -38,22 +38,22 @@
 
 ------
 
-## 1. FTTP文件服务器安装
+## 1. FTTP 文件服务器安装
 
-1.1 apache2安装
+1.1 apache2 安装
 
 ```
 sudo apt-get install apache2
 ```
 
-1.2.1 配置apache2 端口
+1.2.1 配置 apache2 端口
 
 ```
 cd /etc/apache2
 sudo vim apache2.conf
 ```
 
-再文件末尾输入，配置apache2 http使用的端口
+再文件末尾输入，配置 apache2 http 使用的端口
 
 ```
 ServerName localhost:80
@@ -65,14 +65,14 @@ ServerName localhost:80
 sudo /etc/init.d/apache2 start
 ```
 
-1.2.2 配置DocumentRoot
+1.2.2 配置 DocumentRoot
 
 ```
 cd /etc/apache2/sites-available
 sudo vim 000-default.conf
 ```
 
-找到DocumentRoot ，配置自己想设置的路径，例如
+找到 DocumentRoot ，配置自己想设置的路径，例如
 
 ![documentroot](./Rockchip_Developer_Guide_Apache2_Deploy/documentroot.png)
 
@@ -84,7 +84,7 @@ sudo /etc/init.d/apache2 restart
 
 1.2.3 权限配置
 
-在上面配置完后，访问你想要访问/home/zzz路径下的文档，比如/home/zzz目录下的code文件夹，输入
+在上面配置完后，访问你想要访问/home/zzz 路径下的文档，比如/home/zzz 目录下的 code 文件夹，输入
 
 ```
 本机IP/code

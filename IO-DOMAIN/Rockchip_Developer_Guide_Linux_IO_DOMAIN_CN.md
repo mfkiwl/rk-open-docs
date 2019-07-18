@@ -49,7 +49,7 @@
 [TOC]
 ---
 
-## 驱动文件与 DTS 节点：
+## 驱动文件与 DTS 节点
 
 ### 驱动文件
 
@@ -105,10 +105,10 @@ io-domains {
 
 很多工程师反映在 TRM 中找不到 io-domain 相关的寄存器，可以通过 TRM 来搜索需要配置的 io-domain 寄存器描述，在 GRF/PMUGRF 章节搜索 ’vsel‘ ， ‘VSEL’ 或者 ‘volsel’ 索引，PMUGRF 中的 io-domain 是用来控制 PMU IO。
 
-支持配置的两种电压1.8v / 3.3v：
+支持配置的两种电压 1.8v / 3.3v：
 
-- 寄存器配置成1，一般对应的电压范围是 1.62v ~ 1.98v，typical 电压 1.8v；
-- 寄存器配置成0，一般对应的电压范围是 3.00v ~ 3.60v，typical 电压 3.3v。
+- 寄存器配置成 1，一般对应的电压范围是 1.62v ~ 1.98v，typical 电压 1.8v；
+- 寄存器配置成 0，一般对应的电压范围是 3.00v ~ 3.60v，typical 电压 3.3v。
 
 具体电压范围要以实际芯片的 Datasheet 为准。
 
@@ -146,7 +146,7 @@ cond0(no)->e
 
 ## 如何配置 io-domain
 
-不是每个 IO 电源域都需要配置，有些 IO 的电源域是固定的，不需要配置。下面3个步骤描述如何通过软件配置 io-domian：
+不是每个 IO 电源域都需要配置，有些 IO 的电源域是固定的，不需要配置。下面 3 个步骤描述如何通过软件配置 io-domian：
 
 ### 1. 通过 rockchip-io-domain.txt 文档寻找名称
 
@@ -167,7 +167,7 @@ Possible supplies for rk3399 pmu-domains:
 
 ### 2. 通过硬件原理图寻找 io-domain 配置的真实电压
 
-仍以 RK3399-EVB 原理图 和 bt656 IO 电源域为例，我们在 rockchip-io-domain.txt 中找到了 bt656 对应的硬件原理图上表示为 APIO2_VDD。所以通过逆向搜索 ‘APIO2_VDD’ 得到 RK3399-EVB 硬件原理图上的 APIO2_VDD 电源是由RK808 下的 VCC1V8_DVP 供给。
+仍以 RK3399-EVB 原理图 和 bt656 IO 电源域为例，我们在 rockchip-io-domain.txt 中找到了 bt656 对应的硬件原理图上表示为 APIO2_VDD。所以通过逆向搜索 ‘APIO2_VDD’ 得到 RK3399-EVB 硬件原理图上的 APIO2_VDD 电源是由 RK808 下的 VCC1V8_DVP 供给。
 
 ![io-domain-1-rk3399-APIO2-hardware](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-1-rk3399-APIO2-hardware.png)
 
@@ -203,7 +203,7 @@ Possible supplies for rk3399 pmu-domains:
 
 ## DTS 中无定义 Regulator 情况处理
 
-在使用的过程中可能会遇到，你找不到相应的regulator来配置，可能项目上面未使用 pmic等电源，只是简单的拉了一个电源过来，dts 上找不到 regulator 的定义，那么你需要在 dts 文件里面增加fixed regulator 的定义，一般 3.3v 和 1.8v 两个 regulator 就够用了。
+在使用的过程中可能会遇到，你找不到相应的 regulator 来配置，可能项目上面未使用 pmic 等电源，只是简单的拉了一个电源过来，dts 上找不到 regulator 的定义，那么你需要在 dts 文件里面增加 fixed regulator 的定义，一般 3.3v 和 1.8v 两个 regulator 就够用了。
 
 下面是 rk3229-evb.dts 的配置例子，确定硬件上的电压是用 1.8v 还是 3.3v，配置成相应的 regulator：
 
@@ -242,11 +242,11 @@ Possible supplies for rk3399 pmu-domains:
 
 ---
 
-## 常见问题：
+## 常见问题
 
 ### 1. 如何确定某个 Pin 脚所在的电源域寄存器是否配置正确
 
-经常遇到客户报的问题是某 pin 脚的电压与所期望的不符，很有可能就是电源域配置问题。例如，在 RK3399上，软件上代码已经让 GPIO2_B1 输出高，但是实际通过量测发现电压不对；通过读取寄存器已经确认该 pin 脚已经将 iomux 配置成 gpio，并且也设置成输出高，这就很有可能是 io-domain 没有配置正确。那么这时候就要确认电源域寄存器是否配置正确，方法就是上面介绍的如何配置电源域的相反步骤。
+经常遇到客户报的问题是某 pin 脚的电压与所期望的不符，很有可能就是电源域配置问题。例如，在 RK3399 上，软件上代码已经让 GPIO2_B1 输出高，但是实际通过量测发现电压不对；通过读取寄存器已经确认该 pin 脚已经将 iomux 配置成 gpio，并且也设置成输出高，这就很有可能是 io-domain 没有配置正确。那么这时候就要确认电源域寄存器是否配置正确，方法就是上面介绍的如何配置电源域的相反步骤。
 
 - 先确定这个 io 所在的电源域，一般是看硬件原理图或者 Datasheet 来确定。例如，RK3399 下面通过硬件原理如图发现 GPIO2_B1 所在的电源域硬件上表示为 APIO2_VDD，并且 APIO2_VDD 是接的电压是 VCC1V8_DVP 。
 
@@ -258,7 +258,7 @@ Possible supplies for rk3399 pmu-domains:
 
   ![io-domain-9-rk3399-APIO2-desc](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-9-rk3399-APIO2-desc.png)
 
-- 在 TRM 上找到这个寄存器，通过 io 命令或者其他方式读取这个寄存器的值，一般基地址是 GRF 或者 PMUGRF。例如，在 TRM 文档上搜索到 “bt656” 寄存器描述，为 bit0，查看寄存器偏移为 0xe640，GRF 基地址为 0xff770000。在串口终端输入 “io -4 0xff77e640”，得到 io-domain 寄存器值，如果该寄存器值 bit0 为 1，表示 1.8v， 与硬件实际电压 VCC1V8_DVP，dts 中该项配置正确；如果 bit0 为0，则表示3.3v，与硬件实际电压 VCC1V8_DVP 不符，dts 中该项配置不正确。
+- 在 TRM 上找到这个寄存器，通过 io 命令或者其他方式读取这个寄存器的值，一般基地址是 GRF 或者 PMUGRF。例如，在 TRM 文档上搜索到 “bt656” 寄存器描述，为 bit0，查看寄存器偏移为 0xe640，GRF 基地址为 0xff770000。在串口终端输入 “io -4 0xff77e640”，得到 io-domain 寄存器值，如果该寄存器值 bit0 为 1，表示 1.8v， 与硬件实际电压 VCC1V8_DVP，dts 中该项配置正确；如果 bit0 为 0，则表示 3.3v，与硬件实际电压 VCC1V8_DVP 不符，dts 中该项配置不正确。
 
 ![io-domain-10-bt565-bit-desc](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-10-bt565-bit-desc.png)
 

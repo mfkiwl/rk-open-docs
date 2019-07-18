@@ -1,4 +1,4 @@
-# Rockchip RTOS时钟配置说明
+# Rockchip RTOS 时钟配置说明
 
 发布版本：1.0
 
@@ -44,18 +44,18 @@
 
 ---
 
-## 1 CLK配置
+## 1 CLK 配置
 
-### 1.1  HAL CLK配置
+### 1.1  HAL CLK 配置
 
-#### 1.1.1  HAL层CLK头文件
+#### 1.1.1  HAL 层 CLK 头文件
 
-cru的工具会自动生成头文件，里面包含GATE_ID、SOFTRST_ID、DIV_ID、MUX_ID、CLK_ID。
-GATE_ID： 包含CON和SHIFT，CON = GATE_ID / 16, SHIFT = GATE_ID % 16
-SOFTRST_ID: 包含CON和SHIFT，CON = SOFTRST_ID / 16, SHIFT = SOFTRST_ID % 16
-DIV_ID: 包含CON、SHIFT、WIDTH
-MUX_ID： 包含ON、SHIFT、WIDTH
-CLK_ID： 包含DIV和MUX的信息
+cru 的工具会自动生成头文件，里面包含 GATE_ID、SOFTRST_ID、DIV_ID、MUX_ID、CLK_ID。
+GATE_ID： 包含 CON 和 SHIFT，CON = GATE_ID / 16, SHIFT = GATE_ID % 16
+SOFTRST_ID: 包含 CON 和 SHIFT，CON = SOFTRST_ID / 16, SHIFT = SOFTRST_ID % 16
+DIV_ID: 包含 CON、SHIFT、WIDTH
+MUX_ID： 包含 ON、SHIFT、WIDTH
+CLK_ID： 包含 DIV 和 MUX 的信息
 
 e.g:
 
@@ -66,7 +66,7 @@ Con = 10;Shift = 6;Width = 2;
 Con = 10;Shift = 0;Width = 5;
 ```
 
-#### 1.1.2  常用API
+#### 1.1.2  常用 API
 
 ```c
 uint32_t HAL_CRU_GetPllFreq(struct PLL_SETUP *pSetup);
@@ -98,13 +98,13 @@ HAL_Status HAL_CRU_ClkEnable(uint32_t clk);
 HAL_Status HAL_CRU_ClkDisable(uint32_t clk);
 ```
 
-参数是GATE_ID(在soc.h中，详细解释见本文1.1.1)。
+参数是 GATE_ID(在 soc.h 中，详细解释见本文 1.1.1)。
 
 备注：
 
-（1）HAL中没有CLK的完整架构，没有时钟树的概念，每个CLK都是单独的，没有父子关系。
+（1）HAL 中没有 CLK 的完整架构，没有时钟树的概念，每个 CLK 都是单独的，没有父子关系。
 
-（2）没有引用计数的概念，写开就会开，写关就会关，对于很多模块共用的CLK，关闭需谨慎。
+（2）没有引用计数的概念，写开就会开，写关就会关，对于很多模块共用的 CLK，关闭需谨慎。
 
 #### 1.1.4  CLK 频率设置
 
@@ -113,9 +113,9 @@ uint32_t HAL_CRU_ClkGetFreq(eCLOCK_Name clockName);
 HAL_Status HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate);
 ```
 
-这个是封装好的，参数是CLK_ID(在soc.h中，详细解释见本文1.1.1)。
+这个是封装好的，参数是 CLK_ID(在 soc.h 中，详细解释见本文 1.1.1)。
 
-如果有其他需求可以通过DIV和MUX接口，去实现CLK的设置。参数是DIV_ID和MUX_ID（在soc.h中，详细解释见本文1.1.1）。
+如果有其他需求可以通过 DIV 和 MUX 接口，去实现 CLK 的设置。参数是 DIV_ID 和 MUX_ID（在 soc.h 中，详细解释见本文 1.1.1）。
 
 ```c
 HAL_Status HAL_CRU_ClkSetDiv(uint32_t divName, uint32_t divValue);
@@ -132,11 +132,11 @@ HAL_Status HAL_CRU_ClkResetAssert(uint32_t clk);
 HAL_Status HAL_CRU_ClkResetDeassert(uint32_t clk);
 ```
 
-参数是SFRST_ID(在soc.h中，详细解释见本文1.1.1)。
+参数是 SFRST_ID(在 soc.h 中，详细解释见本文 1.1.1)。
 
-### 1.2  RT-THREAD CLK配置
+### 1.2  RT-THREAD CLK 配置
 
-#### 1.2.1  RT-THREAD CLK接口
+#### 1.2.1  RT-THREAD CLK 接口
 
 ```c
 struct clk_gate *get_clk_gate_from_id(int clk_id);
@@ -147,11 +147,11 @@ uint32_t clk_get_rate(eCLOCK_Name clk_id);
 rt_err_t clk_set_rate(eCLOCK_Name clk_id, uint32_t rate);
 ```
 
-在RT-THREAD中封装接口的原因：
-1、增加互斥锁机制，对于公共CLK，两个模块都在使用的，最好能有锁，这样更安全。
-2、增加引用计数，对于公共CLK，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
+在 RT-THREAD 中封装接口的原因：
+1、增加互斥锁机制，对于公共 CLK，两个模块都在使用的，最好能有锁，这样更安全。
+2、增加引用计数，对于公共 CLK，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 1.2.2  RT-THREAD 开关CLK
+#### 1.2.2  RT-THREAD 开关 CLK
 
 使用示例：
 
@@ -176,9 +176,9 @@ clk_set_rate(clk_id, init_rate_hz);
 rt_kprintf("%s: rate = %d\n", __func__, clk_get_rate(clk_id));
 ```
 
-#### 1.2.4  RT-THREAD 设置初始化频率及CLK DUMP
+#### 1.2.4  RT-THREAD 设置初始化频率及 CLK DUMP
 
-(1)在board.c中初始化时钟使用示例如下：
+(1)在 board.c 中初始化时钟使用示例如下：
 
 ```c
 static const struct clk_dump clk_inits[] =
@@ -204,13 +204,13 @@ void rt_hw_board_init()
 
 (2) CLK DUMP
 
-CLK DUMP只能DUMP部分在clk_inits[]结构中的时钟和所有的寄存器，如果需要增加时钟请按照clk_inits[]结构添加。
+CLK DUMP 只能 DUMP 部分在 clk_inits[]结构中的时钟和所有的寄存器，如果需要增加时钟请按照 clk_inits[]结构添加。
 
-CLK DUMP使用是用FINSH_FUNCTION_EXPORT，在shell命令行，切到finsh下，直接敲clk_dump()就可以。
+CLK DUMP 使用是用 FINSH_FUNCTION_EXPORT，在 shell 命令行，切到 finsh 下，直接敲 clk_dump()就可以。
 
-### 1.3  RKOS CLK配置
+### 1.3  RKOS CLK 配置
 
-#### 1.3.1  RKOS CLK接口
+#### 1.3.1  RKOS CLK 接口
 
 ```c
 rk_err_t ClkEnable(CLK_GATE *gate, int on);
@@ -226,11 +226,11 @@ void ClkInit(const CLK_INIT *clkInits, uint32 clkCount, bool clkDump);
 void ClkDump(void);
 ```
 
-在RKOS中封装接口的原因：
-1、增加互斥锁机制，对于公共CLK，两个模块都在使用的，最好能有锁，这样更安全。
-2、增加引用计数，对于公共CLK，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
+在 RKOS 中封装接口的原因：
+1、增加互斥锁机制，对于公共 CLK，两个模块都在使用的，最好能有锁，这样更安全。
+2、增加引用计数，对于公共 CLK，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 1.3.2  RKOS 开关CLK
+#### 1.3.2  RKOS 开关 CLK
 
 使用示例：
 
@@ -255,9 +255,9 @@ ClkSetRate(clkId, rate);
 rk_printfA("%s: rate = %d\n", __func__, ClkGetRate(clk_id));
 ```
 
-#### 1.3.4  RKOS 设置初始化频率及CLK DUMP
+#### 1.3.4  RKOS 设置初始化频率及 CLK DUMP
 
-(1)在board_config.c中初始化时钟使用示例如下：
+(1)在 board_config.c 中初始化时钟使用示例如下：
 
 ```c
 static const CLK_INIT clkInits[] =
@@ -290,17 +290,17 @@ void ClkDevHwDeInit(void)
 
 (2) CLK DUMP
 
-CLK DUMP只能DUMP部分在clkInits[]结构中的时钟和所有的寄存器，如果需要增加时钟请按照clkInits[]结构添加。
+CLK DUMP 只能 DUMP 部分在 clkInits[]结构中的时钟和所有的寄存器，如果需要增加时钟请按照 clkInits[]结构添加。
 
-CLK DUMP使用目前还不支持命令，在需要的位置增加ClkDump()调用。
+CLK DUMP 使用目前还不支持命令，在需要的位置增加 ClkDump()调用。
 
-## 2 PD配置
+## 2 PD 配置
 
-### 2.1  HAL PD配置
+### 2.1  HAL PD 配置
 
-#### 2.1.1  HAL层PD头文件
+#### 2.1.1  HAL 层 PD 头文件
 
-PD的ID需要手动填写一下，如下：
+PD 的 ID 需要手动填写一下，如下：
 
 ```c
 #define PISCES_PD_DSP 0x00000000U
@@ -309,7 +309,7 @@ PD的ID需要手动填写一下，如下：
 #define PISCES_PD_AUDIO 0x00033333U
 ```
 
-按照下面定义，对应填写PWR_SHIFT, ST_SHIFT, REQ_SHIFT, ACK_SHIFT。
+按照下面定义，对应填写 PWR_SHIFT, ST_SHIFT, REQ_SHIFT, ACK_SHIFT。
 
 ```c
 #define PD_PWR_SHIFT  0U
@@ -334,7 +334,7 @@ PD的ID需要手动填写一下，如下：
 #define PD_GET_ACK_SHIFT(x) (((uint32_t)(x)&PD_ACK_MASK) >> PD_ACK_SHIFT)
 ```
 
-#### 2.1.2  常用API
+#### 2.1.2  常用 API
 
 ```c
 HAL_Status HAL_PD_Setting(uint32_t pd, bool powerOn);
@@ -346,15 +346,15 @@ HAL_Status HAL_PD_Setting(uint32_t pd, bool powerOn);
 HAL_Status HAL_PD_Setting(uint32_t pd, bool powerOn);
 ```
 
-参数是PD_ID(在soc.h中，详细解释见本文2.1.1)。
+参数是 PD_ID(在 soc.h 中，详细解释见本文 2.1.1)。
 
 备注：
 
-（1）HAL中没有PD的完整架构，没有电源树的概念，每个PD都是单独的，没有父子关系。
+（1）HAL 中没有 PD 的完整架构，没有电源树的概念，每个 PD 都是单独的，没有父子关系。
 
-（2）没有引用计数的概念，写开就会开，写关就会关，对于很多模块共用的PD，关闭需谨慎。
+（2）没有引用计数的概念，写开就会开，写关就会关，对于很多模块共用的 PD，关闭需谨慎。
 
-### 2.2  RT-THREAD PD配置
+### 2.2  RT-THREAD PD 配置
 
 #### 2.2.1  RT-THREAD 接口
 
@@ -364,11 +364,11 @@ void release_pd_id(struct pd *power);
 rt_err_t pd_power(struct pd *power, int on);
 ```
 
-在RT中封装接口的原因：
-1、增加互斥锁机制，对于公共PD，两个模块都在使用的，最好能有锁，这样更安全。
-2、增加引用计数，对于公共PD，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
+在 RT 中封装接口的原因：
+1、增加互斥锁机制，对于公共 PD，两个模块都在使用的，最好能有锁，这样更安全。
+2、增加引用计数，对于公共 PD，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 2.2.2  RT-THREAD 开关PD
+#### 2.2.2  RT-THREAD 开关 PD
 
 使用示例：
 
@@ -384,7 +384,7 @@ release_pd_id(pd_audio);
 备注：
 因为有引用计数，所以使用的时候注意开关要成对。
 
-### 2.3  RKOS PD配置
+### 2.3  RKOS PD 配置
 
 #### 2.3.1  RKOS 接口
 
@@ -394,11 +394,11 @@ PD *GetPdFromId(int pdId);
 void ReleasePdId(PD *power);
 ```
 
-在RKOS中封装接口的原因：
-1、增加互斥锁机制，对于公共PD，两个模块都在使用的，最好能有锁，这样更安全。
-2、增加引用计数，对于公共PD，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
+在 RKOS 中封装接口的原因：
+1、增加互斥锁机制，对于公共 PD，两个模块都在使用的，最好能有锁，这样更安全。
+2、增加引用计数，对于公共 PD，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 2.3.2  RKOS 开关PD
+#### 2.3.2  RKOS 开关 PD
 
 使用示例：
 

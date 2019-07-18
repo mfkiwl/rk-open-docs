@@ -17,7 +17,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文档主要提供Rockchip SDK平台Kernel 3.10和Kernel 4.4 USB子系统初始化时相关的日志分析。
+本文档主要提供 Rockchip SDK 平台 Kernel 3.10 和 Kernel 4.4 USB 子系统初始化时相关的日志分析。
 
 **读者对象**
 
@@ -32,22 +32,22 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者** | **修改说明**             |
 | ---------- | -------- | -------- | ------------------------ |
 | 2017-12-12 | V1.0     | 王明成   | 初始版本                 |
-| 2019-01-09 | V1.1     | 吴良峰   | 使用markdownlint修订格式 |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式 |
 
 ------
 
 [TOC]
 
 ------
-# 1 Linux USB子系统简介
+# 1 Linux USB 子系统简介
 
-在Linux系统中，提供了主机侧和设备侧视角的USB驱动框架及通用驱动程序。
+在 Linux 系统中，提供了主机侧和设备侧视角的 USB 驱动框架及通用驱动程序。
 
-- 主机侧分为USB Core、HOST控制器驱动，HUB驱动和各设备类驱动。
-- 设备侧分为Gadget框架、Devices控制器驱动和各设备类Function驱动。
+- 主机侧分为 USB Core、HOST 控制器驱动，HUB 驱动和各设备类驱动。
+- 设备侧分为 Gadget 框架、Devices 控制器驱动和各设备类 Function 驱动。
 
 ------
-# 2 Rockchip SoC USB控制器列表
+# 2 Rockchip SoC USB 控制器列表
 
 | 芯片\控制器  | EHCI&OHCI | DWC2 | DWC3 |
 | ------- | :-------: | :--: | :--: |
@@ -66,7 +66,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ## 3.1 适用芯片
 
-本章节介绍Linux Kernel 3.10初始化日志，主要适用于RV1108、RK312X、RK3288、RK322X、RK322XH、RK3328、RK3368等有运行Kernel 3.10 SDK的平台。
+本章节介绍 Linux Kernel 3.10 初始化日志，主要适用于 RV1108、RK312X、RK3288、RK322X、RK322XH、RK3328、RK3368 等有运行 Kernel 3.10 SDK 的平台。
 
 ## 3.2 主机侧日志
 
@@ -81,7 +81,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-以上是Linux Kernel 3.10启动阶段USB模块最早输出的3句log。01行表示注册USB文件系统，系统正常启动后，对应生成/sys/bus/usb/目录；02行表示成功注册USB HUB驱动；03行表明注册USB通用设备驱动，即usb_generic_driver。通常USB设备都是以设备的身份先与usb_generic_driver匹配，成功之后，会分裂出接口，当对接口调用device_add()后，会引起接口和接口驱动的匹配。
+以上是 Linux Kernel 3.10 启动阶段 USB 模块最早输出的 3 句 log。01 行表示注册 USB 文件系统，系统正常启动后，对应生成/sys/bus/usb/目录；02 行表示成功注册 USB HUB 驱动；03 行表明注册 USB 通用设备驱动，即 usb_generic_driver。通常 USB 设备都是以设备的身份先与 usb_generic_driver 匹配，成功之后，会分裂出接口，当对接口调用 device_add()后，会引起接口和接口驱动的匹配。
 
 ### 3.2.2 设备类驱动
 
@@ -109,7 +109,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-上面为主机侧设备类驱动，即各个USB设备HOST端的驱动程序，可通过menuconfig进行配置。
+上面为主机侧设备类驱动，即各个 USB 设备 HOST 端的驱动程序，可通过 menuconfig 进行配置。
 
 ```Kconfig
 
@@ -122,7 +122,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-### 3.2.3 Host控制器驱动
+### 3.2.3 Host 控制器驱动
 
 #### 3.2.3.1 EHCI
 
@@ -145,10 +145,10 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-上述为EHCI控制器初始化完整打印，从log可以获取到如下信息：
+上述为 EHCI 控制器初始化完整打印，从 log 可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
-- EHCI控制器被枚举为一个USB2.0 Root HUB (hub 3-0:1.0)，同时也可以看出该HUB被分配的BUS Number (3)。
+- EHCI 控制器被枚举为一个 USB2.0 Root HUB (hub 3-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (3)。
 
 #### 3.2.3.2 OHCI
 
@@ -170,10 +170,10 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-上述为OHCI控制器初始化完整打印，同EHCI，从log也可以获取到如下信息：
+上述为 OHCI 控制器初始化完整打印，同 EHCI，从 log 也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
-- OHCI控制器被枚举为一个USB1.1 Root HUB (hub 4-0:1.0)，同时也可以看出该HUB被分配的BUS Number (4)。
+- OHCI 控制器被枚举为一个 USB1.1 Root HUB (hub 4-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (4)。
 
 #### 3.2.3.3 DWC2 Host
 
@@ -194,10 +194,10 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-上述为DWC2 HOST控制器初始化完整打印，同其它Host控制器，从log也可以获取到如下信息：
+上述为 DWC2 HOST 控制器初始化完整打印，同其它 Host 控制器，从 log 也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本（version 3.10a 21-DEC-2012）等信息。
-- DWC2 HOST控制器被枚举为一个USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出该HUB被分配的BUS Number (5)。
+- DWC2 HOST 控制器被枚举为一个 USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (5)。
 
 #### 3.2.3.4 DWC3 Host
 
@@ -226,15 +226,15 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从log可以获取到如下信息：
+DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印，从 log 可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、控制器物理地址等信息。
 
-- XHCI控制器分别被枚举为一个USB3.0 Root HUB (hub 1-0:1.0)和一个USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出两个HUB分别被分配到的BUS Number。
+- XHCI 控制器分别被枚举为一个 USB3.0 Root HUB (hub 1-0:1.0)和一个 USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出两个 HUB 分别被分配到的 BUS Number。
 
 ## 3.3 设备侧日志
 
-目前，运行Kernel 3.10 SDK的Rockchip芯片上仅集成DWC2 IP，所以Devices控制器仅DWC2一个，内核使用dwc_otg_310驱动，位于drivers/usb/dwc_otg_310目录。
+目前，运行 Kernel 3.10 SDK 的 Rockchip 芯片上仅集成 DWC2 IP，所以 Devices 控制器仅 DWC2 一个，内核使用 dwc_otg_310 驱动，位于 drivers/usb/dwc_otg_310 目录。
 
 ### 3.3.1 DWC2 Peripheral
 
@@ -252,12 +252,12 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 
 ```
 
-上面为Devcies控制器初始化log，从log也可以得到一些控制器信息。
+上面为 Devcies 控制器初始化 log，从 log 也可以得到一些控制器信息。
 
-- 01-02行：控制器软件版本（version 3.10a 21-DEC-2012），IP版本：3.10a
+- 01-02 行：控制器软件版本（version 3.10a 21-DEC-2012），IP 版本：3.10a
 - 控制器当前的工作模式和部分参数的配置。
 
-### 3.3.2 DWC2 Peripheral枚举日志
+### 3.3.2 DWC2 Peripheral 枚举日志
 
 ```Log
 01 [    9.208851]  [otg id chg] last id -1 current id 64
@@ -286,28 +286,28 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 ...
 ```
 
-上面log为DWC2 peripheral枚举的完整日志。
+上面 log 为 DWC2 peripheral 枚举的完整日志。
 
-- 01行表示检测到USB ID变化，有USB线接入；
-- 03-07为控制器重新初始化log；
-- 10行表示检测到VBUS；
-- 18－22行为USB枚举成功，并通过UEVENT事件通知Android层Gadget连接成功。
+- 01 行表示检测到 USB ID 变化，有 USB 线接入；
+- 03-07 为控制器重新初始化 log；
+- 10 行表示检测到 VBUS；
+- 18－22 行为 USB 枚举成功，并通过 UEVENT 事件通知 Android 层 Gadget 连接成功。
 
 # 4 Kernel 4.4
 
 ## 4.1 适用芯片
 
-本章节介绍Linux Kernel 4.4初始化日志，主要适用于RK312X、RK3288、RK322X、RK322XH、RK3328、RK3366、RK3368，RK3399等有运行Kernel 4.4 SDK的平台。
+本章节介绍 Linux Kernel 4.4 初始化日志，主要适用于 RK312X、RK3288、RK322X、RK322XH、RK3328、RK3366、RK3368，RK3399 等有运行 Kernel 4.4 SDK 的平台。
 
 ## 4.2 主机侧日志
 
-### 4.2.1 USB CORE及设备类驱动
+### 4.2.1 USB CORE 及设备类驱动
 
-跟Linux Kernel 3.10相同，usbcore注册USB文件系统、注册USB HUB驱动，以及注册USB通用设备驱动，log同[Linux Kernel 3.10](#3.2.1 USB CORE) 。
+跟 Linux Kernel 3.10 相同，usbcore 注册 USB 文件系统、注册 USB HUB 驱动，以及注册 USB 通用设备驱动，log 同[Linux Kernel 3.10](#3.2.1 USB CORE) 。
 
-设备类驱动亦同[Kernel 3.10](#3.2.2 设备类驱动)，log和配置方式也相同。
+设备类驱动亦同[Kernel 3.10](#3.2.2 设备类驱动)，log 和配置方式也相同。
 
-### 4.2.2 Host控制器驱动
+### 4.2.2 Host 控制器驱动
 
 #### 4.2.3.1 EHCI
 
@@ -330,10 +330,10 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 
 ```
 
-上述为EHCI控制器初始化完整打印，从log也可以获取到如下信息：
+上述为 EHCI 控制器初始化完整打印，从 log 也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
-- EHCI控制器被枚举为一个USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出该HUB被分配的BUS Number (2)。
+- EHCI 控制器被枚举为一个 USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (2)。
 
 #### 4.2.3.2 OHCI
 
@@ -355,10 +355,10 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 
 ```
 
-上述为OHCI控制器初始化完整打印，同EHCI，从log也可以获取到如下信息：
+上述为 OHCI 控制器初始化完整打印，同 EHCI，从 log 也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
-- OHCI控制器被枚举为一个USB1.1 Root HUB (hub 3-0:1.0)，同时也可以看出该HUB被分配的BUS Number (3)。
+- OHCI 控制器被枚举为一个 USB1.1 Root HUB (hub 3-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (3)。
 
 #### 4.2.3.3 DWC2 Host
 
@@ -381,10 +381,10 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 
 ```
 
-上述为DWC2 HOST控制器初始化完整打印，同其它Host控制器，从log也可以获取到如下信息：
+上述为 DWC2 HOST 控制器初始化完整打印，同其它 Host 控制器，从 log 也可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器部分配置信息。
-- DWC2 HOST控制器被枚举为一个USB2.0 Root HUB (hub 1-0:1.0)，同时也可以看出该HUB被分配的BUS Number (1)。
+- DWC2 HOST 控制器被枚举为一个 USB2.0 Root HUB (hub 1-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (1)。
 
 #### 4.2.3.4 DWC3 Host
 
@@ -414,22 +414,22 @@ DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从
 
 ```
 
-DWC3 Host集成XHCI控制器，上述为XHCI控制器初始化完整打印，从log可以获取到如下信息：
+DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印，从 log 可以获取到如下信息：
 
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
-- XHCI控制器分别被枚举为一个USB3.0 Root HUB (hub 4-0:1.0)和一个USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出两个HUB被分配到的BUS Number。
+- XHCI 控制器分别被枚举为一个 USB3.0 Root HUB (hub 4-0:1.0)和一个 USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出两个 HUB 被分配到的 BUS Number。
 
 ## 4.3 设备侧日志
 
-目前，Rockchip SoC除RK3399 芯片外，其它芯片都是集成DWC2 OTG IP，RK3399集成DWC3 OTG IP，支持USB3.0，所以设备侧log分dwc2和dwc3阐述。
+目前，Rockchip SoC 除 RK3399 芯片外，其它芯片都是集成 DWC2 OTG IP，RK3399 集成 DWC3 OTG IP，支持 USB3.0，所以设备侧 log 分 dwc2 和 dwc3 阐述。
 
-Kernel 4.4，DWC2使用drivers/usb/dwc2目录驱动；DWC3使用drivers/usb/dwc3目录驱动。
+Kernel 4.4，DWC2 使用 drivers/usb/dwc2 目录驱动；DWC3 使用 drivers/usb/dwc3 目录驱动。
 
 ### 4.3.1 DWC2/DWC3 Peripheral
 
-Kernel 4.4，开机在没有连接USB线的情况下，对于DWC2，如果控制器为OTG模式，日志同[DWC2 Host](#4.2.3.3 DWC2 Host)；如果为Peripheral模式，则没有特别log输出；DWC3跟DWC2类似。
+Kernel 4.4，开机在没有连接 USB 线的情况下，对于 DWC2，如果控制器为 OTG 模式，日志同[DWC2 Host](#4.2.3.3 DWC2 Host)；如果为 Peripheral 模式，则没有特别 log 输出；DWC3 跟 DWC2 类似。
 
-### 4.3.2 DWC2 Peripheral枚举日志
+### 4.3.2 DWC2 Peripheral 枚举日志
 
 ```Log
 01 [   18.566773] read descriptors
@@ -445,14 +445,14 @@ Kernel 4.4，开机在没有连接USB线的情况下，对于DWC2，如果控制
 ...
 ```
 
-上面Log为DWC2 Peripheral枚举的完整日志。
+上面 Log 为 DWC2 Peripheral 枚举的完整日志。
 
-- 01-03行Android层开始配置Gadget；
-- 04-05为控制器枚举信息；
-- 06行表示枚举成功，Gadget通过Uevent向Android发送Connected消息；
-- 10行Gadget通过Uevent向Android发送Configured消息；表示Gadget配置成功。
+- 01-03 行 Android 层开始配置 Gadget；
+- 04-05 为控制器枚举信息；
+- 06 行表示枚举成功，Gadget 通过 Uevent 向 Android 发送 Connected 消息；
+- 10 行 Gadget 通过 Uevent 向 Android 发送 Configured 消息；表示 Gadget 配置成功。
 
-### 4.3.3 DWC3 Peripheral枚举日志
+### 4.3.3 DWC3 Peripheral 枚举日志
 
 ```Log
 01 [   13.924130] fusb302 4-0022: CC connected in 1 as UFP
@@ -468,10 +468,10 @@ Kernel 4.4，开机在没有连接USB线的情况下，对于DWC2，如果控制
 ...
 ```
 
-上面log为DWC3 Peripheral枚举的完整日志。
+上面 log 为 DWC3 Peripheral 枚举的完整日志。
 
-- 01行FUSB302检测到USB线有接入；
-- 02行充电检测启动，因为接着PC，所以为标准充电器；
-- 06-07行Android层开始配置Gadget；
-- 08行表示枚举成功，Gadget通过Uevent向Android发送Connected消息；
-- 09-10行，USB Config配置成功，Gadget通过Uevent向Android发送Configured配置成功消息。
+- 01 行 FUSB302 检测到 USB 线有接入；
+- 02 行充电检测启动，因为接着 PC，所以为标准充电器；
+- 06-07 行 Android 层开始配置 Gadget；
+- 08 行表示枚举成功，Gadget 通过 Uevent 向 Android 发送 Connected 消息；
+- 09-10 行，USB Config 配置成功，Gadget 通过 Uevent 向 Android 发送 Configured 配置成功消息。

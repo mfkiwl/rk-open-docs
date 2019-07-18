@@ -14,7 +14,7 @@
 
 **概述**
 
-本文档主要介绍RK平台时钟子系统框架介绍以及配置。
+本文档主要介绍 RK 平台时钟子系统框架介绍以及配置。
 
 **产品版本**
 
@@ -50,13 +50,13 @@
 
 > [*图表 0‑1clk 时钟树的示例图* 1-1](#_Toc456336516)
 >
-> [*图表 0‑2时钟分配示例图* 1-2](#_Toc456336517)
+> [*图表 0‑2 时钟分配示例图* 1-2](#_Toc456336517)
 >
 > [*图表 0‑3 时钟配置流程图* 1-2](#_Toc456336518)
 >
-> [*图表 2‑1总线时钟结构* 2-4](#_Toc456336519)
+> [*图表 2‑1 总线时钟结构* 2-4](#_Toc456336519)
 >
-> [*图表 2‑2 GATING示例图* 2-5](#_Toc456336520)
+> [*图表 2‑2 GATING 示例图* 2-5](#_Toc456336520)
 >
 > [*图表 3‑1 小数分频时钟图* 3-13](#_Toc456336521)
 
@@ -72,19 +72,19 @@
 
 **时钟子系统**
 
-这里讲的时钟是给SOC各组件提供时钟的树状框架，并不是内核使用的时间，和其他模块一样，CLK也有框架，用以适配不同的平台。适配层之上是客户代码和接口，也就是各模块（如需要时钟信号的外设，USB等）的驱动。适配层之下是具体的SOC台的时钟操作细节。
+这里讲的时钟是给 SOC 各组件提供时钟的树状框架，并不是内核使用的时间，和其他模块一样，CLK 也有框架，用以适配不同的平台。适配层之上是客户代码和接口，也就是各模块（如需要时钟信号的外设，USB 等）的驱动。适配层之下是具体的 SOC 台的时钟操作细节。
 
 **时钟树结构**
 
-可运行Linux的主流处理器平台，都有非常复杂的clock tree，我们随便拿一个处理器的spec，查看clock相关的章节，一定会有一个非常庞大和复杂的树状图，这个图由clock相关的器件，以及这些器件输出的clock组成。
+可运行 Linux 的主流处理器平台，都有非常复杂的 clock tree，我们随便拿一个处理器的 spec，查看 clock 相关的章节，一定会有一个非常庞大和复杂的树状图，这个图由 clock 相关的器件，以及这些器件输出的 clock 组成。
 
 **相关器件**
 
-clock相关的器件包括：用于产生clock的Oscillator（有源振荡器，也称作谐振荡器）或者Crystal（无源振荡器，也称晶振）；用于倍频的PLL（锁相环，Phase Locked Loop）；用于分频的divider；用于多路选择的Mux；用于clock enable控制的与门；使用clock的硬件模块（可称作consumer）；等等。
+clock 相关的器件包括：用于产生 clock 的 Oscillator（有源振荡器，也称作谐振荡器）或者 Crystal（无源振荡器，也称晶振）；用于倍频的 PLL（锁相环，Phase Locked Loop）；用于分频的 divider；用于多路选择的 Mux；用于 clock enable 控制的与门；使用 clock 的硬件模块（可称作 consumer）；等等。
 
 ### 1.3 时钟方案
 
-每一个SOC都有自己的时钟分配方案，主要是包括PLL的设置，各个CLK的父属性、DIV、MUX等。芯片不同，时钟方案是有差异的。
+每一个 SOC 都有自己的时钟分配方案，主要是包括 PLL 的设置，各个 CLK 的父属性、DIV、MUX 等。芯片不同，时钟方案是有差异的。
 
 ![0-1-clk-tree](Rockchip_Developer_Guide_Linux3.10_Clock/0-1-clk-tree.png)
 
@@ -92,7 +92,7 @@ clock相关的器件包括：用于产生clock的Oscillator（有源振荡器，
 
 ![0-2-clk-assign](Rockchip_Developer_Guide_Linux3.10_Clock/0-2-clk-assign.png)
 
-图表 1‑2时钟分配示例图
+图表 1‑2 时钟分配示例图
 
 ### 1.4 总体流程
 
@@ -100,53 +100,53 @@ clock相关的器件包括：用于产生clock的Oscillator（有源振荡器，
 
 图表 1‑3 时钟配置流程图
 
-主要内容包括（不需要所有clk都支持）：
+主要内容包括（不需要所有 clk 都支持）：
 
 1. enable/disable clk。
 
-2. 设置clk的频率。
+2. 设置 clk 的频率。
 
-3. 选择clk的parent。
+3. 选择 clk 的 parent。
 
 ### 1.5 代码结构
 
-CLOCK的软件框架由CLK的Device Tree（clk的寄存器描述、clk之间的树状关系等）、Device driver的CLK配置和CLK API三部分构成。这三部分的功能、CLK代码路径如表1-1所示。
+CLOCK 的软件框架由 CLK 的 Device Tree（clk 的寄存器描述、clk 之间的树状关系等）、Device driver 的 CLK 配置和 CLK API 三部分构成。这三部分的功能、CLK 代码路径如表 1-1 所示。
 
 | 项目              | 功能                                     | 路径                                   |
 | --------------- | -------------------------------------- | ------------------------------------ |
-| Device Tree     | clk的寄存器描述、clk之间的树状关系描述等                | Arch/arm/boot/dts/rk3xxx-clocks.dtsi |
-| RK PLL及特殊CLK的处理 | 1.处理RK的PLL时钟2.  处理RK的一些特殊时钟，如LCDC、I2S等 | Drivers/clk/rockchip/clk-xxx.c       |
-| CLK API         | 提供linux环境下供driver调用的接口                 | Drivers/clk/clk-xxx.x                |
+| Device Tree     | clk 的寄存器描述、clk 之间的树状关系描述等                | Arch/arm/boot/dts/rk3xxx-clocks.dtsi |
+| RK PLL 及特殊 CLK 的处理 | 1.处理 RK 的 PLL 时钟 2.  处理 RK 的一些特殊时钟，如 LCDC、I2S 等 | Drivers/clk/rockchip/clk-xxx.c       |
+| CLK API         | 提供 linux 环境下供 driver 调用的接口                 | Drivers/clk/clk-xxx.x                |
 
-表格 1‑1CLK代码构成
+表格 1‑1CLK 代码构成
 
 ---
 
-## 2 CLOCK开发指南
+## 2 CLOCK 开发指南
 
 ### 2.1 概述
 
-本章描述如何修改时钟配置、使用API接口及调试CLK程序。
+本章描述如何修改时钟配置、使用 API 接口及调试 CLK 程序。
 
 ### 2.2 时钟的相关概念
 
 #### 2.2.1 PLL
 
-锁相环，是由24M的晶振输入，然后内部锁相环锁出相应的频率。这是SOC所有CLOCK的时钟的源。SOC的所有总线及设备的时钟都是从PLL分频下来的。RK平台主要PLL有:
+锁相环，是由 24M 的晶振输入，然后内部锁相环锁出相应的频率。这是 SOC 所有 CLOCK 的时钟的源。SOC 的所有总线及设备的时钟都是从 PLL 分频下来的。RK 平台主要 PLL 有:
 
-表格 ‑1PLL描述
+表格 ‑1PLL 描述
 
 | PLL  | 子设备       | 用途            | 备注                                       |
 | ---- | --------- | ------------- | ---------------------------------------- |
-| APLL | CLK_CORE | CPU的时钟        | 一般只给CPU使用，因为CPU会变频，APLL会根据CPU要求的频率变化     |
-| DPLL | Clk_DDR  | DDR的时钟        | 一般只给DDR使用，因为DDR会变频，DPLL会根据DDR要求变化        |
-| GPLL |           | 提供总线、外设时钟做备份  | 一般设置在594M或者1200M，保证基本的100、200、300、400M的时钟都有输出 |
-| CPLL |           | GMAC或者其他设备做备份 | 一般可能是400、500、800、1000M。或者是给lcdc独占使用。     |
-| NPLL |           | 给其他设备做备份      | 一般可能是1188M，或者给lcdc独占使用。                  |
+| APLL | CLK_CORE | CPU 的时钟        | 一般只给 CPU 使用，因为 CPU 会变频，APLL 会根据 CPU 要求的频率变化     |
+| DPLL | Clk_DDR  | DDR 的时钟        | 一般只给 DDR 使用，因为 DDR 会变频，DPLL 会根据 DDR 要求变化        |
+| GPLL |           | 提供总线、外设时钟做备份  | 一般设置在 594M 或者 1200M，保证基本的 100、200、300、400M 的时钟都有输出 |
+| CPLL |           | GMAC 或者其他设备做备份 | 一般可能是 400、500、800、1000M。或者是给 lcdc 独占使用。     |
+| NPLL |           | 给其他设备做备份      | 一般可能是 1188M，或者给 lcdc 独占使用。                  |
 
-我们SOC的总线有ACLK_PERI、HCLK_PERI、PCLK_PERI、ACLK_BUS、HCLK_BUS、PCLK_BUS.（ACLK用于数据传输，PCLK跟HCLK一般是用于寄存器读写）
+我们 SOC 的总线有 ACLK_PERI、HCLK_PERI、PCLK_PERI、ACLK_BUS、HCLK_BUS、PCLK_BUS.（ACLK 用于数据传输，PCLK 跟 HCLK 一般是用于寄存器读写）
 
-> 而区分BUS跟PERI主要是为了做高速和低速总线的区分，ACLK范围100-300M，PCLK范围50M\~150M，HCLK范围37M\~150M。BUS下面主要是一些低速的设备，如I2C、I2S、SPI等，PERI下面一般是EMMC、GMAC、USB等。不同的芯片在设计时会有一些差异。例如：对于某些对总线速度要求较高时，可能单独给此设备设计一个独立的ACLK（如ACLK\_EMMC或者ACLK\_USB等）。
+> 而区分 BUS 跟 PERI 主要是为了做高速和低速总线的区分，ACLK 范围 100-300M，PCLK 范围 50M\~150M，HCLK 范围 37M\~150M。BUS 下面主要是一些低速的设备，如 I2C、I2S、SPI 等，PERI 下面一般是 EMMC、GMAC、USB 等。不同的芯片在设计时会有一些差异。例如：对于某些对总线速度要求较高时，可能单独给此设备设计一个独立的 ACLK（如 ACLK\_EMMC 或者 ACLK\_USB 等）。
 
 各个设备的总线时钟会挂在上面这些时钟下面，如下图结构：
 
@@ -154,19 +154,19 @@ CLOCK的软件框架由CLK的Device Tree（clk的寄存器描述、clk之间的�
 
 ![2-1-bus-structure](Rockchip_Developer_Guide_Linux3.10_Clock/2-1-bus-structure.png)
 
-（如：GMAC想提高自己设备的总线频率以实现其快速的数据拷贝或者搬移，可以提高ACLK\_PERI来实现）
+（如：GMAC 想提高自己设备的总线频率以实现其快速的数据拷贝或者搬移，可以提高 ACLK\_PERI 来实现）
 
-图表 ‑1总线时钟结构
+图表 ‑1 总线时钟结构
 
 #### 2.2.2 GATING
 
-CLOCK的框架中有很多的GATING，主要是为了降低功耗使用，在一些设备关闭，CLOCK不需要维持的时候，可以关闭GATING，节省功耗。
+CLOCK 的框架中有很多的 GATING，主要是为了降低功耗使用，在一些设备关闭，CLOCK 不需要维持的时候，可以关闭 GATING，节省功耗。
 
-RK CLOCK的框架的GATING是按照树的结构，有父子属性。GATING的开关有一个引用计数机制，使用这个计数来实现CLOCK打开时，会遍历打开其父CLOCK。在子CLOCK关闭时，父CLOCK会遍历所有的子CLOCK，在所有的子都关闭的时候才会关闭父CLOCK。
+RK CLOCK 的框架的 GATING 是按照树的结构，有父子属性。GATING 的开关有一个引用计数机制，使用这个计数来实现 CLOCK 打开时，会遍历打开其父 CLOCK。在子 CLOCK 关闭时，父 CLOCK 会遍历所有的子 CLOCK，在所有的子都关闭的时候才会关闭父 CLOCK。
 
-（如：I2S2在使用的时候，必须要打开图中三个GATING（如图2-2），但是软件上只需要开最后一级的GATING，时钟结构会自动的打开其parent的GATING）
+（如：I2S2 在使用的时候，必须要打开图中三个 GATING（如图 2-2），但是软件上只需要开最后一级的 GATING，时钟结构会自动的打开其 parent 的 GATING）
 
-![2-2-GATING](Rockchip_Developer_Guide_Linux3.10_Clock/2-2-GATING.png)图表 ‑2GATING示例图
+![2-2-GATING](Rockchip_Developer_Guide_Linux3.10_Clock/2-2-GATING.png)图表 ‑2GATING 示例图
 
 ### 2.3 时钟配置
 
@@ -182,7 +182,7 @@ arch/arm64/dts/rockchip/rk33xx.dtsi
 
 1. **频率**
 
-CLOCK TREE初始化时设置的频率：
+CLOCK TREE 初始化时设置的频率：
 
 ```c
 	rockchip,clocks-init-rate =
@@ -200,7 +200,7 @@ CLOCK TREE初始化时设置的频率：
 
 2. **Parent**
 
-CLOCK TREE初始化时设置的parent：
+CLOCK TREE 初始化时设置的 parent：
 
 ```c
 	rockchip,clocks-init-parent =
@@ -216,9 +216,9 @@ CLOCK TREE初始化时设置的parent：
 
 3. **Gating**
 
-CLOCK TREE初始化时是否默认enable：
+CLOCK TREE 初始化时是否默认 enable：
 
-注意：对于没有默认初始化enable，且设备没有引用去enable的时钟，在clk初始化完成之后，会被关闭。
+注意：对于没有默认初始化 enable，且设备没有引用去 enable 的时钟，在 clk 初始化完成之后，会被关闭。
 
 ```c
 	rockchip_clocks_enable: clocks-enable {
@@ -246,11 +246,11 @@ CLOCK TREE初始化时是否默认enable：
 }
 ```
 
-#### 2.3.2 Driver的时钟配置
+#### 2.3.2 Driver 的时钟配置
 
-1. 获取CLK指针
+1. 获取 CLK 指针
 
-DTS设备结点里添加clock引用信息（推荐）
+DTS 设备结点里添加 clock 引用信息（推荐）
 
 ```c
 	clocks = <&clk_saradc>, <&clk_gates7 14>;
@@ -262,7 +262,7 @@ DTS设备结点里添加clock引用信息（推荐）
 	dev->clk = devm_clk_get(&pdev->dev, "saradc");
 ```
 
-DTS设备结点里未添加clock引用信息
+DTS 设备结点里未添加 clock 引用信息
 
 ```c
 Driver code：
@@ -271,9 +271,9 @@ Driver code：
 	dev->clk = devm_clk_get(NULL, "clk_saradc");
 ```
 
-### 2.4  CLOCK API接口
+### 2.4  CLOCK API 接口
 
-#### 2.4.1 主要的CLK API
+#### 2.4.1 主要的 CLK API
 
 1. **头文件**
 
@@ -289,14 +289,14 @@ Driver code：
 	clk_round_rate
 ```
 
-2. **获取CLK指针**
+2. **获取 CLK 指针**
 
 ```c
 	struct clk *devm_clk_get(struct device *dev, const char *id)（推荐使用，可以自动释放）
 	struct clk *clk_get(struct device *dev, const char *id)
 ```
 
-3. **准备/使能CLK**
+3. **准备/使能 CLK**
 
 ```c
 	int clk_prepare(struct clk *clk)
@@ -311,25 +311,25 @@ Driver code：
 	clk_prepare/clk_unprepare，启动clock前的准备工作/停止clock后的善后工作。可能会睡眠。
 ```
 
-可以使用clk_prepare_enable / clk_disable_unprepare，clk_prepare_enable / clk_disable_unprepare(或者clk_enable / clk_disable) 必须成对，以使引用计数正确。
+可以使用 clk_prepare_enable / clk_disable_unprepare，clk_prepare_enable / clk_disable_unprepare(或者 clk_enable / clk_disable) 必须成对，以使引用计数正确。
 
 **注意：**
 
-prepare/unprepare，enable/disable的说明：
+prepare/unprepare，enable/disable 的说明：
 
-这两套API的本质，是把clock的启动/停止分为atomic和non-atomic两个阶段，以方便实现和调用。因此上面所说的“不会睡眠/可能会睡眠”，有两个角度的含义：一是告诉底层的clock driver，请把可能引起睡眠的操作，放到prepare/unprepare中实现，一定不能放到enable/disable中；二是提醒上层使用clock的driver，调用prepare/unprepare接口时可能会睡眠，千万不能在atomic上下文（例如内部包含mutex 锁、中断关闭、spinlock锁保护的区域）调用，而调用enable/disable接口则可放心。
+这两套 API 的本质，是把 clock 的启动/停止分为 atomic 和 non-atomic 两个阶段，以方便实现和调用。因此上面所说的“不会睡眠/可能会睡眠”，有两个角度的含义：一是告诉底层的 clock driver，请把可能引起睡眠的操作，放到 prepare/unprepare 中实现，一定不能放到 enable/disable 中；二是提醒上层使用 clock 的 driver，调用 prepare/unprepare 接口时可能会睡眠，千万不能在 atomic 上下文（例如内部包含 mutex 锁、中断关闭、spinlock 锁保护的区域）调用，而调用 enable/disable 接口则可放心。
 
-另外，clock的enable/disable为什么需要睡眠呢？这里举个例子，例如enable PLL clk，在启动PLL后，需要等待它稳定。而PLL的稳定时间是很长的，这段时间要把CPU交出（进程睡眠），不然就会浪费CPU。
+另外，clock 的 enable/disable 为什么需要睡眠呢？这里举个例子，例如 enable PLL clk，在启动 PLL 后，需要等待它稳定。而 PLL 的稳定时间是很长的，这段时间要把 CPU 交出（进程睡眠），不然就会浪费 CPU。
 
-最后，为什么会有合在一起的clk_prepare_enable/clk_disable_unprepare接口呢？如果调用者能确保是在non-atomic上下文中调用，就可以顺序调用prepare/enable、disable/unprepared，为了简单，framework就帮忙封装了这两个接口。
+最后，为什么会有合在一起的 clk_prepare_enable/clk_disable_unprepare 接口呢？如果调用者能确保是在 non-atomic 上下文中调用，就可以顺序调用 prepare/enable、disable/unprepared，为了简单，framework 就帮忙封装了这两个接口。
 
-4. **设置CLK频率**
+4. **设置 CLK 频率**
 
 ```c
 	int clk_set_rate(struct clk *clk, unsigned long rate)（单位Hz）
 ```
 
-（返回值小于0，设置CLK失败）
+（返回值小于 0，设置 CLK 失败）
 
 #### 2.4.2 示例
 
@@ -387,7 +387,7 @@ Driver code
 	}
 ```
 
-### 2.5 CLOCK调试
+### 2.5 CLOCK 调试
 
 1. **CLOCK DEBUGS:**
 
@@ -401,7 +401,7 @@ Driver code
 
 配置选项：
 
-勾选RK\_PM\_TESTS
+勾选 RK\_PM\_TESTS
 
 ```c
 	There is no help available for this option.
@@ -430,13 +430,13 @@ Driver code
 	         echo close [clk_name] > /sys/pm_tests/clk_rate
 ```
 
-3. **TEST\_CLK\_OUT测试：**
+3. **TEST\_CLK\_OUT 测试：**
 
-部分时钟是可以输出到test\_clk\_out，直接测试clk输出频率，用于确认某些时钟波形是否正常。配置方法(以RK3228为例)：
+部分时钟是可以输出到 test\_clk\_out，直接测试 clk 输出频率，用于确认某些时钟波形是否正常。配置方法(以 RK3228 为例)：
 
 ![rk3328-configuration](Rockchip_Developer_Guide_Linux3.10_Clock/rk3328-configuration.png)
 
-**设置CLK的MUX**
+**设置 CLK 的 MUX**
 
 CRU_MISC_CON
 
@@ -444,7 +444,7 @@ Address: Operational Base + offset (0x0134)
 
 ![clk-mux-table](Rockchip_Developer_Guide_Linux3.10_Clock/clk-mux-table.png)
 
-**设置CLK的DIV**
+**设置 CLK 的 DIV**
 
 CRU_CLKSEL4_CON
 
@@ -452,7 +452,7 @@ Address: Operational Base + offset (0x0054)
 
 ![clk-div](Rockchip_Developer_Guide_Linux3.10_Clock/clk-div.png)
 
-**设置CLK的GATING**
+**设置 CLK 的 GATING**
 
 CRU_CLKGATE0_CON
 
@@ -464,13 +464,13 @@ Address: Operational Base + offset (0x00d0)
 
 ## 3 常见问题分析
 
-### 3.1 PLL设置
+### 3.1 PLL 设置
 
-#### 3.1.1 PLL类型查找
+#### 3.1.1 PLL 类型查找
 
-不同芯片PLL相关的寄存器、PLL计算公式等会有一些差异，使用PLL类型来区分芯片不同，去计算并设置PLL的参数。
+不同芯片 PLL 相关的寄存器、PLL 计算公式等会有一些差异，使用 PLL 类型来区分芯片不同，去计算并设置 PLL 的参数。
 
-在rk3xxx-clocks.dtsi中，找到PLL，确认其类型。
+在 rk3xxx-clocks.dtsi 中，找到 PLL，确认其类型。
 
 ```c
 	clk_cpll: pll-clk@0018 {
@@ -480,7 +480,7 @@ Address: Operational Base + offset (0x00d0)
 };
 ```
 
-根据PLL的类型，在clk-pll.c中查找PLL频率支持的表格：
+根据 PLL 的类型，在 clk-pll.c 中查找 PLL 频率支持的表格：
 
 ```c
 	case CLK_PLL_312XPLUS:
@@ -488,7 +488,7 @@ Address: Operational Base + offset (0x00d0)
 	return &clk_pll_ops_312xplus;
 ```
 
-#### 3.1.2 PLL回调函数的定义
+#### 3.1.2 PLL 回调函数的定义
 
 ```c
 	static const struct clk_ops clk_pll_ops_312xplus = {
@@ -498,7 +498,7 @@ Address: Operational Base + offset (0x00d0)
 	};
 ```
 
-#### 3.1.3 PLL频率表格定义
+#### 3.1.3 PLL 频率表格定义
 
 ```c
 	struct pll_clk_set *clk_set = (struct pll_clk_set *)(rk312xplus_pll_com_table);
@@ -512,7 +512,7 @@ Address: Operational Base + offset (0x00d0)
 	};
 ```
 
-#### 3.1.4 PLL计算公式
+#### 3.1.4 PLL 计算公式
 
 ```c
 	VCO = 24M * FBDIV / REFDIV (450M ~ 2200M)
@@ -525,9 +525,9 @@ Address: Operational Base + offset (0x00d0)
 
 FOUT = 1188 / 2/ 1 = 594M
 
-如果需要增加其他的PLL频率，按照上述公式补齐表格即可。
+如果需要增加其他的 PLL 频率，按照上述公式补齐表格即可。
 
-有一个PLL类型是特殊的，查表查不到，会自动去计算PLL的参数。如：
+有一个 PLL 类型是特殊的，查表查不到，会自动去计算 PLL 的参数。如：
 
 ```c
 	CLK_PLL_3036PLUS_AUTO
@@ -535,33 +535,33 @@ FOUT = 1188 / 2/ 1 = 594M
 	CLK_PLL_3188PLUS_AUTO
 ```
 
-（注意：但是使用自动计算的时候，VCO不能保证尽量大，如果对PLL的jitter有要求的不建议使用。）
+（注意：但是使用自动计算的时候，VCO 不能保证尽量大，如果对 PLL 的 jitter 有要求的不建议使用。）
 
 ### 3.2 部分特殊时钟的设置
 
-#### 3.2.1 LCDC显示相关的时钟
+#### 3.2.1 LCDC 显示相关的时钟
 
-LCDC的DCLK是根据当前屏幕的分辨率决定的，所以不同产品间会有很大差异。所以RK平台上LCDC的DCLK一般是独占一个PLL的。由于要独占一个PLL，所以这个PLL的频率会根据屏的要求变化。所以一般此PLL要求是可以自动计算PLL参数的。而且一些其他对时钟有要求的时钟尽量不要挂在此PLL下面。如下表中：
+LCDC 的 DCLK 是根据当前屏幕的分辨率决定的，所以不同产品间会有很大差异。所以 RK 平台上 LCDC 的 DCLK 一般是独占一个 PLL 的。由于要独占一个 PLL，所以这个 PLL 的频率会根据屏的要求变化。所以一般此 PLL 要求是可以自动计算 PLL 参数的。而且一些其他对时钟有要求的时钟尽量不要挂在此 PLL 下面。如下表中：
 
 表格 ‑1
 
 | **产品名称** | **PLL**       |
 | -------- | ------------- |
-| RK303X   | 独占CPLL        |
-| RK312X   | 独占CPLL        |
-| RK322X   | 独占HDMIPHY PLL |
-| RK3288X  | 独占CPLL        |
-| RK3368   | 独占NPLL        |
+| RK303X   | 独占 CPLL        |
+| RK312X   | 独占 CPLL        |
+| RK322X   | 独占 HDMIPHY PLL |
+| RK3288X  | 独占 CPLL        |
+| RK3368   | 独占 NPLL        |
 
-对于显示的CLOCK的设置，不同的平台差异很大，在此以RK322X和RK3288为例。
+对于显示的 CLOCK 的设置，不同的平台差异很大，在此以 RK322X 和 RK3288 为例。
 
 **RK322X：**
 
-使用HDMIPHY PLL给DCLK LCDC，所以就比较简单，DCLK LCDC需要多少，就按照HDMIPHY输出多少的时钟就可以了，这个是HDMIPHY内部实现PLL的锁相输出。
+使用 HDMIPHY PLL 给 DCLK LCDC，所以就比较简单，DCLK LCDC 需要多少，就按照 HDMIPHY 输出多少的时钟就可以了，这个是 HDMIPHY 内部实现 PLL 的锁相输出。
 
 **RK3288：**
 
-RK3288的就比较麻烦了，虽然也是CPLL独占使用，但是CPLL下面还有其他的时钟，而且3288是支持双显，也就是有DCLK\_LCDC0和DCLK\_LCDC1，一个做主显一个做HDMI显示。主显跟HDMI显示都跟实际屏的分辨率有关系，所以理论上需要两个独立的PLL的，但是3288设计上只有一个PLL给显示用，那么我们就只能要求主显的是可以修改CPLL的频率，满足任意分辨率的屏，而另一个lcdc只能是在当前GPLL和CPLL已有的频率下分频出就近的频率。
+RK3288 的就比较麻烦了，虽然也是 CPLL 独占使用，但是 CPLL 下面还有其他的时钟，而且 3288 是支持双显，也就是有 DCLK\_LCDC0 和 DCLK\_LCDC1，一个做主显一个做 HDMI 显示。主显跟 HDMI 显示都跟实际屏的分辨率有关系，所以理论上需要两个独立的 PLL 的，但是 3288 设计上只有一个 PLL 给显示用，那么我们就只能要求主显的是可以修改 CPLL 的频率，满足任意分辨率的屏，而另一个 lcdc 只能是在当前 GPLL 和 CPLL 已有的频率下分频出就近的频率。
 
 ```c
 drivers/clk/rockchip/clk-ops.c
@@ -583,13 +583,13 @@ drivers/clk/rockchip/clk-ops.c
 
 #### 3.2.2 EMMC、SDIO、SDMMC
 
-这几个时钟有要求必须是偶数分频得到的，而且控制器内部还有默认的二分频。也就是说如果EMMC需要50M，那边CLOCK要给EMMC提供100M的时钟。并且100M是由PLL偶数分频得到的。
+这几个时钟有要求必须是偶数分频得到的，而且控制器内部还有默认的二分频。也就是说如果 EMMC 需要 50M，那边 CLOCK 要给 EMMC 提供 100M 的时钟。并且 100M 是由 PLL 偶数分频得到的。
 
 偶数分频的时钟有一个标志：rockchip,clkops-idx = <CLKOPS_RATE_MUX_EVENDIV>;
 
 如果修改此类时钟的频率需要如下步骤：
 
-1. **确认此时钟的parent。**
+1. **确认此时钟的 parent。**
 
 ```c
 arch/arm/dts/rk3xxx-clocks.dtsi
@@ -604,21 +604,21 @@ arch/arm/dts/rk3xxx-clocks.dtsi
 	/*有CPLL、GPLL、24M三个parent可以选择*/
 ```
 
-2. **确认其parent的频率**
+2. **确认其 parent 的频率**
 
 ```c
 	cat /sys/kernel/debug/clk/clk_summary | grep gpll
 ```
 
-按照上面说的二倍的关系，及偶数分频确认是否可以分出需求的频率。如果不能分出，是否可以将PLL的频率倍频上去（但是一般不建议超过1200M）。
+按照上面说的二倍的关系，及偶数分频确认是否可以分出需求的频率。如果不能分出，是否可以将 PLL 的频率倍频上去（但是一般不建议超过 1200M）。
 
 3. **设置频率**
 
-EMMC的驱动中可以通过clk\_set\_rate接口去修改频率。
+EMMC 的驱动中可以通过 clk\_set\_rate 接口去修改频率。
 
 #### 3.2.3 小数分频
 
-I2S、UART等有小数分频的。对于小数分频设置时有一个要求，就是小数分频的频率跟小数分频的parent有一个20倍的关系，如果不满足20倍关系，输出的CLK会有较大的抖动及频偏。
+I2S、UART 等有小数分频的。对于小数分频设置时有一个要求，就是小数分频的频率跟小数分频的 parent 有一个 20 倍的关系，如果不满足 20 倍关系，输出的 CLK 会有较大的抖动及频偏。
 
 ![3-1-Fractional-divided](Rockchip_Developer_Guide_Linux3.10_Clock/3-1-Fractional-divided.png)
 
@@ -626,4 +626,4 @@ I2S、UART等有小数分频的。对于小数分频设置时有一个要求，�
 
 #### 3.2.4 以太网时钟
 
-对于以太网的时钟，一般要求是精准的，百兆以太网要求50M精准的频率，千兆以太网要求125M精准的频率。一般有以太网需求的，PLL也要是精准的时钟输出。如果说当前的时钟方案由于其他的原因不能出精准的时钟，那么以太网就要使用外部时钟晶振。这个是根据项目需求及实际的产品方案定的。
+对于以太网的时钟，一般要求是精准的，百兆以太网要求 50M 精准的频率，千兆以太网要求 125M 精准的频率。一般有以太网需求的，PLL 也要是精准的时钟输出。如果说当前的时钟方案由于其他的原因不能出精准的时钟，那么以太网就要使用外部时钟晶振。这个是根据项目需求及实际的产品方案定的。
