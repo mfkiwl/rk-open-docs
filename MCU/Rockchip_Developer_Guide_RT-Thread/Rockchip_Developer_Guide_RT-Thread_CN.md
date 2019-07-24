@@ -46,13 +46,9 @@
 
    RT-Thread 是一个开源的 RTOS，主要开发成员来自中国，大家主要利用业余时间进行 RT-Thread 的开发和维护，同时也接受开发者，爱好者，以及专业嵌入式领域公司向 RT-Thread 捐赠代码。目前我司只有 RK2108 支持，后续其他 MCU 芯片可能也会加入。
 
-## 2 Pisces 和 RK2108
+## 2 准备工作
 
-   二者本质上是同一颗芯片，其中 Pisces 是给 OPPO 专用，RK2108 则是我们内部或其他客户使用的，主要区别是后者多了一些特有的驱动，如 SDIO、SFC 等。
-
-## 3 准备工作
-
-### 3.1 下载工程
+### 2.1 下载工程
 
    目前 RT-Thread 的移植实际上被我们分成两个部分，HAL(Hardware abstraction layer)和 BSP(Board Support Package)，前者是各个 IP 基本功能的实现，目标是能无缝兼容不同的 RTOS，后者则实现了 HAL 和 RT-Thread 系统的桥接，包括各种驱动的注册和整个系统的启动引导。现在这两个部分是分成两个仓库，独立维护的。
 
@@ -68,7 +64,7 @@
 
    ==Note: clone 的时候需要把用户名换成自己的，不要修改 HAL 的目标路径，因为 BSP 是通过符号链接来找到 HAL 的。==
 
-### 3.2 编译环境配置
+### 2.2 编译环境配置
 
    目前有两台服务器：172.16.12.243 和 10.10.10.110，都已经搭建好 RT-Thread 的编译环境，所以使用这两个服务器的工程师可以跳过这一节，直接开始开发。
 
@@ -80,7 +76,7 @@ sudo apt-get update
 sudo apt-get install gcc-arm-embedded scons clang-format astyle
 ```
 
-### 3.3 编译
+### 2.3 编译
 
    传统开源软件一般用 Makefile 作为编译脚本，如 Linux，有些会加上 Autoconf、Automake 来实现更灵活方便的配置和编译；而 RT-Thread 用 SCons 来实现编译控制，SCons 是一套由 Python 语言编写的开源构建系统，类似于 GNU Make。它采用不同于通常 Makefile 文件的方式，而使用 SConstruct 和 SConscript 文件来替代。这些文件也是 Python 脚本，能够使用标准的 Python 语法来编写。所以在 SConstruct、SConscript 文件中可以调用 Python 标准库进行各类复杂的处理，而不局限于 Makefile 设定的规则。
 
@@ -102,6 +98,17 @@ ls -l rtthread*
 
    其中 rtthread.bin 是我们下载到机器上的二进制固件，另外两个分别是 ELF 文件和符号表。
 
+   有些芯片是支持 XIP ，即代码可以直接下载到 NOR FLASH 执行，是否支持这种模式需要查询芯片的规格书，控制编译生成XIP格式的固件有两种方式：直接修改rtconfig.py和设置环境变量RTT_BUILD_XIP，具体如下：
+
+```shell
+# method 1: modify rtconfig.py, set XIP = 'Y'
+XIP = 'Y'
+#XIP = 'N'
+
+# method 2: export RTT_BUILD_XIP
+export RTT_BUILD_XIP=Y
+```
+
    SCons 构建系统默认是通过 MD5 来判断文件是否需要重新编译，如果你的文件内容没变，而只是时间戳变了（例如通过 touch 去更新时间戳），是不会重新编译这个文件及其依赖的。还有就是如果只修改无关内容，例如代码注释，则只会编译，而不会链接，因为 obj 文件内容没变。同时我有收到几次反馈，代码内容有变，但是没有重新编译，暂时还没有找到问题规律，所以不好查，在开发过程中如果碰到这种异常情况，建议做一次清理，命令如下：
 
 ```shell
@@ -120,7 +127,7 @@ rm -rf build
 scons -h
 ```
 
-### 3.4 静态库编译
+### 2.4 静态库编译
 
    RT-Thread 支持静态库编译，==模块可以先剥离成一个独立的 Group==，每一个 Group 都是一个独立的编译单元，可以有自己的编译标志和链接标志，也可以很方便的编译成静态库，下面以 FileTest 模块为例，先看看这个模块的编译脚本*/path/to/rtthread/examples/file/SConscript*，具体如下：
 
@@ -182,7 +189,7 @@ group = DefineGroup('wlan-wiced', src, depend = ['RT_USING_FILE_TEST'], CPPPATH 
 
    所以，一些不想开源的模块，可以按上面的方法做成静态库，以动态库的形式对外发布。
 
-### 3.5 模块配置
+### 2.5 模块配置
 
    RT-Thread 沿用了 Linux 的 Kconfig 作为模块配置开关，具体命令如下：
 
@@ -241,7 +248,7 @@ optional arguments:
 
    除了上面用到的 update 外，另外有几个常用：list 可以看到当前我们选中的包列表；upgrade 用来更新到最新的包列表，以及 ENV 脚本（pkgs 在这里实现）；wizard 是用来创建自己的包。
 
-### 3.6 保存配置
+### 2.6 保存配置
 
    目前 RTT 的 menuconfig 有个缺陷：第一次执行 menuconfig 的时候会从网络上下载 Online Package 的配置，后续不手动更新的话，这些配置不会变更，这就导致了不同工程师的配置信息可能略有差异，最终导致 menuconfig 生成的.config 和 rtconfig.h 包含大量无效配置，在提交的时候出现互相覆盖，下面是无效配置的例子：
 
@@ -272,7 +279,7 @@ scons --useconfig=board/xxx/defconfig      ; 根据保存的配置，生成不�
 
    从上面我们可以看到 SOC 的 BSP 主目录下有一个.config 文件，在执行 menuconfig 的时候会从中读取默认配置，保存退出的同时也会更新这个文件，我们目前用这个文件作为最小配置集合。menuconfig 保存退出的时候生成的 rtconfig.h 实际上是根据这个文件生成的，==提交补丁的同时请不要提交.config 和 rtconfig.h，以防止引入有冲突的配置导致编译失败==。
 
-### 3.7 Scons 编译脚本
+### 2.7 Scons 编译脚本
 
    大部分驱动和应用并不需要关心编译脚本，目前的编译脚本会自动搜索驱动、板级配置、应用和测试等目录的所有源文件进行编译，所以即使增加模块，一般也不需要改脚本。只有在目录结构有变更，或者需要修改编译标志的时候会需要改动编译脚本。
 
@@ -292,6 +299,11 @@ if os.getenv('RTT_EXEC_PATH'):
 #BUILD = 'debug'
 BUILD = 'release'            # 默认是release配置，O2优化级别
 
+XIP = 'Y'       # xip启用开关，开启的时候大部分代码都会放在flash里跑，可以节省内存
+#XIP = 'N'
+if os.getenv('RTT_BUILD_XIP'):
+    XIP = os.getenv('RTT_BUILD_XIP').upper()
+
 if PLATFORM == 'gcc':
     # toolchains
     PREFIX = 'arm-none-eabi-'    # 默认toolchain名字
@@ -306,13 +318,20 @@ if PLATFORM == 'gcc':
     OBJCPY = PREFIX + 'objcopy'
 
     DEVICE = ' -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffunction-sections -fdata-sections'      # cpu相关的编译选项
-    CFLAGS = DEVICE + ' -g -Wall -Wno-cpp -Werror=maybe-uninitialized -Werror=implicit-function-declaration -Werror=return-type -Werror=address -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast'    # 全局编译标志
+    CFLAGS = DEVICE + ' -g -Wall -Wno-cpp -Werror=maybe-uninitialized -Werror=implicit-function-declaration -Werror=return-type -Werror=address -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast '    # 全局编译标志
     AFLAGS = ' -c' + DEVICE + ' -x assembler-with-cpp -Wa,-mimplicit-it=thumb -D__ASSEMBLY__ '                              # 全局汇编编译标志
     LFLAGS = DEVICE + ' -lm -lgcc -lc' + ' -nostartfiles -Wl,--gc-sections,-Map=rtthread.map,-cref,-u,Reset_Handler -T gcc_arm.ld'
                                # 全局链接标志
 
     CPATH = ''
     LPATH = ''
+
+    if XIP == 'Y':
+        AFLAGS += ' -D__STARTUP_COPY_MULTIPLE '
+        CFLAGS += ' -D__STARTUP_COPY_MULTIPLE '
+        LFLAGS += ' -T gcc_xip.ld'
+    else:
+        LFLAGS += ' -T gcc_ram.ld'
 
     if BUILD == 'debug':
         CFLAGS += ' -O0 -gdwarf-2'
@@ -378,7 +397,84 @@ CPPDEFINES                                         # 全局宏定义
 ASFLAGS                                            # 全部汇编标志
 ```
 
-## 4 驱动开发
+### 2.8 固件打包和烧写
+
+   前面步骤编译生成的只是 elf 和 bin ，需要打包成固件才能烧写到设备上，下面以 RK2108 为例介绍一下固件打包和烧写，其他芯片可能略有差别，以产品文档为主：
+
+```shell
+cd bsp/rockchip-rk2108
+./mkimage.sh                                              # 打包固件
+upgrade_tool db Image/rk2108_db_loader.bin                # 下载烧写loader
+upgrade_tool wl 0 ./Image/Firmware.img                    # 下载固件
+upgrade_tool rd
+```
+
+   以上是 linux 的下载
+
+   固件打包的配置文件位于 Image/setting.ini ，具体如下：
+
+```shell
+#Flag   1:skip flag,2:reserved flag,4:no partition size flag
+#type can suppot 32 partiton types,0x0:undefined 0x1:Vendor 0x2:IDBlock ,bit3:bit31 are available
+#PartSize and PartOffset unit by sector
+#Gpt_Enable 1:compact gpt,0:normal gpt
+#Backup_Partition_Enable 0:no backup,1:backup
+#Loader_Encrypt 0:no encrypt,1:rc4
+#nano 1:generate idblock in nano format
+[System]    #gpt分区，不允许修改
+FwVersion=1.0
+Gpt_Enable=
+Backup_Partition_Enable=
+Nano=
+Loader_Encrypt=
+Chip=
+Model=
+[UserPart1]   #loader分区，不允许修改
+Name=IDBlock
+Type=0x2
+PartOffset=0x80
+PartSize=0x80
+Flag=
+File=rk2108_loader.bin,Boot2_Fake.bin
+[UserPart2]   #固件分区，允许部分修改
+Name=rtthread
+Type=0x8
+PartOffset=0x100    # 起始位置，单位sector=512
+PartSize=0x200      # 分区大小，单位sector=512，max=0x1000，即最大固件是2MB，如果需要更大，需要同步调整root起始位置，需要保证64KB对齐
+Flag=
+File=rtthread.img
+[UserPart3]   # 根文件系统，允许部分修改
+Name=root
+Type=
+PartOffset=0x1100   # 一般不需要修改，如果一定要改，需要确保64KB对齐，并且同步修改board/xxx/mnt.c的root起始位置
+PartSize=0x6f00     # 分区大小=flash总大小-起始位置
+Flag=1              # root不打包到固件里，独立烧写
+File=root.img
+```
+
+### 2.9 根文件系统制作和烧写
+
+   目前我们默认的根文件系统是 fat 格式的，所以这里以 fat 的根文件系统为例，具体如下：
+
+```shell
+dd if=/dev/zero of=./root.img bs=4096 count=1024
+mkfs.msdos -S 4096 root.img
+mkdir rootfs
+sudo mount -t vfat ./root.img ./rootfs
+cp -r /path/to/your/root/dir/* ./rootfs
+sudo umount ./rootfs
+# 此时root.img就是你要的根文件系统了
+```
+
+   烧写的命令也很简单：
+
+```shell
+upgrade_tool db Image/rk2108_db_loader.bin                # 下载烧写loader
+upgrade_tool wl 0x1100 ./Image/Firmware.img               # 这里的地址要和固件打包的配置文件setting.ini里定义的root分区地址一致
+upgrade_tool rd
+```
+
+## 3 驱动开发
 
    驱动的开发实际上分两个部分：HAL 和 Driver，前者可以参考 HAL 的开发指南，这里主要说明后者开发过程中的注意事项：
 
@@ -523,7 +619,7 @@ static void udelay(unsigned long usec) {
 #include "hal_base.h"
 ```
 
-## 5 测试用例
+## 4 测试用例
 
    提交驱动的同时，最好同步提交测试程序，目前我们的 BSP 测试被分为两个部分：公共和私有，前者是可以多个芯片共用的测试，后者是这个芯片特有的测试，目录分别如下：
 
@@ -630,9 +726,9 @@ finsh >> tc_start("bsp")      ;  遍历所有bsp测试用例
 finsh >> tc_start("bsp_spi")  ;  遍历所有spi测试用例
 ```
 
-## 6 调试
+## 5 调试
 
-### 6.1 内存问题
+### 5.1 内存问题
 
    针对最常见的两种内存问题：内存泄漏和访问越界，RTT 都提供了辅助调试手段，需要打开 RT_USING_MEMTRACE 开关，具体如下：
 
@@ -689,7 +785,7 @@ address: 0x62028de8
 
    ==需要注意的，memcheck 只能检查一小部分的内存越界，即刚好冲了内存块管理结构的前 12 字节才能检查到，所以即使 memcheck 没检查出错误，也不代表没有越界存在。==
 
-### 6.2 死锁问题
+### 5.2 死锁问题
 
    对于死锁问题，RTT 也提供了几个命令，可以列出所有的任务同步和通信的状态，通过这些就可以比较容易定位死锁关系：两个死锁线程的名字，死锁的锁名字，这些信息可以大幅缩小排查范围，具体命令如下：
 
@@ -714,7 +810,7 @@ shrx     000 0
 heap     001 0
 ```
 
-### 6.3 模块调试
+### 5.3 模块调试
 
    RTT 提供了大部分内核模块的调试 log 开关，默认情况下都是关闭的，开发者可以根据需求打开，具体如下：
 
@@ -733,7 +829,7 @@ heap     001 0
 #define RT_DEBUG_MODULE_CONFIG   // 动态模块加载的相关信息
 ```
 
-### 6.4 Fault 调试
+### 5.4 Fault 调试
 
    目前我们默认启用了 CMBacktrace，出现 Fault 后会自动打印堆栈和调用信息，可以用自带的测试命令 cmb_test 来看 dump 的格式，具体如下：
 
@@ -787,7 +883,7 @@ cd /path_to_rtthread_home/bsp/rockchip-pisces
 addr2line -e rtthread.elf -a -f 04010abe 04010a9d 0400c325 0400afad
 ```
 
-### 6.5 Backtrace
+### 5.5 Backtrace
 
    为了方便调试，我们封装了一个简单的 Backtrace，提供打印堆栈和高级 ASSERT 功能如下：
 
