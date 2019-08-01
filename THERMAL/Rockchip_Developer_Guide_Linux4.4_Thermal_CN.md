@@ -44,7 +44,7 @@
 
 Thermal是内核开发者定义的一套支持根据指定governor控制系统温度，以防止芯片过热的框架模型。Thermal framework由governor、core、cooling device、sensor driver组成，软件架构如下：
 
-![](./Rockchip-Developer-Guide-Linux4.4-Thermal/thermal framework.png)
+![](./Rockchip_Developer_Guide_Linux4.4_Thermal/thermal framework.png)
 
 Thermal governor：用于决定cooling device是否需要降频，降到什么程度。目前Linux4.4内核中包含了如下几种governor：
 

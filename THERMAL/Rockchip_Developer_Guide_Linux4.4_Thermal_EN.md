@@ -44,7 +44,7 @@ Field application engineers
 
 Thermal is a framework model defined by kernel developers supporting to control the system temperature according to the specific governor in order to prevent the chipset from overheating. Thermal framework consists of governor, core, cooling device and sensor driver. The software architecture is as below:
 
-![](./Rockchip-Developer-Guide-Linux4.4-Thermal/thermal framework.png)
+![](./Rockchip_Developer_Guide_Linux4.4_Thermal/thermal framework.png)
 
 Thermal governor: used to decide whether the cooling device needs to decrease frequency, and decrease to what extent. Currently Linux4.4 kernel includes several kinds of governor as below:
 
