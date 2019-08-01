@@ -1,6 +1,5 @@
 # **MCU 开发指南**
 
-
 发布版本：1.1
 
 作者邮箱：frank.wang@rock-chips.com
@@ -9,7 +8,8 @@
 
 文件密级：公开资料
 
-------
+---
+
 **前言**
 
 **概述**
@@ -37,24 +37,24 @@
 | 2017-09-20 | V1.0   | 王明成    | 初始版本     |
 | 2017-12-27 | V1.1   | 王明成    | 修订文档格式   |
 
-------
+---
 
 [TOC]
 
-------
+---
+
 ## 1 Rockchip MCU简介
 
 ARM® Cortex®-M处理器系列具有灵活性、易用性、高性能、低功耗等特点。同时，Cortex-M处理器能够帮助开发者以更低的成本提供更多的功能，其在代码重用和提高开发效率方面有显著优势，所以在嵌入式设备领域的应用非常广泛。如下为Cortex-M0和Cortex-M3的基本简介。
 
--   Cortex-M0采用ARMv6-M结构，基于一个高集成度、低功耗的32位处理器内核；它采用冯·诺伊曼结构，基于16位的Thumb指令集，并包含Thumb-2技术。
+- Cortex-M0采用ARMv6-M结构，基于一个高集成度、低功耗的32位处理器内核；它采用冯·诺伊曼结构，基于16位的Thumb指令集，并包含Thumb-2技术。
 
--   Cortex-M3采用ARMv7-M结构，为32位处理器内核。它采用哈佛结构，拥有独立的指令总线和数据总线，可以让取指与数据访问并行不悖。
+- Cortex-M3采用ARMv7-M结构，为32位处理器内核。它采用哈佛结构，拥有独立的指令总线和数据总线，可以让取指与数据访问并行不悖。
 
 基于以上ARM® Cortex®-M优点，目前，Rockchip SoC上集成的MCU说明如下：
 
--   RK3399 集成2个Cortex-M0，其一PMU M0为ATF所用，其二Perilp M0开放给客户使用。
+- RK3399 集成2个Cortex-M0，其一PMU M0为ATF所用，其二Perilp M0开放给客户使用。
 
-------
 ## 2 开发基础
 
 ### 2.1 运行前配置
@@ -90,14 +90,14 @@ Chapter 2.2章节Memory model和RK3399 TRM Chapter 7.4.2章节。通常，我们
 
 注意，RK3399 M0的地址映射需要通过SGRF配置，所以务必在能访问SGRF的模块进行配置（通常放在miniloader或ATF中进行），以[2.1.1章节](#2.1.1 启动地址)中的加载地址为例，具体内存映射配置方式如下：
 
--   启动地址配置
+- 启动地址配置
 
-```
+```c
 sgrf_perilp_m0_con7 = 0xf << (4 + 16) | (0x080000 >> 28) & 0x0f
 sgrf_perilp_m0_con15 = 0xffff << 16 | (0x80000 >> 12) & 0xffff
 ```
 
--   外设地址配置
+- 外设地址配置
 
 Rockchip MCU已默认配置了外设的映射地址(0x40000000-0x5FFFFFFF)，即：
 
@@ -112,7 +112,7 @@ Rockchip MCU 时钟源可选择CPLL或GPLL，可参考RK3399 TRM Chapter 3 CRU�
 bit[15] : 时钟源选择，1’b0: CPLL；1’b1: GPLL
 bit[12:8] : 分频设置，用于配置MCU的运行频率。
 
--   u-boot 参考代码
+- u-boot 参考代码
 
 ```c
 arch/arm/cpu/armv8/rk33xx/clock-rk3399.c
@@ -135,7 +135,7 @@ MCU运行起来的最后一步就是进行复位撤销。其寄存器信息阅RK
 PMUCRU_SOFTRST_CON0(0x0110)
 需要设置PMUCRU_SOFTRST_CON0[5:0] = 4b’0000.
 
--   u-boot 参考代码
+- u-boot 参考代码
 
 ```c
 arch/arm/cpu/armv8/rk33xx/clock-rk3399.c
@@ -155,7 +155,7 @@ MCU开发过程中，常常需要借助于JTAG来跟踪、调试和解决问题�
 
 RK3399 Perilp M0的iomux配置信息详见RK3399 TRM Chapter 7.3章节，包括如下两个寄存器。
 
-```
+```c
 GRF_GPIO4B_IOMUX[9:8] = 2’b10
 GRF_GPIO4B_IOMUX[9:8] = 2’b10
 ```
@@ -200,22 +200,21 @@ Rockchip MCU亦可通过共享内存方式与主控通信，比如在INTMEM (SRA
 
 Rockchip MCU还可以通过UART或其它方式与主控通信。
 
------
 ## 3 Demo程序
 
 ### 3.1 代码获取
 
 Git仓库路径：
 
--   ssh://git@10.10.10.29/rk/mcu或https://github.com/frawang/rk-mcu.git
+- ssh://git@10.10.10.29/rk/mcu或<https://github.com/frawang/rk-mcu.git>
 
--   29代码可参考rk3399-pmu-m0 branch；github可参考rk3399-box-m0 branch。
+- 29代码可参考rk3399-pmu-m0 branch；github可参考rk3399-box-m0 branch。
 
 ### 3.2 代码简介
 
 #### 3.2.1 目录结构
 
-```
+```c
 rk-mcu>ls -R
 .:
 build  include  Makefile  src
@@ -239,9 +238,9 @@ mcu.h  remotectl_pwm.h  rk3399.h
 main.c  main.c.bk  remotectl_pwm.c  startup.c
 ```
 
--   build：用于存放编译生成的obj文件和bin文件。
--   include：代码头文件。
--   src：代码C文件。
+- build：用于存放编译生成的obj文件和bin文件。
+- include：代码头文件。
+- src：代码C文件。
 
     startup.c文件为M0入口程序，主要包括M0中断向量表和中断执行函数。
     main.c文件为M0程序的main函数。
@@ -251,7 +250,7 @@ main.c  main.c.bk  remotectl_pwm.c  startup.c
 交叉编译工具链使用gcc-arm-none-eabi- v4.8版本或以上。
 编译方法如下：
 
-```
+```c
 rk-mcu>make help
 usage: make PLAT=<RK3399M0> <all|clean|distclean>
 
@@ -314,30 +313,28 @@ M0_INT_ARB_GET_FLAG() // 获取中断bit
 
 RK3399 Perilp M0支持的外部中断请参阅RK3399 TRM 2.4 System Interrupt Connection for Cortex-M0 章节。
 
------
 ## 4 MCU调试
 
 ### 4.1 JTAG调试
 
--   GRF中设置JTAG相关iomux、tck、tms，请阅[2.2.1章节](#2.2.1 JTAG使能配置)。
+- GRF中设置JTAG相关iomux、tck、tms，请阅[2.2.1章节](#2.2.1 JTAG使能配置)。
 
--   开发板JTAG拨码开关或tck/tms开关拨至MCU处；
+- 开发板JTAG拨码开关或tck/tms开关拨至MCU处；
 
--   DS-5或ICE连接m3/m0进行调试。
+- DS-5或ICE连接m3/m0进行调试。
 
 ### 4.2 串口打印
 
--   M0可直接访问UART寄存器进行打印调试。
+- M0可直接访问UART寄存器进行打印调试。
 
--   如果MCU使用跟主控相同的UART，建议正常运行时关闭M0打印，防止UART访问异常导致系统异常。
+- 如果MCU使用跟主控相同的UART，建议正常运行时关闭M0打印，防止UART访问异常导致系统异常。
 
 ### 4.3 读写寄存器
 
--   可将系统停留到u-boot或Kernel命令行，通过io读取MCU状态寄存器查看MCU状态。
+- 可将系统停留到u-boot或Kernel命令行，通过io读取MCU状态寄存器查看MCU状态。
 
--   也可将MCU关键点的运行状态写入空闲GRF寄存器，然后在u-boot或kernel命令行读取其值判断MCU的当前运行状态。
+- 也可将MCU关键点的运行状态写入空闲GRF寄存器，然后在u-boot或kernel命令行读取其值判断MCU的当前运行状态。
 
------
 ## 参考文档
 
 [Cortex-M0 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0497a/index.html)  
