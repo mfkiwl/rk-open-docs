@@ -37,6 +37,7 @@
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
 | 2019-06-24 | V1.0     | 廖华平   | 初始版本     |
+| 2019-08-02 | V1.1     | 谢科迪   | 增加Floating License 服务器安装说明 |
 
 ------
 
@@ -60,7 +61,149 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 ## 2 HIFI3 软件环境搭建
 
-### 2.1 Xploere 工具安装
+### 2.1 Floating License Server 搭建
+
+- 将相关文件放置到服务器
+
+```txt
+/usr/local/flexlm
+├── licenses
+│   ├── license.dat
+│   └── license.data
+├── lmgrd
+├── lmutil
+├── logs
+│   └── lmgrd.log
+├── softwareserver_2018-12-13.lic # license文件
+├── xtensad
+└── xtensa_lic_test.linux
+```
+
+- 安装依赖文件
+
+依赖lsb-core, CentOS/RedHat发行版默认自带，Ubuntu 18.04 安装方法如下：
+
+```console
+sudo apt install lsb-core
+```
+
+其他发行版或Ubuntu <= 16.04 的安装包名、方法不同，自行Google.
+
+- license 文件修改
+
+license 文件格式如下，根据服务器 MAC 生成，将 host 改为服务器的主机名，MAC 改为服务器的网卡 MAC 地址，格式为“AABBCCDDEEFF”，将端口改为需要开放的端口号，如 27000 。
+
+```txt
+SERVER <host> <mac> <port>
+VENDOR xtensad <path_to_xtensad>
+USE_SERVER
+
+PACKAGE
+...
+```
+
+- 配置 flexlm 服务
+
+在 /etc/init.d/ 目录下，新增 flexlm 文件，内容如下：
+
+```sh
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          flexlm
+# Required-Start:    $local_fs $syslog
+# Required-Stop:     $local_fs $syslog
+# Should-Start:      autofs $network $named 
+# Should-Stop:       autofs $network $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: lmgrd init script
+# Description:       Cadence Flexlm license manager daemon
+### END INIT INFO
+
+# Author: Cody Xie <cody.xie@rock-chips.com>
+
+. /lib/lsb/init-functions
+
+PATH=/usr/local/flexlm:/bin:/usr/bin:/sbin:/usr/sbin
+NAME=flexlm
+DESC="The Cadence flexlm license daemon lmgrd"
+DAEMON=/usr/local/flexlm/lmgrd
+LIC=/usr/local/flexlm/softwareserver_2018-12-13.lic
+LOG=/usr/local/flexlm/logs/lmgrd.log
+LMGRD_OPTS="-c $LIC -l $LOG"
+PIDFILE=/run/$NAME.pid
+
+[ -x "$DAEMON" ] || exit 0
+
+lmgrd_start () {
+    log_daemon_msg "Starting $DESC" "$NAME"
+    start-stop-daemon --start --quiet --oknodo --pidfile "$PIDFILE" \
+        --exec "$DAEMON" -- $LMGRD_OPTS
+    log_end_msg $?
+}
+
+lmgrd_stop () {
+    log_daemon_msg "Stopping $DESC" "$NAME"
+    start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile "$PIDFILE" \
+        --exec $DAEMON
+    log_end_msg $?
+}
+
+case "$1" in
+    start)
+        lmgrd_start
+        ;;
+    stop)
+        lmgrd_stop
+        ;;
+    status)
+    	status_of_proc -p $PIDFILE $DAEMON $NAME
+	;;
+    restart|force-reload)
+        lmgrd_stop
+        lmgrd_start
+        ;;
+    force-start)
+        lmgrd_start
+        ;;
+    force-restart)
+        lmgrd_stop
+        lmgrd_start
+        ;;
+    force-reload)
+	lmgrd_stop
+	lmgrd_start
+	;;
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload}"
+        exit 2
+        ;;
+esac
+```
+
+安装 flexlm 服务并开机自动启动
+
+```console
+sudo cd /etc/init.d
+sudo chmod +x flexlm
+sudo update-rc.d flexlm defaults
+sudo update-rc.d flexlm enable
+```
+
+- 确认 license 服务器工作正常
+
+打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入 “27000@host”，其中 host 为 服务器主机名或IP地址，完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。
+
+![Xplorer_License_Keys](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_Keys.png)
+
+![Xplorer_License_Config](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_Config.png)
+
+![Xplorer_License_Config](Rockchip_Developer_Guide_RT-Thread_DSP/Success_Install_Key_1.png)
+
+
+
+### 2.2 Xplorer 工具安装
 
 Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cadence 官网，LICENSE 需要联系 Cadence 获取。
 
@@ -80,7 +223,7 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 
 ![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RT-Thread_DSP/HiFi3Dev181304_Detail.png)
 
-### 2.2 DSP 代码下载及编译
+### 2.3 DSP 代码下载及编译
 
 Git 仓库路径：
 
@@ -92,14 +235,14 @@ Git 仓库路径：
 
 在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
-### 2.3 DSP 固件生成
+### 2.4 DSP 固件生成
 
 工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 cmd 控制台，找到工程根目录，运行固件生成脚本“generate_dsp_fw.bat 项目名“，如果是 PISCES 项目，项目名对应的就是 PISCES，脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，运行 HifiFirmwareGenerator.exe 进行固件打包，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
 
 - ssh://git@10.10.10.29:29418/rk/dsp/DspFirmwareGenerator
 - <https://github.com/LiaoHuaping/DspFirmwareGenerator>
 
-### 2.4 固件打包配置文件
+### 2.5 固件打包配置文件
 
 在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
 
@@ -112,7 +255,7 @@ Git 仓库路径：
 - SourceCodeMemEnd: DSP 端代码内存空间的结束地址。
 - DestinationCodeMemStart：MCU 端对应的代码内存空间的地址，因为可能存在内存空间映射情况不同的情况。比如同一块物理内存地址 TCM，DSP 的访问的地址是 0x30000000，MCU 访问的地址是 0x20400000，它们分别对应 SourceCodeMemStart 和 DetinationCodeMemStart。如果地址映射相同，那么填入对应即可。
 
-### 2.5 Map 配置信息修改
+### 2.6 Map 配置信息修改
 
 Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在"T:(active build target)->Modify"，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“<工具安装目录>\XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
 
