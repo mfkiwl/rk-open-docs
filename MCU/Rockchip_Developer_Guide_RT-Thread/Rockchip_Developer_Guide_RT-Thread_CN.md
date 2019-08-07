@@ -98,7 +98,7 @@ ls -l rtthread*
 
    其中 rtthread.bin 是我们下载到机器上的二进制固件，另外两个分别是 ELF 文件和符号表。
 
-   有些芯片是支持 XIP ，即代码可以直接下载到 NOR FLASH 执行，是否支持这种模式需要查询芯片的规格书，控制编译生成XIP格式的固件有两种方式：直接修改rtconfig.py和设置环境变量RTT_BUILD_XIP，具体如下：
+   有些芯片是支持 XIP ，即代码可以直接下载到 NOR FLASH 执行，是否支持这种模式需要查询芯片的规格书，控制编译生成 XIP 格式的固件有两种方式：直接修改 rtconfig.py 和设置环境变量 RTT_BUILD_XIP，具体如下：
 
 ```shell
 # method 1: modify rtconfig.py, set XIP = 'Y'
