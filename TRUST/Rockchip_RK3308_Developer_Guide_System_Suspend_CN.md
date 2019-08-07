@@ -1,4 +1,4 @@
-# RK3308系统待机配置指南
+# RK3308 系统待机配置指南
 
 发布版本：1.0
 
@@ -14,7 +14,7 @@
 
 **概述**
 
-​	本文档用于指导用户如何根据产品需求，配置RK3308系统待机模式。
+​	本文档用于指导用户如何根据产品需求，配置 RK3308 系统待机模式。
 
 **读者对象**
 
@@ -44,9 +44,9 @@
 
 ## 1. 系统待机
 
-凡是带有trust的SoC平台，系统待机（system suspend）的工作都在trust中完成。因为各个平台的trust对于系统待机实现各不相同，所以**不同平台之间的待机配置选项/方法没有任何关联性和参考性，本文档仅适用于RK3308平台**。
+凡是带有 trust 的 SoC 平台，系统待机（system suspend）的工作都在 trust 中完成。因为各个平台的 trust 对于系统待机实现各不相同，所以**不同平台之间的待机配置选项/方法没有任何关联性和参考性，本文档仅适用于 RK3308 平台**。
 
-系统待机流程一般会有如下操作：关闭power domain、模块IP、时钟、PLL、ddr进入自刷新、系统总线切到低速时钟（24M或32K）、vdd_arm断电、配置唤醒源等。为了满足不同产品对待机模式的需求，目前都是通过DTS节点把相关配置在开机阶段传递给trust。
+系统待机流程一般会有如下操作：关闭 power domain、模块 IP、时钟、PLL、ddr 进入自刷新、系统总线切到低速时钟（24M 或 32K）、vdd_arm 断电、配置唤醒源等。为了满足不同产品对待机模式的需求，目前都是通过 DTS 节点把相关配置在开机阶段传递给 trust。
 
 ### 1.1 驱动文件
 
@@ -56,7 +56,7 @@
 ./include/dt-bindings/suspend/rockchip-rk3308.h
 ```
 
-### 1.2 DTS节点
+### 1.2 DTS 节点
 
 ```c
 rockchip_suspend: rockchip-suspend {
@@ -90,7 +90,7 @@ rockchip_suspend: rockchip-suspend {
 };
 ```
 
-## 2. DTS配置
+## 2. DTS 配置
 
 目前已支持的配置选项都定义在：
 
@@ -131,10 +131,10 @@ rockchip,sleep-mode-config = <...>;
 #define RKPM_PWM_VOLTAGE_DEFAULT    BIT(10)
 ```
 
-目前RK3308支持的待机模式可分为2类：
+目前 RK3308 支持的待机模式可分为 2 类：
 
-- VAD类产品：待机时需要支持VAD唤醒源，不会关闭VAD/ACODEC/PDM等相关模块IP和时钟，需保持24M晶振和相关PLL正常工作。目前待机时会trust先检测VAD相关模式是否在kernel阶段已经关闭，如果没有关闭则默认是VAD类产品，待机时切到支持VAD唤醒的低功耗模式。
-- 非VAD类产品：待机时没有需要维持工作的模块IP，所有的模块和时钟几乎都可以关闭，是一种最低功耗的模式。这种模式下，系统时钟可以切到32K或者24M。
+- VAD 类产品：待机时需要支持 VAD 唤醒源，不会关闭 VAD/ACODEC/PDM 等相关模块 IP 和时钟，需保持 24M 晶振和相关 PLL 正常工作。目前待机时会 trust 先检测 VAD 相关模式是否在 kernel 阶段已经关闭，如果没有关闭则默认是 VAD 类产品，待机时切到支持 VAD 唤醒的低功耗模式。
+- 非 VAD 类产品：待机时没有需要维持工作的模块 IP，所有的模块和时钟几乎都可以关闭，是一种最低功耗的模式。这种模式下，系统时钟可以切到 32K 或者 24M。
 
 ### 2.2 电源配置
 
@@ -153,7 +153,7 @@ rockchip,pwm-regulator-config = <...>;
 
 电源注意点：
 
-- 根据外部硬件电路设计确定是否使用了pwm-regulator。
+- 根据外部硬件电路设计确定是否使用了 pwm-regulator。
 
 ### 2.3 唤醒配置
 
@@ -189,17 +189,17 @@ rockchip,wakeup-config = <...>;
 
 - RKPM_GPIO0_WAKEUP_EN（首选）：
 
-  GPIO0~3中仅支持GPIO0这组pin脚作为唤醒源，该模式下GPIO0上的pin脚中断信号被直接送往PMU状态机，不经过GIC。在硬件设计上，建议用户把需要的唤醒源尽量都放到GPIO0这组pin脚上。
+  GPIO0~3 中仅支持 GPIO0 这组 pin 脚作为唤醒源，该模式下 GPIO0 上的 pin 脚中断信号被直接送往 PMU 状态机，不经过 GIC。在硬件设计上，建议用户把需要的唤醒源尽量都放到 GPIO0 这组 pin 脚上。
 
 - RKPM_ARM_GIC_WAKEUP_EN（次选）：
 
-  支持所有在kernel阶段用enable_irq_wake()注册到GIC的可唤醒中断，适用的唤醒中断源数量比RKPM_GPIO0_WAKEUP_EN更多。但这种方式相当于把唤醒源的管理权分散交给了kernel各个模块，待机时系统有可能被不期望的中断唤醒。
+  支持所有在 kernel 阶段用 enable_irq_wake()注册到 GIC 的可唤醒中断，适用的唤醒中断源数量比 RKPM_GPIO0_WAKEUP_EN 更多。但这种方式相当于把唤醒源的管理权分散交给了 kernel 各个模块，待机时系统有可能被不期望的中断唤醒。
 
 - RKPM_TIMEOUT_WAKEUP_EN：
 
-  PMU内部的timer唤醒，默认5s超时产生中断，一般仅用于开发阶段测试休眠唤醒使用。
+  PMU 内部的 timer 唤醒，默认 5s 超时产生中断，一般仅用于开发阶段测试休眠唤醒使用。
 
-### 2.4 debug配置
+### 2.4 debug 配置
 
 配置项：
 
@@ -229,13 +229,13 @@ rockchip,sleep-mode-config = <...>;
 #define RKPM_CONFIG_WAKEUP_END      BIT(31)
 ```
 
-debug注意点：
+debug 注意点：
 
-- RKPM_DBG_CLK_UNGATE：如果怀疑待机阶段某些clk被关闭而引起系统/模块唤醒异常，可使能该配置。
-- RKPM_DBG_REG：如果怀疑待机阶段某些寄存器值被trust修改，可使能该配置。
-- RKPM_DBG_FSM_SOUT：使能该配置后，待机时PMU状态机会通过GPIO4_D5一直输出特定波形信号，用于反馈当前PMU状态机内部状态，该功能仅在发生系统待机时PMU状态机本身死机的情况下有用处。
+- RKPM_DBG_CLK_UNGATE：如果怀疑待机阶段某些 clk 被关闭而引起系统/模块唤醒异常，可使能该配置。
+- RKPM_DBG_REG：如果怀疑待机阶段某些寄存器值被 trust 修改，可使能该配置。
+- RKPM_DBG_FSM_SOUT：使能该配置后，待机时 PMU 状态机会通过 GPIO4_D5 一直输出特定波形信号，用于反馈当前 PMU 状态机内部状态，该功能仅在发生系统待机时 PMU 状态机本身死机的情况下有用处。
 
-### 2.5 reboot复位配置
+### 2.5 reboot 复位配置
 
 配置项：
 
@@ -255,19 +255,19 @@ rockchip,apios-suspend = <...>;
 #define GLB1RST_IGNORE_GPIO3       BIT(29)
 ```
 
-reboot复位注意点：
+reboot 复位注意点：
 
-目前RK3308默认使用的是first global sotfware reset，reboot时所有模块IP都会被复位。如果需要保持某些IP不被复位，那么需要配置上面的选项，目前支持：pwm0~3/gpio0~3不复位。
+目前 RK3308 默认使用的是 first global sotfware reset，reboot 时所有模块 IP 都会被复位。如果需要保持某些 IP 不被复位，那么需要配置上面的选项，目前支持：pwm0~3/gpio0~3 不复位。
 
-GPIO不复位的需求示例：
+GPIO 不复位的需求示例：
 
-某些硬件电路设计上会提供“power hold”电源控制引脚，需要在系统上电早期阶段由软件拉高/低保证系统电源工作正常，在reboot过程中“power hold”引脚也不能被复位，否则会出现系统下电的情况。
+某些硬件电路设计上会提供“power hold”电源控制引脚，需要在系统上电早期阶段由软件拉高/低保证系统电源工作正常，在 reboot 过程中“power hold”引脚也不能被复位，否则会出现系统下电的情况。
 
 ## 3. 打印信息
 
-如下简要介绍系统待机和唤醒时的trust打印信息含义。为注释方便，如下对一些打印内容进行分行，不同的待机功耗模式同样也会带来不同的打印，所有打印信息内容以实际显示为主。
+如下简要介绍系统待机和唤醒时的 trust 打印信息含义。为注释方便，如下对一些打印内容进行分行，不同的待机功耗模式同样也会带来不同的打印，所有打印信息内容以实际显示为主。
 
-**RK3308系统待机打印：**
+**RK3308 系统待机打印：**
 
 ```c
 // 具备当唤醒源的pin脚
@@ -289,7 +289,7 @@ PMU: pd-000e wake-000c core-0bfb lo-180d hi-000e if-4001 24Mhz
 5bRc678wfi
 ```
 
-**RK3308系统唤醒打印：**
+**RK3308 系统唤醒打印：**
 
 ```c
 // 唤醒流程步骤打印
