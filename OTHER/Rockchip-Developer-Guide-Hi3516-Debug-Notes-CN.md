@@ -10,7 +10,7 @@
 
 ---
 **前言**
-本文档描述调试和分析Hi3516DV300/CV500的记录，以及使用说明
+本文档描述调试和分析 Hi3516DV300/CV500 的记录，以及使用说明
 
 **概述**
 涉及部分不可描述手段，仅供内部使用，切不可外传
@@ -25,7 +25,7 @@
 
 本文档（本指南）主要适用于以下对象：
 
-需要分析对比Hi3516的工程师
+需要分析对比 Hi3516 的工程师
 
 **修订记录**
 
@@ -38,7 +38,7 @@
 [TOC]
 
 ---
-## Hi3516CV500采购模组信息
+## Hi3516CV500 采购模组信息
 
 * 淘宝链接
 
@@ -53,34 +53,34 @@
   * 公  司：深圳市善谦创新技术有限公司
 
 * 基本资料
-  * 600115002-BV-H1502-BV38双板-3516CV500+307-中性-20190410.bin
+  * 600115002-BV-H1502-BV38 双板-3516CV500+307-中性-20190410.bin
     * 分析得出分区表信息：
 
       ```console
       BoardType=600115002-BV-H1502 arch=arm baudrate=115200 board=hi3516cv500 board_name=hi3516cv500 bootcmd=sf probe 0;sf read 0x82000000 0x50000 0x380000;bootm 0x82000000 bootdelay=1 cpu=armv7 ethact=eth0 ethaddr=d0:22:12:88:88:88 gateway=192.168.1.1 ipaddr=192.168.1.120 netmask=255.255.255.0 serverip=192.168.1.35 soc=hi3516cv500 stderr=serial stdin=serial stdout=serial vendor=hisilicon verify=n chiptype=hi3516CV500 bootargs=mem=128M console=ttyAMA0,115200 root=/dev/mtdblock3 rootfstype=squashfs rw init=/init mtdparts=hi_sfc:256k(u-boot)ro,64k(env),3072k(kernel),3584k(rootfs),512k(config),-(app) sensortype=imx307 mac=D0:22:12:88:88:88 s),512k(config),-(app) sensortype=imx307
       ```
 
-    * uboot分区有效数据实际大小236KB左右（应该包含ddr初始代码和uboot）
-    * linux kernel ：版本Linux-4.9.37，实际大小2.9MB，不知道具体压缩算法，dts是hi3516cv500-demb.dts
+    * uboot 分区有效数据实际大小 236KB 左右（应该包含 ddr 初始代码和 uboot）
+    * linux kernel ：版本 Linux-4.9.37，实际大小 2.9MB，不知道具体压缩算法，dts 是 hi3516cv500-demb.dts
     * config 分区为 512KB，不是 app 的备份。从数据上看，像被写过的 jffs2 文件系统，包含被删除的文件
 
-  * 02 Hi3516CV500+IMX327接口说明.rar
-    * 主板1
+  * 02 Hi3516CV500+IMX327 接口说明.rar
+    * 主板 1
     <img src="./Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/主板1.png">
-    * 主板2
+    * 主板 2
     <img src="./Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/主板2.png">
-    * sensor板
+    * sensor 板
     <img src="./Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/SENSOR.png">
-    * FPC排线定义
+    * FPC 排线定义
     <img src="./Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/FPC排线定义.png">
-    * GPIO接口定义
+    * GPIO 接口定义
     <img src="./Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/Hi3516CV500的GPIO接口定义.png">
-    * TF卡接口定义
+    * TF 卡接口定义
     <img src="./Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/TF卡接口定义.png">
 
-## 替换rootfs以及修改密码
+## 替换 rootfs 以及修改密码
 
-1. 准备rootfs
+1. 准备 rootfs
 
     1. 导出固件
 
@@ -97,7 +97,7 @@
         dd if=600115002-BV-H1502-BV38双板-3516CV500+307-中性-20190410.bin of=app.jffs2 skip=7488 bs=1024
         ```
 
-    1. 修改rootfs
+    1. 修改 rootfs
 
         ```console
         # 先查看根文件系统信息
@@ -138,7 +138,7 @@
         $ mksquashfs squashfs-root rootfs.img -comp xz -all-root -b 64k
         ```
 
-1. 查看jffs2分区内容
+1. 查看 jffs2 分区内容
 
     ```console
     ./dd.sh 600115002-BV-H1502-BV38双板-3516CV500+307-中性-20190410.bin
@@ -159,7 +159,7 @@
     cp -R /mnt/loop/* ./squashfs-root/mnt/$1
     ```
 
-1. 开机uboot，ctrl-c进入uboot命令行
+1. 开机 uboot，ctrl-c 进入 uboot 命令行
 
    ```console
    Uncompress Ok!  
@@ -182,7 +182,7 @@
    hi3516cv500 #
    ```
 
-1. printenv先查看env，备份
+1. printenv 先查看 env，备份
 
    ```console
    hi3516cv500 # printenv
@@ -216,7 +216,7 @@
    Environment size: 811/65532 bytes
    ```
 
-1. minicom下，uboot命令行输入loady 0x82000000 115200
+1. minicom 下，uboot 命令行输入 loady 0x82000000 115200
 
    ```console
    hi3516cv500 # loady 0x82000000 115200
@@ -224,13 +224,13 @@
    CC
    ```
 
-1. minicom用ctrl-s，选择ymodem，把rootfs.img下载下去
+1. minicom 用 ctrl-s，选择 ymodem，把 rootfs.img 下载下去
 
    ![ymodem](Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/ymodem.png)
 
    ![ymodem_sel_file](Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/ymodem_sel_file.png)
 
-1. UBoot命令行下，修改flash上的rootfs分区
+1. UBoot 命令行下，修改 flash 上的 rootfs 分区
 
    ```console
    sf probe
@@ -238,17 +238,17 @@
    sf write 0x82000000 0x350000 0x33F000(刚才下载打印的大小）
    ```
 
-1. 用printenv查看的命令行, sf read.... bootm ....引导进入系统
+1. 用 printenv 查看的命令行, sf read…… bootm ……引导进入系统
 
    ```console
    sf probe 0;sf read 0x82000000 0x50000 0x380000;bootm 0x82000000
    ```
 
-1. 用户名，密码是root, 123456
+1. 用户名，密码是 root, 123456
 
    ![login](Rockchip-Developer-Guide-Hi3516-Debug-Notes-CN/login.png)
 
-## 使用telnet登陆并替换busybox
+## 使用 telnet 登陆并替换 busybox
 
 **>>> 首先，上面的方法本来就可以修改根文件系统，不需要这个方法，仅供无第一种方法时参考**
 
@@ -266,7 +266,7 @@ name : root
 password : 123456
 ```
 
-在IPC上，用如下方法接收文件
+在 IPC 上，用如下方法接收文件
 
 ```console
 $ cd /tmp
@@ -277,7 +277,7 @@ $ ./aa.sh > busybox2
 $ chmod +x busybox2
 ```
 
-在ubuntu上安装tftpd，并将需要传输的文件放到ftp目录，如/srv/ftp/temp.bin
+在 ubuntu 上安装 tftpd，并将需要传输的文件放到 ftp 目录，如/srv/ftp/temp.bin
 
 ```console
 $ sudo apt install -y atftpd
@@ -287,15 +287,15 @@ $ sudo systemctl enable atftpd
 $ sudo systemctl restart atftpd
 ```
 
-在IPC上，使用busybox2 tftp传输文件
+在 IPC 上，使用 busybox2 tftp 传输文件
 
 ```console
 ./busybox2 tftp -l temp.bin -r temp.bin -g 172.16.21.xxx (tftpd服务器地址)
 ```
 
-## NFS搭建及挂载
+## NFS 搭建及挂载
 
-* 安装NFS（Ubuntu 18.04）
+* 安装 NFS（Ubuntu 18.04）
 
   ```console
   $ sudo apt update
@@ -336,9 +336,9 @@ $ sudo systemctl restart atftpd
 
 ## 其他调试说明
 
-* proc以及debugfs
+* proc 以及 debugfs
 
-海思的内核KO加载成功后，都会在/proc/umap目录下生成所有模块的调试入口，直接cat后可以查看。例如：
+海思的内核 KO 加载成功后，都会在/proc/umap 目录下生成所有模块的调试入口，直接 cat 后可以查看。例如：
 
 ```console
 cat /proc/umap/nnie
@@ -346,7 +346,7 @@ cat /proc/umap/nnie
 
 * debugfs
 
-海思默认没有挂载debugfs，root登陆后，可以通过以下方式挂载，查看如clk等。
+海思默认没有挂载 debugfs，root 登陆后，可以通过以下方式挂载，查看如 clk 等。
 
 ```console
 mount -t debugfs debugfs /sys/kernel/debug

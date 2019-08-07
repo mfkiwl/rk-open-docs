@@ -1,4 +1,4 @@
-# Rockchip Typora编辑指南
+# Rockchip Typora 编辑指南
 
 发布版本：2.4
 
@@ -10,10 +10,10 @@
 
 ---
 **前言**
-本文档是基于typora软件，markdown语言的说明和文本模板。可以更改版本信息 ，Karen.huang等相关关键字，将本文档当做其他文档模板使用。
+本文档是基于 typora 软件，markdown 语言的说明和文本模板。可以更改版本信息 ，Karen.huang 等相关关键字，将本文档当做其他文档模板使用。
 
 **概述**
-typora是一个编辑器，编辑器 ，编辑器而已。并没有很多功能，只是有编辑功能而已。（我说这句话的意思是，目测不能在typora里面直接push到gerrit上，谢谢）
+typora 是一个编辑器，编辑器 ，编辑器而已。并没有很多功能，只是有编辑功能而已。（我说这句话的意思是，目测不能在 typora 里面直接 push 到 gerrit 上，谢谢）
 
 **产品版本**
 
@@ -37,8 +37,8 @@ typora是一个编辑器，编辑器 ，编辑器而已。并没有很多功能�
 | --------- | ------ | ------ | ---------------- |
 | 2017.9.11 | V1.0   | 黄莹，何灿阳 | 初始版本，<br>先奠定基本资料 </br>    |
 | 2018.2.1  | V1.1   | 黄莹     | 添加一些常见问题的答案，完善规范 |
-| 2019.1.3  | V2.0   | 黄莹     | 添markdownlint检查及相关信息 |
-| 2019.1.16  | V2.1   | 黄莹     | 删除段首tab的要求 |
+| 2019.1.3  | V2.0   | 黄莹     | 添 markdownlint 检查及相关信息 |
+| 2019.1.16  | V2.1   | 黄莹     | 删除段首 tab 的要求 |
 | 2019.3.4  | V2.2  | 黄莹     | 修改段落删除线 |
 | 2019.4.20  | V2.3  | 黄莹     | 增加表格内段落如何换行的说明 |
 | 2019.5.23 | V2.3  | 黄莹     | 细节完善校正 |
@@ -51,7 +51,7 @@ typora是一个编辑器，编辑器 ，编辑器而已。并没有很多功能�
 
 ## 以下是必读文档规范
 
-### 关于文件名规范^V2.0新增^
+### 关于文件名规范^V2.0 新增^
 
 :smiley:文件名以==“Rockchip-Developer-Guide-Linux4.4-CPUFreq-CN”==为标准，具体要求如下，头尾是必须有的。**每个单词首字母大写，模块缩写按协议标准，一般情况模块缩写全大写，结尾全大写**
 
@@ -59,18 +59,18 @@ typora是一个编辑器，编辑器 ，编辑器而已。并没有很多功能�
 
 1：没什么特殊原因就写上，目的是统一写，看起来工整
 
-2：Guide可以看情况修改，按文档性质可以用Tutorial，Introduction之类修改。
+2：Guide 可以看情况修改，按文档性质可以用 Tutorial，Introduction 之类修改。
 
 3：有版本限制就写，没有就不写
 
-4：CN为中文内容/EN为英文内容。
+4：CN 为中文内容/EN 为英文内容。
 
 文件夹名称/文件名全英文。
 
 英文文档：Rockchip-Developer-Guide-Linux3.10-Clock-EN
 
-- 必填打头Rockchip
-- 不分内核版本可以不填linux版本
+- 必填打头 Rockchip
+- 不分内核版本可以不填 linux 版本
 
 问题排查：Trouble Shooting
 
@@ -82,11 +82,11 @@ typora是一个编辑器，编辑器 ，编辑器而已。并没有很多功能�
 
 注意事项：Notes
 
-### 关于Markdownlint^V2.0新增^
+### 关于 Markdownlint^V2.0 新增^
 
-现启用“markdownlint"检查文档规范。Markdownlint安装见
+现启用“markdownlint"检查文档规范。Markdownlint 安装见
 
-<https://github.com/markdownlint/markdownlint>网站里有相关安装说明，<u>同时需要安装rake和bundler</u>。使用的工具是 markdownlint ，调用参数为：
+<https://github.com/markdownlint/markdownlint>网站里有相关安装说明，<u>同时需要安装 rake 和 bundler</u>。使用的工具是 markdownlint ，调用参数为：
 
 ```shell
 mdl -s .mdl.rb FILE.md
@@ -118,19 +118,19 @@ head2：请输入：##空格 head 2
 下划线：<u>文本</u>
 ```
 
-**note**：两个大章节之间horizonal line用`---回车`来分割输出horizonal line ：----回车  或者***********回车 （有且仅有三个字符，否则会报错）但是，**无论是标题还是段落，不要出现无谓的空格，不然会被纠错**。
+**note**：两个大章节之间 horizonal line 用`---回车`来分割输出 horizonal line ：----回车  或者***********回车 （有且仅有三个字符，否则会报错）但是，**无论是标题还是段落，不要出现无谓的空格，不然会被纠错**。
 
 ---
 
-### 关于段落^V2.2更改^
+### 关于段落^V2.2 更改^
 
-~~**段落首输入一个tab，表示汉字中的段首空2格。（这个要求，由于新typora识别不到，并且会引起mdl校验错误，所以删掉）**~~如果你一直写下去不打回车的话，typora会自动帮你断句，排列到第二行的，为了行文美观，段落未结束之前尽量不要回车。
+~~**段落首输入一个 tab，表示汉字中的段首空 2 格。（这个要求，由于新 typora 识别不到，并且会引起 mdl 校验错误，所以删掉）**~~如果你一直写下去不打回车的话，typora 会自动帮你断句，排列到第二行的，为了行文美观，段落未结束之前尽量不要回车。
 
 ```markdown
 <br>如果想在表格内部换行，可以使用这个html的转换符号 </br>
 ```
 
-第二行再真正输入回车，但是为了行文的美观，还是建议大家一段不要写的特别长，（虽然我没看过写特别长的情况）。:smile:段落的结尾不要有空格，否则会触发MD009号错误。
+第二行再真正输入回车，但是为了行文的美观，还是建议大家一段不要写的特别长，（虽然我没看过写特别长的情况）。:smile:段落的结尾不要有空格，否则会触发 MD009 号错误。
 
 ---
 
@@ -147,7 +147,7 @@ void main(void)
 }
 ```
 
-请输入：```回车
+请输入：`回车
 
 ```markdown
 #这里会自动配色，假如你在右下角选择你输入的语言种类
@@ -197,14 +197,14 @@ this is a example code `hello world`
 
 ==比如==：\internal-docs\DDR\内部资料
 
-### 关于文档写完^V2.0新增^
+### 关于文档写完^V2.0 新增^
 
-1. 提交到gerrit审核
+1. 提交到 gerrit 审核
 2. 修改完善
-3. 作者自行提交到alfresco,并添加类别标签。
-4. markdownlint中，如果出现与本文不一致的结果，通常以markdownlint为准，并联系作者修改本文。
+3. 作者自行提交到 alfresco,并添加类别标签。
+4. markdownlint 中，如果出现与本文不一致的结果，通常以 markdownlint 为准，并联系作者修改本文。
 
-## 关于TYPORA使用方法（选读）
+## 关于 TYPORA 使用方法（选读）
 
 ### ==快捷键说明 ！==
 
@@ -232,7 +232,7 @@ _也是斜体_ctrl+i
 
 <u>下划线</u>
 
-<u>当然下划线可以用快捷键 ctrl+L选中整行然后ctrl+u</u>来实现
+<u>当然下划线可以用快捷键 ctrl+L 选中整行然后 ctrl+u</u>来实现
 
 ~~删除线~~
 
@@ -240,7 +240,7 @@ _也是斜体_ctrl+i
 
 :anger:
 
-这是一段对话测试代码，用于熟悉markdown
+这是一段对话测试代码，用于熟悉 markdown
 
 > 好的
 > 没问题
@@ -255,7 +255,7 @@ _也是斜体_ctrl+i
 2. 第二行，回车。
 3. 按两次回车跳出自动编码
 
-- [ ] 打一个  -空格和一个[ ] 再打空格得到task
+- [ ] 打一个  -空格和一个[ ] 再打空格得到 task
 - [x] task1
 - [x] task 2
 
@@ -273,7 +273,7 @@ _也是斜体_ctrl+i
   文档中如果图片比较多，可以使用导入，如果代码和文本比较多，可以直接复制到typora，复制代码一般不会产生自动转义字符，（如果更新的版本中也添加了复制代码也转义，那当我没说，你们就随意选择，谢谢- -）
 ```
 
-### insert Image插入图片
+### insert Image 插入图片
 
 ```markdown
 edit ->insert-> img
@@ -283,7 +283,7 @@ edit ->insert-> img
 比如：audio-mixer-path
 ```
 
-（单击图片可见地址）通过Edit菜单插入本地图片
+（单击图片可见地址）通过 Edit 菜单插入本地图片
 
 拖放的效果![He](Rockchip-Developer-Guide-Typora-CN/He.jpg)
 
@@ -307,7 +307,7 @@ edit ->insert-> img
 
 <img src="Rockchip-Developer-Guide-Typora-CN/He.jpg" style="zoom:20%"/>
 
-还可以全部通过\<img\>的style方式来实现
+还可以全部通过\<img\>的 style 方式来实现
 
 指定宽度
 
@@ -326,13 +326,13 @@ edit ->insert-> img
 
 ### ==自动编写标题序号==
 
-目前标准官方autonumbering的方法如下：
+目前标准官方 autonumbering 的方法如下：
 
 - [Auto Numbering for Headings](http://support.typora.io/Auto-Numbering/)
 
-- 使用之前先说下**重点，**auto-numbering的代码目测还需要改一下，因为首标题也会显示1 这不是我们所想要的，另外，现有的文档规则里面对自动编写序号不作要求，所以可以不使用。:v:
+- 使用之前先说下**重点，**auto-numbering 的代码目测还需要改一下，因为首标题也会显示 1 这不是我们所想要的，另外，现有的文档规则里面对自动编写序号不作要求，所以可以不使用。:v:
 
-  简单的说就是复制css代码到主题文件里，保存，比如我选的是, 将主题重新选中一下GitHub主题，就能使用了。
+  简单的说就是复制 css 代码到主题文件里，保存，比如我选的是, 将主题重新选中一下 GitHub 主题，就能使用了。
 
   <img src="Rockchip-Developer-Guide-Typora-CN/Github-css.png" style="zoom:50%"/>
 
@@ -422,19 +422,19 @@ edit ->insert-> img
   }
   ```
 
-### Links超链接
+### Links 超链接
 
 This is [an example](www.baidu.com "百度") inline link
 
 [This link](www.sina.com) has no title attribute
 
-## internal Links内部链接
+## internal Links 内部链接
 
-[goto list](#一级目录) 按住ctrl + goto list
+[goto list](#一级目录) 按住 ctrl + goto list
 
 [^说明]: 不管是跳到几级的目录，都是只要一个#就可以了
 
-### Reference Links参考链接
+### Reference Links 参考链接
 
 This is [an example 1][1] reference-style link.
 
@@ -450,7 +450,7 @@ and that is [an example 2][2] reference-style link.
 [2][] will goto 163.com
 ```
 
-### URLs网站地址
+### URLs 网站地址
 
 ```markdown
 <test.com> not works
@@ -472,7 +472,7 @@ and auto save to the folder
 
 ### Table 表格
 
-paste excel table 粘贴excel的表格：直接粘贴excel表格，格式会有一些错的,原有的excel的格式也会失效，所以不要用。
+paste excel table 粘贴 excel 的表格：直接粘贴 excel 表格，格式会有一些错的,原有的 excel 的格式也会失效，所以不要用。
 
 ```markdown
 | 写表格呢 | that is |
@@ -482,9 +482,9 @@ paste excel table 粘贴excel的表格：直接粘贴excel表格，格式会有�
 
 ---
 
-### 仅内部人员可看的注释功能^V2.0新增^
+### 仅内部人员可看的注释功能^V2.0 新增^
 
-对md文档可以进行注释语句，转成PDF的情况下是看不见注释语句的。
+对 md 文档可以进行注释语句，转成 PDF 的情况下是看不见注释语句的。
 
 比如注释<!--在PDF中不显示这句话-->
 
@@ -492,13 +492,13 @@ paste excel table 粘贴excel的表格：直接粘贴excel表格，格式会有�
 
 ### 上下标
 
-下标要先在File -》 Preference -》 Markdown里选中subscript
+下标要先在 File -》 Preference -》 Markdown 里选中 subscript
 
-再用~包裹住下标内容就可以了 双击可读出source code
+再用~包裹住下标内容就可以了 双击可读出 source code
 
 V~下标~, log~2~
 
-上标要先在File -》 Preference -》 Markdown里选中superscript
+上标要先在 File -》 Preference -》 Markdown 里选中 superscript
 
 再用^包裹住上标内容就可以了
 
@@ -508,7 +508,7 @@ V^上标^, 2^2^=4
 
 ### 高亮
 
-高亮要先在File -》 Preference -》 Markdown里选中highlight
+高亮要先在 File -》 Preference -》 Markdown 里选中 highlight
 
 再用==包裹住要高亮的内容就可以了
 
@@ -516,7 +516,7 @@ V^上标^, 2^2^=4
 
 ---
 
-### 时序图Sequence
+### 时序图 Sequence
 
 语法
 
@@ -542,7 +542,7 @@ trust-->kernel:finish!
 
 ---
 
-### 流程图flowchart
+### 流程图 flowchart
 
 [^注意]: 每个定义后都要有空格，然后才能写内容
 
@@ -603,7 +603,7 @@ graph TD;
 	C-->|Three|F[Car]
 ```
 
-mermaid的时序图，相对sequence，如果只用->，则不会产生箭头，得用->>才能产生箭头mermaid的时序图，有更直观的颜色，这个比sequence好。
+mermaid 的时序图，相对 sequence，如果只用->，则不会产生箭头，得用->>才能产生箭头 mermaid 的时序图，有更直观的颜色，这个比 sequence 好。
 
 ```mermaid
 sequenceDiagram
