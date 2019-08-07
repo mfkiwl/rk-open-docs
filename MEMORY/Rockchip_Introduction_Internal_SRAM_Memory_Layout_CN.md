@@ -1,4 +1,4 @@
-# Internal SRAM使用情况
+# Internal SRAM 使用情况
 
 发布版本：1.0
 
@@ -14,7 +14,7 @@
 
 **概述**
 
-本文档对Rockchip各平台上的Internal SRAM（不包含PMU SRAM）使用情况做一个简要说明。
+本文档对 Rockchip 各平台上的 Internal SRAM（不包含 PMU SRAM）使用情况做一个简要说明。
 
 **读者对象**
 
@@ -36,7 +36,7 @@
 | ---------- | ------ | ------ | -------- |
 | 2018-03-22 | V1.0   | 陈健洪    | 初始版本     |
 
-## 各平台Internal SRAM使用情况：
+## 各平台 Internal SRAM 使用情况
 
 | 芯片      | 全部大小（byte） | 起始地址       | 结束地址（已占用）  | 已使用大小（byte）    |
 | ------- | ---------- | ---------- | ---------- | -------------- |
@@ -51,14 +51,14 @@
 | RK3326  | 16 * 1024  | 0xff0e0000 | 0xff0e4000 | 16 * 1024 (已满) |
 | PX30    | 16 * 1024  | 0xff0e0000 | 0xff0e4000 | 16 * 1024 (已满) |
 
-- 目前各平台的Internal SRAM主要用途：休眠唤醒代码、DDR变频代码。
+- 目前各平台的 Internal SRAM 主要用途：休眠唤醒代码、DDR 变频代码。
 
-- 上述32位平台数据，基于OPTEE仓库提交点：
+- 上述 32 位平台数据，基于 OPTEE 仓库提交点：
 
 分支：remotes/origin/develop-rk3228
 提交：25074da plat-rockchip: add configure uart port function
 
-- 上述64位平台数据（不包含RK3326/PX30），基于ATF仓库提交点：
+- 上述 64 位平台数据（不包含 RK3326/PX30），基于 ATF 仓库提交点：
 
 分支：remotes/origin/develop-rk3399
 提交：6aa5f84 plat: px30: suspend: support SLP_PLLS_DEEP option
