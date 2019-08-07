@@ -1,4 +1,4 @@
-# **Thermal开发指南**
+# **Thermal 开发指南**
 
 发布版本：1.1
 
@@ -14,7 +14,7 @@
 
 **概述**
 
-本文档主要介绍RK平台Thermal配置的调试方法。
+本文档主要介绍 RK 平台 Thermal 配置的调试方法。
 
 **产品版本**
 
@@ -49,23 +49,23 @@
 
 ## 概述
 
-本文档主要描述Thermal的相关的重要概念、配置方法和调试接口。
+本文档主要描述 Thermal 的相关的重要概念、配置方法和调试接口。
 
 ## 重要概念
 
-在Linux内核中，定义一套温控（thermal）框架，在3.10内核arm64版本，我们使用thermal框架的sysfs接口读取当前的温度。温控策略是自定义的方式：
+在 Linux 内核中，定义一套温控（thermal）框架，在 3.10 内核 arm64 版本，我们使用 thermal 框架的 sysfs 接口读取当前的温度。温控策略是自定义的方式：
 
-- performance策略：当前温度超过了目标温度，CPU会设定在固定的频率，具体的数值配置在芯片级dtsi文件。
+- performance 策略：当前温度超过了目标温度，CPU 会设定在固定的频率，具体的数值配置在芯片级 dtsi 文件。
 
-- normal策略：当前温度超过目标温度不同的温度值时，CPU会降低相应的频率，具体的数值配置在芯片级dtsi文件。
+- normal 策略：当前温度超过目标温度不同的温度值时，CPU 会降低相应的频率，具体的数值配置在芯片级 dtsi 文件。
 
 ---
 
 ## 配置方法
 
-### TSADC配置
+### TSADC 配置
 
-#### Menuconfig配置
+#### Menuconfig 配置
 
 ```
 make ARCH=arm64 menuconfig
@@ -77,9 +77,9 @@ make ARCH=arm64 menuconfig
 
 ![thermal-Menuconfig03](././Rockchip_Developer_Guide_Linux3.10_Thermal/thermal-Menuconfig03.jpg)
 
-#### dts配置
+#### dts 配置
 
-如下是芯片级的dtsi的配置：
+如下是芯片级的 dtsi 的配置：
 
 ```c
 tsadc: tsadc@ff250000 {
@@ -107,13 +107,13 @@ tsadc: tsadc@ff250000 {
 	rockchip,hw-tshut-mode = <1>;
 ```
 
-配置温度超过关机温度的复位方式，配置0是通过复位SoC的CRU模块，配置1是通过配置上文提到的pinctrl = "tsadc_int"来实现，tsadc_int引脚一般会接入pmic的reset引脚（如下图），至于这个引脚是高有效还是低有效，需要配置hw-tshut-polarity来实现。
+配置温度超过关机温度的复位方式，配置 0 是通过复位 SoC 的 CRU 模块，配置 1 是通过配置上文提到的 pinctrl = "tsadc_int"来实现，tsadc_int 引脚一般会接入 pmic 的 reset 引脚（如下图），至于这个引脚是高有效还是低有效，需要配置 hw-tshut-polarity 来实现。
 
 ![image005](././Rockchip_Developer_Guide_Linux3.10_Thermal/image005.jpg)
 
-注：有的芯片，这个引脚没有引出来，具体请参考TRM手册。
+注：有的芯片，这个引脚没有引出来，具体请参考 TRM 手册。
 
-TSADC模块，默认在dtsi中是disabled状态，要启用的时候，需要在板级的dts中配置，如：
+TSADC 模块，默认在 dtsi 中是 disabled 状态，要启用的时候，需要在板级的 dts 中配置，如：
 
 ```c
 &tsadc {
@@ -125,15 +125,15 @@ TSADC模块，默认在dtsi中是disabled状态，要启用的时候，需要在
 
 ### 策略配置
 
-#### 默认使用Normal策略，以CPU为例说明
+#### 默认使用 Normal 策略，以 CPU 为例说明
 
 ```c
 echo 1 > /sys/module/rockchip_pm/parameters/policy
 ```
 
-在init.rc脚本里面配置policy参数为1
+在 init.rc 脚本里面配置 policy 参数为 1
 
-温控参数配置在dvfs里面，具体配置参数如下：
+温控参数配置在 dvfs 里面，具体配置参数如下：
 
 ```c
 temp-limit-enable = <1>; /* 使能温控 */
@@ -165,13 +165,13 @@ normal-temp-limit = <
 >;
 ```
 
-#### 使用Performance策略，以CPU为例说明
+#### 使用 Performance 策略，以 CPU 为例说明
 
 ```c
 echo 0 > /sys/module/rockchip_pm/parameters/policy
 ```
 
-配置policy为0，或者不用配置这个参数，policy默认是0。
+配置 policy 为 0，或者不用配置这个参数，policy 默认是 0。
 
 ```c
 /*
@@ -184,9 +184,9 @@ performance-temp-limit = <
 >;
 ```
 
-#### Thermal\_zone配置
+#### Thermal\_zone 配置
 
-以RK3328的配置为例
+以 RK3328 的配置为例
 
 ```c
 thermal-zones {
@@ -208,11 +208,11 @@ thermal-zones {
 
 ### 关温控
 
-主控默认开启温控，即dvfs的dts里面配置temp-limit-enable = <1>。如果要关闭温控，dvfs的dts里面配置temp-limit-enable = <0>。
+主控默认开启温控，即 dvfs 的 dts 里面配置 temp-limit-enable = <1>。如果要关闭温控，dvfs 的 dts 里面配置 temp-limit-enable = <0>。
 
 ### 获取当前温度
 
-以RK3328为例，获取CPU温度，在串口中输入如下命令：
+以 RK3328 为例，获取 CPU 温度，在串口中输入如下命令：
 
 ```c
 cat /sys/class/thermal/thermal_zone0/temp
