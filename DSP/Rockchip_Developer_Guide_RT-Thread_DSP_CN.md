@@ -37,7 +37,7 @@
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
 | 2019-06-24 | V1.0     | 廖华平   | 初始版本     |
-| 2019-08-02 | V1.1     | 谢科迪   | 增加Floating License 服务器安装说明 |
+| 2019-08-02 | V1.1     | 谢科迪   | 增加 Floating License 服务器安装说明 |
 
 ------
 
@@ -81,13 +81,13 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 - 安装依赖文件
 
-依赖lsb-core, CentOS/RedHat发行版默认自带，Ubuntu 18.04 安装方法如下：
+依赖 lsb-core, CentOS/RedHat 发行版默认自带，Ubuntu 18.04 安装方法如下：
 
 ```console
 sudo apt install lsb-core
 ```
 
-其他发行版或Ubuntu <= 16.04 的安装包名、方法不同，自行Google.
+其他发行版或 Ubuntu <= 16.04 的安装包名、方法不同，自行 Google.
 
 - license 文件修改
 
@@ -193,7 +193,7 @@ sudo update-rc.d flexlm enable
 
 - 确认 license 服务器工作正常
 
-打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入 “27000@host”，其中 host 为 服务器主机名或IP地址，完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。
+打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入 “27000@host”，其中 host 为 服务器主机名或 IP 地址，完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。
 
 ![Xplorer_License_Keys](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_Keys.png)
 
