@@ -1,4 +1,4 @@
-# **DDR开发指南**
+# **DDR 开发指南**
 
 发布版本：1.2
 
@@ -34,16 +34,16 @@
 | **日期**   | **版本** | **作者** | **修改说明**                       |
 | ---------- | -------- | -------- | ---------------------------------- |
 | 2017.12.21 | V1.0     | 何灿阳   |                                    |
-| 2018.3.30  | V1.1     | 何灿阳   | 增加对kernel 4.4 DDR频率相关的描述 |
-| 2019.1.29  | V1.2     | 何智欢   | 增加调整loader的de-skew说明        |
+| 2018.3.30  | V1.1     | 何灿阳   | 增加对 kernel 4.4 DDR 频率相关的描述 |
+| 2019.1.29  | V1.2     | 何智欢   | 增加调整 loader 的 de-skew 说明        |
 
 ---------
 [TOC]
 ------
 
-## 如何看懂DDR打印信息
+## 如何看懂 DDR 打印信息
 
-DDR打印信息包括loader中的打印和kernel中的打印，loader中打印的解析如下：
+DDR 打印信息包括 loader 中的打印和 kernel 中的打印，loader 中打印的解析如下：
 
 ```c
 DDR Version 1.05 20170712// DDR 初始化代码的版本信息，用于核对版本。从这行开始，已经进入DDR初始化代码
@@ -58,7 +58,7 @@ Memory OK // 是Channel b的自测结果。有报错，说明焊接有问题；�
 OUT // 这行打印之后，就退出了DDR初始化代码
 ```
 
-如下是kernel 3.0和kernel 3.10中打印的DDR信息
+如下是 kernel 3.0 和 kernel 3.10 中打印的 DDR 信息
 
 ```c
 [    0.528564] DDR DEBUG: version 1.00 20150126 //版本信息
@@ -72,7 +72,7 @@ OUT // 这行打印之后，就退出了DDR初始化代码
 //DDR DEBUG的字样打印结束，就是kernel中DDR初始化完成了
 ```
 
-kernel 3.10还会有如下打印，是DDR变频模块的输出信息
+kernel 3.10 还会有如下打印，是 DDR 变频模块的输出信息
 
 ```c
 [    1.473637] ddrfreq: verion 1.2 20140526	//DDR变频模块版本
@@ -85,16 +85,16 @@ kernel 3.10还会有如下打印，是DDR变频模块的输出信息
 //如果在这段打印过程中系统卡死了，很可能是DDR变频有问题
 ```
 
-## 如何将我们给的DDR bin 合成成完整可用的loader
+## 如何将我们给的 DDR bin 合成成完整可用的 loader
 
-1. 将DDR bin放在U-Boot工程的rk\rkbin\bin\对应目录下
-2. 删除原有的DDR bin文件
-3. 将新的DDR bin改名为删除掉的名字
-4. 编译U-Boot（详见《Rockchip-Developer-Guide-UBoot-nextdev.pdf》），就会生成对应的loader文件
+1. 将 DDR bin 放在 U-Boot 工程的 rk\rkbin\bin\对应目录下
+2. 删除原有的 DDR bin 文件
+3. 将新的 DDR bin 改名为删除掉的名字
+4. 编译 U-Boot（详见《Rockchip-Developer-Guide-UBoot-nextdev.pdf》），就会生成对应的 loader 文件
 
-==5. 根据DDR bin打印的串口信息，确认loader已经更新正确==
+==5. 根据 DDR bin 打印的串口信息，确认 loader 已经更新正确==
 
-各平台DDR bin对应目录整理如下：
+各平台 DDR bin 对应目录整理如下：
 
 | 芯片平台                 | 路径                                                        | Note |
 | ------------------------ | ----------------------------------------------------------- | ---- |
@@ -112,15 +112,15 @@ kernel 3.10还会有如下打印，是DDR变频模块的输出信息
 | RK3328                   | rk\rkbin\bin\rk33\rk3328\_ddr\_333MHz\_vX.XX.bin            |      |
 | RK3399                   | rk\rkbin\bin\rk33\rk3399\_ddr\_XXXMHz\_vX.XX.bin            | 2    |
 
-Note 1：具体用哪个频率由rk\rkbin\RKBOOT\RK3036_ECHOMINIALL.ini或RK3036MINIALL.ini文件中指定。其中RK3036_ECHOMINIALL.ini是ECHO产品使用的，其他产品都使用RK3036MINIALL.ini。至于哪个是ECHO产品，请联系产品部的人。
+Note 1：具体用哪个频率由 rk\rkbin\RKBOOT\RK3036_ECHOMINIALL.ini 或 RK3036MINIALL.ini 文件中指定。其中 RK3036_ECHOMINIALL.ini 是 ECHO 产品使用的，其他产品都使用 RK3036MINIALL.ini。至于哪个是 ECHO 产品，请联系产品部的人。
 
-Note 2：具体用哪个频率由rk\rkbin\RKBOOT\RK3399MINIALL.ini文件中指定
+Note 2：具体用哪个频率由 rk\rkbin\RKBOOT\RK3399MINIALL.ini 文件中指定
 
-Note 3：不在这个表格中的芯片，就是不支持从U-Boot中生成loader。
+Note 3：不在这个表格中的芯片，就是不支持从 U-Boot 中生成 loader。
 
-## 如何修改U-Boot中的DDR频率
+## 如何修改 U-Boot 中的 DDR 频率
 
-目前这个功能只有RK322x支持，修改方法是，修改kernel-3.10代码中的arch/arm/boot/dts/rk322x.dtsi
+目前这个功能只有 RK322x 支持，修改方法是，修改 kernel-3.10 代码中的 arch/arm/boot/dts/rk322x.dtsi
 
 ```c
 dram: dram {
@@ -131,19 +131,19 @@ dram: dram {
 };
 ```
 
-修改其中的，dram_freq就可以了，这里单位是Hz，频率可以随便选择。
+修改其中的，dram_freq 就可以了，这里单位是 Hz，频率可以随便选择。
 
-U-Boot会去解析这个dts，然后读取这个频率，变频到对应频率。
+U-Boot 会去解析这个 dts，然后读取这个频率，变频到对应频率。
 
-## 如何enable/disable kernel中的DDR变频功能
+## 如何 enable/disable kernel 中的 DDR 变频功能
 
-先确认该芯片支持kernel中的DDR变频功能，如果支持，可以通过如下方式enable或disable变频功能。
+先确认该芯片支持 kernel 中的 DDR 变频功能，如果支持，可以通过如下方式 enable 或 disable 变频功能。
 
-- 对于kernel 4.4，需要找到dts中最终的dmc节点，将status改成disabled就可以disable kernel的DDR变频功能。相反的，改成okay，就会enable DDR变频功能。
+- 对于 kernel 4.4，需要找到 dts 中最终的 dmc 节点，将 status 改成 disabled 就可以 disable kernel 的 DDR 变频功能。相反的，改成 okay，就会 enable DDR 变频功能。
 
-  Note: 由于早期代码，dmc节点有依赖于dfi节点，如果dfi节点为disabled，也会导致dmc节点无效。所以最好dfi节点的status保持跟dmc一致。
+  Note: 由于早期代码，dmc 节点有依赖于 dfi 节点，如果 dfi 节点为 disabled，也会导致 dmc 节点无效。所以最好 dfi 节点的 status 保持跟 dmc 一致。
 
-  举例如下，RK3399 EVB板的最终dmc节点在arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi中，
+  举例如下，RK3399 EVB 板的最终 dmc 节点在 arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi 中，
 
 ``` c
 &dfi {
@@ -167,7 +167,7 @@ U-Boot会去解析这个dts，然后读取这个频率，变频到对应频率�
 };
 ```
 
-- 对于kernel 3.10，需要找到dts中最终的clk_ddr_dvfs_table节点，将status改成disabled就可以disable kernel的DDR变频功能。相反的，改成okay，就会enable DDR变频功能。举例如下，RK3288 SDK板的最终clk_ddr_dvfs_table在arch/arm/boot/dts/rk3288-tb_8846.dts中，
+- 对于 kernel 3.10，需要找到 dts 中最终的 clk_ddr_dvfs_table 节点，将 status 改成 disabled 就可以 disable kernel 的 DDR 变频功能。相反的，改成 okay，就会 enable DDR 变频功能。举例如下，RK3288 SDK 板的最终 clk_ddr_dvfs_table 在 arch/arm/boot/dts/rk3288-tb_8846.dts 中，
 
 ``` c
 &clk_ddr_dvfs_table {
@@ -183,7 +183,7 @@ U-Boot会去解析这个dts，然后读取这个频率，变频到对应频率�
 };
 ```
 
-- 对于kernel 3.0，需要在板级的borad-**.c文件中修改dvfs_ddr_table， 让这个表，只留一个DDR_FREQ_NORMAL频率，就不会运行DDR变频了。举例如下，RK3066 SDK板的板级文件在arch/arm/mach-rk30/board-rk30-sdk.c中
+- 对于 kernel 3.0，需要在板级的 borad-**.c 文件中修改 dvfs_ddr_table， 让这个表，只留一个 DDR_FREQ_NORMAL 频率，就不会运行 DDR 变频了。举例如下，RK3066 SDK 板的板级文件在 arch/arm/mach-rk30/board-rk30-sdk.c 中
 
 ``` c
 /* 这样的表格enable DDR变频 */
@@ -205,21 +205,21 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 };
 ```
 
-## 如何让kernel一次DDR变频都不运行
+## 如何让 kernel 一次 DDR 变频都不运行
 
-上一个标题所讲的修改只是开启或关闭变频功能，即DDR不会在平时系统运行时变频，但有一次例外是不受上面修改控制的，即开机的第一次ddr_init时，会运行一次变频，用于更新DDR timing，让性能更高。如果想让kernel中一次DDR变频都不运行，包括ddr_init。除了上一个标题讲的“如何enable/disable kernel中的DDR变频功能”要做以外。还需要修改代码：
+上一个标题所讲的修改只是开启或关闭变频功能，即 DDR 不会在平时系统运行时变频，但有一次例外是不受上面修改控制的，即开机的第一次 ddr_init 时，会运行一次变频，用于更新 DDR timing，让性能更高。如果想让 kernel 中一次 DDR 变频都不运行，包括 ddr_init。除了上一个标题讲的“如何 enable/disable kernel 中的 DDR 变频功能”要做以外。还需要修改代码：
 
-- 对于kernel 4.4
+- 对于 kernel 4.4
 
-  只要按上一个标题讲的“如何enable/disable kernel中的DDR变频功能”做，就一次DDR变频都不会运行了
+  只要按上一个标题讲的“如何 enable/disable kernel 中的 DDR 变频功能”做，就一次 DDR 变频都不会运行了
 
-- 对于kernel 3.10
+- 对于 kernel 3.10
 
   芯片：RK322x
 
-  代码位置：kernel中无代码
+  代码位置：kernel 中无代码
 
-  修改：把dram节点改成disabled，就可以了
+  修改：把 dram 节点改成 disabled，就可以了
 
   ```c
   dram: dram {
@@ -232,21 +232,21 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 
   芯片：RK3188
 
-  代码位置：arch/arm/mach-rockchip/ddr_rk30.c的ddr_init()函数
+  代码位置：arch/arm/mach-rockchip/ddr_rk30.c 的 ddr_init()函数
 
   芯片：RK3288
 
-  代码位置：arch/arm/mach-rockchip/ddr_rk32.c的ddr_init()函数
+  代码位置：arch/arm/mach-rockchip/ddr_rk32.c 的 ddr_init()函数
 
-  芯片：RK3126B、RK3126C不带trust.img固件
+  芯片：RK3126B、RK3126C 不带 trust.img 固件
 
-  代码位置：arch/arm/mach-rockchip/ddr_rk3126b.c的ddr_init()函数
+  代码位置：arch/arm/mach-rockchip/ddr_rk3126b.c 的 ddr_init()函数
 
   芯片：RK3126、RK3128
 
-  代码位置：./arch/arm/mach-rockchip/ddr_rk3126.c的ddr_init()函数
+  代码位置：./arch/arm/mach-rockchip/ddr_rk3126.c 的 ddr_init()函数
 
-  修改：注释掉ddr_init()函数中，如下几行代码
+  修改：注释掉 ddr_init()函数中，如下几行代码
 
   ```c
   if(freq != 0)
@@ -259,9 +259,9 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 
   芯片：RV1108
 
-  代码位置：arch/arm/mach-rockchip/ddr_rv1108.c的ddr_init()函数
+  代码位置：arch/arm/mach-rockchip/ddr_rv1108.c 的 ddr_init()函数
 
-  修改：注释掉ddr_init()函数中，如下几行代码
+  修改：注释掉 ddr_init()函数中，如下几行代码
 
   ```c
   if (freq == 0)
@@ -272,15 +272,15 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 
   ​
 
-  除了上述几个特殊的芯片，剩下芯片，以及3126B/3126c带trust.img固件的，只需要按上一个标题讲的“如何enable/disable kernel中的DDR变频功能”做，就一次DDR变频都不会运行了。
+  除了上述几个特殊的芯片，剩下芯片，以及 3126B/3126c 带 trust.img 固件的，只需要按上一个标题讲的“如何 enable/disable kernel 中的 DDR 变频功能”做，就一次 DDR 变频都不会运行了。
 
-- 对于kernel 3.0
+- 对于 kernel 3.0
 
   | 芯片             | 代码位置                                    |
   | -------------- | --------------------------------------- |
-  | RK3066         | arch/arm/mach-rk30/ddr.c的ddr_init()函数   |
-  | RK3026、RK3028A | arch/arm/mach-rk2928/ddr.c的ddr_init()函数 |
-  修改：注释掉ddr_init()函数中，如下几行代码
+  | RK3066         | arch/arm/mach-rk30/ddr.c 的 ddr_init()函数   |
+  | RK3026、RK3028A | arch/arm/mach-rk2928/ddr.c 的 ddr_init()函数 |
+  修改：注释掉 ddr_init()函数中，如下几行代码
 
   ```c
   if(freq != 0)
@@ -289,18 +289,18 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
   	value=ddr_change_freq(clk_get_rate(clk_get(NULL, "ddr"))/1000000);
   ```
 
-## 如何查看DDR的容量
+## 如何查看 DDR 的容量
 
-如果只是简单的想看DDR有多大容量，可以用如下命令，查看MemTotal容量，这个容量会比DDR实际容量小一点点，自己往上取到标准容量就可以了。
+如果只是简单的想看 DDR 有多大容量，可以用如下命令，查看 MemTotal 容量，这个容量会比 DDR 实际容量小一点点，自己往上取到标准容量就可以了。
 
 ```c
 root@rk3399:/ # cat /proc/meminfo
 MemTotal:        3969804 kB
 ```
 
-如果需要看DDR容量的详细信息，按如下步骤：
+如果需要看 DDR 容量的详细信息，按如下步骤：
 
-在2个地方有DDR容量的打印，loader中的DDR初始化阶段和kernel中DDR的初始化阶段。kernel 4.4中全部没有DDR容量信息的打印，kernel 3.10不全有。loader中的DDR详细信息，所有芯片都有。loader中的DDR容量打印，必须用串口才能抓到，如果使用adb，是抓不到这部分信息的。
+在 2 个地方有 DDR 容量的打印，loader 中的 DDR 初始化阶段和 kernel 中 DDR 的初始化阶段。kernel 4.4 中全部没有 DDR 容量信息的打印，kernel 3.10 不全有。loader 中的 DDR 详细信息，所有芯片都有。loader 中的 DDR 容量打印，必须用串口才能抓到，如果使用 adb，是抓不到这部分信息的。
 
 具体情况如下：
 
@@ -310,8 +310,8 @@ MemTotal:        3969804 kB
 | RK3028A                      | 有详细信息  | 有详细信息           |
 | RK3036                       | 有详细信息  | 没有              |
 | RK3066                       | 有详细信息  | 有详细信息           |
-| RK3126B、RK3126C带trust.img固件  | 有详细信息  | 没有              |
-| RK3126B、RK3126C不带trust.img固件 | 有详细信息  | 有详细信息           |
+| RK3126B、RK3126C 带 trust.img 固件  | 有详细信息  | 没有              |
+| RK3126B、RK3126C 不带 trust.img 固件 | 有详细信息  | 有详细信息           |
 | RK3126                       | 有详细信息  | 有详细信息           |
 | RK3128                       | 有详细信息  | 有详细信息           |
 | RK3188                       | 有详细信息  | 有详细信息           |
@@ -323,11 +323,11 @@ MemTotal:        3969804 kB
 | RK3399                       | 有详细信息  | 没有              |
 | RV1108                       | 有详细信息  | 没有              |
 
-DDR的详细信息，会包含有：DDR类型、DDR频率、通道信息(Channel a\Channel b)、总线数据位宽(bus width/BW)、行数量(row)、列数量(col/column)、bank数量(bank/BK)、片选数量(CS)、单颗颗粒的数据位宽(Die Bus width/Die BW)、单个通道的DDR总容量(size/Total Capability)。
+DDR 的详细信息，会包含有：DDR 类型、DDR 频率、通道信息(Channel a\Channel b)、总线数据位宽(bus width/BW)、行数量(row)、列数量(col/column)、bank 数量(bank/BK)、片选数量(CS)、单颗颗粒的数据位宽(Die Bus width/Die BW)、单个通道的 DDR 总容量(size/Total Capability)。
 
-如果需要整机的总容量，芯片只有一个DDR通道的，整机容量就等于size/Total Capability。芯片有2个通道的，整机容量等于2个通道的size/Total Capability相加。
+如果需要整机的总容量，芯片只有一个 DDR 通道的，整机容量就等于 size/Total Capability。芯片有 2 个通道的，整机容量等于 2 个通道的 size/Total Capability 相加。
 
-如下是loader中打印的DDR容量详细信息
+如下是 loader 中打印的 DDR 容量详细信息
 
 ```c
 DDR Version 1.05 20170712
@@ -341,7 +341,7 @@ Memory OK
 OUT
 ```
 
-如下是kernel中打印的DDR容量详细信息
+如下是 kernel 中打印的 DDR 容量详细信息
 
 ```c
 [    0.528564] DDR DEBUG: version 1.00 20150126
@@ -354,25 +354,25 @@ OUT
 [    0.528762] DDR DEBUG: addr=0xd40000
 ```
 
-## 如何修改DDR频率
+## 如何修改 DDR 频率
 
-kernel中改变DDR频率的，有2种情况，一种是场景变频，一种是负载变频。对于这2种变频策略，kernel 4.4和kernel 3.10的实现有些不同。
+kernel 中改变 DDR 频率的，有 2 种情况，一种是场景变频，一种是负载变频。对于这 2 种变频策略，kernel 4.4 和 kernel 3.10 的实现有些不同。
 
 kernel 4.4：
 
-场景变频指：进入指定场景，如果此时负载变频功能关闭，则DDR频率就变到对应SYS_STATUS_XXX定义的频率。如果此时负载变频功能开启的，则SYS_STATUS_XXX定义的频率作为最低频率，再根据实际DDR利用率状况结合upthreshold、downdifferential定义来提频或降频，但是最低频率始终不会低于SYS_STATUS_XXX定义的频率。
+场景变频指：进入指定场景，如果此时负载变频功能关闭，则 DDR 频率就变到对应 SYS_STATUS_XXX 定义的频率。如果此时负载变频功能开启的，则 SYS_STATUS_XXX 定义的频率作为最低频率，再根据实际 DDR 利用率状况结合 upthreshold、downdifferential 定义来提频或降频，但是最低频率始终不会低于 SYS_STATUS_XXX 定义的频率。
 
-负载变频指：所有场景都会根据负载来变频。但是会保证频率不低于SYS_STATUS_XXX场景定义的频率。唯一特例的是SYS_STATUS_NORMAL，如果负载变频功能开启，SYS_STATUS_NORMAL完全被负载变频替换，连最低频率都是由auto-min-freq决定，而不是SYS_STATUS_NORMAL决定。
+负载变频指：所有场景都会根据负载来变频。但是会保证频率不低于 SYS_STATUS_XXX 场景定义的频率。唯一特例的是 SYS_STATUS_NORMAL，如果负载变频功能开启，SYS_STATUS_NORMAL 完全被负载变频替换，连最低频率都是由 auto-min-freq 决定，而不是 SYS_STATUS_NORMAL 决定。
 
 kernel 3.10：
 
-场景变频指：进入指定场景，DDR频率就变到对应SYS_STATUS_XXX定义的频率，不在变化，即使此时负载变频功能是打开的，也不会根据负载来变频。
+场景变频指：进入指定场景，DDR 频率就变到对应 SYS_STATUS_XXX 定义的频率，不在变化，即使此时负载变频功能是打开的，也不会根据负载来变频。
 
-负载变频指：仅仅是用来替换SYS_STATUS_NORMAL场景的。即只有在SYS_STATUS_NORMAL场景下，DDR频率才会根据负载情况来变频。
+负载变频指：仅仅是用来替换 SYS_STATUS_NORMAL 场景的。即只有在 SYS_STATUS_NORMAL 场景下，DDR 频率才会根据负载情况来变频。
 
-要修改DDR频率，还是得按分支来分开处理
+要修改 DDR 频率，还是得按分支来分开处理
 
-- 对于kernel 4.4，需要找到dts中dmc节点。举例如下，RK3399 EVB板的dmc节点在arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi和arch/arm64/boot/dts/rockchip/rk3399.dtsi，
+- 对于 kernel 4.4，需要找到 dts 中 dmc 节点。举例如下，RK3399 EVB 板的 dmc 节点在 arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi 和 arch/arm64/boot/dts/rockchip/rk3399.dtsi，
 
 ``` c
 &dmc {
@@ -447,7 +447,7 @@ dmc: dmc {
 };
 ```
 
-==注意==：kernel 4.4的频率电压跟kernel 3.10不同，只有频率等于dmc_opp_table所列opp-hz的，才会按该频率运行；小于opp-hz，频率会向上取；如果频率超过这个表格的最大opp-hz，只会按最大opp-hz工作。所以，如果不想频率被向上取，或被限制到最大opp-hz，dmc_opp_table也是需要关注的。
+==注意==：kernel 4.4 的频率电压跟 kernel 3.10 不同，只有频率等于 dmc_opp_table 所列 opp-hz 的，才会按该频率运行；小于 opp-hz，频率会向上取；如果频率超过这个表格的最大 opp-hz，只会按最大 opp-hz 工作。所以，如果不想频率被向上取，或被限制到最大 opp-hz，dmc_opp_table 也是需要关注的。
 
 ```c
 dmc_opp_table: opp-table3 {
@@ -464,9 +464,9 @@ dmc_opp_table: opp-table3 {
 };
 ```
 
-明白了每个配置的含义后，根据需要修改的场景，来修改对应的频率定义，就可以了。如果auto-freq-en=1，就不好控制频率，这时候降频如果是为了查找定位问题，可以把auto-freq-en设置为0，然后修改各场景定义的频率值来达到目的。
+明白了每个配置的含义后，根据需要修改的场景，来修改对应的频率定义，就可以了。如果 auto-freq-en=1，就不好控制频率，这时候降频如果是为了查找定位问题，可以把 auto-freq-en 设置为 0，然后修改各场景定义的频率值来达到目的。
 
-- 对于kernel 3.10，需要找到dts中的clk_ddr_dvfs_table节点。举例如下，RK3288 SDK板的最终的clk_ddr_dvfs_table在arch/arm/boot/dts/rk3288-tb_8846.dts中，
+- 对于 kernel 3.10，需要找到 dts 中的 clk_ddr_dvfs_table 节点。举例如下，RK3288 SDK 板的最终的 clk_ddr_dvfs_table 在 arch/arm/boot/dts/rk3288-tb_8846.dts 中，
 
 ``` c
 &clk_ddr_dvfs_table {
@@ -526,11 +526,11 @@ dmc_opp_table: opp-table3 {
 };
 ```
 
-明白了每个配置的含义后，根据需要修改的场景，来修改对应的频率定义，就可以了。如果auto-freq=1，就不好控制频率，这时候降频如果是为了查找定位问题，可以把auto-freq设置为0，然后修改各场景定义的频率值来达到目的。
+明白了每个配置的含义后，根据需要修改的场景，来修改对应的频率定义，就可以了。如果 auto-freq=1，就不好控制频率，这时候降频如果是为了查找定位问题，可以把 auto-freq 设置为 0，然后修改各场景定义的频率值来达到目的。
 
-==注意：修改频率，一定要注意对应的电压，是否能正常工作。==如何修改电压，见"如何修改DDR某个频率对应的电压"章节
+==注意：修改频率，一定要注意对应的电压，是否能正常工作。==如何修改电压，见"如何修改 DDR 某个频率对应的电压"章节
 
-- 对于kernel 3.0，需要在板级的borad-**.c文件中修改dvfs_ddr_table。举例如下，RK3066 SDK板的板级文件在arch/arm/mach-rk30/board-rk30-sdk.c中
+- 对于 kernel 3.0，需要在板级的 borad-**.c 文件中修改 dvfs_ddr_table。举例如下，RK3066 SDK 板的板级文件在 arch/arm/mach-rk30/board-rk30-sdk.c 中
 
 ``` c
 static struct cpufreq_frequency_table dvfs_ddr_table[] = {
@@ -544,25 +544,25 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 };
 ```
 
-kernel 3.0只有3个场景，所要修改的DDR频率在.frequency的200 * 1000这里，频率单位是KHz。“ + DDR_FREQ_SUSPEND”这串可以不用管。
+kernel 3.0 只有 3 个场景，所要修改的 DDR 频率在.frequency 的 200 * 1000 这里，频率单位是 KHz。“ + DDR_FREQ_SUSPEND”这串可以不用管。
 
-==注意：修改频率，一定要注意对应的电压，是否能正常工作。==如何修改电压，见"如何修改DDR某个频率对应的电压"章节
+==注意：修改频率，一定要注意对应的电压，是否能正常工作。==如何修改电压，见"如何修改 DDR 某个频率对应的电压"章节
 
-## 如何修改DDR某个频率对应的电压
+## 如何修改 DDR 某个频率对应的电压
 
 如果是为了定位问题，想通过命令来修改电压，可以采用如下方式
 
-kernel 4.4：需要编译kernel时，打开pm_tests选项(make ARCH=arm64 menuconfig ->Device Drivers -> SOC （System On Chip) specific Drivers -> Rockchip pm_test support )
+kernel 4.4：需要编译 kernel 时，打开 pm_tests 选项(make ARCH=arm64 menuconfig ->Device Drivers -> SOC （System On Chip) specific Drivers -> Rockchip pm_test support )
 
-kernel 3.10：需要编译kernel时，打开pm_tests选项(make menuconfig ->System Type -> /sys/pm_tests/ support )。调整DDR电压的命令是：
+kernel 3.10：需要编译 kernel 时，打开 pm_tests 选项(make menuconfig ->System Type -> /sys/pm_tests/ support )。调整 DDR 电压的命令是：
 
 RK3399： `echo set vdd_center  900000 > /sys/pm_tests/clk_volt`
 
 其他： `echo set vdd_logic  1200000 > /sys/pm_tests/clk_volt`
 
-如果没有pm_tests或者命令无法满足要求，就需要改kernel固件，按如下步骤
+如果没有 pm_tests 或者命令无法满足要求，就需要改 kernel 固件，按如下步骤
 
-- 对于kernel 4.4，需要找到dts中dmc_opp_table节点。举例如下，RK3399 EVB板的在arch/arm64/boot/dts/rockchip/rk3399-opp.dtsi、RK3368在arch/arm64/boot/dts/rockchip/rk3368.dtsi，以RK3399为例。
+- 对于 kernel 4.4，需要找到 dts 中 dmc_opp_table 节点。举例如下，RK3399 EVB 板的在 arch/arm64/boot/dts/rockchip/rk3399-opp.dtsi、RK3368 在 arch/arm64/boot/dts/rockchip/rk3368.dtsi，以 RK3399 为例。
 
 ```c
 /* 只有频率等于dmc_opp_table所列opp-hz的，才会按该频率运行；小于opp-hz，频率会向上取；如果频率超过这个表格的最大opp-hz，只会按最大opp-hz工作;这是跟kernel 3.10不同的地方 */
@@ -597,7 +597,7 @@ dmc_opp_table: opp-table3 {
 };
 ```
 
-RK3368为例：
+RK3368 为例：
 
 ```c
 /* 只有频率等于dmc_opp_table所列opp-hz的，才会按该频率运行；小于opp-hz，频率会向上取；如果频率超过这个表格的最大opp-hz，只会按最大opp-hz工作;这是跟kernel 3.10不同的地方 */
@@ -628,9 +628,9 @@ dmc_opp_table: opp_table2 {
 };
 ```
 
-可以修改对应频率对应的电压。因为频率电压表采用的是小于等于指定频率，就使用相应电压。如果新增的频率超出了这张表格的最高频率，使得找不到对应电压，会导致DDR无法切换到该新增频率。这时候，就需要增加一项该频率对应的电压表。
+可以修改对应频率对应的电压。因为频率电压表采用的是小于等于指定频率，就使用相应电压。如果新增的频率超出了这张表格的最高频率，使得找不到对应电压，会导致 DDR 无法切换到该新增频率。这时候，就需要增加一项该频率对应的电压表。
 
-- 对于kernel 3.10，需要找到dts中的clk_ddr_dvfs_table节点。举例如下，RK3288 SDK板的最终的clk_ddr_dvfs_table在arch/arm/boot/dts/rk3288-tb_8846.dts中，
+- 对于 kernel 3.10，需要找到 dts 中的 clk_ddr_dvfs_table 节点。举例如下，RK3288 SDK 板的最终的 clk_ddr_dvfs_table 在 arch/arm/boot/dts/rk3288-tb_8846.dts 中，
 
 ```c
 &clk_ddr_dvfs_table {
@@ -649,9 +649,9 @@ dmc_opp_table: opp_table2 {
 };
 ```
 
-可以修改对应频率对应的电压。因为频率电压表采用的是小于等于指定频率，就使用相应电压。如果新增的频率超出了这张表格的最高频率，使得找不到对应电压，会导致DDR无法切换到该新增频率。这时候，就需要增加一项该频率对应的电压表。
+可以修改对应频率对应的电压。因为频率电压表采用的是小于等于指定频率，就使用相应电压。如果新增的频率超出了这张表格的最高频率，使得找不到对应电压，会导致 DDR 无法切换到该新增频率。这时候，就需要增加一项该频率对应的电压表。
 
-- 对于kernel 3.0，需要在板级的borad-**.c文件中修改dvfs_ddr_table。举例如下，RK3066 SDK板的板级文件在arch/arm/mach-rk30/board-rk30-sdk.c中
+- 对于 kernel 3.0，需要在板级的 borad-**.c 文件中修改 dvfs_ddr_table。举例如下，RK3066 SDK 板的板级文件在 arch/arm/mach-rk30/board-rk30-sdk.c 中
 
 ```c
 static struct cpufreq_frequency_table dvfs_ddr_table[] = {
@@ -662,11 +662,11 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 };
 ```
 
-dvfs_ddr_table表格中的.index就是对应的电压，单位是uV。
+dvfs_ddr_table 表格中的.index 就是对应的电压，单位是 uV。
 
-## 如何关闭DDR的负载变频功能，只留场景变频
+## 如何关闭 DDR 的负载变频功能，只留场景变频
 
-- 对于kernel 4.4，需要找到dts中dmc节点的auto-freq-en。举例如下，RK3399 EVB板的在arch/arm64/boot/dts/rockchip/rk3399.dtsi
+- 对于 kernel 4.4，需要找到 dts 中 dmc 节点的 auto-freq-en。举例如下，RK3399 EVB 板的在 arch/arm64/boot/dts/rockchip/rk3399.dtsi
 
 ```c
 dmc: dmc {
@@ -679,7 +679,7 @@ dmc: dmc {
 };
 ```
 
-- 对于kernel 3.10，需要找到dts中的clk_ddr_dvfs_table节点。举例如下，RK3288 SDK板的最终的clk_ddr_dvfs_table在arch/arm/boot/dts/rk3288-tb_8846.dts中，
+- 对于 kernel 3.10，需要找到 dts 中的 clk_ddr_dvfs_table 节点。举例如下，RK3288 SDK 板的最终的 clk_ddr_dvfs_table 在 arch/arm/boot/dts/rk3288-tb_8846.dts 中，
 
 ```c
 &clk_ddr_dvfs_table {
@@ -691,36 +691,36 @@ dmc: dmc {
 };
 ```
 
-- 对于kernel 3.0，本身就不支持负载变频
+- 对于 kernel 3.0，本身就不支持负载变频
 
-## DDR如何定频
+## DDR 如何定频
 
 如果是为了定位问题，想通过命令来定频，可以采用如下方式
 
 kernel 4.4：
 
-获取固件支持的DDR频率：
+获取固件支持的 DDR 频率：
 `cat /sys/class/devfreq/dmc/available_frequencies`
 
 设置频率：
 
 `echo userspace > /sys/class/devfreq/dmc/governor`
-`echo 300000000 > /sys/class/devfreq/dmc/min_freq`   //这条是防止要设置的频率低于min_freq，导致设置失败
+`echo 300000000 > /sys/class/devfreq/dmc/min_freq`   //这条是防止要设置的频率低于 min_freq，导致设置失败
 `echo 300000000 > /sys/class/devfreq/dmc/userspace/set_freq`
 
 kernel 3.10：
 
-需要编译kernel时，打开pm_tests选项(make menuconfig ->System Type -> /sys/pm_tests/ support )。DDR定频的命令是：
+需要编译 kernel 时，打开 pm_tests 选项(make menuconfig ->System Type -> /sys/pm_tests/ support )。DDR 定频的命令是：
 
 `echo set clk_ddr 300000000 > /sys/pm_tests/clk_rate`
 
-这里的频率单位是Hz，具体要固定要什么频率可以根据需求改命令的参数。
+这里的频率单位是 Hz，具体要固定要什么频率可以根据需求改命令的参数。
 
-如果上面的方法不可行，只能修改代码或dts了
+如果上面的方法不可行，只能修改代码或 dts 了
 
-- 对于kernel 4.4，如果上述方法不行，一般都是因为你需要定频的目标频率，在`cat /sys/class/devfreq/dmc/available_frequencies`里找不到。
+- 对于 kernel 4.4，如果上述方法不行，一般都是因为你需要定频的目标频率，在`cat /sys/class/devfreq/dmc/available_frequencies`里找不到。
 
-  添加频率的方法是，找到板级dts文件，在dmc_opp_table中增加你需要的频率。举例如下，RK3399 EVB板的在arch/arm64/boot/dts/rockchip/rk3399-opp.dtsi，假设你需要增加的是666MHz
+  添加频率的方法是，找到板级 dts 文件，在 dmc_opp_table 中增加你需要的频率。举例如下，RK3399 EVB 板的在 arch/arm64/boot/dts/rockchip/rk3399-opp.dtsi，假设你需要增加的是 666MHz
 
   ```c
   dmc_opp_table: opp-table3 {
@@ -743,9 +743,9 @@ kernel 3.10：
   };
   ```
 
-  dts添加完后，就可以用前面的命令，进行固定频率了。
+  dts 添加完后，就可以用前面的命令，进行固定频率了。
 
-  如果不想通过开机输入命令来固定频率，而是希望开机后一直运行在一个固定频率，可以像如下一样修改dts。假设你需要开机后固定的频率是666MHz，举例如下，RK3399 EVB板的dmc节点在arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi
+  如果不想通过开机输入命令来固定频率，而是希望开机后一直运行在一个固定频率，可以像如下一样修改 dts。假设你需要开机后固定的频率是 666MHz，举例如下，RK3399 EVB 板的 dmc 节点在 arch/arm64/boot/dts/rockchip/rk3399-evb.dtsi
 
   ```c
   /* dfi必须为okay，由于早期代码，dmc节点有依赖于dfi节点。如果dfi节点为disabled，也会导致dmc节点无效。所以最好dfi节点的status保持跟dmc一致 */
@@ -779,7 +779,7 @@ kernel 3.10：
   };
   ```
 
-- 对于kernel 3.10，需要找到dts中的clk_ddr_dvfs_table节点。举例如下，RK3288 SDK板的最终的clk_ddr_dvfs_table在arch/arm/boot/dts/rk3288-tb_8846.dts中，
+- 对于 kernel 3.10，需要找到 dts 中的 clk_ddr_dvfs_table 节点。举例如下，RK3288 SDK 板的最终的 clk_ddr_dvfs_table 在 arch/arm/boot/dts/rk3288-tb_8846.dts 中，
 
 ```c
 &clk_ddr_dvfs_table {
@@ -832,13 +832,13 @@ kernel 3.10：
 };
 ```
 
-只要上面3步，就可以完成固定频率的固件，
+只要上面 3 步，就可以完成固定频率的固件，
 
-1. 负载变频的，要设置为0
-2. 注释其他场景，只留SYS_STATUS_NORMAL，并把他定义为你需要固定的频率
+1. 负载变频的，要设置为 0
+2. 注释其他场景，只留 SYS_STATUS_NORMAL，并把他定义为你需要固定的频率
 3. 如果要固定的频率，超出了频率电压表的最大频率，还需要添加该频率的电压表
 
-- 对于kernel 3.0，需要在板级的borad-**.c文件中修改dvfs_ddr_table。举例如下，RK3066 SDK板的板级文件在arch/arm/mach-rk30/board-rk30-sdk.c中
+- 对于 kernel 3.0，需要在板级的 borad-**.c 文件中修改 dvfs_ddr_table。举例如下，RK3066 SDK 板的板级文件在 arch/arm/mach-rk30/board-rk30-sdk.c 中
 
 ```c
 static struct cpufreq_frequency_table dvfs_ddr_table[] = {
@@ -852,74 +852,74 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
 };
 ```
 
-只要上面2步，就可以完成固定频率的固件，
+只要上面 2 步，就可以完成固定频率的固件，
 
-1. 注释其他场景，只留DDR_FREQ_NORMAL
-2. 把DDR_FREQ_NORMAL定义成你需要的频率，对应的电压有可能需要调整
+1. 注释其他场景，只留 DDR_FREQ_NORMAL
+2. 把 DDR_FREQ_NORMAL 定义成你需要的频率，对应的电压有可能需要调整
 
-## 如何查看DDR带宽利用率
+## 如何查看 DDR 带宽利用率
 
-kernel 4.4提供了一个命令，可以简单查看整个DDR带宽利用率，但是没有详细每个端口的数据量信息。
+kernel 4.4 提供了一个命令，可以简单查看整个 DDR 带宽利用率，但是没有详细每个端口的数据量信息。
 
 ```c
 rk3288:/sys/class/devfreq/dmc # cat load
 11@396000000Hz
 ```
 
-11表示DDR的当前带宽利用率是11%
+11 表示 DDR 的当前带宽利用率是 11%
 
-## 如何测试DDR可靠性
+## 如何测试 DDR 可靠性
 
-请查看文档“DDR颗粒验证流程说明”
+请查看文档“DDR 颗粒验证流程说明”
 
-## 如何确定DDR能运行的最高频率
+## 如何确定 DDR 能运行的最高频率
 
-1. 先添加各种高频的频率电压表，如何添加见“如何修改DDR频率”和“如何修改DDR某个频率对应的电压”章节
-2. 从高频到低频，运行google stressapptest，碰到报错，就降低频率，再运行。没报错，可以多运行一段时间，还是没报错，进入下一步。
+1. 先添加各种高频的频率电压表，如何添加见“如何修改 DDR 频率”和“如何修改 DDR 某个频率对应的电压”章节
+2. 从高频到低频，运行 google stressapptest，碰到报错，就降低频率，再运行。没报错，可以多运行一段时间，还是没报错，进入下一步。
 
-google stressapptest在“DDR颗粒验证流程说明”包中可以找到，如何使用，也在里面，不在此文档范围。
+google stressapptest 在“DDR 颗粒验证流程说明”包中可以找到，如何使用，也在里面，不在此文档范围。
 
-3. 上一步已经大概摸清了最高频率的位置，这里再运行一个memtester。方法一样，碰到报错，就降低频率，再运行。没报错，可以多运行一段时间，还是没报错，就可以确认最高频率点。
+3. 上一步已经大概摸清了最高频率的位置，这里再运行一个 memtester。方法一样，碰到报错，就降低频率，再运行。没报错，可以多运行一段时间，还是没报错，就可以确认最高频率点。
 
-memtester在“DDR颗粒验证流程说明”包中可以找到，如何使用，也在里面，不在此文档范围。
+memtester 在“DDR 颗粒验证流程说明”包中可以找到，如何使用，也在里面，不在此文档范围。
 
-google stressapptest是一个粗筛选的过程，他能快速报错。而memtester是一个细的筛选过程，他报错比较慢，但是主要是针对信号的测试，能覆盖到google stressapptest没覆盖到的面。
+google stressapptest 是一个粗筛选的过程，他能快速报错。而 memtester 是一个细的筛选过程，他报错比较慢，但是主要是针对信号的测试，能覆盖到 google stressapptest 没覆盖到的面。
 
-当然，以上方法，都是基于软件的测试方法，用于快速确认最高频率，实际DDR信号是否在最高频能否达标，就不一定了，需要信号测试和拷机。
+当然，以上方法，都是基于软件的测试方法，用于快速确认最高频率，实际 DDR 信号是否在最高频能否达标，就不一定了，需要信号测试和拷机。
 
-## 怎么判断DDR已经进入自刷新（self-refresh省电模式）
+## 怎么判断 DDR 已经进入自刷新（self-refresh 省电模式）
 
-可以通过测量CKE信号来判断，而且不需要带宽很高的示波器就可以。
+可以通过测量 CKE 信号来判断，而且不需要带宽很高的示波器就可以。
 
-| CKE状态          | 解释       |
+| CKE 状态          | 解释       |
 | -------------- | -------- |
-| 低电平(时间大于7.8us) | 处于自刷新状态  |
+| 低电平(时间大于 7.8us) | 处于自刷新状态  |
 | 高电平            | 处于正常工作状态 |
 
-如果测到的CKE是一会儿为高一会儿为低，也是按上表的解释来理解，即一会儿进入了自刷新，一会儿退出自刷新，处于正常工作状态。
+如果测到的 CKE 是一会儿为高一会儿为低，也是按上表的解释来理解，即一会儿进入了自刷新，一会儿退出自刷新，处于正常工作状态。
 
-注意：CKE为低电平时间一定要大于7.8us才算进入自刷新，因为power-down状态也是CKE为低，但时间小于7.8us，不要混淆。
+注意：CKE 为低电平时间一定要大于 7.8us 才算进入自刷新，因为 power-down 状态也是 CKE 为低，但时间小于 7.8us，不要混淆。
 
-## 怎么判断DDR已经进入auto power-down省电模式
+## 怎么判断 DDR 已经进入 auto power-down 省电模式
 
-可以通过测量CKE信号来判断，而且不需要带宽很高的示波器就可以。
+可以通过测量 CKE 信号来判断，而且不需要带宽很高的示波器就可以。
 
-| CKE状态          | 解释                  |
+| CKE 状态          | 解释                  |
 | -------------- | ------------------- |
-| 低电平(时间小于7.8us) | 处于auto power-down状态 |
+| 低电平(时间小于 7.8us) | 处于 auto power-down 状态 |
 | 高电平            | 处于正常工作状态            |
 
-auto power-down状态，测到的CKE状态，是CKE保持低电平将近7.8us（DDR3、DDR4）或3.9us(LPDDR2、LPDDR3、LPDDR4），然后拉高一小段时间，再进入低电平近7.8us或3.9us，如此一直往复。
+auto power-down 状态，测到的 CKE 状态，是 CKE 保持低电平将近 7.8us（DDR3、DDR4）或 3.9us(LPDDR2、LPDDR3、LPDDR4），然后拉高一小段时间，再进入低电平近 7.8us 或 3.9us，如此一直往复。
 
-注意：CKE为低电平时间一定要小于7.8us（DDR3、DDR4）或3.9us(LPDDR2、LPDDR3、LPDDR4）才是auto power-down，如果时间大于7.8us，就是自刷新，不要混淆。
+注意：CKE 为低电平时间一定要小于 7.8us（DDR3、DDR4）或 3.9us(LPDDR2、LPDDR3、LPDDR4）才是 auto power-down，如果时间大于 7.8us，就是自刷新，不要混淆。
 
-## 如何调整DQ、DQS、CA、CLK的de-skew
+## 如何调整 DQ、DQS、CA、CLK 的 de-skew
 
-主要由于硬件PCB中DDR走线不等长，可以通过调整de-skew，达到类似DDR走线等长的效果。de-skew功能就是DDR PHY内部串联在信号线上的一个个延迟单元，可以通过de-skew寄存器控制各个信号线上串联的延迟单元的个数来改变每个信号线的延迟。
+主要由于硬件 PCB 中 DDR 走线不等长，可以通过调整 de-skew，达到类似 DDR 走线等长的效果。de-skew 功能就是 DDR PHY 内部串联在信号线上的一个个延迟单元，可以通过 de-skew 寄存器控制各个信号线上串联的延迟单元的个数来改变每个信号线的延迟。
 
-### 调整kernel中的de-skew
+### 调整 kernel 中的 de-skew
 
-要调整kernel中的de-skew，目前也只有RK322xh、RK3328支持。需要改对应的dts文件
+要调整 kernel 中的 de-skew，目前也只有 RK322xh、RK3328 支持。需要改对应的 dts 文件
 
 芯片：RK322xh、RK3328
 
@@ -929,26 +929,26 @@ arch/arm64/boot/dts/rk322xh-dram-default-timing.dtsi
 
 arch/arm64/boot/dts/rk322xh-dram-2layer-timing.dtsi
 
-如果产品有覆盖这2个的定义，以新定义的为准。
+如果产品有覆盖这 2 个的定义，以新定义的为准。
 
 修改：
 
-根据发布的“deskew自动扫描工具”扫出来的结果，选择mid值，修改到对应dts定义中。
+根据发布的“deskew 自动扫描工具”扫出来的结果，选择 mid 值，修改到对应 dts 定义中。
 
-“deskew自动扫描工具”的使用请按照《3228H deskew自动扫描工具使用说明.pdf》来做
+“deskew 自动扫描工具”的使用请按照《3228H deskew 自动扫描工具使用说明.pdf》来做
 
-### 调整loader中的de-skew
+### 调整 loader 中的 de-skew
 
-要调整loader中的de-skew，目前只有RK3308支持。
+要调整 loader 中的 de-skew，目前只有 RK3308 支持。
 
 芯片：RK3308
 
 需要的文件：
 
-deskew自动扫描工具，3308_deskew.exe，RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt，rk3308_ddr_XXXMHz_uartX_mX_vX.XX.bin
+deskew 自动扫描工具，3308_deskew.exe，RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt，rk3308_ddr_XXXMHz_uartX_mX_vX.XX.bin
 
 修改：
 
-根据发布的“deskew自动扫描工具”扫出来的结果，选择mid值，修改到RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt对应定义中。使用3308_deskew.exe将RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt定义的de-skew修改到rk3308_ddr_XXXMHz_uartX_mX_vX.XX.bin中。
+根据发布的“deskew 自动扫描工具”扫出来的结果，选择 mid 值，修改到 RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt 对应定义中。使用 3308_deskew.exe 将 RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt 定义的 de-skew 修改到 rk3308_ddr_XXXMHz_uartX_mX_vX.XX.bin 中。
 
-“deskew自动扫描工具”的使用请按照《deskew自动扫描工具使用说明.pdf》来做。
+“deskew 自动扫描工具”的使用请按照《deskew 自动扫描工具使用说明.pdf》来做。
