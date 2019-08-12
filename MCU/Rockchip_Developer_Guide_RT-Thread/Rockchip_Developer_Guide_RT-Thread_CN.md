@@ -1,4 +1,4 @@
-# **RT-Thread 开发向导**
+# RT-Thread 开发向导
 
 发布版本：1.0
 
@@ -16,7 +16,7 @@
 
 **产品版本**
 
-| **芯片名称**  | **RT-Thread 版本** |
+| **支持芯片** | **RT-Thread 版本** |
 | ------------- | ----------------- |
 | RK2108/Pisces | 3.11/4.0          |
 
@@ -35,6 +35,7 @@
 | 2019-05-14 | v1.2     | 陈谋春   | 更新测试用例描述，增加调试说明     |
 | 2019-06-17 | v1.3     | 陈谋春   | 更新模块配置说明，增加编译脚本配置 |
 | 2019-07-08 | v1.4     | 陈谋春   | 增加静态库编译说明                 |
+| 2019-08-12 | v1.5     | 陈谋春   | 修正准备工作：下载工程、保存配置   |
 
 ---
 
@@ -50,19 +51,21 @@
 
 ### 2.1 下载工程
 
-   目前 RT-Thread 的移植实际上被我们分成两个部分，HAL(Hardware abstraction layer)和 BSP(Board Support Package)，前者是各个 IP 基本功能的实现，目标是能无缝兼容不同的 RTOS，后者则实现了 HAL 和 RT-Thread 系统的桥接，包括各种驱动的注册和整个系统的启动引导。现在这两个部分是分成两个仓库，独立维护的。
+   目前 RT-Thread 的移植实际上被我们分成两个部分，HAL(Hardware abstraction layer)和 BSP(Board Support Package)，前者是各个 IP 基本功能的实现，目标是能无缝兼容不同的 RTOS，后者则实现了 HAL 和 RT-Thread 系统的桥接，包括各种驱动的注册和整个系统的启动引导。现在这两个部分是分成两个仓库，通过 repo 来管理。
 
-   所以下载也需要分开，具体命令如下：
+   具体下载命令如下：
 
 ```shell
- git clone ssh://<USERNAME>@10.10.10.29:29418/rtos/rt-thread/rt-thread
- cd rt-thread
- git checkout develop
- cd bsp/rockchip-common
- git clone ssh://<USERNAME>@10.10.10.29:29418/rk/mcu/hal
+repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.10.29:29418/rtos/rt-thread/manifests -b master
+.repo/repo/repo sync
 ```
 
-   ==Note: clone 的时候需要把用户名换成自己的，不要修改 HAL 的目标路径，因为 BSP 是通过符号链接来找到 HAL 的。==
+   默认的 manifest 包含了大部分 Rockchip SOC 的实现，但是有一些芯片是单独 manifest 维护的，例如：Pisces，可以用如下命令指定manifest来同步：
+
+```shell
+repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.10.29:29418/rtos/rt-thread/manifests -m pisces.xml -b master
+.repo/repo/repo sync
+```
 
 ### 2.2 编译环境配置
 
@@ -83,7 +86,7 @@ sudo apt-get install gcc-arm-embedded scons clang-format astyle
    编译命令如下：
 
 ```shell
-cd bsp/rockchip-pisces
+cd bsp/rockchip-rk2108
 scons -j8
 ```
 
@@ -161,7 +164,7 @@ scons: building associated VariantDir targets: build
 AR libFileTest_gcc.a
 ranlib libFileTest_gcc.a
 Install compiled library... FileTest_gcc
-Copy libFileTest_gcc.a => /home1/rockchip/rt-thread2/examples/file/libFileTest_gcc.a
+Copy libFileTest_gcc.a => /path/to/rt-thread/examples/file/libFileTest_gcc.a
 scons: done building targets.
 ```
 
@@ -194,15 +197,15 @@ group = DefineGroup('wlan-wiced', src, depend = ['RT_USING_FILE_TEST'], CPPPATH 
    RT-Thread 沿用了 Linux 的 Kconfig 作为模块配置开关，具体命令如下：
 
 ```shell
-cd bsp/rockchip-pisces
+cd bsp/rockchip-rk2108
 scons --menuconfig
 ```
 
-   会弹出如下界面，操作方法和 Linux 是一样，修改配置以后保存退出，这个过程会自动重新生成一个 rtconfig.h 文件，这个文件包含了我们选中的各种配置，最后重新编译即可：
+   会弹出如下界面，操作方法和 Linux 是一样，这个过程会从 .config 载入当前的默认配置，退出保存配置的时候会覆盖 .config ，同时自动重新生成一个 rtconfig.h 文件，这个文件包含了我们选中的各种配置，最终参与编译的只有这个 rtconfig.h ，具体界面如下图所示：
 
 ![menuconfig](./menuconfig.png)
 
-​    上图中各个分类的名字很清晰，这里就不具体描述了，其中前三个是 RT-Thread 公版的配置，后面两个是我们 BSP 的驱动配置和测试用例。需要额外说明的是：online packages，这些包不是随 RT-Thread 源码发布的，而是自己独立仓库维护，需要的时候，我们需要先在这里把配置打开，然后再通过 pkgs 命令下载或更新，把工程下载到本地，最后才能编译，并且这些包并不保证每个都能用，有的可能连编译都无法成功。主要是有些包编译器兼容性较差，有些则是太久没维护了。下面以 Wi-Fi 模块为例，演示一下具体操作：
+​    上图中各个分类的名字很清晰，这里就不具体描述了，其中前三个是 RT-Thread 公版的配置，后面都是我们 BSP 的驱动配置和测试用例。需要额外说明的是：第三项 online packages，这些包不是随 RT-Thread 源码发布的，而是自己独立仓库维护，需要的时候，我们需要先在这里把配置打开，然后再通过 pkgs 命令下载或更新，把工程下载到本地，最后才能编译，并且这些包并不保证每个都能用，有的可能连编译都无法成功。主要是有些包编译器兼容性较差，有些则是太久没维护了。下面以 Wi-Fi 模块为例，演示一下具体操作：
 
 - 先选上我们要的 Wi-Fi 驱动，然后退出并保存配置：
 
@@ -224,7 +227,7 @@ scons -j8
   可以看到下载下来的 Wi-Fi 驱动在如下目录：
 
 ```shell
-/home1/rockchip/rt-thread/bsp/rockchip-pisces/packages/wlan_wiced-latest
+/path/to/rt-thread/bsp/rockchip-rk2108/packages/wlan_wiced-latest
 ```
 
    其他 pkgs 命令如下：
@@ -250,7 +253,11 @@ optional arguments:
 
 ### 2.6 保存配置
 
-   目前 RTT 的 menuconfig 有个缺陷：第一次执行 menuconfig 的时候会从网络上下载 Online Package 的配置，后续不手动更新的话，这些配置不会变更，这就导致了不同工程师的配置信息可能略有差异，最终导致 menuconfig 生成的.config 和 rtconfig.h 包含大量无效配置，在提交的时候出现互相覆盖，下面是无效配置的例子：
+   上一节我们看到配置信息是保存在 .config ，同时在每一个板级配置目录下都有一个默认配置 defconfig，如果没有执行 menuconfig ，会用默认的 rtconfig.h 参与编译。在提交配置修改的时候，如果配置需要应用于所有的板级，则三个都要提交，否则只要提交相应板级的 defconfig。
+
+   ==在线包经常变动，所以如果在线包选上了，每个工程师的在线包起点不一样，其配置信息中的在线包选项也会差异很大，导致review变得不方便，所以默认我们是不选上在线包的，需要某个在线包功能的时候，请移植到third_party下，并修改Kconfig配置项名字，减少和在线包冲突，这样也方便修改在线包的代码==
+
+   下面是无效配置的例子：
 
 ```shell
 /* RT-Thread online packages */
@@ -269,15 +276,13 @@ optional arguments:
 /* PKG_USING_NANOPB is not set */
 ```
 
-   可以通过 RTT 自带的两个命令来去掉这些无效配置，方法如下：
+   要修改板子的 defconfig，可以先用它覆盖 .config，通过 menuconfig 改完以后再保存回去，下面是具体例子：
 
 ```shell
-scons --genconfig                          ; 根据rtconfig.h生成不含无效配置的.config
+cp board/xxx/defconfig .config             ; 拷贝要修改的板子的默认配置
+scons menuconfig                           ; 修改配置项
 cp .config board/xxx/defconfig             ; 保存配置为板子的默认配置
-scons --useconfig=board/xxx/defconfig      ; 根据保存的配置，生成不含无效配置的rtconfig.h
 ```
-
-   从上面我们可以看到 SOC 的 BSP 主目录下有一个.config 文件，在执行 menuconfig 的时候会从中读取默认配置，保存退出的同时也会更新这个文件，我们目前用这个文件作为最小配置集合。menuconfig 保存退出的时候生成的 rtconfig.h 实际上是根据这个文件生成的，==提交补丁的同时请不要提交.config 和 rtconfig.h，以防止引入有冲突的配置导致编译失败==。
 
 ### 2.7 Scons 编译脚本
 
@@ -469,9 +474,17 @@ sudo umount ./rootfs
    烧写的命令也很简单：
 
 ```shell
+./mkimage.sh                                              # 打包固件
 upgrade_tool db Image/rk2108_db_loader.bin                # 下载烧写loader
-upgrade_tool wl 0x1100 ./Image/Firmware.img               # 这里的地址要和固件打包的配置文件setting.ini里定义的root分区地址一致
+upgrade_tool wl 0 ./Image/Firmware.img                    # 下载固件
+upgrade_tool wl 0x1100 ./Image/root.img                   # 下载根文件系统，这里的地址要和固件打包的配置文件setting.ini里定义的root分区地址一致
 upgrade_tool rd
+```
+
+   打包和下载根文件系统这一步不是必须的，如果没有文件需要烧下去，完全可以直接格式化文件系统，然后复位，即可自动挂载文件系统，来节省烧写时间：
+
+```shell
+mkfs -t elm root                                          # 格式化root分区
 ```
 
 ## 3 驱动开发
@@ -493,14 +506,14 @@ ls documentation/coding_style_cn.md -l
    目前驱动程序被分为两类：公共和私有，前者指的是多个芯片可以共用的驱动，可以放如下目录：
 
 ```shell
-/home1/rockchip/rt-thread/bsp/rockchip-common/drivers
+/path/to/rt-thread/bsp/rockchip-common/drivers
 ```
 
    而私有驱动，则只适用特定芯片，可以放到这个芯片 BSP 主目录下的 drivers 目录，例如：
 
 ```shell
-/home1/rockchip/rt-thread/bsp/rockchip-rk2108/drivers
-/home1/rockchip/rt-thread/bsp/rockchip-pisces/drivers
+/path/to/rt-thread/bsp/rockchip-rk2108/drivers
+/path/to/rt-thread/bsp/rockchip-rk1808/drivers
 ```
 
    所有的驱动都要以 drv_xxx.c 和 drv_xxx.h，其中 xxx 为模块名或相应缩写，要求全部小写，不能有特殊字符存在，如果必要可以用"_"分割长模块名，如“drv_sdio_sd.c”。各个模块不需要修改编译脚本，目前的脚本已经可以自动搜索 drivers 下所有的源文件，自动完成编译，但是推荐模块加上自己的 Kconfig 配置开关，并且考虑多芯片之间的复用，方便裁剪和调试，具体可以参考如下实现：
@@ -542,7 +555,7 @@ endmenu
 ```c
 #if defined(RT_USING_I2C)
 
-#if defined(RKMCU_PISCES)
+#if defined(RKMCU_RK2108)
 void do_someting(void)
 {
 
@@ -552,7 +565,7 @@ void do_someting(void)
 #endif
 ```
 
-   如果驱动有汇编文件，尽量三种编译器都支持：gcc、keil(armcc)、iar，文件名可以按如下规则：xxx_gcc.S、xxx_arm.s、xxx_iar.s，目前汇编文件不会自动加入编译，要手动修改编译脚本，参考 bsp/rockchip-pisces/drivers/SConscript：
+   如果驱动有汇编文件，尽量三种编译器都支持：gcc、keil(armcc)、iar，文件名可以按如下规则：xxx_gcc.S、xxx_arm.s、xxx_iar.s，目前汇编文件不会自动加入编译，要手动修改编译脚本，参考 bsp/rockchip-rk2108/drivers/SConscript：
 
 ```python
 Import('RTT_ROOT')
@@ -610,22 +623,13 @@ static void udelay(unsigned long usec) {
 
    如果两个模块有先后顺序以来，可以放到上面的不同初始化组里，来控制顺序。当然也自己在代码里去控制，举例，如果有两个模块 A 和 B，A 的初始化依赖于 B 的初始化，则最好只把 B 的初始化 EXPORT 出来，然后在 B 里再去调用 A 的初始化。
 
-   还有一个提示，目前驱动引用 HAL 的头文件，只需要加“hal_base.h"，而不需要另外在包含芯片头文件，因为会自动根据"hal_conf.h"的定义来包含芯片头文件，例如：
-
-```shell
-#include <pisces.h>   /*这一句是可以去掉的*/
-#include <rtdevice.h>
-#include <rtthread.h>
-#include "hal_base.h"
-```
-
 ## 4 测试用例
 
    提交驱动的同时，最好同步提交测试程序，目前我们的 BSP 测试被分为两个部分：公共和私有，前者是可以多个芯片共用的测试，后者是这个芯片特有的测试，目录分别如下：
 
 ```shell
-/home1/rockchip/rt-thread/bsp/rockchip-common/tests
-/home1/rockchip/rt-thread/bsp/rockchip-pisces/tests
+/path/to/rt-thread/bsp/rockchip-common/tests
+/path/to/rt-thread/bsp/rockchip-rk2108/tests
 ```
 
    可以把测试程序做成 RTT 的 shell 命令，文件名可以命名为 tc_xxx.c，其中 xxx 是模块名，例如串口可以用 tc_uart.c。下面是一个简单例子：
@@ -730,13 +734,98 @@ finsh >> tc_start("bsp_spi")  ;  遍历所有spi测试用例
 
 ### 5.1 内存问题
 
-   针对最常见的两种内存问题：内存泄漏和访问越界，RTT 都提供了辅助调试手段，需要打开 RT_USING_MEMTRACE 开关，具体如下：
+   目前 RTT 上我们配置了三种堆：系统堆、large和uncache，后两者是可选的。下面通过一个表格来说明三者的差异：
+
+![heap_list](./heap_list.png)
+
+​    查看堆内存分配情况，有两个命令：free 和 list_memheap，前者对应系统堆，后者可以查看large和uncache的分配情况，具体如下：
+
+```shell
+msh />free
+total memory: 462312                             # 系统堆总大小，单位byte
+used memory : 14360                              # 系统堆当前使用大小，单位byte
+maximum allocated memory: 16728                  # 系统堆峰值使用大小，单位byte
+
+msh />list_memheap
+memheap  pool size  max used size available size # 堆名  堆总大小 峰值使用大小 当前可用大小
+------- ---------- ------------- --------------
+large   524288     48            524240
+ucheap  32768      48            32720
+```
+
+   针对最常见的两种内存问题：内存泄漏和访问越界，RTT 另外提供了辅助调试手段，需要打开 RT_USING_MEMTRACE 开关，具体如下：
 
 ![memtrace](./memtrace.png)
 
    重新编译后，MSH 会多出两个命令：memtrace 和 memcheck，前者可以导出当前系统的动态内存分配情况，包括当前已用内存大小、最大使用内存大小和内存跟踪情况，具体如下：
 
-![memtrace_dump](./memtrace_dump.png)
+```shell
+msh />memtrace
+total memory: 462312                  # 系统堆总大小
+used memory : 14360                   # 系统堆当前使用大小
+maximum allocated memory: 16728       # 系统堆峰值使用大小
+
+memory heap address:
+heap_ptr: 0x200871f8                  # 堆起始地址
+lfree   : 0x200871f8                  # 最低可用内存地址
+heap_end: 0x200f7ff0                  # 堆结束地址
+
+--memory item information --          # [起始地址 - 大小] 线程名
+[0x200871f8 -    1K]                  # 线程名为空，表示是free内存
+[0x20087698 -   292] init             # 线程名为init，表示是init线程分配的
+[0x200877cc -    48] init
+[0x2008780c -   128] init
+[0x2008789c -   512] init
+[0x20087aac -    12] init
+[0x20087ac8 -    32] init
+[0x20087af8 -   524] init
+[0x20087d14 -    48] init
+[0x20087d54 -   128] init
+[0x20087de4 -   256] init
+[0x20087ef4 -    68] init
+[0x20087f48 -    36] init
+[0x20087f7c -    44] init
+[0x20087fb8 -    96] init
+[0x20088028 -    64] init
+[0x20088078 -   284] init
+[0x200881a4 -    36] init
+[0x200881d8 -   216] init
+[0x200882c0 -    28] init
+[0x200882ec -    28] init
+[0x20088318 -    32] init
+[0x20088348 -    64] init
+[0x20088398 -    64] init
+[0x200883e8 -    16] init
+[0x20088408 -    16] init
+[0x20088428 -    24] init
+[0x20088450 -    32] init
+[0x20088480 -    32] init
+[0x200884b0 -    32] init
+[0x200884e0 -   112] init
+[0x20088560 -    48] init
+[0x200885a0 -    92] init
+[0x2008860c -   100] init
+[0x20088680 -    48] init
+[0x200886c0 -    92] init
+[0x2008872c -   100] init
+[0x200887a0 -    92] init
+[0x2008880c -   100] init
+[0x20088880 -   428] init
+[0x20088a3c -    16] init
+[0x20088a5c -    36] init
+[0x20088a90 -    12] init
+[0x20088aac -    12] init
+[0x20088ac8 -    76] init
+[0x20088b24 -    12] init
+[0x20088b40 -    12] init
+[0x20088b5c -    12] init
+[0x20088b78 -    4K] init
+[0x20089bc4 -    36] init
+[0x20089bf8 -   520] init
+[0x20089e10 -   128] init
+[0x20089ea0 -    4K] init
+[0x2008aeb0 -  436K]  
+```
 
    根据上面的信息，可以找到哪个线程吃掉太多内存，也可以找到内存泄漏的可疑线程名称和内存块大小，有了这些信息就可以大大缩小排查范围。
 
