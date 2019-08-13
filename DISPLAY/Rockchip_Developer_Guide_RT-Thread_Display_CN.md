@@ -26,11 +26,11 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2019-07-15 | V1.0     | 黄家钗   | 初始发布     |
-|            |          |          |              |
-|            |          |          |              |
+| **日期**   | **版本** | **作者** | **修改说明**                    |
+| ---------- | -------- | -------- | ------------------------------- |
+| 2019-07-15 | V1.0     | 黄家钗   | 初始发布                        |
+| 2019-08-15 | V1.1     | 黄家钗   | 调整格式、加入Color Key使用说明 |
+|            |          |          |                                 |
 
 ---
 [TOC]
@@ -188,7 +188,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 
 例子：bt709tobt2020 转换矩阵：
 
-```
+```c
 {0.6274, 0.3293, 0.0433},
 {0.0691, 0.9195, 0.0114},
 {0.0164, 0.0880, 0.8956}
@@ -196,7 +196,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 
 按 0x80 定点后为(bit7 为符号位)
 
-```
+```c
 coe00 = 0.6274 * 0x80  = 0x50
 coe01 = 0.3293 * 0x80  = 0x2a
 coe02 = 0.0433 * 0x80  = 0x05
@@ -204,7 +204,7 @@ coe02 = 0.0433 * 0x80  = 0x05
 
 同理可得：
 
-```
+```c
 colorMatrixCoe[3][3] = {
     {0x50, 0x2a, 0x05},
     {0x05, 0x75, 0x02},
@@ -231,9 +231,9 @@ colorMatrixCoe[3][3] = {
 
 有些屏本身有对齐要求，以 S6E3HC2 屏为例：
 
-配置为 1440x3120 的时候 DSC 的 slice 大小为 720x65，所以区域刷新时显示的位置和大小需要按 720x65 做对齐；
+配置为 1440x3120 的时候 DSC 的 slice 大小为 720x65，所以区域刷新时显示的位置需要按720x65对齐，显示区域的大小需要按 720x195 对齐；
 
-配置为 720x1560 的时候 DSC 的 slice 大小为 360x52，所以区域刷新时显示的位置和大小需要按 7360x52 做对齐；
+配置为 720x1560 的时候 DSC 的 slice 大小为 360x52，所以区域刷新时显示的位置需要按 360x52 对齐，显示区域的大小需要按360x390对齐。
 
 ## 6 屏配置说明
 
@@ -241,7 +241,7 @@ colorMatrixCoe[3][3] = {
 
 按以下通路选择对应屏的配置文件：
 
-```
+```shell
 cd bsp/rockchip-pisces
     scons --menuconfig
         RT-Thread rockchip common drivers  --->
@@ -250,10 +250,13 @@ cd bsp/rockchip-pisces
 
 ### 6.2 增加一块新的屏支持
 
-1、进入屏配置文件目录：cd bsp/rockchip-common/drivers/panel_cfg；
-2、拷贝当前目录下的一个.h 文件 new_panel.h，参考本文 6.4 章节并根据屏 spec 的定义，修改文件中屏的配置参数；
-3、回到上一级目录 cd ../;即目录 bsp/rockchip-common/drivers/目录下；
-4、打开 Kconfig 文件 ，搜索”Panel Type”,参考其他 config RT_USING_PANEL_配置定义新屏的配置 RT_USING_PANEL_NEW_PANEL；
+1. 进入屏配置文件目录：cd bsp/rockchip-common/drivers/panel_cfg；
+
+2. 拷贝当前目录下的一个.h 文件 new_panel.h，参考本文 6.4 章节并根据屏 spec 的定义，修改文件中屏的配置参数；
+
+3. 回到上一级目录 cd ../;即目录 bsp/rockchip-common/drivers/目录下；
+
+4. 打开 Kconfig 文件 ，搜索”Panel Type”,参考其他 config RT_USING_PANEL_配置定义新屏的配置 RT_USING_PANEL_NEW_PANEL；
 
 ![6-2_panel](Rockchip_Developer_Guide_RT-Thread_Display/6-2_panel.png)
 
@@ -265,34 +268,38 @@ cd bsp/rockchip-pisces
 
 | **Parameters**                | **Description**                              |
 | ----------------------------- | -------------------------------------------- |
-| RT_HW_LCD_XRES                | 屏水平方向分辨率，对应 6.3 图中的 hactive       |
-| RT_HW_LCD_YRES                | 屏垂直方向分辨率，对应 6.3 图中的 vactive       |
-| RT_HW_LCD_PIXEL_CLOCK         | 像素时钟，单位 khz                            |
-| RT_HW_LCD_LANE_MBPS           | MIPI DPHY CLK Lane 时钟，单位 Mbps             |
-| RT_HW_LCD_LEFT_MARGIN         | 屏左消隐，对应 6.3 图中的 hback-porch           |
-| RT_HW_LCD_RIGHT_MARGIN        | 屏右消隐，对应 6.3 图中的 hfront-porch          |
-| RT_HW_LCD_UPPER_MARGIN        | 屏上消隐，对应 6.3 图中的 vback-porch           |
-| RT_HW_LCD_LOWER_MARGIN        | 屏下消隐，对应 6.3 图中的 vfront-porch          |
-| RT_HW_LCD_HSYNC_LEN           | 屏水平同步时间，对应 6.3 图中的 hsync-porch     |
-| RT_HW_LCD_VSYNC_LEN           | 屏垂直同步时间，对应 6.3 图中的 vsync-porch     |
+| RT_HW_LCD_XRES                | 屏水平方向分辨率，对应 6.3 图中的 hactive    |
+| RT_HW_LCD_YRES                | 屏垂直方向分辨率，对应 6.3 图中的 vactive    |
+| RT_HW_LCD_PIXEL_CLOCK         | 像素时钟，单位 khz                           |
+| RT_HW_LCD_LANE_MBPS           | MIPI DPHY CLK Lane 时钟，单位 Mbps           |
+| RT_HW_LCD_LEFT_MARGIN         | 屏左消隐，对应 6.3 图中的 hback-porch        |
+| RT_HW_LCD_RIGHT_MARGIN        | 屏右消隐，对应 6.3 图中的 hfront-porch       |
+| RT_HW_LCD_UPPER_MARGIN        | 屏上消隐，对应 6.3 图中的 vback-porch        |
+| RT_HW_LCD_LOWER_MARGIN        | 屏下消隐，对应 6.3 图中的 vfront-porch       |
+| RT_HW_LCD_HSYNC_LEN           | 屏水平同步时间，对应 6.3 图中的 hsync-porch  |
+| RT_HW_LCD_VSYNC_LEN           | 屏垂直同步时间，对应 6.3 图中的 vsync-porch  |
 | RT_HW_LCD_CONN_TYPE           | 屏的类型，如： RK_DISPLAY_CONNECTOR_DSI      |
 | RT_HW_LCD_BUS_FORMAT          | 屏的接口类型，如： MEDIA_BUS_FMT_RGB888_1X24 |
-| RT_HW_LCD_VMODE_FLAG          | 屏的极性、是否支持 DSC 配置等                  |
-| RT_HW_LCD_INIT_CMD_TYPE       | CMD 类型， CMD_TYPE_DEFAULT 默认为 mipi CMD     |
-| RT_HW_LCD_DISPLAY_MODE        | CMD 模式和 video 模式选择                      |
+| RT_HW_LCD_VMODE_FLAG          | 屏的极性、是否支持 DSC 配置等                |
+| RT_HW_LCD_INIT_CMD_TYPE       | CMD 类型， CMD_TYPE_DEFAULT 默认为 mipi CMD  |
+| RT_HW_LCD_DISPLAY_MODE        | CMD 模式和 video 模式选择                    |
 | RT_HW_LCD_AREA_DISPLAY        | 是否支持区域刷新                             |
+| RT_HW_LCD_XACT_ALIGN          | 屏显示区域宽对齐要求，单位为像素             |
+| RT_HW_LCD_YACT_ALIGN          | 屏显示区域高对齐要求，单位为像素             |
+| RT_HW_LCD_XPOS_ALIGN          | 屏显示区域X坐标对齐要求，单位为像素          |
+| RT_HW_LCD_YPOS_ALIGN          | 屏显示区域Y坐标对齐要求，单位为像素          |
 | struct rockchip_cmd cmd_on[]  | 屏初始化命令                                 |
 | struct rockchip_cmd cmd_off[] | 屏反初始化命令                               |
 
 ### 6.5 屏初始化命令说明
 
-1、下面以 MIPI DSI CMD 为例说明：
+1. 下面以 MIPI DSI CMD 为例说明：
 
 ![6-5-1_dsi-cmd](Rockchip_Developer_Guide_RT-Thread_Display/6-5-1_dsi-cmd.png)
 
 前 3 个字节（16 进制），分别代表 Data Type，Delay，Payload Length。从第四个字节开始的数据代表长度为 Length 的实际有效 Payload.
 
-2、第一条命令的解析如下：
+2. 第一条命令的解析如下：
 
 ![6-5-2_sleep-cmd](Rockchip_Developer_Guide_RT-Thread_Display/6-5-2_sleep-cmd.png)
 
@@ -301,7 +308,7 @@ Delay：0x05 (5 ms)
 Payload Length：0x01 (1 Bytes)
 Payload：0x11
 
-3、第二条命令解析如下：
+3. 第二条命令解析如下：
 
 ![6-5-3_fd-setting-cmd](Rockchip_Developer_Guide_RT-Thread_Display/6-5-3_fd-setting-cmd.png)
 
@@ -310,13 +317,13 @@ Delay：0x00 (0 ms)
 Payload Length：0x03 (3 Bytes)
 Payload：0xf0 0x5a 0x5a
 
-4、Data Type 定义
+4. Data Type 定义
 
 ![6-5-4_data-type](Rockchip_Developer_Guide_RT-Thread_Display/6-5-4_data-type.png)
 
 ![6-5-4_data-type-2](Rockchip_Developer_Guide_RT-Thread_Display/6-5-4_data-type-2.png)
 
-5、DCS Write
+5. DCS Write
 
 ![6-5-4_wirte](Rockchip_Developer_Guide_RT-Thread_Display/6-5-4_wirte.png)
 
@@ -324,7 +331,7 @@ DCS packet 包括一个字节的 dcs 命令，以及 n 个字节的 parameters�
 如果 n < 2，将以 Short Packet 的形式对 Payload 进行打包。n = 0，表示只发送 dcs 命令，不带参数，Data Type 为 0x05；n = 1，表示发送 dcs 命令，带一个参数，Data Type 为 0x15。
 如果 n >= 2，将以 Long Packet 的形式对 Payload 进行打包。此时发送 dcs 命令，带 n 个参数，Data Type 为 0x39。
 
-6、Generic Write
+6. Generic Write
 
 ![6-5-6_generic-write](Rockchip_Developer_Guide_RT-Thread_Display/6-5-6_generic-write.png)
 
@@ -332,15 +339,19 @@ Gerneic Packet 包括 n 个字节的 parameters。
 如果 n < 3，将以 Short Packet 的形式对 Payload 进行打包。n = 0，表示 no parameters，Data Type 为 0x03；n = 1，表示 1 parameter，Data Type 为 0x13；n = 2，表示 2 parameters，Data Type 为 0x23。
 如果 n >= 3，将以 Long Packet 的形式进行对 Payload 打包，表示 n parameters，Data Type 为 0x29。
 
-7、Delay
+7. Delay
 
 表示当前 Packet 发送完成之后，需要延时多少 ms，再开始发送下一条命令。
 
-8、Payload Length
+8. Payload Length
+
 表示 Packet 的有效负载长度。
-9、Payload
+
+9. Payload
+
 表示 Packet 的有效负载，长度为 Payload Length。
-10、Example
+
+10. Example
 
 ![6-5-7_Dimming](Rockchip_Developer_Guide_RT-Thread_Display/6-5-7_Dimming.png)
 
@@ -348,8 +359,12 @@ Gerneic Packet 包括 n 个字节的 parameters。
 
 ### 7.1 display_test 支持的测试 case
 
-使用命令: display_test cmd
+使用命令:
+
+```c
+display_test cmd
 dsc; winloop; winmove; winalpha; scale; coe;  bcsh; gamma; clip; mipi_switch; ebook; color_bar
+```
 
 | **CMD**     | **Description**                           |
 | ----------- | ----------------------------------------- |
@@ -368,45 +383,45 @@ dsc; winloop; winmove; winalpha; scale; coe;  bcsh; gamma; clip; mipi_switch; eb
 
 ### 7.2 demo 说明
 
-1、LCD 设备
+1. LCD 设备
 
-```
+```c
 g_display_dev = rt_device_find("lcd");
 RT_ASSERT(g_display_dev != RT_NULL);
 ```
 
-2、 打开 lcd 设备
+2. 打开 lcd 设备
 
-```
+```c
 ret = rt_device_open(g_display_dev, RT_DEVICE_FLAG_RDWR);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-3、使能 lcd 设备
+3. 使能 lcd 设备
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_ENABLE, NULL);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-4、获得屏相关信息
+4. 获得屏相关信息
 
-```
+```c
 ret = rt_device_control(g_display_dev, RTGRAPHIC_CTRL_GET_INFO, (void *)graphic_info);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-5、初始化 win_config, post_scale 配置信息
+5. 初始化 win_config, post_scale 配置信息
 
-win_config 的初始化：
+- win_config 的初始化：
 
-```
+```c
 static void display_win_init(struct CRTC_WIN_STATE *win_config)
 {
     win_config->winEn = true;
     win_config->winId = 0;
-    win_config->zpos = 0;
-    win_config->format = SRC_DATA_FMT;
+    win_config->zpos  = 0;
+    win_config->format   = SRC_DATA_FMT;
     win_config->yrgbAddr = (uint32_t)rtt_framebuffer_test;
     win_config->cbcrAddr = (uint32_t)rtt_framebuffer_uv;
     win_config->yrgbLength = 0;
@@ -425,9 +440,9 @@ static void display_win_init(struct CRTC_WIN_STATE *win_config)
 }
 ```
 
-post_scale 初始化（全屏显示不缩放）
+- post_scale 初始化（全屏显示不缩放）
 
-```
+```c
 static void display_post_init(struct CRTC_WIN_STATE *win_config,
                               struct VOP_POST_SCALE_INFO *post_scale,
                               struct rt_device_graphic_info *graphic_info)
@@ -441,9 +456,9 @@ static void display_post_init(struct CRTC_WIN_STATE *win_config,
 }
 ```
 
-post_scale 初始化（区域刷新水平和垂直分别做 2 倍放大）
+- post_scale 初始化（区域刷新水平和垂直分别做 2 倍放大）
 
-```
+```c
 static void display_post_init(struct CRTC_WIN_STATE *win_config,
                               struct VOP_POST_SCALE_INFO *post_scale,
                               struct rt_device_graphic_info *graphic_info)
@@ -457,30 +472,30 @@ static void display_post_init(struct CRTC_WIN_STATE *win_config,
 }
 ```
 
-6、如果是 bpp 格式图片，load lut 调色板，如果不是 bpp 格式可以忽略
+6. 如果是 bpp 格式图片，load lut 调色板，如果不是 bpp 格式可以忽略
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_LOAD_LUT, &lut_state);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-7、配置 post_scale 确认缩放前的数据大小和缩放后显示的大小
+7. 配置 post_scale 确认缩放前的数据大小和缩放后显示的大小
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_SET_SCALE, post_scale);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-8、配置 win_config 图层信息
+8. 配置 win_config 图层信息
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_SET_PLANE, win_config);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-9、提交显示
+9. 提交显示
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_COMMIT, NULL);
 RT_ASSERT(ret == RT_EOK);
 ```
@@ -489,13 +504,13 @@ RT_ASSERT(ret == RT_EOK);
 
 ### 7.3 区域刷新坐标配置说明
 
-1、同时支持 X 和 Y 方向区域刷新屏的配置 demo
+1. 同时支持 X 和 Y 方向区域刷新屏的配置 demo
 
 ![7-3-1](Rockchip_Developer_Guide_RT-Thread_Display/7-3-1.png)
 
-(1) 红色区域为 win0 图层，坐标为(X0,Y0),大小为(W0,H0),此时配置:
+- 红色区域为 win0 图层，坐标为(X0,Y0),大小为(W0,H0),此时配置:
 
-```
+```c
 win_config->winId = 0;
 win_config->winEn = 1;
 ……
@@ -505,21 +520,21 @@ win_config->srcW = W0;
 win_config->srcH = H0;
 ```
 
-(2) 绿色区域为 win1 图层，坐标为(X1,Y1),大小为(W1,H1),此时配置:
+- 绿色区域为 win1 图层，坐标为(X1,Y1),大小为(W1,H1),此时配置:
 
-```
+```c
 win_config->winId = 1;
 win_config->winEn = 1;
 ……
 win_config->srcX = X1;
 win_config->srcY = Y1;
 win_config->srcW = W1;
-win_config->srcH= H1;
+win_config->srcH = H1;
 ```
 
-(3) 后级缩放配置
+- 后级缩放配置
 
-```
+```c
 post_scale->srcW = W1;
 post_scale->srcH = H2;
 post_scale->dstX = X1;
@@ -528,89 +543,163 @@ post_scale->dstW = W1;
 post_scale->dstH = H2;
 ```
 
-实际配置显示的代码中要求先配置后级的缩放参数：
+- 实际配置显示的代码中要求先配置后级的缩放参数：
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_SET_SCALE, post_scale);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-然后调用 WIN0, WIN1 的配置：
+- 然后调用 WIN0, WIN1 的配置：
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_SET_PLANE, win_config);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-最后提交显示：
+- 最后提交显示：
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_COMMIT, NULL);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-2、只支持 Y 方向不支持 X 方向区域刷新配置 demo
+2. 只支持 Y 方向不支持 X 方向区域刷新配置 demo
 
 ![7-3-2](Rockchip_Developer_Guide_RT-Thread_Display/7-3-2.png)
 
-(1) 红色区域为 win0 图层，坐标为(X0,Y0),大小为(W0,H0),此时配置:
+- 红色区域为 win0 图层，坐标为(X0,Y0),大小为(W0,H0),此时配置:
 
-```
-win_config->winId  = 0;
+```c
+win_config->winId = 0;
 win_config->winEn = 1;
 ……
-win_config->srcX	= X0;
-win_config->srcY	= Y0;
-win_config->srcW	= W0;
-win_config->srcH	= H0;
+win_config->srcX = X0;
+win_config->srcY = Y0;
+win_config->srcW = W0;
+win_config->srcH = H0;
 ```
 
-(2) 绿色区域为 win1 图层，坐标为(X1,Y1),大小为(W1,H1),此时配置:
+- 绿色区域为 win1 图层，坐标为(X1,Y1),大小为(W1,H1),此时配置:
 
-```
-win_config->winId	= 1;
-win_config->winEn	= 1;
+```c
+win_config->winId = 1;
+win_config->winEn = 1;
 ……
-win_config->srcX	= X1;
-win_config->srcY	= Y1;
-win_config->srcW	= W1;
-win_config->srcH	= H1;
+win_config->srcX = X1;
+win_config->srcY = Y1;
+win_config->srcW = W1;
+win_config->srcH = H1;
 ```
 
-(3) 后级缩放配置
+- 后级缩放配置
 
-```
-post_scale->srcW  = Xres;
-post_scale->srcH	= H2;
-post_scale->dstX	= 0;
-post_scale->dstY	= Y0;
-post_scale->dstW  = Xres;
-post_scale->dstH	= H2;
+```c
+post_scale->srcW = Xres;
+post_scale->srcH = H2;
+post_scale->dstX = 0;
+post_scale->dstY = Y0;
+post_scale->dstW = Xres;
+post_scale->dstH = H2;
 ```
 
-由于不支持 X 方向的区域刷新，所以和 1 中的对比，post scale 的 src 和 dstW 都配置为屏实际的宽 Xres，dstX 配置为 0，其他的和 1 中的步骤一致：
-实际配置显示的代码中要求先配置后级的缩放参数：
+- 由于不支持 X 方向的区域刷新，所以和 1 中的对比，post scale 的 src 和 dstW 都配置为屏实际的宽 Xres，dstX 配置为 0，其他的和 1 中的步骤一致：
+  实际配置显示的代码中要求先配置后级的缩放参数：
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_SET_SCALE, post_scale);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-然后调用 WIN0, WIN1 的配置：
+- 然后调用 WIN0, WIN1 的配置：
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_SET_PLANE, win_config);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-最后提交显示：
+- 最后提交显示：
 
-```
+```c
 ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_COMMIT, NULL);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-## 8 参考文档
+## 8 Color Key使用说明
+
+VOP支持关键色全透的效果即指定图层中某一种颜色实现透视到下一图层或者背景层的效果，驱动提供win_config中的colorKey参数用来配置color key功能，其中bit[23, 0]分别表示RGB三个分量的关键色数据，bit24用来表示打开或者关闭color key功能。
+
+下面分别以RGB888和RGB565两中格式说明color key配置方法，R_VAL，G_VAL，B_VAL分别表示要透视的RGB三个分量的值：
+
+```c
+#define COLOR_KEY_EN	BIT(24)
+```
+
+### 8.1 RGB888格式配置Color Key的方法
+
+1. 实现红色全透，配置:
+
+```c
+win_config->colorKey = 0xFF0000 | COLOR_KEY_EN;
+```
+
+2. 实现绿色全透，配置:
+
+```c
+win_config->colorKey = 0x00FF00 | COLOR_KEY_EN;
+```
+
+3. 实现蓝色全透，配置:
+
+```c
+win_config->colorKey = 0xf0000FF | COLOR_KEY_EN;
+```
+
+即:
+
+```c
+win_config->colorKey = (R_VAL << 16) | (G_VAL << 8) | (B_VAL) | COLOR_KEY_EN;
+```
+
+### 8.2 RGB565格式配置Color Key的方法
+
+1. 实现红色全透，配置：
+
+```c
+win_config->colorKey = 0xF80000 | COLOR_KEY_EN;
+```
+
+2. 实现绿色全透，配置：
+
+```c
+win_config->colorKey = 0x00FC00 | COLOR_KEY_EN;
+```
+
+3. 实现蓝色全透，配置：
+
+```c
+win_config->colorKey = 0x0000F8 | COLOR_KEY_EN;
+```
+
+即:
+
+```c
+R_VAL_CONFIG = R_VAL << 3;  //R[4,0] -> R[7,0]
+
+G_VAL_CONFIG = G_VAL << 2;  //G[5,0] -> G[7,0]
+
+B_VAL_CONFIG = B_VAL << 3;  //B[4,0] -> B[7,0]
+
+win_config->colorKey = (R_VAL_CONFIG  << 16) | (G_VAL_CONFIG << 8) | B_VAL_CONFIG  | COLOR_KEY_EN;
+```
+
+### 8.3 关闭Color Key的方法
+
+```c
+win_config->colorKey = 0;
+```
+
+## 9 参考文档
 
 (1) Rockchip DRM Display Driver Development Guide
 (2) Rockchip_DRM_Panel_Porting_Guide.pdf
