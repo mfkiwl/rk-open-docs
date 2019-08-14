@@ -60,13 +60,6 @@ repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.1
 .repo/repo/repo sync
 ```
 
-   默认的 manifest 包含了大部分 Rockchip SOC 的实现，但是有一些芯片是单独 manifest 维护的，例如：Pisces，可以用如下命令指定manifest来同步：
-
-```shell
-repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.10.29:29418/rtos/rt-thread/manifests -m pisces.xml -b master
-.repo/repo/repo sync
-```
-
 ### 2.2 编译环境配置
 
    目前有两台服务器：172.16.12.243 和 10.10.10.110，都已经搭建好 RT-Thread 的编译环境，所以使用这两个服务器的工程师可以跳过这一节，直接开始开发。
