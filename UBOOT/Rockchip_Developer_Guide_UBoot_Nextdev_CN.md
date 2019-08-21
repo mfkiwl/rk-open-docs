@@ -1,6 +1,6 @@
 # U-Boot next-dev(v2017)开发指南
 
-发布版本：1.40
+发布版本：1.41
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -9,7 +9,7 @@
 ​	Chen Liang cl@rock-chips.com
 ​	Ping Lin <hisping.lin@rock-chips.com>
 
-日期：2019.06
+日期：2019.08
 
 文件密级：公开资料
 
@@ -64,6 +64,7 @@
 | 2019-05-14 | V1.32    | 朱志展   | 补充 kernel cmdline 说明                                       |
 | 2019-05-29 | V1.33    | 朱志展   | 增加 MMC 命令小节、AVB 与 A/B 系统说明，术语说明                           |
 | 2019-06-20 | V1.40    | 陈健洪        | 增加/更新：memblk/sysmem/bi dram/statcktrace/hotkey/fdt param/run_command/distro/led/reset/env/wdt/spl/amp/crypto/efuse/Android compatible/io-domain/bootflow/pack image |
+| 2019-08-21 | V1.41    | 朱志展        | 增加 secure otp 说明 |
 ---
 [TOC]
 ---
@@ -1290,7 +1291,7 @@ void mmu_set_region_dcache_behaviour(phys_addr_t start, size_t size,
 
 U-Boot 负责 kernel 的引导，通常 32 位平台使用 zImage，64 位平台使用 Image，U-Boot 不用关心它们的解压问题。
 
-目前 rockchip 平台新增：U-Boot 支持解压 LZ4 格式内核。
+目前 Rockchip 平台新增：U-Boot 支持解压 LZ4 格式内核。
 
 - 使能配置：
 
@@ -1397,7 +1398,7 @@ CONFIG_ARM64_BOOT_AARCH32
 
 ### 2.17 TrustZone
 
-目前 rockchip 所有的平台都启用了 ARM TrustZone 技术，在整个 TrustZone 的架构中 U-Boot 属于 Non-Secure World，所以无法访问任何安全的资源（如：某些安全 memory、安全 efuse...）。
+目前 Rockchip 所有的平台都启用了 ARM TrustZone 技术，在整个 TrustZone 的架构中 U-Boot 属于 Non-Secure World，所以无法访问任何安全的资源（如：某些安全 memory、安全 efuse...）。
 
 ## 3. 平台编译
 
@@ -1946,7 +1947,7 @@ irq_handler_enable(irq);
 （3）强制指定 gpio
 
 ```c
-// 此方法直接强制指定gpio，传入的gpio必须通过Rockchip特殊的宏来声明才行，不够灵活，比较少用。
+// 此方法直接强制指定 gpio，传入的 gpio 必须通过 Rockchip 特殊的宏来声明才行，不够灵活，比较少用。
 int hard_gpio_to_irq(unsigned gpio);
 ```
 
@@ -2508,7 +2509,7 @@ CONFIG_ERRNO_STR=y
 
 **关于 upstream defconfig 配置的说明：**
 
-upstream 维护了一套 rockchip U-Boot 显示驱动，目前主要支持 RK3288 和 RK3399 两个平台：
+upstream 维护了一套 Rockchip U-Boot 显示驱动，目前主要支持 RK3288 和 RK3399 两个平台：
 
 ```
 ./drivers/video/rockchip/
@@ -2939,7 +2940,7 @@ CONFIG_RKSFC_NAND    /* SPI Nand flash */
 
 注意：
 
-1. SFC（serial flash controller）是 rockchip 为简便支持 spi flash 所设计的专用模块；
+1. SFC（serial flash controller）是 Rockchip 为简便支持 spi flash 所设计的专用模块；
 2. 由于 rknand 驱动与 rkflash 驱动 Nand 代码中 ftl 部分不兼容，所以
 - CONFIG_RKNAND 与 CONFIG_RKNANDC_NAND 不能同时配置
 - CONFIG_RKNAND 与 CONFIG_RKSFC_NAND 不能同时配置
@@ -3703,7 +3704,7 @@ U-Boot 向 kernel 传递 cmdline 的方法是：篡改内核 dtb 里的/chosen/b
 
 #### 5.17.2 cmdline 含义
 
-下面列出 rockchip 常用的 cmdlinie 参数含义,如有其他需求,可以先参考 kernel 下的文件 Documentation/admin-guide/kernel-parameters.txt 的参数定义。
+下面列出 Rockchip 常用的 cmdlinie 参数含义,如有其他需求,可以先参考 kernel 下的文件 Documentation/admin-guide/kernel-parameters.txt 的参数定义。
 
 - sdfwupdate：用作 sd 升级卡升级标志
 - root=PARTUUID：为 kernel 指定 rootfs(system)在存储中的位置，仅 GPT 表支持
@@ -3843,7 +3844,7 @@ crypto: crypto@ff0b0000 {
 
 #### 5.19.1 框架支持
 
-reset 驱动使用 wdt-uclass.c 通用框架和标准接口。在 rockchip 平台上，reset 的实质上是进行 CRU 软复位。
+reset 驱动使用 wdt-uclass.c 通用框架和标准接口。在 Rockchip 平台上，reset 的实质上是进行 CRU 软复位。
 
 配置：
 
@@ -4073,7 +4074,7 @@ endif
 
 #### 5.20.5 ENV_IS_IN_BLK_DEV
 
-目前常用的存储介质一般有：eMMC/sdmmc/Nandflash/Norflash 等，但 U-Boot 原生的 Nand、Nor 类 ENV 驱动都走 MTD 框架，而 rockchip 所有已支持的存储介质都是走 BLK 框架层，因此这些 ENV 驱动无法使用。
+目前常用的存储介质一般有：eMMC/sdmmc/Nandflash/Norflash 等，但 U-Boot 原生的 Nand、Nor 类 ENV 驱动都走 MTD 框架，而 Rockchip 所有已支持的存储介质都是走 BLK 框架层，因此这些 ENV 驱动无法使用。
 
 因此，rockchip 为接入 BLK 框架层的存储介质提供了 CONFIG_ENV_IS_IN_BLK_DEV 配置选项：
 
@@ -4204,14 +4205,21 @@ leds {
 
 #### 5.23.1 框架支持
 
-efuse/otp 驱动使用 misc-uclass.c 通用框架和标准接口。通常情况下，SoC 上一般会有 secure 和 non-secure 的 efuse/otp 之分，U-Boot 仅提供 non-secure 的访问。
+efuse/otp 驱动使用 misc-uclass.c 通用框架和标准接口。通常情况下，SoC 上一般会有 secure 和 non-secure 的 efuse/otp 之分，U-Boot 提供 non-secure 的访问，U-Boot spl 提供部分 secure otp 的读写。
 
-配置：
+non-secure 配置：
 
 ```
 CONFIG_MISC
 CONFIG_ROCKCHIP_EFUSE
 CONFIG_ROCKCHIP_OTP
+```
+
+secure 配置：
+
+```
+CONFIG_SPL_MISC=y
+CONFIG_SPL_ROCKCHIP_SECURE_OTP=y
 ```
 
 框架代码：
@@ -4222,39 +4230,112 @@ CONFIG_ROCKCHIP_OTP
 
 驱动代码：
 
-```
+```c
+// non-secure:
 ./drivers/misc/rockchip-efuse.c
 ./drivers/misc/rockchip-otp.c
+// secure:
+./drivers/misc/rockchip-secure-otp.S
 ```
 
 #### 5.23.2 相关接口
 
-```
+```c
+// non-secure:
 int misc_read(struct udevice *dev, int offset, void *buf, int size)
+// secure:
+int misc_read(struct udevice *dev, int offset, void *buf, int size)
+int misc_write(struct udevice *dev, int offset, void *buf, int size)
 ```
 
-目前 U-Boot 仅对 efuse/otp 的读操作进行了底层实现。
+#### 5.23.3 设备节点
 
-#### 5.23.3 调试命令
+以 rk3308 为例：
 
-rockchip efuse/otp 驱动中实现了```rockchip_dump_efuses```和```rockchip_dump_otps```命令，但是需要打开 DEBUG 后才能看到；这两个命令分别 dump 出所有的 efuse/otp 信息。
+non-secure:
+
+```
+otp: otp@ff210000 {
+	compatible = "rockchip,rk3308-otp";
+	reg = <0x0 0xff210000 0x0 0x4000>;
+};
+```
+
+secure:
+
+```
+secure_otp: secure_otp@0xff2a8000 {
+	compatible = "rockchip,rk3308-secure-otp";
+	reg = <0x0 0xff2a8000 0x0 0x4000>;
+	secure_conf = <0xff2b0004>;
+	mask_addr = <0xff540000>;
+};
+```
+
+#### 5.23.4 调试命令
+
+rockchip efuse/otp 驱动中实现了```rockchip_dump_efuses```和```rockchip_dump_otps```命令，这两个命令分别 dump 出 non-secure 区域的 efuse/otp 信息。
 
 ```c
-// rockchip-efuse.c文件中：
-#if defined(DEBUG)
 static int dump_efuses(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 		......
 }
-#endif
 
-// rockchip-otps.c文件中：
-#if defined(DEBUG)
 static int dump_otps(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 		......
 }
-#endif
+```
+
+#### 5.23.5 调用示例
+
+non-secure 示例:
+
+```c
+char data[10] = {0};
+struct udevice *dev;
+/* retrieve the device */
+ret = uclass_get_device_by_driver(UCLASS_MISC,
+				  DM_GET_DRIVER(rockchip_otp), &dev);
+if (ret) {
+	printf("no misc-device found\n");
+	return 0;
+}
+
+misc_read(dev, 0x10, &data, 10);
+```
+
+secure 示例:
+
+```c
+char data[10] = {0};
+struct udevice *dev;
+int i;
+/* retrieve the device */
+ret = uclass_get_device_by_driver(UCLASS_MISC,
+				  DM_GET_DRIVER(rockchip_secure_otp), &dev);
+if (ret) {
+	printf("no misc-device found\n");
+	return 0;
+}
+
+for (i = 0; i < 10; i++)
+    data[i] = i;
+
+misc_write(dev, 0x10, &data, 10);
+memset(data, 0, 10);
+misc_read(dev, 0x10, &data, 10);
+```
+
+#### 5.23.6 secure otp 安全区域说明
+
+rockchip 对 secure otp 只开放部分区域读写，区域如下：
+
+```c
+0x0;        // Rockchip 定义为 Secure boot enable flag
+0x10-0x2f;  // Rockchip 定义为 RSA Public key hash
+0x80-0x187; // Rockchip 定义为 reserved for OEM
 ```
 
 ### 5.24 IO-DOMAIN 驱动
@@ -4905,7 +4986,7 @@ TPL(Tiny Program Loader)和 SPL(Secondary Program Loader)是比 U-Boot 更早阶
 BOOTROM => TPL(ddr bin) => SPL(miniloader) => TRUST => U-BOOT => KERNEL
 ```
 
-TPL 相当于 ddr bin，SPL 相当于 miniloader，所以 SPL+TPL 的组合实现了跟 rockchip ddr.bin+miniloader 完全一致的功能，可相互替换。
+TPL 相当于 ddr bin，SPL 相当于 miniloader，所以 SPL+TPL 的组合实现了跟 Rockchip ddr.bin+miniloader 完全一致的功能，可相互替换。
 
 SPL 和 TPL 更多原理介绍请参考：
 
@@ -5142,7 +5223,7 @@ cjh@ubuntu:~/uboot-nextdev/u-boot$ fdtdump u-boot.itb | less
 
 #### 8.3.2 RKFW 格式
 
-RKFW 格式的固件是 rockchip 默认的固件打包方案，即 SPL 引导独立的分区和固件：trust.img 和 uboot.img。
+RKFW 格式的固件是 Rockchip 默认的固件打包方案，即 SPL 引导独立的分区和固件：trust.img 和 uboot.img。
 
 **配置：**
 
