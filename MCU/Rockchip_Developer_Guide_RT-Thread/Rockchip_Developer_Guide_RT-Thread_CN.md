@@ -36,6 +36,7 @@
 | 2019-06-17 | v1.3     | 陈谋春   | 更新模块配置说明，增加编译脚本配置 |
 | 2019-07-08 | v1.4     | 陈谋春   | 增加静态库编译说明                 |
 | 2019-08-12 | v1.5     | 陈谋春   | 修正准备工作：下载工程、保存配置   |
+| 2019-08-23 | v1.6     | 陈谋春   | 增加Cache问题注意事项              |
 
 ---
 
@@ -55,7 +56,18 @@
 
    具体下载命令如下：
 
+1. repo 工具下载，如果已经安装了 repo ，请略过
+
 ```shell
+git clone ssh://10.10.10.29:29418/android/tools/repo -b stable
+export PATH=/path/to/repo:$PATH
+```
+
+2. 工程下载
+
+```shell
+mkdir rt-thread
+cd rt-thread
 repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.10.29:29418/rtos/rt-thread/manifests -b master
 .repo/repo/repo sync
 ```
@@ -72,6 +84,18 @@ sudo apt-get update
 sudo apt-get install gcc-arm-embedded scons clang-format astyle
 ```
 
+   如果不想安装 toolchain ，还可以通过下载的方式，通过环境变量指定一下 toolchain 的路径即可，具体如下：
+
+```shell
+export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
+```
+
+   由于 RT-Thread 使用 menuconfig 做配置工具，所以需要安装如下软件包，如果已经配置过 Linux 或 Android 的开发环境，请跳过这一步：
+
+```shell
+sudo apt-get install libncurses5-dev build-essential
+```
+
 ### 2.3 编译
 
    传统开源软件一般用 Makefile 作为编译脚本，如 Linux，有些会加上 Autoconf、Automake 来实现更灵活方便的配置和编译；而 RT-Thread 用 SCons 来实现编译控制，SCons 是一套由 Python 语言编写的开源构建系统，类似于 GNU Make。它采用不同于通常 Makefile 文件的方式，而使用 SConstruct 和 SConscript 文件来替代。这些文件也是 Python 脚本，能够使用标准的 Python 语法来编写。所以在 SConstruct、SConscript 文件中可以调用 Python 标准库进行各类复杂的处理，而不局限于 Makefile 设定的规则。
@@ -79,7 +103,7 @@ sudo apt-get install gcc-arm-embedded scons clang-format astyle
    编译命令如下：
 
 ```shell
-cd bsp/rockchip-rk2108
+cd bsp/rockchip/rk2108
 scons -j8
 ```
 
@@ -180,7 +204,7 @@ if GetDepend('SOC_RK2108'):
 elif GetDepend('SOC_RK1808'):
     LIBPATH = [cwd + '/rk1808']
 
-group = DefineGroup('wlan-wiced', src, depend = ['RT_USING_FILE_TEST'], CPPPATH = CPPPATH, LIBS = LIBS, LIBPATH = LIBPATH)
+group = DefineGroup('file-test', src, depend = ['RT_USING_FILE_TEST'], CPPPATH = CPPPATH, LIBS = LIBS, LIBPATH = LIBPATH)
 ```
 
    所以，一些不想开源的模块，可以按上面的方法做成静态库，以动态库的形式对外发布。
@@ -190,7 +214,7 @@ group = DefineGroup('wlan-wiced', src, depend = ['RT_USING_FILE_TEST'], CPPPATH 
    RT-Thread 沿用了 Linux 的 Kconfig 作为模块配置开关，具体命令如下：
 
 ```shell
-cd bsp/rockchip-rk2108
+cd bsp/rockchip/rk2108
 scons --menuconfig
 ```
 
@@ -220,7 +244,7 @@ scons -j8
   可以看到下载下来的 Wi-Fi 驱动在如下目录：
 
 ```shell
-/path/to/rt-thread/bsp/rockchip-rk2108/packages/wlan_wiced-latest
+/path/to/rt-thread/bsp/rockchip/rk2108/packages/wlan_wiced-latest
 ```
 
    其他 pkgs 命令如下：
@@ -246,7 +270,7 @@ optional arguments:
 
 ### 2.6 保存配置
 
-   上一节我们看到配置信息是保存在 .config ，同时在每一个板级配置目录下都有一个默认配置 defconfig，如果没有执行 menuconfig ，会用默认的 rtconfig.h 参与编译。在提交配置修改的时候，如果配置需要应用于所有的板级，则三个都要提交，否则只要提交相应板级的 defconfig。
+   上一节我们看到配置信息是保存在 .config ，同时在每一个板级配置目录下都有一个默认配置 defconfig，如果没有执行 menuconfig ，会用默认的 rtconfig.h 参与编译。==在提交配置修改的时候，如果配置需要应用于所有的板级，则三个都要提交，否则只要提交相应板级的 defconfig==。
 
    ==在线包经常变动，所以如果在线包选上了，每个工程师的在线包起点不一样，其配置信息中的在线包选项也会差异很大，导致review变得不方便，所以默认我们是不选上在线包的，需要某个在线包功能的时候，请移植到third_party下，并修改Kconfig配置项名字，减少和在线包冲突，这样也方便修改在线包的代码==
 
@@ -344,12 +368,14 @@ if PLATFORM == 'gcc':
 import os
 Import('RTT_ROOT')
 
+PROJECT = 'RK2108'
+Export('PROJECT')
 cwd = str(Dir('#'))
 objs = []
 list = os.listdir(cwd)
 
 # HAL的编译脚本
-objs = SConscript(os.path.join(cwd, 'HalSConscript'), variant_dir = '.', duplicate=0)
+objs = SConscript(os.path.join(cwd, '../common/HalSConscript'), variant_dir = 'common/hal', duplicate=0)
 
 # 搜索所有包含SConscript文件的一级子目录，全部都会加入编译
 for d in list:
@@ -358,8 +384,8 @@ for d in list:
         objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
 # 添加BSP主目录外的模块：公共驱动、测试和examples
-objs = objs + SConscript(os.path.join(RTT_ROOT, 'bsp/rockchip-common/drivers/SConscript'), variant_dir = 'common/drivers', duplicate=0)
-objs = objs + SConscript(os.path.join(RTT_ROOT, 'bsp/rockchip-common/tests/SConscript'), variant_dir = 'common/tests', duplicate=0)
+objs = objs + SConscript(os.path.join(RTT_ROOT, 'bsp/rockchip/common/drivers/SConscript'), variant_dir = 'common/drivers', duplicate=0)
+objs = objs + SConscript(os.path.join(RTT_ROOT, 'bsp/rockchip/common/tests/SConscript'), variant_dir = 'common/tests', duplicate=0)
 objs = objs + SConscript(os.path.join(RTT_ROOT, 'examples/kernel/SConscript'), variant_dir = 'examples/kernel', duplicate=0)
 
 Return('objs')
@@ -400,14 +426,18 @@ ASFLAGS                                            # 全部汇编标志
    前面步骤编译生成的只是 elf 和 bin ，需要打包成固件才能烧写到设备上，下面以 RK2108 为例介绍一下固件打包和烧写，其他芯片可能略有差别，以产品文档为主：
 
 ```shell
-cd bsp/rockchip-rk2108
+cd bsp/rockchip/rk2108
 ./mkimage.sh                                              # 打包固件
-upgrade_tool db Image/rk2108_db_loader.bin                # 下载烧写loader
+upgrade_tool db Image/rk2108_db_loader.bin                # 下载烧写loader，这个loader只用于下载，重启后自毁
 upgrade_tool wl 0 ./Image/Firmware.img                    # 下载固件
-upgrade_tool rd
+upgrade_tool rd                                           # 重启
 ```
 
-   以上是 linux 的下载
+   以上是 linux 的下载，另外我们还封装了一个脚本，简化下载流程：
+
+```shell
+./update_fimeware.sh
+```
 
    固件打包的配置文件位于 Image/setting.ini ，具体如下：
 
@@ -499,14 +529,14 @@ ls documentation/coding_style_cn.md -l
    目前驱动程序被分为两类：公共和私有，前者指的是多个芯片可以共用的驱动，可以放如下目录：
 
 ```shell
-/path/to/rt-thread/bsp/rockchip-common/drivers
+/path/to/rt-thread/bsp/rockchip/common/drivers
 ```
 
    而私有驱动，则只适用特定芯片，可以放到这个芯片 BSP 主目录下的 drivers 目录，例如：
 
 ```shell
-/path/to/rt-thread/bsp/rockchip-rk2108/drivers
-/path/to/rt-thread/bsp/rockchip-rk1808/drivers
+/path/to/rt-thread/bsp/rockchip/rk2108/drivers
+/path/to/rt-thread/bsp/rockchip/rk1808/drivers
 ```
 
    所有的驱动都要以 drv_xxx.c 和 drv_xxx.h，其中 xxx 为模块名或相应缩写，要求全部小写，不能有特殊字符存在，如果必要可以用"_"分割长模块名，如“drv_sdio_sd.c”。各个模块不需要修改编译脚本，目前的脚本已经可以自动搜索 drivers 下所有的源文件，自动完成编译，但是推荐模块加上自己的 Kconfig 配置开关，并且考虑多芯片之间的复用，方便裁剪和调试，具体可以参考如下实现：
@@ -558,7 +588,7 @@ void do_someting(void)
 #endif
 ```
 
-   如果驱动有汇编文件，尽量三种编译器都支持：gcc、keil(armcc)、iar，文件名可以按如下规则：xxx_gcc.S、xxx_arm.s、xxx_iar.s，目前汇编文件不会自动加入编译，要手动修改编译脚本，参考 bsp/rockchip-rk2108/drivers/SConscript：
+   如果驱动有汇编文件，尽量三种编译器都支持：gcc、keil(armcc)、iar，文件名可以按如下规则：xxx_gcc.S、xxx_arm.s、xxx_iar.s，目前汇编文件不会自动加入编译，要手动修改编译脚本，参考 bsp/rockchip/rk2108/drivers/SConscript：
 
 ```python
 Import('RTT_ROOT')
@@ -569,11 +599,11 @@ cwd     = os.path.join(str(Dir('#')), 'drivers')
 
 src = Glob('*.c')
 if rtconfig.CROSS_TOOL == 'gcc':
-    src += Glob(RTT_ROOT + '/bsp/rockchip-common/drivers/drv_cache_gcc.S')
+    src += Glob(RTT_ROOT + '/bsp/rockchip/common/drivers/drv_cache_gcc.S')
 elif rtconfig.CROSS_TOOL == 'keil':
-    src += Glob(RTT_ROOT + '/bsp/rockchip-common/drivers/drv_cache_arm.s')
+    src += Glob(RTT_ROOT + '/bsp/rockchip/common/drivers/drv_cache_arm.s')
 elif rtconfig.CROSS_TOOL == 'iar':
-    src += Glob(RTT_ROOT + '/bsp/rockchip-common/drivers/drv_cache_iar.s')
+    src += Glob(RTT_ROOT + '/bsp/rockchip/common/drivers/drv_cache_iar.s')
 
 CPPPATH = [cwd]
 
@@ -621,11 +651,11 @@ static void udelay(unsigned long usec) {
    提交驱动的同时，最好同步提交测试程序，目前我们的 BSP 测试被分为两个部分：公共和私有，前者是可以多个芯片共用的测试，后者是这个芯片特有的测试，目录分别如下：
 
 ```shell
-/path/to/rt-thread/bsp/rockchip-common/tests
-/path/to/rt-thread/bsp/rockchip-rk2108/tests
+/path/to/rt-thread/bsp/rockchip/common/tests
+/path/to/rt-thread/bsp/rockchip/rk2108/tests
 ```
 
-   可以把测试程序做成 RTT 的 shell 命令，文件名可以命名为 tc_xxx.c，其中 xxx 是模块名，例如串口可以用 tc_uart.c。下面是一个简单例子：
+   可以把测试程序做成 RTT 的 shell 命令，文件名可以命名为 test_xxx.c，其中 xxx 是模块名，例如串口可以用 test_uart.c。下面是一个简单例子：
 
 ```c
 #include <rthw.h>
@@ -961,7 +991,7 @@ Show more call stack info by run: addr2line -e rtthread.elf -a -f 04010abe 04010
    最后一行的命令直接复制到 bsp 的主目录下执行，就可以看到错误时候的堆栈，从而找到错误位置：
 
 ```shell
-cd /path_to_rtthread_home/bsp/rockchip-pisces
+cd /path_to_rtthread_home/bsp/rockchip/rk2108
 addr2line -e rtthread.elf -a -f 04010abe 04010a9d 0400c325 0400afad
 ```
 
@@ -974,3 +1004,75 @@ void dump_call_stack(void);
 
 #define RT_BACKTRACE_ASSERT(EX)
 ```
+
+## 5.6 Cache一致性
+
+   RK2108 有两个 Cache：ICache 和 Dcache ，所以外设如果存在和 CPU 共用内存的场景，就必须要考虑 Cache 一致性的问题，在这个过程中需要注意两点：共用的内存要保持 Cache Line 对齐，在合适的位置做 Cache Maintain。
+
+​    由于 Cache 都是以 Cache Line 为单位操作的，如果使用的内存范围不以 Cache Line 对齐，在做 Cache Maintain 操作的时候就会影响到相邻的内存（因为在同一个 Cache Line 内）。而不幸的是，可能由于大部分 MCU 都不带 Cache ，所以 RT-Thread 在这一块做的并不好，所以我们额外增加了几个做了 Cache Line 对齐的分配释放函数，具体如下：
+
+```c
+void *rt_dma_malloc(uint32_t size);                /* 在系统堆分配DMA内存 */
+void rt_dma_free(void *ptr);
+
+void *rt_dma_malloc_large(rt_size_t size);         /* 在large堆分配DMA内存 */
+void rt_dma_free_large(void *ptr);
+```
+
+   ==所有需要做 Cache Maintain 操作的内存，动态分配的时候都要用带 dma 名字的分配释放函数，如果是静态分配，也要通过属性来保证对齐==，例如：
+
+```c
+/* CACHE_LINE_SIZE定义了Cache Line的大小，内存大小必须是它的整数倍，HAL_CACHELINE_ALIGNED则可以保证起始地址的对齐 */
+HAL_CACHELINE_ALIGNED uint8_t setupBuf[CACHE_LINE_SIZE];  
+```
+
+   上面一直在提 Cache Maintain ，这其实可以分为两类操作：Clean 和 Invalidate，不同 OS 对它们的叫法可以略有差异，我们这里沿用最通用的叫法。它们的含义分别如下：
+
+- Clean: 如果 Cache Line 的标识是 dirty 的，即数据加载到 Cache 以后被CPU修改过了，这个操作会把数据写回到下一级存储，对RK2108来说就是写回到内部SRAM或外部PSRAM
+
+- Invalidate: 把Cache中的数据置为无效
+
+   理解了上面 Clean 和 Invalidate 的差异以后，对于它们的用途就比较好理解了，下面是一个伪代码的例子（假设Cache 下一级是 sram）：
+
+```c
+camera_record_data(buf);               /* camera录制一段视频 */
+cache_invalidate(buf);                 /* cpu invalidate这段视频 */
+cpu_load_and_modify_data(buf);         /* 由于这段数据被invalidate，cpu修改前会从sram再次加载，此时就能看到camera录制的最新数据，cpu在这个基础对数据做处理，比如加一些特效 */
+cache_clean(buf);                      /* cpu clean这段视频, cpu修改过的视频数据会被写回到sram */
+vop_display_data(buf);                 /* 此时vop看到的数据就是cpu做过特效处理的数据 */
+```
+
+   所以，上面的例子中 invalidate 是为了让 CPU 能看到外设修改过的数据，而 clean 则是为了让外设看到 CPU 修改过的数据，这个关系要理清。除了二者作用不要弄混以外，还要注意在合适的位置操作，请看下面的错误例子：
+
+```c
+camera_record_data(buf);               /* camera录制一段视频 */
+cache_invalidate(buf);                 /* cpu invalidate这段视频 */
+camera_modify_data(buf);               /* camera修改这段数据，比如做一些isp的后处理 */
+cpu_load_and_modify_data(buf);         /* 注意这里cpu可能看不到camera修改过的数据 */
+cache_clean(buf);                      /* cpu clean这段视频, cpu修改过的视频数据会被写回到sram */
+cpu_modify_data(buf);                  /* cpu继续修改视频数据，比如再加一些特效或缩放 */
+vop_display_data(buf);                 /* 注意这里vop可能看不到cpu最后修改的数据 */
+```
+
+   上面的例子告诉我们：在 Maintain 操作之后的数据修改，很可能会导致数据一致性问题，所以一定要注意在合适的位置做 Maintain 。
+
+   下面介绍一下 RT-Thread 提供的 Cache Maintain 接口，具体如下：
+
+```c
+/* ops有两个：RT_HW_CACHE_FLUSH对应我们说的clean操作
+ * RT_HW_CACHE_INVALIDATE对应invalidate操作，
+ * addr对应你要做maintain操作的起始地址，
+ * size对应maintain操作的大小。*/
+rt_hw_cpu_dcache_ops(ops, addr, size);  
+```
+
+   还有一个要注意的是 maintain 操作的地址范围要覆盖你修改的数据，但不要超过，下面是一个具体例子：
+
+```c
+buf = rt_dma_malloc(buf_size);
+modify_start = &buf[50];
+device_modify_data(modify_start, buf_size-50);
+/* 注意起始地址不要用buf，大小也不要用buf_size，只要覆盖你修改的数据范围就够了 */
+rt_hw_cpu_dcache_ops(RT_HW_CACHE_INVALIDATE, modify_start, buf_size-50);
+```
+
