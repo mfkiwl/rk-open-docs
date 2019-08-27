@@ -1,10 +1,10 @@
 # U-Boot MTD Block Device Design
 
-发布版本：1.1
+发布版本：1.2
 
 作者邮箱：jason.zhu@rock-chips.com
 
-日期：2019.06
+日期：2019.08
 
 文件密级：内部资料
 
@@ -32,6 +32,7 @@ U-Boot 下 MTD block device 设计介绍。
 | ---------- | -------- | --------- | ------------ |
 | 2019-05-20 | V1.0     | Jason Zhu | 初始版本     |
 | 2019-06-18 | V1.1     | Jason Zhu | 修改分区支持,更新 step by step 章节 |
+| 2019-08-27 | V1.2     | Jason Zhu | 更正config错误 |
 
 ------
 
@@ -133,7 +134,7 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ### 4.4 新增 CONFIG
 
-增加 CONFIG_MTD_BLK、CONFIG_CMD_MTD，支持 mtd block device。
+增加 CONFIG_MTD_BLK、CONFIG_CMD_MTD_BLK，支持 mtd block device。
 
 ### 4.5 驱动挂接框图
 
@@ -145,7 +146,7 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ```
 CONFIG_MTD_BLK=y
-CONFIG_CMD_MTD=y
+CONFIG_CMD_MTD_BLK=y
 ```
 
 其他 nand 的配置可以参考<https://10.10.10.29/#/c/android/rk/u-boot/+/75116/>。
