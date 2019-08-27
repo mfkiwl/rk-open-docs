@@ -36,7 +36,7 @@
 | 2019-06-17 | v1.3     | 陈谋春   | 更新模块配置说明，增加编译脚本配置 |
 | 2019-07-08 | v1.4     | 陈谋春   | 增加静态库编译说明                 |
 | 2019-08-12 | v1.5     | 陈谋春   | 修正准备工作：下载工程、保存配置   |
-| 2019-08-23 | v1.6     | 陈谋春   | 增加Cache问题注意事项              |
+| 2019-08-23 | v1.6     | 陈谋春   | 增加 Cache 问题注意事项              |
 
 ---
 
@@ -272,7 +272,7 @@ optional arguments:
 
    上一节我们看到配置信息是保存在 .config ，同时在每一个板级配置目录下都有一个默认配置 defconfig，如果没有执行 menuconfig ，会用默认的 rtconfig.h 参与编译。==在提交配置修改的时候，如果配置需要应用于所有的板级，则三个都要提交，否则只要提交相应板级的 defconfig==。
 
-   ==在线包经常变动，所以如果在线包选上了，每个工程师的在线包起点不一样，其配置信息中的在线包选项也会差异很大，导致review变得不方便，所以默认我们是不选上在线包的，需要某个在线包功能的时候，请移植到third_party下，并修改Kconfig配置项名字，减少和在线包冲突，这样也方便修改在线包的代码==
+   ==在线包经常变动，所以如果在线包选上了，每个工程师的在线包起点不一样，其配置信息中的在线包选项也会差异很大，导致 review 变得不方便，所以默认我们是不选上在线包的，需要某个在线包功能的时候，请移植到 third_party 下，并修改 Kconfig 配置项名字，减少和在线包冲突，这样也方便修改在线包的代码==
 
    下面是无效配置的例子：
 
@@ -297,7 +297,7 @@ optional arguments:
 
 ```shell
 cp board/xxx/defconfig .config             ; 拷贝要修改的板子的默认配置
-scons menuconfig                           ; 修改配置项
+scons --menuconfig                         ; 修改配置项
 cp .config board/xxx/defconfig             ; 保存配置为板子的默认配置
 ```
 
@@ -757,11 +757,11 @@ finsh >> tc_start("bsp_spi")  ;  遍历所有spi测试用例
 
 ### 5.1 内存问题
 
-   目前 RTT 上我们配置了三种堆：系统堆、large和uncache，后两者是可选的。下面通过一个表格来说明三者的差异：
+   目前 RTT 上我们配置了三种堆：系统堆、large 和 uncache，后两者是可选的。下面通过一个表格来说明三者的差异：
 
 ![heap_list](./heap_list.png)
 
-​    查看堆内存分配情况，有两个命令：free 和 list_memheap，前者对应系统堆，后者可以查看large和uncache的分配情况，具体如下：
+​    查看堆内存分配情况，有两个命令：free 和 list_memheap，前者对应系统堆，后者可以查看 large 和 uncache 的分配情况，具体如下：
 
 ```shell
 msh />free
@@ -847,7 +847,7 @@ heap_end: 0x200f7ff0                  # 堆结束地址
 [0x20089bf8 -   520] init
 [0x20089e10 -   128] init
 [0x20089ea0 -    4K] init
-[0x2008aeb0 -  436K]  
+[0x2008aeb0 -  436K]
 ```
 
    根据上面的信息，可以找到哪个线程吃掉太多内存，也可以找到内存泄漏的可疑线程名称和内存块大小，有了这些信息就可以大大缩小排查范围。
@@ -1005,7 +1005,7 @@ void dump_call_stack(void);
 #define RT_BACKTRACE_ASSERT(EX)
 ```
 
-## 5.6 Cache一致性
+## 5.6 Cache 一致性
 
    RK2108 有两个 Cache：ICache 和 Dcache ，所以外设如果存在和 CPU 共用内存的场景，就必须要考虑 Cache 一致性的问题，在这个过程中需要注意两点：共用的内存要保持 Cache Line 对齐，在合适的位置做 Cache Maintain。
 
@@ -1023,16 +1023,16 @@ void rt_dma_free_large(void *ptr);
 
 ```c
 /* CACHE_LINE_SIZE定义了Cache Line的大小，内存大小必须是它的整数倍，HAL_CACHELINE_ALIGNED则可以保证起始地址的对齐 */
-HAL_CACHELINE_ALIGNED uint8_t setupBuf[CACHE_LINE_SIZE];  
+HAL_CACHELINE_ALIGNED uint8_t setupBuf[CACHE_LINE_SIZE];
 ```
 
    上面一直在提 Cache Maintain ，这其实可以分为两类操作：Clean 和 Invalidate，不同 OS 对它们的叫法可以略有差异，我们这里沿用最通用的叫法。它们的含义分别如下：
 
-- Clean: 如果 Cache Line 的标识是 dirty 的，即数据加载到 Cache 以后被CPU修改过了，这个操作会把数据写回到下一级存储，对RK2108来说就是写回到内部SRAM或外部PSRAM
+- Clean: 如果 Cache Line 的标识是 dirty 的，即数据加载到 Cache 以后被 CPU 修改过了，这个操作会把数据写回到下一级存储，对 RK2108 来说就是写回到内部 SRAM 或外部 PSRAM
 
-- Invalidate: 把Cache中的数据置为无效
+- Invalidate: 把 Cache 中的数据置为无效
 
-   理解了上面 Clean 和 Invalidate 的差异以后，对于它们的用途就比较好理解了，下面是一个伪代码的例子（假设Cache 下一级是 sram）：
+   理解了上面 Clean 和 Invalidate 的差异以后，对于它们的用途就比较好理解了，下面是一个伪代码的例子（假设 Cache 下一级是 sram）：
 
 ```c
 camera_record_data(buf);               /* camera录制一段视频 */
@@ -1063,7 +1063,7 @@ vop_display_data(buf);                 /* 注意这里vop可能看不到cpu最�
  * RT_HW_CACHE_INVALIDATE对应invalidate操作，
  * addr对应你要做maintain操作的起始地址，
  * size对应maintain操作的大小。*/
-rt_hw_cpu_dcache_ops(ops, addr, size);  
+rt_hw_cpu_dcache_ops(ops, addr, size);
 ```
 
    还有一个要注意的是 maintain 操作的地址范围要覆盖你修改的数据，但不要超过，下面是一个具体例子：
