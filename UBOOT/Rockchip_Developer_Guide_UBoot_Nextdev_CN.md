@@ -1,6 +1,6 @@
 # U-Boot next-dev(v2017)开发指南
 
-发布版本：1.41
+发布版本：1.42
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -65,6 +65,7 @@
 | 2019-05-29 | V1.33    | 朱志展   | 增加 MMC 命令小节、AVB 与 A/B 系统说明，术语说明                           |
 | 2019-06-20 | V1.40    | 陈健洪        | 增加/更新：memblk/sysmem/bi dram/statcktrace/hotkey/fdt param/run_command/distro/led/reset/env/wdt/spl/amp/crypto/efuse/Android compatible/io-domain/bootflow/pack image |
 | 2019-08-21 | V1.41    | 朱志展        | 增加 secure otp 说明 |
+| 2019-08-27 | V1.42    | 朱志展        | 增加存储设备说明 |
 ---
 [TOC]
 ---
@@ -2945,6 +2946,24 @@ CONFIG_RKSFC_NAND    /* SPI Nand flash */
 - CONFIG_RKNAND 与 CONFIG_RKNANDC_NAND 不能同时配置
 - CONFIG_RKNAND 与 CONFIG_RKSFC_NAND 不能同时配置
 
+**MMC & SD**
+
+MMC为多媒体卡，比如 eMMC；SD为是一种基于半导体快闪记忆器的新一代记忆设备。在rockchip平台，它们共用一个 dw_mmc 控制器（除了rk3399，rk3399pro）。
+
+配置：
+
+```
+CONFIG_MMC_DW=y
+CONFIG_MMC_DW_ROCKCHIP=y
+CONFIG_CMD_MMC=y
+```
+
+驱动文件：
+
+```
+./drivers/mmc/
+```
+
 #### 5.9.2 相关接口
 
 获取 blk 描述符：
@@ -2989,11 +3008,38 @@ if (ret != 1) {
 
 #### 5.9.3 DTS 配置
 
-```
+```c
+// rkxxxx.dtsi配置
+emmc: dwmmc@ff390000 {
+	compatible = "rockchip,px30-dw-mshc", "rockchip,rk3288-dw-mshc";
+	reg = <0x0 0xff390000 0x0 0x4000>;      // 控制器寄存器base address及长度
+	max-frequency = <150000000>;            // eMMC普通模式时钟为50MHz,当配置为eMMC
+                                            // HS200模式，该max-frequency生效
+	clocks = <&cru HCLK_EMMC>, <&cru SCLK_EMMC>,
+		 <&cru SCLK_EMMC_DRV>, <&cru SCLK_EMMC_SAMPLE>;   // 控制器对应时钟编号
+	clock-names = "biu", "ciu", "ciu-drv", "ciu-sample";  // 控制器时钟名
+	fifo-depth = <0x100>;                                 // fifo深度，默认配置
+	interrupts = <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>;        // 中断配置
+	status = "disabled";
+};
+
+// rkxxxx-u-boot.dtsi
 &emmc {
 	u-boot,dm-pre-reloc;
 	status = "okay";
 }
+
+// rkxxxx.dts
+&emmc {
+	bus-width = <8>;                   // 设备总线位宽
+	cap-mmc-highspeed;                 // 标识此卡槽支持highspeed mmc
+	mmc-hs200-1_8v;                    // 支持HS200
+	supports-emmc;                     // 标识此插槽为eMMC功能，必须添加，否则无法初始化外设
+	disable-wp;                        // 对于无物理WP管脚，需要配置
+	non-removable;                     // 此项表示该插槽为不可移动设备。 此项为必须添加项
+	num-slots = <1>;                   // 标识为第几插槽
+	status = "okay";
+};
 ```
 
 ```
