@@ -1,6 +1,6 @@
 # U-Boot MTD Block Device Design
 
-发布版本：1.2
+发布版本：1.3
 
 作者邮箱：jason.zhu@rock-chips.com
 
@@ -32,7 +32,8 @@ U-Boot 下 MTD block device 设计介绍。
 | ---------- | -------- | --------- | ------------ |
 | 2019-05-20 | V1.0     | Jason Zhu | 初始版本     |
 | 2019-06-18 | V1.1     | Jason Zhu | 修改分区支持,更新 step by step 章节 |
-| 2019-08-27 | V1.2     | Jason Zhu | 更正config错误 |
+| 2019-08-27 | V1.2     | Jason Zhu | 更正 config 错误 |
+| 2019-08-27 | V1.3     | Jason Zhu | 增加 SPL MTD block 说明 |
 
 ------
 
@@ -140,7 +141,74 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 
 ![mtd-block](.\Rockchip_Developer_Guide_UBoot_MTD_Block_Device_Design\mtd-block.png)
 
+### 4.6 SPL MTD block 设计
+
+SPL MTD block 层可以统一  SPL 下的 nand & spi nand & spi nor 的驱动调用，上层有统一的接口读写设备，达到精简代码的效果。
+
+**框架代码：**
+
+```
+./common/spl/spl_mtd_blk.c
+./drivers/mtd/mtdcore.c
+./drivers/mtd/mtd_blk.c
+./drivers/mtd/mtd_uboot.c
+./drivers/mtd/mtd-uclass.c
+```
+
+**config 配置：**
+
+```
+CONFIG_SPL_MTD_SUPPORT=y
+```
+
+**分区表支持：**
+
+```
+CONFIG_SPL_LIBDISK_SUPPORT=y
+CONFIG_SPL_EFI_PARTITION=y
+CONFIG_PARTITION_TYPE_GUID=y
+```
+
+**启动顺序配置：**
+
+```c
+// rkxxxx-u-boot.dtsi
+chosen {
+	u-boot,spl-boot-order = &sfc, &nandc, &emmc;
+};
+```
+
+**启动顺序源码：**
+
+```c
+// arch/arm/mach-rockchip/spl-boot-order.c
+void board_boot_order(u32 *spl_boot_list)
+{
+	......
+	boot_device = spl_node_to_boot_device(node);
+	......
+}
+
+static int spl_node_to_boot_device(int node)
+{
+	struct udevice *parent;
+
+	if (!uclass_get_device_by_of_offset(UCLASS_SPI, node, &parent))
+		return BOOT_DEVICE_MTD_BLK_SPI_NAND;
+	....
+}
+```
+
+**读接口：**
+
+```
+unsigned long blk_dread(struct blk_desc *block_dev, lbaint_t start,
+                        lbaint_t blkcnt, void *buffer)
+```
+
 ## 5 step by step
+
+### 5.1 U-Boot
 
 1. 对应的 defconfig 添加
 
@@ -155,7 +223,7 @@ CONFIG_CMD_MTD_BLK=y
 3. 编译 uboot，例如编译 rk3308
 
 ```
-./make.sh evb-rk3308
+./make.sh rk3308
 ```
 
 4. 更改支持 GPT 的 parameter.txt，例如：
@@ -171,7 +239,7 @@ MACHINE: 3308
 CHECK_MASK: 0x80
 PWR_HLD: 0,0,A,0,1
 TYPE: GPT
-CMDLINE:mtdparts=rk29xxnand:0x00000800@0x00001000(uboot),0x00000800@0x00000800(trust),0x00000100@0x00002000(pa),0x00000800@0x00003000(misc),0x00007800@0x00003800(recovery),0x00004800@0x0000B000(boot),0x00020000@0x0000F800(rootfs),-@0x0002F800(data:grow)
+CMDLINE:mtdparts=rk29xxnand:0x00000800@0x00001000(uboot),0x00000800@0x00000800(trust),0x00000800@0x00003000(misc),0x00007800@0x00003800(recovery),0x00004800@0x0000B000(boot),0x00020000@0x0000F800(rootfs),-@0x0002F800(data:grow)
 ```
 
 5. 烧写固件
@@ -198,3 +266,21 @@ Starting kernel ...
                                       //ubi.mtd指定分区中rootfs的位置
 ......
 ```
+
+### 5.2 SPL
+
+1.config 配置，参考<https://10.10.10.29/#/c/android/rk/u-boot/+/79335/>
+
+2.uboot 编译，例如编译 rk3308
+
+```
+./make.sh rk3308
+```
+
+3.编译 pre-loader
+
+```
+./make.sh spl-s ../rkbin/RKBOOT/RK3308MINIALL_WO_FTL.ini
+```
+
+4.下载编译参考上章节
