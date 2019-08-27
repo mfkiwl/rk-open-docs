@@ -65,7 +65,7 @@
 | 2019-05-29 | V1.33    | 朱志展   | 增加 MMC 命令小节、AVB 与 A/B 系统说明，术语说明                           |
 | 2019-06-20 | V1.40    | 陈健洪        | 增加/更新：memblk/sysmem/bi dram/statcktrace/hotkey/fdt param/run_command/distro/led/reset/env/wdt/spl/amp/crypto/efuse/Android compatible/io-domain/bootflow/pack image |
 | 2019-08-21 | V1.41    | 朱志展        | 增加 secure otp 说明 |
-| 2019-08-27 | V1.42    | 朱志展        | 增加存储设备说明 |
+| 2019-08-27 | V1.42    | 朱志展        | 增加存储设备/MTD 设备说明 |
 ---
 [TOC]
 ---
@@ -4416,6 +4416,58 @@ void io_domain_init(void)
 ```
 
 用户不需要主动调用```io_domain_init()```，只需要开启 CONFIG 配置即可，U-Boot 初始化流程默认会在合适的时刻发起调用。功能和 kernel 里的驱动是一样的，会配置 io-domain 节点指定的 domain 状态，但是 U-Boot 里没有 notify 通知链，所以无法动态更新 io-domain 的状态（在 U-Boot 中一般也不存在这样的需求）。
+
+### 5.25 MTD 驱动
+
+Memory Technology Device 即内存技术设备，支持设备有 nand、spi nand、spi nor。同时 rockchip 设计 MTD block 层，支持对 MTD 设备进行读写。
+
+#### 5.25.1 框架支持
+
+U-Boot配置：
+
+```c
+// MTD驱动
+CONFIG_MTD=y
+CONFIG_CMD_MTDPARTS=y
+CONFIG_MTD_DEVICE=y
+
+// MTD block设备驱动
+CONFIG_CMD_MTD_BLK=y
+CONFIG_MTD_BLK=y
+
+// 其他nand设备驱动config
+......
+```
+
+SPL配置：
+
+```c
+CONFIG_MTD=y
+CONFIG_CMD_MTDPARTS=y
+CONFIG_MTD_DEVICE=y
+CONFIG_SPL_MTD_SUPPORT=y
+
+// 其他nand设备驱动config
+......
+```
+
+框架代码代码：
+
+```
+drivers/mtd/mtd-uclass.c
+drivers/mtd/mtdcore.c
+drivers/mtd/mtd_uboot.c
+drivers/mtd/mtd_blk.c
+```
+
+驱动为各个控制器驱动，把读写等接口挂接到 MTD 层。
+
+#### 5.25.2 相关接口
+
+```c
+unsigned long blk_dread(struct blk_desc *block_dev, lbaint_t start,
+                        lbaint_t blkcnt, void *buffer)
+```
 
 ## 6. USB download
 
