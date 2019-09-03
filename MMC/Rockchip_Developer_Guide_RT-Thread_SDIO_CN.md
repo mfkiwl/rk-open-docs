@@ -1,10 +1,10 @@
 # **SDIO**开发指南
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：shawn.lin@rock-chips.com
 
-日期：2019.07
+日期：2019.09
 
 文件密级：公开资料
 
@@ -29,7 +29,7 @@
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
 | 2019-07-11 | V1.0     | 林涛     | 初始发布     |
-|            |          |          |              |
+| 2019-09-03 | V1.1     | 林涛     | 更新文件路径 |
 |            |          |          |              |
 
 ---
@@ -63,8 +63,8 @@ components/drivers/sdio/mmc.c eMMC协议栈
 SDIO 驱动适配层：
 
 ```c
-bsp/rockchip-common/drivers/drv_sdio.c
-bsp/rockchip-common/drivers/drv_sdio.h
+bsp/rockchip/common/drivers/drv_sdio.c
+bsp/rockchip/common/drivers/drv_sdio.h
 ```
 
 ### 2.2 配置
@@ -107,3 +107,5 @@ sd1           Block Device     0
 (1)  将 RT_SDIO_DEBUG 配置选上后，则会输出更多 SDIO/SD/EMMC 协议栈的执行流程信息。
 (2)  将 bsp/rockchip-common/drivers/drv_sdio.c 中的 RK_MMC_DBG 配置后，则会输出更多控制器驱动执行信息。
 (3)  请务必在板级配置中设置好 IOMUX，IO 电源设置，卡电源设置，对应 gpio bank 的 io domain，以及确保控制器的输出时钟为偶数分频所得。
+
+(4) 如果wifi驱动有多个线程同时对function进行读写，请使用mmcsd_host_lock和mmcsd_host_unlock接口进行互斥保护。
