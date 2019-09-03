@@ -1,6 +1,6 @@
 # U-Boot next-dev(v2017)开发指南
 
-发布版本：1.42
+发布版本：1.43
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -9,7 +9,7 @@
 ​	Chen Liang cl@rock-chips.com
 ​	Ping Lin <hisping.lin@rock-chips.com>
 
-日期：2019.08
+日期：2019.10
 
 文件密级：公开资料
 
@@ -66,6 +66,7 @@
 | 2019-06-20 | V1.40    | 陈健洪        | 增加/更新：memblk/sysmem/bi dram/statcktrace/hotkey/fdt param/run_command/distro/led/reset/env/wdt/spl/amp/crypto/efuse/Android compatible/io-domain/bootflow/pack image |
 | 2019-08-21 | V1.41    | 朱志展        | 增加 secure otp 说明 |
 | 2019-08-27 | V1.42    | 朱志展        | 增加存储设备/MTD 设备说明 |
+| 2019-10-08 | V1.43   | 朱志展        | 增加BCB说明 |
 ---
 [TOC]
 ---
@@ -1400,6 +1401,63 @@ CONFIG_ARM64_BOOT_AARCH32
 ### 2.17 TrustZone
 
 目前 Rockchip 所有的平台都启用了 ARM TrustZone 技术，在整个 TrustZone 的架构中 U-Boot 属于 Non-Secure World，所以无法访问任何安全的资源（如：某些安全 memory、安全 efuse...）。
+
+### 2.18 BCB
+
+BCB 为 Bootloader Control Block，为安卓控制系统启动流程而设计的，数据保存在 misc 分区偏移 16KB 位置。
+
+**数据结构**
+
+```c
+struct android_bootloader_message {
+    char command[32];
+    char status[32];
+    char recovery[768];
+
+    /* The 'recovery' field used to be 1024 bytes.  It has only ever
+     * been used to store the recovery command line, so 768 bytes
+     * should be plenty.  We carve off the last 256 bytes to store the
+     * stage string (for multistage packages) and possible future
+     * expansion. */
+    char stage[32];
+
+    /* The 'reserved' field used to be 224 bytes when it was initially
+     * carved off from the 1024-byte recovery field. Bump it up to
+     * 1184-byte so that the entire bootloader_message struct rounds up
+     * to 2048-byte. */
+    char reserved[1184];
+};
+```
+
+command：启动命令，目前支持以下三个：
+| 参数                | 功能                                         |
+| :------------------ | -------------------------------------------- |
+| bootonce-bootloader | 启动进入 U-Boot fastboot                     |
+| boot-recovery       | 启动进入 recovery                            |
+| boot-fastboot       | 启动进入 recovery fastboot（简称 fastbootd） |
+
+recovery：为进入 recovery mode 的附带命令，开头为"recovery\n"，后面可以带多个参数，以"--"开头，以"\n"结尾，例如"recovery\n--wipe_ab\n--wipe_package_size=345\n--reason=wipePackage\n"：
+
+| 参数                 | 功能                                                         |
+| :------------------- | ------------------------------------------------------------ |
+| update_package       | OTA 升级                                                     |
+| retry_count          | 进 recovery 升级次数，比如升级时意外掉电，依据该值重新进入 recovery 升级 |
+| wipe_data            | erase user data (and cache), then reboot                     |
+| wipe_cache           | wipe cache (but not user data), then reboot                  |
+| show_text            | show the recovery text menu, used by some bootloader         |
+| sideload             |                                                              |
+| sideload_auto_reboot | an option only available in user-debug build, reboot the device without waiting |
+| just_exit            | do nothing, exit and reboot                                  |
+| locale               | save the locale to cache, then recovery will load locale from cache when reboot |
+| shutdown_after       | return shutdown                                              |
+| wipe_all             | 擦除整个 userdata 分区                                       |
+| wipe_ab              | wipe the current A/B device, with a secure wipe of all the partitions in RECOVERY_WIPE |
+| wipe_package_size    | wipe package size                                            |
+| prompt_and_wipe_data | prompt the user that data is corrupt, with their consent erase user data (and cache), then reboot |
+| fw_update            | SD 卡固件升级                                                |
+| factory_mode         | 工厂模式，主要用于做一些设备测试，如 PCBA 测试               |
+| pcba_test            | 进入 PCBA 测试                                               |
+| resize_partition     | 重新规划分区大小，android Q 的动态分区支持                   |
 
 ## 3. 平台编译
 
