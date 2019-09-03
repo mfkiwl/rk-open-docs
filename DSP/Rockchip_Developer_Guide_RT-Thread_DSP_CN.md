@@ -1,10 +1,10 @@
 # DSP 开发指南
 
-发布版本：1.0
+发布版本：1.2
 
 作者邮箱：huaping.liao@rock-chips.com
 
-日期：2019.6
+日期：2019.9
 
 文件密级：公开资料
 
@@ -38,6 +38,7 @@
 | ---------- | -------- | -------- | ------------ |
 | 2019-06-24 | V1.0     | 廖华平   | 初始版本     |
 | 2019-08-02 | V1.1     | 谢科迪   | 增加 Floating License 服务器安装说明 |
+| 2019-09-03 | V1.2 | 廖华平 | 增加固件打包说明 |
 
 ------
 
@@ -61,7 +62,15 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 ## 2 HIFI3 软件环境搭建
 
-### 2.1 Floating License Server 搭建
+### 2.1 License 安装
+
+license是和mac地址绑定的。如果需要多台机器使用，那么需要搭建license服务器，但是同时只能一台机器访问license服务器。服务器搭建步骤参考2.2章的内容。
+
+如果是单台机器使用，那么直接使用本地目录的license文件，不需要搭建服务器。打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入文件路径名。完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。需要注意mac地址要和liscense中的host id一致。
+
+![Xplorer_License_Keys](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_File_Config.png)
+
+### 2.2 Floating License Server 搭建
 
 - 将相关文件放置到服务器
 
@@ -113,7 +122,7 @@ PACKAGE
 # Provides:          flexlm
 # Required-Start:    $local_fs $syslog
 # Required-Stop:     $local_fs $syslog
-# Should-Start:      autofs $network $named 
+# Should-Start:      autofs $network $named
 # Should-Stop:       autofs $network $named
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
@@ -201,15 +210,13 @@ sudo update-rc.d flexlm enable
 
 ![Xplorer_License_Config](Rockchip_Developer_Guide_RT-Thread_DSP/Success_Install_Key_1.png)
 
-
-
-### 2.2 Xplorer 工具安装
+### 2.3 Xplorer 工具安装
 
 Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cadence 官网，LICENSE 需要联系 Cadence 获取。
 
 工具安装好后，需要安装先安装数据包“HiFi3Dev181203_win32.tgz”，数据包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
 
-安装方法是在 Xplorer 中，"File->New->Xtensa Configuration",找到下图的配置页面并点击 Install 选项：
+安装方法是在 Xplorer 中，<File> --> <New> --> <Xtensa Configuration>，找到下图的配置页面并点击 Install 选项：
 
 ![Xtensa_Configuration](Rockchip_Developer_Guide_RT-Thread_DSP/Xtensa_Configuration.png)
 
@@ -223,7 +230,7 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 
 ![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RT-Thread_DSP/HiFi3Dev181304_Detail.png)
 
-### 2.3 DSP 代码下载及编译
+### 2.4 DSP 代码下载及编译
 
 Git 仓库路径：
 
@@ -231,18 +238,18 @@ Git 仓库路径：
 
 工程目录在根目录的 projects 下，存放不同工程的配置文件和工程文件。
 
-通过"File->Import->Genaral->Existing Projects into Workspace"导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 PISCES，RK2206 对应工程名是 CANARY。
+通过<File> --> <Import> --> <Genaral> --> <Existing Projects into Workspace>导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 RK2206。
 
 在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
-### 2.4 DSP 固件生成
+### 2.5 DSP 固件生成
 
 工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 cmd 控制台，找到工程根目录，运行固件生成脚本“generate_dsp_fw.bat 项目名“，如果是 PISCES 项目，项目名对应的就是 PISCES，脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，运行 HifiFirmwareGenerator.exe 进行固件打包，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
 
 - ssh://git@10.10.10.29:29418/rk/dsp/DspFirmwareGenerator
 - <https://github.com/LiaoHuaping/DspFirmwareGenerator>
 
-### 2.5 固件打包配置文件
+### 2.6 固件打包配置文件
 
 在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
 
@@ -255,9 +262,9 @@ Git 仓库路径：
 - SourceCodeMemEnd: DSP 端代码内存空间的结束地址。
 - DestinationCodeMemStart：MCU 端对应的代码内存空间的地址，因为可能存在内存空间映射情况不同的情况。比如同一块物理内存地址 TCM，DSP 的访问的地址是 0x30000000，MCU 访问的地址是 0x20400000，它们分别对应 SourceCodeMemStart 和 DetinationCodeMemStart。如果地址映射相同，那么填入对应即可。
 
-### 2.6 Map 配置信息修改
+### 2.7 Map 配置信息修改
 
-Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在"T:(active build target)->Modify"，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“<工具安装目录>\XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
+Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在<T:(active build target)> --> <Modify>，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“<工具安装目录>\XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
 
 段配置文件为“memmap.xmm”。text、data 等会存放在 sram0 中，这是 Share Memory 的地址空间，需要将这些段存放在 TCM 中。可以参考“<工程目录>\rkdsp\projects\PISCES\map\min-rt\memmap.xmm”中的相关修改。修改完后，需要使用命令“<工具安装目录>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b <map 目录> --xtensa-core=HiFi3Dev181203”。这时候可以在 Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成“.map”文件，里面记录了具体函数分配到的地址空间，以验证上述修改是否生效。
 
@@ -268,56 +275,85 @@ Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空�
 DSP 框架：
 
 ```
-bsp/rockchip-common/drivers/dsp.c
-bsp/rockchip-common/drivers/dsp.h
+bsp/rockchip/common/drivers/dsp.c
+bsp/rockchip/common/drivers/dsp.h
 ```
 
 DSP 驱动适配层：
 
 ```
-bsp/rockchip-common/drivers/drv_dsp.c
-bsp/rockchip-common/drivers/drv_dsp.h
+bsp/rockchip/common/drivers/drv_dsp.c
+bsp/rockchip/common/drivers/drv_dsp.h
 ```
 
 DSP 驱动调用流程可以参考以下测试用例：
 
 ```
-bsp/rockchip-common/tests/dsp_test.c
+bsp/rockchip/common/tests/dsp_test.c
 ```
 
 ### 3.2 配置
 
-打开 DSP driver 配置如下：
+打开 DSP driver 配置如下，下面以rk2108工程为例：
 
 ```
 RT-Thread bsp drivers  --->
-    RT-Thread rockchip common drivers  --->
-        [*] Enable DSP
-        [ ]   Enable firmware loader to dsp
-        [ ]   Enable dsp send trace to cm4
+    RT-Thread rockchip rk2108 drivers  --->
+         Enable DSP  --->
+            [*] Enable DSP
+            [*]   Enable firmware loader to dsp
+                    Dsp firmware path (Store firmware data in file)  --->
+            (/rkdsp.bin) Dsp firmware path
+            [ ]   Enable dsp send trace to cm4
+            (-1)  Config dsp debug uart port
 ```
 
-选中”Enable firmware loader to dsp“表示 dsp 驱动启动的时候，会下载 dsp 固件；“Enable dsp send trace to cm4”表示使能 trace 功能，使得部分 dsp 中的打印 log 可以在 mcu 中打印出来，那么打印 log 就不需要依赖于单独的串口。
+”Enable firmware loader to dsp“表示 dsp 驱动启动的时候，会下载 dsp 固件；
 
-打开 dsp test case 配置如下：
+“Dsp firmware path”有两个选项有以下两个选项：
+
+- 一个选项是”Store firmware data in file“，固件使用flash中的rkdsp.bin，固件地址在“Dsp firmware path”中指定。“/rkdsp.bin”可以是文件系统中的路径，也可以是一个固件节点（在setting.ini中加入dsp固件分区）。
+- 另一个选项是“Store firmware data in builtin ”，表示将DSP固件编入到m4的固件中，编译的时候会将工程目录dsp_fw目录下的rkdsp_fw.h编译进入，rkdsp_fw.h在2.4的操作中生成。因为工程默认支持XIP，DSP固件会被编译到XIP中。使用这种方式的好处是简单方便，不需要走文件系统操作。但是尽量在支持XIP的时候使用，否则DSP固件会被加载到M4的内存中，浪费内存空间。
+
+“Enable dsp send trace to cm4”表示使能 trace 功能，使得部分 dsp 中的打印 log 可以在 mcu 中打印出来，那么打印 log 就不需要依赖于单独的串口。
+
+“Config dsp debug uart port”表示设置DSP打印的uart端口。如果值是-1那么将不会设置。DSP代码中默认使用UART0。
+
+### 3.3 测试case
+
+打开 dsp test和audio test 配置如下：
 
 ```
 RT-Thread bsp test case  --->
    RT-Thread Common Test case  --->
-        [*] Enable BSP Common DSP TEST
+        [*] Enable BSP Common TEST
+        [*]   Enable BSP Common AUDIO TEST
+        [*]   Enable BSP Common DSP TEST
+        [*]     Enable Dsp wakeup function
 ```
 
-执行命令可以看下已经生成的测试命令
+编译固件烧录后，在控制台输入dsp_vad_test，可以看到如下log：
 
 ```
-msh >help
-RT-Thread shell commands:
-shutdown         - Shutdown System
-reboot           - Reboot System
-dsp_test        -dsp_test test. e.g: dsp_test()
+msh />dsp_vad_test
+dsp wakeup_test
+Hmsh />ifi3: Hifi3 config done
+Hifi3: kwsSetConfig ok
+Hifi3: init uv_asr ok
+ringbuf_addr:0x30260000, period_size:0x00000280
 ```
 
-执行“dsp_test”命令即可进行 DSP 驱动代码测试。
+输入audio_capture后，对着麦喊，”xiaoduxiaodu“，可以检测到唤醒词：
+
+```
+msh />audio_capture
+audio_capture
+vad buf: 0x30260000, size: 0x20000 bytes
+vad periodsize: 0x280 kbytes
+msh />Hifi3: xiaodu_wakeup--------xiaoduxiaodu-------
+Hifi3: process return value = 1
+work result:0x00000001
+```
 
 ## 4 MCU 驱动分析
 
