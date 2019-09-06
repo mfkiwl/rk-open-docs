@@ -1,10 +1,10 @@
 # Rockchip SD Card Boot Reference
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：jason.zhu@rock-chips.com
 
-日期：2018.07
+日期：2019.09
 
 文件密级：内部资料
 
@@ -31,6 +31,7 @@
 | **日期**     | **版本** | **作者** | **修改说明** |
 | ---------- | ------ | ------ | -------- |
 | 2018-07-17 | V1.0   | 朱志展、刘翊 | 初始版本     |
+| 2019-09-06 | V1.1  | 朱志展 | 升级卡支持GPT     |
 
 ------
 
@@ -120,15 +121,31 @@ SD 卡升级卡是通过 RK 的工具制作，实现通过 SD 卡对本地存储
 
 2. 拷贝 demo 文件到 SD 卡根目录下的 Demo 目录中
 
-SD 引导升级卡格式(非 GPT，目前不支持 GPT，所以**U-Boot 需要配置 CONFIG_RKPARM_PARTITION**)
+SD 引导升级卡格式(非 GPT)
 
 |   偏移    |       数据段        |
 | :-------: | :-----------------: |
-|   扇区 0   |  MBR(启动标志置 0)   |
-| 扇区 64-4M |       IDBLOCK       |
+|   扇区 0   |  MBR   |
+| 扇区 64-4M |       IDBLOCK(启动标志置 0)       |
 |   4M-8M   |      Parameter      |
-|  8M-12M   |        uboot        |
-|  12M-16M  |        trust        |
+|  12M-16M   |        uboot        |
+|  16M-20M  |        trust        |
+|  ……   |        misc         |
+|  ……   |      resource       |
+|  ……   |       kernel        |
+|  ……   |      recovery       |
+| 剩下空间  | Fat32 存放 update.img |
+
+SD 引导升级卡格式(GPT)
+
+|   偏移    |       数据段        |
+| :-------: | :-----------------: |
+|   扇区 0   |  MBR   |
+|  扇区 1-34  |      GPT 分区表       |
+| 扇区 64-4M |       IDBLOCK(启动标志置 0)       |
+|   4M-8M   |      Parameter      |
+|  ……   |        uboot        |
+|  ……  |        trust        |
 |  ……   |        misc         |
 |  ……   |      resource       |
 |  ……   |       kernel        |
