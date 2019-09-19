@@ -1,10 +1,10 @@
 # Rockchip RTOS 时钟配置说明
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：zhangqing@rock-chips.com
 
-日期：2019.5
+日期：2019.9
 
 文件密级：公开资料
 
@@ -37,6 +37,7 @@
 | **日期**   | **版本** | **作者** | **修改说明**       |
 | ---------- | -------- | -------- | ------------------ |
 | 2019-05-21 | V1.0     | Elaine   | 第一次临时版本发布 |
+| 2019-09-19 | V1.1     | Tao Huang | 修订 clk dump 相关实现 |
 
 ---
 
@@ -181,15 +182,15 @@ rt_kprintf("%s: rate = %d\n", __func__, clk_get_rate(clk_id));
 (1)在 board.c 中初始化时钟使用示例如下：
 
 ```c
-static const struct clk_dump clk_inits[] =
+static const struct clk_init clk_inits[] =
 {
-    DUMP_CLK("PLL_GPLL", PLL_GPLL, 1188000000),
-    DUMP_CLK("PLL_CPLL", PLL_CPLL, 1000000000),
-    DUMP_CLK("HCLK_M4", HCLK_M4, 400000000),
-    DUMP_CLK("ACLK_DSP", ACLK_DSP, 300000000),
-    DUMP_CLK("ACLK_LOGIC", ACLK_LOGIC, 300000000),
-    DUMP_CLK("HCLK_LOGIC", HCLK_LOGIC, 150000000),
-    DUMP_CLK("PCLK_LOGIC", PCLK_LOGIC, 150000000),
+    INIT_CLK("PLL_GPLL", PLL_GPLL, 1188000000),
+    INIT_CLK("PLL_CPLL", PLL_CPLL, 1000000000),
+    INIT_CLK("HCLK_M4", HCLK_M4, 400000000),
+    INIT_CLK("ACLK_DSP", ACLK_DSP, 300000000),
+    INIT_CLK("ACLK_LOGIC", ACLK_LOGIC, 300000000),
+    INIT_CLK("HCLK_LOGIC", HCLK_LOGIC, 150000000),
+    INIT_CLK("PCLK_LOGIC", PCLK_LOGIC, 150000000),
 };
 ```
 
@@ -262,16 +263,16 @@ rk_printfA("%s: rate = %d\n", __func__, ClkGetRate(clk_id));
 ```c
 static const CLK_INIT clkInits[] =
 {
-    DUMP_CLK("PLL_GPLL", PLL_GPLL, 384000000),
-    DUMP_CLK("PLL_VPLL", PLL_VPLL, 491520000),
-    DUMP_CLK("CLK_HIFI3", CLK_HIFI3, 164000000),
-    DUMP_CLK("HCLK_MCU_BUS", HCLK_MCU_BUS, 200000000),
-    DUMP_CLK("PCLK_MCU_BUS", PCLK_MCU_BUS, 100000000),
-    DUMP_CLK("SCLK_M4F0", SCLK_M4F0, 200000000),
-    DUMP_CLK("ACLK_PERI_BUS", ACLK_PERI_BUS, 200000000),
-    DUMP_CLK("HCLK_PERI_BUS", HCLK_PERI_BUS, 100000000),
-    DUMP_CLK("HCLK_TOP_BUS", HCLK_TOP_BUS, 100000000),
-    DUMP_CLK("PCLK_TOP_BUS", PCLK_TOP_BUS, 100000000),
+    INIT_CLK("PLL_GPLL", PLL_GPLL, 384000000),
+    INIT_CLK("PLL_VPLL", PLL_VPLL, 491520000),
+    INIT_CLK("CLK_HIFI3", CLK_HIFI3, 164000000),
+    INIT_CLK("HCLK_MCU_BUS", HCLK_MCU_BUS, 200000000),
+    INIT_CLK("PCLK_MCU_BUS", PCLK_MCU_BUS, 100000000),
+    INIT_CLK("SCLK_M4F0", SCLK_M4F0, 200000000),
+    INIT_CLK("ACLK_PERI_BUS", ACLK_PERI_BUS, 200000000),
+    INIT_CLK("HCLK_PERI_BUS", HCLK_PERI_BUS, 100000000),
+    INIT_CLK("HCLK_TOP_BUS", HCLK_TOP_BUS, 100000000),
+    INIT_CLK("PCLK_TOP_BUS", PCLK_TOP_BUS, 100000000),
 };
 ```
 
