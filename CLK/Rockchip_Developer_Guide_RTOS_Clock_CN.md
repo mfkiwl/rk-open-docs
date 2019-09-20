@@ -1,6 +1,6 @@
-# Rockchip RTOS 时钟配置说明
+# Rockchip Developer Guide RTOS Clock
 
-发布版本：1.1
+发布版本：1.2
 
 作者邮箱：zhangqing@rock-chips.com
 
@@ -38,6 +38,7 @@
 | ---------- | -------- | -------- | ------------------ |
 | 2019-05-21 | V1.0     | Elaine   | 第一次临时版本发布 |
 | 2019-09-19 | V1.1     | Tao Huang | 修订 clk dump 相关实现 |
+| 2019-09-19 | V1.2     | Elaine | 修订 接口修改，test 相关实现 |
 
 ---
 
@@ -140,9 +141,12 @@ HAL_Status HAL_CRU_ClkResetDeassert(uint32_t clk);
 #### 1.2.1  RT-THREAD CLK 接口
 
 ```c
-struct clk_gate *get_clk_gate_from_id(int clk_id);
-void release_clk_gate_id(struct clk_gate *gate);
-rt_err_t clk_enable(struct clk_gate *gate, int on);
+rt_err_t clk_enable_by_id(int gate_id)；
+rt_err_t clk_disable_by_id(int gate_id)；
+struct clk_gate *get_clk_gate_from_id(int gate_id);
+void put_clk_gate(struct clk_gate *gate);
+rt_err_t clk_enable(struct clk_gate *gate);
+rt_err_t clk_disable(struct clk_gate *gate);
 int clk_is_enabled(struct clk_gate *gate);
 uint32_t clk_get_rate(eCLOCK_Name clk_id);
 rt_err_t clk_set_rate(eCLOCK_Name clk_id, uint32_t rate);
@@ -156,19 +160,28 @@ rt_err_t clk_set_rate(eCLOCK_Name clk_id, uint32_t rate);
 
 使用示例：
 
+1、对于复用时钟，如hclk_audio是hclk_audio、hclk_vad、hclk_i2s、hclk_pdm等模块复用的，所以开关的时候需要使用下面带有引用计数和锁的接口。
+
 ```c
 struct clk_gate *aclk_vio0 = get_clk_gate_from_id(ACLK_VIO0_GATE);
 
-clk_enable(aclk_vio0, 1);/* clk enable */
-clk_enable(aclk_vio0, 0);/* clk disable */
+clk_enable(aclk_vio0);/* clk enable */
+clk_disable(aclk_vio0);/* clk disable */
 
-release_clk_gate_id(aclk_vio0);
+put_clk_gate(aclk_vio0);
 ```
 
 备注：
 因为有引用计数，所以使用的时候注意开关要成对。
 
-#### 1.2.3  RT-THREAD 设置频率
+2、对于模块专有时钟，如aclk_dsp。开关的时候可以直接通过ID开关，使用如下直接调用HAL的方式：
+
+```c
+clk_enable_by_id(ACLK_DSP_GATE);/* clk enable */
+clk_disable_by_id(ACLK_DSP_GATE);/* clk disable */
+```
+
+### 1.2.3  RT-THREAD 设置频率
 
 使用示例：
 
@@ -207,23 +220,27 @@ void rt_hw_board_init()
 
 CLK DUMP 只能 DUMP 部分在 clk_inits[]结构中的时钟和所有的寄存器，如果需要增加时钟请按照 clk_inits[]结构添加。
 
-CLK DUMP 使用是用 FINSH_FUNCTION_EXPORT，在 shell 命令行，切到 finsh 下，直接敲 clk_dump()就可以。
+CLK DUMP使用是用FINSH_FUNCTION_EXPORT，直接敲clk_dump()就可以。
 
 ### 1.3  RKOS CLK 配置
 
 #### 1.3.1  RKOS CLK 接口
 
 ```c
-rk_err_t ClkEnable(CLK_GATE *gate, int on);
+rk_err_t ClkEnableById(int gateId);
+rk_err_t ClkDisableById(int gateId);
+rk_err_t ClkEnable(CLK_GATE *gate);
+rk_err_t ClkDisable(CLK_GATE *gate);
 int ClkIsEnabled(CLK_GATE *gate);
-CLK_GATE *GetClkGateFromId(int clkId);
-void ReleaseClkGateId(CLK_GATE *gate);
+CLK_GATE *GetClkGateFromId(int gateId);
+void PutClkGate(CLK_GATE *gate);
 uint32_t ClkGetRate(eCLOCK_Name clkId);
 rk_err_t ClkSetRate(eCLOCK_Name clkId, uint32_t rate);
 uint32 GetHclkSysCoreFreq(void);
 rk_err_t ClkDevInit(void);
 rk_err_t ClkDevDeinit(void);
 void ClkInit(const CLK_INIT *clkInits, uint32 clkCount, bool clkDump);
+void ClkDisableUnused(const CLK_UNUSED *clksUnused, uint32 clkUnusedCount);
 void ClkDump(void);
 ```
 
@@ -235,19 +252,28 @@ void ClkDump(void);
 
 使用示例：
 
+1、对于复用时钟，如hclk_audio是hclk_audio、hclk_vad、hclk_i2s、hclk_pdm等模块复用的，所以开关的时候需要使用下面带有引用计数和锁的接口。
+
 ```c
 CLK_GATE *aclk_vio0 = GetClkGateFromId(ACLK_VIO0_GATE);
 
-ClkEnable(aclk_vio0, 1);/* clk enable */
-ClkEnable(aclk_vio0, 0);/* clk disable */
+ClkEnable(aclk_vio0);/* clk enable */
+ClkDisable(aclk_vio0);/* clk disable */
 
-ReleaseClkGateId(aclk_vio0);
+PutClkGate(aclk_vio0);
 ```
 
 备注：
 因为有引用计数，所以使用的时候注意开关要成对。
 
-#### 1.3.3  RKOS 设置频率
+2、对于模块专有时钟，如aclk_dsp。开关的时候可以直接通过ID开关，使用如下直接调用HAL的方式：
+
+```c
+ClkEnableById(ACLK_DSP_GATE);/* clk enable */
+ClkDisableById(ACLK_DSP_GATE);/* clk disable */
+```
+
+### 1.3.3  RKOS 设置频率
 
 使用示例：
 
@@ -293,7 +319,7 @@ void ClkDevHwDeInit(void)
 
 CLK DUMP 只能 DUMP 部分在 clkInits[]结构中的时钟和所有的寄存器，如果需要增加时钟请按照 clkInits[]结构添加。
 
-CLK DUMP 使用目前还不支持命令，在需要的位置增加 ClkDump()调用。
+CLK DUMP有支持test命令。详细见第3章TEST。
 
 ## 2 PD 配置
 
@@ -304,10 +330,14 @@ CLK DUMP 使用目前还不支持命令，在需要的位置增加 ClkDump()调�
 PD 的 ID 需要手动填写一下，如下：
 
 ```c
-#define PISCES_PD_DSP 0x00000000U
-#define PISCES_PD_LOGIC 0x00011111U
-#define PISCES_PD_SHRM 0x00022222U
-#define PISCES_PD_AUDIO 0x00033333U
+#ifndef __ASSEMBLY__
+typedef enum PD_Id {
+    PD_DSP              = 0x80000000U,
+    PD_LOGIC            = 0x80011111U,
+    PD_SHRM             = 0x80022222U,
+    PD_AUDIO            = 0x80033333U,
+} ePD_Id;
+#endif
 ```
 
 按照下面定义，对应填写 PWR_SHIFT, ST_SHIFT, REQ_SHIFT, ACK_SHIFT。
@@ -338,13 +368,13 @@ PD 的 ID 需要手动填写一下，如下：
 #### 2.1.2  常用 API
 
 ```c
-HAL_Status HAL_PD_Setting(uint32_t pd, bool powerOn);
+HAL_Status HAL_PD_On(ePD_Id pd);
 ```
 
 #### 2.1.3  PD 开关
 
 ```c
-HAL_Status HAL_PD_Setting(uint32_t pd, bool powerOn);
+HAL_Status HAL_PD_Off(ePD_Id pd);
 ```
 
 参数是 PD_ID(在 soc.h 中，详细解释见本文 2.1.1)。
@@ -360,9 +390,10 @@ HAL_Status HAL_PD_Setting(uint32_t pd, bool powerOn);
 #### 2.2.1  RT-THREAD 接口
 
 ```c
-struct pd *get_pd_from_id(int pd_id);
-void release_pd_id(struct pd *power);
-rt_err_t pd_power(struct pd *power, int on);
+struct pd *get_pd_from_id(ePD_Id pd_id);
+void put_pd(struct pd *power);
+rt_err_t pd_on(struct pd *power);
+rt_err_t pd_off(struct pd *power);
 ```
 
 在 RT 中封装接口的原因：
@@ -373,26 +404,36 @@ rt_err_t pd_power(struct pd *power, int on);
 
 使用示例：
 
+1、对于复用PD，如PD_AUDIO是PDM、VAD、I2S等模块复用的，所以开关的时候需要使用下面带有引用计数和锁的接口。
+
 ```c
-struct pd *pd_audio = get_pd_from_id(PISCES_PD_AUDIO);
+struct pd *pd_audio = get_pd_from_id(PD_AUDIO);
 
-pd_power(pd_audio, 1);/* power on */
-pd_power(pd_audio, 0);/* power off */
+pd_on(pd_audio);/* power on */
+pd_off(pd_audio);/* power off */
 
-release_pd_id(pd_audio);
+put_pd(pd_audio);
 ```
 
 备注：
 因为有引用计数，所以使用的时候注意开关要成对。
 
-### 2.3  RKOS PD 配置
+2、对于模块专有PD，如PD_DSP。开关的时候可以直接通过ID开关，使用如下直接调用HAL的方式：
+
+```c
+HAL_PD_On(PD_DSP);/* power on */
+HAL_PD_Off(PD_DSP);/* power off */
+```
+
+### 2.3  RKOS PD配置
 
 #### 2.3.1  RKOS 接口
 
 ```c
-rk_err_t PdPower(PD *power, int on);
+rk_err_t PdPowerOn(PD *power);
+rk_err_t PdPowerOff(PD *power);
 PD *GetPdFromId(int pdId);
-void ReleasePdId(PD *power);
+void PutPd(PD *power);
 ```
 
 在 RKOS 中封装接口的原因：
@@ -403,14 +444,88 @@ void ReleasePdId(PD *power);
 
 使用示例：
 
+1、对于复用PD，如PD_AUDIO是PDM、VAD、I2S等模块复用的，所以开关的时候需要使用下面带有引用计数和锁的接口。
+
 ```c
-PD *pd_audio = GetPdFromId(RK2206_PD_AUDIO);
+PD *pd_audio = GetPdFromId(PD_AUDIO);
 
-PdPower(pd_audio, 1);/* power on */
-PdPower(pd_audio, 0);/* power off */
+PdPowerOn(pd_audio);/* power on */
+PdPowerOff(pd_audio);/* power off */
 
-ReleasePdId(pd_audio);
+PutPd(pd_audio);
 ```
 
 备注：
 因为有引用计数，所以使用的时候注意开关要成对。
+
+2、对于模块专有PD，如PD_DSP。开关的时候可以直接通过ID开关，使用如下直接调用HAL的方式：
+
+```c
+HAL_PD_On(PD_DSP);/* power on */
+HAL_PD_Off(PD_DSP);/* power off */
+```
+
+## 3 TEST
+
+### 3.1  RT-THREAD
+
+#### 3.1.1  CONFIG配置
+
+```c
+RT-Thread bsp test case  --->
+    RT-Thread Common Test case  --->
+        [*] Enable BSP Common TEST
+            [*]   Enable BSP Common PM TEST
+```
+
+#### 3.1.2  USAGE
+
+```c
+clk -w <id|name> <rate_hz>    set clk rate;
+clk -r <id|name>              get clk rate;
+clk -e <id>                   enable clk;
+clk -d <id>                   disable clk;
+clk_dump                      print clk id;
+```
+
+使用示例：
+
+```c
+/* 设置GPLL频率 594M, GPLL的ID是0 */
+clk -w 0 594000000
+/* 获取GPLL频率 */
+clk -r 0
+/* 打印时钟树和部分id */
+clk_dump
+```
+
+### 3.2  RKOS
+
+#### 3.2.1  CONFIG配置
+
+```c
+Components Config  --->
+    Command shell  --->
+        [*]     Enable PM_TEST Shell
+```
+
+#### 3.2.2  USAGE
+
+```c
+"    clk -w <id> <rate_hz>    set clk rate\r\n"
+"    clk -r <id>              get clk rate\r\n"
+"    clk -e <id>              enable clk\r\n"
+"    clk -d <id>              disable clk\r\n"
+"    clk dump                 print clk id\r\n"
+```
+
+使用示例：
+
+```c
+/* 设置GPLL频率 594M, GPLL的ID是0 */
+clk -w 0 594000000
+/* 获取GPLL频率 */
+clk -r 0
+/* 打印时钟树和部分id */
+clk_dump
+```
