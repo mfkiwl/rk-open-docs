@@ -1107,6 +1107,34 @@ shmoo 测试的 buffer 小，只用到 1KB。而 sw_training 用的 buffer 有 6
 
 ---
 
+## 11. RK3326/PX30
+
+### 11.1 问题：RK3326/PX30 DDR测试工具Loader设备下测试失败
+
+**关键词：DDR测试工具 Loader设备 A35 ICACHE**
+
+**现象描述**
+
+DDR测试工具Loader设备下测试出现下载boot就卡住无法正常测试的现象。 而短路flash进入maskrom设备下是能够正常测试的。
+
+**分析过程**
+
+- 测试失败时连接jtag查看boot.bin有正常下载成功，处于WFE的CPU1-3均正常，而CPU0处于running无法stop。
+- 将boot.bin 替换成初始化的ddrbin 能够正常运行。
+- 用烧写工具从Loader设备切换到maskrom设备烧写同一版本的loader能够正常烧写，不同版本的loader会死机。（实验用v1.10 和v1.13互相烧写）
+- 烧写工具在Loader设备下直接升级loader，然后重启，不管版本是否一致都能正常起来。
+- ddr初始化代码return之前加Icache invalidate后正常。
+
+**问题原因**
+
+A35默认Icache 是enable的，当从Loader设备软件切换到maskrom设备时，是先加载运行了ddrbin再回到bootrom中进入maskrom设备。由于执行过ddrbin,这时候进行ddr测试或者下载新版本的ddrbin时，旧的ddrbin代码存在Icache中，部分执行旧的代码部分执行新的代码导致CPU异常死机。而如果是Loader设备下直接烧写然后重启的话ARM在reset的时候会invalidate Icache，所有不会有问题。
+
+**解决方法**
+
+需要软件进入maskrom设备时ddrbin在返回的时候清除下icache。而ddrbin或者ddr测试工具的第一条指令同时也需要清除下icache，因为ddrbin退出前虽然清除了icache但是最后一条return指令仍然会导致icache变脏。
+
+---
+
 下面作为模版放着，免得格式不同，要新增问题，可以从这里拷贝
 
 ### 问题
