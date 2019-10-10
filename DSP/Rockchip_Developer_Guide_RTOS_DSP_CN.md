@@ -1,10 +1,10 @@
 # DSP 开发指南
 
-发布版本：1.2
+发布版本：1.3
 
 作者邮箱：huaping.liao@rock-chips.com
 
-日期：2019.9
+日期：2019.10
 
 文件密级：公开资料
 
@@ -18,11 +18,11 @@
 
 **产品版本**
 
-| **芯片名称** | **RT Thread 版本** |
+| **芯片名称** | **版本** |
 | :----------- | ----------------- |
-| RK2108       |                   |
-| X1           |                   |
-| RK2206       |                   |
+| RK2108       | RT-THREAD |
+| PISCES     | RT-THREAD |
+| RK2206       | RKOS |
 
 **读者对象**
 
@@ -39,6 +39,7 @@
 | 2019-06-24 | V1.0     | 廖华平   | 初始版本     |
 | 2019-08-02 | V1.1     | 谢科迪   | 增加 Floating License 服务器安装说明 |
 | 2019-09-03 | V1.2 | 廖华平 | 增加固件打包说明 |
+| 2019-10-10 | V1.3 | 廖华平 | 增加rkos说明 |
 
 ------
 
@@ -56,7 +57,7 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 目前，Rockchip SoC 上集成的 DSP 说明如下：
 
-- RK2108、RK2206 和 X1 集成 HIFI3 DSP。
+- RK2108、RK2206 和 PISCES集成 HIFI3 DSP。
 
 ------
 
@@ -68,7 +69,7 @@ license是和mac地址绑定的。如果需要多台机器使用，那么需要�
 
 如果是单台机器使用，那么直接使用本地目录的license文件，不需要搭建服务器。打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入文件路径名。完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。需要注意mac地址要和liscense中的host id一致。
 
-![Xplorer_License_Keys](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_File_Config.png)
+![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_File_Config.png)
 
 ### 2.2 Floating License Server 搭建
 
@@ -204,11 +205,11 @@ sudo update-rc.d flexlm enable
 
 打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入 “27000@host”，其中 host 为 服务器主机名或 IP 地址，完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。
 
-![Xplorer_License_Keys](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_Keys.png)
+![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_Keys.png)
 
-![Xplorer_License_Config](Rockchip_Developer_Guide_RT-Thread_DSP/Xplorer_License_Config.png)
+![Xplorer_License_Config](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_Config.png)
 
-![Xplorer_License_Config](Rockchip_Developer_Guide_RT-Thread_DSP/Success_Install_Key_1.png)
+![Xplorer_License_Config](Rockchip_Developer_Guide_RTOS_DSP/Success_Install_Key_1.png)
 
 ### 2.3 Xplorer 工具安装
 
@@ -218,27 +219,23 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 
 安装方法是在 Xplorer 中，<File> --> <New> --> <Xtensa Configuration>，找到下图的配置页面并点击 Install 选项：
 
-![Xtensa_Configuration](Rockchip_Developer_Guide_RT-Thread_DSP/Xtensa_Configuration.png)
+![Xtensa_Configuration](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Configuration.png)
 
-点击 Next 并且选择文件“HiFi3Dev181203_win32.tgz”后，会提示安装 RG-2018.9，这时候点击“Manage Xtensa Tools”安装“XtensaTools_RG_2018_9_win32.tgz”，安装完成后，就可以进行数据包的安装操作。
+点击 Next 并且选择文件“HiFi3Dev181203_win32.tgz”后，会提示安装 RG-2018.9，这时候点击“Manage Xtensa Tools”安装“XtensaTools_RG_2018_9_win32.tgz”，安装完成后，点击“Add Build”，就可以进行数据包的安装操作。
 
 数据包安装完成后，会在工具栏看到"C:(Active configuration)"栏目中看到 HiFi3Dev181304，点击并选中：
 
-![HiFi3Dev181304](Rockchip_Developer_Guide_RT-Thread_DSP/HiFi3Dev181304.png)
+![HiFi3Dev181304](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304.png)
 
 这时候软件左下角的 System Overivew 就会看到相关 HiFi3Dev181304 的配置文件，点击相关文件，会看到当前 Core 的配置信息。可以看到对应的 ITCM、DTCM、中断号等。连接外部 INTC 的中断为 INterrupt0.
 
-![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RT-Thread_DSP/HiFi3Dev181304_Detail.png)
+![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304_Detail.png)
 
 ### 2.4 DSP 代码下载及编译
 
-Git 仓库路径：
-
-- ssh://git@10.10.10.29:29418/rk/dsp/hifi3
-
 工程目录在根目录的 projects 下，存放不同工程的配置文件和工程文件。
 
-通过<File> --> <Import> --> <Genaral> --> <Existing Projects into Workspace>导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 RK2206。
+通过<File> --> <Import> --> <Genaral> --> <Existing Projects into Workspace>导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 Canary。
 
 在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
@@ -248,6 +245,8 @@ Git 仓库路径：
 
 - ssh://git@10.10.10.29:29418/rk/dsp/DspFirmwareGenerator
 - <https://github.com/LiaoHuaping/DspFirmwareGenerator>
+
+同时脚本会使用执行程序“FirmwareArrayGenerator.exe”将rkdsp.bin转换为头文件rkdsp_fw.h，数组名为”dsp_fw“。不同文件的加载方式在3.2中有介绍。
 
 ### 2.6 固件打包配置文件
 
@@ -268,7 +267,7 @@ Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空�
 
 段配置文件为“memmap.xmm”。text、data 等会存放在 sram0 中，这是 Share Memory 的地址空间，需要将这些段存放在 TCM 中。可以参考“<工程目录>\rkdsp\projects\PISCES\map\min-rt\memmap.xmm”中的相关修改。修改完后，需要使用命令“<工具安装目录>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b <map 目录> --xtensa-core=HiFi3Dev181203”。这时候可以在 Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成“.map”文件，里面记录了具体函数分配到的地址空间，以验证上述修改是否生效。
 
-## 3 MCU 端软件
+## 3 RT-THREAD 代码解析
 
 ### 3.1 代码路径
 
@@ -319,7 +318,23 @@ RT-Thread bsp drivers  --->
 
 “Config dsp debug uart port”表示设置DSP打印的uart端口。如果值是-1那么将不会设置。DSP代码中默认使用UART0。
 
-### 3.3 测试case
+### 3.3 驱动调用
+
+驱动调用方式可以参考“bsp/rockchip-common/tests/dsp_test.c”。
+
+```c
+struct rt_device *dsp_dev = rt_device_find("dsp0");
+rt_device_open(dsp_dev, RT_DEVICE_OFLAG_RDWR);
+rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work);
+rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work);
+rt_device_close(dsp_dev);
+```
+
+调用 rt_device_open 时候，会调用到驱动的“rk_dsp_open”函数，会执行启动 DSPcore 以及下载固件，并且将 DSP 代码运行起来。
+
+调用“rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work)”的时候，传入 work 指针，驱动会通过 mailbox 将 work 发送给 dsp，dsp 解析 work，并进行相应的算法操作，将 work 处理结果传回来。调用“rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work)”可以取回 DSP 的算法处理结果，如果 DSP 仍在处理中，那么该函数会阻塞，直到 dsp 处理完成。
+
+### 3.4 测试case
 
 打开 dsp test和audio test 配置如下：
 
@@ -355,25 +370,88 @@ Hifi3: process return value = 1
 work result:0x00000001
 ```
 
-## 4 MCU 驱动分析
+## 4 RKOS 代码解析
 
-### 4.1 驱动调用
+### 4.1 代码路径
 
-驱动调用方式可以参考“bsp/rockchip-common/tests/dsp_test.c”。
+DSP 驱动层：
 
 ```
-struct rt_device *dsp_dev = rt_device_find("dsp0");
-rt_device_open(dsp_dev, RT_DEVICE_OFLAG_RDWR);
-rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work);
-rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work);
-rt_device_close(dsp_dev);
+src/driver/dsp/DspDevice.c
+include/driver/DspDevice.h
 ```
 
-调用 rt_device_open 时候，会调用到驱动的“rk_dsp_open”函数，会执行启动 DSPcore 以及下载固件，并且将 DSP 代码运行起来。
+DSP 驱动调用流程可以参考以下测试用例：
 
-调用“rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work)”的时候，传入 work 指针，驱动会通过 mailbox 将 work 发送给 dsp，dsp 解析 work，并进行相应的算法操作，将 work 处理结果传回来。调用“rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work)”可以取回 DSP 的算法处理结果，如果 DSP 仍在处理中，那么该函数会阻塞，直到 dsp 处理完成。
+```
+src/subsys/shell/Shell_DspDevice.c
+```
 
-### 4.2 通信协议
+### 4.2 配置
+
+打开 DSP driver 配置如下：
+
+```
+BSP Driver  --->
+    Enable DSP  --->
+        [*] Enable DSP
+        [*]   Enable firmware loader to dsp
+                Dsp firmware path (Store firmware data in file)  --->
+        (/rkdsp.bin) Dsp firmware path
+        [ ]   Enable dsp send trace to cm4
+        (-1)  Config dsp debug uart port
+        [ ]   Enable dsp jtag
+```
+
+menuconfig选项和3.2基本一致，这里说下两个不同的地方：
+
+rkdsp_fw.h的存放目录改为了"src/driver/dsp/dsp_fw"。
+
+添加了“Enable dsp jtag”选项，表示使能dsp jtag。
+
+### 4.3 驱动调用
+
+驱动调用方式可以参考“src/subsys/shell/Shell_DspDevice.c”。
+
+```c
+rkdev_create(DEV_CLASS_DSP, 0, NULL);
+HDC dsp_dev = rkdev_open(DEV_CLASS_DSP, 0, NOT_CARE);
+rk_dsp_open(dsp_dev, 0);
+rk_dsp_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work);
+rk_dsp_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work);
+rk_dsp_close (dsp_dev);
+rkdev_close(dsp_dev);
+rkdev_delete(DEV_CLASS_DSP, 0, NULL);
+```
+
+调用说明可以参考3.3中的介绍，只是函数名有些不同，执行方式是一样的。
+
+### 4.4 测试case
+
+打开 dsp test配置如下：
+
+```
+Components Config  --->
+   Command shell  --->
+       [*]  Enable DSP shell command
+```
+
+编译固件烧录后，在控制台输入dsp_test，可以看到如下log：
+
+```
+dsp_test
+Hifi3: Hifi3 config done
+Hifi3: kwsSetConfig ok
+Hifi3: init uv_asr ok
+config end
+[A.DspTe][000024.61]workresult:0x00000000
+[A.DspTe][000024.61]work result:0x00000000
+[A.DspTe][000024.61]work result:0x00000000
+```
+
+## 5 通信协议
+
+### 5.1 通信协议分析
 
 MCU 和 DSP 通过 Mailbox 进行通信，Mailbox 包含 4 个通道，一个通道传输 32bit 的 cmd 和 data 数据。每次发送消息，cmd 通道传输命令码，表示这次消息进行哪些操作；data 通道传输数据，一般为 work 或者 config 的 buffer 指针。命令码存于在 drv_dsp.h 中，DSP_CMD_WORK、DSP_CMD_READY、DSP_CMD_CONFIG 等。
 
