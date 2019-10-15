@@ -1,6 +1,6 @@
 # U-Boot next-dev(v2017)开发指南
 
-发布版本：1.43
+发布版本：1.44
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -66,7 +66,8 @@
 | 2019-06-20 | V1.40    | 陈健洪        | 增加/更新：memblk/sysmem/bi dram/statcktrace/hotkey/fdt param/run_command/distro/led/reset/env/wdt/spl/amp/crypto/efuse/Android compatible/io-domain/bootflow/pack image |
 | 2019-08-21 | V1.41    | 朱志展        | 增加 secure otp 说明 |
 | 2019-08-27 | V1.42    | 朱志展        | 增加存储设备/MTD 设备说明 |
-| 2019-10-08 | V1.43   | 朱志展        | 增加BCB说明 |
+| 2019-10-08 | V1.43   | 朱志展        | 增加 BCB 说明 |
+| 2019-10-015 | V1.44  | 朱志展        | 增加 SPL 驱动与功能支持说明 |
 ---
 [TOC]
 ---
@@ -5416,6 +5417,297 @@ CONFIG_RKFW_U_BOOT_SECTOR      // uboot.img分区地址
 **打包：**
 
 目前可以通过./make.sh 命令把 u-boot-spl.bin 替换掉 miniloader 生成 loader，然后通过 PC 工具烧写。具体参考 [3.2.5 pack 辅助命令](#3.2.5 pack 辅助命令)。
+
+### 8.4 驱动支持
+
+#### 8.4.1 MMC 驱动
+
+eMMC 与 SD 卡的驱动。
+
+config 配置：
+
+```
+CONFIG_SPL_MMC_SUPPORT=y /* 默认已开 */
+```
+
+驱动代码：
+
+```
+./common/spl/spl_mmc.c
+```
+
+接口：
+
+```
+int spl_mmc_load_image(struct spl_image_info *spl_image,
+		       struct spl_boot_device *bootdev);
+```
+
+#### 8.4.2 MTD block 驱动
+
+SPL 下，统一 nand、spi nand、spi nor 接口到 block 层。
+
+config配置：
+
+```c
+// MTD 驱动支持
+CONFIG_MTD=y
+CONFIG_CMD_MTD_BLK=y
+CONFIG_SPL_MTD_SUPPORT=y
+CONFIG_MTD_BLK=y
+CONFIG_MTD_DEVICE=y
+
+// spi nand 驱动支持
+CONFIG_MTD_SPI_NAND=y
+CONFIG_ROCKCHIP_SFC=y
+CONFIG_SPL_SPI_FLASH_SUPPORT=y
+CONFIG_SPL_SPI_SUPPORT=y
+
+// nand 驱动支持
+CONFIG_NAND=y
+CONFIG_CMD_NAND=y
+CONFIG_NAND_ROCKCHIP=y
+CONFIG_SPL_NAND_SUPPORT=y
+CONFIG_SYS_NAND_U_BOOT_LOCATIONS=y
+CONFIG_SYS_NAND_U_BOOT_OFFS=0x8000
+CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND=0x10000
+
+// spi nor 驱动支持
+CONFIG_CMD_SF=y
+CONFIG_CMD_SPI=y
+CONFIG_SPI_FLASH=y
+CONFIG_SF_DEFAULT_MODE=0x1
+CONFIG_SF_DEFAULT_SPEED=50000000
+CONFIG_SPI_FLASH_GIGADEVICE=y
+CONFIG_SPI_FLASH_MACRONIX=y
+CONFIG_SPI_FLASH_WINBOND=y
+CONFIG_SPI_FLASH_MTD=y
+CONFIG_ROCKCHIP_SFC=y
+CONFIG_SPL_SPI_SUPPORT=y
+CONFIG_SPL_MTD_SUPPORT=y
+CONFIG_SPL_SPI_FLASH_SUPPORT=y
+```
+
+驱动代码：
+
+```
+./common/spl/spl_mtd_blk.c
+```
+
+接口：
+
+```c
+int spl_mtd_load_image(struct spl_image_info *spl_image,
+                       struct spl_boot_device *bootdev);
+```
+
+#### 8.4.3 OTP 驱动
+
+一般用于存储不可更改数据，在安全启动用到。
+
+config 配置：
+
+```
+CONFIG_SPL_MISC=y
+CONFIG_SPL_ROCKCHIP_SECURE_OTP=y
+```
+
+驱动代码：
+
+```
+./drivers/misc/misc-uclass.c
+./drivers/misc/rockchip-secure-otp.S
+```
+
+接口：
+
+```c
+int misc_read(struct udevice *dev, int offset, void *buf, int size);
+int misc_write(struct udevice *dev, int offset, void *buf, int size);
+```
+
+#### 8.4.4 crypto 支持
+
+安全启动会使用一些算法，可以使用 crypto 模块加速运算。
+
+config 配置：
+
+```
+CONFIG_SPL_DM_CRYPTO=y
+
+/* crypto v1 支持平台：rk3399/rk3368/rk3328/rk3229/rk3288/rk3128 */
+CONFIG_SPL_ROCKCHIP_CRYPTO_V1=y
+
+/* crypto v2 支持平台：px30/rk3326/rk1808/rk3308 */
+CONFIG_SPL_ROCKCHIP_CRYPTO_V2=y
+```
+
+源码：
+
+```
+./drivers/crypto/crypto-uclass.c
+./drivers/crypto/rockchip/crypto_v1.c
+./drivers/crypto/rockchip/crypto_v2.c
+./drivers/crypto/rockchip/crypto_v2_pka.c
+./drivers/crypto/rockchip/crypto_v2_util.c
+```
+
+接口：
+
+```c
+u32 crypto_algo_nbits(u32 algo);
+struct udevice *crypto_get_device(u32 capability);
+int crypto_sha_init(struct udevice *dev, sha_context *ctx);
+int crypto_sha_update(struct udevice *dev, u32 *input, u32 len);
+int crypto_sha_final(struct udevice *dev, sha_context *ctx, u8 *output);
+int crypto_sha_csum(struct udevice *dev, sha_context *ctx,
+		    char *input, u32 input_len, u8 *output);
+int crypto_rsa_verify(struct udevice *dev, rsa_key *ctx, u8 *sign, u8 *output);
+```
+
+#### 9.4.5 uart 支持
+
+uart 用于打印必要的信息，目前 SPL 下的串口选择由 rkxxxx-u-boot.dtsi 内的 chosen 节点配置，如下（以 rk3308 为例）：
+
+```
+chosen {
+	stdout-path = &uart2;
+};
+
+&uart2 {
+	u-boot,dm-pre-reloc;
+	clock-frequency = <24000000>;
+	status = "okay";
+};
+```
+
+### 8.5 功能支持
+
+#### 8.5.1 rockchip firmware 支持
+
+rockchip 定义了自己的一套固件打包格式，所以启动加载这些固件需要按 rockchip 固件格式进行解析加载。
+
+config配置：
+
+```
+CONFIG_SPL_LOAD_RKFW=y
+CONFIG_RKFW_TRUST_SECTOR=0X3000
+CONFIG_RKFW_U_BOOT_SECTOR=0X2000
+```
+
+CONFIG_RKFW_TRUST_SECTOR 与 CONFIG_RKFW_U_BOOT_SECTOR 分别指定 trust 与 U-Boot 的存储加载地址这里需要与 parameter.txt 的配置一致。
+
+后续支持 GPT，会优先使用 GPT 内定义的存储加载地址。
+
+#### 8.5.2 GPT 支持
+
+rockchip平台后续统一使用GPT分区。
+
+config 配置：
+
+```
+CONFIG_SPL_LIBDISK_SUPPORT=y
+CONFIG_SPL_EFI_PARTITION=y
+CONFIG_PARTITION_TYPE_GUID=y
+```
+
+源码：
+
+```
+./disk/part.c
+./disk/part_efi.c
+```
+
+接口：
+
+```c
+int part_get_info(struct blk_desc *dev_desc, int part, disk_partition_t *info);
+int part_get_info_by_name(struct blk_desc *dev_desc,
+			      const char *name, disk_partition_t *info);
+```
+
+#### 8.5.3 AB boot 支持
+
+支持AB两套系统启动。
+
+config 配置：
+
+```
+CONFIG_SPL_AB=y
+```
+
+源码：
+
+```
+./common/spl/spl_ab.c
+```
+
+接口：
+
+```c
+int spl_get_current_slot(struct blk_desc *dev_desc, char *partition, char *slot);
+int spl_get_partitions_sector(struct blk_desc *dev_desc, char *partition,
+			       u32 *sectors);
+```
+
+#### 8.5.4 设备启动顺序
+
+SPL 下使用 u-boot,spl-boot-order 定义设备的启动顺序，在rkxxxx-u-boot.dtsi下配置：
+
+```
+chosen {
+	stdout-path = &uart2;
+	u-boot,spl-boot-order = &sdmmc, &sfc, &nandc, &emmc;
+};
+```
+
+rockchip maskrom 定义的启动优先级为 spi nor > spi nand > emmc > sd。
+
+rockchip pre-loader(SPL) 定义的启动优先级为 sd > spi nor > spi nand > emmc。在 pre-loader(SPL) 把 sd 卡的优先级提到最高，可以方便系统从 sd 卡启动。比如把 sd 卡当做系统启动卡，或系统升级盘卡，或PCBA测试卡。
+
+#### 8.5.5 ATAGS支持
+
+为方便 SPL 与 U-Boot 的参数传递，rockchip 设计了 ATAGS 用于传递参数。比如启动的存储设备，打印串口等。
+
+config 配置：
+
+```
+CONFIG_ROCKCHIP_PRELOADER_ATAGS=y
+```
+
+源码：
+
+```
+./arch/arm/include/asm/arch-rockchip/rk_atags.h
+./arch/arm/mach-rockchip/rk_atags.c
+```
+
+接口：
+
+```
+int atags_set_tag(u32 magic, void *tagdata);
+struct tag *atags_get_tag(u32 magic);
+```
+
+#### 8.5.6 spl kernel boot 支持
+
+SPL kernel boot 为在 SPL 下直接启动 kernel。目前可以支持加载 android head version 2 的 boot.img，打包命令如下：
+
+```
+python mkbootimg.py --kernel Image --dtb rk1808-evb-v10.dtb --header_version 2 -o boot.img
+```
+
+这里不再支持旧的 kernel dtb 打包到 resource.img 的方式。
+
+启动顺序为：
+
+```
+maskrom -> ddr -> SPL -> trust(bl31 [-> bl32]) -> kernel
+```
+
+#### 8.5.7 secure boot 支持
+
+to-do
 
 ## 9. U-Boot 和 kernel DTB 支持
 
