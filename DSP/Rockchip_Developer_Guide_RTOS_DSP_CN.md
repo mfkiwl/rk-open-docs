@@ -40,6 +40,7 @@
 | 2019-08-02 | V1.1     | 谢科迪   | 增加 Floating License 服务器安装说明 |
 | 2019-09-03 | V1.2 | 廖华平 | 增加固件打包说明 |
 | 2019-10-10 | V1.3 | 廖华平 | 增加rkos说明 |
+| 2019-10-16 | V1.4 | 廖华平 | 增加ubuntu安装说明 |
 
 ------
 
@@ -213,7 +214,9 @@ sudo update-rc.d flexlm enable
 
 ### 2.3 Xplorer 工具安装
 
-Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cadence 官网，LICENSE 需要联系 Cadence 获取。
+#### 2.3.1 window环境
+
+Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cadence 官网，LICENSE 需要联系 Cadence 获取，我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“。
 
 工具安装好后，需要安装先安装数据包“HiFi3Dev181203_win32.tgz”，数据包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
 
@@ -230,6 +233,33 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 这时候软件左下角的 System Overivew 就会看到相关 HiFi3Dev181304 的配置文件，点击相关文件，会看到当前 Core 的配置信息。可以看到对应的 ITCM、DTCM、中断号等。连接外部 INTC 的中断为 INterrupt0.
 
 ![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304_Detail.png)
+
+#### 2.3.2 ubuntu环境
+
+由于开发工具在ubuntu环境下有未知的ui适配问题和使用问题，所以我们建议尽量在windows下开发。
+
+ubuntu 64bit下我们推荐的工具安装包为“Xplorer-8.0.8-linux-x64-installer.bin”，如果是32bit的系统，推荐工具安装包“Xplorer-7.0.9-linux-installer”。配置包为“HiFi3Dev181203_linux.tgz”和“XtensaTools_RG_2018_9_linux.tgz”。安装过程和window一致。
+
+因为配置包为32bit，为了兼容64bit系统，需要执行以下命令：
+
+```
+sudo apt-get install libgtk2.0-0:i386 gtk2-engines:i386 libc6:i386 libcanberra-gtk3-0:i386 libxtst6:i386 libncurses5:i386
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libc6:i386 libstdc++6:i386
+sudo apt-get update -y
+sudo apt-get update kernel* -y
+sudo apt-get update  kernel-headers kernel-devel -y
+sudo apt-get install kernel-headers kernel-devel -y
+sudo apt-get install compat-libstdc++-33.i686 -y
+sudo apt-get install libstdc++.i686 -y
+sudo apt-get install gtk2.i686 -y
+sudo apt-get install libcanberra-gtk2.i686 -y
+sudo apt-get install PackageKit-gtk3-module.i686 -y
+sudo apt-get install libXtst.i686 -y
+sudo apt-get install ncurses-libs.i686 -y
+sudo apt-get install redhat-lsb.i686 -y
+```
 
 ### 2.4 DSP 代码下载及编译
 
@@ -253,7 +283,7 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
 
 - CoreName：编译的 Core 的名称，当前使用的是 HiFi3Dev181203。
-- ToolsPath：安装 Xplorer 的工具目录，进行固件打包时，会使用到安装的工具包。
+- ==**ToolsPath：安装 Xplorer 的工具目录，这需要开发人员手动更改。**==
 - ExecutableFile：输入固件名。
 - ExternalFile：除 DSP 固件外，额外需要打包的文件名。如没有，置空即可。
 - ExternalAddr：额外需要打包的文件需要加载的地址。
