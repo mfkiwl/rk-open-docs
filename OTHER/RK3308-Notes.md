@@ -37,6 +37,8 @@ RK3308B/RK3308H: 0x3308
 
 其他更进一步的区分通过OTP。
 
+这些变种在封装上 pin2pin，所以硬件上可以直接互换，比如原来贴 RK3308 的板子可以换成 RK3308B，把板子上贴的 DDR 去掉，可以直接换上内置 DDR2 的 RK3308G/RK3308H。
+
 ## AArch32 模式
 
 为了满足64M小容量内存的需求，我们开发了32位的运行模式，具体实现方式为：在Trust 跳转到 U-Boot的时候将CPU从AArch64 切换到 AArch32 模式，之后U-Boot、Linux kernel、userspace都运行于AArch32模式。
