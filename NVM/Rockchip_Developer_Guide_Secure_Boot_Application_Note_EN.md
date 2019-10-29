@@ -1,26 +1,36 @@
 # **Rockchip Secure Boot Application Note**
 
-Version:1.8
+Version: 2.1
 
-Email:zyf@rock-chips.com hjh@rock-chips.com
+Email: zyf@rock-chips.com / hjh@rock-chips.com / cf@rock-chips.com
 
-Date:2017.11
+Date: 2019.10
 
-Classification level:Publicity
+Classification level: Publicity
 
 ---
 
-**Preface**
+## Preface
 
-**Terms**
+**Terms : **
 
-**Sector**
+**Sector:**  Sector size is 512 bytes
 
-Sector size is 512 bytes
+**eFuse:**  One-Time Programmable Memory IP in SOC
 
-**eFuse**
+**RSA Encryption:**  Use public key for encryption
 
-One-Time Programmable Memory IP in SOC
+**RSA Decryption:**  Use private key for decryption
+
+**OTP:** One-Time Programmable Memory IP in SOC
+
+**MaskRom:** BootROM, Boot Read-Only Memory in SOC
+
+**loader:** Boot loader, generally means Miniloader or SPL(uboot)
+
+**OBM CODE:**  Generally means the code compiled or trusted by OEM/OBM
+
+---
 
 **Introduction**
 
@@ -32,7 +42,7 @@ The device which had programmed eFuse will enable secure boot ROM, and could not
 
 NOTE: The valid signed firmware can boot smoothly on fake copies of device circuit board or same CPU platform hardware. Secure boot will verify the validity of software, but not hardware.
 
-This document applies to RK3126, RK3128, RK3228, RK3229, RK3288, RK3368, RK3399, RK3228H and RK3328.
+This document applies to RK3126, RK3128, RK3228, RK3229, RK3288, RK3368, RK3399, RK3228H, RK3328, RK3326, RK3308 and PX30.
 
 Features of secure boot:
 
@@ -42,13 +52,9 @@ Features of secure boot:
 
 - Support RSA2048
 
-- Support eFuse hash to verify public key
+- Support eFuse or OTP hash to verify public key
 
-The relative tool and loader revision:
-
-- MiniloaderV2.19 or the latest revision
-
-- Uboot V2.17or the latest revision
+The relative tool revision:
 
 - Efuse tool V1.35 or the latest revision
 
@@ -60,25 +66,29 @@ The relative tool and loader revision:
 
 **History**
 
-| **Revision** | **Date**   | **Description**                          | **Author** |
-| ------------ | ---------- | ---------------------------------------- | ---------- |
-| 1.0          | 2014-11-05 | Original document                        | ZYF        |
-| 1.1          | 2015-12-21 | Update secure boot tool                  | YBC        |
-| 1.2          | 2016-02-02 | Update secure boot tool                  | YHC        |
-| 1.3          | 2016-09-29 | Re-edit                                  | ZYF        |
-| 1.4          | 2016-11-15 | Add detailed description of workflow     | Joshua     |
+| **Revision** | **Date**   | **Description**                                   | **Author** |
+| ------------ | ---------- | ------------------------------------------------- | ---------- |
+| 1.0          | 2014-11-05 | Original document                                 | ZYF        |
+| 1.1          | 2015-12-21 | Update secure boot tool                           | YBC        |
+| 1.2          | 2016-02-02 | Update secure boot tool                           | YHC        |
+| 1.3          | 2016-09-29 | Re-edit                                           | ZYF        |
+| 1.4          | 2016-11-15 | Add detailed description of workflow              | Joshua     |
 | 1.5          | 2016-11-16 | 1. Add terms and definitions.2. Add eFuse layout. | Joshua     |
-| 1.6          | 2017-02-15 | Add RK3328 and RK3228H.                  | ZYF        |
-| 1.7          | 2017-05-19 | Add sequence chart and note              | ZZJ        |
-| 1.8          | 2017-10-30 | Refactor the format and add hardware info | CW         |
+| 1.6          | 2017-02-15 | Add RK3328 and RK3228H.                           | ZYF        |
+| 1.7          | 2017-05-19 | Add sequence chart and note                       | ZZJ        |
+| 1.8          | 2017-10-30 | Refactor the format and add hardware info         | CW         |
+| 1.9          | 2018-06-05 | Add OTP program public key hash flow              | CF         |
+| 2.0          | 2018-11-09 | Add RK3336、PX30 and RK3308 OTP layout            | CF         |
+| 2.1          | 2019-10-29 | Fix some error                                    | ZYF/CF     |
 
 ---
-
+<div STYLE="page-break-after: always;"></div>
 **Contents**
 
 [TOC]
 
 ---
+<div STYLE="page-break-after: always;"></div>
 
 ## 1 Architecture
 
@@ -98,7 +108,7 @@ Figure 1-2 Secure boot sequence
 
 ![1-3MaskRom-to-loader-sequence](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-3MaskRom-to-loader-sequence.png)
 
-Figure 1-3 MaskRom to loader sequence
+Figure 1-3-1 MaskRom to loader sequence
 
 First loader layout in user partition of flash
 
@@ -118,9 +128,65 @@ Table 1-1 First loader data layout
 
 The structure of public key and digital signature layout at address 2048 to 4095:
 
-![1-4Second_loader_hdr-struct](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-4Second_loader_hdr-struct.png)
+```c
+typedef struct tagBOOT_HEADER
+{
+    uint32 tag;
+    uint32 version;
+    uint32 flags;
+    uint32 size;
+    uint32 reserved1[3];
+    uint16 HashBits;
+    uint16 RSABits;        /* length in bits of modulus */
+    uint32 RSA_N[64];      /* RSA public key*/
+    uint32 RSA_E[64];
+    uint32 RSA_C[64];
+    uint32 HashData[(8+1)*2];
+    uint32 signature[64];
+}BOOT_HEADER, *PBOOT_HEADER;
+```
 
-Figure 1-4 Second_loader_hdr struct
+Public key: uint32 RSA_N[64], RSA_E[64], RSA_C[64] ;
+
+Digital signature:  uint32 signature[64]
+
+Step1: Get public key from first loader partition.
+
+Step2: Calculate the hash(SHA256) of public key and compare it with the the hash stored in OTP.If mathed,load the first loader successfully, otherwise booting failed.
+
+Step3: Calculate the hash(SHA256) of raw binary and compare it with **RSA2048 encryption**(have been obtainde in step1) of digital signature. If matched, load first loader successfully, otherwise booting failed.
+
+### 1.4 First Loader boot to u-boot(Secondary Boot Loader,option)
+
+![1-4 boot to u-boot flow](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-4-boot-to-u-boot-flow.png)
+
+Figure 1-4-1 boot to -uboot flow
+
+![1-4 uboot layout in flash](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-4-uboot-layout-in-flash.png)
+
+Table 1-4 u-boot layout in flash
+
+The structure of header with digital digital signature layout at address 0 to 2047:
+
+```c
+typedef struct tag_second_loader_hdr
+{
+    unsigned char magic[LOADER_MAGIC_SIZE];
+    unsigned int version;
+    unsigned int reserved0;
+    unsigned int loader_load_addr;         /* load to DDR address */
+    unsigned int loader_load_size;         /* size in bytes */
+    unsigned int crc32;                    /* crc32 */
+    unsigned int hash_len;                 /* 20 or 32 , 0 is no hash */
+    unsigned char hash[LOADER_HASH_SIZE];  /* sha256 */
+    unsigned int js_hash;                  /* js hsah */
+    unsigned char reserved[1024-32-32-4];
+    unsigned int signTag;                  /* 0x4E474953, "NGIS" */
+    unsigned int signlen;                  /* 256 */
+    unsigned char rsaHash[256];            /* digital signature */
+    unsigned char reserved2[2048-1024-256-8];
+}second_loader_hdr;
+```
 
 Digital signature: unsigned char rsaHash[256];
 
@@ -128,11 +194,11 @@ l Step 1: Get public key from first loader partition
 
 l Step 2: Calculate the hash (sha256) of public key and compare it with hash in OTP, if matched go to next step, otherwise booting failed.
 
-l Step 3: Calculate the hash(SHA256) of raw binary and compare it with RSA2048 encryption (have been obtained in step 1) of digital signature, if matched, loading successfully and deliver the public key to U-Boot, otherwise booting failed.
+l Step 3: Calculate the hash(SHA256) of raw binary and compare it with **RSA2048 encryption** (have been obtained in step 1) of digital signature, if matched, loading successfully and deliver the public key to U-Boot, otherwise booting failed.
 
-### 1.4 U-Boot Boot to Boot Image with Linux kernel)
+### 1.5 U-Boot Boot to Boot Image with Linux kernel
 
-![1-5-UBoot to boot sequence](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-5-UBoot to boot sequence.png)
+![1-5-UBoot to boot sequence](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-5-UBoot-to-boot-sequence.png)
 
 Figure 1-5 U-Boot to boot sequence
 
@@ -147,9 +213,31 @@ Table 1-2 Boot data layout
 
 The structure of layout 0-2047(header):
 
-![1-6-Boot_img_hdr struct](Rockchip_Developer_Guide_Secure_Boot_Application_Note/1-6-Boot_img_hdr struct.png)
-
-Figure 1-6 Boot_img_hdr struct
+```c
+#define BOOT_MAGIC_SIZE 8
+#define BOOT_NAME_SIZE 16
+#define BOOT_ARGS_SIZE 512
+typedef struct tag_boot_img_hdr
+{
+    unsigned char magic[BOOT_MAGIC_SIZE]; /* "ANDROID!" */
+    unsigned int kernel_size;             /* size in bytes */
+    unsigned int kernel_addr;             /* physical load addr */
+    unsigned int ramdisk_size;            /* size in bytes */
+    unsigned int ramdisk_addr;            /* physical load addr */
+    unsigned int second_size;             /* size in bytes */
+    unsigned int second_addr;             /* physical load addr */
+    unsigned int tags_addr;               /* physical addr for kernel tags */
+    unsigned int page_size;               /* flash page size we assume */
+    unsigned int unused[2];               /* future expansion: should be 0 */
+    unsigned char name[BOOT_NAME_SIZE];   /* asciiz product name */
+    unsigned char cmdline[BOOT_ARGS_SIZE];
+    unsigned int id[8];                   /* timestamp / checksum / sha1 / etc */
+    unsigned char reserved[0x400-0x260];
+    unsigned int signTag;                 /* 0x4E474953 */
+    unsigned int signlen;                 /* 128 */
+    unsigned char rsaHash[128];
+}boot_img_hdr;
+```
 
 Digital signature: unsigned char rsaHash[128];
 
@@ -157,12 +245,14 @@ l Step 1: U-Boot get public key obtained from first loader.
 
 l Step 2: Calculate the hash (sha256) of public key and compare it with hash in OTP, if matched go to next step, otherwise booting failed.
 
-l Step 3: Hash(SHA256) of raw binary and compare it with RSA2048 encryption(using public key get in step 1) of digital signature, if matched, boot to linux kernel, otherwise booting failed.
+l Step 3: Hash(SHA256) of raw binary and compare it with **RSA2048 encryption** (using public key get in step 1) of digital signature, if matched, boot to linux kernel, otherwise booting failed.
 
-### 1.5 U-Boot Boot to Recovery
+### 1.6 U-Boot Boot to Recovery
 
-The same as boot to boot image, detail please refer to chapter1.4.
+The same as boot to boot image, detail please refer to chapter 1.4.
 
+---
+<div STYLE="page-break-after: always;"></div>
 ## 2 eFuse Layout
 
 RK3368, RK3288, RK3229 and RK3228 used 1024 bits eFuse for secure boot, data layout:
@@ -195,32 +285,41 @@ Table 2-2 OTP data layout
 | 130-131                    | Non-trusted Firmware revocation counter (ID #1) |
 | 132-239                    | Reserved                                 |
 
+---
+
+RK3326、PX30 and RK3308 used 4096 bits OTP for secure boot, data layout:
+
+Table 2-3 OTP data layout2
+
+| **32-bit Word Addressing** | **Description**                                 |
+| -------------------------- | ----------------------------------------------- |
+| 0                          | Secure boot enable flag                         |
+| 1-3                        | Reserved                                        |
+| 4-11                       | RSA Public key hash(using SHA256)               |
+| 12-19                      | Device root key                                 |
+| 20-23                      | FW encryption key                               |
+| 24-25                      | Trusted Firmware revocation counter (ID #0)     |
+| 26-31                      | Non-trusted Firmware revocation counter (ID #1) |
+| 32-97                      | Reserved for OEM                                |
+
+---
+<div STYLE="page-break-after: always;"></div>
 ## 3 Overall Operation Flow
+
+Enable secure boot flow：
+
+1. Package update.img
+2. Sign Firmware(update.img)
+3. Program EFUSE or OTP
+4. Upgrade Firmware(update.img)
+5. Check secure boot enable
 
 ![3-1Secure-boot-operation-process](Rockchip_Developer_Guide_Secure_Boot_Application_Note/3-1Secure-boot-operation-process.png)
 
 Figure 3-1 Secure boot operation process
 
-### 3.1 Make Update.img
-
-[See Make update.img](#_Make_update.img)
-
-### 3.2 Firmware Sign
-
-[See Firmware Sign Flow](#_Firmware_Sign_Flow)
-
-### 3.3 Programming eFuse
-
-[See Programming eFuse](#_Programming_EFUSE)
-
-### 3.4 Firmware Upgrade
-
-[See Firmware Upgrade](#_Firmware_Upgrade)
-
-### 3.5 Ensure that Secure Boot has been Enabled
-
-[See Verification](#_Verification_1)
-
+---
+<div STYLE="page-break-after: always;"></div>
 ## 4 Make Update.img
 
 ### 4.1 Generate Images
@@ -233,7 +332,7 @@ After build Android,use the following script to generate images:
 
 Figure 4-1 Script to generate images
 
-### 4.2 Make Update.img
+### 4.2 Packet Update.img
 
 Refer to RKTools/windows/AndroidTool/rockdev/package-file. This file controls which files will be packaged.
 
@@ -247,6 +346,8 @@ Copy RKTools/windows folders to windows system, then run AndroidTool/rockdev/mku
 
 ![4-3Script-to-generate-images](Rockchip_Developer_Guide_Secure_Boot_Application_Note/4-3Script-to-generate-images.png)Figure 4-3 Script-to-generate-images
 
+---
+<div STYLE="page-break-after: always;"></div>
 ## 5 Firmware Sign Flow
 
 This instruction is for Windows tools, while Linux has its own.
@@ -319,6 +420,8 @@ Signed firmware:
 
 Figure 5-6 Secure Boot Tool-signed firmware
 
+---
+<div STYLE="page-break-after: always;"></div>
 ## 6 Programming eFuse
 
 ### 6.1 Hardware Conditions
@@ -358,10 +461,10 @@ Table 6-1 Hardware parameters
 
 | Chip Part Number | eFusePower | Programming Mode               | VQPS Current Requirement | Pull-down Resistance Value | eFusePower Pin Number | Remark          |
 | ---------------- | ---------- | ------------------------------ | ------------------------ | -------------------------- | --------------------- | --------------- |
-| RK3126RK3126C    | 2.5V       | Power by PCBA test board       | >50mA                    | None                       | PIN68                 | Reused with ADC |
+| RK3126/RK3126C  | 2.5V       | Power by PCBA test board       | >50mA                    | None                       | PIN68                 | Reused with ADC |
 | RK3128           | 2.5V       | Onboard or powered by external | >50mA                    | <=10K                      | R10                   |                 |
-| RK3168RK3188     | 1.5V       | Onboard or powered by external | >50mA                    | <=510R                     | Y10                   |                 |
-| RK3228RK3229     | 1.55-1.6V  | Onboard or powered by external | >50mA                    | <=100R                     | R10                   |                 |
+| RK3168/RK3188   | 1.5V       | Onboard or powered by external | >50mA                    | <=510R                     | Y10                   |                 |
+| RK3228/RK3229   | 1.6V       | Onboard or powered by external | >50mA                    | <=100R                     | R10                   |                 |
 | RK3288           | 1.5V       | Onboard or powered by external | >50mA                    | <=510R                     | P19                   |                 |
 | RK3368           | 1.5V       | Onboard or powered by external | >50mA                    | <=47R                      | Y10                   |                 |
 | RK3399           | 1.8V       | Onboard or powered by external | >50mA                    | <=1K                       | AD23                  |                 |
@@ -416,8 +519,34 @@ Connect the device to the PC by USB cable; the tool will program the hash of RSA
 
 Programming eFuse needs an external power supply, the detail information please refer to SOC's DATASHEET.
 
-Notice: RK3228H and RK3328 don’t need step [6.2](#_Tool_UI) to [6.4](#_Click'run'_Button_to). Programming will be done by upgrading firmware which has been signed.
+Notice:RK3228H,RK3328,RK3336,RK3308 and PX30 don’t need step [6.2](#_Tool_UI) to [6.4](#_Click'run'_Button_to). Programming will be done by upgrading firmware which has been signed.
 
+### 6.6 Programming OTP
+
+RK3228H,RK3328,RK3326,RK3308 and PX30 support OTP programming. Public key hash need  program to OTP. Programming OTP performs are :
+
+1. First, follow the above steps to burn signed firmware. If the machine can start normally，the signature process is correct. Then OTP can be programed.
+
+2. The signature tool uses version of SecureBootTool V1.9 or more. Open the config.ini file in the tools directory. Find "sign_flag="，set"sign_flag=0x20"(bit 5 set 1) which enable write OTP in RKloader.  Save config.ini file. Reopen SecureBootTool.exe to sign firmware or RKLoader.
+
+![6-6 SecureBootTool](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-6-SecureBootTool.png)
+
+Figure 6-6-1 SecureBootTool
+
+![6-6 Config_ini](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-6-Config_ini.png)
+
+Figure 6-6-2 config.ini
+
+3. Use re-signed firmware or RKLoader burnning. After burnning, restart the machine. The RKLoader will be responsible for generating hash of public key and writing it to OTP during startup and enable secure boot.
+
+![6-6 OTP program flow](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-6-OTP-program-flow.png)
+
+Figure 6-6-3 OTP program flow
+
+4. If OTP program success, serial port print “otp write key success!!!”. If OTP program fail, serial port print"otp write error: !!!".
+
+---
+<div STYLE="page-break-after: always;"></div>
 ## 7 Firmware Upgrade
 
 ### 7.1 Firmware Upgrade
@@ -434,15 +563,15 @@ Click the ‘Upgrade’ button to start firmware upgrade and wait it to be compl
 
 Figure 7-2 Upgrade tool 2
 
+---
+<div STYLE="page-break-after: always;"></div>
 ## 8 Verification
 
 ### 8.1 Check Secure Flag
 
 Use serial port tools (e.g. SecureCRT) to get the log of system boot. These words show that the security boot is on:
 
-Secure Boot Mode: 0x1
-
-SecureBootEn = 1, SecureBootLock = 1
+​	**Secure Boot Mode: 0x1**  or **SecureMode = 0x1**
 
 ![8-1log-of-system-boot](Rockchip_Developer_Guide_Secure_Boot_Application_Note/8-1log-of-system-boot.png)
 
@@ -467,3 +596,31 @@ Other SOC will fail at “Download Boot”:
 ![8-3Upgrade-fail-2](Rockchip_Developer_Guide_Secure_Boot_Application_Note/8-3Upgrade-fail-2.png)
 
 Figure 8-3 Upgrade fail 2
+
+---
+<div STYLE="page-break-after: always;"></div>
+## 9 Secure Debug
+
+### 9.1 Introduction
+
+The secure debug only support disabled **secure boot verification** feature for upgrade unsigned kernel to speed up debugging.
+
+There has a 128-bit unique CPU ID for each SOC. The Signed Tools read the CPU ID and using **RSA private key** to Decryption and got a certificate, then the device using **RSA public key** to verify it. After the certificate is verified, the device will disable secure boot verification in uboot.
+
+### 9.2 Secure Debug Process
+
+```mermaid
+graph LR
+    cpuid[<font size=8>CPU<br>ID]-->signed[<font size=8>Signed<br><br>Tools]
+    signed--<font size=6>RSA<br><br>Decryption-->certificate[<font size=8>Certi-<br><br>ficate]
+    certificate--<font size=6>RSA<br><br>Encryption-->verify{<font size=8>uboot<br><br>verify?}
+    cpuid-->verify
+    verify--<font size=6>PASS-->disable[<font size=8>disable<br><br>secure<br><br>boot]
+    verify--<font size=6>NOT<br><br>PASS-->do_nothing[<font size=8>do<br><br>nothing]
+    style cpuid fill:#ff8,stroke:#333,stroke-width:4px;
+    style signed fill:#ccf,stroke:#333,stroke-width:4px;
+    style certificate fill:#ccf,stroke:#333,stroke-width:4px;
+    style disable fill:#ff8,stroke:#333,stroke-width:4px;
+    style do_nothing fill:#ff8,stroke:#333,stroke-width:4px;
+    style verify fill:#ccf,stroke:#f66,stroke-width:5px,stroke-dasharray:5,5;
+```
