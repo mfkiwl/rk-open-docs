@@ -1,10 +1,10 @@
 # Rockchip 时钟配置详细说明
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：zhangqing@rock-chips.com
 
-日期：2018.6
+日期：2019.11
 
 文件密级：公开资料
 
@@ -19,6 +19,7 @@
 | **芯片名称** | **内核版本** |
 | -------- | -------- |
 | RK3399   | 4.4      |
+| RK3399   | 4.19     |
 
 **读者对象**
 
@@ -30,9 +31,10 @@
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明**       |
+| **日期**     | **版本** | **作者** | **修改说明**      |
 | ---------- | ------ | ------ | -------------- |
 | 2018-06-08 | V1.0   | Elaine | 第一次临时版本发布      |
+| 2019-11-11 | V1.1   | Elaine | support linux 4.19      |
 
 ---
 
@@ -669,7 +671,7 @@ VCODEC 的驱动文件 drivers/usb/dwc3/dwc3-rockchip.c
 
 #### 1.2.1  PMUCRU 时钟树
 
-![clk-pmucru-tree](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-pmucru-tree.png)
+![clk-pmucru-tree](Rockchip_RK3399_Developer_Guide_Clock/clk-pmucru-tree.png)
 
 **注意**
 　　　上述时钟控制都是在 pmucru 寄存器。
@@ -907,7 +909,7 @@ UART 的驱动文件 drivers/tty/serial/8250/8250_dw.c
 ### 2.1  普通的父子关系
 
 时钟结构图及时钟树如下：
-![clk-parent-child-ie](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-parent-child-ie.png)
+![clk-parent-child-ie](Rockchip_RK3399_Developer_Guide_Clock/clk-parent-child-ie.png)
 
 普通的父子关系的依赖关系就是，子时钟开启的时候需要开启父时钟，时钟结构会保证此操作，只需要开启子时钟即可，时钟结构会自动索引其父时钟并开启。只要其子时钟有在工作，父时钟就不能关闭，正常情况时钟的开关是有引用计数，如上图中的 enable_cnt，子时钟或者本身时钟被 enable 后计数加一，disable 的时候计数减一，直到计数减为零，时钟才会被关闭。
 
@@ -916,9 +918,9 @@ UART 的驱动文件 drivers/tty/serial/8250/8250_dw.c
 　　　在设计 NOC 的时候，有一些模块之间的 Noc 是复用，这就要求任何一个模块在使用的时候，NOC 时钟都要开启，而且 NOC 的父时钟的整个时钟通路都要开启。
 有这种特殊要求的有如下时钟（目前代码中都已经处理，保证 NOC 时钟常开）：
 
-![clk-noc-1](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-noc-1.png)
+![clk-noc-1](Rockchip_RK3399_Developer_Guide_Clock/clk-noc-1.png)
 
-![clk-noc-2](Rockchip_RK3399_Developer_Guide_Linux4.4_Clock/clk-noc-2.png)
+![clk-noc-2](Rockchip_RK3399_Developer_Guide_Clock/clk-noc-2.png)
 
 ### 2.3  不同模块间 GRF 复用
 
