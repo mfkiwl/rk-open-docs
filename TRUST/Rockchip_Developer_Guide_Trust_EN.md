@@ -1,10 +1,10 @@
 # Trust Developer Guide
 
-Release version：1.0
+Release version：1.1
 
 Author email：chenjh@rock-chips.com
 
-Date：2017.12
+Date：2019.11
 
 Security Class: Public
 
@@ -14,7 +14,7 @@ Security Class: Public
 
 **Overview**
 
-Trust is one of firmware in Rockchip SDK, since it is related to security and confidentiality, the source code is only open to some internal engineers (the basic functions of RK322x/RK3328/RK3368/RK3399/ platform have been open source [0]). This document only provides an brief description of Trust (take 64-bit platform as an example), intended to give readers an idea of its role and functions in the overall system architecture. At the same time, it guides readers how to collect and feedback issues when have problems in practice.
+Trust is one of firmware in Rockchip SDK, since it is related to security and confidentiality, the source code is only open to some internal engineers (the basic functions of RK322x/RK3328/RK3368/RK3399/PX30, etc platform have been open source [0]). This document only provides an brief description of Trust (take 64-bit platform as an example), intended to give readers an idea of its role and functions in the overall system architecture. At the same time, it guides readers how to collect and feedback issues when have problems in practice.
 
 **Applicable object**
 
@@ -26,15 +26,16 @@ This document or this guide is mainly suitable for the following engineers：
 
 **Product version**
 
-| **Chipset model**                                 | **Kernel version** |
-| ------------------------------------------------- | :----------------- |
-| RK3036/RK3126C/RK3288/RK322X/RK3368/RK3328/RK3399 | 3.10、4.4          |
+| **Chipset model**                                            | **Kernel version** |
+| ------------------------------------------------------------ | :----------------- |
+| RK3036/RK3126C/RK3288/RK322X/RK3368/RK3328/RK3399/PX30/RK3308 | 3.10、4.4、4.19    |
 
 **Revision history**
 
-| **Date**   | **Version** | **Author**    | **Revision Description** |
-| ---------- | ----------- | ------------- | ------------------------ |
-| 2017-12-30 | V1.0        | Jianhong Chen | Initial Release          |
+| **Date**   | **Version** | **Author**    | **Revision Description**            |
+| ---------- | ----------- | ------------- | ----------------------------------- |
+| 2017-12-30 | V1.0        | Jianhong Chen | Initial Release                     |
+| 2019-11-11 | V1.1        | Jianhong Chen | Update the chip/kernel support list |
 
 ---
 [TOC]
@@ -106,6 +107,8 @@ When compiling uboot.img of a certain platform, the "trust.img" of the correspon
 ```
 tools/rk_tools/RKTRUST/
 ```
+
+Note: Developers can download the individual rkbin repository which contains the binaries of all platforms.
 
 ### 4. Enable DTS
 
@@ -185,7 +188,7 @@ cpus {
 };
 ```
 
-#### 4.2 Kernel 4.4
+#### 4.2 Kernel 4.4+
 
 ##### 4.2.1 32 bit platform
 
@@ -296,7 +299,7 @@ SYSTEM_RESET
 ......
 ```
 
-4.4 Kernel related code path
+4.4+ Kernel related code path
 
 ```
 ./arch/arm/kvm/psci.c
