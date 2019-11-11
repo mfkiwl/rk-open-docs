@@ -1,10 +1,10 @@
 # DSP 开发指南
 
-发布版本：1.3
+文件标识：RK-KF-YF-302
 
-作者邮箱：huaping.liao@rock-chips.com
+发布版本：1.4
 
-日期：2019.10
+日       期：2019.10
 
 文件密级：公开资料
 
@@ -66,9 +66,9 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 ### 2.1 License 安装
 
-license是和mac地址绑定的。如果需要多台机器使用，那么需要搭建license服务器，但是同时只能一台机器访问license服务器。服务器搭建步骤参考2.2章的内容。
+License是和MAC地址绑定的。如果需要多台机器使用，那么需要搭建License服务器，但是同时只能一台机器访问License服务器。服务器搭建步骤参考2.2章的内容。
 
-如果是单台机器使用，那么直接使用本地目录的license文件，不需要搭建服务器。打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入文件路径名。完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。需要注意mac地址要和liscense中的host id一致。
+如果是单台机器使用，那么直接使用本地目录的License文件，不需要搭建服务器。打开 Xplorer 工具，打开 “help” --  “Xplorer License Keys” ，点击 ”Install License Keys”，输入文件路径名。完成后，点击 ”License Options” 或 ”Check Xtensa Tools Keys” 确认 License 状态。需要注意mac地址要和liscense中的host id一致。
 
 ![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_File_Config.png)
 
@@ -100,9 +100,9 @@ sudo apt install lsb-core
 
 其他发行版或 Ubuntu <= 16.04 的安装包名、方法不同，自行 Google.
 
-- license 文件修改
+- License 文件修改
 
-license 文件格式如下，根据服务器 MAC 生成，将 host 改为服务器的主机名，MAC 改为服务器的网卡 MAC 地址，格式为“AABBCCDDEEFF”，将端口改为需要开放的端口号，如 27000 。
+License 文件格式如下，根据服务器 MAC 生成，将 Host 改为服务器的主机名，MAC 改为服务器的网卡 MAC 地址，格式为“AABBCCDDEEFF”，将端口改为需要开放的端口号，如 27000 。
 
 ```txt
 SERVER <host> <mac> <port>
@@ -202,9 +202,9 @@ sudo update-rc.d flexlm defaults
 sudo update-rc.d flexlm enable
 ```
 
-- 确认 license 服务器工作正常
+- 确认 License 服务器工作正常
 
-打开 Xplorer 工具，打开 <help> --> <Xplorer License Keys> ，点击 <Install License Keys>，输入 “27000@host”，其中 host 为 服务器主机名或 IP 地址，完成后，点击 <License Options> 或 <Check Xtensa Tools Keys> 确认 license 状态。
+打开 Xplorer 工具，打开 “help” --> “Xplorer License Keys” ，点击”Install License Keys” ，输入 “27000@host”，其中 host 为 服务器主机名或 IP 地址，完成后，点击 ” License Options”  或 ”Check Xtensa Tools Keys”  确认 License 状态。
 
 ![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_Keys.png)
 
@@ -214,13 +214,13 @@ sudo update-rc.d flexlm enable
 
 ### 2.3 Xplorer 工具安装
 
-#### 2.3.1 window环境
+#### 2.3.1 Window环境
 
 Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cadence 官网，LICENSE 需要联系 Cadence 获取，我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“。
 
-工具安装好后，需要安装先安装数据包“HiFi3Dev181203_win32.tgz”，数据包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
+工具安装好后，需要先安装数据包“HiFi3Dev181203_win32.tgz”，数据包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
 
-安装方法是在 Xplorer 中，<File> --> <New> --> <Xtensa Configuration>，找到下图的配置页面并点击 Install 选项：
+安装方法是在 Xplorer 中，”File” --> ”New” --> ”Xtensa Configuration”，找到下图的配置页面并点击 Install 选项：
 
 ![Xtensa_Configuration](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Configuration.png)
 
@@ -234,11 +234,11 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 
 ![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304_Detail.png)
 
-#### 2.3.2 ubuntu环境
+#### 2.3.2 Ubuntu环境
 
-由于开发工具在ubuntu环境下有未知的ui适配问题和使用问题，所以我们建议尽量在windows下开发。
+由于开发工具在Ubuntu环境下有未知的ui适配问题和使用问题，所以我们建议尽量在windows下开发。
 
-ubuntu 64bit下我们推荐的工具安装包为“Xplorer-8.0.8-linux-x64-installer.bin”，如果是32bit的系统，推荐工具安装包“Xplorer-7.0.9-linux-installer”。配置包为“HiFi3Dev181203_linux.tgz”和“XtensaTools_RG_2018_9_linux.tgz”。安装过程和window一致。
+Ubuntu 64bit下我们推荐的工具安装包为“Xplorer-8.0.8-linux-x64-installer.bin”，如果是32bit的系统，推荐工具安装包“Xplorer-7.0.9-linux-installer”。配置包为“HiFi3Dev181203_linux.tgz”和“XtensaTools_RG_2018_9_linux.tgz”。安装过程和Window一致。
 
 因为配置包为32bit，为了兼容64bit系统，需要执行以下命令：
 
@@ -263,15 +263,15 @@ sudo apt-get install redhat-lsb.i686 -y
 
 ### 2.4 DSP 代码下载及编译
 
-工程目录在根目录的 projects 下，存放不同工程的配置文件和工程文件。
+工程目录在根目录的 Projects 下，存放不同工程的配置文件和工程文件。
 
-通过<File> --> <Import> --> <Genaral> --> <Existing Projects into Workspace>导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 Canary。
+通过 ”File” -->  ”Import” -->  ”Genaral” -->  ”Existing Projects into Workspace”导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 Canary。
 
 在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
 ### 2.5 DSP 固件生成
 
-工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 cmd 控制台，找到工程根目录，运行固件生成脚本“generate_dsp_fw.bat 项目名“，如果是 PISCES 项目，项目名对应的就是 PISCES，脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，运行 HifiFirmwareGenerator.exe 进行固件打包，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
+工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 CMD 控制台，找到工程根目录，运行固件生成脚本“generate_dsp_fw.bat 项目名“，如果是 PISCES 项目，项目名对应的就是 PISCES，脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，运行 HifiFirmwareGenerator.exe 进行固件打包，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
 
 - ssh://git@10.10.10.29:29418/rk/dsp/DspFirmwareGenerator
 - <https://github.com/LiaoHuaping/DspFirmwareGenerator>
@@ -280,7 +280,7 @@ sudo apt-get install redhat-lsb.i686 -y
 
 ### 2.6 固件打包配置文件
 
-在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
+在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 Xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
 
 - CoreName：编译的 Core 的名称，当前使用的是 HiFi3Dev181203。
 - ==**ToolsPath：安装 Xplorer 的工具目录，这需要开发人员手动更改。**==
@@ -293,9 +293,9 @@ sudo apt-get install redhat-lsb.i686 -y
 
 ### 2.7 Map 配置信息修改
 
-Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在<T:(active build target)> --> <Modify>，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“<工具安装目录>\XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
+Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在 ”T:(active build target) ” -->  ”Modify”，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“ <工具安装目录> \XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
 
-段配置文件为“memmap.xmm”。text、data 等会存放在 sram0 中，这是 Share Memory 的地址空间，需要将这些段存放在 TCM 中。可以参考“<工程目录>\rkdsp\projects\PISCES\map\min-rt\memmap.xmm”中的相关修改。修改完后，需要使用命令“<工具安装目录>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b <map 目录> --xtensa-core=HiFi3Dev181203”。这时候可以在 Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成“.map”文件，里面记录了具体函数分配到的地址空间，以验证上述修改是否生效。
+段配置文件为“memmap.xmm”，text、data 等会存放在 sram0 中，这是 Share Memory 的地址空间，需要将这些段存放在 TCM 中。可以参考“<工程目录>\rkdsp\projects\PISCES\map\min-rt\memmap.xmm”中的相关修改。修改完后，需要使用命令”<工具安装目录>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b  <map目录> --xtensa-core=HiFi3Dev181203”。这时候可以在 Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成“.map”文件，里面记录了具体函数分配到的地址空间，以验证上述修改是否生效。
 
 ## 3 RT-THREAD 代码解析
 
@@ -419,7 +419,7 @@ src/subsys/shell/Shell_DspDevice.c
 
 ### 4.2 配置
 
-打开 DSP driver 配置如下：
+打开 DSP Driver 配置如下：
 
 ```
 BSP Driver  --->
@@ -437,7 +437,7 @@ menuconfig选项和3.2基本一致，这里说下两个不同的地方：
 
 rkdsp_fw.h的存放目录改为了"src/driver/dsp/dsp_fw"。
 
-添加了“Enable dsp jtag”选项，表示使能dsp jtag。
+添加了“Enable dsp jtag”选项，表示使能DSP JTAG。
 
 ### 4.3 驱动调用
 
@@ -458,7 +458,7 @@ rkdev_delete(DEV_CLASS_DSP, 0, NULL);
 
 ### 4.4 测试case
 
-打开 dsp test配置如下：
+打开 DSP Test配置如下：
 
 ```
 Components Config  --->
@@ -466,7 +466,7 @@ Components Config  --->
        [*]  Enable DSP shell command
 ```
 
-编译固件烧录后，在控制台输入dsp_test，可以看到如下log：
+编译固件烧录后，在控制台输入dsp_test，可以看到如下LOG：
 
 ```
 dsp_test
@@ -483,6 +483,6 @@ config end
 
 ### 5.1 通信协议分析
 
-MCU 和 DSP 通过 Mailbox 进行通信，Mailbox 包含 4 个通道，一个通道传输 32bit 的 cmd 和 data 数据。每次发送消息，cmd 通道传输命令码，表示这次消息进行哪些操作；data 通道传输数据，一般为 work 或者 config 的 buffer 指针。命令码存于在 drv_dsp.h 中，DSP_CMD_WORK、DSP_CMD_READY、DSP_CMD_CONFIG 等。
+MCU 和 DSP 通过 Mailbox 进行通信，Mailbox 包含 4 个通道，一个通道传输 32bit 的 CMD 和 Data 数据。每次发送消息，CMD 通道传输命令码，表示这次消息进行哪些操作；Data 通道传输数据，一般为 work 或者 config 的 buffer 指针。命令码存于在 drv_dsp.h 中，DSP_CMD_WORK、DSP_CMD_READY、DSP_CMD_CONFIG 等。
 
 当 DSP 启动后，DSP 会进行自身的初始化等操作。初始化完成后，DSP 会发送 DSP_CMD_READY 命令，MCU 端接收到后，会调用“rk_dsp_config”函数对 dsp 进行 trace 等相关信息的配置。DSP 接收到 DSP_CMD_CONFIG 并且配置完成后，会发送 DSP_CMD_CONFIG_DONE，表示配置已经完成，可以进行算法工作。这三次消息发送相当于一个握手过程，握手完成后就可以进行算法调用。
