@@ -28,11 +28,11 @@ VICAP（video capture unit）用于对并口数据进行接收，主要支持以
 
 **产品版本**
 
-| 芯片名称 | 版本
-| : - : | : - :
-| RK2108 | RT-Thread & HAL
-| PISCES | RT-Thread & HAL
-| RK2206 | RKOS & HAL
+| 芯片名称 | 版本 |
+| :----: | :----: |
+| RK2108 | RT-Thread & HAL |
+| PISCES | RT-Thread & HAL |
+| RK2206 | RKOS & HAL |
 
 **读者对象**
 
@@ -223,9 +223,9 @@ Camera device driver的整体框架是基于RT-Thread/RKOS的设备对象而实�
 
 | filename | description |
 |:----:|:----:|
- | camera.c | 实现了camera框架
- | camera.h| 声明了camera device的相关对象
- | camera_mediabus.h | 声明了media-bus相关参数及对象
+| camera.c | 实现了camera框架 |
+| camera.h| 声明了camera device的相关对象 |
+| camera_mediabus.h | 声明了media-bus相关参数及对象 |
 
 #### 2.2.1 创建和注册camera设备
 
@@ -249,12 +249,12 @@ struct rk_camera_device
 
 | field | description |
 |  :----:  |  :----: |
-| parent | camera对象派生自内核的设备对象，rk_device 由adapter层实现
-| name | 用于设置具体camera的名称，具有唯一性，是内核查找设备的唯一标识。由在camera设备注册时由驱动具体设置。
-| info | 用于设置camera输出的分辨率、mediabus等信息，可为上层应用所获取用于图像配置。由驱动具体设置。
-| ops | 用于实现具体camera的访问和控制。由驱动具体设置。
-| i2c_name | 用于指定具体camera挂载所在的i2c总线的名称，该名称需与对应的系统的i2c总线驱动名称一致。由驱动具体设置。
-| i2c_bus | 由系统接口rk_device_find(...)通过i2c_name获得，进而控制camera。一般在init阶段进行赋值。由驱动具体设置。
+| parent | camera对象派生自内核的设备对象，rk_device 由adapter层实现 |
+| name | 用于设置具体camera的名称，具有唯一性，是内核查找设备的唯一标识。由在camera设备注册时由驱动具体设置。|
+| info | 用于设置camera输出的分辨率、mediabus等信息，可为上层应用所获取用于图像配置。由驱动具体设置。|
+| ops | 用于实现具体camera的访问和控制。由驱动具体设置。|
+| i2c_name | 用于指定具体camera挂载所在的i2c总线的名称，该名称需与对应的系统的i2c总线驱动名称一致。由驱动具体设置。|
+| i2c_bus | 由系统接口rk_device_find(...)通过i2c_name获得，进而控制camera。一般在init阶段进行赋值。由驱动具体设置。|
 
 其中struct rk_camera_ops *ops，是用户实现具体camera驱动的重点，相关函数由用户自行实现对应回调函数。具体说明如下：
 
@@ -367,73 +367,73 @@ VICAP driver framework是基于RTOS的设备对象封装了struct rk_VICAP_devic
 - step1: Find out the VICAP device by device name:
 
 ```c
-VICAPdev = rk_device_find(name);
+vicapdev = rk_device_find(name);
 ```
 
 - step2: Open the found VICAP device in step1 to init device:
 
 ```c
-ret = rk_device_open(VICAPdev, RT_DEVICE_OFLAG_RDWR);
+ret = rk_device_open(vicapdev, RT_DEVICE_OFLAG_RDWR);
 ```
 
 - step3: Set the work mode of VICAP device after opening device:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_SET_WORKMODE, &workmode);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_SET_WORKMODE, &workmode);
 ```
 
 - step4: Set the format for outputing:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_SET_FMT, &format);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_SET_FMT, &format);
 ```
 
 - step5: Set the crop information if it is required:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_CROP_IMAGE, &crop);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_CROP_IMAGE, &crop);
 ```
 
 - step6: Set the block num if the VICAP's block mode is required:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_SET_BLOCK_NUM, &num);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_SET_BLOCK_NUM, &num);
 ```
 
 - step7: Set the buf num required by application to capture image:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_REQBUF, &reqbuf);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_REQBUF, &reqbuf);
 ```
 
 - step8: Query the buffers have been allocated in step 7):
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_QUERYBUF, &buf);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_QUERYBUF, &buf);
 ```
 
 - step9: Queue all the buffers have been checked in step 8 into VICAP drivers:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_QBUF, &buf);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_QBUF, &buf);
 ```
 
 - step10: Stream on the VICAP device to capture image:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_STREAM_ON, RK_NULL);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_STREAM_ON, RK_NULL);
 ```
 
 - step11: Dqueue the buf filled with image data from driver for processing in application:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_DQBUF, &buf);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_DQBUF, &buf);
 ```
 
 - step12: Queue the buf has been processed in application into driver:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_QBUF, &buf);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_QBUF, &buf);
 ```
 
 - step13:Loop step11 and step 12 untill application stops streaming;
@@ -445,7 +445,13 @@ do something user needs.
 - step14: Stop streaming:
 
 ```c
-ret = rk_device_control(VICAPdev, RK_DEVICE_CTRL_VICAP_STREAM_OFF, RK_NULL);
+ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_STREAM_OFF, RK_NULL);
+```
+
+- step15: Close device
+
+```c
+ret = rk_device_close(vicapdev);
 ```
 
 ### 2.4 VICAP 测试
