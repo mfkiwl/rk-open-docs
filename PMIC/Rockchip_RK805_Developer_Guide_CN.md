@@ -1,10 +1,10 @@
 # **RK805 开发指南**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：chenjh@rock-chips.com
 
-日期：2018.05
+日期：2019.11
 
 文档密级：公开资料
 
@@ -18,9 +18,9 @@
 
 **产品版本**
 
-| **芯片名称** | **内核版本**  |
-| -------- | --------- |
-| RK805    | 3.10、 4.4 |
+| **芯片名称** | **内核版本**     |
+| ------------ | ---------------- |
+| RK805        | 3.10、 4.4、4.19 |
 
 **读者对象**
 
@@ -32,9 +32,10 @@
 
 **修订记录**
 
-| **日期**     | **版本** | **作者** | **修改说明** |
-| ---------- | ------ | ------ | -------- |
-| 2017.05.28 | V1.0   | 陈健洪    | 初稿       |
+| **日期**   | **版本** | **作者** | **修改说明**     |
+| ---------- | -------- | -------- | ---------------- |
+| 2017.05.28 | V1.0     | 陈健洪   | 初始版本         |
+| 2019-11-11 | V1.1     | 陈健洪   | 增加4.19内核支持 |
 
 ---
 [TOC]
@@ -151,7 +152,7 @@ RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1
 
 ### 2.1 驱动和 menuconfig
 
-3.10 内核配置
+**3.10 内核配置**
 
 RK805 驱动文件（复用 RK816 驱动）：
 
@@ -173,7 +174,7 @@ CONFIG_REGULATOR_RK816
 CONFIG_INPUT_RK816_PWRKEY
 ```
 
-4.4 内核配置
+**4.4 内核配置**
 
 RK805 驱动文件：
 
@@ -197,9 +198,33 @@ CONFIG_INPUT_RK8XX_PWRKEY
 CONFIG_COMMON_CLK_RK808
 ```
 
+**4.19 内核配置**
+
+RK805 驱动文件：
+
+```c
+drivers/mfd/rk808.c
+drivers/input/misc/rk805-pwrkey.c       // 跟4.4内核不同
+drivers/rtc/rtc-rk808.c
+drivers/pinctrl/pinctrl-rk805.c         // 跟4.4内核不同
+drivers/regulator/rk808-regulator.c     // 跟4.4内核不同
+drivers/clk/clk-rk808.c
+```
+
+menuconfig 里对应的宏配置：
+
+```c
+CONFIG_MFD_RK808
+CONFIG_RTC_RK808
+CONFIG_PINCTRL_RK805
+CONFIG_REGULATOR_RK808
+CONFIG_INPUT_RK805_PWRKEY
+CONFIG_COMMON_CLK_RK808
+```
+
 ### 2.2 DTS 配置
 
-3.10 内核配置
+**3.10 内核配置**
 
 DTS 的配置包括：I2C 挂载、主体、regulator、rtc、poweroff 等部分。
 
@@ -309,7 +334,7 @@ gpio_poweroff {
 
 因为 RK805 支持拉高 pmic_sleep 引脚进行整个 PMIC 的下电，所以需要在根节点下增加这个节点。其中 gpios 是可改部分，用于指明 pmic_sleep 引脚。
 
-4.4 内核配置
+**4.4 内核配置**
 
 DTS 的配置包括：i2c 挂载、主体、rtc、pwrkey、gpio、regulator 等部分。
 
@@ -354,6 +379,7 @@ DTS 的配置包括：i2c 挂载、主体、rtc、pwrkey、gpio、regulator 等�
 			vdd_logic: RK805_DCDC1@0 {
 				regulator-compatible = "RK805_DCDC1";
 				regulator-name = "vdd_logic";
+				regulator-init-microvolt = <1100000>;
 				regulator-min-microvolt = <712500>;
 				regulator-max-microvolt = <1450000>;
 				regulator-initial-mode = <0x1>;
@@ -394,7 +420,6 @@ rockchip,system-power-controller;
 wakeup-source;
 gpio-controller;
 #gpio-cells = <2>;
-
 ```
 
 - 可修改（按照 pinctrl 规则）
@@ -412,6 +437,7 @@ pinctrl-0：引用 pinctrl 里定义好的 pmic_int 引脚；
 
 - `regulator-compatible`：驱动注册时需要匹配的名字，不能改动，否则会加载失败；
 - `regulator-name`：电源的名字，建议和硬件图上保持一致，使用 regulator_get 接口时需要匹配这个名字；
+- `regulator-init-microvolt`：u-boot阶段的初始化电压，kernel阶段无效；
 - `regulator-min-microvolt`：运行时可以调节的最小电压；
 - `regulator-max-microvolt`：运行时可以调节的最大电压；
 - `regulator-initial-mode`：运行时 DCDC 的工作模式，一般配置为 1。 1：force pwm，2：auto pwm/pfm；
@@ -422,6 +448,10 @@ pinctrl-0：引用 pinctrl 里定义好的 pmic_int 引脚；
 - `regulator-ramp-delay`：DCDC 的电压上升时间，固定配置为 12500；
 - `regulator-on-in-suspend`：休眠时保持上电状态，想要关闭该路电源，则改成”regulator-off-in-suspend”；
 - `regulator-suspend-microvolt`：休眠不断电情况下的待机电压。
+
+**4.19 内核配置**
+
+请参考4.4内核DTS配置。差异点：4.19内核的DTS配置不再需要gpio子节点，但其他模块依然使用`gpios = <&rk805 0 GPIO_ACTIVE_LOW>;`的方式引用和使用rk805的pin脚。
 
 ### 2.3 函数接口
 
@@ -465,6 +495,8 @@ regulator_disable(rdev_logic);							// 关闭vdd_logic
 regulator_put(rdev_logic);								// 释放vdd_logic
 ```
 
+说明：4.4或者4.19内核还提供了`devm_`开头的regulator接口帮开发者管理要申请的资源。
+
 ## 3 Debug
 
 ### 3.10 内核
@@ -498,3 +530,7 @@ regulator_put(rdev_logic);								// 释放vdd_logic
 命令格式同 3.10 内核一样，只是节点路径不同，4.4 内核上的 debug 节点路径是：
 
 `/sys/rk8xx/rk8xx_dbg`
+
+### 4.19 内核
+
+请参考4.4内核命令。
