@@ -1,10 +1,10 @@
 # Rockchip Power Discrete DCDC Development Guide
 
-Release version:1.0
+Release version:1.1
 
 E-mail：zhangqing@rock-chips.com
 
-Release Date：2017.07
+Release Date：2019.11
 
 Classifed Level：Publicity
 
@@ -17,13 +17,13 @@ Classifed Level：Publicity
 
 | Chipset name | Kernel version |
 | ------------ | -------------- |
-| RK3399       | Linux4.4       |
-| RK3328       | Linux4.4       |
-| RK3368       | Linux4.4       |
-| RK3288       | Linux4.4       |
-| RK3036       | Linux4.4       |
-| RK312X       | Linux4.4       |
-| RK3326       | Linux4.4       |
+| RK3399       | Linux4.4 & Linux4.19       |
+| RK3328       | Linux4.4 & Linux4.19       |
+| RK3368       | Linux4.4 & Linux4.19       |
+| RK3288       | Linux4.4 & Linux4.19       |
+| RK3036       | Linux4.4 & Linux4.19       |
+| RK312X       | Linux4.4 & Linux4.19       |
+| RK3326       | Linux4.4 & Linux4.19       |
 
 **Applicable object**
 
@@ -37,7 +37,8 @@ Software Development Engineer
 
 | **Date**   | **Version** | **Author** | **Revision description** |
 | ---------- | ----------- | ---------- | ------------------------ |
-| 2017-07-24 | V1.0        | ZhangQing  | The first   version      |
+| 2017-07-24 | V1.0        | ZhangQing  | The first   version        |
+| 2019-11-12 | V1.1        | ZhangQing  | support linux 4.19 version |
 
 ---
 [TOC]
