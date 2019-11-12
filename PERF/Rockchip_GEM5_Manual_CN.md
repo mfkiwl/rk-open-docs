@@ -74,19 +74,19 @@ Rockchip Electronics Co., Ltd.
 
 ## 概述
 
-   GEM5 是一个在工业和学术界比较流行的开源计算机体系架构仿真平台，是由密歇根大学的 m5 项目和威斯康星大学的 gems 项目在2011年合并完成。许多知名的实验室都采用 GEM5 做计算机体系架构研究，包括：ARM、AMD、Google、Micron、HP 和三星等。
+GEM5 是一个在工业和学术界比较流行的开源计算机体系架构仿真平台，是由密歇根大学的 m5 项目和威斯康星大学的 gems 项目在2011年合并完成。许多知名的实验室都采用 GEM5 做计算机体系架构研究，包括：ARM、AMD、Google、Micron、HP 和三星等。
 
-   这里有必须要对仿真器和模拟器做一下概念上的区分，前者翻译自 simulator ，通常具有 cycle 精确的仿真模型，可以较为真实的仿真真实硬件的内部运行时序；而后者翻译自 emulator ，通常只会实现功能上的模拟，而忽略内部实现上的差异。GEM5 作为一个仿真器，同样具备了 cycle 精确的特性，可以用于性能和功耗的仿真。
+这里有必须要对仿真器和模拟器做一下概念上的区分，前者翻译自 simulator ，通常具有 cycle 精确的仿真模型，可以较为真实的仿真真实硬件的内部运行时序；而后者翻译自 emulator ，通常只会实现功能上的模拟，而忽略内部实现上的差异。GEM5 作为一个仿真器，同样具备了 cycle 精确的特性，可以用于性能和功耗的仿真。
 
-   GEM5 支持四类 CPU 模型：simple、timing 、 O3（out of order）和 KVM ，simple 只实现了简单的指令翻译执行，没有严格的时序限制；而 timing 则提供了严格的时序限制，可以配置每个指令的 latency ；O3 则在 timing 的基础上，增加了乱序的支持；KVM 则是使用了虚拟化加速技术。
+GEM5 支持四类 CPU 模型：simple、timing 、 O3（out of order）和 KVM ，simple 只实现了简单的指令翻译执行，没有严格的时序限制；而 timing 则提供了严格的时序限制，可以配置每个指令的 latency ；O3 则在 timing 的基础上，增加了乱序的支持；KVM 则是使用了虚拟化加速技术。
 
-   另外 GEM5 的事件驱动模型，可以提供精确的 Memory 和 总线互联模型。同时还支持多种指令集的仿真：ARM、 X86、 RISC-V、 SPARC 和 ALPHA 。
+另外 GEM5 的事件驱动模型，可以提供精确的 Memory 和 总线互联模型。同时还支持多种指令集的仿真：ARM、 X86、 RISC-V、 SPARC 和 ALPHA 。
 
 ## 环境搭建
 
 ### 代码下载
 
-   Gem5 的代码目前是托管在 Google Source 上，所以在下载代码前，请确保你可以访问 Google，具体步骤如下：
+Gem5 的代码目前是托管在 Google Source 上，所以在下载代码前，请确保你可以访问 Google，具体步骤如下：
 
 ```shell
 git clone https://gem5.googlesource.com/public/gem5
@@ -94,14 +94,14 @@ git clone https://gem5.googlesource.com/public/gem5
 
 ### Docker
 
-   使用 Docker 可以跳过一些繁琐的环境配置，只需要几步就可以完成所有配置，具体如下：
+使用 Docker 可以跳过一些繁琐的环境配置，只需要几步就可以完成所有配置，具体如下：
 
 ```shell
 sudo apt install docker.io                                               ## 安装 Docker
 sudo docker pull gcr.io/gem5-test/ubuntu-20.04_all-dependencies          ## 获取 Gem5 官方的 Docker 镜像
 ```
 
-   截止本文撰写的时间，Gem5 的稳定版本是 V20，官方文档显示这个版本同时支持 Python 2 和 Python 3，对于 Ubuntu 18.04 推荐用 Python 2，而 Ubuntu 20.04 则默认用 Python 3，但实际测试过程中，我发现在 Python 2 的一些支持已经被废弃，所以上面采用的 Ubuntu 20.04 的镜像，如果你处于老版本的 Gem5 下，可能会需要一些其他镜像，下面是官方提供的镜像清单：
+截止本文撰写的时间，Gem5 的稳定版本是 V20，官方文档显示这个版本同时支持 Python 2 和 Python 3，对于 Ubuntu 18.04 推荐用 Python 2，而 Ubuntu 20.04 则默认用 Python 3，但实际测试过程中，我发现在 Python 2 的一些支持已经被废弃，所以上面采用的 Ubuntu 20.04 的镜像，如果你处于老版本的 Gem5 下，可能会需要一些其他镜像，下面是官方提供的镜像清单：
 
 ```shell
 Ubuntu 18.04 with all optional dependencies (Python 2): gcr.io/gem5-test/ubuntu-18.04_all-dependencies (source Dockerfile).
@@ -112,20 +112,20 @@ Ubuntu 20.04 with all optional dependencies (Python 3): gcr.io/gem5-test/ubuntu-
 
 ```
 
-   如果遇到镜像下载失败，可以用我这边做好的镜像，方法如下：
+如果遇到镜像下载失败，可以用我这边做好的镜像，方法如下：
 
 ```shell
 wget http://10.10.10.110/shared/gem5_docker_ubuntu_20.tar.gz
 sudo docker load -i gem5_docker_ubuntu_20.tar.gz
 ```
 
-   默认 Docker 是需要 sudo 权限的，为了方便开发，可以给普通用户添加 Docker 权限，方法如下：
+默认 Docker 是需要 sudo 权限的，为了方便开发，可以给普通用户添加 Docker 权限，方法如下：
 
 ```shell
 sudo usermod -G docker -a user_name               ## user_name 为你的用户名
 ```
 
-   顺利完成后，可以看一下镜像是否安装成功，命令如下：
+顺利完成后，可以看一下镜像是否安装成功，命令如下：
 
 ```shell
 docker images
@@ -133,7 +133,7 @@ REPOSITORY                                       TAG                 IMAGE ID   
 gcr.io/gem5-test/ubuntu-20.04_all-dependencies   latest              7dfc9cd17d88        4 weeks ago         1.27GB
 ```
 
-   镜像安装成功以后，就可以启动 Docker 了，命令如下：
+镜像安装成功以后，就可以启动 Docker 了，命令如下：
 
 ```shell
 gcr.io/gem5-test/ubuntu-20.04_all-dependenciesdocker run -u $UID:$GID --volume <gem5 directory>:/gem5 --rm -it <image>
@@ -169,14 +169,14 @@ gem5$ tree -L 1
 
 ## 编译
 
-   如果你的 Docker 运行正常，进到 Gem5 主目录就可以在 Docker 环境下执行编译了，具体命令如下：
+如果你的 Docker 运行正常，进到 Gem5 主目录就可以在 Docker 环境下执行编译了，具体命令如下：
 
 ```shell
 cd gem5
 scons build/{ISA}/gem5.{variant} -j {cpus}
 ```
 
-   其中 {ISA} 即你要仿真的指令集，目前 Gem5 支持的指令集如下：
+其中 {ISA} 即你要仿真的指令集，目前 Gem5 支持的指令集如下：
 
 ```shell
 The valid ISAs are:
@@ -191,7 +191,7 @@ SPARC
 X86
 ```
 
-   而 {variant} 则关联到各种编译开关，区别在于是否启用优化，以及是否支持 Debug 和 Profiling ，可以用一个表格来表示：
+而 {variant} 则关联到各种编译开关，区别在于是否启用优化，以及是否支持 Debug 和 Profiling ，可以用一个表格来表示：
 
 | Build variant | Optimizations | Run time debugging support | Profiling support |
 | ------------- | ------------- | -------------------------- | ----------------- |
@@ -208,7 +208,7 @@ scons build/ARM/gem5.opt -j 8
 ## 编译 ARM 架构，opt 配置，8 线程并行编译
 ```
 
-   编译成功后，可以在 Gem5 主目录下看到如下文件，即你后面要用的仿真器：
+编译成功后，可以在 Gem5 主目录下看到如下文件，即你后面要用的仿真器：
 
 ```shell
 ls -l build/ARM/gem5.opt
@@ -217,7 +217,7 @@ ls -l build/ARM/gem5.opt
 
 ## 仿真器选项
 
-   仿真器有很多运行时选项，一些选项对我们接下来的仿真运行和调试非常重要，所以我们需要先来了解它，可以通过 `./build/ARM/gem5.opt --help` 命令来列出所有选项，其中重要的选项有特别标注出来，具体如下：
+仿真器有很多运行时选项，一些选项对我们接下来的仿真运行和调试非常重要，所以我们需要先来了解它，可以通过 `./build/ARM/gem5.opt --help` 命令来列出所有选项，其中重要的选项有特别标注出来，具体如下：
 
 ```shell
 user@1dc5484c7277:/gem5$ ./build/ARM/gem5.opt --help
@@ -294,15 +294,15 @@ Help Options
 
 ## 仿真模式
 
-   Gem5 支持两种仿真模式：FS(full system) 和 SE(syscall emulation)，二者的区别在于：前者可以跑 Linux Kernel，整个流程非常接近真实系统，包括完整的 Boot 流程；而 SE 只能运行用户态的程序，其系统调用都是模拟出来的，不保证 Cycle 精确，并且 MMU 和真实场景也会有差异。但是 FS 的优点也带来了更多的工作量，你需要去调试甚至编译内核，要配置更复杂更真实的拓扑结构，同时运行速度也更慢，因此，选用哪个仿真模式是根据需求来的，如果你要仿真的场景完全都在用户态，并且不在意 Memory 性能的精度，则可以选用 SE 模式来加快进度，如果你的场景中真实的内核行为非常重要，则只能选择 FS 模式。
+Gem5 支持两种仿真模式：FS(full system) 和 SE(syscall emulation)，二者的区别在于：前者可以跑 Linux Kernel，整个流程非常接近真实系统，包括完整的 Boot 流程；而 SE 只能运行用户态的程序，其系统调用都是模拟出来的，不保证 Cycle 精确，并且 MMU 和真实场景也会有差异。但是 FS 的优点也带来了更多的工作量，你需要去调试甚至编译内核，要配置更复杂更真实的拓扑结构，同时运行速度也更慢，因此，选用哪个仿真模式是根据需求来的，如果你要仿真的场景完全都在用户态，并且不在意 Memory 性能的精度，则可以选用 SE 模式来加快进度，如果你的场景中真实的内核行为非常重要，则只能选择 FS 模式。
 
-   实际使用中，经常是两种模式交叉，SE 用于从大量配置中筛选中较优的配置，然后 FS 用于精确验证性能功耗的收益。
+实际使用中，经常是两种模式交叉，SE 用于从大量配置中筛选中较优的配置，然后 FS 用于精确验证性能功耗的收益。
 
 ## FS例子
 
-   因为 FS 完全模拟了真实的 Boot 流程，所以要移植 Boot Loader，Kernel 和 Root FS，不过为了简化流程，可以直接用 Gem5 官方提供的镜像，根据自己的需求去替换自己的镜像。Loader & Kernel 的编译和移植方式会在另外一份文档做介绍，本文都是直接使用官方现成的镜像。
+因为 FS 完全模拟了真实的 Boot 流程，所以要移植 Boot Loader，Kernel 和 Root FS，不过为了简化流程，可以直接用 Gem5 官方提供的镜像，根据自己的需求去替换自己的镜像。Loader & Kernel 的编译和移植方式会在另外一份文档做介绍，本文都是直接使用官方现成的镜像。
 
-   第一步，你要有一个配置文件，这个配置文件定义了你的硬件拓扑结构，以及软件镜像位置和启动脚本等。Gem5 的所有配置文件都是以 Python 脚本的形式存在，只要熟悉 Python 的基础语法，入门是非常容易的，并且为了进一步简化配置流程，Gem5 提供了一些常见的拓扑结构配置例子，具体如下：
+第一步，你要有一个配置文件，这个配置文件定义了你的硬件拓扑结构，以及软件镜像位置和启动脚本等。Gem5 的所有配置文件都是以 Python 脚本的形式存在，只要熟悉 Python 的基础语法，入门是非常容易的，并且为了进一步简化配置流程，Gem5 提供了一些常见的拓扑结构配置例子，具体如下：
 
 ```shell
 configs/example/
@@ -401,7 +401,7 @@ optional arguments:
                         to be installed in the host PATH or selected with with: VirtIO9PDiod.diod.
 ```
 
-   比较重要的选项具体如下：
+比较重要的选项具体如下：
 
 | 选项                           | 用途                                                         | 必选 |
 | ------------------------------ | ------------------------------------------------------------ | ---- |
@@ -439,7 +439,7 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
     --mem-size=2GB
 ```
 
-   如果成功运行，可以看到如下log：
+如果成功运行，可以看到如下log：
 
 ```shell
 gem5 Simulator System.  http://gem5.org
@@ -461,7 +461,7 @@ system.terminal: Listening for connections on port 3456        # 这是控制台
 ...
 ```
 
-   仿真器运行的时候，我们可以通过串口转发的端口号，来连接控制台查看内核的 log ，以及做一些交互。GEM5 提供了一个 telnet 程序来连接，所以需要先编译一下这个程序，方法如下：
+仿真器运行的时候，我们可以通过串口转发的端口号，来连接控制台查看内核的 log ，以及做一些交互。GEM5 提供了一个 telnet 程序来连接，所以需要先编译一下这个程序，方法如下：
 
 ```shell
 # 先进 docker 环境
@@ -471,13 +471,13 @@ ls -l m5term
 -rwxrwxr-x 1 user user 18168 Dec 31 02:53 m5term
 ```
 
-   有了 `m5term` 就可以连接控制台了，现在前面仿真器启动 log 中，找到如下输出：
+有了 `m5term` 就可以连接控制台了，现在前面仿真器启动 log 中，找到如下输出：
 
 ```shell
 system.terminal: Listening for connections on port 3456        # 这是控制台转发的端口号
 ```
 
-   然后执行如下命令：
+然后执行如下命令：
 
 ```shell
 /gem5/util/term/m5term 3456
@@ -515,7 +515,7 @@ m5 dumpresetstats
 echo "leave lmbench test"
 ```
 
-   最后，在仿真结束后，你可以在 `m5out` 目录（可以通过 outdir 选项指定目录）下找到仿真的输出，具体如下：
+最后，在仿真结束后，你可以在 `m5out` 目录（可以通过 outdir 选项指定目录）下找到仿真的输出，具体如下：
 
 ```shell
 ls m5out/ -l
@@ -536,22 +536,22 @@ drwxr-xr-x 5 cmc cmc   4096 Jan 15 17:12 fs
 -rw-rw-r-- 1 cmc cmc  12730 Dec 31 11:32 system.workload.dmesg   # 内核 dmesg
 ```
 
-   比较重要的是 `config.dot.pdf` 和 `config.json`，这是拓扑结构图和每个仿真对象的配置参数，在配置完平台的时候，一般需要从这两个文件确认配置是否符合预期。`stats.txt` 是仿真器运行期间的统计信息，`m5 dumpresetstats` 命令每次执行都会 dump 当前的统计信息到这个文件，并重新清0。
+比较重要的是 `config.dot.pdf` 和 `config.json`，这是拓扑结构图和每个仿真对象的配置参数，在配置完平台的时候，一般需要从这两个文件确认配置是否符合预期。`stats.txt` 是仿真器运行期间的统计信息，`m5 dumpresetstats` 命令每次执行都会 dump 当前的统计信息到这个文件，并重新清0。
 
 ## SE例子
 
-   SE 则会更简单一些，其配置方法和 FS 一样，因为其所有的内核系统调用都是模拟出来的，所以不需要提供系统镜像，只需要一个标准的 ELF 即可，下面是一个具体的运行命令：
+SE 则会更简单一些，其配置方法和 FS 一样，因为其所有的内核系统调用都是模拟出来的，所以不需要提供系统镜像，只需要一个标准的 ELF 即可，下面是一个具体的运行命令：
 
 ```shell
 # 运行docker，cd /gem5
 build/ARM/gem5.opt configs/example/se.py --cpu-type=ex5_big --l1d_size=64kB --l1i_size=64kB --l2_size=1MB --l1d_assoc=4 --l1i_assoc=4 --l2_assoc=16 --caches --l2cache --mem-type=DDR4_3200_1x16 --mem-channels=2 --mem-ranks=2 --mem-size=2GB --sys-clock=4GHz --cpu-clock=4GHz -c /path/to/lat_mem_rd -o "1"
 ```
 
-   测试程序的打印输出会直接转发到命令行，同时仿真的结果也会输出 `m5out` (可以通过 outdir 选项更改) 目录下。
+测试程序的打印输出会直接转发到命令行，同时仿真的结果也会输出 `m5out` (可以通过 outdir 选项更改) 目录下。
 
 ## 自定义Linux内核
 
-   编译内核的流程和我们常规的内核开发流程并无什么不同，首先我们要下载已经移植了 GEM5 支持的 Kernel 源码，具体如下：
+编译内核的流程和我们常规的内核开发流程并无什么不同，首先我们要下载已经移植了 GEM5 支持的 Kernel 源码，具体如下：
 
 ```shell
 git clone https://gem5.googlesource.com/arm/linux
@@ -576,7 +576,7 @@ ls -l vmlinux
 
 ### 多个配置并行仿真
 
-   GEM5 作为纯软件的仿真，运行速度可想而之是非常慢的，例如在我当前的机器配置：I7-7700K + 16GB DDR3200下，仿真一个：大核4GHz + 小核 2GHz 的 Cotex-A15 + 2CH DDR4 3200 ，差不多速度要放慢 13850 倍。因为仿真是单线程运行的，所以加速仿真的方法目前只有两个：多个配置并行仿真 和 checkpoint。
+GEM5 作为纯软件的仿真，运行速度可想而之是非常慢的，例如在我当前的机器配置：I7-7700K + 16GB DDR3200下，仿真一个：大核4GHz + 小核 2GHz 的 Cotex-A15 + 2CH DDR4 3200 ，差不多速度要放慢 13850 倍。因为仿真是单线程运行的，所以加速仿真的方法目前只有两个：多个配置并行仿真 和 checkpoint。
 
    为了发挥当前 host 多核的优势，我们可以并发运行我们要仿真的多个配置，例如：你当前的研究是想看看不同的 DRAM Addr Mapping 配置对某个 benchmark 的影响，就可以并发运行你要比较的配置，可以看下面两组运行命令：
 
@@ -624,15 +624,15 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
     --param='system.bigCluster.l2.prefetcher.prefetch_on_access="false"' \
 ```
 
-   需要注意的是，在你更改配置的时候，请同步修改 `outdir` ，确保不同配置的仿真结果输出不会互相覆盖，并且目录名最好能直接体现出配置上的差异，方便记录数据。
+需要注意的是，在你更改配置的时候，请同步修改 `outdir` ，确保不同配置的仿真结果输出不会互相覆盖，并且目录名最好能直接体现出配置上的差异，方便记录数据。
 
-   checkpoint 则只适用于仿真配置不变的情况下，快速快进到你要仿真的位置，例如跳过漫长的 android 启动过程，直接从指定位置开始仿真。其前提是你要先用一份稳定的仿真配置，跑到指定的位置并保存一份快照，后面只要仿真配置不变，就可以一直用这个快照来跑。下面是具体步骤：
+checkpoint 则只适用于仿真配置不变的情况下，快速快进到你要仿真的位置，例如跳过漫长的 android 启动过程，直接从指定位置开始仿真。其前提是你要先用一份稳定的仿真配置，跑到指定的位置并保存一份快照，后面只要仿真配置不变，就可以一直用这个快照来跑。下面是具体步骤：
 
 - 创建快照：在运行到指定位置后，在串口控制台或者启动脚本中执行命令 `m5 checkpoint delay period` ， delay 和 period 都是可选的，分别控制延迟和周期快照，快照默认会存放在仿真结果的输出目录（默认是 m5out）。
 
 - 载入快照：这个需要配置脚本在运行仿真的时候去指定快照的路径，可以参考 `configs/example/arm/fs_bigLITTLE.py` 的例子，具体如下：
 
-    ```python
+```python
     if options.restore_from:
             if checkpoint_dir and not os.path.isabs(options.restore_from):
                 cpt = os.path.join(checkpoint_dir, options.restore_from)
@@ -643,11 +643,11 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
             m5.instantiate(cpt)
         else:
             m5.instantiate()
-    ```
+```
 
-    所以，我们只要在运行仿真器的时候通过命令行选项去指定快照路径即可，具体如下：
+所以，我们只要在运行仿真器的时候通过命令行选项去指定快照路径即可，具体如下：
 
-    ```shell
+```shell
     export IMG_ROOT=/gem5/arm_images/kernel_loader
     ./build/ARM/gem5.opt --outdir=DDR4_3200_1x16_RoCoRaBaCh_4CH_xor_9_intlv_64_out configs/example/arm/fs_big_little.py \
         --caches \
@@ -664,7 +664,7 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
         --xor_low_bit=9 \
         --mem_channels_intlv=64 \
         --restore_from="/path/to/your/checkpoint"
-    ```
+```
 
 ### 调试输出
 
@@ -699,7 +699,7 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
     --param='system.bigCluster.l2.write_buffers=64' \
 ```
 
-​    因为仿真器是 cycle 精确的仿真，所以调试输出是巨量的，例如上面的命令只是抓取 lmbench 的 wr 测试中一小段的内存控制器的调试输出，就有差不多30GB ，所以调试输出有几个小技巧要注意：
+因为仿真器是 cycle 精确的仿真，所以调试输出是巨量的，例如上面的命令只是抓取 lmbench 的 wr 测试中一小段的内存控制器的调试输出，就有差不多30GB ，所以调试输出有几个小技巧要注意：
 
 - 尽量输出到 ssd 上，防止写文件成为瓶颈，影响仿真运行速度
 
@@ -707,9 +707,9 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
 
 - 尽量减少调试输出的区间，即可以通过一些手段去定位你关心的时间区间，例如可以记录 benchmark 的起始和结束的 tick ，然后预估你要抓的区间，通过 `debug-start` 和 `debug-end` 去指定
 
-   要增加自己的调试输出也非常简单，下面是一个具体例子：
+要增加自己的调试输出也非常简单，下面是一个具体例子：
 
-   输出调试信息前，需要有一个调试开关，可以沿用现有的调试开关，例如前面的 `MemCtrl`，也可以定义自己的调试开关，这是在编译脚本中指定的，具体如下：
+输出调试信息前，需要有一个调试开关，可以沿用现有的调试开关，例如前面的 `MemCtrl`，也可以定义自己的调试开关，这是在编译脚本中指定的，具体如下：
 
 ```c++
    Import('*')
@@ -743,9 +743,9 @@ export IMG_ROOT=/gem5/arm_images/kernel_loader
 
 ## 配置文件解析
 
-   为了简化仿真流程，我们前面直接用了现成的 fs_bigLITTLE.py 作为我们的配置文件，但这个配置文件肯定不能满足我们所有的需求，我们有时候需要根据自己的需求去改造它，或者重写我们自己的配置文件，这就要求我们要先看懂这个配置文件，所以本节就让我们以 fs_bigLITTLE.py 为例，学习 FS 仿真的配置流程，至于 SE 仿真的配置流程差异非常小，就不重复介绍了。
+为了简化仿真流程，我们前面直接用了现成的 fs_bigLITTLE.py 作为我们的配置文件，但这个配置文件肯定不能满足我们所有的需求，我们有时候需要根据自己的需求去改造它，或者重写我们自己的配置文件，这就要求我们要先看懂这个配置文件，所以本节就让我们以 fs_bigLITTLE.py 为例，学习 FS 仿真的配置流程，至于 SE 仿真的配置流程差异非常小，就不重复介绍了。
 
-   我们首先从入口函数开始，具体如下：
+我们首先从入口函数开始，具体如下：
 
 ```python
 def main():
@@ -759,7 +759,7 @@ def main():
     run()                                                     # 运行仿真
 ```
 
-   `addOptions` 是为了简化配置，把一些我们关心的配置都作为选项添加到脚本中，这些选项通常是指定拓扑结构各个仿真对象的可配置参数，我们可以在启动仿真器的时候通过命令行参数来给这些选项赋值，这对于并发运行多个配置非常有意义。下面是这个函数的具体实现：
+`addOptions` 是为了简化配置，把一些我们关心的配置都作为选项添加到脚本中，这些选项通常是指定拓扑结构各个仿真对象的可配置参数，我们可以在启动仿真器的时候通过命令行参数来给这些选项赋值，这对于并发运行多个配置非常有意义。下面是这个函数的具体实现：
 
 ```python
 def addOptions(parser):
@@ -818,7 +818,7 @@ def addOptions(parser):
     return parser
 ```
 
-   `build` 函数也是我们需要具体看一下的函数，在这里会完成仿真拓扑结构的配置，镜像的导入等，下面是具体实现：
+`build` 函数也是我们需要具体看一下的函数，在这里会完成仿真拓扑结构的配置，镜像的导入等，下面是具体实现：
 
 ```python
 def build(options):
@@ -922,7 +922,7 @@ def build(options):
     return root
 ```
 
-   `root.apply_config` 是根据给定的参数修改仿真对象的配置参数，主要是仿真对象的可配置参数太多，我们不可能每一个都用 `addOption` 加到选项里，那些不在选项里的参数就可以通过 `param` 选项的方式来修改。例如下面这行配置可以把0，1，2，3四个内存控制器的 dram 地址映射都改成 RoCoRaBaCh ：
+`root.apply_config` 是根据给定的参数修改仿真对象的配置参数，主要是仿真对象的可配置参数太多，我们不可能每一个都用 `addOption` 加到选项里，那些不在选项里的参数就可以通过 `param` 选项的方式来修改。例如下面这行配置可以把0，1，2，3四个内存控制器的 dram 地址映射都改成 RoCoRaBaCh ：
 
 ```shell
 --param='system.mem_ctrls[0,1,2,3].dram.addr_mapping="RoCoRaBaCh"'
@@ -934,11 +934,11 @@ def build(options):
 
 ### SimObject 仿真对象
 
-   在 GEM5 中几乎所有的仿真对象都继承自 SimObject 对象，包括 CPU、CACHE  或 Memory 等。所以要实现一个仿真模块，一般都会继承这个基类，下面我们会以一个 Memory 对象为例，看如何创建一个自己的仿真模块。
+在 GEM5 中几乎所有的仿真对象都继承自 SimObject 对象，包括 CPU、CACHE  或 Memory 等。所以要实现一个仿真模块，一般都会继承这个基类，下面我们会以一个 Memory 对象为例，看如何创建一个自己的仿真模块。
 
 ### master and slave ports
 
-   在实现 Memory 对象前，我们要首先明白 GEM5 的 master 和 slave ports ，所有的 Memory 对象都是通过这些 ports 互联，这些接口实现了三种不同的 Memory 子系统的模型：atomic、timing 和 functional ，他们的主要差别如下：
+在实现 Memory 对象前，我们要首先明白 GEM5 的 master 和 slave ports ，所有的 Memory 对象都是通过这些 ports 互联，这些接口实现了三种不同的 Memory 子系统的模型：atomic、timing 和 functional ，他们的主要差别如下：
 
 - atomic: 这个模型通常只用于 FS 仿真的 Bring up 阶段，它假设内存子系统之间不会产生任何事件，所有的内存请求都是通过函数调用链来完成，也就不会有精准的时序模型。
 
@@ -948,27 +948,27 @@ def build(options):
 
    master 和 slave 的差异，类似于真实世界中总线互联的 master 和 slave 接口的差异。master 可以主动发起请求，而 slave 只能被动响应 master 的请求。下面是我们这个例子的拓扑结构图：
 
-![simple_memobj](./simple_memobj.png)
+![simple_memobj](Rockchip_GEM5_Manual/simple_memobj.png)
 
-   图中的 `simple memory object` 就是我们要实现的仿真模块，它有两个 slave ports：data_port 和 inst_port 分别连到 CPU 的 dcache_port 和 icache_port，同时它还有一个 master port：mem_side 则是连到 membus 。所以我们的仿真模块是被动接收 CPU 发出的请求，但是可以主动向 membus 发送请求。
+图中的 `simple memory object` 就是我们要实现的仿真模块，它有两个 slave ports：data_port 和 inst_port 分别连到 CPU 的 dcache_port 和 icache_port，同时它还有一个 master port：mem_side 则是连到 membus 。所以我们的仿真模块是被动接收 CPU 发出的请求，但是可以主动向 membus 发送请求。
 
-   三种内存模型里，最重要的是 timing 模型，其他两个模型相对简单，所以这里只介绍了 timing 模型的交互模式，具体如下：
+三种内存模型里，最重要的是 timing 模型，其他两个模型相对简单，所以这里只介绍了 timing 模型的交互模式，具体如下：
 
-![master_slave_1](./master_slave_1.png)
+![master_slave_1](Rockchip_GEM5_Manual/master_slave_1.png)
 
-   首先，每次都是 Master 先通过 `sendTimingReq` 函数发出一个请求，对端的 Slave 的 `recvTimingReq` 函数就会被调用，如果 Slave 判断到当前自己可以响应这个请求，就会返回一个 `true` ，然后开始处理这个请求，处理完成之后会调用 `sendTimingResq` 函数来告诉 Master 已经完成，这会触发 Master 的 `recvTimingResq` 函数，如果 Master 可以处理这个响应，则返回 `true` ，至此这个内存请求就算完成了。
+首先，每次都是 Master 先通过 `sendTimingReq` 函数发出一个请求，对端的 Slave 的 `recvTimingReq` 函数就会被调用，如果 Slave 判断到当前自己可以响应这个请求，就会返回一个 `true` ，然后开始处理这个请求，处理完成之后会调用 `sendTimingResq` 函数来告诉 Master 已经完成，这会触发 Master 的 `recvTimingResq` 函数，如果 Master 可以处理这个响应，则返回 `true` ，至此这个内存请求就算完成了。
 
    以上这个时序图比较简单，我们没有考虑双方 busy 的情况，如果 Slave 在收到请求时候处于 busy 状态，则需要在 `recvTimingReq`  函数返回 `false` ，并且在退出 busy 状态的时候还需要调用 `sendReqRetry` ，这会同步触发 Master 的 `recvReqRetry` 函数，此时 Master 就可以重新调用 `sendTimingReq` 函数重发请求了，时序图具体如下：
 
-![master_slave_2](./master_slave_2.png)
+![master_slave_2](Rockchip_GEM5_Manual/master_slave_2.png)
 
    反之，如果 Master 在 `recvTimingResq` 的时候处于 busy 状态，则同样需要返回 `false` 给 Slave ，并且在退出 busy 状态的时候，调用 `sendRespRetry` 函数告诉 Slave 可以重发响应了，具体时序图如下：
 
-![master_slave_3](./master_slave_3.png)
+![master_slave_3](Rockchip_GEM5_Manual/master_slave_3.png)
 
 ### Packets
 
-   在 GEM5 中，所有的 Ports 之间都是通过 Packet 来收发数据，每个 Packet 都有一个 Request 来存放原始请求，其包括：地址和请求类型等信息。同时还有一个 MemCmd 来描述当前命令，在 Packet 的生命周期中，当前命令是会变化，例如：一旦请求得到服务以后，就会从 request 变成 response 命令，下面是常见的 MemCmd 类型：
+在 GEM5 中，所有的 Ports 之间都是通过 Packet 来收发数据，每个 Packet 都有一个 Request 来存放原始请求，其包括：地址和请求类型等信息。同时还有一个 MemCmd 来描述当前命令，在 Packet 的生命周期中，当前命令是会变化，例如：一旦请求得到服务以后，就会从 request 变成 response 命令，下面是常见的 MemCmd 类型：
 
 ```c
         InvalidCmd,
@@ -1033,7 +1033,7 @@ def build(options):
 
 ### 声明一个仿真对象
 
-   首先我们需要声明一下仿真对象，这样才能在配置文件中去引用它，具体如下：
+首先我们需要声明一下仿真对象，这样才能在配置文件中去引用它，具体如下：
 
 ```python
 from m5.params import *
@@ -1048,7 +1048,7 @@ class SimpleMemobj(SimObject):    # 首先我们要继承 SimObject
     mem_side = RequestPort("Memory side port, sends requests")    # master port，用于连接 membus
 ```
 
-   代码路径：src/learning_gem5/part2/SimpleMemobj.py
+代码路径：src/learning_gem5/part2/SimpleMemobj.py
 
 ### 定义仿真类
 
@@ -1068,11 +1068,11 @@ class SimpleMemobj : public SimObject
 };
 ```
 
-   代码路径：src/learning_gem5/part2/simple_memobj.hh
+代码路径：src/learning_gem5/part2/simple_memobj.hh
 
 ### 定义 slave port
 
-   SimpleMemobj 有两种 ports，用于和 CPU 互联的 slave port，以及用于和 membus 互联的 master port ， 考虑到没有其他类会调用这两种 ports ， 我们就直接在仿真类内部直接定义了，下面先看看 slave port 的定义：
+SimpleMemobj 有两种 ports，用于和 CPU 互联的 slave port，以及用于和 membus 互联的 master port ， 考虑到没有其他类会调用这两种 ports ， 我们就直接在仿真类内部直接定义了，下面先看看 slave port 的定义：
 
 ```c++
 /**
@@ -1217,11 +1217,11 @@ class SimpleMemobj : public SimObject
     };
 ```
 
-   代码路径：src/learning_gem5/part2/simple_memobj.hh
+代码路径：src/learning_gem5/part2/simple_memobj.hh
 
 ### 定义 SimObject 接口
 
-   完成两种 Port 的定义后，我们就可以在 SimpleMemobj 中声明三个 ports 。同时，我们也要声明 SimObject 的纯虚函数 getPort ，这个函数用于在 GEM5 初始阶段通过 ports 连接各个内存对象。新的定义如下：
+完成两种 Port 的定义后，我们就可以在 SimpleMemobj 中声明三个 ports 。同时，我们也要声明 SimObject 的纯虚函数 getPort ，这个函数用于在 GEM5 初始阶段通过 ports 连接各个内存对象。新的定义如下：
 
 ```c++
 class SimpleMemobj : public SimObject
@@ -1329,11 +1329,11 @@ SimpleMemobj::getAddrRanges() const
 }
 ```
 
-   代码路径：src/learning_gem5/part2/simple_memobj.cc
+代码路径：src/learning_gem5/part2/simple_memobj.cc
 
 ### 实现请求接收
 
-   前面我们只实现了简单的 functional 模型，本节我们看看 timing 模型的实现，同样只是做一层简单的转发，即可以认为 SimpleMemobj 这一层没有 latency 存在，CPU 读写的 latency 完全受下一级 membus 的影响。具体如下：
+前面我们只实现了简单的 functional 模型，本节我们看看 timing 模型的实现，同样只是做一层简单的转发，即可以认为 SimpleMemobj 这一层没有 latency 存在，CPU 读写的 latency 完全受下一级 membus 的影响。具体如下：
 
 ```c++
 bool
@@ -1430,7 +1430,7 @@ SimpleMemobj::handleResponse(PacketPtr pkt)
 
 ### 创建配置文件并执行仿真
 
-   最后，还需要把前面创建的仿真对象加入到编译脚本中，具体如下：
+最后，还需要把前面创建的仿真对象加入到编译脚本中，具体如下：
 
 ```python
 Import('*')
@@ -1442,7 +1442,7 @@ Source('simple_memobj.cc')
 DebugFlag('SimpleMemobj', "For Learning gem5 Part 2.")
 ```
 
-   重新编译仿真器后，就可以通过配置文件来搭建一个仿真平台来引用这个仿真对象，并验证最终结果了，下面是具体的配置文件：
+重新编译仿真器后，就可以通过配置文件来搭建一个仿真平台来引用这个仿真对象，并验证最终结果了，下面是具体的配置文件：
 
 ```python
 """ This file creates a barebones system and executes 'hello', a simple Hello
@@ -1556,7 +1556,7 @@ SimpleCache::CPUSidePort::recvTimingReq(PacketPtr pkt)
 }
 ```
 
-   可以看到，SimpleCache 的 slave port 只是直接把 CPU 的请求转发给了 SimpleCache 去处理，我们进一步跟下去看看：
+可以看到，SimpleCache 的 slave port 只是直接把 CPU 的请求转发给了 SimpleCache 去处理，我们进一步跟下去看看：
 
 ```c++
 bool
@@ -1586,7 +1586,7 @@ SimpleCache::handleRequest(PacketPtr pkt, int port_id)
 }
 ```
 
-   从上面的代码可以看到，SimpleCache 是通过 schedule 函数来确保在固定的 latency 后产生一个 event ，这里为了方便直接用来 EventFunctionWrapper 这个类来实例化这个 event ，它的构造函数有三个参数，第一个参数是一个回调函数，在 event 触发时会被自动调用。schedule 的第二个参数 clockEdge(latency) 会把 latency 换算成 tick 数，以保证正确的 tick 延迟后触发。下面我们来看一下 accessTiming 函数，具体如下：
+从上面的代码可以看到，SimpleCache 是通过 schedule 函数来确保在固定的 latency 后产生一个 event ，这里为了方便直接用来 EventFunctionWrapper 这个类来实例化这个 event ，它的构造函数有三个参数，第一个参数是一个回调函数，在 event 触发时会被自动调用。schedule 的第二个参数 clockEdge(latency) 会把 latency 换算成 tick 数，以保证正确的 tick 延迟后触发。下面我们来看一下 accessTiming 函数，具体如下：
 
 ```c++
 void
@@ -1648,4 +1648,4 @@ SimpleCache::accessTiming(PacketPtr pkt)
 }
 ```
 
-   可以看到 SimpleCache 的处理非常简单，只是直接转发给下一级的 Memory ，毕竟只是为了演示事件驱动模型而已，如果要看更贴近真实的 Cache 仿真逻辑，可以参考代码：src/mem/cache 。
+可以看到 SimpleCache 的处理非常简单，只是直接转发给下一级的 Memory ，毕竟只是为了演示事件驱动模型而已，如果要看更贴近真实的 Cache 仿真逻辑，可以参考代码：src/mem/cache 。

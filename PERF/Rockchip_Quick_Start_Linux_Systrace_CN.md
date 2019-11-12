@@ -44,14 +44,11 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文提供一个标准模板供套用。后续模板以此份文档为基础改动。
-
 **产品版本**
 
-| **芯片名称** | **内核版本**     |
-| ------------ | ---------------- |
-| 全系列      |  4.4   |
-
+| **芯片名称** | **内核版本** |
+| ------------ | ------------ |
+| 全系列       | 通用         |
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
@@ -240,33 +237,33 @@ python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq di
 
 ​    用 chrome 打开以后，界面如下：
 
-<img src="./view_1.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/view_1.jpg"></img>
 
 左列是抓取的线程名或 trace 名，既然是绘制问题，我们第一个要看肯定是绘制的线程，Android 5.0 以前是在 ui 线程做绘制的，以后的版本都是在 render 线程做绘制，所以我们先拉到 render 线程，可以看到如下：
 
-<img src="./view_2.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/view_2.jpg"></img>
 
 点击右边的有四个按键，分别对应四种模式如下：
 
-<img src="./button.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/button.jpg"></img>
 
 先用”时间线“模式拉个 1s 左右的时间线，然后切到“选择”模式，选择这段时间线内 render 线程的区域，会自动在下方列出这个区域的函数统计：
 
-<img src="./slice.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/slice.jpg"></img>
 
 可以看到帧率确实很低，这段时间的绘制只有 9 次（drawgl 次数），平均耗时 29ms，平均间隔是 111ms，所以主要原因是绘制间隔太大。继续往下分析就要根据浏览器的渲染模型了，我们知道 chromium 里是由光栅化和 canvas 线程完成实际绘制的（内部叫 paint），而 ui 线程或 render 线程来完成贴图（内部叫 draw）。因为这个网页用的 canvas，所以我们先用“时间线”模式拉出绘制间隔，然后顺着时间线往下找绘制线程如下：
 
-<img src="./js_paint.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/js_paint.jpg"></img>
 
 可以看到最近这一次的绘制耗时 124ms，拉开看一下具体耗时：
 
-<img src="./js_slice.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/js_slice.jpg"></img>
 
 刚好有 1000 个绘制，这里会不会就是那 1000 只鱼，通过查看网页源码，可以确认：
 
-<img src="./js_src_1.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/js_src_1.jpg"></img>
 
-<img src="./js_src_2.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Systrace/js_src_2.jpg"></img>
 
 javascript 是单线程运行的，所以这里无法用到多核，javascript worker 技术是让 js 跑多线程，但是这个网页并没有用到这个技术。
 

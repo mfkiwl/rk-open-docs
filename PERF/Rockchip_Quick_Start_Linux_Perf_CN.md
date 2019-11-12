@@ -44,13 +44,11 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文提供一个标准模板供套用。后续模板以此份文档为基础改动。
-
 **产品版本**
 
-| **芯片名称** | **内核版本**     |
-| ------------ | ---------------- |
-| 全系列      |  4.4   |
+| **芯片名称** | **内核版本** |
+| ------------ | ------------ |
+| 全系列       | 通用         |
 
 **读者对象**
 
@@ -235,7 +233,7 @@ $ adb shell
 
 结果输出如下：
 
-<img src="./top.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Perf/top.jpg"></img>
 
 perf top 还可以只抓取指定进程的 pid，这一般是用在要优化某个程序是非常有用，命令如下：
 
@@ -257,7 +255,7 @@ perf stat 用于获取进程某个时间段内的 pmu 统计信息，命令如�
 
 ctrl+c 退出，或发信号让 Perf 进程退出都可以看到统计结果，例如：
 
-<img src="./stat.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Perf/stat.jpg"></img>
 
 一些明显的异常值会被标注为红色，例如上图是浏览器跑 fishtank 时候抓的统计信息，可以看到分支预测的失败率非常高，结合 Perf 的热点分析工具可以进一步缩小范围找到分支预测失败的原因。
 
@@ -286,7 +284,7 @@ perf report --objdump=aarch64-linux-android-objdump --vmlinux=/path/to/vmlinux -
 
 结果如图：
 
-<img src="./report.jpg"></img>
+<img src="Rockchip_Quick_Start_Linux_Perf/report.jpg"></img>
 
  上图有‘+’的地方可以用‘enter’键来遍历其调用关系。
 

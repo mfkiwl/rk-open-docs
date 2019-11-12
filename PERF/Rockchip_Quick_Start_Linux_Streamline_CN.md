@@ -40,11 +40,15 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
+**前言**
+
+**概述**
+
 **产品版本**
 
-| **芯片名称** | **内核版本**     |
-| ------------ | ---------------- |
-| 全系列      |  4.4   |
+| **芯片名称** | **内核版本** |
+| ------------ | ------------ |
+| 全系列       | 通用         |
 
 **读者对象**
 
@@ -94,23 +98,23 @@ Rockchip Electronics Co., Ltd.
 
 - 建立连接
 
-  gatord 跑起来之后就可以在 host 端打开 Streamline，在左上角点击<img src="./button_con.jpg"></img>按钮，会弹出如下对话框：
+  gatord 跑起来之后就可以在 host 端打开 Streamline，在左上角点击<img src="Rockchip_Quick_Start_Linux_Streamline/button_con.jpg"></img>按钮，会弹出如下对话框：
 
-  <img src="./dialog_con.jpg"></img>
+  <img src="Rockchip_Quick_Start_Linux_Streamline/dialog_con.jpg"></img>
 
   选中你要调试的设备，点“select”即可。
 
 - 配置计数器
 
-  Streamline 支持的计数器和设备相关，在连接完成后，可以点击<img src="./button_cfg.jpg"></img>按钮，会弹出对话框，列出所有支持的计数器：
+  Streamline 支持的计数器和设备相关，在连接完成后，可以点击<img src="Rockchip_Quick_Start_Linux_Streamline/button_cfg.jpg"></img>按钮，会弹出对话框，列出所有支持的计数器：
 
-  <img src="./dialog_counter.jpg"></img>
+  <img src="Rockchip_Quick_Start_Linux_Streamline/dialog_counter.jpg"></img>
 
   左边是可选的计数器，右边是已选的计数器，在可选计数器上双击即可移动到已选计数器，完成后点“save”按钮即可，全部重选可以点击“load defaults"先恢复默认设置。
 
 - 抓取数据
 
-  计数器选好以后，可以点击<img src="./button_start.jpg"></img>开启抓取，结束时点击<img src="./button_stop.jpg"></img>按钮，这时候会自动跳转到分析界面。
+  计数器选好以后，可以点击<img src="Rockchip_Quick_Start_Linux_Streamline/button_start.jpg"></img>开启抓取，结束时点击<img src="Rockchip_Quick_Start_Linux_Streamline/button_stop.jpg"></img>按钮，这时候会自动跳转到分析界面。
 
 ## 分析结果
 
@@ -120,19 +124,19 @@ Streamline 相对于传统的 profile 工具的优势在于：丰富的硬件计
 
   右键单击左侧的我们抓取到的数据名称，在弹出的菜单中点击”analyze"，会弹出如下对话框：
 
-  <img src="./load_symbols.jpg"></img>
+  <img src="Rockchip_Quick_Start_Linux_Streamline/load_symbols.jpg"></img>
 
   点击红色箭头指向的按钮就可以添加带符号信息的 elf 文件了。不用全部添加，根据热点添加即可。
 
 - Heat Map
 
-  这个视图可以很方便的找到热点线程，点击左下角的<img src="./button_view.jpg"></img>
+  这个视图可以很方便的找到热点线程，点击左下角的<img src="Rockchip_Quick_Start_Linux_Streamline/button_view.jpg"></img>
 
   点击▶️可以展开各个进程，点击每个线程的名字，可以只显示这个线程的统计值，例如线程的 cpu 占有率，线程的 miss rate 等。
 
   时间轴上有个滑块，可以拉伸和移动，以显示某个时间段内的统计数据，类似下图：
 
-  <img src="./heat_map.jpg"></img>
+  <img src="Rockchip_Quick_Start_Linux_Streamline/heat_map.jpg"></img>
 
 - Core Map
 
@@ -154,7 +158,7 @@ Streamline 相对于传统的 profile 工具的优势在于：丰富的硬件计
 
   点击上部的”functions"选项卡，可以看到整个抓取周期内的函数热点统计，如下图所示：
 
-  <img src="./function_tab.jpg"></img>
+  <img src="Rockchip_Quick_Start_Linux_Streamline/function_tab.jpg"></img>
 
 - Call Paths
 
