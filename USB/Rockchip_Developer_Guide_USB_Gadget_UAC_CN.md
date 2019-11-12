@@ -1,17 +1,17 @@
-# **Linux4.4 USB Gadget UAC**
+# **Rockchip USB Gadget UAC**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：wulf@rock-chips.com
 
-日期：2019-03-13
+日期：2019-11-11
 
 文档密级：公开资料
 
 ------
 **概述**
 
-本文档提供 Rockchip 平台基于 Linux4.4 内核的 USB Gadget UAC（USB Audio Class）驱动的使用方法。Rockchip 平台可以支持 UAC1（兼容 USB Audio Class specification 1.0）和 UAC2（兼容 USB Audio Class specification 2.0）驱动，并且，这两个驱动都可以支持基础的录音和放音功能。此外，Rockchip 平台还提供了 UAC1 Legacy （需要实际的声卡支持，只支持放音功能）和 Audio Source（只支持录音功能，但可以支持多达 15 种不同的采样率）。开发人员可以根据产品的实际需求来选择合适的 UAC 驱动。
+本文档提供 Rockchip 平台基于 Linux 内核的 USB Gadget UAC（USB Audio Class）驱动的使用方法。Rockchip 平台可以支持 UAC1（兼容 USB Audio Class specification 1.0）和 UAC2（兼容 USB Audio Class specification 2.0）驱动，并且，这两个驱动都可以支持基础的录音和放音功能。此外，Rockchip 平台还提供了 UAC1 Legacy （需要实际的声卡支持，只支持放音功能）和 Audio Source（只支持录音功能，但可以支持多达 15 种不同的采样率）。开发人员可以根据产品的实际需求来选择合适的 UAC 驱动。
 
 如果要支持音量调节/静音功能，需要添加 HID 的控制，目前发布的 SDK 还没有支持。开发人员可以参考如下的文档，进行 HID 功能的开发。
 
@@ -23,9 +23,9 @@ Kernel/Documentation/ABI/testing/configfs-usb-gadget-hid
 
 **产品版本**
 
-| **芯片名称**                                 | **内核版本** |
-| ---------------------------------------- | -------- |
-| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux4.4 |
+| **芯片名称**                                                 | **内核版本**          |
+| ------------------------------------------------------------ | --------------------- |
+| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux-4.4、Linux-4.19 |
 
 **读者对象**
 本文档（本指南）主要适用于以下工程师：
@@ -36,9 +36,10 @@ Kernel/Documentation/ABI/testing/configfs-usb-gadget-hid
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2019-03-13 | V1.0     | 吴良峰   | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**                 |
+| ---------- | -------- | -------- | ---------------------------- |
+| 2019-03-13 | V1.0     | 吴良峰   | 初始版本                     |
+| 2019-11-11 | V1.1     | 吴良峰   | 修改文档名称，支持Linux-4.19 |
 
 ------
 [TOC]
@@ -214,15 +215,15 @@ echo ff400000.usb > ../../UDC
 
 配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如下图 2-1 Windows-USB-Audio-Class1，图 2-2 Ubuntu-USB-Audio-Class1-Output 和图 2-3 Ubuntu-USB-Audio-Class1-Input。
 
-![Windows-USB-Audio-Class1](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Class1.png)
+![Windows-USB-Audio-Class1](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-USB-Audio-Class1.png)
 
 图 2-1 Windows-USB-Audio-Class1
 
-![Ubuntu-USB-Audio-Class1-Output](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Output.png)
+![Ubuntu-USB-Audio-Class1-Output](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-USB-Audio-Output.png)
 
 图 2-2 Ubuntu-USB-Audio-Class1-Output
 
-![Ubuntu-USB-Audio-Class1-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
+![Ubuntu-USB-Audio-Class1-Input](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
 
 图 2-3 Ubuntu-USB-Audio-Class1-Input
 
@@ -292,7 +293,7 @@ controlC2  pcmC0D0p   pcmC2D0c   pcmC7D0p   timer
 
 打开 Windows 声音设置，如下图 2-4 Windows-Audio-Setting，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
 
-![Windows-Audio-Setting](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Audio-Setting.png)
+![Windows-Audio-Setting](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-Audio-Setting.png)
 
 图 2-4 Windows-Audio-Setting
 
@@ -326,7 +327,7 @@ aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 
 执行完上述命令后，PC 端可以使用 Windows 自带的 “Voice Recorder”软件保存录音文件，如下图 2-5 Windows-Voice-Recorder。
 
-![Windows-Voice-Recorder](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Voice-Recorder.png)
+![Windows-Voice-Recorder](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-Voice-Recorder.png)
 
 图 2-5 Windows-Voice-Recorder
 
@@ -336,25 +337,25 @@ aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 
 如下图 2-6 Windows-Capture-Listen-1 和图 2-7 Windows-Capture-Listen-2。
 
-![Windows-Capture-Listen-1](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Capture-Listen-1.png)
+![Windows-Capture-Listen-1](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-Capture-Listen-1.png)
 
 图 2-6 Windows-Capture-Listen-1
 
-![Windows-Capture-Listen-2](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-Capture-Listen-2.png)
+![Windows-Capture-Listen-2](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-Capture-Listen-2.png)
 
-图 2-6 Windows-Capture-Listen-2
+图 2-7 Windows-Capture-Listen-2
 
 #### 2.2.2 UAC1 Test on Ubuntu
 
-打开 Ubuntu 声音设置，如下图 2-7 Ubuntu-Audio-Setting-Output 和图 2-8 Ubuntu-Audio-Setting-Input，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
+打开 Ubuntu 声音设置，如下图 2-8 Ubuntu-Audio-Setting-Output 和图 2-9 Ubuntu-Audio-Setting-Input，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
 
-![Ubuntu-Audio-Setting-Output](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-Audio-Setting-Output.png)
+![Ubuntu-Audio-Setting-Output](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-Audio-Setting-Output.png)
 
-图 2-7 Ubuntu-Audio-Setting-Output
+图 2-8 Ubuntu-Audio-Setting-Output
 
-![Ubuntu-Audio-Setting-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-Audio-Setting-Input.png)
+![Ubuntu-Audio-Setting-Input](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-Audio-Setting-Input.png)
 
-图 2-8 Ubuntu-Audio-Setting-Input
+图 2-9 Ubuntu-Audio-Setting-Input
 
 **测试 Ubuntu UAC1 放音功能：**
 
@@ -392,11 +393,11 @@ audacity 安装命令：
 sudo apt install audacity
 ```
 
-audacity 录音界面如下图 2-9 所示。
+audacity 录音界面如下图 2-10 所示。
 
-![Ubuntu-audacity](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-audacity.png)
+![Ubuntu-audacity](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-audacity.png)
 
-图 2-9 Ubuntu-audacity
+图 2-10 Ubuntu-audacity
 
 ## 3 UAC2 Usage and Test
 
@@ -494,15 +495,15 @@ echo ff400000.usb > ../../UDC
 
 配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如下图 3-1 Windows-USB-Audio-Class2，图 3-2 Ubuntu-USB-Audio-Class2-Output 和图 3-3 Ubuntu-USB-Audio-Class2-Input。
 
-![Windows-USB-Audio-Class2](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Class2.png)
+![Windows-USB-Audio-Class2](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-USB-Audio-Class2.png)
 
 图 3-1 Windows-USB-Audio-Class2
 
-![Ubuntu-USB-Audio-Class2-Output](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Output.png)
+![Ubuntu-USB-Audio-Class2-Output](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-USB-Audio-Output.png)
 
 图 3-2 Ubuntu-USB-Audio-Class2-Output
 
-![Ubuntu-USB-Audio-Class2-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
+![Ubuntu-USB-Audio-Class2-Input](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
 
 图 3-3 Ubuntu-USB-Audio-Class2-Input
 
@@ -689,7 +690,7 @@ echo ff400000.usb > ../../UDC
 
 配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如图 4-1
 
-![Windows-USB-Audio-Class1-Legacy](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Class1-Legacy.png)
+![Windows-USB-Audio-Class1-Legacy](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-USB-Audio-Class1-Legacy.png)
 
 图 4-1 Windows-USB-Audio-Class1-Legacy
 
@@ -812,11 +813,11 @@ echo ff400000.usb > ../../UDC
 
 配置脚本执行成功后，连接 USB 到 PC，PC 端可以识别到 USB Audio 设备，如下图 5-1 Windows-USB-Audio-Source 和图 5-2 Ubuntu-USB-Audio-Source
 
-![Windows-USB-Audio-Source](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Source.png)
+![Windows-USB-Audio-Source](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-USB-Audio-Source.png)
 
 图 5-1 Windows-USB-Audio-Source
 
-![Ubuntu-USB-Audio-Input](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
+![Ubuntu-USB-Audio-Input](Rockchip-Developer-Guide-USB-Gadget-UAC\Ubuntu-USB-Audio-Input.png)
 
 图 5-2 Ubuntu-USB-Audio-Source
 
@@ -880,7 +881,7 @@ aplay /tmp/test.wav -r 44100 -c 2 -D hw:2,0
 
 如下图 5-3 所示。
 
-![Windows-USB-Audio-Source-Setting](Rockchip-Developer-Guide-Linux4.4-USB-Gadget-UAC\Windows-USB-Audio-Source-Setting.png)
+![Windows-USB-Audio-Source-Setting](Rockchip-Developer-Guide-USB-Gadget-UAC\Windows-USB-Audio-Source-Setting.png)
 
 图 5-3 Windows-USB-Audio-Source-Setting
 

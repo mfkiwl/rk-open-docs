@@ -1,10 +1,10 @@
-# Linux 4.4 USB 开发指南
+# Rockchip Linux USB 开发指南
 
-发布版本：1.2.1
+发布版本：1.2.2
 
 作者邮箱：wulf@rock-chips.com、frank.wang@rock-chips.com、daniel.meng@rockchip.com
 
-日期：2019-03-20
+日期：2019-11-12
 
 文档密级：公开资料
 
@@ -16,9 +16,9 @@
 
 **产品版本**
 
-| **芯片名称**                                 | **内核版本** |
-| :--------------------------------------- | :------: |
-| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux4.4 |
+| **芯片名称**                                                 |     **内核版本**      |
+| :----------------------------------------------------------- | :-------------------: |
+| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux-4.4、Linux-4.19 |
 
 **读者对象**
 
@@ -26,12 +26,13 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者**               | **修改说明**                                           |
-| ---------- | -------- | ---------------------- | ------------------------------------------------------ |
-| 2017-12-22 | v1.0     | 吴良峰、王明成、孟东阳 | 初始版本                                               |
-| 2018-06-08 | v1.1     | 吴良峰                 | support RK3308、RK3326、PX30<br />修正格式和错误       |
-| 2019-01-09 | V1.2     | 吴良峰                 | 使用 markdownlint 修订格式                               |
+| **日期**   | **版本** | **作者**               | **修改说明**                                               |
+| ---------- | -------- | ---------------------- | ---------------------------------------------------------- |
+| 2017-12-22 | v1.0     | 吴良峰、王明成、孟东阳 | 初始版本                                                   |
+| 2018-06-08 | v1.1     | 吴良峰                 | support RK3308、RK3326、PX30<br />修正格式和错误           |
+| 2019-01-09 | V1.2     | 吴良峰                 | 使用 markdownlint 修订格式                                 |
 | 2019-03-20 | V1.2.1   | 吴良峰                 | 修正 USB OTG 控制器硬件电路说明<br />删除段首 Tab 空格符号 |
+| 2019-11-12 | V1.2.2   | 吴良峰                 | 修改文档名称，支持Linux-4.19                               |
 
 ---
 [TOC]
@@ -72,13 +73,13 @@ Open Host Controller Interface Specification(OHCI), Revision 1.0a
 
 Support high-speed(480Mbps), full-speed(12Mbps) andlow-speed(1.5Mbps)
 
-![USB2.0-HostController-Block-Diagram](Rockchip-Developer-Guide-linux4.4-USB/USB2.0-HostController-Block-Diagram.png)
+![USB2.0-HostController-Block-Diagram](Rockchip-Developer-Guide-USB/USB2.0-HostController-Block-Diagram.png)
 
-​							图 1‑1 USB 2.0 Host Controller Block Diagram
+图 1‑1 USB 2.0 Host Controller Block Diagram
 
- 				![USB2.0-USB 2.0-PHYBlock-Diagram](Rockchip-Developer-Guide-linux4.4-USB/USB2.0-USB2.0-PHYBlock-Diagram.png)
+![USB2.0-USB 2.0-PHYBlock-Diagram](Rockchip-Developer-Guide-USB/USB2.0-USB2.0-PHYBlock-Diagram.png)
 
-​							图 1‑2USB 2.0 USB 2.0 PHY Block Diagram
+图 1‑2USB 2.0 USB 2.0 PHY Block Diagram
 
 ### 1.3 USB 2.0 OTG
 
@@ -106,9 +107,9 @@ Support Battery Charge in device role
 
 Support Uart Bypass Mode
 
-![USB2.0-OTG-Block-Diagram](Rockchip-Developer-Guide-linux4.4-USB\USB2.0-OTG-Block-Diagram.png)
+![USB2.0-OTG-Block-Diagram](Rockchip-Developer-Guide-USB\USB2.0-OTG-Block-Diagram.png)
 
-​							图 1‑3 USB 2.0 OTG Block Diagram
+图 1‑3 USB 2.0 OTG Block Diagram
 
 ### 1.4 USB 2.0 PHY
 
@@ -180,9 +181,9 @@ UFP/DFP and Data Role Swap Defined in USB TypeC Specification
 
 Not support USB 3.0/USB 2.0 OTG session request protocol(SRP), hostnegotiation protocol(HNP) and Role Swap Protocol(RSP)
 
-![USB30-OTG-BlockDiagram](Rockchip-Developer-Guide-linux4.4-USB/USB30-OTG-BlockDiagram.png)
+![USB30-OTG-BlockDiagram](Rockchip-Developer-Guide-USB/USB30-OTG-BlockDiagram.png)
 
-​								图 1‑4 USB 3.0 OTG Block Diagram
+图 1‑4 USB 3.0 OTG Block Diagram
 
 ### 1.6 TypeC PHY
 
@@ -198,9 +199,9 @@ Support DisplayPort Alt Mode on TypeC A, B, C, D, E and F pinassignments
 
 Support Normal and Flipped orientation
 
-​						![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-linux4.4-USB/TypC-PHY-BlockDiagram.png)
+![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-USB/TypC-PHY-BlockDiagram.png)
 
-​								图 1‑5 TypeC PHY Block Diagram
+图 1‑5 TypeC PHY Block Diagram
 
 ---
 
@@ -218,23 +219,23 @@ USB HSIC（High Speed Inter Chip）使用 240MHz DDR 信号，传输速率与 US
 
 USB 2.0 HOST 控制器硬件信号参考电路如图 2-1 所示，USB 2.0 HOST 的 VBUS 控制电路和接口电路如图 2-2 和图 2-3 所示：
 
-![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB-20-HOST-SoCsignal-Pin.png)
+![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-USB/USB-20-HOST-SoCsignal-Pin.png)
 
-​								图 2‑1 USB 2.0 HOST SoC 信号引脚
+图 2‑1 USB 2.0 HOST SoC 信号引脚
 
-![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-linux4.4-USB/HSIC-Hardware-of-Controller.png)![USB-20-HOST-VBUSGPIO-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB-20-HOST-VBUSGPIO-Pin.png)
+![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-USB/HSIC-Hardware-of-Controller.png)![USB-20-HOST-VBUSGPIO-Pin](Rockchip-Developer-Guide-USB/USB-20-HOST-VBUSGPIO-Pin.png)
 
-​							图 2‑2 USB 2.0 HOST VBUS GPIO 控制脚
+图 2‑2 USB 2.0 HOST VBUS GPIO 控制脚
 
- ![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-linux4.4-USB/HSIC-Hardware-of-Controller.png)
+ ![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-USB/HSIC-Hardware-of-Controller.png)
 
-​									图 2‑3 HSIC 控制器硬件电路
+图 2‑3 HSIC 控制器硬件电路
 
 HSIC（High Speed Inter Chip）是具有与 USB 2.0 相同的带宽（480Mbps）的芯片间互连接口，如图 2-4 所示，USIC_STROBE 为 240MHz DDR 信号线，USIC_DATA 为数据线，供电电压为 0.9V 和 1.2V， 信号传输的标准电压为 1.2V，降低了系统的功耗，最大的走线长度为 10cm（4 英寸）。
 
-![HSIC-Hardware](Rockchip-Developer-Guide-linux4.4-USB/HSIC-Hardware.png)
+![HSIC-Hardware](Rockchip-Developer-Guide-USB/HSIC-Hardware.png)
 
-​									图 2‑4 HSIC 硬件电路
+图 2‑4 HSIC 硬件电路
 
 ### 2.2 USB OTG 控制器硬件电路
 
@@ -244,21 +245,21 @@ RK3399 没有独立的 USB 2.0 OTG 控制器，但有独立的 USB 3.0 OTG 控�
 
 完整的 USB 2.0 OTG 参考电路如图 2-5 ~ 图 2-8 所示：
 
-![USB2.0-OTG-控制器硬件信号](Rockchip-Developer-Guide-linux4.4-USB\USB2.0-OTG-控制器硬件信号.png)
+![USB2.0-OTG-控制器硬件信号](Rockchip-Developer-Guide-USB\USB2.0-OTG-控制器硬件信号.png)
 
-​								图 2-5 USB 2.0 控制器硬件信号
+图 2-5 USB 2.0 控制器硬件信号
 
-![OTG-PORT-电路图](Rockchip-Developer-Guide-linux4.4-USB\OTG-PORT-电路图.png)
+![OTG-PORT-电路图](Rockchip-Developer-Guide-USB\OTG-PORT-电路图.png)
 
-​									图 2-6  OTG PORT 电路图
+图 2-6  OTG PORT 电路图
 
-![OTG-DET-电路图](Rockchip-Developer-Guide-linux4.4-USB\OTG-DET-电路图.png)
+![OTG-DET-电路图](Rockchip-Developer-Guide-USB\OTG-DET-电路图.png)
 
-​									图 2-7  OTG DET 电路图
+图 2-7  OTG DET 电路图
 
-![OTG-DRV-电路图](Rockchip-Developer-Guide-linux4.4-USB\OTG-DRV-电路图.png)
+![OTG-DRV-电路图](Rockchip-Developer-Guide-USB\OTG-DRV-电路图.png)
 
-​									图 2-8  OTG DRV 电路图
+图 2-8  OTG DRV 电路图
 
 - OTG_DP/OTG_DM: USB 差分信号 D+/D-，需要在每根信号线上串联 2.2Ω 的电阻。
 - USB_DET: 输入信号，当 OTG 作为 Peripheral mode 时，用于检测 USB 是否连接到 Host（如: PC Host）或者 USB 充电器。默认为低电平 0V。当连接到 Host 或者 USB 充电器时，为高电平 3.0 ～ 3.2 V。
@@ -271,35 +272,35 @@ RK3399 没有独立的 USB 2.0 OTG 控制器，但有独立的 USB 3.0 OTG 控�
 
 USB 3.0 OTG 具有 USB 3.0 OTG 功能，且向下兼容 USB 2.0 OTG 功能，最大传输速率为 5Gbps，物理接口为 Type-C，支持正反插。在传输线方面，USB 3.0 支持长达 3 米的四线差分信号线及 11 英寸 PCB。5Gbps 信号在长线缆上采用的是差分信号方式传输，从而避免信号被干扰及减少电磁干扰问题。
 
-​		![table-GND-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/table-GND-kernel4.4.png)
+![table-GND-kernel4.4](Rockchip-Developer-Guide-USB/table-GND-kernel4.4.png)
 
-![tabel-socketkernel4.4](Rockchip-Developer-Guide-linux4.4-USB/tabel-socketkernel4.4.png)
+![tabel-socketkernel4.4](Rockchip-Developer-Guide-USB/tabel-socketkernel4.4.png)
 
- 				![Type-C-Interface-Definition](Rockchip-Developer-Guide-linux4.4-USB/Type-C-Interface-Definition.png)
+![Type-C-Interface-Definition](Rockchip-Developer-Guide-USB/Type-C-Interface-Definition.png)
 
-​										图 2‑5 Type-C 接口定义
+图 2‑9 Type-C 接口定义
 
- 				![USB3-OTG-Controller-SoC-Signal-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB3-OTG-Controller-SoC-Signal-Pin.png)
+![USB3-OTG-Controller-SoC-Signal-Pin](Rockchip-Developer-Guide-USB/USB3-OTG-Controller-SoC-Signal-Pin.png)
 
-​							图 2‑6 USB3 OTG 控制器 SoC 信号引脚
+图 2‑10 USB3 OTG 控制器 SoC 信号引脚
 
-![USB3-OTG-Type-C-Interface](Rockchip-Developer-Guide-linux4.4-USB/USB3-OTG-Type-C-Interface.png)
+![USB3-OTG-Type-C-Interface](Rockchip-Developer-Guide-USB/USB3-OTG-Type-C-Interface.png)
 
-​							图 2‑7 USB3OTG Type-C 接口
+图 2‑11 USB3OTG Type-C 接口
 
- 				![USB3-Type-C-pd／cc-Circuit（FUSB302）](Rockchip-Developer-Guide-linux4.4-USB/USB3-Type-C-pd／cc-Circuit（FUSB302）.png)
+![USB3-Type-C-pd／cc-Circuit（FUSB302）](Rockchip-Developer-Guide-USB/USB3-Type-C-pd／cc-Circuit（FUSB302）.png)
 
-​							图 2‑8 USB3Type-C pd/cc 电路（FUSB302）
+图 2‑12 USB3Type-C pd/cc 电路（FUSB302）
 
-![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-linux4.4-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png)
+![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png)
 
-![kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-017-kernel4.4.png)
+![kernel4.4](Rockchip-Developer-Guide-USB/USB-017-kernel4.4.png)
 
-​						图 2‑9 USB3 VBUS 控制电路-1（GPIO 控制电路输出 5V）
+图 2‑13 USB3 VBUS 控制电路-1（GPIO 控制电路输出 5V）
 
-![USB3-VBUS-Circuit-2（RK818-output5V）](Rockchip-Developer-Guide-linux4.4-USB/USB3-VBUS-Circuit-2（RK818-output5V）.png)
+![USB3-VBUS-Circuit-2（RK818-output5V）](Rockchip-Developer-Guide-USB/USB3-VBUS-Circuit-2（RK818-output5V）.png)
 
-​					图 2‑10 USB3 VBUS 控制电路-2（RK818 控制电路输出 5V）
+图 2‑14 USB3 VBUS 控制电路-2（RK818 控制电路输出 5V）
 
 ---
 ## 3 Kernel USB CONFIG
@@ -528,19 +529,19 @@ Device Driver --->
 
   如果要支持 USB GPS，如 u-blox 6 - GPS Receiver 设备，需要选择如下选项：
 
- 
+```
 
 Device Drivers	--->
 	[*]	USB support	--->
 		[*] USB Modem (CDC ACM) support
 
- ```
+```
 
 #### 3.5.3 USB HID CONFIG
 
 USB键鼠的配置选项如下：
 
-```makefile
+ ```makefile
 
 Device Drivers	--->
 	[*]	HID support
@@ -548,7 +549,7 @@ Device Drivers	--->
 		[ ] PID device support
 		[*] /dev/hiddev raw HID device support
 
-```
+ ```
 
 #### 3.5.4 USB Net CONFIG
 
@@ -1636,9 +1637,9 @@ async periodic registers
 ---
 ## 6 Android USB Gadget 配置
 
-Linux Kernel4.0，Android5.0 及其后版本，USB Gadget 均采用 ConfigFs 配置，同时内核也删除了 Gadget 目录下 android.c 文件。因此 Gadget 与之前配置方式有所差异。
+从Linux-3.11开始，USB Gadget 引入 ConfigFS 框架，同时内核也删除了 Gadget 目录下 android.c 文件。因此 Gadget 与之前配置方式有所差异。
 
-关于如何使能 Android ConfigFs Gadgets 功能，请参考 Linaro 官网的说明：
+关于如何使能 Android ConfigFS Gadgets 功能，请参考 Linaro 官网的说明：
 
 [https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets](https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets)
 
@@ -2044,21 +2045,21 @@ BC1.2 spec 要求将 USB Charger 中的 D+和 D-进行短接，以配合 USB 外
 
 USB 充电类型检测流程见下图所示：
 
-![USB-065-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-065-kernel4.4.png)
+![USB-065-kernel4.4](Rockchip-Developer-Guide-USB/USB-065-kernel4.4.png)
 
-​									图 7‑1 USB 充电检测流程
+图 7‑1 USB 充电检测流程
 
 典型的 SDP 检测过程中，D+/D-波形如下图所示：
 
-![USB-066-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-066-kernel4.4.png)
+![USB-066-kernel4.4](Rockchip-Developer-Guide-USB/USB-066-kernel4.4.png)
 
-​									图 7‑2 SDP 检测波形
+图 7‑2 SDP 检测波形
 
 典型的 DCP 检测过程中，D+/D-波形如下图所示：
 
- ![USB-067-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-067-kernel4.4.png)
+ ![USB-067-kernel4.4](Rockchip-Developer-Guide-USB/USB-067-kernel4.4.png)
 
-​									图 7‑3 DCP 检测波形
+图 7‑3 DCP 检测波形
 
 如果连接 USB 充电器，发现充电慢，有可能是 DCP 被误检测为 SDP，导致充电电流被设置为 500mA。当 USB 线连接不稳定或者充电检测驱动出错，都可能会产生该问题。解决方法：
 

@@ -1,10 +1,10 @@
-# Linux 4.4 USB Developer Guide
+# Rockchip Linux USB Developer Guide
 
-Release Version: 1.2
+Release Version: 1.2.1
 
 Author email: william.wu@rock-chips.com、frank.wang@rock-chips.com
 
-Date: 2019-03-11
+Date: 2019-11-12
 
 Security Classification: Public
 
@@ -12,13 +12,13 @@ Security Classification: Public
 
 **Overview**
 
-The purpose of this manual is to show you the hardware circuits of USB, how to configure the USB in Kernel-4.4, and help you to develop and debug the driver of USB PHYs and Controllers quickly.
+The purpose of this manual is to show you the hardware circuits of USB, how to configure the USB in Kernel, and help you to develop and debug the driver of USB PHYs and Controllers quickly.
 
 **Product version**
 
-| Chipset name                                                 | Kernel version |
-| :----------------------------------------------------------- | :------------: |
-| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 |    Linux4.4    |
+| Chipset name                                                 |    Kernel version     |
+| :----------------------------------------------------------- | :-------------------: |
+| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux-4.4、Linux-4.19 |
 
 **Application object**
 
@@ -34,7 +34,8 @@ Field application engineers
 | ---------- | ------- | ---------------------- | ------------------------------------------------------------ |
 | 2017-12-22 | v1.0    | william.wu, frank.wang | The initial version                                          |
 | 2018-06-08 | v1.1    | william.wu             | Support RK3308、RK3326、PX30<br />Correct formats and errors |
-| 2019-03-11 | V1.2    | william.wu             | Fix style issues by markdownlint                             |
+| 2019-03-11 | v1.2    | william.wu             | Fix style issues by markdownlint                             |
+| 2019-11-12 | v1.2.1  | william.wu             | Modify document name，support Linux-4.19                     |
 
 ---
 [TOC]
@@ -75,13 +76,13 @@ Features
 
 - Support high-speed(480Mbps), full-speed(12Mbps) andlow-speed(1.5Mbps)
 
-![USB2.0-HostController-Block-Diagram](Rockchip-Developer-Guide-linux4.4-USB/USB2.0-HostController-Block-Diagram.png)
+![USB2.0-HostController-Block-Diagram](Rockchip-Developer-Guide-USB/USB2.0-HostController-Block-Diagram.png)
 
-​							Figure 1-1 USB 2.0 Host Controller Block Diagram
+Figure 1-1 USB 2.0 Host Controller Block Diagram
 
- 				![USB2.0-USB 2.0-PHYBlock-Diagram](Rockchip-Developer-Guide-linux4.4-USB/USB2.0-USB2.0-PHYBlock-Diagram.png)
+![USB2.0-USB 2.0-PHYBlock-Diagram](Rockchip-Developer-Guide-USB/USB2.0-USB2.0-PHYBlock-Diagram.png)
 
-​							Figure 1-2 USB 2.0 PHY Block Diagram
+Figure 1-2 USB 2.0 PHY Block Diagram
 
 ### 1.3 USB 2.0 OTG
 
@@ -109,9 +110,9 @@ Features
 
 - Support Uart Bypass Mode
 
-![USB2.0-OTG-Block-Diagram](Rockchip-Developer-Guide-linux4.4-USB\USB2.0-OTG-Block-Diagram.png)
+![USB2.0-OTG-Block-Diagram](Rockchip-Developer-Guide-USB\USB2.0-OTG-Block-Diagram.png)
 
-​							Figure 1‑3 USB 2.0 OTG Block Diagram
+Figure 1‑3 USB 2.0 OTG Block Diagram
 
 ### 1.4 USB 2.0 PHY
 
@@ -181,9 +182,9 @@ USB 3.0 xHCI Host Features
 
 - Not support USB 3.0/USB 2.0 OTG session request protocol(SRP), hostnegotiation protocol(HNP) and Role Swap Protocol(RSP)
 
-![USB30-OTG-BlockDiagram](Rockchip-Developer-Guide-linux4.4-USB/USB30-OTG-BlockDiagram.png)
+![USB30-OTG-BlockDiagram](Rockchip-Developer-Guide-USB/USB30-OTG-BlockDiagram.png)
 
-​								Figure 1‑4 USB 3.0 OTG Block Diagram
+Figure 1‑4 USB 3.0 OTG Block Diagram
 
 ### 1.6 Type-C USB 3.0 PHY
 
@@ -199,9 +200,9 @@ USB 3.0 xHCI Host Features
 
 - Support Normal and Flipped orientation
 
-​						![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-linux4.4-USB/TypC-PHY-BlockDiagram.png)
+![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-USB/TypC-PHY-BlockDiagram.png)
 
-​								Figure 1‑5 TypeC PHY Block Diagram
+Figure 1‑5 TypeC PHY Block Diagram
 
 ---
 
@@ -217,13 +218,13 @@ USB 2.0 works at 480MHz clock, it is suggested that the width of USB 2.0 DP/DM l
 
 The hardware signal reference circuit of USB 2.0 HOST controller is shown in Figure 2-1, and the VBUS control circuit and interface circuit of USB 2.0 HOST are shown in Figure 2-2（Reference to RK3399 EVB）.
 
-![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB-20-HOST-SoCsignal-Pin.png)
+![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-USB/USB-20-HOST-SoCsignal-Pin.png)
 
-​								Figure 2‑1 USB 2.0 HOST pin in SoC
+Figure 2‑1 USB 2.0 HOST pin in SoC
 
-![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-linux4.4-USB/HSIC-Hardware-of-Controller.png)![USB-20-HOST-VBUSGPIO-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB-20-HOST-VBUSGPIO-Pin.png)
+![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-USB/HSIC-Hardware-of-Controller.png)![USB-20-HOST-VBUSGPIO-Pin](Rockchip-Developer-Guide-USB/USB-20-HOST-VBUSGPIO-Pin.png)
 
-​					Figure 2‑2 USB 2.0 HOST VBUS control circuit and interface circuit
+Figure 2‑2 USB 2.0 HOST VBUS control circuit and interface circuit
 
 #### 2.1.2 USB 2.0 HSIC Hardware Circuit
 
@@ -231,9 +232,9 @@ HSIC (High Speed Inter Chip) uses 240 MHz DDR signal, so the transmission rate i
 
 As shown in Figure 2-3, USIC_STROBE is 240MHz DDR signal line, USIC_DATA is data line. The power supply voltage is only 0.9V and 1.2V, and standard voltage of signal transmission is 1.2V, which has lower power consumption than USB 2.0 PHY.
 
-![HSIC-Hardware](Rockchip-Developer-Guide-linux4.4-USB/HSIC-Hardware.png)
+![HSIC-Hardware](Rockchip-Developer-Guide-USB/HSIC-Hardware.png)
 
-​									Figure 2‑3 USB 2.0 HSIC pin in SoC
+Figure 2‑3 USB 2.0 HSIC pin in SoC
 
 ### 2.2 USB 2.0/3.0 OTG Hardware Circuits
 
@@ -241,21 +242,21 @@ As shown in Figure 2-3, USIC_STROBE is 240MHz DDR signal line, USIC_DATA is data
 
 The complete USB 2.0 OTG reference circuit is shown in Figures 2-4 ～ 2-7（Reference to PX30 EVB）.
 
-![USB2.0-OTG-控制器硬件信号](Rockchip-Developer-Guide-linux4.4-USB\USB2.0-OTG-控制器硬件信号.png)
+![USB2.0-OTG-控制器硬件信号](Rockchip-Developer-Guide-USB\USB2.0-OTG-控制器硬件信号.png)
 
-​								Figure 2-4 USB 2.0 OTG pin in SoC
+Figure 2-4 USB 2.0 OTG pin in SoC
 
-![OTG-PORT-电路图](Rockchip-Developer-Guide-linux4.4-USB\OTG-PORT-电路图.png)
+![OTG-PORT-电路图](Rockchip-Developer-Guide-USB\OTG-PORT-电路图.png)
 
-​								Figure 2-5  USB 2.0 OTG Micro-Interface
+Figure 2-5  USB 2.0 OTG Micro-Interface
 
-![OTG-DET-电路图](Rockchip-Developer-Guide-linux4.4-USB\OTG-DET-电路图.png)
+![OTG-DET-电路图](Rockchip-Developer-Guide-USB\OTG-DET-电路图.png)
 
-​								Figure 2-6  USB 2.0 OTG_DET circuit
+Figure 2-6  USB 2.0 OTG_DET circuit
 
-![OTG-DRV-电路图](Rockchip-Developer-Guide-linux4.4-USB\OTG-DRV-电路图.png)
+![OTG-DRV-电路图](Rockchip-Developer-Guide-USB\OTG-DRV-电路图.png)
 
-​								Figure 2-7 USB 2.0 OTG_DRV circuit
+Figure 2-7 USB 2.0 OTG_DRV circuit
 
 - OTG_DP/OTG_DM: USB differential signal D+/D-, need to place 2.2Ω series resistance on each signal line.
 - USB_DET: Input signal, used for OTG Peripheral mode to determine whether to connect to Host or USB charger. Default is low level 0V. If connect to Host or USB charger, the high level is 3.0 ~ 3.2 V.
@@ -270,35 +271,35 @@ The maximum transmission rate of USB 3.0 OTG is 5Gbps, which is downward compati
 
 Figure 2-8 ~ 2-13 is the Type-C USB 3.0 related circuit design of RK3399 platform.
 
-​		![table-GND-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/table-GND-kernel4.4.png)
+![table-GND-kernel4.4](Rockchip-Developer-Guide-USB/table-GND-kernel4.4.png)
 
-![tabel-socketkernel4.4](Rockchip-Developer-Guide-linux4.4-USB/tabel-socketkernel4.4.png)
+![tabel-socketkernel4.4](Rockchip-Developer-Guide-USB/tabel-socketkernel4.4.png)
 
- 				![Type-C-Interface-Definition](Rockchip-Developer-Guide-linux4.4-USB/Type-C-Interface-Definition.png)
+![Type-C-Interface-Definition](Rockchip-Developer-Guide-USB/Type-C-Interface-Definition.png)
 
-​								Figure 2‑8 Type-C interface definition
+Figure 2‑8 Type-C interface definition
 
- 				![USB3-OTG-Controller-SoC-Signal-Pin](Rockchip-Developer-Guide-linux4.4-USB/USB3-OTG-Controller-SoC-Signal-Pin.png)
+![USB3-OTG-Controller-SoC-Signal-Pin](Rockchip-Developer-Guide-USB/USB3-OTG-Controller-SoC-Signal-Pin.png)
 
-​							Figure 2‑9 USB 3.0 OTG pin in SoC
+Figure 2‑9 USB 3.0 OTG pin in SoC
 
-![USB3-OTG-Type-C-Interface](Rockchip-Developer-Guide-linux4.4-USB/USB3-OTG-Type-C-Interface.png)
+![USB3-OTG-Type-C-Interface](Rockchip-Developer-Guide-USB/USB3-OTG-Type-C-Interface.png)
 
-​							Figure 2‑10 USB 3.0 OTG Type-C interface
+Figure 2‑10 USB 3.0 OTG Type-C interface
 
- 				![USB3-Type-C-pd／cc-Circuit（FUSB302）](Rockchip-Developer-Guide-linux4.4-USB/USB3-Type-C-pd／cc-Circuit（FUSB302）.png)
+![USB3-Type-C-pd／cc-Circuit（FUSB302）](Rockchip-Developer-Guide-USB/USB3-Type-C-pd／cc-Circuit（FUSB302）.png)
 
-​						Figure 2‑11 USB 3.0 Type-C CC detection circuit（FUSB302）
+Figure 2‑11 USB 3.0 Type-C CC detection circuit（FUSB302）
 
-![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-linux4.4-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png)
+![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png)
 
-![kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-017-kernel4.4.png)
+![kernel4.4](Rockchip-Developer-Guide-USB/USB-017-kernel4.4.png)
 
-​					Figure 2‑12 USB 3.0 VBUS Control Circuit-1（Control by GPIO）
+Figure 2‑12 USB 3.0 VBUS Control Circuit-1（Control by GPIO）
 
-![USB3-VBUS-Circuit-2（RK818-output5V）](Rockchip-Developer-Guide-linux4.4-USB/USB3-VBUS-Circuit-2（RK818-output5V）.png)
+![USB3-VBUS-Circuit-2（RK818-output5V）](Rockchip-Developer-Guide-USB/USB3-VBUS-Circuit-2（RK818-output5V）.png)
 
-​					Figure 2‑13 USB 3.0 VBUS Control-2（Control by RK818）
+Figure 2‑13 USB 3.0 VBUS Control-2（Control by RK818）
 
 ---
 ## 3 Kernel USB CONFIG
@@ -1768,9 +1769,9 @@ async periodic registers
 ---
 ## 6 Android USB Gadget Configuration
 
-Since Linux 4.0, USB Gadgets have been configured in the framework of ConfigFs, and the android.c file in the Gadget directory has been deleted from the kernel.
+Since Linux-3.11, USB Gadgets have been configured in the framework of ConfigFS, and the android.c file in the Gadget directory has been deleted from the kernel.
 
-For instructions on how to use Android ConfigFs Gadgets, please refer to Linaro's official website:
+For instructions on how to use Android ConfigFS Gadgets, please refer to Linaro's official website:
 
 [https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets](https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets)
 
@@ -2147,21 +2148,21 @@ BC1.2 spec requires D + and D - in USB Charger to be short connected to match th
 
 The USB charging type detection process is shown in the following figure:
 
-![USB-065-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-065-kernel4.4.png)
+![USB-065-kernel4.4](Rockchip-Developer-Guide-USB/USB-065-kernel4.4.png)
 
-​						Figure 7‑1 USB Charging Detection Process
+Figure 7‑1 USB Charging Detection Process
 
 In the typical SDP detection process, the D+/D- signals is shown as follows:
 
-![USB-066-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-066-kernel4.4.png)
+![USB-066-kernel4.4](Rockchip-Developer-Guide-USB/USB-066-kernel4.4.png)
 
-​									Figure 7‑2 SDP detection signals
+Figure 7‑2 SDP detection signals
 
 In the typical DCP detection process, the D+/D- signals is shown as follows:
 
- ![USB-067-kernel4.4](Rockchip-Developer-Guide-linux4.4-USB/USB-067-kernel4.4.png)
+ ![USB-067-kernel4.4](Rockchip-Developer-Guide-USB/USB-067-kernel4.4.png)
 
-​									Figure 7‑3 DCP detection signals
+Figure 7‑3 DCP detection signals
 
 If connected to an USB charger, but it is found that charging is slow, may be the DCP is misdetected as SDP, resulting in charging current set to 500 mA. This problem may happens when the USB cable connection is unstable or the charging detection driver is wrong.
 
