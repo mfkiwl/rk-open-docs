@@ -1,4 +1,3 @@
-
 # **RKupgrade二次开发库用户手册**
 
 发布版本：1.0
@@ -26,8 +25,6 @@ RKUpgrade.dll二次开发库,是基于VS2008开发,支持Ansi和Unicode编码.�
 | RK3188 RK3126 RK3128 |
 | RK3066               |
 
-
-
 **读者对象**
 
   工具开发工程师
@@ -43,7 +40,6 @@ RKUpgrade.dll二次开发库,是基于VS2008开发,支持Ansi和Unicode编码.�
 ---
 [TOC]
 ---
-
 
 ## 1.二次开发步骤
 
@@ -86,43 +82,43 @@ RKUpgrade.dll二次开发库,是基于VS2008开发,支持Ansi和Unicode编码.�
 说明:自定义数据保存在IDBLOCK的扇区3中,有512个字节空间
 函数:RK_WriteCustomData 和RK_ReadCustomData
 参数:
-​	pCustomData:分配512字节buffer
-​	nCustomDataOffset:自定义数据在512空间中的偏移
-​	nCustomDataLen:自定义数据的长度,字节单位
+`pCustomData`:分配512字节buffer
+`nCustomDataOffset`:自定义数据在512空间中的偏移
+`nCustomDataLen`:自定义数据的长度,字节单位
 **注:读取成功后,返回的是整个sector3数据,要通过nCustomDataOffset偏移到自定义数据.**
-​      **写入的数据是从pCustomData + nCustomDataOffset开始的nCustomDataLen数据**
+**写入的数据是从pCustomData + nCustomDataOffset开始的nCustomDataLen数据**
 
 ### 2.2 读写序列号
 
 说明:序列号在sector3中2-61位置,0-1是序列号长度
 函数:RK_WriteSN和RK_ReadSN
 参数:
-​	pSN:序列号,字符串数据
-​	nSNLen:序列号长度,字节单位
+`pSN`:序列号,字符串数据
+`nSNLen`:序列号长度,字节单位
 
 ### 2.3 读写网卡地址
 
 说明:网卡地址在sector3中506-511位置,每4位代表一个字符,一共表示12个字符网卡地址,
 函数:RK_WriteMAC和RK_ReadMAC
-参数: 
-​	pMac:6个字节转换后的地址
-​	nMacLen:长度为6
+参数:
+`pMac`:6个字节转换后的地址
+`nMacLen`:长度为6
 
 ### 2.4 读写WifiMac地址
 
 说明:WifiMac地址在sector3中445-450位置,每4位代表一个字符,一共表示12个字符网卡地址,
 函数:RK_WriteWifi和RK_ReadWifi
 参数:
-​	pWifi:6个字节转换后的地址
-​	nWifiLen:长度为6
+`pWifi`:6个字节转换后的地址
+`nWifiLen`:长度为6
 
 ### 2.5读写蓝牙地址
 
 说明:蓝牙地址在sector3中499-504位置,每4位代表一个字符,一共表示12个字符网卡地址,
 函数:RK_WriteBT和RK_ReadBT
 参数:
-​	pBT:6个字节转换后的地址
-​	nBTLen:长度为6
+`pBT`:6个字节转换后的地址
+`nBTLen`:长度为6
 
 ### 2.6清空Sector3数据
 
@@ -131,52 +127,53 @@ RKUpgrade.dll二次开发库,是基于VS2008开发,支持Ansi和Unicode编码.�
 
 ### 2.7读写Vendor数据
 
-说明:有两个Vendor区,分别是vendor0和vendor1,每个区504个字节,这个区域的性质是升级后数据不会丢失,设备端可读可写
+说明:有两个Vendor区,分别是vendor0和vendor1,每个区504个字节,这个区域的性质是升级后数据不会丢失,设备端可读可写。
 函数:RK_WriteVendorInfo和RK_ReadVendorInfo
 参数:
-​	pVendorBuffer:504为单位的buffer
-​	sectorOffset:指定vendor号,只有0或者1
-​	sectorCount: 指定读写访问的vendor数
+`pVendorBuffer`:504为单位的buffer
+`sectorOffset`:指定vendor号,只有0或者1
+`sectorCount`: 指定读写访问的vendor数
 
 ## 2.8读写Provision数据
-说明:Provision区,大概1-1.5M大小的空间,按ID来访问每个读写项,每个项数据不能超过62K.目前只有新的芯片方案有这个接口,请与系统工程师确认后使用 
+
+说明:Provision区,大概1-1.5M大小的空间,按ID来访问每个读写项,每个项数据不能超过62K.目前只有新的芯片方案有这个接口,请与系统工程师确认后使用。
 函数: RK_WriteProvisioningData和RK_ReadProvisioningData
 参数:
-​	pDataBuffer:数据项的访问buffer
-​	nBufferSize:数据项buffer大小,字节单位
-​	nID:数据项ID
+`pDataBuffer`:数据项的访问buffer
+`nBufferSize`:数据项buffer大小,字节单位
+`nID`:数据项ID
 
 ### 2.9读写KeyHash数据
 
-说明:芯片内部有一块efuse存储空间,里面有块区域保存的是公钥的hash.这部分空间只能写一次.写入公钥hash后,芯片激活安全机制. 
+说明:芯片内部有一块efuse存储空间,里面有块区域保存的是公钥的hash.这部分空间只能写一次.写入公钥hash后,芯片激活安全机制。
 函数:RK_WriteKeyHashToEfuse和RK_ReadKeyHashFromEfuse
 参数:
-​	pKeyHash:32字节内存空间
-​	usKeyHashSize:读取到的keyhash长度
+`pKeyHash`:32字节内存空间
+`usKeyHashSize`:读取到的keyhash长度
 **注:调用RK_WriteKeyHashToEfuse前,要先调用RK_SetFirmware设置签名后的update.img固件**
 
 ### 2.10读写Efuse数据
 
-说明:芯片内部有一块efuse存储空间,去掉被占用的空间外还有一些空间是开放给客户使用.这部分空间只能写一次.具体每个芯片开放的空间大小都不同,请与系统工程师确认后使用. 
+说明:芯片内部有一块efuse存储空间,去掉被占用的空间外还有一些空间是开放给客户使用.这部分空间只能写一次.具体每个芯片开放的空间大小都不同,请与系统工程师确认后使用。
 函数: RK_WriteDataToEfuse和RK_ReadDataFromEfuse
 参数:
-​	pBuffer:内存空间,每个bit占用一个字节,最多读写512比特
-​	usPos:读写的起始比特
-​	usWriteSize:写入的比特数
-​	usReadSize:读取的比特数
+`pBuffer`:内存空间,每个bit占用一个字节,最多读写512比特
+`usPos`:读写的起始比特
+`usWriteSize`:写入的比特数
+`usReadSize`:读取的比特数
 
 ### 2.11重启rockusb设备
 
-说明:重启rockusb设备 
+说明:重启rockusb设备
 函数: RK_ResetRockusb
 参数:
-​	Subcode:0为正常重启,3为重启进入maskrom
+`Subcode`:0为正常重启,3为重启进入maskrom
 
 ## 3.常见问题
 
 ### 3.1 日志文件提示'ERROR:CheckUsbDevice->Usb type mismatch'
 
-原因:上面除efuse相关的操作外,都需要在loader状态下进行.
+原因:上面除efuse相关的操作外,都需要在loader状态下进行。
 注:maskrom和loader都属于rockusb,maskrom下的操作有限.当通过RK_ScanDevice扫描到Rockusb设备后,可以通过调用RK_GetDeviceInfo函数中pUsbtypeArray参数来判断,值为1是maskrom,值为2是loader
 
 ### 3.2 日志文件提示'ERROR:WriteSN-->SN Size is Wrong'
@@ -198,10 +195,9 @@ RKUpgrade.dll二次开发库,是基于VS2008开发,支持Ansi和Unicode编码.�
 ### 3.6 RK_ScanDevice找不到设备
 
 原因:
+
 1. 先打开设备管理器,确认是不是有rockusb设备
 2. 存在rockusb设备,那么检查库初始化时是不是有指定bScan4FsUsb为TRUE
 3. 存在未知设备,查看此设备硬件ID,我们的rockusb设备vid是0x2207,pid是0x3xxx,0x2xxx,0x1xxx
 4. 如果属于上面范围,使用DriverAssistant工具安装驱动
 5. 未知设备(获取描述符失败),请更新产品最新loader
-
-
