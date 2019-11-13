@@ -16,9 +16,10 @@ Classified Level：Publicity
 
 **Chipset Version**
 
-| **Chipset**                         | **Kernel Version** |
-| ----------------------------------- | :----------------- |
-| All Rockchip chipset with Linux 4.4 | Linux4.4           |
+| **Chipset**                          | **Kernel Version** |
+| ------------------------------------ | :----------------- |
+| All Rockchip chipset with Linux 4.4  | Linux4.4           |
+| All Rockchip chipset with Linux 4.19 | Linux4.19          |
 
 Intended Audience
 
@@ -32,7 +33,7 @@ Software Engineer
 | ---------- | ----------- | ----------- | ------------------------- |
 | 2017-12-21 | V1.0        | Huibin.Hong | Initial Release           |
 | 2019-02-14 | V1.1        | Huibin.Hong | Update                    |
-|            |             |             |                           |
+| 2019-11-13 | V1.2        | Huibin.Hong | Support Linux4.19         |
 
 ---
 [TOC]
