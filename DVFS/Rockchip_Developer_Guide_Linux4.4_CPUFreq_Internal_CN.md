@@ -40,17 +40,11 @@
 
 ## 1 概述
 
-​	CPUFreq 是内核开发者定义的一套支持根据指定的 governor 动态调整 CPU 频率和电压的框架模型，它能有效
-
-地降低 CPU 的功耗，同时兼顾 CPU 的性能。CPUFreq framework 由 governor、core、driver、stats 组成，软件架
-
-构如下：
+CPUFreq 是内核开发者定义的一套支持根据指定的 governor 动态调整 CPU 频率和电压的框架模型，它能有效地降低 CPU 的功耗，同时兼顾 CPU 的性能。CPUFreq framework 由 governor、core、driver、stats 组成，软件架构如下：
 
 ![](./Rockchip_Developer_Guide_Linux4.4_CPUFreq/cpufreq-framework.png)
 
-​	CPUFreq governor：用于 CPU 升降频检测，根据系统负载，决定 CPU 频率。目前 Linux4.4 内核中包含了如下
-
-几种 governor：
+CPUFreq governor：用于 CPU 升降频检测，根据系统负载，决定 CPU 频率。目前 Linux4.4 内核中包含了如下几种 governor：
 
 - conservative：根据 CPU 负载动态调频，按一定的比例平滑的升高或降低频率。
 
@@ -64,23 +58,19 @@
 
 - performance：性能优先，始终将频率设置为最高值。
 
-- schedutil：EAS 使用 governor。EAS（Energy Aware Scheduling）是新一代的任务调度策略， 结合 CPUFreq
+- schedutil：EAS 使用 governor。EAS（Energy Aware Scheduling）是新一代的任务调度策略， 结合CPUFreq和 CPUIdle 的策略， 在为某个任务选择运行 CPU 时， 同时考虑了性能和功耗， 保证了系统能耗最低，并且不会对性能造成影响。Schedutil 调度策略就是专门给 EAS 使用的 CPU 调频策略。
 
-  和 CPUIdle 的策略， 在为某个任务选择运行 CPU 时， 同时考虑了性能和功耗， 保证了系统能耗最低，并且不
+CPUFreq core： 对 cpufreq governors 和 cpufreq driver 进行了封装和抽象，并定义了清晰的接口。
 
-  会对性能造成影响。Schedutil 调度策略就是专门给 EAS 使用的 CPU 调频策略。
+CPUFreq driver：用于初始化 CPU 的频率电压表，设置具体 CPU 的频率。
 
-  CPUFreq core： 对 cpufreq governors 和 cpufreq driver 进行了封装和抽象，并定义了清晰的接口。
-
-  CPUFreq driver：用于初始化 CPU 的频率电压表，设置具体 CPU 的频率。
-
-  CPUFreq stats：提供 cpufreq 有关的统计信息。
+CPUFreq stats：提供 cpufreq 有关的统计信息。
 
 -----
 
 ## 2 代码路径
 
-​	Governor 相关代码：
+Governor 相关代码：
 
 ```c
 drivers/cpufreq/cpufreq_conservative.c        /* conservative调频策略 */
@@ -91,19 +81,19 @@ drivers/cpufreq/cpufreq_performance.c         /* performance调频策略 */
 kernel/sched/cpufreq_schedutil.c              /* schedutil调频策略 */
 ```
 
-​	Stats 相关代码：
+Stats 相关代码：
 
 ```c
 drivers/cpufreq/cpufreq_stats.c
 ```
 
-​	Core 相关代码：
+Core 相关代码：
 
 ```c
 drivers/cpufreq/cpufreq.c
 ```
 
-​	Driver 相关代码：
+Driver 相关代码：
 
 ```c
 drivers/cpufreq/cpufreq-dt.c                  /* platform driver */
@@ -138,17 +128,13 @@ CPU Power Management  --->
 		<*>   Rockchip CPUfreq driver                   /* platform device */
 ```
 
-​	通过“Default CPUFreq governor”配置项，可以选择变频策略，开发者可以根据实际产品需求进行修改。
+通过“Default CPUFreq governor”配置项，可以选择变频策略，开发者可以根据实际产品需求进行修改。
 
 ### 3.2 Clock 配置
 
-​	根据平台的实际情况，在 CPU 节点下增加“clock”属性，一般在 DTSI 文件中。Clock 的详细配置说明，请参考
+根据平台的实际情况，在 CPU 节点下增加“clock”属性，一般在 DTSI 文件中。Clock 的详细配置说明，请参考clock 相关的开发文档。
 
-clock 相关的开发文档。
-
-​	对于非大小核的平台，比如 RK3326、RK3328 等，在 CPU0 节点下增加“clocks = <&cru ARMCLK>;”，以
-
-RK3328 为例：
+对于非大小核的平台，比如 RK3326、RK3328 等，在 CPU0 节点下增加“clocks = <&cru ARMCLK>;”，以RK3328 为例：
 
 ```c
 cpu0: cpu@0 {
@@ -159,9 +145,7 @@ cpu0: cpu@0 {
 };
 ```
 
-​	对于大小核的平台，如 RK3368、RK3399 等，在每个大核的 CPU 节点下增加“clocks = <&cru ARMCLKB>;”，
-
-在每个小核的 CPU 节点下增加“clocks = <&cru ARMCLKL>;”，以 RK3399 为例：
+对于大小核的平台，如 RK3368、RK3399 等，在每个大核的 CPU 节点下增加“clocks = <&cru ARMCLKB>;”，在每个小核的 CPU 节点下增加“clocks = <&cru ARMCLKL>;”，以 RK3399 为例：
 
 ```c
 cpu_l0: cpu@0 {
@@ -207,7 +191,7 @@ cpu_b1: cpu@101 {
 };
 ```
 
-​	注意：如果 clock 没有配置，CPUFreq 驱动加载失败，提示如下错误：
+注意：如果 clock 没有配置，CPUFreq 驱动加载失败，提示如下错误：
 
 ```c
 cpu cpu0: failed to get clock: -2
@@ -216,11 +200,9 @@ cpufreq-dt: probe of cpufreq-dt failed with error -2
 
 ### 3.3 Regulator 配置
 
-​	根据实际产品硬件使用的电源方案，在 CPU 节点下增加“cpu-supply”属性，一般在板级 DTS 文件中。
+根据实际产品硬件使用的电源方案，在 CPU 节点下增加“cpu-supply”属性，一般在板级 DTS 文件中。Regulator 的详细配置说明，请参考 Regulator 和 PMIC 相关的开发文档。
 
-Regulator 的详细配置说明，请参考 Regulator 和 PMIC 相关的开发文档。
-
-​	对于非大小核的平台，在 CPU0 节点下增加“cpu-supply”属性，以 RK3328 为例：
+对于非大小核的平台，在 CPU0 节点下增加“cpu-supply”属性，以 RK3328 为例：
 
 ```c
 &i2c1 {
@@ -259,7 +241,7 @@ Regulator 的详细配置说明，请参考 Regulator 和 PMIC 相关的开发�
 };
 ```
 
-​	对于大小核的平台，在每个 CPU 节点下增加“cpu-supply”属性，以 rk3399 为例：
+对于大小核的平台，在每个 CPU 节点下增加“cpu-supply”属性，以 rk3399 为例：
 
 ```c
 &cpu_l0 {
@@ -287,17 +269,11 @@ Regulator 的详细配置说明，请参考 Regulator 和 PMIC 相关的开发�
 };
 ```
 
-​	注意：如果 regulator 没有配置，cpufreq 驱动仍然可以加载成功，认为只调频不调压，频率比较高时，可能
-
-会因为电压偏低而出现死机的现象。
+注意：如果 regulator 没有配置，cpufreq 驱动仍然可以加载成功，认为只调频不调压，频率比较高时，可能会因为电压偏低而出现死机的现象。
 
 ### 3.4 OPP Table 配置
 
-​	Linux4.4 内核将频率、电压相关的配置放在了 devicetree 中，我们将这些配置信息组成的节点，称之为
-
-OPP Table。OPP Table 节点包含描述频率和电压的 OPP 节点、leaakge 相关配置属性、PVTM 相关配置属性等。
-
-OPP 的详细配置说明，可以参考如下文档：
+Linux4.4 内核将频率、电压相关的配置放在了 devicetree 中，我们将这些配置信息组成的节点，称之为OPP Table。OPP Table 节点包含描述频率和电压的 OPP 节点、leaakge 相关配置属性、PVTM 相关配置属性等。OPP 的详细配置说明，可以参考如下文档：
 
 ```c
 Documentation/devicetree/bindings/opp/opp.txt
@@ -306,9 +282,7 @@ Documentation/power/opp.txt
 
 #### 3.4.1 增加 OPP Table
 
-​	根据平台的实际情况，增加一个 OPP Table 节点，并在每个 CPU 节点下增加“operating-points-v2”属性，
-
-一般在 DTSI 文件中。以 RK3328 为例：
+根据平台的实际情况，增加一个 OPP Table 节点，并在每个 CPU 节点下增加“operating-points-v2”属性，一般在 DTSI 文件中。以 RK3328 为例：
 
 ```c
 cpu0: cpu@0 {
@@ -366,9 +340,7 @@ cpu0_opp_table: opp_table0 {
 }
 ```
 
-​	注意：如果 operating-points-v2 没有配置，cpufreq 初始化失败，系统启动后无法进行调频调压，提示类似
-
-如下的错误：
+注意：如果 operating-points-v2 没有配置，cpufreq 初始化失败，系统启动后无法进行调频调压，提示类似如下的错误：
 
 ```c
 cpu cpu0: OPP-v2 not supported
@@ -377,9 +349,9 @@ cpu cpu0: couldn't find opp table for cpu:0, -19
 
 #### 3.4.2 删除 OPP
 
-​	如果开发者需要删除某些频点，可以使用如下方法。
+如果开发者需要删除某些频点，可以使用如下方法。
 
-​	方法一：直接在对应 OPP 节点下增加“status = "disabeld";”，比如：
+方法一：直接在对应 OPP 节点下增加“status = "disabeld";”，比如：
 
 ```c
 cpu0_opp_table: opp_table0 {
@@ -401,7 +373,7 @@ cpu0_opp_table: opp_table0 {
 }
 ```
 
-​	方法二：在板级 DTS 中重新引用 OPP Table 节点，并在对应 OPP 节点下增加“status = "disabeld";”，比如：
+方法二：在板级 DTS 中重新引用 OPP Table 节点，并在对应 OPP 节点下增加“status = "disabeld";”，比如：
 
 ```c
 &cpu0_opp_table {
@@ -413,27 +385,15 @@ cpu0_opp_table: opp_table0 {
 
 ### 3.5 根据 leakage 调整 OPP Table
 
-​	IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指 CMOS 电路静态时从电源获取的电
-
-流，我们也称之为 leakage。CPU 的 leakage 指给 CPU 提供特定的电压，测得的静态电流值。在芯片生产过程中，
-
-会将 leakage 写到 eFuse 或者 OTP 中。
+IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指 CMOS 电路静态时从电源获取的电流，我们也称之为 leakage。CPU 的 leakage 指给 CPU 提供特定的电压，测得的静态电流值。在芯片生产过程中，会将 leakage 写到 eFuse 或者 OTP 中。
 
 #### 3.5.1 根据 leakage 调整电压
 
-​	背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较
+背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较小，通过这一特性可以根据 leakage 值降低大 leakage 芯片的电压，以降低功耗和提高性能。
 
-小，通过这一特性可以根据 leakage 值降低大 leakage 芯片的电压，以降低功耗和提高性能。
+功能说明：从 eFuse 或 OTP 中获取该芯片的 CPU leakage 值，通过查表得到对应的档位，然后在每个 OPP 中选择对应档位的电压，作为该频点的电压。
 
-​	功能说明：从 eFuse 或 OTP 中获取该芯片的 CPU leakage 值，通过查表得到对应的档位，然后在每个 OPP 中选
-
-择对应档位的电压，作为该频点的电压。
-
-​	配置方法：首先需要增加 eFuse 或者 OTP 的支持，具体方法请参考 eFuse 和 OTP 的相关文档。然后在 OPP
-
-Table 节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvmem-cell-names”三个属性，同时 OPP 节点
-
-根据实际情况增加“opp-microvolt-\<name\>”属性，这些配置一般都在 DTSI 文件中。以 RK3328 为例：
+配置方法：首先需要增加 eFuse 或者 OTP 的支持，具体方法请参考 eFuse 和 OTP 的相关文档。然后在 OPP Table 节点增加“rockchip,leakage-voltage-sel”、“nvmem-cells”和“nvmem-cell-names”三个属性，同时 OPP 节点根据实际情况增加“opp-microvolt-\<name\>”属性，这些配置一般都在 DTSI 文件中。以 RK3328 为例：
 
 ```c
 cpu0_opp_table: cpu0-opp-table {
@@ -477,25 +437,15 @@ cpu0_opp_table: cpu0-opp-table {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
+如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
 #### 3.5.2 根据 leakage 调整最高频
 
-​	背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较
+背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较小，并且小 leakage 的 Vmin 超出了芯片允许的最高电压，这种情况需要根据 leakage 限制最高频，以防止电压过高，影响芯片寿命。
 
-小，并且小 leakage 的 Vmin 超出了芯片允许的最高电压，这种情况需要根据 leakage 限制最高频，以防止电压过
+功能说明：从 eFuse 或 OTP 中获取该芯片的 CPU leakage 值，通过查表得到最高频转换因子并转换成频率，最后通过删除频点，cpufreq 框架层限制频率或者 clock 驱动层限制频率等方式限制最高频。
 
-高，影响芯片寿命。
-
-​	功能说明：从 eFuse 或 OTP 中获取该芯片的 CPU leakage 值，通过查表得到最高频转换因子并转换成频率，最
-
-后通过删除频点，cpufreq 框架层限制频率或者 clock 驱动层限制频率等方式限制最高频。
-
-​	配置方法：首先需要增加 eFuse 或者 OTP 的支持，具体方法请参考 eFuse 和 OTP 的相关文档。然后在 OPP
-
-Table 节点增加"rockchip,avs"、“clocks”、“rockchip,leakage-scaling-sel”、“nvmem-cells“和
-
-”nvmem-cell-names“属性，这些配置一般都在 DTSI 文件中。
+配置方法：首先需要增加 eFuse 或者 OTP 的支持，具体方法请参考 eFuse 和 OTP 的相关文档。然后在 OPP Table 节点增加"rockchip,avs"、“clocks”、“rockchip,leakage-scaling-sel”、“nvmem-cells“和”nvmem-cell-names“属性，这些配置一般都在 DTSI 文件中。
 
 ```c
 cpu0_opp_table: opp_table0 {
@@ -532,31 +482,19 @@ cpu0_opp_table: opp_table0 {
 }
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,leakage-scaling-sel”属性。
+如需关闭该项功能，可以删除“rockchip,leakage-scaling-sel”属性。
 
 ### 3.6 根据 PVTM 调整 OPP Table
 
-​	CPU PVTM(Process-Voltage-Temperature Monitor)是一个位于 CPU 附近，能反应出不同芯片之间性能差异
-
-的模块，它受工艺、电压、温度的影响。
+CPU PVTM(Process-Voltage-Temperature Monitor)是一个位于 CPU 附近，能反应出不同芯片之间性能差异的模块，它受工艺、电压、温度的影响。
 
 #### 3.6.1 根据 PVTM 调整电压
 
-​	背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片
+背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片Vmin 比较小，通过这一特性可以根据 PVTM 值降低大 PVTM 芯片的电压，以降低功耗和提高性能。
 
-Vmin 比较小，通过这一特性可以根据 PVTM 值降低大 PVTM 芯片的电压，以降低功耗和提高性能。
+功能说明：在指定的电压和频率下获取 PVTM 值，并转换成参考温度下的 PVTM 值，然后查表得到对应的档位，最后在每个 OPP 中选择对应档位的电压，作为该频点的电压。
 
-​	功能说明：在指定的电压和频率下获取 PVTM 值，并转换成参考温度下的 PVTM 值，然后查表得到对应的档
-
-位，最后在每个 OPP 中选择对应档位的电压，作为该频点的电压。
-
-​	配置方法：首先需要先增加 PVTM 的支持，具体方法请参考 PVTM 的相关文档。然后在 OPP Table 节点增加
-
-“rockchip,pvtm-voltage-sel”、“rockchip,thermal-zone”和“rockchip,pvtm-\<name\>”属性，多种工艺的情况还需要
-
-增加“nvmem-cells”和“nvmem-cell-names”属性，OPP 节点根据实际情况增加“opp-microvolt-\<name\>”属性。这
-
-些配置一般都在 DTSI 文件中。以 RK3288 为例：
+配置方法：首先需要先增加 PVTM 的支持，具体方法请参考 PVTM 的相关文档。然后在 OPP Table 节点增加“rockchip,pvtm-voltage-sel”、“rockchip,thermal-zone”和“rockchip,pvtm-\<name\>”属性，多种工艺的情况还需要增加“nvmem-cells”和“nvmem-cell-names”属性，OPP 节点根据实际情况增加“opp-microvolt-\<name\>”属性。这些配置一般都在 DTSI 文件中。以 RK3288 为例：
 
 ```c
 cpu0_opp_table: opp_table0 {
@@ -628,27 +566,15 @@ cpu0_opp_table: opp_table0 {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
+如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
 #### 3.6.2 根据 PVTM 调整最高频
 
-​	背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片
+背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片Vmin 比较小，并且 PVTM 值小的芯片 Vmin 超出了芯片允许的最高电压，这种情况需要根据 PVTM 限制最高频，以防止电压过高，影响芯片寿命。
 
-Vmin 比较小，并且 PVTM 值小的芯片 Vmin 超出了芯片允许的最高电压，这种情况需要根据 PVTM 限制最高频，以
+功能说明：在指定的电压和频率下获取 PVTM 值，并转换成参考温度下的 PVTM 值，然后查表得到对应的频率转换因子并转换成频率，最后通过删除频点，cpufreq 框架层限制频率或者 clock 驱动层限制频率的方式限制最高频。
 
-防止电压过高，影响芯片寿命。
-
-​	功能说明：在指定的电压和频率下获取 PVTM 值，并转换成参考温度下的 PVTM 值，然后查表得到对应的频率
-
-转换因子并转换成频率，最后通过删除频点，cpufreq 框架层限制频率或者 clock 驱动层限制频率的方式限制最高
-
-频。
-
-​	配置方法：首先需要先增加 PVTM 的支持，具体方法请参考 PVTM 的相关文档。然后在 OPP Table 节点增加
-
-“rockchip,avs“、“clocks”、“rockchip,pvtm-scaling-sel”、“rockchip,thermal-zone”和“rockchip,pvtm-\<name\>”属
-
-性，这些配置一般都在 DTSI 文件中。
+配置方法：首先需要先增加 PVTM 的支持，具体方法请参考 PVTM 的相关文档。然后在 OPP Table 节点增加“rockchip,avs“、“clocks”、“rockchip,pvtm-scaling-sel”、“rockchip,thermal-zone”和“rockchip,pvtm-\<name\>”属性，这些配置一般都在 DTSI 文件中。
 
 ```c
 cpu0_opp_table: opp_table0 {
@@ -691,29 +617,17 @@ cpu0_opp_table: opp_table0 {
 }
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,pvtm-scaling-sel”属性。
+如需关闭该项功能，可以删除“rockchip,pvtm-scaling-sel”属性。
 
 ### 3.7 根据 IR-Drop 调整 OPP Table
 
-​	IR-Drop 是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、
+IR-Drop 是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、电路板布线等因素导致的压降。
 
-电路板布线等因素导致的压降。
+背景：实测发现有些客户的板子电源纹波比较差，使用和 EVB 相同的电压表，某些频点的电压偏低，导致系统运行不稳定，这种情况需要根据 IR-Drop 调整调整 OPP Table。
 
-​	背景：实测发现有些客户的板子电源纹波比较差，使用和 EVB 相同的电压表，某些频点的电压偏低，导致系
+功能说明：将样机板每个频点的纹波减去 EVB 板的纹波，得到的差值就是该频点所需要增加的电压，如果最终电压超过了允许设置的最高电压，则会最后通过删除频点，cpufreq 框架层限制频率或者 clock 驱动层限制频率的方式限制最高频。
 
-统运行不稳定，这种情况需要根据 IR-Drop 调整调整 OPP Table。
-
-​	功能说明：将样机板每个频点的纹波减去 EVB 板的纹波，得到的差值就是该频点所需要增加的电压，如果最终
-
-电压超过了允许设置的最高电压，则会最后通过删除频点，cpufreq 框架层限制频率或者 clock 驱动层限制频率的
-
-方式限制最高频。
-
-​	配置方法：需要在 OPP Table 节点增加“rockchip,max-volt ”、“rockchip,evb-irdrop”和
-
-“rockchip,board-irdrop”属性，其中“rockchip,board-irdrop”一般在板级 DTS 文件中配置，其他在 DTSI 文件中配
-
-置。以 RK3326 为例，DTSI 中配置如下：
+配置方法：需要在 OPP Table 节点增加“rockchip,max-volt ”、“rockchip,evb-irdrop”和“rockchip,board-irdrop”属性，其中“rockchip,board-irdrop”一般在板级 DTS 文件中配置，其他在 DTSI 文件中配置。以 RK3326 为例，DTSI 中配置如下：
 
 ```c
 cpu0_opp_table: cpu0-opp-table {
@@ -739,7 +653,7 @@ cpu0_opp_table: cpu0-opp-table {
 }
 ```
 
-​	板级 DTS 文件中配置如下：
+板级 DTS 文件中配置如下：
 
 ```c
 &cpu0_opp_table {
@@ -761,23 +675,15 @@ cpu0_opp_table: cpu0-opp-table {
 };
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,board-irdrop”属性。
+如需关闭该项功能，可以删除“rockchip,board-irdrop”属性。
 
 ### 3.8 根据 bin 调整最高频
 
-​	背景：在 CP(Chip Probe)测试阶段，会将芯片的特殊功能区分、最高频区分、bin 区分等信息写人到 eFuse 或
+背景：在 CP(Chip Probe)测试阶段，会将芯片的特殊功能区分、最高频区分、bin 区分等信息写人到 eFuse 或者 OTP 中，用于区分芯片的性能。
 
-者 OTP 中，用于区分芯片的性能。
+功能说明：从 eFuse 或 OTP 中获取该芯片性能相关信息，通过一定的算法转换成 bin 值，然后通过查表得到最高频转换因子并转换成频率，最后通过删除频点，cpufreq 框架层限制频率、clock 驱动层限制频率等方式限制最高频。
 
-​	功能说明：从 eFuse 或 OTP 中获取该芯片性能相关信息，通过一定的算法转换成 bin 值，然后通过查表得到最
-
-高频转换因子并转换成频率，最后通过删除频点，cpufreq 框架层限制频率、clock 驱动层限制频率等方式限制最
-
-高频。
-
-​	配置方法：需要在 OPP Table 节点增加“rockchip,bin-scaling-sel”、“nvmem-cells“和”nvmem-cell-names“属
-
-性，这些配置一般都在 DTSI 文件中。以 RK3288 为例，DTSI 中配置如下：
+配置方法：需要在 OPP Table 节点增加“rockchip,bin-scaling-sel”、“nvmem-cells“和”nvmem-cell-names“属性，这些配置一般都在 DTSI 文件中。以 RK3288 为例，DTSI 中配置如下：
 
 ```c
 cpu0_opp_table: opp_table0 {
@@ -817,29 +723,17 @@ cpu0_opp_table: opp_table0 {
 }
 ```
 
-​	如需关闭该项功能，可以删除“rockchip,bin-scaling-sel”属性。
+如需关闭该项功能，可以删除“rockchip,bin-scaling-sel”属性。
 
 ### 3.9 宽温配置
 
-​	宽温通常指环境温度为-40~85℃。
+宽温通常指环境温度为-40~85℃。
 
-​	背景：实测发现某些平台在低温环境下，运行不稳定，对某些频点抬压后可以稳定运行，这种情况需要根据
+背景：实测发现某些平台在低温环境下，运行不稳定，对某些频点抬压后可以稳定运行，这种情况需要根据温度调整电压表。实测也发现高温高压下芯片的寿命会缩短，也需要根据温度限制频率和电压。
 
-温度调整电压表。实测也发现高温高压下芯片的寿命会缩短，也需要根据温度限制频率和电压。
+功能说明：当系统检测到温度低于一定程度后，对各个频点进行抬压，如果某些频点的电压超过了系统允许设置的最高电压，这些频点将被限制，即运行过程中不会跑到这些频点。当温度恢复常温，电压表恢复成默认的状态。当系统检测到温度大于一定程度后，电压超过一定值的频点，将被限制。当温度恢复常温，解除频率限制。
 
-​	功能说明：当系统检测到温度低于一定程度后，对各个频点进行抬压，如果某些频点的电压超过了系统允许
-
-设置的最高电压，这些频点将被限制，即运行过程中不会跑到这些频点。当温度恢复常温，电压表恢复成默认的状
-
-态。当系统检测到温度大于一定程度后，电压超过一定值的频点，将被限制。当温度恢复常温，解除频率限制。
-
-​	配置方法：低温情况在 OPP Table 节点增加“rockchip,temp-hysteresis”、“rockchip,low-temp“、
-
-”rockchip,low-temp-min-volt“、“rockchip,low-temp-adjust-volt”、“rockchip,max-volt”属性。高温情况在 OPP
-
-Table 节点增加“rockchip,temp-hysteresis”、“rockchip,high-temp”和“rockchip,high-temp-max-volt”属性。这些
-
-配置一般都在 DTSI 文件中。
+配置方法：低温情况在 OPP Table 节点增加“rockchip,temp-hysteresis”、“rockchip,low-temp“、”rockchip,low-temp-min-volt“、“rockchip,low-temp-adjust-volt”、“rockchip,max-volt”属性。高温情况在 OPPTable 节点增加“rockchip,temp-hysteresis”、“rockchip,high-temp”和“rockchip,high-temp-max-volt”属性。这些配置一般都在 DTSI 文件中。
 
 ```c
 cpu0_opp_table: opp_table0 {
@@ -871,17 +765,11 @@ cpu0_opp_table: opp_table0 {
 
 ## 4 用户态接口介绍
 
-​	非大小核的平台，如 RK3288、RK3326、RK3328 等，所有 CPU 共用一个 clock，用户态接口也是相同的，
+非大小核的平台，如 RK3288、RK3326、RK3328 等，所有 CPU 共用一个 clock，用户态接口也是相同的，在/sys/devices/system/cpu/cpufreq/policy0/目录下。
 
-在/sys/devices/system/cpu/cpufreq/policy0/目录下。
+大小核的平台，如 RK3368、RK3399 等，包含两个 cluster，每个 cluster 都有独立的 clock 和用户态接口，比如cluster0 是小核，对应接口在/sys/devices/system/cpu/cpufreq/policy0/目录下，cluster1 是大核，对应的接口在/sys/devices/system/cpu/cpufreq/policy4/目录下。
 
-​	大小核的平台，如 RK3368、RK3399 等，包含两个 cluster，每个 cluster 都有独立的 clock 和用户态接口，比如
-
-cluster0 是小核，对应接口在/sys/devices/system/cpu/cpufreq/policy0/目录下，cluster1 是大核，对应的接口
-
-在/sys/devices/system/cpu/cpufreq/policy4/目录下。
-
-​	通过用户态接口可以切换 governor，查看当前频率，修改频率等，具体如下：
+通过用户态接口可以切换 governor，查看当前频率，修改频率等，具体如下：
 
 ```c
 related_cpus                  /* 同个cluster下的所有CPU */
@@ -919,13 +807,13 @@ stats/trans_table             /* 记录CPU在每个频率上的变频次数 */
 
 ### 5.2 如何查看频率电压表
 
-​	执行如下命令：
+执行如下命令：
 
 ```c
 cat /sys/kernel/debug/opp/opp_summary
 ```
 
-​	以 PX30 为例：
+以 PX30 为例：
 
 ```c
  device                rate(Hz)    target(uV)    min(uV)    max(uV)
@@ -944,9 +832,9 @@ cat /sys/kernel/debug/opp/opp_summary
 
 ### 5.3 如何修改电压
 
-​	方法一：直接修改 OPP 节点中每个档位的电压。以 CPU 816MHz 抬压 25000uV 为例：
+方法一：直接修改 OPP 节点中每个档位的电压。以 CPU 816MHz 抬压 25000uV 为例：
 
-​	假设默认值如下：
+假设默认值如下：
 
 ```c
 opp-816000000 {
@@ -961,7 +849,7 @@ opp-816000000 {
 };
 ```
 
-​	修改后如下：
+修改后如下：
 
 ```c
 opp-816000000 {
@@ -977,11 +865,9 @@ opp-816000000 {
 };
 ```
 
-​	方法二：通过修改 IR-Drop 的配置调整电压，具体参考 3.7 章节的介绍。以 CPU 408MHz 以下的频率全部抬压
+方法二：通过修改 IR-Drop 的配置调整电压，具体参考 3.7 章节的介绍。以 CPU 408MHz 以下的频率全部抬压25000uV 为例。
 
-25000uV 为例。
-
-​	假设 IR-Drop 默认配置如下：
+假设 IR-Drop 默认配置如下
 
 ```c
 &cpu0_opp_table {
@@ -1003,7 +889,7 @@ opp-816000000 {
 };
 ```
 
-​	修改后如下：
+修改后如下：
 
 ```c
 &cpu0_opp_table {
@@ -1029,11 +915,9 @@ opp-816000000 {
 
 ### 5.4 如何定频
 
-​	方法一：在 menuconfig 中将 governor 设置为 userspace。开机后 CPU 频率为 CRU 节点中设置频率。
+方法一：在 menuconfig 中将 governor 设置为 userspace。开机后 CPU 频率为 CRU 节点中设置频率。
 
-​	方法二：将 OPP Table 中不想要的频率全部 disable 掉，只留一个想要的频率。以 RK3308 为例，CPU 定频
-
-1008MHz 的配置如下：
+方法二：将 OPP Table 中不想要的频率全部 disable 掉，只留一个想要的频率。以 RK3308 为例，CPU 定频1008MHz 的配置如下：
 
 ```c
 cpu0_opp_table: cpu0-opp-table {
@@ -1079,9 +963,9 @@ cpu0_opp_table: cpu0-opp-table {
 	};
 ```
 
-​	方法三：开机后通过命令定频。
+方法三：开机后通过命令定频。
 
-​	非大小核平台，比如 RK3288，执行如下命令：
+非大小核平台，比如 RK3288，执行如下命令：
 
 ```c
 /* 切换governor到userspace */
@@ -1090,7 +974,7 @@ echo userspace > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
 echo 216000 > /sys/devices/system/cpu/cpufreq/policy0/scaling_setspeed
 ```
 
-​	大小核平台，比如 RK3399，执行如下命令：
+大小核平台，比如 RK3399，执行如下命令：
 
 ```c
 /* 切换小核governor到userspace */
@@ -1104,13 +988,13 @@ echo userspace > /sys/devices/system/cpu/cpufreq/policy4/scaling_governor
 echo 408000 > /sys/devices/system/cpu/cpufreq/policy4/scaling_setspeed
 ```
 
-​	注意：通过 cpufreq 节点设置 CPU 频率时，通常电压也会被改变，除非两个频点的电压相同。
+注意：通过 cpufreq 节点设置 CPU 频率时，通常电压也会被改变，除非两个频点的电压相同。
 
 ### 5.5 如何查看当前频率
 
-​	可以通过 cpufreq 的用户接口和 clock 的 debug 接口两种方法查看频率。
+可以通过 cpufreq 的用户接口和 clock 的 debug 接口两种方法查看频率。
 
-​	非大小核平台，执行如下命令：
+非大小核平台，执行如下命令：
 
 ```c
 /* 方法一：cpufreq的用户态接口 */
@@ -1120,7 +1004,7 @@ cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq
 cat /sys/kernel/debug/clk/armclk/clk_rate
 ```
 
-​	大小核平台，执行如下命令：
+大小核平台，执行如下命令：
 
 ```c
 /* 方法一：cpufreq的用户态接口 */
@@ -1134,14 +1018,14 @@ cat /sys/kernel/debug/clk/armclkb/clk_rate /* 大核频率 */
 
 ### 5.6 如何查看当前电压
 
-​	非大小核平台，执行如下命令：
+非大小核平台，执行如下命令：
 
 ```c
 /* 不一定是vdd_core，根据实际的regulator配置修改 */
 cat /sys/kernel/debug/regulator/vdd_core/voltage
 ```
 
-​	大小核平台，执行如下命令：
+大小核平台，执行如下命令：
 
 ```c
 /* 不一定是vdd_core_l和vdd_core_b，根据实际的regulator配置修改 */
@@ -1151,9 +1035,9 @@ cat /sys/kernel/debug/regulator/vdd_core_b/voltage /* 小核电压 */
 
 ### 5.7 如何单独调频调压
 
-​	关闭 CPU 自动变频，参考 5.3 中的方法三。
+关闭 CPU 自动变频，参考 5.3 中的方法三。
 
-​	调频，通过 clock 的 debug 接口设置频率，举例如下：
+调频，通过 clock 的 debug 接口设置频率，举例如下：
 
 ```c
 /* 非大小核平台，比如RK3288，设置216MHz */：
@@ -1167,7 +1051,7 @@ echo 408000000 > /sys/kernel/debug/clk/armclkb/clk_rate /* 设置大核频率 */
 cat /sys/kernel/debug/clk/armclkb/clk_rate              /* 查看大核频率 */
 ```
 
-​	调压，通过 regulator 的 debug 接口设置电压，举例如下：
+调压，通过 regulator 的 debug 接口设置电压，举例如下：
 
 ```c
 /*
@@ -1187,17 +1071,17 @@ echo 950000 > /sys/kernel/debug/regulator/vdd_core_b/voltage  /* 设置大核电
 cat /sys/kernel/debug/regulator/vdd_core_b/voltage            /* 查看小核电压 */
 ```
 
-​	注意：升频时，先升压再升频，降频时，先降频再降压。
+注意：升频时，先升压再升频，降频时，先降频再降压。
 
 ### 5.8 如何查看当前电压的档位
 
-​	如果是通过 PVTM 调压，执行如下命令
+如果是通过 PVTM 调压，执行如下命令
 
 ```c
 dmesg | grep pvtm
 ```
 
-​	以 RK3399 CPU 为例，会打印出如下信息：
+以 RK3399 CPU 为例，会打印出如下信息：
 
 ```c
 [    0.669456] cpu cpu0: temp=22222, pvtm=138792 (140977 + -2185)
@@ -1211,7 +1095,7 @@ dmesg | grep pvtm
 [    3.366915] mali ff9a0000.gpu: pvtm-volt-sel=0
 ```
 
-​	同理如果是通过 leakage 调压，则执行如下命令，也有类似打印输出。
+同理如果是通过 leakage 调压，则执行如下命令，也有类似打印输出。
 
 ```c
 dmesg | grep leakage
@@ -1219,13 +1103,13 @@ dmesg | grep leakage
 
 ### 5.9 如何查看 leakage
 
-​	执行如下命令
+执行如下命令
 
 ```c
 dmesg | grep leakage
 ```
 
-​	以 RK3399 CPU 为例，会有如下打印：
+以 RK3399 CPU 为例，会有如下打印：
 
 ```c
 [    0.656175] cpu cpu0: leakage=10 /* leakage=10，说明当前芯片小核的leakage是10mA */
