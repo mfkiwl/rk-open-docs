@@ -18,9 +18,9 @@
 
 **产品版本**
 
-| 芯片名称 | 内核版本     |
-| ---- | -------- |
-| 所有芯片 | Linux4.4 |
+| 芯片名称 | 内核版本            |
+| -------- | ------------------- |
+| 所有芯片 | Linux4.4、Linux4.19 |
 
 **读者对象**
 
@@ -28,9 +28,10 @@
 
 **修订记录**
 
-| 日期       | 版本 | 作者 | 修订说明 |
-| ---------- | ---- | ---- | -------- |
-| 2018-12-04 | V1.0 | 肖锋 | 初始版本 |
+| 日期       | 版本 | 作者 | 修订说明      |
+| ---------- | ---- | ---- | ------------- |
+| 2018-12-04 | V1.0 | 肖锋 | 初始版本      |
+| 2019-11-14 | V1.1 | 肖锋 | 支持Linux4.19 |
 
 -----
 
@@ -42,7 +43,7 @@
 
 CPUFreq 是内核开发者定义的一套支持根据指定的 governor 动态调整 CPU 频率和电压的框架模型，它能有效地降低 CPU 的功耗，同时兼顾 CPU 的性能。CPUFreq framework 由 governor、core、driver、stats 组成，软件架构如下：
 
-![](./Rockchip_Developer_Guide_Linux4.4_CPUFreq/cpufreq-framework.png)
+![](./Rockchip_Developer_Guide_CPUFreq/cpufreq-framework.png)
 
 CPUFreq governor：用于 CPU 升降频检测，根据系统负载，决定 CPU 频率。目前 Linux4.4 内核中包含了如下几种 governor：
 

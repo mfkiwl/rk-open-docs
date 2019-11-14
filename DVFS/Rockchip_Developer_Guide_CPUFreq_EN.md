@@ -42,7 +42,7 @@ Software development engineers
 
 CPUFreq is a framework model defined by the kernel developer to dynamically change the CPU frequency and voltage according to the specified governor. It can be effective to lower power consumption of the CPU with taking into account the performance of the CPU. CPUFreq framework consists of governor, core, driver, stats. The software architecture is as below:
 
-![](./Rockchip_Developer_Guide_Linux4.4_CPUFreq/cpufreq-framework.png)
+![](./Rockchip_Developer_Guide_CPUFreq/cpufreq-framework.png)
 
 CPUFreq governor：It is used to determine when to chang the CPU frequency and which frequency will be chang to. The kernel includes the following governor:
 
