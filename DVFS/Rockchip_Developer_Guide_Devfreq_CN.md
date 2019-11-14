@@ -1,10 +1,10 @@
 # **Devfreq 开发指南**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：finley.xiao@rock-chips.com
 
-日期：2018.09.14
+日期：2019.11
 
 文档密级：公开资料
 
@@ -18,9 +18,9 @@
 
 **产品版本**
 
-| 芯片名称 | 内核版本     |
-| ---- | -------- |
-| 所有芯片 | Linux4.4 |
+| 芯片名称 | 内核版本            |
+| -------- | ------------------- |
+| 所有芯片 | Linux4.4、Linux4.19 |
 
 **读者对象**
 
@@ -30,9 +30,10 @@
 
 **修订记录**
 
-| 日期       | 版本 | 作者 | 修订说明 |
-| ---------- | ---- | ---- | -------- |
-| 2018-09-14 | V1.0 | 肖锋 | 初始版本 |
+| 日期       | 版本 | 作者 | 修订说明      |
+| ---------- | ---- | ---- | ------------- |
+| 2018-09-14 | V1.0 | 肖锋 | 初始版本      |
+| 2019-11-14 | V1.1 | 肖锋 | 支持Linux4.19 |
 
 ---
 
@@ -44,7 +45,7 @@
 
 Devfreq 是内核开发者定义的一套支持根据指定的 governor 动态调整频率和电压的框架模型，它能有效地降低的功耗，同时兼顾性能。Devfreq 类似 CPUFreq，不过 CPUFreq 只适用于 CPU，devfreq 用于除了 CPU 外，也需要动态调频调压的模块。Devfreq framework 由 governor、core、driver、event 组成，软件框架如下：
 
-![](./Rockchip_Developer_Guide_Linux4.4_Devfreq/devfreq-framwork.png)
+![](./Rockchip_Developer_Guide_Devfreq/devfreq-framwork.png)
 
 Devfreq governor：用于升降频检测，决定频率。目前 Linux4.4 内核中包含了如下几种 governor：
 
