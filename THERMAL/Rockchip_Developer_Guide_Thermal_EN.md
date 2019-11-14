@@ -1,10 +1,10 @@
 # **Thermal developer guide**
 
-Release version: 1.0
+Release version: 1.1
 
 Author email: finley.xiao@rock-chips.com
 
-Date: 2019.01.22
+Date: 2019.11
 
 Security Classification: Public
 
@@ -18,9 +18,9 @@ This document mainly describes the related concept, configuration method and use
 
 **Product version**
 
-| Chipset name | Kernel version |
-| ------------ | -------------- |
-| All chipsets | Linux4.4       |
+| Chipset name | Kernel version     |
+| ------------ | ------------------ |
+| All chipsets | Linux4.4,Linux4.19 |
 
 **Application object**
 
@@ -30,9 +30,10 @@ Field application engineers
 
 **Revision history**
 
-| Date       | Version | Author      | Revision description |
-| ---------- | ------- | ----------- | -------------------- |
-| 2019-01-22 | V1.0    | Finley Xiao | The initial version  |
+| Date       | Version | Author      | Revision description      |
+| ---------- | ------- | ----------- | ------------------------- |
+| 2019-01-22 | V1.0    | Finley Xiao | The initial version       |
+| 2019-11-14 | V1.1    | Finley Xiao | Add support for Linux4.19 |
 
 -----
 
@@ -44,7 +45,7 @@ Field application engineers
 
 Thermal is a framework model defined by kernel developers supporting to control the system temperature according to the specific governor in order to prevent the chipset from overheating. Thermal framework consists of governor, core, cooling device and sensor driver. The software architecture is as below:
 
-![](./Rockchip_Developer_Guide_Linux4.4_Thermal/thermal framework.png)
+![](./Rockchip_Developer_Guide_Thermal/thermal framework.png)
 
 Thermal governor: used to decide whether the cooling device needs to decrease frequency, and decrease to what extent. Currently Linux4.4 kernel includes several kinds of governor as below:
 

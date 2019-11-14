@@ -1,10 +1,10 @@
 # **Thermal 开发指南**
 
-发布版本：1.0
+发布版本：1.1
 
 作者邮箱：finley.xiao@rock-chips.com
 
-日期：2019.01.22
+日期：2019.11
 
 文档密级：公开资料
 
@@ -18,9 +18,9 @@
 
 **产品版本**
 
-| 芯片名称 | 内核版本     |
-| ---- | -------- |
-| 所有芯片 | Linux4.4 |
+| 芯片名称 | 内核版本            |
+| -------- | ------------------- |
+| 所有芯片 | Linux4.4、Linux4.19 |
 
 **读者对象**
 
@@ -30,9 +30,10 @@
 
 **修订记录**
 
-| 日期       | 版本 | 作者 | 修订说明 |
-| ---------- | ---- | ---- | -------- |
-| 2019-01-22 | V1.0 | 肖锋 | 初始版本 |
+| 日期       | 版本 | 作者 | 修订说明      |
+| ---------- | ---- | ---- | ------------- |
+| 2019-01-22 | V1.0 | 肖锋 | 初始版本      |
+| 2019-11-14 | V1.1 | 肖锋 | 支持Linux4.19 |
 
 -----
 
@@ -44,7 +45,7 @@
 
 Thermal 是内核开发者定义的一套支持根据指定 governor 控制系统温度，以防止芯片过热的框架模型。Thermal framework 由 governor、core、cooling device、sensor driver 组成，软件架构如下：
 
-![](./Rockchip_Developer_Guide_Linux4.4_Thermal/thermal framework.png)
+![](./Rockchip_Developer_Guide_Thermal/thermal framework.png)
 
 Thermal governor：用于决定 cooling device 是否需要降频，降到什么程度。目前 Linux4.4 内核中包含了如下几种 governor：
 
