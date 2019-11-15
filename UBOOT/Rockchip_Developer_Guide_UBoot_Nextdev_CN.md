@@ -1,6 +1,6 @@
 # U-Boot next-dev(v2017)开发指南
 
-发布版本：1.44
+发布版本：1.45
 
 作者邮箱：
 ​	Joseph Chen <chenjh@rock-chips.com>
@@ -9,7 +9,7 @@
 ​	Chen Liang cl@rock-chips.com
 ​	Ping Lin <hisping.lin@rock-chips.com>
 
-日期：2019.10
+日期：2019.11
 
 文件密级：公开资料
 
@@ -67,7 +67,8 @@
 | 2019-08-21 | V1.41    | 朱志展        | 增加 secure otp 说明 |
 | 2019-08-27 | V1.42    | 朱志展        | 增加存储设备/MTD 设备说明 |
 | 2019-10-08 | V1.43   | 朱志展        | 增加 BCB 说明 |
-| 2019-10-015 | V1.44  | 朱志展        | 增加 SPL 驱动与功能支持说明 |
+| 2019-10-15 | V1.44  | 朱志展        | 增加 SPL 驱动与功能支持说明 |
+| 2019-11-15 | V1.45  | 朱志展        | 增加 spl pinctrl 使用说明 |
 ---
 [TOC]
 ---
@@ -5705,7 +5706,66 @@ python mkbootimg.py --kernel Image --dtb rk1808-evb-v10.dtb --header_version 2 -
 maskrom -> ddr -> SPL -> trust(bl31 [-> bl32]) -> kernel
 ```
 
-#### 8.5.7 secure boot 支持
+#### 8.5.7 pinctrl支持
+
+配置：
+
+```
+CONFIG_SPL_PINCTRL_GENERIC=y
+CONFIG_SPL_PINCTRL=y
+```
+
+源码：
+
+```
+./drivers/pinctrl/pinctrl-uclass.c
+./drivers/pinctrl/pinctrl-generic.c
+./drivers/pinctrl/pinctrl-rockchip.c
+```
+
+dts 配置，以 sdmmc 为例：
+
+```
+&pinctrl {
+	u-boot,dm-pre-reloc;
+};
+
+&pcfg_pull_none_4ma {
+	u-boot,dm-spl;
+};
+
+&pcfg_pull_up_4ma {
+	u-boot,dm-spl;
+};
+
+&sdmmc {
+	u-boot,dm-pre-reloc;
+};
+
+&sdmmc_pin {
+	u-boot,dm-spl;
+};
+
+&sdmmc_clk {
+	u-boot,dm-spl;
+};
+
+&sdmmc_cmd {
+	u-boot,dm-spl;
+};
+
+&sdmmc_bus4 {
+	u-boot,dm-spl;
+};
+
+&sdmmc_pwren {
+	u-boot,dm-spl;
+};
+```
+
+**注意**：spl 下开启 pinctrl，需要在各个 defconfig 下的 CONFIG_OF_SPL_REMOVE_PROPS 删除“pinctrl-0 pinctrl-names”才能真正使能 pinctrl。
+
+#### 8.5.8 secure boot 支持
 
 to-do
 
