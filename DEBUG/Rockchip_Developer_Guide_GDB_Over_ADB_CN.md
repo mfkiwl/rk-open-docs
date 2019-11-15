@@ -42,19 +42,19 @@ GDB Over ADB 使用指南。
 
 配置使能 gdb 主机程序
 
-![menuconfig-1](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-1.png)
+![menuconfig-1](Rockchip_Developer_Guide_GDB_Over_ADB/menuconfig-1.png)
 
 配置 gdbserver 程序
 
-![menuconfig-2](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-2.png)
+![menuconfig-2](Rockchip_Developer_Guide_GDB_Over_ADB/menuconfig-2.png)
 
 这里选择 gdbserver 够用即可
 
-![menuconfig-3](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-3.png)
+![menuconfig-3](Rockchip_Developer_Guide_GDB_Over_ADB/menuconfig-3.png)
 
 配置编译 buildroot 包带调试信息，如果 buildroot 有配置"strip target binaries"，那么不影响最终打包到 target 的包，仅影响 staging 目录，相当于 android 的 symbol 目录和最终目录。
 
-![menuconfig-4](Rockchip-Developer-Guide-GDB-Over-ADB-CN/menuconfig-4.png)
+![menuconfig-4](Rockchip_Developer_Guide_GDB_Over_ADB/menuconfig-4.png)
 
 ## 启动 GDB over ADB
 
