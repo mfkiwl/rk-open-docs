@@ -30,6 +30,7 @@
 | ---------- | -------- | -------- | ------------------------------- |
 | 2019-07-15 | V1.0     | 黄家钗   | 初始发布                        |
 | 2019-08-15 | V1.1     | 黄家钗   | 调整格式、加入Color Key使用说明 |
+| 2019-11-18 | V1.2     | 黄家钗   | 加入更新lut的方法及AOD模式说明  |
 |            |          |          |                                 |
 
 ---
@@ -266,30 +267,32 @@ cd bsp/rockchip-pisces
 
 ### 6.4 屏配置参数说明
 
-| **Parameters**                | **Description**                              |
-| ----------------------------- | -------------------------------------------- |
-| RT_HW_LCD_XRES                | 屏水平方向分辨率，对应 6.3 图中的 hactive    |
-| RT_HW_LCD_YRES                | 屏垂直方向分辨率，对应 6.3 图中的 vactive    |
-| RT_HW_LCD_PIXEL_CLOCK         | 像素时钟，单位 khz                           |
-| RT_HW_LCD_LANE_MBPS           | MIPI DPHY CLK Lane 时钟，单位 Mbps           |
-| RT_HW_LCD_LEFT_MARGIN         | 屏左消隐，对应 6.3 图中的 hback-porch        |
-| RT_HW_LCD_RIGHT_MARGIN        | 屏右消隐，对应 6.3 图中的 hfront-porch       |
-| RT_HW_LCD_UPPER_MARGIN        | 屏上消隐，对应 6.3 图中的 vback-porch        |
-| RT_HW_LCD_LOWER_MARGIN        | 屏下消隐，对应 6.3 图中的 vfront-porch       |
-| RT_HW_LCD_HSYNC_LEN           | 屏水平同步时间，对应 6.3 图中的 hsync-porch  |
-| RT_HW_LCD_VSYNC_LEN           | 屏垂直同步时间，对应 6.3 图中的 vsync-porch  |
-| RT_HW_LCD_CONN_TYPE           | 屏的类型，如： RK_DISPLAY_CONNECTOR_DSI      |
-| RT_HW_LCD_BUS_FORMAT          | 屏的接口类型，如： MEDIA_BUS_FMT_RGB888_1X24 |
-| RT_HW_LCD_VMODE_FLAG          | 屏的极性、是否支持 DSC 配置等                |
-| RT_HW_LCD_INIT_CMD_TYPE       | CMD 类型， CMD_TYPE_DEFAULT 默认为 mipi CMD  |
-| RT_HW_LCD_DISPLAY_MODE        | CMD 模式和 video 模式选择                    |
-| RT_HW_LCD_AREA_DISPLAY        | 是否支持区域刷新                             |
-| RT_HW_LCD_XACT_ALIGN          | 屏显示区域宽对齐要求，单位为像素             |
-| RT_HW_LCD_YACT_ALIGN          | 屏显示区域高对齐要求，单位为像素             |
-| RT_HW_LCD_XPOS_ALIGN          | 屏显示区域X坐标对齐要求，单位为像素          |
-| RT_HW_LCD_YPOS_ALIGN          | 屏显示区域Y坐标对齐要求，单位为像素          |
-| struct rockchip_cmd cmd_on[]  | 屏初始化命令                                 |
-| struct rockchip_cmd cmd_off[] | 屏反初始化命令                               |
+| **Parameters**                    | **Description**                              |
+| --------------------------------- | -------------------------------------------- |
+| RT_HW_LCD_XRES                    | 屏水平方向分辨率，对应 6.3 图中的 hactive    |
+| RT_HW_LCD_YRES                    | 屏垂直方向分辨率，对应 6.3 图中的 vactive    |
+| RT_HW_LCD_PIXEL_CLOCK             | 像素时钟，单位 khz                           |
+| RT_HW_LCD_LANE_MBPS               | MIPI DPHY CLK Lane 时钟，单位 Mbps           |
+| RT_HW_LCD_LEFT_MARGIN             | 屏左消隐，对应 6.3 图中的 hback-porch        |
+| RT_HW_LCD_RIGHT_MARGIN            | 屏右消隐，对应 6.3 图中的 hfront-porch       |
+| RT_HW_LCD_UPPER_MARGIN            | 屏上消隐，对应 6.3 图中的 vback-porch        |
+| RT_HW_LCD_LOWER_MARGIN            | 屏下消隐，对应 6.3 图中的 vfront-porch       |
+| RT_HW_LCD_HSYNC_LEN               | 屏水平同步时间，对应 6.3 图中的 hsync-porch  |
+| RT_HW_LCD_VSYNC_LEN               | 屏垂直同步时间，对应 6.3 图中的 vsync-porch  |
+| RT_HW_LCD_CONN_TYPE               | 屏的类型，如： RK_DISPLAY_CONNECTOR_DSI      |
+| RT_HW_LCD_BUS_FORMAT              | 屏的接口类型，如： MEDIA_BUS_FMT_RGB888_1X24 |
+| RT_HW_LCD_VMODE_FLAG              | 屏的极性、是否支持 DSC 配置等                |
+| RT_HW_LCD_INIT_CMD_TYPE           | CMD 类型， CMD_TYPE_DEFAULT 默认为 mipi CMD  |
+| RT_HW_LCD_DISPLAY_MODE            | CMD 模式和 video 模式选择                    |
+| RT_HW_LCD_AREA_DISPLAY            | 是否支持区域刷新                             |
+| RT_HW_LCD_XACT_ALIGN              | 屏显示区域宽对齐要求，单位为像素             |
+| RT_HW_LCD_YACT_ALIGN              | 屏显示区域高对齐要求，单位为像素             |
+| RT_HW_LCD_XPOS_ALIGN              | 屏显示区域X坐标对齐要求，单位为像素          |
+| RT_HW_LCD_YPOS_ALIGN              | 屏显示区域Y坐标对齐要求，单位为像素          |
+| struct rockchip_cmd cmd_on[]      | 屏初始化命令                                 |
+| struct rockchip_cmd cmd_off[]     | 屏反初始化命令                               |
+| struct rockchip_cmd cmd_aod_on[]  | 屏进入aod模式初始化命令                      |
+| struct rockchip_cmd cmd_aod_off[] | 屏退出aod模式初始化命令                      |
 
 ### 6.5 屏初始化命令说明
 
@@ -652,7 +655,7 @@ win_config->colorKey = 0x00FF00 | COLOR_KEY_EN;
 3. 实现蓝色全透，配置:
 
 ```c
-win_config->colorKey = 0xf0000FF | COLOR_KEY_EN;
+win_config->colorKey = 0x0000FF | COLOR_KEY_EN;
 ```
 
 即:
@@ -699,7 +702,33 @@ win_config->colorKey = (R_VAL_CONFIG  << 16) | (G_VAL_CONFIG << 8) | B_VAL_CONFI
 win_config->colorKey = 0;
 ```
 
-## 9 参考文档
+## 9 更新lut的方法
+
+图层的lut在使用时需要打开lut_en，打开lut_en后lut会被保护起来，即此时无法读写lut的寄存器，如果在不同的场景切换需要更新lut的配置，而lut_en的开关需要帧生效，所以更新lut需要按如下步骤操作:
+
+1. 关闭lut
+
+   (1) 设置图层的格式为非bpp格式，即不能是以下几种格式
+
+   ```c
+   RTGRAPHIC_PIXEL_FORMAT_GRAY1
+   RTGRAPHIC_PIXEL_FORMAT_GRAY4,
+   RTGRAPHIC_PIXEL_FORMAT_GRAY16,
+   RTGRAPHIC_PIXEL_FORMAT_GRAY256,
+   RTGRAPHIC_PIXEL_FORMAT_RGB332,
+   ```
+
+   (2) 关闭所有图层，在屏幕无显示内容的位置刷新一阵32x32大小的图片，32x32不是固定大小，目的就是刷新一帧无效的显示让关闭lut_en生效，同时不影响当前屏幕上的显示。
+
+2. 更新lut
+
+   更新lut数组，调用RK_DISPLAY_CTRL_LOAD_LUT更新lut
+
+3. 配置新的一帧
+
+   将win中的格式设置为对应的bpp格式刷一帧，此时新的lut生效。
+
+## 10 参考文档
 
 (1) Rockchip DRM Display Driver Development Guide
 (2) Rockchip_DRM_Panel_Porting_Guide.pdf
