@@ -254,6 +254,27 @@ USE_TZ = False
 sudo service lava-server-gunicorn restart
 ```
 
+#### 修改job-output默认路径
+
+LAVA server执行的每一个任务都会生成一些数据文件，在时间比较长以后，会占用较大的空间，这个路径默认是'/var/lib/lava-server/default/media'，由于根文件系统一般空间不大，所以需要把这个路径改到其他空间较大的分区(比如/home)，可能的方法有：
+
+- 修改MEDIA_ROOT
+
+  在/etc/lava-server/settings.conf中添加如下内容，然后重启服务：
+
+  `"MEDIA_ROOT": "/home/lava/workspace/lava-server/media",`
+
+- 上述路径使用链接
+
+  这个方法测试成功，需要修改目录的user/group，否则会报"Permission denied"无法使用。
+
+```shell
+mkdir -p /home/lava/workspace/lava-server/media/
+sudo chown lavaserver:lavaserver /home/lava/workspace/lava-server/media/
+cd /var/lib/lava-server/default/
+sudo ln -s /home/lava/workspace/lava-server/media/ .
+```
+
 ### 2.2.4 检查部署
 
 要检查前面的安装部署是否成功，可以运行如下命令：
