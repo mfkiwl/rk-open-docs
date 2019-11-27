@@ -378,7 +378,7 @@ FIXME: 以上修改可以实现静态IP，但是无法产生正确的DNS server(
 安装各种需要用到的基础包
 
 ```shell
-sudo apt-get install vim apt-transport-https samba　git python-serial
+sudo apt-get install vim apt-transport-https samba git python-serial lavacli libusb-1.0-0-dev
 sudo apt-get install simg2img img2simg #android sparse 解包打包
 ```
 
