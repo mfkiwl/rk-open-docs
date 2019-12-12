@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-052
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2019-12-03
+日期：2019-12-12
 
 文件密级：公开资料
 
@@ -68,6 +68,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0    | 林鼎强 | 2019-12-03 | 初始版本     |
+| V1.0.1 | 林鼎强 | 2019-12-12 | 添加 SPI Flash 框架章节 |
 
 **目录**
 
@@ -79,7 +80,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ### 1 简介
 
-#### 1.1 SPI Nor
+#### 1.1 支持器件
 
 RK MCU 产品使用的 SPI flash 仅为 SPI Nor，不支持 SPI Nand。
 
@@ -87,11 +88,16 @@ SPI Nor 具有封装小、读速率相较其他小容量非易失存储更快、
 
 RK RTOS SPI flash 框架提供通用的 SPI Nor 接口和自动化的 XIP 方案。
 
-#### 1.2 FSPI 和 SPI 控制器
+#### 1.2 主控控制器
 
 RK 平台 SPI Flash 可选用的控制器包括 FSPI 和 SPI 两种方案。
 
-FSPI   (Flexible Serial Peripheral Interface)  是一个灵活的串行传输控制器，主要支持 SPI Nor、SPI Nand、SPI 协议的 Psram 和 SRAM，支持 SPI Nor 1线、2线和4线传输和 XIP 实现。RK RTOS 平台目前仅实现 SPI Nor 和 Psram 的实现。
+FSPI   (Flexible Serial Peripheral Interface)  是一个灵活的串行传输控制器，有以下主要特性：
+
+- 支持 SPI Nor、SPI Nand、SPI 协议的 Psram 和 SRAM
+- 支持 SPI Nor 1线、2线和4线传输
+- XIP 技术
+- DMA 传输
 
 SPI （ Serial Peripheral Interface ）为通用的 串行传输控制器，可以支持外挂 SPI Nor、SPI Nand，RK RTOS 平台目前仅支持 SPI Nor 的实现。
 
@@ -101,18 +107,45 @@ XIP（eXecute In Place），即芯片内执行，指 CPU 直接通过映射地�
 
 FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相近方式获取 flash 数据，如同访问一片“只读的 sram”空间，详细 FSPI 信息参考 TRM 中 FSPI 章节。
 
+#### 1.4 驱动框架
+
+考虑到要适配 FSPI 和 SPI 两种控制器，所以抽象出控制器层，从而将整个驱动框架分为三个层次 ：
+
+- RTOS Driver 层，完成以下逻辑:
+  - RTOS 设备框架注册
+  - 注册控制器及操作接口到 HAL_SNOR 协议层
+  - 封装读写擦除接口给用户
+- 基于 SPI Nor 传输协议的 HAL_SNOR 协议层
+- 控制器层
+
+![SPIMemory_Layer](Rockchip_Developer_Guide_FreeRTOS_SPIFLASH_CN/SPIFLASH_Layer.png)
+
+**基于 FSPI 控制器的 FreeRTOS 实现**：
+
+- OS 驱动层：SpiFlashDev.c 实现:
+  - 基于 FSPI HAL层读写接口封装 SPI_Xfer，并注册 FSPI host 及 SPI_Xfer 至 HAL_SNOR 协议层
+  - 封装 HAL_SNOR 协议层提供的读写擦除接口
+  - 注册 OS 设备驱动
+- 协议层：HAL 开发包中的 hal_snor.c 实现 SPI Nor flash 的协议层
+- 控制器层：HAL 开发包中的 hal_fspi.c 实现 FSPI 控制器驱动代码
+
+**基于 SPI 控制器的 FreeRTOS 实现**：
+
+- OS 驱动层：SpiFlashDev.c 实现:
+  - 基于 SPI OS driver 读写接口封装 SPI_Xfer，并注册 SPI host 和 SPI_Xfer 至 HAL_SNOR 协议层；
+  - 封装 HAL_SNOR 协议层提供的读写擦除接口
+  - 注册 OS 设备驱动
+- 协议层：HAL 开发包中的 hal_snor.c 实现 SPI Nor flash 的协议层
+- 控制器层：HAL 开发包中的 hal_spi.c 实现 SPI 控制器 low layer 驱动代码，SpiDevice.c 代码实现 RTOS SPI DRIVER 的设备注册和接口封装
+
+注意：
+
+1. 以上实现一一对应附图，可结合阅读
+2. 由于 RK SPI DMA 传输相关代码在 OS Driver 层，且 SPI 控制器除了应用在 SPI Nor 上，还支持较多其他器件，存在硬件资源边界保护，所以在 SPI Flash 框架中的 SPI 控制器不应直接套接 HAL 层 hal_spi.c 驱动，而应使用 OS Driver 中的 SPI 接口。
+
 ### 2 配置
 
-SPI flash 完整的驱动由以下三个抽象层构成：
-
-* RTOS Driver 驱动层，完成以下逻辑：
-  * RTOS 设备注册
-  * HAL_SNOR 协议层套接控制器 HAL 驱动 实现
-  * 提供 HAL_SNOR 读写擦除接口的封装的 RTOS 驱动接口
-* HAL_SNOR 协议层
-* 控制器 HAL 驱动
-
-![SPIFLASH_Layer](Rockchip_Developer_Guide_FreeRTOS_SPIFLASH_CN/SPIFLASH_Layer.png)
+SPI Flash 驱动框架所有配置都能通过 Kconfig 进行灵活调整，如 1.4 章节所讲，SPI flash 完整的驱动框架由三个抽象层构成，相应的配置也分为三个层次：
 
 **RTOS Driver 驱动层配置：**
 
@@ -122,7 +155,7 @@ SPI flash 完整的驱动由以下三个抽象层构成：
         (80000000) Reset the speed of SPI Nor flash in H
 ```
 
-**HAL_SNOR 协议层及控制器 HAL 驱动配置：**
+**HAL_SNOR 协议层套接控制器配置：**
 
 FSPI 控制器方案：
 
@@ -144,6 +177,19 @@ SPI 控制器方案：
         		(X) Attach SPI controller to SNOR
         		(0)     the id of the SPI device which is used as SPIFLASH adapter (NEW)
 ```
+
+**控制器驱动配置**
+
+FSPI 控制器配置：
+
+```c
+[*] Use HAL FSPI Module
+	[*]     Enable FSPI XIP
+```
+
+SPI 控制器配置：
+
+请参考《Rockchip_Developer_Guide_Linux_SPI_CN.md》文档。
 
 ### 3 代码和接口
 
@@ -188,8 +234,8 @@ rk_err_t SpiFlashDev_GetSize(HDC dev, uint32_t *Size);
 
 SPI  Nor 常用的文件系统需求两种数据读写接口。
 
-* 支持 block size 对齐的读写接口，例如 FAT fs；
-* 支持最小 byte 为单位的读写接口和 block size 的擦除接口，例如 spifs、littlefs。
+- 支持 block size 对齐的读写接口，例如 FAT fs；
+- 支持最小 byte 为单位的读写接口和 block size 的擦除接口，例如 spifs、littlefs。
 
 由于 SPI Nor flash 容量较小，128KB 的 block 擦除使用效率较差，所以对上 block size 设定为最小擦除单位 —— sector（4KB）。
 
@@ -212,21 +258,27 @@ rk_size_t SpiFlashDev_Read(HDC dev, rk_size_t off, uint8_t *data, rk_size_t len)
 rk_err_t SpiFlashDev_Erase(HDC dev, rk_size_t off, rk_size_t len);
 ```
 
-### 4 XIP 实现方案
+### 4 XIP 实现方案须知
 
-前面已经介绍 SPI Nor 支持 XIP 功能，而如果选用 FSPI 主控实现的 SPI Nor 方案，会自动开启 XIP 功能，以下介绍产品应用上涉及到 XIP 的一些要求。
+前面已经介绍 SPI Nor 支持 XIP 功能，如果选用 FSPI 主控实现的 SPI Nor 方案，会自动开启 XIP 功能，以下介绍产品应用中涉及到 XIP 的一些须知。
 
-**XIP 支持**
+#### 4.1 添加 XIP 支持
 
-当选用 FSPI 实现的 SPI Flash 方案，并按照 1.2 章节中关于 FSPI 配置方法去配置，SPI Flash 将默认开启 XIP 功能。
+当选用 FSPI 实现的 SPI Flash 方案，并按照 1.2 章节中关于 FSPI 配置方法去配置，SPI Flash 将默认配置使用 XIP 功能，如要关闭该功能，应则关闭配置 “Enable FSPI XIP”
 
-**XIP 开关**
+#### 4.2 XIP 使用过程的开关
 
-由于颗粒自身原因， SPI Nor 不支持 XIP 下的擦除/写的，所以当 SPI Nor flash 有擦除和写请求的时候，如文件系统写请求，则 SPI flash 需要切换到 normal mode，期间将无法使用 XIP 功能，完整的 suspend XIP 切换流程如下：
+RK SPI Flash 框架会在需求的场景自动开关 XIP 功能，客户无需调用开关接口，详细如下:
+
+**XIP 开**
+
+由于 SPI Nor 擦除/写耗时长的特点， SPI Nor 不支持 XIP 下的擦除/写，所以当 SPI Nor flash 有擦除和写请求的时候，如文件系统写请求， 软件会调用 XIP suspend 接口切换 SPI nor 主控 FSPI 到 normal mode，期间将无法使用 XIP 功能，完整的 suspend XIP 切换流程如下：
 
 1. 通知所有受 XIP disable 影响的 master 模块挂起 XIP 操作
 2. 关闭全局中断，避免产生中断导致 CPU 执行放在 SPI Nor 中的 XIP 的代码
 3. 关闭 XIP
+
+**XIP 关**
 
 当 SPI Nor flash 擦除/写完成且 FSPI idle 后 SPI Flash 驱动将重新恢复 XIP 功能，也就是在没有擦除写操作的情况下， FSPI 一直将使能 XIP 功能，完整的 XIP resume 流程如下：
 
@@ -240,6 +292,25 @@ rk_err_t SpiFlashDev_Erase(HDC dev, rk_size_t off, rk_size_t len);
 static void SpiFlashDev_xipSuspend(void)
 static void SpiFlashDev_xipResume(void)
 ```
+
+**总结**
+
+- 如果 SPI Nor 颗粒由 FSPI 主控驱动，默认使能 XIP 功能
+- SPI Nor 主控 FSPI 在 idle 状态默认开启 XIP 功能，此时支持 XIP 通路的设备都可访问 XIP memory 映射地址获取 SPI Nor 上的数据
+- SPI Nor 主控 FSPI 在进行擦除和写行为时关闭 XIP 功能
+- SPI Nor 主控 FSPI 开关 XIP 过程，需通知相应设备停止/恢复 XIP 访问，具体按照上文 “XIP 关” 所述操作
+- XIP 关，同时会关闭全局中断
+
+**常见问题**
+
+- Q1: 常开 XIP 功能是否有多余功耗？
+  - A1: FSPI 有 time out 机制，主控 idle 一定时长后，自动释放 cs，SPI Nor 将进入 idle 的低功耗状态，所以不会有较大功耗差异。
+- Q2: 如果多个 master 同时通过 XIP 访问 SPI Nor，是否会有冲突？
+  - A2: 多个 master 同时访问 XIP，总线会做仲裁，串行完成传输，请求会挂在总线上。
+- Q3: 对于频繁读写文件系统的产品，是否应该使用 XIP 功能？
+  - A3: 对于频繁写文件系统的产品，建议将代码段至于 sram 或 psram 中，然后关闭 FSPI XIP 功能，否则将影响 RTOS 系统实时性，同样，使用 XIP 运行 code 段的方案，应减少 SPI Nor 的擦除和写。
+- Q4: 使能 XIP 功能后，文件系统读，是否关 XIP ？
+  - 使能 XIP 功能后，文件系统读，驱动实现直接通过 XIP 访问，所以不关 XIP。
 
 ### 5 函数接口调用范例
 
