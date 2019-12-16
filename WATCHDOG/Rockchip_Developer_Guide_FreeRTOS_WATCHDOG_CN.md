@@ -1,6 +1,6 @@
 # Rockchip Developer Guide FreeRTOS WATCHDOG
 
-文件标识：RK-KF-YF-062
+文件标识：RK-KF-YF-061
 
 发布版本：V1.0.0
 
