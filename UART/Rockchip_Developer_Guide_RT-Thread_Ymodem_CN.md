@@ -127,7 +127,7 @@ RT-Thread Components --->
 
 发送文件的文件路径请使用绝对路径，暂不支持相对路径。接收端生成的新文件的名字会包含整个文件路径，用户可以通过修改ry_sy.c代码中的`_rym_send_begin`函数解析文件路径，从而实现接收端文件名不包含文件路径。
 
-## 3 优化方向
+## 3 存在的问题及优化方向
 
 目前Ymodem协议部分和应用示例部分代码已完成Upstream，成功Merge RT-Thread主分支，如图。进一步开发将对Ymodem进行以下几个方面的优化：
 
@@ -138,3 +138,11 @@ RT-Thread Components --->
 
 ![4_Merged](./Rockchip_Developer_Guide_RT-Thread_Ymodem_CN/4_Merged.jpg)
 
+## 4 Ymodem软件兼容情况
+
+| **操作系统** | **终端软件** | **接收功能** | **发送功能** |
+| ----------- | ------------| ----------- | ----------- |
+| Windows | SecureCRT | 支持 | 支持 |
+| MacOS | SecureCRT | 不支持 | 支持 |
+| MacOS | Minicom | 不支持 | 不支持 |
+| Linux | Minicom | 支持 | 不支持 |
