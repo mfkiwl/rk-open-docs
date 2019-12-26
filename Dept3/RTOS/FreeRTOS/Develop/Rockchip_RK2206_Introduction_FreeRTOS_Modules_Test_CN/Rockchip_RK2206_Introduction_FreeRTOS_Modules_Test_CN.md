@@ -2,7 +2,7 @@
 
 文件标识：RK-SM-CS-001
 
-发布版本：1.0.0
+发布版本：1.0.1
 
 日       期：2019.11
 
@@ -80,6 +80,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-10-26 | V0.0.12  | Conway   | 添加SD卡读写测试说明   |
 | 2019-10-26 | V0.0.13  | CWW      | 添加系统命令说明       |
 | 2019-11-27 | V1.0.0   | CWW      | 修改文档排版           |
+| 2019-12-26 | V1.0.1   | Jair Wu  | 更新播放、录音测试命令 |
 
 ## **目录**
 
@@ -169,43 +170,45 @@ RK2206>
 测试命令：
 
 ```
-file.setpath A:\
-music.create file
+music.create
 music.play A:\music5s.wav
 music.stop
-music.delete
 ```
 
 测试log：
 
 ```
-RK2206>file.setpath A:\
-  curpath:A:\
-RK2206>music.create file[D]player_create-721: in
-...
-[a][001591.866438][D]player_create-752: out
-[a][001591.879310]
-RK2206>music.play A:\music5s.wavplayer start...[V]player_play-773: A:\music5s.wav
-...
-[a][001607.417331][D]file_preprocessor_init_impl-33: [two] open native file ok, file: A:\music5s.wav, audio type:wav
-...
-[a][001607.685353][V]playback_device_open_impl-28: rate:16000 bits:16 ch:2
-[a][001607.694822][V]pcm_open-53: pcm_open:0x38205a0c
-...
-[a][001612.587647][V]playback_run-713: stop
-[a][001612.597508][D]audio_queue_receive-572: r:2001dc10: self->fill:0,self->item_count = 1
-[A.play_][001612.605326]
-[a][001612.615676][D]audio_queue_receive-573: os_queue_state = 0.
-[a][001612.621389][D]audio_queue_receive-593: os_queue_state = 1
-RK2206>music.stopplay stop.[D]player_stop-857: stop player,idle state
-[A.14.00][001612.118967]
-[a][001612.121687]
-RK2206>music.delete[D]player_stop-857: stop player,idle state
-[A.14.00][001612.706625]
-[a][001621.711042][D]player_destroy-910: player_destory in
-[a][001621.721154]delete thread classId = -1, objectid = 1, name = preprocess_task, remain = 6197264delete thread classId = -1, objectid = 2, name = decode_task, remain = 6201480delete thread classId = -1, objectid = 3, name = play_task, remain = 6209792[D]player_destroy-934: player_destory player free.
-[a][001621.746943][D]player_deinit-943: player deinit.
-[a][001621.756736]
+RK2206>music.create
+
+[A.14.00][000004.634941]create thread classId = -1, objectid = 2, name = preprocess_task, remain = 5124664
+[A.14.00][000004.640690]
+[A.14.00][000004.649440]create thread classId = -1, objectid = 3, name = decode_task, remain = 5120440
+[A.14.00][000004.666770]
+[A.14.00][000004.676804]create thread classId = -1, objectid = 4, name = play_task, remain = 5112120
+[A.14.00][000004.684695][V]player_create-761: Success
+[A.14.00][000004.697398]
+RK2206>music.play A:\music5s.wav
+
+[A.14.00][000012.998797]player start...
+[A.14.00][000012.999861][V]player_stop-912: stop player,idle state
+[A.14.00][000012.004736]
+[A.14.00][000012.012004][V]player_play-785: A:\music5s.wav
+[A.14.00][000012.025123][D]rkos_file_open-641: open file:382076e0
+[A.prepr][000012.033835][V]file_preprocessor_init_impl-35: [two] open native file ok, file: A:\music5s.wav, audio type:wav
+[A.prepr][000012.052332][V]play_wav_process_impl-55: wav decoder sample rate: 16000, channels: 2, bits: 16
+[A.decod][000012.070492][V]decoder_post-398: 16000 != 48000, need resample
+[A.decod][000012.084958][V]playback_run-602: start
+[A.play_][000012.094213][V]pcm_open-62: pcm_open:0x382066e8
+[A.play_][000012.098608][V]playback_device_open_impl-43: rate:48000 bits:16 ch:2
+[A.play_][000012.118031]
+RK2206>music.stop
+play stop.[V]preprocess_run-254: out
+[A.prepr][000014.672964][V]decoder_run-483: decode res 0x2
+[A.decod][000014.679376][E]playback_run-661: do not read data=0...
+[A.play_][000014.701998][V]playback_run-721: stop
+[A.play_][000014.706433][V]player_stop-906: stop player,pause/running state
+[A.14.00][000014.717982]
+[A.14.00][000014.721250]
 ```
 
 #### **2.3.2 在线播放**
@@ -215,47 +218,53 @@ RK2206>music.delete[D]player_stop-857: stop player,idle state
 ```
 wifi.start sta
 wifi.connect Rockchip-2.4G 12344321
-music.create http
+music.create
 music.play <url>
 music.stop
-music.delete
 ```
 
 测试log（WiFi相关log请看[5. Wi-Fi测试](# 5. Wi-Fi测试)）：
 
 ```
-RK2206>music.create http[D]player_create-721: in
-...
-[a][000494.106137][D]player_create-752: out
-[a][000494.117995]
-RK2206>music.play http://192.168.0.100/10.mp3player start...[V]player_play-773: http://192.168.0.100/10.mp3
-...
-[A.prepr][000511.266043][HTTP]  url = http://192.168.0.100/10.mp3. relative_url = /10.mp3
-RK2206>
-[A.prepr][000513.347025][HTTP] cfg->target:http://192.168.0.100/10.mp3
-[A.prepr][000513.348843][HTTP] host_addr:192.168.0.100
-[A.prepr][000513.354626][HTTP] port:80
-[A.prepr][000513.364070][HTTP] download_file_name:10.mp3
-...
-[a][000513.770744][V]playback_device_open_impl-28: rate:16000 bits:16 ch:2
-[a][000513.783212][V]pcm_open-53: pcm_open:0x38205a0c
-[a][000513.790918][D]playback_device_open_impl-32: Open Playback success.
-[a][000513.806271][D]playback_device_start_impl-41: playback_device_start_impl err= 0
-...
-[a][000518.141059][V]playback_run-713: stop
-[a][000518.152920][D]audio_queue_receive-572: r:2001ea10: self->fill:0,self->item_count = 1
-[A.play_][000518.161740]
-[a][000518.173091][D]audio_queue_receive-573: os_queue_state = 0.
-[a][000518.180805][D]audio_queue_receive-593: os_queue_state = 1
-RK2206>music.stopplay stop.[D]player_stop-857: stop player,idle state
-[A.14.00][000518.118967]
-[a][000518.121687]
-RK2206>music.delete[D]player_stop-857: stop player,idle state
-[A.14.00][000518.243281]
-[a][000523.247698][D]player_destroy-910: player_destory in
-[a][000523.256822]delete thread classId = -1, objectid = 1, name = preprocess_task, remain = 6193136delete thread classId = -1, objectid = 2, name = decode_task, remain = 6197352delete thread classId = -1, objectid = 3, name = play_task, remain = 6205664[D]player_destroy-934: player_destory player free.
-[a][000523.291605][D]player_deinit-943: player deinit.
-[a][000523.301390]
+RK2206>music.create
+
+[A.14.00][000018.375902]create thread classId = -1, objectid = 4, name = preprocess_task, remain = 5105792
+[A.14.00][000019.387642]
+[A.14.00][000019.392384]create thread classId = -1, objectid = 5, name = decode_task, remain = 5101568
+[A.14.00][000019.405743]
+[A.14.00][000019.411695]create thread classId = -1, objectid = 6, name = play_task, remain = 5093248
+[A.14.00][000019.425656][V]player_create-761: Success
+[A.14.00][000019.434360]
+RK2206>music.play http://openaudio-app-50.beva.cn/dq/lpyKDWdpRILOAnswKSsJxQGoyRDn.mp3
+
+[A.14.00][000074.073829]player start...
+[A.14.00][000074.080913][V]player_stop-906: stop player,pause/running state
+[A.14.00][000074.092524]
+[A.14.00][000074.096792][V]player_play-785: http://openaudio-app-50.beva.cn/dq/lpyKDWdpRILOAnswKSsJxQGoyRDn.mp3
+[A.14.00][000074.110369][V]http_preprocessor_init_impl-64:      HTTP reponse: 206
+[A.prepr][000075.524851][V]http_preprocessor_init_impl-91:      HTTP file length: 5084517 byte
+[A.prepr][000075.535654][V]http_preprocessor_init_impl-111: [two] open native http ok, http: http://openaudio-app-50.beva.cn/dq/lpyKDWdpRILOAnswKSsJxQGoyRDn.mp3, audio type:mp3
+[A.prepr][000075.551693]mp3 decode open
+[a][000075.561291][V]play_mp3_init_impl-58: mp3 init SUCCESS out
+[A.decod][000075.566839]
+[A.decod][000075.574106][V]play_mp3_process_impl-212: is first frame mp3 samprate = 44100 Channel = 2 bits = 16 outlen = 2304
+[A.decod][000075.593214]
+[A.decod][000075.604468][V]decoder_post-398: 44100 != 48000, need resample
+[A.decod][000075.611935][V]playback_run-602: start
+[A.play_][000075.626829][V]pcm_open-62: pcm_open:0x382066e8
+[A.play_][000075.633765][V]playback_device_open_impl-43: rate:48000 bits:16 ch:2
+[A.play_][000075.647730]
+RK2206>music.stop
+play stop.[E]play_mp3_process_impl-253: mp3_decode pcm write failed
+[A.decod][000082.630919]
+[A.decod][000082.640840][V]decoder_run-483: decode res 0
+[A.decod][000082.645796]mp3 decode close
+[a][[E]playback_run-661: do not read data=0...
+[A.play_][000082.667524][V]playback_run-721: stop
+[A.play_][000082.674893000082.654491]][V]player_stop-906: stop player,pause/running state
+[A.14.00][000082.689622]
+[A.14.00][000082.696894]
+RK2206>[V]preprocess_run-254: out
 ```
 
 ## **3 录音测试**
@@ -318,13 +327,12 @@ RK2206>tcapture A:\r1.wav -D sound3c -p 3072 -n 4 -c 2 -b 16 -r 16000 -t 10
 测试命令：
 
 ```
-file.setpath A:\
+file.setpath C:\
 file.df te.wav
 file.mf te.wav
 record.create
-record.start -t 5 -f A:\te.wav
+record.start -t 5 -f C:\te.wav
 record.stop
-record.delete
 ```
 
 [^注]: -t为指定录音时长（s），另可使用-r指定采样率，使用-c指定声道数，-f指定保存文件，且-f必须为最后一个参数，目前支持.pcm和.wav后缀
@@ -332,33 +340,45 @@ record.delete
 测试log：
 
 ```
-RK2206>file.setpath A:\
-  curpath:A:\
-RK2206>file.df te.wavfile delete failure
-RK2206>file.mf te.wavclus = 0, i = 10, name = TE      WAV
+RK2206>file.setpath C:\
+
+curpath:C:\
+RK2206>file.df te.wav
+
+RK2206>file.mf te.wav
+clus = 2, i = 14, name = TE      WAV
 RK2206>record.create
-[A.14.00][000015.743416]record create.[D]recorder_create-467: recorder_create in
-...
-[a][000025.297040][D]recorder_create-497: recorder_create out
-RK2206>record.start -t 5 -f A:\te.wav
-[A.14.00][000082.512337]record start:rate= 16000,ch= 2,target = A:\te.wav,time = 5.
-[A.14.00][000082.523139][D]recorder_record-503: start type wav
-...
-[a][000082.130129][D]capture_device_start_impl-39: pcm start return 0.
-[A.recor][000082.143192]
-[a][000082.148544][E]record_wav_process-59: wav->input failed
-[A.encod][000087.128313]
-...
-[a][000088.508021][D]write_run-194: write_stream was stopped
-...
-[a][000089.876072][D]recorder_stop-572: recorder_stop stop recorder,pause/running state
-RK2206>record.stop[D]recorder_stop-571: recorder_stop stop recorder,idle state
-[A.14.00][000097.063114]
-[a][000097.074456]
-RK2206>record.delete[D]recorder_stop-571: recorder_stop stop recorder,idle state
-[A.14.00][000097.297304]
-[D]recorder_destroy-603: in.
-[a][000097.590096]delete thread classId = -1, objectid = 1, name = write_task, remain = 6188976delete thread classId = -1, objectid = 2, name = encode_task, remain = 6193192delete thread classId = -1, objectid = 3, name = record_task, remain = 6201504
+
+[A.14.00][000250.162210]record create.
+[A.14.00][000205.172072]create thread classId = -1, objectid = 3, name = write_task, remain = 5151080
+[A.14.00][000205.178946]
+[A.14.00][000205.187630]create thread classId = -1, objectid = 4, name = encode_task, remain = 5146856
+[A.14.00][000205.205033]
+[A.14.00][000205.215984]create thread classId = -1, objectid = 5, name = record_task, remain = 5138536
+[A.14.00][000205.224127]
+RK2206>record.start -t 5 -f C:\te.wav
+
+[A.14.00][000206.108533]record start:rate= 16000,ch= 2,target = C:\te.wav,time = 5.
+[A.14.00][000206.113353][V]recorder_stop-599: recorder_stop stop recorder,idle state
+[A.14.00][000206.125660]
+[A.14.00][000206.129928][V]recorder_record-560: msg.type =3820632c, 0,
+[A.14.00][000206.140060][V]capture_device_open_impl-56: Open Capture success.
+[A.recor][000206.147778]
+[A.recor][000206.157218][E]rkos_file_create-449: file create failure[D]rkos_file_open-641: open file:382076e0
+[A.write][000206.166457][V]file_writer_init_impl-25: [one]open native file ok, file: C:\te.wav, audio type:wav
+[A.write][000206.184943]
+[A.write][000206.195220][V]recorder_record-562: audio_queue_send   3820632c, 0,
+[A.14.00][000206.217157]
+RK2206>record.stop
+[E]record_wav_process-60: wav->input failed
+[A.encod][000209.206802]
+[A.encod][000209.216304][W]encoder_run-337: record_encoder_INPUT_ERROR
+[A.encod][000209.222435]
+[A.encod][000209.230705][W]capture_run-452: Record stream stopped
+[A.recor][000209.244418]
+[A.recor][000209.250687][V]recorder_stop-594: recorder_stop stop recorder,pause/running state
+[A.14.00][000209.265161]
+[A.14.00][000209.272992]
 ```
 
 ## **4 回采测试**
@@ -394,17 +414,15 @@ RK2206>audio.rx2tx -P sound3p -C sound3c -p 1024 -n 2 -t 10 -f 2
 测试命令：
 
 ```
-file.setpath A:\
+file.setpath C:\
 file.df te.wav
 file.mf te.wav
 record.create
-music.create file
+music.create
 music.play A:\music5s.wav
-record.start -c 4 -t 5 -f A:\te.wav
+record.start -c 4 -t 5 -f C:\te.wav
 music.stop
 record.stop
-music.delete
-record.delete
 ```
 
 [^注]: -c为指定录音声道，此处为4声道，实际上为3声道，回采仅有1声道数据。测试前请确保文件系统内有文件可播放
@@ -412,58 +430,77 @@ record.delete
 测试log：
 
 ```
-RK2206>file.setpath A:\
-  curpath:A:\
+RK2206>file.setpath C:\
+
+curpath:C:\
 RK2206>file.df te.wav
-RK2206>file.mf te.wavclus = 0, i = 10, name = TE      WAV
+
+RK2206>file.mf te.wav
+clus = 2, i = 14, name = TE      WAV
 RK2206>record.create
-[A.14.00][000050.240471]record create.[D]recorder_create-467: recorder_create in
-...
-[a][000050.560094][D]recorder_create-497: recorder_create out
-[a][000050.574475]
-RK2206>music.create file[D]player_create-721: in
-...
-[a][000055.357994][D]player_create-752: out
-[a][000055.367855]
-RK2206>music.play A:\music5s.wavplayer start...[V]player_play-773: A:\music5s.wav
-...
-[a][000112.020767][D]rkos_file_open-517: open file:382069ec
-[A.prepr][000112.028894][D]file_preprocessor_init_impl-27: [two] open native file, file: A:\music5s.wav
-[a][000112.045875][D]file_preprocessor_init_impl-33: [two] open native file ok, file: A:\music5s.wav, audio type:wav
-...
-[a][000112.278484][V]playback_run-588: start
-[a][000112.288430][D]playback_device_open_impl-17: cfg->frame_size = 4096.
-[a][000112.294899][V]playback_device_open_impl-28: rate:16000 bits:16 ch:2
-[a][000112.307367][V]pcm_open-53: pcm_open:0x38205a0c
-[a][000112.315072]
-RK2206>record.start -c 4 -t 5 -f A:\te.wav
-[A.14.00][000113.687418]record start:rate= 16000,ch= 4,target = A:\te.wav,time = 5.
-[A.14.00][000113.699117][D]recorder_record-503: start type wav
-...
-[a][000117.554955][V]playback_run-713: stop
-...
-[a][000117.600328][E]record_wav_process-59: wav->input failed
-[A.encod][000118.480282]
-...
-[a][000120.104165][D]write_run-194: write_stream was stopped
-...
-[a][000121.379499][D]recorder_stop-572: recorder_stop stop recorder,pause/running state
-RK2206>music.stopplay stop.[D]player_stop-857: stop player,idle state
-[A.14.00][000130.754775]
-[a][000130.766114]
-RK2206>record.stop[D]recorder_stop-571: recorder_stop stop recorder,idle state
-[A.14.00][000131.021095]
-[a][000131.028020]
-RK2206>music.delete[D]player_stop-857: stop player,idle state
-[A.14.00][000131.531288]
-[a][000131.532351][D]player_destroy-910: player_destory in
-[a][000131.538475]delete thread classId = -1, objectid = 4, name = preprocess_task, remain = 5488096delete thread classId = -1, objectid = 5, name = decode_task, remain = 5492312delete thread classId = -1, objectid = 6, name = play_task, remain = 5500624[D]player_destroy-934: player_destory player free.
-[a][000131.570261][D]player_deinit-943: player deinit.
-[a][000131.577048]
-RK2206>record.delete[D]recorder_stop-578: recorder_stop stop recorder,idle state
-[A.14.00][000131.510398]
-[a][000131.515320][D]recorder_destroy-604: in.
-[a][000131.524436]delete thread classId = -1, objectid = 1, name = write_task, remain = 5519744delete thread classId = -1, objectid = 2, name = encode_task, remain = 5523960delete thread classId = -1, objectid = 3, name = record_task, remain = 5532272
+
+[A.14.00][000019.162210]record create.
+[A.14.00][000019.172072]create thread classId = -1, objectid = 3, name = write_task, remain = 5151080
+[A.14.00][000019.178946]
+[A.14.00][000019.187630]create thread classId = -1, objectid = 4, name = encode_task, remain = 5146856
+[A.14.00][000019.205033]
+[A.14.00][000019.215984]create thread classId = -1, objectid = 5, name = record_task, remain = 5138536
+[A.14.00][000019.224127]
+RK2206>music.create
+
+[A.14.00][000020.690421]create thread classId = -1, objectid = 6, name = preprocess_task, remain = 5092736
+[A.14.00][000020.700156]
+[A.14.00][000020.702908]create thread classId = -1, objectid = 7, name = decode_task, remain = 5088512
+[A.14.00][000020.713255]
+[A.14.00][000020.717224]create thread classId = -1, objectid = 8, name = play_task, remain = 5080192
+[A.14.00][000020.729173][V]player_create-761: Success
+[A.14.00][000020.735879]
+RK2206>music.play A:\music5s.wav
+
+[A.14.00][000023.051370]player start...
+[A.14.00][000023.057444][V]player_stop-912: stop player,idle state
+[A.14.00][000023.069170]
+[A.14.00][000023.073438][V]player_play-785: A:\music5s.wav
+[A.14.00][000023.082560][D]rkos_file_open-641: open file:382076e0
+[A.prepr][000023.097277][V]file_preprocessor_init_impl-35: [two] open native file ok, file: A:\music5s.wav, audio type:wav
+[A.prepr][000023.112773][V]play_wav_process_impl-55: wav decoder sample rate: 16000, channels: 2, bits: 16
+[A.decod][000023.126925][V]decoder_post-398: 16000 != 48000, need resample
+[A.decod][000023.138451][V]playback_run-602: start
+[A.play_][000023.148247][V]pcm_open-62: pcm_open:0x382066e8
+[A.play_][000023.150183][V]playback_device_open_impl-43: rate:48000 bits:16 ch:2
+[A.play_][000023.159154]
+RK2206>record.start -c 4 -t 5 -f C:\te.wav
+channels= 4.
+[A.14.00][000024.441693]record start:rate= 16000,ch= 4,target = C:\te.wav,time = 5.
+[A.14.00][000024.446374][V]recorder_stop-599: recorder_stop stop recorder,idle state
+[A.14.00][000024.458685]
+[A.14.00][000024.462950][V]recorder_record-560: msg.type =3820632c, 0,
+[A.14.00][000024.473088][V]pcm_open-62: pcm_open:0x38206800
+[A.recor][000024.479295][E]rkos_file_create-449: file create failure[D]rkos_file_open-641: open file:382076f0
+[A.write][000024.494678][V]file_writer_init_impl-25: [one]open native file ok, file: C:\te.wav, audio type:wav
+[A.write][000024.509199]
+[A.write][000024.516463][V]recorder_record-562: audio_queue_send   3820632c, 0,
+[A.14.00][000024.532239]
+RK2206>[V]capture_device_open_impl-56: Open Capture success.
+[A.recor][000024.544876]
+[A.recor][000024.549143]music.stop
+play stop.[V]preprocess_run-254: out
+[A.prepr][000026.256341][V]decoder_run-483: decode res 0x2
+[A.decod][000026.266387][E]playback_run-661: do not read data=0...
+[A.play_][000026.279967][V]playback_run-721: stop
+[A.play_][000026.285403][V]player_stop-906: stop player,pause/running state
+[A.14.00][000026.297957]
+[A.14.00][000026.302226]
+RK2206>record.stop
+[E]record_wav_process-60: wav->input failed
+[A.encod][000027.855644]
+[A.encod][000027.859149][W]encoder_run-337: record_encoder_INPUT_ERROR
+[A.encod][000027.869276]
+[A.encod][000027.871543][W]capture_run-452: Record stream stopped
+[A.recor][000027.879254]
+[A.recor][000027.889533][V]recorder_stop-594: recorder_stop stop recorder,pause/running state
+[A.14.00][000027.901901]
+[A.14.00][000027.907580]
 ```
 
 ## **5 获取声卡号**
