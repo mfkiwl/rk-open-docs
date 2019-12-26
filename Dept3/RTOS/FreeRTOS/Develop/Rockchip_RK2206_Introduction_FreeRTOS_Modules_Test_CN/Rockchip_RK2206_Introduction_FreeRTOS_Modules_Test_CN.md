@@ -2,7 +2,7 @@
 
 文件标识：RK-SM-CS-001
 
-发布版本：1.0.1
+发布版本：1.0.2
 
 日       期：2019.11
 
@@ -81,6 +81,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-10-26 | V0.0.13  | CWW      | 添加系统命令说明       |
 | 2019-11-27 | V1.0.0   | CWW      | 修改文档排版           |
 | 2019-12-26 | V1.0.1   | Jair Wu  | 更新播放、录音测试命令 |
+| 2019-12-26 | V1.0.2   | Conway   | 更新Wi-Fi频偏测试说明  |
 
 ## **目录**
 
@@ -679,24 +680,44 @@ mp ---- 射频信号测试模式
 测试log：
 
 ```
-[A.18.00][000398.341094] wifi thread createcreate thread classId = 7, objectid = 0, name = wifi/0, remain = 6209928
-[A.18.00][000398.349654]wifi_applicationTask_Enter
-[A.07.00][000398.362103]SysSeed = 0create thread classId = 11, objectid = 0, name = bcore/0, remain = 6205488
-[A.18.00][000398.374504]FILE: bcore/BcoreDevice.c, LINE: 420: start bb system...wifi start ok
-[A.14.00][000398.384569]
-RK2206>[0 I] ==== RK912 Firmware Starting ====
-[0 I] lmac boot successfully!
-[0 I] load_rom_patch: rom patch address[18028508] length[928]
-[0 I] waiting for rpu ready...
-[0 I] lpw_init SUCCESS...
-[0 I] setup tx buffer(10) at 0x20040000
-[0 I] setup rx event buffer(24) at 0x20054e60
-FILE: bcore/BcoreDevice.c, LINE: 427: start bb system OKMAC address: aa:5c:2f:31:5f:a1
-[A.07.00][000398.435224][0 I] got add address
-[0 I] RK912: INFO: rk912_core_init.
-[0 I] RK912: INFO: MAC ADDR: aa:5c:2f:31:5f:a1
-[0 I] WPA: init WPA_SM.
-[70 I] received M4 command: 4
+RK2206>wifi.start mp
+
+[A.14.00][000361.897194]mode 3 thresh 0
+[A.14.00][000361.906247]
+[A.18.00][000361.915748] wifi thread create
+[A.18.00][000361.928590]create thread classId = 7, objectid = 0, name = wifi/0, remain = 5161944
+[A.18.00][000361.939768]wifi_applicationTask_Enter
+[A.07.00][000361.945221]SysSeed = 0
+[A.18.00][000361.954655]create thread classId = 11, objectid = 0, name = bcore/0, remain = 5157480
+[A.18.00][000361.971894]
+[A.07.00][000361.981728]FILE: bcore/BcoreDevice.c, LINE: 414: start bb system...wifi start ok
+[A.14.00][000361.989231]
+RK2206>[         0 I] [wifi] ==== RK2206 WiFi Starting ====
+[         0 I] [wifi] ==== version  svn-288 build time: Dec 20 2019 14:34:24 ====
+[         0 I] [wifi] lmac boot successfully!
+[         0 I] [wifi] load_rom_patch: rom patch address[18028368] length[4844]
+[         0 I] [wifi] waiting for rpu ready...
+[         0 I] [wifi] lpw_init SUCCESS...
+[         0 I] [wifi] setup tx buffer(26) at 0x20040000
+[         0 I] [wifi] setup rx normal buffer(24) at 0x2004ade0
+[         0 I] [wifi] setup rx event buffer(24) at 0x20054e60
+
+[A.07.00][000361.087070]FILE: bcore/BcoreDevice.c, LINE: 420: start bb system OK[Vendor ERROR]:No matching item, id=2
+[A.07.00][000361.104560]
+[A.07.00][000361.113919]FILE: fwmgr/rkpart.c, LINE: 207: vendor_storage_read fail
+[A.07.00][000361.129968]
+[A.07.00][000361.139355]
+[A.07.00][000361.140585]FILE: fwmgr/rkpart.c, LINE: 212: vendor read Type 1 :RK22062019102806
+[A.07.00][000361.149639]MAC address from SN
+[A.07.00][000361.162515]MAC address: 52:4b:ca:20:55:bf
+[A.07.00][000361.170304][         0 I] [wifi] got add address
+[        10 I] [wifi] RK912: INFO: rk912_core_init.
+[        10 I] [wifi] RK912: INFO: MAC ADDR: 52:4b:ca:20:55:bf
+[        20 I] [wifi] WPA: init WPA_SM.
+[       120 I] [wifi] M4 cmd: 4
+
+RK2206>[     10010 I] [wifi] lpw is s (0 0 0)
+RK2206>[     20020 I] [wifi] lpw is s (0 0 0)
 ```
 
 启动 RX 射频信号测试命令:
@@ -718,15 +739,59 @@ wifi.mp.rx -c 1
 测试log：
 
 ```
-RK2206>wifi.mp.rx -c 1[14630 I] received M4 command: 32
-[14630 I] RK912: INFO: -UMAC: Reset (ENABLE)
-[14630 I] RK912: INFO: : reset_type=0x70, rpu_mode=0x0
-[14740 I] RK912: INFO: Patch: 2_0_2 FW: Sep 30 2019 10:47:13
-[14740 I] setup rx small buffer
-[14740 I] priv cmd: 6
-[14740 I] if 0 ADD
-[14740 I] wlan
-[15140 I] rx start ok
+RK2206>
+RK2206>wifi.start mp
+[A.14.00][000109.886094]mode 3 thresh 0
+[A.14.00][000109.893137]
+[A.18.00][000109.900620] wifi thread create
+[A.18.00][000109.911476]create thread classId = 7, objectid = 0, name = wifi/0, remain = 5161944
+[A.18.00][000109.920656]wifi_applicationTask_Enter
+[A.07.00][000109.934108]SysSeed = 0
+[A.18.00][000109.941540]create thread classId = 11, objectid = 0, name = bcore/0, remain = 5157480
+[A.18.00][000109.956781]
+[A.07.00][000109.964561]FILE: bcore/BcoreDevice.c, LINE: 414: start bb system...wifi start ok
+[A.14.00][000109.980114]
+RK2206>[         0 I] [wifi] ==== RK2206 WiFi Starting ====
+[         0 I] [wifi] ==== version  svn-288 build time: Dec 20 2019 14:34:24 ====
+[         0 I] [wifi] lmac boot successfully!
+[         0 I] [wifi] load_rom_patch: rom patch address[18028368] length[4844]
+[         0 I] [wifi] waiting for rpu ready...
+[         0 I] [wifi] lpw_init SUCCESS...
+[         0 I] [wifi] setup tx buffer(26) at 0x20040000
+[         0 I] [wifi] setup rx normal buffer(24) at 0x2004ade0
+[         0 I] [wifi] setup rx event buffer(24) at 0x20054e60
+[A.07.00][000109.075914]FILE: bcore/BcoreDevice.c, LINE: 420: start bb system OK[Vendor ERROR]:No matching item, id=2
+[A.07.00][000109.090403]
+[A.07.00][000109.097761]FILE: fwmgr/rkpart.c, LINE: 207: vendor_storage_read fail
+[A.07.00][000109.111810]
+[A.07.00][000109.119085]
+[A.07.00][000109.128439]FILE: fwmgr/rkpart.c, LINE: 212: vendor read Type 1 :RK22062019102806
+[A.07.00][000109.145492]MAC address from SN
+[A.07.00][000109.156361]MAC address: 52:4b:ca:20:55:bf
+[A.07.00][000109.162149][         0 I] [wifi] got add address
+[        10 I] [wifi] RK912: INFO: rk912_core_init.
+[        10 I] [wifi] RK912: INFO: MAC ADDR: 52:4b:ca:20:55:bf
+[        20 I] [wifi] WPA: init WPA_SM.
+[       120 I] [wifi] M4 cmd: 4
+RK2206>wifi.mp.rx -c 1[     10010 I] [wifi] lpw is s (0 0 0)
+[     20020 I] [wifi] lpw is s (0 0 0)
+[     30030 I] [wifi] lpw is s (0 0 0)
+[     34190 I] [wifi] M4 cmd: 26
+[     34190 I] [wifi] RK912: INFO: -UMAC: Reset (ENABLE)
+[     34190 I] [wifi] RK912: INFO: : reset_type=0x70, rpu_mode=0x0
+[     34190 I] [wifi] CMD_RESET (ENABLE) -> lmac
+[     34260 I] [wifi] RK912: INFO: Patch: 2_0_6
+[     34260 I] [wifi] setup rx small buffer
+[     34260 I] [wifi] priv cmd: 6
+[     34260 I] [wifi] if 0 ADD
+[     34260 I] [wifi] wlan
+[     34290 I] [wifi] rx start ok
+RK2206>
+RK2206>[     40040 I] [wifi] lpw is r (0 0 80)
+RK2206>
+RK2206>[     50050 I] [wifi] lpw is r (0 0 129)
+RK2206>[     60060 I] [wifi] lpw is r (0 0 155)
+[     70070 I] [wifi] lpw is r (0 0 112)
 ```
 
 [^注]: 执行启动 RX 射频信号测试命令(wifi.mp.rx -c 1 )后，可以继续输入执行命令获取 RX 收包信息(wifi.mp.get )。
@@ -776,14 +841,59 @@ wifi.mp.tx -c 1 -r 55 -t n -p 2 -n 100
 测试log：
 
 ```
-RK2206>wifi.mp.tx -c 1 -r 55 -t n -p 2 -n 100[64780 I] received M4 command: 36
-[64780 I] Channel = 1, Rate = MCS55, Type = 11n, Power = 2, Count = 100
-[64780 I] RK912: INFO: : reset_type=0x70, rpu_mode=0x0
-[64890 I] RK912: INFO: Patch: 2_0_2 FW: Sep 30 2019 10:47:13
-[64890 I] setup rx small buffer
-[64890 I] priv cmd: 6
-[64890 I] if 0 ADD
-[64890 I] wlan
+RK2206>wifi.start mp
+[A.14.00][000009.661306]mode 3 thresh 0
+[A.14.00][000009.663350]
+[A.18.00][000009.666778] wifi thread create
+[A.18.00][000009.673633]create thread classId = 7, objectid = 0, name = wifi/0, remain = 5161944
+[A.18.00][000009.688812]wifi_applicationTask_Enter
+[A.07.00][000009.698264]SysSeed = 0
+[A.18.00][000009.701699]create thread classId = 11, objectid = 0, name = bcore/0, remain = 5157480
+[A.18.00][000009.712940]
+[A.07.00][000009.716721]FILE: bcore/BcoreDevice.c, LINE: 414: start bb system...wifi start ok
+[A.14.00][000009.728272]
+RK2206>
+RK2206>[         0 I] [wifi] ==== RK2206 WiFi Starting ====
+[         0 I] [wifi] ==== version  svn-288 build time: Dec 20 2019 14:34:24 ====
+[         0 I] [wifi] lmac boot successfully!
+[         0 I] [wifi] load_rom_patch: rom patch address[18028368] length[4844]
+[         0 I] [wifi] waiting for rpu ready...
+[         0 I] [wifi] lpw_init SUCCESS...
+[         0 I] [wifi] setup tx buffer(26) at 0x20040000
+[         0 I] [wifi] setup rx normal buffer(24) at 0x2004ade0
+[         0 I] [wifi] setup rx event buffer(24) at 0x20054e60
+
+[A.07.00][000009.820449]FILE: bcore/BcoreDevice.c, LINE: 420: start bb system OK[Vendor ERROR]:No matching item, id=2
+[A.07.00][000009.831923]
+[A.07.00][000009.835289]FILE: fwmgr/rkpart.c, LINE: 207: vendor_storage_read fail
+[A.07.00][000009.846333]
+[A.07.00][000009.850625]
+[A.07.00][000009.855961]FILE: fwmgr/rkpart.c, LINE: 212: vendor read Type 1 :RK22062019102806
+[A.07.00][000009.869014]MAC address from SN
+[A.07.00][000009.876879]MAC address: 52:4b:ca:20:55:bf
+[A.07.00][000009.888670][         0 I] [wifi] got add address
+[        10 I] [wifi] RK912: INFO: rk912_core_init.
+[        10 I] [wifi] RK912: INFO: MAC ADDR: 52:4b:ca:20:55:bf
+[        20 I] [wifi] WPA: init WPA_SM.
+[       130 I] [wifi] M4 cmd: 4
+
+RK2206>wifi.mp.tx -c 1 -r 55 -t n -p 2 -n 100
+[      8680 I] [wifi] M4 cmd: 30
+[      8680 I] [wifi] Channel = 1, Rate = MCS55, Type = 11n, Power = 2, Count = 100
+[      8680 I] [wifi] RK912: INFO: -UMAC: Reset (ENABLE)
+[      8680 I] [wifi] RK912: INFO: : reset_type=0x70, rpu_mode=0x0
+[      8690 I] [wifi] CMD_RESET (ENABLE) -> lmac
+[      8760 I] [wifi] RK912: INFO: Patch: 2_0_6
+[      8760 I] [wifi] setup rx small buffer
+[      8760 I] [wifi] priv cmd: 6
+[      8760 I] [wifi] if 0 ADD
+[      8760 I] [wifi] wlan
+
+RK2206>[     10010 I] [wifi] lpw is r (72 1 16)
+RK2206>[     20020 I] [wifi] lpw is r (481 1 130)
+RK2206>[     30030 I] [wifi] lpw is r (499 1 141)
+[     40040 I] [wifi] lpw is r (484 1 102)
+[     50050 I] [wifi] lpw is r (519 1 153)
 ```
 
 ## **9 iperf测试**
