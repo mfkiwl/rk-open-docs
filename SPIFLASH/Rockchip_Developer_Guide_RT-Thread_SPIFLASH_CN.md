@@ -1,8 +1,8 @@
-# Rockchip FreeRTOS SPIFLASH
+# Rockchip RT-Thread SPIFLASH
 
-文件标识：RK-KF-YF-052
+文件标识：RK-KF-YF-080
 
-发布版本：V1.0.2
+发布版本：V1.0.0
 
 日期：2020-02-21
 
@@ -46,13 +46,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文主要描述了 ROCKCHIP FreeRTOS SPI Flash 的原理和使用方法。
+本文主要描述了 ROCKCHIP RT-Thread SPI Flash 的原理和使用方法。
 
 **产品版本**
 
-| **芯片名称** | **内核版本**    |
-| ------------ | --------------- |
-| RK2206       | FreeRTOS V10.0.1 |
+| **芯片名称**                          | **内核版本** |
+| ------------------------------------- | ------------ |
+| 所有使用 RK RT-Thread  SDK 的芯片产品 | RT-Thread    |
 
 **读者对象**
 
@@ -66,10 +66,8 @@ Fuzhou Rockchip Electronics Co., Ltd.
 **修订记录**
 
 | **版本号** | **作者** | **修改日期** | **修改说明** |
-| ---------- | --------| :--------- | ------------ |
-| V1.0.0    | 林鼎强 | 2019-12-03 | 初始版本     |
-| V1.0.1 | 林鼎强 | 2019-12-12 | 添加 SPI Flash 框架章节 |
-| V1.0.2 | 林鼎强 | 2020-02-21 | 调整标题层级 |
+| ---------- | -------- | :----------- | ------------ |
+| V1.0.0     | 林鼎强   | 2020-02-21   | 初始版本     |
 
 **目录**
 
@@ -110,8 +108,9 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 
 ### 1.4 驱动框架
 
-考虑到要适配 FSPI 和 SPI 两种控制器，所以抽象出控制器层，从而将整个驱动框架分为三个层次 ：
+考虑到要适配 FSPI 和 SPI 两种控制器，所以抽象出控制器层，从而将整个驱动框架分为四个层次 ：
 
+- MTD 框架层
 - RTOS Driver 层，完成以下逻辑:
   - RTOS 设备框架注册
   - 注册控制器及操作接口到 HAL_SNOR 协议层
@@ -121,21 +120,21 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 
 ![SPIMemory_Layer](Rockchip_Developer_Guide_FreeRTOS_SPIFLASH_CN/SPIFLASH_Layer.png)
 
-**基于 FSPI 控制器的 FreeRTOS 实现**：
+**基于 FSPI 控制器的 RT-Thread 实现**：
 
-- OS 驱动层：SpiFlashDev.c 实现:
+- OS 驱动层：drv_snor.c 实现:
   - 基于 FSPI HAL层读写接口封装 SPI_Xfer，并注册 FSPI host 及 SPI_Xfer 至 HAL_SNOR 协议层
   - 封装 HAL_SNOR 协议层提供的读写擦除接口
-  - 注册 OS 设备驱动
+  - 注册 OS 设备驱动到 MTD 框架层
 - 协议层：HAL 开发包中的 hal_snor.c 实现 SPI Nor flash 的协议层
 - 控制器层：HAL 开发包中的 hal_fspi.c 实现 FSPI 控制器驱动代码
 
-**基于 SPI 控制器的 FreeRTOS 实现**：
+**基于 SPI 控制器的 RT-Thread 实现**：
 
-- OS 驱动层：SpiFlashDev.c 实现:
+- OS 驱动层：drv_snor.c 实现:
   - 基于 SPI OS driver 读写接口封装 SPI_Xfer，并注册 SPI host 和 SPI_Xfer 至 HAL_SNOR 协议层；
   - 封装 HAL_SNOR 协议层提供的读写擦除接口
-  - 注册 OS 设备驱动
+  - 注册 OS 设备驱动到 MTD 框架层
 - 协议层：HAL 开发包中的 hal_snor.c 实现 SPI Nor flash 的协议层
 - 控制器层：HAL 开发包中的 hal_spi.c 实现 SPI 控制器 low layer 驱动代码，SpiDevice.c 代码实现 RTOS SPI DRIVER 的设备注册和接口封装
 
@@ -146,117 +145,95 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 
 ## 2 配置
 
-SPI Flash 驱动框架所有配置都能通过 Kconfig 进行灵活调整，如 1.4 章节所讲，SPI flash 完整的驱动框架由三个抽象层构成，相应的配置也分为三个层次：
+SPI Flash 驱动框架所有配置都能通过 Kconfig 进行灵活调整，如 1.4 章节所讲，SPI flash 完整的驱动框架由四个抽象层构成，相应的配置也分为四个层次。
 
-**RTOS Driver 驱动层配置：**
+### 2.1 MTD 框架配置
 
 ```c
-    BSP Driver  --->
-        [*] Enable SPIFASLH  --->
-        (80000000) Reset the speed of SPI Nor flash in H
+RT-Thread Components  --->
+    Device Drivers  --->
+        -*- Using MTD Nor Flash device drivers
 ```
 
-**HAL_SNOR 协议层套接控制器配置：**
+### 2.2 SPI Flash Driver 驱动配置
+
+在进行该项配置前，需明确硬件上所选用的 SPI Flash 相应的主控类型，以选择相应方案;
 
 FSPI 控制器方案：
 
 ```c
-	HAL Options	--->
-        -*- Use HAL SNOR Module
-        	Choose SPI Nor Flash Adapter (Attach FSPI controller to SNOR)  --->
-        		(X) Attach FSPI controller to SNOR
-        		( ) Attach FSPI controller to SNOR
+RT-Thread rockchip common drivers  --->
+    [*] Enable ROCKCHIP SPI NOR Flash
+    (80000000) Reset the speed of SPI Nor flash in Hz
+    [ ]   Set SPI Host DUAL IO Lines /* 如果 FSPI 主控仅预留 IO0~1,应使用 Dual mode */
+            Choose SPI Nor Flash Adapter (Attach FSPI controller to SNOR) --->
+                (X) Attach FSPI controller to SNOR
 ```
 
 SPI 控制器方案：
 
 ```c
-	HAL Options	--->
-        -*- Use HAL SNOR Module
-        	Choose SPI Nor Flash Adapter (Attach SPI controller to SNOR)  --->
-        		( ) Attach FSPI controller to SNOR
-        		(X) Attach SPI controller to SNOR
-        		(0)     the id of the SPI device which is used as SPIFLASH adapter (NEW)
+RT-Thread rockchip common drivers  --->
+    [*] Enable ROCKCHIP SPI NOR Flash
+    (80000000) Reset the speed of SPI Nor flash in Hz
+    [ ]   Set SPI Host DUAL IO Lines /* 如果 cFSPI 主控仅预留 IO0~1,应使用 Dual mode */
+    (spi1_0)  the name of the SPI device which is used as SNOR adapte /* 指定 SPI 控制器 #SPIID_#CS */
 ```
 
-**控制器驱动配置**
-
-FSPI 控制器配置：
-
 ```c
-[*] Use HAL FSPI Module
-	[*]     Enable FSPI XIP
+RT-Thread rockchip pisces drivers  --->
+        Enable SPI  --->
+        [*] Enable SPI1 /* 配置相应的 SPI 控制器 */
 ```
 
-SPI 控制器配置：
+## 3 分区及文件系统配置
 
-请参考《Rockchip_Developer_Guide_Linux_SPI_CN.md》文档。
+此处仅作简单的配置说明，详细可参考请参考 rockchip 目录下的《Rockchip_Developer_Guide_RT-Thread_CN.md》，4.7 到 4.8 章节。
 
-### 3 代码和接口
+### 3.1 分区信息生成、解析和 OS 分区注册
 
-#### 3.1 代码
+RK RT-Thread SDK 打包后的固件会在 flash 前 2KB 位置生成 RK_PARTITION 分区表，可以通过修改相应的 setting.ini 来调整分区信息。
 
-"src/driver/spiflash/SpiFlashDev.c"
-"include/driver/SpiFlashDev.h"
+随固件下载到 SPI Nor 的分区表将在 SPI Nor 初始化成功后进行探测解析并注册（代码在 drv_snor.c 中的 snor_partition_init 函数中实现）。
 
-#### 3.2 函数接口
+可以通过以下命令查看相应分区是否挂载成功：
 
-**创建设备接口**
-
-```c
-HDC SpiFlashDev_Create(uint8 DevID, void *arg);
-rk_err_t SpiFlashDev_Delete(uint8 DevID, void *arg);
+```
+msh />list_device
+device          type         ref count
+------- -------------------- ----------
+root    Block Device         1            /* 分区名 root，分区类型 block 设备 */
+snor    MTD Device           0            /* 存储设备，分区读写最终接入到该节点完成读写擦除 */
 ```
 
-其中，arg 参数暂无实际意义，目前仅作为接口预留，可不传递。
+### 3.2  elm-fat 文件系统及分区挂载文件系统
 
-**获取SPI Flash 设备信息**
-
-由于部分文件系统需要获取 SPI Nor 的信息，所以 SPI Flash 驱动参考 MTD 框架做法，将 SPI Flash 句柄设定为全局变量，可以通过 dev 转型 struct _SPIFLASH_DEVICE_CLASS 来获取最小擦除块大小、容量信息。
+**RT-Thread elm-fat 文件支持**
 
 ```c
-typedef  struct _SPIFLASH_DEVICE_CLASS
+RT-Thread Components --->
+    Device virtual file system  --->
+    [*] Using device virtual file system
+    [*]   Using mount table for file system /* 实现相应注册分区表，可实现分区上电自动挂载 */
+    [*]   Enable elm-chan fatfs /* fat 文件系统 */
+		elm-chan's FatFs, Generic FAT Filesystem Module  --->
+		(4096) Maximum sector size to be handled. /*对于 SPI Nor 产品必须修改为 4096 */
+```
+
+如开启分区自动挂载文件系统 ，可在 mnt.c 中添加相应分区注册信息，例如“root”分区到“/”目录：
+
+```c
+const struct dfs_mount_tbl mount_table[] =
 {
-    DEVICE_CLASS stSpiFlashDevice;
-    pSemaphore osSpiFlashOperSem;
-    uint32 blockSize;	// 该 SPI Nor flash 最小擦除大小，单位 byte
-    uint32 blockStart;	// 默认为 0 地址；
-    uint32 blockEnd;	// SPI Nor size, 单位 byte；
-} SPIFLASH_DEVICE_CLASS;
+    {"root", "/", "elm", 0, 0},
+    {0}
+};
 ```
 
-除了全局句柄，还提供了通用的获取 SPI Nor flash 容量信息的接口，单位为 byte：
+如希望自行设计文件系统挂载流程，也可以通过以下代码实现文件系统挂载：
 
 ```c
-rk_err_t SpiFlashDev_GetSize(HDC dev, uint32_t *Size);
-```
-
-**数据传输接口**
-
-SPI  Nor 常用的文件系统需求两种数据读写接口。
-
-- 支持 block size 对齐的读写接口，例如 FAT fs；
-- 支持最小 byte 为单位的读写接口和 block size 的擦除接口，例如 spifs、littlefs。
-
-由于 SPI Nor flash 容量较小，128KB 的 block 擦除使用效率较差，所以对上 block size 设定为最小擦除单位 —— sector（4KB）。
-
-Block 接口：
-
-对于类似 FAT 的文件系统，需求的 block write 实际上是 overwrite 的实现，所以 RK SPI Flash 提供的 block write 接口内完成了 block write（在 SPI Nor 中实际为 sector） 和 block write 的结合操作。
-
-```c
-/* For block write/read, maybe good for FAT fs */
-rk_size_t SpiFlashDev_WriteBlk(HDC dev, rk_size_t sec, const uint8_t *data, rk_size_t nSec);
-rk_size_t SpiFlashDev_ReadBlk(HDC dev, rk_size_t sec, uint8_t *data, rk_size_t nSec);
-```
-
-Byte 接口：
-
-```c
-/* For byte write/read/erase, maybe good for small fs */
-rk_size_t SpiFlashDev_Write(HDC dev, rk_size_t off, const uint8_t *data, rk_size_t len);
-rk_size_t SpiFlashDev_Read(HDC dev, rk_size_t off, uint8_t *data, rk_size_t len);
-rk_err_t SpiFlashDev_Erase(HDC dev, rk_size_t off, rk_size_t len);
+dfs_mount("root", "/", "elm", 0, 0)
 ```
 
 ## 4 XIP 实现方案须知
@@ -290,8 +267,8 @@ RK SPI Flash 框架会在需求的场景自动开关 XIP 功能，客户无需�
 以上所述操作入口如下：
 
 ```c
-static void SpiFlashDev_xipSuspend(void)
-static void SpiFlashDev_xipResume(void)
+static rt_base_t snor_xip_suspend(void)
+static void snor_xip_resume(rt_base_t level)
 ```
 
 **总结**
@@ -304,33 +281,40 @@ static void SpiFlashDev_xipResume(void)
 
 ## 5 函数接口调用范例
 
-参考 shell_spiflash.c。
+参考 snor_test.c。
 
-## 6 shell使用范例
+## 6 测试驱动
 
-**创建设备**
+建议 SPI Flash 开发流程中引入以下测试流程，做简单的读写测试判断。
+
+### 6.1 配置
 
 ```c
-spiflash.create <spi devid>   /*例如： spi.create 0 */
+    RT-Thread bsp test case  --->
+        RT-Thread Common Test case  --->
+            [*] Enable BSP Common TEST
+            [*]   Enable BSP Common SNOR TEST (NEW)
 ```
 
-**数据传输**
+如配置成功，在 msh 中会有 snor_test 的 命令选项。
 
-数据传输接口对应 1.2 章节中描述的读写接口。
+### 6.2 测试命令
+
+输入命令 snor_test 可以获取详细的说明，以下命令单位皆为 byte。
 
 ```c
-    "readblk",   SpiFlashDevShellReadBlk,  "block read data from spiflash device", "spiflash.read <devID> <from> <size>",
-    "writeblk",  SpiFlashDevShellWriteBlk, "block over write data to spiflash device", "spiflash.write <devID> <from> <size> <value>",
-    "read",      SpiFlashDevShellRead,     "read data from spiflash device", "spiflash.read <devID> <from> <size>",
-    "write",     SpiFlashDevShellWrite,    "write data to spiflash device", "spiflash.write <devID> <from> <size> <value>",
-    "erase",     SpiFlashDevShellErase,    "erase spiflash device by sector size", "spiflash.erase <devID> <from> <size>",
+snor_test write offset size /* 写固定数据 pattern 到 flash 指定区域 */
+snor_test read offset size  /* 读 flash 指定区域数据，并打印出来 */
+snor_test erase offset      /* 擦除 flash 指定区域数据 */
+snor_test stress offset size loop /* 读写测试 */
+snor_test io_stress offset size loop /* IO 读写测试 */
 ```
 
 ## 7 常见问题
 
 - **如何判断 SPI flash 已经挂载成功？**
 
-  通过 shell 窗口中查看是否有 spiflash 设备节点。
+  通过 list_device 查看是否有 snor 设备节点。
 
 - **Init adapte error ret= -19 是什么报错？**
 
