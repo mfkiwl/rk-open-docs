@@ -2,7 +2,7 @@
 
 文件标识：RK-KF-CS-007
 
-发布版本：0.0.9
+发布版本：1.0.0
 
 日       期：2019.11
 
@@ -75,6 +75,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-09-09 | V0.0.7 | CWW | 1. 增加花括号,缩进,源代码编码字符集以及结构体typedef规范<br>2. 更新typedef.h重命名为rkos_typedef.h |
 | 2019-10-11 | V0.0.8 | CWW | 增加文件标识 |
 | 2019-11-27 | V0.0.9 | CWW | 修改文档排版 |
+| 2020-1-10 | V1.0.0 | SCH | 增加打印规范，启动流程，命令集的编写方法|
 
 ---
 
@@ -194,7 +195,72 @@ RKOS层以及APP层，返回值使用rk_err_t（int）, HTC(void *)，HDC(void *
 
 ## **2 打印规范**
 
-## **3 启动初始化流程整理**
+### **2.1 打印说明**
+
+printf: 重定向到rk_printf, 最大字符不超过512个，字符前加\n, 比如：printf("\n nihao");
+
+rk_printf: 中断中最大支持字符128个，线程中最大支持字符1024个，字符前加\n, 比如：rk_printf("\n nihao")；
+
+rk_puts: 打印字符串，无字符限制，自动换行，比如：rk_puts("nihao"); rk_puts(pstring); 其中pstring 是指向字符串的指针。
+
+DEBUG：重定义到rk_printf, 自动换行，增加了文件名和，行号，使用方法和rk_printf
+
+printf, rk_printf, DEBUG遇到\n会打印时间戳，时间戳的格式如下：
+
+```
+线程中打印：
+[A.yhk_t][001583.728347]  A--线程中打印; yhk_t--线程名；001583--单位S; 728347--单位US
+中断中打印：
+[a][001986.168937] a--中断中打印；001986--单位S; 168937--单位US
+```
+
+rk_puts 遇到\n会打印时间戳，时间戳的格式如下：
+
+```
+[a][001986.168937] a--无意义；001986--单位S; 168937--单位US
+```
+
+### **2.1 打印级别**
+
+![log_level](resources\log_level.png)
+
+RKOS打印级别分三级
+
+Debug：所有的打印都可以使用
+
+Beta: 除了DEBUG, 所有的打印都禁止输出
+
+Release: 打印API全部被移除，所有的打印代码都被移除。
+
+## **3 启动流程**
+
+开机-->maskrom->loader-->rkos boot-->hal初始化-->bsp初始化-->driver初始化-->freertos启动-->rktm初始化-->rkdm初始化-->rkpm初始化-->rksm初始化-->设备树创建-->app管理器初始化-->app工作。
+
+maskrom: 固化在SOC中启动代码
+
+loader: 分析加载存储介质中的固件，如果没有则启动usb boot,请求下载固件。
+
+rkos boot: 负责从存储介质搬运代码到相应的内存区域，并跳转到HAL层
+
+hal初始化：soc 硬件抽象层初始化
+
+bsp初始化： PCB板相关初始化
+
+driver初始化：驱动框架初始化
+
+freertos启动：freertos启动，运行第一个线程rktm
+
+rktm初始化： rkos task manager 启动rkos device tree mananger
+
+rkdm初始化：rkos device tree mananger启动rkos power manager, 初始化rkos segment manager
+
+rksm初始化： 初始化固件信息，OTA相关的参数
+
+设备树创建： 创建支持APP运行的设备树和相关组件，比如shell 和 app 管理器
+
+app管理器初始化：初始化相关参数，并根据情况进入工厂测试，充电，故事机三种模式。
+
+app工作：工厂测试模式，充电模式，故事机模式。
 
 ## **4 Kconfig配置**
 
@@ -277,11 +343,11 @@ app/test_demo/gcc/.config
 
 ### **5.2 增加一个命令**
 
-3 新增一个SHELL入口文件 SHELL FUN rk\_err\_t ShellIo(HDC dev, uint8 *pstr)
+1 新增一个命令入口函数 SHELL FUN rk\_err\_t ShellIo(HDC dev, uint8 *pstr)
 
-4 使用REGISTER_SHELL_CMD导出ShellIo，注意导出命令时需要需要对变量进行初始化，具体请参考shell\_io.c
+2 使用REGISTER_SHELL_CMD导出ShellIo，注意导出命令时需要需要对变量进行初始化，具体请参考shell\_io.c
 
-### **5.3 编写实体**
+### **5.3 编写命令**
 
 1 函数需要调用宏 CHECK_HELP_CMD(); 框架所需，用来挡住cmd.help命令
 2 采用下面的格式来解析参数
@@ -313,6 +379,122 @@ config COMPONENTS_SHELL_IO
 注意开关宏的命名，格式 COMPONENTS_SHELL_XXX
 
 ## **6 Shell 命令集添加方法**
+
+### **6.1 添加文件**
+
+1 在src/subsys/shell 目录下创建一个shell专用文件 shell_benchmark.c, 该文件只有shell相关的代码，如果要在其他文件夹下实现shell命令，必须保证C文件中有非shell相关的代码，并且被使用。
+
+2 新加的文件需要导入版权信息和必要的头文件,详细参考shell_benchmark.c
+
+### **6.2 增加一个命令集和命令**
+
+1 新增一个命令集结构体ShellBenchmarkName
+
+```
+SHELL_CMD ShellBenchmarkName[] =
+{
+    "all",          benchmark_shell,    "<command>    run all test", "benchmark.all",
+#ifdef CONFIG_COMPONENTS_TINYMEMBENCH
+    "tinymem",      tinymem_shell,      "<command>    run memory test", "benchmark.tinymem",
+#endif
+#ifdef CONFIG_COMPONENTS_LINPACK
+    "linpack",      linpack_shell,      "<command>    Test CPU float computation performance", "benchmark.linpack",
+#endif
+#ifdef CONFIG_COMPONENTS_DHRYSTONE
+    "dhrystone",    dhrystone_shell,    "<command>    Test CPU integer computation performance", "benchmark.dhrystone",
+#endif
+#ifdef CONFIG_COMPONENTS_FHOURSTONE
+    "fhourstones",  fhourstones_shell,  "<command>    CPU test", "benchmark.fhourstones",
+#endif
+#ifdef CONFIG_COMPONENTS_PI_CSS5
+    "pi_css5",      pi_css5_shell,      "<command>    CPU test by calculate PI", "benchmark.pi_css5",
+#endif
+#ifdef CONFIG_COMPONENTS_WHETSTONE
+    "whetstone",    whetstone_shell,    "<command>    Include integer computation,float computation,\narray index, subroutine call,trigonometric function etc.", "benchmark.whetstone",
+#endif
+#ifdef CONFIG_COMPONENTS_COREMARK
+    "coremark",     coremark_shell,     "<command>    List processing, matrix operations, \nstate machines, and CRC calculations", "benchmark.coremark",
+#endif
+    "\b",           NULL,               "NULL", "NULL",
+};
+```
+
+2 使用REGISTER_SHELL_CMD_PACKAGE导出ShellBenchmarkName，注意导出命令时需要需要对变量进行初始化，具体请参考shell_benchmark.c
+
+### **6.3 编写命令**
+
+1 函数需要调用宏 CHECK_HELP_CMD(); 框架所需，用来挡住cmd.help命令
+2 采用下面的格式来解析参数
+
+```c
+while (strCnt = ShellCheckParameter(pstr, &pItem, &pValue))
+{
+	pstr += strCnt;
+}
+```
+
+- <1> StrCnt == 0 说明参数分离完成
+- <2> pItem 代表 -c -v -l 的开始位置， 不包括 - pItem == NULL 标志找到一个不带属性的值（pValue）, 该值所在的位置决定了其意义
+- <3> pValue 代表 pItem 后面跟的值，可以使用SHELL\_GET\_HEX_PARA(val) SHELL\_GET\_DEC_PARA(val) SHELL\_GET\_STRING_PARA(val) 来提取相应的值。如果pItem 没有数值，可以不关心这个值
+- <4> shell\_io.c 中io命令注释和实现方案，大家可以参考。
+
+### **6.4 添加Kconfig**
+
+在src\components\benchmark\Kconfig中对应的配置项
+
+```
+config COMPONENTS_BENCHMARK
+	bool "Enable benchmarks"
+	default n
+	help
+		Select this option to enable banchmarks.
+
+if COMPONENTS_BENCHMARK
+
+	config COMPONENTS_TINYMEMBENCH
+		bool "Enable tinymembench"
+		default n
+		help
+			Memory test:Memory access latency test.
+
+	config COMPONENTS_COREMARK
+		bool "Enable coremark"
+		default n
+		help
+			CPU test:List processing, matrix operations, state machines,
+			and CRC calculations.
+
+	config COMPONENTS_DHRYSTONE
+		bool "Enable dhrystone"
+		default n
+		help
+			CPU test:Test CPU integer computation performance.
+
+	config COMPONENTS_FHOURSTONE
+		bool "Enable fhourstone"
+		default n
+		help
+			Select this option to enable fhourstone.
+
+	config COMPONENTS_LINPACK
+		bool "Enable linpack"
+		default n
+		help
+			CPU test:Test CPU float computation performance.
+
+	config COMPONENTS_PI_CSS5
+		bool "Enable pi_css5"
+		default n
+		help
+			CPU test:By calculate PI.
+
+	config COMPONENTS_WHETSTONE
+		bool "Enable whetstone"
+		default n
+		help
+			CPU test:Include integer computation,float computation,array index,
+			subroutine call,trigonometric function etc.
+```
 
 ## **7 RKOS 版本简介**
 
