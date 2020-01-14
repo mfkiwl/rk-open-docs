@@ -1,6 +1,6 @@
 # **RK2206 RKOS Debug User Guide**
 
-文件标识：RK-YH-YF-301
+文件标识：RK-YH-YF-315
 
 发布版本：1.0.0
 
