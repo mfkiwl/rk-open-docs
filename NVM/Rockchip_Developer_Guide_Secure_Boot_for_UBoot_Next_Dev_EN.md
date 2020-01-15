@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-023
 
-Release version: 1.0
+Release version: 1.1
 
-Release Date: 2019-12-04
+Release Date: 2020-01-15
 
 Author email: jason.zhu@rock-chips.com
 
@@ -60,6 +60,7 @@ Software development engineers
 | **Date** | **Version** | **Author** | **Revision description** |
 | ---------- | -------- | --------- | ------------------ |
 | 2019-12-04 | V1.0     | Jason Zhu & Chen Haiyan | Initial version release |
+| 2020-01-15 | V1.1 | Ken Bian | Add more details for Android SDK |
 
 ------
 
@@ -152,6 +153,8 @@ python avbtool make_atx_permanent_attributes --output=permanent_attributes.bin -
 ```
 
 The product_id.bin should be defined by yourself. It takes 16 bytes, and can be used as product ID.
+
+**Note: The signatures of the following Android images(boot.img, system.img) and the generation of vbmeta.img have been bundled in Android 9.0 and later, no signing and manual generation are required. Please refer to [5.7 Android SDK configuration instruction](#5.7-Android SDK configuration instruction)**
 
 The example of boot.img signature:
 
@@ -465,7 +468,13 @@ firmware {
 
 #### AVB Enable
 
-Enable BOARD_AVB_ENABLE
+For Android 9.0 and later, the image signature is already bundled in the SDK, just enable BOARD_AVB_ENABLE and configure the path of PSK and metadata.bin. All the configurations you need to set in your BoardConfig.mk (for example: device/rockchip/rk3326/BoardConfig.mk) are:
+
+```makefile
+BOARD_AVB_ENABLE := true
+BOARD_AVB_METADATA_BIN_PATH := path/to/metadata.bin
+BOARD_AVB_KEY_PATH := path/to/testkey_psk.pem
+```
 
 #### A/B system
 

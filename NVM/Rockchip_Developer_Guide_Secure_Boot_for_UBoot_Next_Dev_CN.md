@@ -1,10 +1,10 @@
 # Rockchip Secure Boot
 
-发布版本：2.0
+发布版本：2.1
 
 作者邮箱：jason.zhu@rock-chips.com
 
-日期：2019.09
+日期：2020.01.15
 
 文件密级：公开资料
 
@@ -33,6 +33,7 @@
 | 2019-01-14 | V1.0     | Jason Zhu | 初始版本           |
 | 2019-06-03 | V1.1     | Jason Zhu | 修正一些不恰当描述 |
 | 2019-09-19 | V2.0  | Jason Zhu | 版本更新 |
+| 2020-01-15 | V2.1 | Ken Bian | 添加更多Android SDK中的细节 |
 
 ------
 
@@ -131,6 +132,8 @@ python avbtool make_atx_permanent_attributes --output=permanent_attributes.bin -
 ```
 
 其中 product_id.bin 需要自己定义，占 16 字节，可作为产品 ID 定义。
+
+**注意：以下部分的boot.img, system.img等Android固件签名及vbmeta.img的生成, 在Android 9.0及以上版本的SDK中已经集成, 不需要再手动操作, 详细配置请参照 [5.7 Android SDK 一些配置说明](#5.7-Android SDK 一些配置说明)**
 
 boot.img 签名示例：
 
@@ -436,7 +439,13 @@ firmware {
 
 #### AVB Enable
 
-使能 BOARD_AVB_ENABLE
+对于Android 9.0及以上版本的SDK, 固件(除``MiniLoader/uboot/trust``外)的签名流程已经集成, 只需要使能 BOARD_AVB_ENABLE并配置好PSK及metadata.bin即可. 即共需要在你的BoardConfig.mk (例如: device/rockchip/rk3326/BoardConfig.mk) 中设置以下三个宏:
+
+```makefile
+BOARD_AVB_ENABLE := true
+BOARD_AVB_METADATA_BIN_PATH := path/to/metadata.bin
+BOARD_AVB_KEY_PATH := path/to/testkey_psk.pem
+```
 
 #### A/B system
 
