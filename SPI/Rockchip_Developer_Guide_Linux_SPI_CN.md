@@ -2,11 +2,11 @@
 
 文件标识：RK-KF-YF-020
 
-发布版本：V2.0.0
+发布版本：V2.1.0
 
-日期：2019-12-03
+日期：2020-02-12
 
-文件密级：内部资料
+文件密级：公开资料
 
 ---
 
@@ -70,6 +70,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0 | 洪慧斌 | 2016-06-29 | 初始版本 |
 | V2.0.0 | 林鼎强 | 2019-12-03 | 新增 linux4.19 支持 |
+| V2.1.0 | 林鼎强 | 2020-02-13 | 修改 SPI slave 配置 |
 
 **目录**
 
@@ -114,17 +115,15 @@ Device Drivers  --->
 ### 2.3 DTS 节点配置
 
 ```c
-&spi1 {     						引用spi 控制器节点
+&spi1 {     						//引用spi 控制器节点
 status = "okay";
-max-freq = <48000000>; 				spi内部工作时钟
-dma-names = "tx","rx";   			使能DMA模式，一般通讯字节少于32字节的不建议用
+max-freq = <48000000>; 				//spi内部工作时钟
+dma-names = "tx","rx";   			//使能DMA模式，一般通讯字节少于32字节的不建议用
 	spi_test@10 {
-		compatible ="rockchip,spi_test_bus1_cs0";  与驱动对应的名字
-		reg = <0>;   			 片选0或者1
-		spi-max-frequency = <24000000>;   spi clk输出的时钟频率，不超过50M
-		spi-cpha；  				如果有配，cpha为1
-		spi-cpol；  				如果有配，cpol为1,clk脚保持高电平
-		status = "okay";		 使能设备节点
+		compatible ="rockchip,spi_test_bus1_cs0";  //与驱动对应的名字
+		reg = <0>;   			 //片选0或者1
+		spi-max-frequency = <24000000>;   //spi clk输出的时钟频率，不超过50M
+		status = "okay";		 //使能设备节点
 	};
 };
 ```
@@ -263,9 +262,11 @@ MODULE_DEVICE_TABLE(of, spidev_dt_ids);
 
 请参照 Documentation/spi/spidev_test.c
 
-#### 2.5 SPI 做 slave
+### 2.5 SPI 做 slave
 
-使用的接口和 master 模式一样，都是 spi_read 和 spi_write。
+SPI 做 slave 使用的接口和 master 模式一样，都是 spi_read 和 spi_write。
+
+#### 2.5.1 Linux 4.4 配置
 
 内核补丁，请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
 
@@ -329,28 +330,49 @@ dts 配置：
                 id = <1>;
                 reg = <1>;
                 //spi-max-frequency = <24000000>;  这不需要配
-                spi-cpha;
-                spi-cpol;
-                spi-slave-mode; 使能slave 模式， 只需改这里就行。
+                spi-slave-mode; //使能slave 模式， 只需改这里就行。
         };
     };
 ```
 
 注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
 
-测试：
+#### 2.5.2 Linux 4.19 配置
 
-spi 做 slave， 要先启动 slave read，再启动 master write，不然会导致 slave 还没读完，master 已经写完了。
+Linux 4.19 引入 SPI slave 框架，因此主控代码 spi-rockchip.c 添加了探测 SPI slave 模式的支持：
 
-slave write，master read 也是需要先启动 slave write，因为只有 master 送出 clk 后，slave 才会工作，同时 master
+```c
+of_property_read_bool(pdev->dev.of_node, "spi-slave")
+```
 
-会立即发送或接收数据。
+所以仅需配置 dts ：
+
+```c
+&spi0 {
+	status = "okay";
+	max-freq = <48000000>; //spi internal clk, don't modify
+	spi-slave; //使能 slave 模式
+	slave { //按照框架要求，SPI slave 子节点的命名需以 "slave" 开始
+		compatible = "rockchip,spi_test_bus0_cs0";
+		id = <0>;
+		spi-max-frequency = <24000000>;
+	};
+};
+```
+
+注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
+
+#### 2.5.3 测试
+
+spi 做 slave，要先启动 slave read，再启动 master write，不然会导致 slave 还没读完，master 已经写完了。
+
+slave write，master read 也是需要先启动 slave write，因为只有 master 送出 clk 后，slave 才会工作，同时 master 会立即发送或接收数据。
 
 在第三章节的基础上：
 
-先 master : `echo write 0 1 16 > /dev/spi_misc_test`
+先 slave : `echo write 0 1 16 > /dev/spi_misc_test`
 
-再 slave:  `echo read 0 1 16 > /dev/spi_misc_test`
+再 master:  `echo read 0 1 16 > /dev/spi_misc_test`
 
 ## 3 SPI 内核测试驱动
 
@@ -377,8 +399,6 @@ drivers/spi/Makefile
                 id = <0>;		//这个属性spi-rockchip-test.c用来区分不同的spi从设备的
                 reg = <0>;   //chip select  0:cs0  1:cs1
                 spi-max-frequency = <24000000>;   //spi output clock
-                //spi-cpha;      //not support
-                //spi-cpol;     //if the property is here it is 1:clk is high, else 0:clk is low  when idle
         };
 
         spi_test@01 {
@@ -386,8 +406,6 @@ drivers/spi/Makefile
                 id = <1>;
                 reg = <1>;
                 spi-max-frequency = <24000000>;
-                spi-cpha;
-                spi-cpol;
                 spi-slave-mode; 使能slave 模式， 只需改这里就行。
         };
 };

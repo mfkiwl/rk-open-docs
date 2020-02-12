@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-075
 
-Release Version: V2.0.0
+Release Version: V2.1.0
 
-Release Date: 2019-12-09
+Release Date: 2020-02-13
 
 Security Level: Non-confidential
 
@@ -58,10 +58,11 @@ Software development engineers
 
 **Revision History**
 
-| **Version** | **Author**    | **Date**   | **Change Description** |
-| ----------- | ------------- | :--------- | ---------------------- |
-| V1.0.0      | Huibin Hong   | 2016-06-29 | Initial version        |
-| V2.0.0      | Dingqiang Lin | 2019-12-09 | Support Linux 4.19     |
+| **Version** | **Author**    | **Date**   | **Change Description**         |
+| ----------- | ------------- | :--------- | ------------------------------ |
+| V1.0.0      | Huibin Hong   | 2016-06-29 | Initial version                |
+| V2.0.0      | Dingqiang Lin | 2019-12-09 | Support Linux 4.19             |
+| V2.1.0      | Dingqiang Lin | 2020-02-13 | Adjust SPI slave configuration |
 
 **Content**
 
@@ -257,7 +258,11 @@ After the driver device is successfully registered, a device like this name will
 
 Please refer to Documentation/spi/spidev_test.c
 
-#### 2.5 Independent SPI slave configuration
+### 2.5 Independent SPI slave configuration
+
+The interfaces "spi_read" and "spi_write" of SPI slave are the same as SPI master.
+
+#### 2.5.1 Linux 4.4 configuration
 
 About kernel patch of the slave, please check if your code contains the following patches, if not, please add the patch:
 
@@ -321,8 +326,6 @@ DTS configuration：
                 id = <1>;
                 reg = <1>;
                 //"spi-max-frequency = <24000000>; " is no need
-                spi-cpha;
-                spi-cpol;
                 spi-slave-mode; //if enble slave mode,just modify here
         };
     };
@@ -330,7 +333,32 @@ DTS configuration：
 
 Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
 
-Testing:
+#### 2.5.2 Linux 4.19 configuration
+
+Owning to the developing of Linux 4.19 SPI slave framework，it support SPI slave after adding related code in spi-rockchip.c：
+
+```c
+of_property_read_bool(pdev->dev.of_node, "spi-slave")
+```
+
+DTS configuration：
+
+```c
+&spi0 {
+	status = "okay";
+	max-freq = <48000000>; //spi internal clk, don't modify
+	spi-slave; //enable slave mode
+	slave { //As spi-bus requied, SPI slave sub-node should name start with "slave"
+		compatible = "rockchip,spi_test_bus0_cs0";
+		id = <0>;
+		spi-max-frequency = <24000000>;
+	};
+};
+```
+
+Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
+
+#### Testing
 
 If SPI working as slave, you must start" slave read" and then start "master write". Otherwise, the slave will not finish reading and the master has finished writing.
 
@@ -338,9 +366,9 @@ If it is slave write , then master read, also needs to start slave write first, 
 
 Based on the third chapter:
 
-First master : `echo write 0 1 16 > /dev/spi_misc_test`
+First slave: `echo write 0 1 16 > /dev/spi_misc_test`
 
-Then slave: `echo read 0 1 16 > /dev/spi_misc_test`
+Then master: `echo read 0 1 16 > /dev/spi_misc_test`
 
 ## 3 SPI Testing Driver in Kernel
 
@@ -368,8 +396,6 @@ drivers/spi/Makefile
                 id = <0>;		//This attribute is used to distinguish different SPI slave devices in "spi-rockchip-test.c".
                 reg = <0>;   //chip select  0:cs0  1:cs1
                 spi-max-frequency = <24000000>;   //spi output clock
-                //spi-cpha;      //not support
-                //spi-cpol;     //if the property is here it is 1:clk is high, else 0:clk is low  when idle
         };
 
         spi_test@01 {
@@ -377,8 +403,6 @@ drivers/spi/Makefile
                 id = <1>;
                 reg = <1>;
                 spi-max-frequency = <24000000>;
-                spi-cpha;
-                spi-cpol;
                 spi-slave-mode;
         };
 };
