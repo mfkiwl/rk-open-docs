@@ -1,19 +1,47 @@
-**Rockchip**
+# Rockchip USB Initialization Log Analysis
 
-# **USB Initialization Log Analysis**
+文件标识：RK-KF-YF-099
 
-发布版本：1.1
+发布版本：V1.1.1
 
-作者邮箱：frank.wang@rock-chips.com
+日期：2020-02-19
 
-日期：2019-01-09
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
-文件密级：公开资料
+---
+**免责声明**
 
-Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
+本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
-------
-# 前言
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有© 2019福州瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+福州瑞芯微电子股份有限公司
+
+Fuzhou Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
+
+**前言**
 
 **概述**
 
@@ -24,30 +52,32 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 本文档（本指南）主要适用于以下工程师：
 
 技术支持工程师
-软件工程师
-硬件工程师
+软件开发工程师
+硬件开发工程师
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**             |
-| ---------- | -------- | -------- | ------------------------ |
-| 2017-12-12 | V1.0     | 王明成   | 初始版本                 |
-| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式 |
+| **日期**   | **版本** | **作者** | **修改说明**                       |
+| ---------- | -------- | -------- | ---------------------------------- |
+| 2017-12-12 | V1.0     | 王明成   | 初始版本                           |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式         |
+| 2020-02-19 | V1.1.1   | 吴良峰   | 增加免责声明，商标声明以及版权声明 |
 
-------
+**目录**
 
+---
 [TOC]
+---
 
-------
-# 1 Linux USB 子系统简介
+## 1 Linux USB 子系统简介
 
 在 Linux 系统中，提供了主机侧和设备侧视角的 USB 驱动框架及通用驱动程序。
 
 - 主机侧分为 USB Core、HOST 控制器驱动，HUB 驱动和各设备类驱动。
 - 设备侧分为 Gadget 框架、Devices 控制器驱动和各设备类 Function 驱动。
 
-------
-# 2 Rockchip SoC USB 控制器列表
+---
+## 2 Rockchip SoC USB 控制器列表
 
 | 芯片\控制器  | EHCI&OHCI | DWC2 | DWC3 |
 | ------- | :-------: | :--: | :--: |
@@ -61,16 +91,16 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 | RK3368  |     Y     |  Y   |  N   |
 | RK3399  |     Y     |  N   |  Y   |
 
-------
-# 3 Kernel 3.10
+---
+## 3 Kernel 3.10
 
-## 3.1 适用芯片
+### 3.1 适用芯片
 
 本章节介绍 Linux Kernel 3.10 初始化日志，主要适用于 RV1108、RK312X、RK3288、RK322X、RK322XH、RK3328、RK3368 等有运行 Kernel 3.10 SDK 的平台。
 
-## 3.2 主机侧日志
+### 3.2 主机侧日志
 
-### 3.2.1 USB CORE
+#### 3.2.1 USB CORE
 
 ```Log
 
@@ -83,7 +113,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 以上是 Linux Kernel 3.10 启动阶段 USB 模块最早输出的 3 句 log。01 行表示注册 USB 文件系统，系统正常启动后，对应生成/sys/bus/usb/目录；02 行表示成功注册 USB HUB 驱动；03 行表明注册 USB 通用设备驱动，即 usb_generic_driver。通常 USB 设备都是以设备的身份先与 usb_generic_driver 匹配，成功之后，会分裂出接口，当对接口调用 device_add()后，会引起接口和接口驱动的匹配。
 
-### 3.2.2 设备类驱动
+#### 3.2.2 设备类驱动
 
 ```Log
 
@@ -122,9 +152,9 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-### 3.2.3 Host 控制器驱动
+#### 3.2.3 Host 控制器驱动
 
-#### 3.2.3.1 EHCI
+##### 3.2.3.1 EHCI
 
 ```Log
 
@@ -150,7 +180,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
 - EHCI 控制器被枚举为一个 USB2.0 Root HUB (hub 3-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (3)。
 
-#### 3.2.3.2 OHCI
+##### 3.2.3.2 OHCI
 
 ```Log
 
@@ -175,7 +205,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
 - OHCI 控制器被枚举为一个 USB1.1 Root HUB (hub 4-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (4)。
 
-#### 3.2.3.3 DWC2 Host
+##### 3.2.3.3 DWC2 Host
 
 ```Log
 
@@ -199,7 +229,7 @@ Copyright 2017 @Fuzhou Rockchip Electronics Co., Ltd.
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本（version 3.10a 21-DEC-2012）等信息。
 - DWC2 HOST 控制器被枚举为一个 USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (5)。
 
-#### 3.2.3.4 DWC3 Host
+##### 3.2.3.4 DWC3 Host
 
 ```Log
 
@@ -293,23 +323,24 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 10 行表示检测到 VBUS；
 - 18－22 行为 USB 枚举成功，并通过 UEVENT 事件通知 Android 层 Gadget 连接成功。
 
-# 4 Kernel 4.4
+---
+## 4 Kernel 4.4
 
-## 4.1 适用芯片
+### 4.1 适用芯片
 
 本章节介绍 Linux Kernel 4.4 初始化日志，主要适用于 RK312X、RK3288、RK322X、RK322XH、RK3328、RK3366、RK3368，RK3399 等有运行 Kernel 4.4 SDK 的平台。
 
-## 4.2 主机侧日志
+### 4.2 主机侧日志
 
-### 4.2.1 USB CORE 及设备类驱动
+#### 4.2.1 USB CORE 及设备类驱动
 
 跟 Linux Kernel 3.10 相同，usbcore 注册 USB 文件系统、注册 USB HUB 驱动，以及注册 USB 通用设备驱动，log 同[Linux Kernel 3.10](#3.2.1 USB CORE) 。
 
 设备类驱动亦同[Kernel 3.10](#3.2.2 设备类驱动)，log 和配置方式也相同。
 
-### 4.2.2 Host 控制器驱动
+#### 4.2.2 Host 控制器驱动
 
-#### 4.2.3.1 EHCI
+##### 4.2.3.1 EHCI
 
 ```Log
 01 [    0.869076] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
@@ -335,7 +366,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
 - EHCI 控制器被枚举为一个 USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (2)。
 
-#### 4.2.3.2 OHCI
+##### 4.2.3.2 OHCI
 
 ```Log
 
@@ -360,7 +391,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
 - OHCI 控制器被枚举为一个 USB1.1 Root HUB (hub 3-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (3)。
 
-#### 4.2.3.3 DWC2 Host
+##### 4.2.3.3 DWC2 Host
 
 ```Log
 
@@ -386,7 +417,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器部分配置信息。
 - DWC2 HOST 控制器被枚举为一个 USB2.0 Root HUB (hub 1-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (1)。
 
-#### 4.2.3.4 DWC3 Host
+##### 4.2.3.4 DWC3 Host
 
 ```Log
 01 [    0.942624] xhci-hcd xhci-hcd.7.auto: xHCI Host Controller

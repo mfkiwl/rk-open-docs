@@ -1,14 +1,49 @@
-# USB SQ Test Guide
+# Rockchip USB SQ 测试指南
 
-发布版本：1.6.1
+文件标识：RK-CS-YF-094
 
-作者邮箱：wulf@rock-chips.com
+发布版本：V1.6.2
 
-日期：2019-10-21
+日期：2020-02-19
 
-文档密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
----------
+---
+
+**免责声明**
+
+本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+福州瑞芯微电子股份有限公司
+
+Fuzhou Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
+
+**前言**
+
 **概述**
 
 本文档提供 Rockchip 平台 USB 2.0/3.0 信号完整性测试的方法。
@@ -44,9 +79,11 @@ Rockchip SOCs 通常内置多个 USB 控制器，不同控制器之间互相独�
 | 2019-01-15 | V1.5     | 吴良峰   | 增加 RK1808 测试命令、修正文档缩进、修正 USB3.0 测试命令 |
 | 2019-06-26 | V1.6     | 吴良峰   | 增加无法进入 Compliance Test 的解决方法                  |
 | 2019-10-21 | V1.6.1   | 吴良峰   | 增加 RK2108/RK2206 测试命令                              |
+| 2020-02-19 | V1.6.2   | 吴良峰   | 增加免责声明，商标声明以及版权声明                       |
 
----------
+---
 [TOC]
+---
 
 ## 1 USB 2.0 SQ Test
 
@@ -110,19 +147,16 @@ for xHCI：
 
 2. 打开测试工具，选择“Device”,然后点击“TEST”按钮，如下图 1-1 所示
 
-   ![USB2-Device-SQ-Test-tool](Rockchip-USB-SQ-Test-Guide/USB2-Device-SQ-Test-tool.png)
-
-   ​          									图 1-1 选择测试类型
+![USB2-Device-SQ-Test-tool](Rockchip-USB-SQ-Test-Guide/USB2-Device-SQ-Test-tool.png)
+图 1-1 选择测试类型
 
 3. 如图 1-2 所示，选择要测试的设备和测试命令”TEST PACKET”，然后点击“EXECUTE”按钮所示，执行完上述操作后，USB 控制器就会自动进入 Test Packet Mode，并连续发送周期性的测试包，测试波形如图 1-3 所示：
 
-   ![USB2-Device-SQ-Test-tool-cmd](Rockchip-USB-SQ-Test-Guide/USB2-Device-SQ-Test-tool-cmd.png)
+![USB2-Device-SQ-Test-tool-cmd](Rockchip-USB-SQ-Test-Guide/USB2-Device-SQ-Test-tool-cmd.png)
+图 1-2 选择测试设备和测试命令
 
-   ​								图 1-2 选择测试设备和测试命令
-
-   ![Test-packet-signal](Rockchip-USB-SQ-Test-Guide/Test-packet-signal.png)
-
-   ​										图 1-3 测试波形
+![Test-packet-signal](Rockchip-USB-SQ-Test-Guide/Test-packet-signal.png)
+图 1-3 测试波形
 
 #### 1.2.2 USB 2.0 Host 测试命令
 
@@ -197,8 +231,7 @@ USB 2.0 Host SQ 测试，只能使用测试命令，没有专门的测试工具�
 以 Agilent 示波器测试 USB2.0 Device SQ 为例，搭建好的测试环境如图 1-4 所示：
 
 ![Agilent-USB2- SQ-test-diagram](Rockchip-USB-SQ-Test-Guide/Agilent-USB2- SQ-test-diagram.png)
-
-​								图 1-4 Agilent USB 2.0 SQ 测试环境
+图 1-4 Agilent USB 2.0 SQ 测试环境
 
 **2). 设置 USB 进入测试模式[Test Packet Mode]**
 
@@ -213,8 +246,7 @@ USB 2.0 Host SQ 测试，只能使用测试命令，没有专门的测试工具�
 先将待测的 Host 口连接到测试夹具的测试接口一端，然后将高速设备（如 U 盘）连接到夹具的另一端接口，如下图 1-5，再执行测试命令，设置 USB 进测试模式。
 
 ![Agilent-usb2-test-fixture](Rockchip-USB-SQ-Test-Guide/Agilent-usb2-test-fixture.png)
-
-​							图 1-5 Agilent USB 2.0 SQ 测试夹具连接方法
+图 1-5 Agilent USB 2.0 SQ 测试夹具连接方法
 
 **b). Tektronix 测试套件**
 
@@ -227,8 +259,7 @@ USB 2.0 Host SQ 测试，只能使用测试命令，没有专门的测试工具�
 在 USB 控制器成功进入测试模式后，会产生并发送持续的 Test Packet Pattern，可以从示波器观察到周期性的测试波形，如图 1-6 所示。示波器的 USB 自动化测试软件，会自动对测试波形进行分析，并生成完成的测试报告。
 
 ![Test-packet-signal-analysis](Rockchip-USB-SQ-Test-Guide/Test-packet-signal-analysis.png)
-
-​								图 1-6 USB 2.0 信号质量分析界面
+图 1-6 USB 2.0 信号质量分析界面
 
 ### 1.5 USB 2.0 测试结果分析
 
@@ -237,12 +268,10 @@ USB 2.0 Host SQ 测试，只能使用测试命令，没有专门的测试工具�
 USB 2.0 眼图模板有两种不同的标准：近端（Near End）和远端（Far End）。在 High Speed Signal Quality 测试中，若待测 USB 的端口直接通过小于 10cm 的线缆与测试夹具相连，则采用 Near End 眼图模板。若待测的 USB 端口通过大于 10cm 的线缆与测试夹具相连，则采用 Far End 眼图模板。在 Rockchip 平台的 USB 2.0 眼图测试中，为保证 USB 2.0 信号质量的可靠性，建议统一采用更为严格的 Near End 眼图模块作为参考标准。图 1-7 和图 1-8 分别是使用 Near End 和 Far End 眼图模板的标准 USB 眼图。
 
 ![High-speed-Near-End-SQ-Eye-diagram](Rockchip-USB-SQ-Test-Guide/High-speed-Near-End-SQ-Eye-diagram.png)
-
-​							图 1-7 USB 2.0 High-speed Near End SQ Eye Diagram
+图 1-7 USB 2.0 High-speed Near End SQ Eye Diagram
 
 ![High-speed-Far- End-SQ-Eye-Diagram](Rockchip-USB-SQ-Test-Guide/High-speed-Far- End-SQ-Eye-Diagram.png)
-
-​						   图 1-8 USB 2.0 High-speed Far End SQ Eye Diagram
+图 1-8 USB 2.0 High-speed Far End SQ Eye Diagram
 
 从图 1-7 和图 1-8 中，可以看出，标准的 USB 2.0 眼图呈现为一个迹线又细又清晰的“眼睛”，“眼”张开得很大。当有码间串扰时，波形失真，码元不完全重合，眼图的迹线就会不清晰，引起“眼”部分闭合。若再加上噪声的影响，则使眼图的线条变得模糊，“眼”开启得小了，因此，“眼”张开的大小表示了失真的程度，反映了码间串扰的强弱。
 
@@ -261,14 +290,12 @@ USB 2.0 眼图模板有两种不同的标准：近端（Near End）和远端（F
 如图 1-9 所示，USB 眼图的信号幅度比标准的大一倍，如果使用的是 Agilent 测试套件，一般是因为测试夹具的 D+和 D-没有挂上 50 欧的终端 SMA 电阻。
 
 ![USB眼图失真-1](Rockchip-USB-SQ-Test-Guide/USB眼图失真-1.png)
-
-​									    图 1-9 USB 眼图幅度失真
+图 1-9 USB 眼图幅度失真
 
 如图 1-10 所示，USB 眼图的信号中间有明显的塌陷，如果使用的是 Agilent 测试套件，一般是因为没有将测试夹具的开关切到 ON 档。
 
 ![USB眼图失真-2](Rockchip-USB-SQ-Test-Guide/USB眼图失真-2.png)
-
-​									图 1-10 USB 眼图信号塌陷失真
+图 1-10 USB 眼图信号塌陷失真
 
 **3). USB 眼图没有张开**
 
@@ -278,8 +305,7 @@ USB 2.0 眼图模板有两种不同的标准：近端（Near End）和远端（F
 - 通过软件调整 USB PHY 的驱动强度和上升沿、下降沿，请联系负责 USB 驱动的工程师协助调试。
 
 ![USB眼图没有张开](Rockchip-USB-SQ-Test-Guide/USB眼图没有张开.png)
-
-​									   图 1-11 USB 眼图没有张开
+图 1-11 USB 眼图没有张开
 
 **4). USB 眼图模糊甚至布满血丝**
 
@@ -290,9 +316,9 @@ USB 2.0 眼图模板有两种不同的标准：近端（Near End）和远端（F
 - 检查 USB 的 PCB 走线、USB 的 24MHz 时钟源、USB PHY 的供电电源纹波
 
 ![USB眼图模糊](Rockchip-USB-SQ-Test-Guide/USB眼图模糊.png)
+图 1-12 USB 眼图模糊
 
-​										图 1-12 USB 眼图模糊
-
+---
 ## 2 USB 2.0 HUB SQ Test
 
 USB 2.0 HUB 的 SQ test 包括了 upstream ports 和 downstream ports，但实际应用中，我们一般只需测试提供给用户使用的 downstream ports。因此，本文档只提供了测试 USB2.0 HUB downstream ports 的 SQ 测试方法。
@@ -348,13 +374,13 @@ Type 'q' to stop the test: q (退出测试脚本)
 [root@hari LinuxEye]#
 ```
 
+---
 ## 3 USB 3.0 Compliance Test
 
 USB 3.0 是双总线架构，在 USB 2.0 的基础上增加了超高速(Super Speed)总线部分。超高速总线的信号速率达到 5Gbps， 采用 ANSI 8b/10b 编码，全双工方式工作，最大支持的电缆长度达 3 米。如下图 3-1 是典型的 USB3.0 的总线架构。
 
 ![USB3总线架构](Rockchip-USB-SQ-Test-Guide/USB3总线架构.png)
-
-​									图 3-1 USB 3.0 总线架构
+图 3-1 USB 3.0 总线架构
 
 ### 3.1 USB 3.0 新增测试规范
 
@@ -391,16 +417,13 @@ USB 3.0 是双总线架构，在 USB 2.0 的基础上增加了超高速(Super Sp
 其次， USB 3.0 发送端测试，不是用夹具直接连接 DUT，其定义的被测点是“**一致性通道** ( Compliance Channel)” 的末端。一致性通道模拟 PCB 走线和电缆对信号的影响。对于 HOST 的测试，它模拟的是 3m 长电缆＋5 英寸 PCB 走线的影响；对于 Device 的测试，它模拟的是 3m 长电缆＋11 英寸 PCB 走线的影响。USB3.0 的测试规范里会以 S 参数文件的形式提供一致性通道的模型。在真正测试时是用测试夹具直接连接 DUT，然后用示波器的 S 参数嵌入的方式加入通道影响。如图 3-2 Tx 测试模型，TP1 为示波器的测试点。
 
 ![Tx测试模型](Rockchip-USB-SQ-Test-Guide/Tx测试模型.png)
-
-​									图 3-2 USB 3.0 Tx 测试模型
+图 3-2 USB 3.0 Tx 测试模型
 
 ![TX测试眼图要求](Rockchip-USB-SQ-Test-Guide/TX测试眼图要求.png)
-
-​								   图 3-3 USB 3.0 Tx 测试眼图要求
+图 3-3 USB 3.0 Tx 测试眼图要求
 
 ![TX测试电气参数要求](Rockchip-USB-SQ-Test-Guide/TX测试电气参数要求.png)
-
-​								  图 3-4 USB 3.0 Tx 测试电气参数要求
+图 3-4 USB 3.0 Tx 测试电气参数要求
 
 #### 3.2.2 USB 3.0 Tx 测试项目
 
@@ -409,16 +432,14 @@ USB 3.0 是双总线架构，在 USB 2.0 的基础上增加了超高速(Super Sp
 - Tx(近端/远端）：眼图；Tj， Rj， Dj；幅度；
 
 ![Agilent-USB3-Tx测试选项](Rockchip-USB-SQ-Test-Guide/Agilent-USB3-Tx测试选项.png)
-
-​								图 3-5 Agilent USB 3.0 Tx 测试选项
+图 3-5 Agilent USB 3.0 Tx 测试选项
 
 #### 3.2.3 USB 3.0 Tx 测试模式
 
 根据 USB 3.0 spec 规定，USB 3.0 控制器要先进入测试模式(Compliance Mode)，才能开始 USB 3.0 Tx 的信号完整性测试。如图 3-6 所示，在 Polling 阶段的**第一个 LFPS timeout**后，控制器就会从 Polling.LFPS 退出到 Compliance Mode。
 
 ![USB3-Compliance-mode](Rockchip-USB-SQ-Test-Guide/USB3-Compliance-mode.png)
-
-​						图 3-6 USB 3.0 进入 Compliance Mode 的流程
+图 3-6 USB 3.0 进入 Compliance Mode 的流程
 
 #### 3.2.4 USB 3.0 Tx 测试环境
 
@@ -427,18 +448,15 @@ USB 3.0 是双总线架构，在 USB 2.0 的基础上增加了超高速(Super Sp
 对于 USB 3.0 Tx 信号的测试，Agilent 推荐使用 90000 系列示波器(提供高达 13GHz 的带宽)， 配上自动的一致性测试软件 U7243A 和测试夹具 U7242A 来完成 USB 3.0 规范要求的发送端测试和验证。
 
 ![Agilent-USB3-Tx测试套件](Rockchip-USB-SQ-Test-Guide/Agilent-USB3-Tx测试套件.png)
-
-​							图 3-7 Agilent USB 3.0 Tx 测试环境
+图 3-7 Agilent USB 3.0 Tx 测试环境
 
 ![Agilent-USB3-Tx测试夹具U7242A](Rockchip-USB-SQ-Test-Guide/Agilent-USB3-Tx测试夹具U7242A.png)
-
-​							图 3-8 Agilent USB 3.0 Tx 测试夹具 U7242
+图 3-8 Agilent USB 3.0 Tx 测试夹具 U7242
 
 此外，Agilent 还提供了 USB 3.1 Gen1 Type-C 测试夹具 N7015A，如下图 3-9，用于测试 USB 3.0/3.1 Type-C 接口的信号完整性，测试软件与 U7242A 夹具一样。Type-C 测试夹具的具体使用方法，请参考文档《Keysight N7015A-16A Type-C Test Kit》。
 
 ![Agilent-Type-C测试夹具](Rockchip-USB-SQ-Test-Guide/Agilent-Type-C测试夹具.png)
-
-​								图 3-9 Agilent USB 3.0 Type-C 测试夹具 N7015A
+图 3-9 Agilent USB 3.0 Type-C 测试夹具 N7015A
 
 **2). Tektronix USB 3.0 Tx 测试套件**
 
@@ -449,8 +467,7 @@ Tektronix 的 Tx 测试示意图如图 3-10 所示，Tektronix USB 3.0 发射机
 <https://www.tek.com.cn/datasheet/usb3-transmitter-and-receiver-solutions-datasheet>
 
 ![Tek-USB3-Transmitter-Receiver-Solutions](Rockchip-USB-SQ-Test-Guide/Tek-USB3-Transmitter-Receiver-Solutions.jpg)
-
-​								图 3-10 Tektronix USB 3.0 Tx 测试示意图
+图 3-10 Tektronix USB 3.0 Tx 测试示意图
 
 #### 3.2.5 USB 3.0 Device Tx 测试命令
 
@@ -490,8 +507,7 @@ cat /sys/kernel/debug/xxxx.dwc3/link_state    (xxxx表示USB3控制器基地址)
 **1). 自动化测试软件设置**
 
 ![USB3-Device-Tx测试软件设置界面](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx测试软件设置界面.png)
-
-​							图 3-11 USB 3.0 Device Tx 测试软件设置界面
+图 3-11 USB 3.0 Device Tx 测试软件设置界面
 
 **Note：**
 
@@ -500,8 +516,7 @@ a). 使用的测试软件版本为**V2.01**，如果使用更新的测试版本(
 b). Channel Setting 的设置方法如下：
 
 ![USB3-Device-Tx测试软件Chanel的设置方法](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx测试软件Chanel的设置方法.png)
-
-​					图 3-12 USB 3.0 Device Tx 测试软件中 Channel 的设置方法
+图 3-12 USB 3.0 Device Tx 测试软件中 Channel 的设置方法
 
 Channel Settings 默认选择 Normal Channel，即嵌入 S 参数，来模拟 3m 长 usb cable + 5’’PCB 走线的影响。因此，要求测试时，用测试夹具直接连接待测试设备（DUT）。如果测试使用的 usb cable 太长（大于 10 cm），可能导致 Far End 测试项 fail，建议 Channel Settings 选择 None，或者使用小于 10cm 的短线测试。
 
@@ -510,72 +525,60 @@ Channel Settings 默认选择 Normal Channel，即嵌入 S 参数，来模拟 3m
 勾选 All USB3 Tests，可选择全部 USB 3.0 Tx 一致性测试项目。
 
 ![USB3-Device-Tx测试项的选择](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx测试项的选择.png)
-
-​							图 3-13 USB 3.0 Device Tx 测试项的设置
+图 3-13 USB 3.0 Device Tx 测试项的设置
 
 **3).  配置测试条件**
 
 将 Automate Test Pattern Change 设置为 Auto，其余使用默认配置即可。
 
 ![USB3-Device-Tx测试条件设置](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx测试条件设置.png)
-
-​							图 3-14 USB 3.0 Device Tx 测试条件设置
+图 3-14 USB 3.0 Device Tx 测试条件设置
 
 **4). 连接示波器、夹具和待测 USB 设备**
 
 按照示波器的提示进行连接，如下图所示。VBus 5V 供电也要连接。
 
 ![USB3-Device-Tx测试连接示意图](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx测试连接示意图.png)
-
-​							图 3-15 USB 3.0 Device Tx 测试连接示意图
+图 3-15 USB 3.0 Device Tx 测试连接示意图
 
 **5). 开始 Tx 测试**
 
 5.1). 测试过程中，自动化软件提示测试 LFPS 的操作方法
 
 ![USB3-LFPS测试](Rockchip-USB-SQ-Test-Guide/USB3-LFPS测试.png)
-
-​									图 3-16 LFPS 测试界面
+图 3-16 LFPS 测试界面
 
 **Note**：进行 LFPS 测试前，要先断开 USB3.0 夹具和被测件，然后点击“OK”，再重新连接到夹具。
 
 ![USB3-LFPS测试界面-LFPS参考波形](Rockchip-USB-SQ-Test-Guide/USB3-LFPS测试界面-LFPS参考波形.png)
-
-​							图 3-17 USB 3.0 Device Tx LFPS 参考波形
+图 3-17 USB 3.0 Device Tx LFPS 参考波形
 
 5.2). LFPS 测试完成后，开始 SSC 测试，自动化软件提示更改示波器、夹具和被测件的连接
 
 ![USB3-Device-Tx-SSC测试](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx-SSC测试.png)
-
-​							图 3-18 USB 3.0 Device Tx SSC 测试
+图 3-18 USB 3.0 Device Tx SSC 测试
 
  5.3). SSC 测试完成后， 开始眼图/抖动测试，自动化软件提示更改示波器、夹具和被测件的连接。
 
 ![USB3-Device-Tx-眼图及抖动测试](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx-眼图及抖动测试.png)
-
-​						图 3-19 USB 3.0 Device Tx 眼图及抖动测试
+图 3-19 USB 3.0 Device Tx 眼图及抖动测试
 
 5.4). 测试完成，自动生成测试报告，查看测试报告
 
 ![USB3-Device-Tx眼图测试报告-1](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx眼图测试报告-1.png)
-
-​								图 3-20 USB 3.0 Device Tx 测试报告
+图 3-20 USB 3.0 Device Tx 测试报告
 
 ![USB3-LFPS-Burst-Width](Rockchip-USB-SQ-Test-Guide/USB3-LFPS-Burst-Width.png)
-
-​							图 3-21  USB 3.0 Device Tx LFPS Burst Width
+图 3-21  USB 3.0 Device Tx LFPS Burst Width
 
 ![USB3-LFPS-Repeat-Time-Interval](Rockchip-USB-SQ-Test-Guide/USB3-LFPS-Repeat-Time-Interval.png)
-
-​						图 3-22 USB 3.0 Device Tx LFPS Repeat Time Interval
+图 3-22 USB 3.0 Device Tx LFPS Repeat Time Interval
 
 ![USB3-Device-Tx-Short-Channel-Eye-Diagram](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx-Short-Channel-Eye-Diagram.png)
-
-​						图 3-23 USB 3.0 Device Tx Short Channel Eye Diagram
+图 3-23 USB 3.0 Device Tx Short Channel Eye Diagram
 
 ![USB3-Device-Tx-Far-End-Eye-Diagram](Rockchip-USB-SQ-Test-Guide/USB3-Device-Tx-Far-End-Eye-Diagram.png)
-
-​							图 3-24 USB 3.0 Device Tx Far End Eye Diagram
+图 3-24 USB 3.0 Device Tx Far End Eye Diagram
 
 #### 3.2.7 USB 3.0 Host Tx 测试命令
 
@@ -840,8 +843,7 @@ USB 3.0 Rx 的电气性能测试，我们称之为接收容限测试(Rx Toleranc
 USB 3.0 控制器在 link training 的 Polling.Configuration 阶段，如果检测到 T2 pattern 中 Loopback bit 位，就会自动配置 USB 3.0 PHY 进入 Loopback mode。如下图 3-25 所示。
 
 ![USB3-RX-Loopback-mode](Rockchip-USB-SQ-Test-Guide/USB3-RX-Loopback-mode.png)
-
-​						图 3-25 USB 3.0 进入 Loopback mode 的流程
+图 3-25 USB 3.0 进入 Loopback mode 的流程
 
 **2). 确认进入 Loopback mode 的方法**
 
@@ -902,6 +904,7 @@ USB 3.0 控制器在 link training 的 Polling.Configuration 阶段，如果检�
    +static int usb_autosuspend_delay = -1;         /* Default delay value,
    ```
 
+---
 ## 4 USB 3.0 HUB Compliance Test
 
 USB 3.0 HUB 的 Compliance test 包括了 upstream ports 和 downstream ports，但实际应用中，我们一般只需测试提供给用户使用的 downstream ports。因此，本文档只提供了测试 USB3.0 HUB downstream ports 的 Compliance test 测试方法。
@@ -962,6 +965,7 @@ LinuxEye - select one of the following hub for testing.
 重复上述步骤，测试其他port
 ```
 
+---
 ## 5 参考文档
 
 1. 《USB 2.0 Specification》

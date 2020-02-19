@@ -1,14 +1,47 @@
-# **USB Performance Analysis Guide**
+# Rockchip USB Performance Analysis Guide
 
-发布版本：1.1
+文件标识：RK-KF-YF-100
 
-作者邮箱：wulf@rock-chips.com
+发布版本：V1.1.1
 
-日期：2019-01-09
+日期：2020-02-19
 
-文档密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
----------
+---
+
+**免责声明**
+
+本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+福州瑞芯微电子股份有限公司
+
+Fuzhou Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
+
 **前言**
 
 **概述**
@@ -29,13 +62,15 @@
 技术支持工程师
 
 **修订记录**
-| **日期**   | **版本** | **作者** | **修改说明**             |
-| ---------- | -------- | -------- | ------------------------ |
-| 2017-12-25 | V1.0     | 吴良峰   | 初始版本                 |
-| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式 |
+| **日期**   | **版本** | **作者** | **修改说明**                       |
+| ---------- | -------- | -------- | ---------------------------------- |
+| 2017-12-25 | V1.0     | 吴良峰   | 初始版本                           |
+| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式         |
+| 2020-02-19 | V1.1.1   | 吴良峰   | 增加免责声明，商标声明以及版权声明 |
 
----------
+---
 [TOC]
+---
 
 ## 1 USB 理论传输速率分析
 
@@ -126,6 +161,7 @@ USB 的传输速率主要受如下几方面的影响：
 
    U 盘拷贝速率容易受文件系统的影响，常见的文件系统格式包括：VFAT、EXT4 和 NTFS。对于 VFAT/EXT4 两种文件系统格式的传输机制，kernel 的 block 层会自动将小的数据块 merge 为 120K，再写入磁盘。而 NTFS 的写入磁盘操作是在用户空间，数据块不会由 block 层 merge。所以，如果应用层每次请求的数据块太小（如 4KB），NTFS 文件系统格式的 U 盘，拷贝速率一般会明显慢于 VFAT/EXT4 的文件系统格式。详细的分析，请参考[2.1 USB Disk 传输速率分析](#2.1 USB Disk 传输速率分析)
 
+---
 ## 2 USB Host 传输性能分析
 
 ### 2.1 USB Disk 传输速率分析
@@ -307,7 +343,7 @@ USB Disk 的传输速率测试，通常有以下两种方法：
 
 测试环境：RK3399 EVB （2G DDR + 16G EMMC）
 
-​                   USB3 Disk 型号为 SanDisk Type-C USB3.0 32G （NTFS 文件系统）
+USB3 Disk 型号为 SanDisk Type-C USB3.0 32G （NTFS 文件系统）
 
 测试场景：测试从 USB3 Disk 拷贝大文件到 3399 EMMC 的速率
 
@@ -356,8 +392,6 @@ EMMC 文件存储路径：/sdcard/.
 
   结果：1073741824 bytes (1.0GB) copied, 14.183164 seconds, 72.2MB/s
 
-  ​
-
   每次执行 dd 命令前，先清缓存
 
   `echo 3 > /proc/sys/vm/drop_caches`
@@ -368,8 +402,6 @@ EMMC 文件存储路径：/sdcard/.
 
   结果：1073741824 bytes (1.0GB) copied, 12.546069 seconds, 81.6MB/s
 
-  ​
-
   每次执行 dd 命令前，先清缓存
 
   `echo 3 > /proc/sys/vm/drop_caches`
@@ -379,8 +411,6 @@ EMMC 文件存储路径：/sdcard/.
   `busybox dd if=/mnt/media_rw/0E64-5F76/test of=/dev/null bs=128K count=8K`
 
   结果：1073741824 bytes (1.0GB) copied, 12.601817 seconds, 81.3MB/s
-
-  ​
 
   每次执行 dd 命令前，先清缓存
 
@@ -404,8 +434,6 @@ EMMC 文件存储路径：/sdcard/.
 
   结果：1073741824 bytes (1.0GB) copied, 39.525297 seconds, 25.9MB/s
 
-  ​
-
   `rm of=/sdcard/test`
 
   `sync`
@@ -418,8 +446,6 @@ EMMC 文件存储路径：/sdcard/.
 
   结果： 1073741824 bytes (1.0GB) copied, 37.505206 seconds, 27.3MB/s
 
-  ​
-
   `rm of=/sdcard/test`
 
   `sync`
@@ -431,8 +457,6 @@ EMMC 文件存储路径：/sdcard/.
   `busybox dd if=/dev/zero of=/sdcard/test bs=128K count=8K`
 
   结果： 1073741824 bytes (1.0GB) copied, 37.461603 seconds, 27.3MB/s
-
-  ​
 
   `rm of=/sdcard/test`
 
@@ -548,7 +572,7 @@ EMMC 文件存储路径：/sdcard/.
 
 图 2-1 blktrace data
 
-​	说明 3399 的 block 层的 merge 行为是没有问题的。
+说明 3399 的 block 层的 merge 行为是没有问题的。
 
 更详细的 blktrace 使用方法，请参考[blktrace 分析 IO](http://bean-li.github.io/blktrace-to-report/)
 
@@ -728,6 +752,7 @@ b). USB Host 驱动的同步传输性能；
 
 对于因素 a)，可以在 PC 上验证 USB Camera 的性能。对于因素 b)，可以考虑提高 USB QOS 的优先级、提高 USB 中断的响应速度、提高 USB 控制器的 AHB CLK 以及 DMA burst length。
 
+---
 ## 3 USB Device 传输性能分析
 
 ### 3.1 USB MTP 传输速率分析
@@ -1115,22 +1140,21 @@ PC Windows：HidTest.exe，PortHelper1.7.exe，或者下载[HID API](http://www.
 
 PC Ubuntu：Linux-3.10 Documentation/usb/gadget_hid.txt 中的 hid_gadget_test 测试脚本
 
-​                        或者下载[HID API](http://www.signal11.us/oss/hidapi/)
+或者下载[HID API](http://www.signal11.us/oss/hidapi/)
 
 **测试结果：**
 
 测试 rk3188 Gadget HID 传输速率，结果如下：
 
-case1.  设置 report_length 为 512 bytes，传输间隔为 1ms，传输文件大小为 10768KB，HID 为 high speed 设备
+case1.  设置 report_length 为 512 bytes，间隔为 1ms，传输文件大小 10768KB，HID 为 high speed 设备
 
-​             PC     -> 3188        速率： 249 KBps
+PC     -> 3188        速率：249 KBps
+3188   -> PC          速率：125 KBps
 
-​              3188 -> PC           速率：125 KBps
+case2.  设置 report_length 为 512 bytes，间隔为 125us，传输文件大小 10768KB，HID 为 high speed 设备
 
-case2.  设置 report_length 为 512 bytes，传输间隔为 125us，传输文件大小为 10768KB，HID 为 high speed 设备
-
-​              PC     -> 3188        速率： 872 KBps
-​              3188 -> PC            速率： 2659 KBps
+PC     -> 3188        速率：872 KBps
+3188   -> PC          速率：2659 KBps
 
 **测试结果分析：**
 

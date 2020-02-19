@@ -1,14 +1,42 @@
 # Rockchip Linux USB Developer Guide
 
-Release Version: 1.2.1
+ID: RK-KF-YF-097
 
-Author email: william.wu@rock-chips.com、frank.wang@rock-chips.com
+Release Version: V1.2.2
 
-Date: 2019-11-12
+Release Date: 2020-02-19
 
-Security Classification: Public
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
 ---
+
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Fuzhou Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
+
+**Preface**
 
 **Overview**
 
@@ -20,13 +48,13 @@ The purpose of this manual is to show you the hardware circuits of USB, how to c
 | :----------------------------------------------------------- | :-------------------: |
 | RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux-4.4、Linux-4.19 |
 
-**Application object**
+**Intended Audience**
 
+This document (this guide) is mainly intended for:
+
+Technical support engineers
 Software development engineers
-
 Hardware development engineers
-
-Field application engineers
 
 **Revision history**
 
@@ -36,6 +64,7 @@ Field application engineers
 | 2018-06-08 | v1.1    | william.wu             | Support RK3308、RK3326、PX30<br />Correct formats and errors |
 | 2019-03-11 | v1.2    | william.wu             | Fix style issues by markdownlint                             |
 | 2019-11-12 | v1.2.1  | william.wu             | Modify document name，support Linux-4.19                     |
+| 2020-02-19 | v1.2.2  | william.wu             | Add DISCLAIMER，Trademark Statement, etc.                    |
 
 ---
 [TOC]
