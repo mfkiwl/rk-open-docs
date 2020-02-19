@@ -1094,9 +1094,9 @@ vcc5v0_host: vcc5v0-host-regulator {
 
   ```shell
   1.Force host mode
-    echo host > sys/kernel/debug/usb0/dwc3_mode
+    echo host > sys/devices/platform/usb0/dwc3_mode
   2.Force peripheral mode
-    echo peripheral > sys/kernel/debug/usb0/dwc3_mode
+    echo peripheral > sys/devices/platform/usb0/dwc3_mode
   ```
 
 - Linux-4.19 内核切换 USB 控制器工作在 Peripheral mode 或 Host mode 的方法
