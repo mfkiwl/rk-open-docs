@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-096
 
-发布版本：V1.3
+发布版本：V1.3.1
 
-日期：2020-02-19
+日期：2020-02-20
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -74,6 +74,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-03-20 | V1.2.1   | 吴良峰         | 修正 USB OTG 控制器硬件电路说明<br />删除段首 Tab 空格符号   |
 | 2019-11-12 | V1.2.2   | 吴良峰         | 修改文档名称，支持Linux-4.19                                 |
 | 2020-02-19 | V1.3     | 吴良峰         | 修正大部分章节的内容，提高可读性<br />增加新的章节《USB 常用调试方法和调试命令》<br />增加常见问题分析 |
+| 2020-02-20 | V1.3.1   | 吴良峰         | 增加新的章节《Linux USB 驱动架构》<br />修正第五章的章节编号 |
 
 **目录**
 
@@ -1059,11 +1060,19 @@ usbdrd3_0: usb0 {
 ---
 ## 5 USB 驱动开发
 
-### 5.1 USB PHY 驱动开发
+### 5.1 Linux USB 驱动架构
+
+Linux USB 协议栈是一个分层的架构，如下图 5-1 所示，左边是 USB Device 驱动，右边是 USB Host 驱动，最底层是 Rockchip 系列芯片不同 USB 控制器和 PHY 的驱动。
+
+![Linux_usb_driver_architecture](Rockchip-Developer-Guide-USB\Linux_usb_driver_architecture.png)
+
+图 5-1 Linux USB 驱动架构
+
+### 5.2 USB PHY 驱动开发
 
 本章节，主要对 PHY 的驱动代码进行简要的说明，如果要了解更多的关于 PHY 的硬件框架、寄存器说明、信号调整等信息，请参考文档 《Rockchip_Developer_Guide_Linux_USB_PHY_CN》。
 
-#### 5.1.1 USB 2.0 PHY 驱动开发
+#### 5.2.1 USB 2.0 PHY 驱动开发
 
 Rockchip 系列芯片，主要使用两种 USB 2.0 PHY IP：Innosilicon IP 和 Synopsis IP。这两种 IP 的硬件设计不同，所以需要独立的 USB PHY 驱动。同时，使用同一种 USB 2.0 PHY IP 的系列芯片，复用同一个 USB 2.0 PHY 驱动，而不是每种芯片都有一个专用的 USB 2.0 PHY 驱动。
 
@@ -1280,7 +1289,7 @@ Note：USB 2.0 PHY 完整路径中 [u2phy dev name] 需要修改为芯片对应�
 
   `echo 0 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-#### 5.1.2 USB 3.0 PHY 驱动开发
+#### 5.2.2 USB 3.0 PHY 驱动开发
 
 Rockchip 系列芯片，主要使用三种 USB 3.0 PHY IP：Type-C PHY IP，Innosilicon USB 3.0 PHY IP 和  Innosilicon USB 3.0 CombPhy IP。这三种 IP 的硬件设计不同，所以需要独立的 USB PHY 驱动。
 
@@ -1446,26 +1455,26 @@ Note：
 
 - 在切换 USB 3.0 和 USB 2.0 only 工作模式时，需要设置 otg_mode 节点的原因是为了重新初始化 xHCI 控制器，否则切换 PHY 的工作模式，会导致控制器工作异常；
 
-### 5.2 USB 控制器驱动开发
+### 5.3 USB 控制器驱动开发
 
-#### 5.2.1 USB 2.0 OTG 控制器驱动开发
+#### 5.3.1 USB 2.0 OTG 控制器驱动开发
 
-##### 5.2.1.1 USB 2.0 OTG 控制器框架
+##### 5.3.1.1 USB 2.0 OTG 控制器框架
 
-USB 2.0 OTG 使用的是 DWC2 控制器，系统级框图如下图 5-1 所示，从图中可以看出，DWC2 控制器同时具备 AHB 主接口和 AHB 从接口，这是因为 DWC2 控制器具备内部 DMA 的能力，能够通过 AHB 总线在 USB FIFO 和 Memory 之间搬移数据。
+USB 2.0 OTG 使用的是 DWC2 控制器，系统级框图如下图 5-2 所示，从图中可以看出，DWC2 控制器同时具备 AHB 主接口和 AHB 从接口，这是因为 DWC2 控制器具备内部 DMA 的能力，能够通过 AHB 总线在 USB FIFO 和 Memory 之间搬移数据。
 同时，需要注意图中的绿框部分为硬件 IP 选配功能，Rockchip 芯片的 DWC2 控制器不支持外部 DMA 功能，不支持 endp_multi_proc_interrupt，与 USB PHY 通信的接口协议为 UTMI+。
 
 ![USB2.0-OTG-Controller-System-Level-Block-Diagram](Rockchip-Developer-Guide-USB\USB2.0-OTG-Controller-System-Level-Block-Diagram.png)
 
-图 5-1 DWC2 控制器系统级框图
+图 5-2 DWC2 控制器系统级框图
 
-如下图 5-2，说明了 DWC2 控制器的中断处理层级。由图中，可以看出，DWC2 支持 Device 中断/Host 中断/OTG中断，这三类中断还包含了子中断。所有的中断，通过一个总的中断信号连接到芯片的中断处理模块。
+如下图 5-3，说明了 DWC2 控制器的中断处理层级。由图中，可以看出，DWC2 支持 Device 中断/Host 中断/OTG中断，这三类中断还包含了子中断。所有的中断，通过一个总的中断信号连接到芯片的中断处理模块。
 
 ![USB2.0-OTG-Interrupt-Hierarchy](Rockchip-Developer-Guide-USB\USB2.0-OTG-Interrupt-Hierarchy.png)
 
-图 5-2 DWC2 控制器的中断层级
+图 5-3 DWC2 控制器的中断层级
 
-##### 5.2.1.2 USB 2.0 OTG 驱动说明
+##### 5.3.1.2 USB 2.0 OTG 驱动说明
 
 1. **USB 2.0 OTG 控制器驱动代码路径**
 
@@ -1508,7 +1517,7 @@ dwc2 驱动代码结构如下：
 
 ```
 
-##### 5.2.1.3 USB 2.0 OTG 调试接口
+##### 5.3.1.3 USB 2.0 OTG 调试接口
 
 - **dwc2 控制器驱动调试接口**
 
@@ -1565,15 +1574,17 @@ debuglevel ff580000.usb    op_state       unbind versio
 
 **vbus_status:** 获取 VBUS 的状态；
 
-#### 5.2.2 USB 2.0 Host 控制器驱动开发
+#### 5.3.2 USB 2.0 Host 控制器驱动开发
 
-##### 5.2.2.1 USB 2.0 Host 控制器框架
+##### 5.3.2.1 USB 2.0 Host 控制器框架
 
-USB 2.0 Host 控制器使用 USB 2.0 EHCI 控制器和 USB 1.1 OHCI 控制器。图中的绿框部分为硬件 IP 选配功能，Rockchip 芯片的 USB 2.0 Host 控制器配置为一个 EHCI 控制器和一个 OHCI 控制器，并且使用 UTMI+ 接口与 USB PHY 进行通信。EHCI 和 OHCI 都使用内部 DMA 通过 AHB 总线访问系统内存。EHCI 负责处理 HighSpeed 传输事务，OHCI 负责处理 FullSpeed 和 LowSpeed 传输事务。
+USB 2.0 Host 控制器使用 USB 2.0 EHCI 控制器和 USB 1.1 OHCI 控制器。图 5-4 中的绿框部分为硬件 IP 选配功能，Rockchip 芯片的 USB 2.0 Host 控制器配置为一个 EHCI 控制器和一个 OHCI 控制器，并且使用 UTMI+ 接口与 USB PHY 进行通信。EHCI 和 OHCI 都使用内部 DMA 通过 AHB 总线访问系统内存。EHCI 负责处理 HighSpeed 传输事务，OHCI 负责处理 FullSpeed 和 LowSpeed 传输事务。
 
 ![Rockchip-Developer-Guide-USB\USB2.0-Host-Controller-System-Level-Block-Diagram.png](Rockchip-Developer-Guide-USB\USB2.0-Host-Controller-System-Level-Block-Diagram.png)
 
-##### 5.2.2.2 USB 2.0 Host 驱动说明
+图 5-4 EHC&OHCI 控制器系统级框图
+
+##### 5.3.2.2 USB 2.0 Host 驱动说明
 
 1. **USB 2.0 Host 驱动代码路径**
 
@@ -1714,7 +1725,7 @@ static const struct hc_driver ohci_hc_driver = {
 
 ```
 
-##### 5.2.2.3 USB 2.0 Host 调试接口
+##### 5.3.2.3 USB 2.0 Host 调试接口
 
 以RK3399 USB 2.0 Host EHCI/OHCI 为例。
 
@@ -1762,15 +1773,20 @@ async periodic registers
 
 **registers:** 打印 OHCI 控制器的寄存器状态
 
-#### 5.3.1 USB 3.0 OTG 控制器驱动开发
+#### 5.3.3 USB 3.0 OTG 控制器驱动开发
 
-##### 5.3.1.1 USB 3.0 OTG 控制器框架
+##### 5.3.3.1 USB 3.0 OTG 控制器框架
+
+USB 3.0 OTG 控制器使用的是 DWC3 控制器，如下图 5-5 所示。
 
 ![USB3-OTG-System-Level-Block-Diagram](Rockchip-Developer-Guide-USB\USB3-OTG-System-Level-Block-Diagram.png)
 
+图 5-5 DWC3 控制器系统级框图
+
 USB3.0 控制器的特点如下：
 
-- DWC3 with xHCI host controller
+- 支持 USB 3.0/2.0/1.1/1.0 协议
+- 集成 xHCI Host controller
 - 只支持 DRD mode (dule role)，不支持 OTG mode
 - Device 和 Host 功能不能同时使用
 - Host 的 USB2.0 Port 和 USB3.0 Port 可以独立同时使用
@@ -1778,7 +1794,7 @@ USB3.0 控制器的特点如下：
 - 需要使用 System Memory (Sram/Dram)
 - xHCI 为标准 USB3.0 Host 控制器，同 PC USB 3.0接口。并且，可以支持 Force USB2.0 only mode。
 
-##### 5.3.1.2 USB 3.0 OTG 驱动说明
+##### 5.3.3.2 USB 3.0 OTG 驱动说明
 
 1. **USB 3.0 OTG 控制器驱动代码路径**
    `drivers/usb/dwc3/*` （USB3.0 OTG Global  core 和 Peripheral 相关驱动）
@@ -1914,7 +1930,7 @@ static const struct hc_driver xhci_hc_driver = {
 
 ```
 
-##### 5.3.1.3 USB 3.0 OTG 调试接口
+##### 5.3.3.3 USB 3.0 OTG 调试接口
 
 - **USB 3.0 OTG debugfs 调试接口**
 
