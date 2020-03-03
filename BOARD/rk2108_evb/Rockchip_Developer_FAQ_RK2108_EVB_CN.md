@@ -43,7 +43,7 @@
 ## 1. 板子介绍
 
  RK2108B_EVB_V10 板正面照
-   ![rk2108b](./Rockchip_Developer_FAQ_RK2108_EVB_CN/正面.jpg)
+   ![rk2108b](./Rockchip_Developer_FAQ_RK2108_EVB_CN/front.jpg)
 
  注意：
 
@@ -123,8 +123,6 @@ sudo ./upgrade_tool wl 0 Image/Firmware.img
 sudo ./upgrade rd
 ```
 
-
-
 ### 4.2 Windows版升级工具
 
 下载 Windows 升级工具，链接：
@@ -139,9 +137,7 @@ sudo ./upgrade rd
 	第1项“LoaderToDDR”选择bsp/rockchip/rk2108/Image/rk2108_db_loader.bin
 	第2项“Firmware”选择bsp/rockchip/rk2108/Image/Firmware.img
 
-![升级工具](./Rockchip_Developer_FAQ_RK2108_EVB_CN/升级工具.png)
-
-
+![升级工具](./Rockchip_Developer_FAQ_RK2108_EVB_CN/upgrade-tool.png)
 
 升级按 Reset，RK2108 EVB 的 debug 口也能看到打印：
 
@@ -152,8 +148,6 @@ sudo ./upgrade rd
 	mount fs[elm] on / failed.
 	testing sleep 1s:
 	msh />actual tick is:1000
-
-
 
 ## 5. JTAG调试
 
@@ -175,8 +169,6 @@ RT_USING_UART2 [=y]
 如果需要用 UART2 连接蓝牙，可以飞线 UART1_TX_M0 和 UART1_RX_M0 到 Debug 口，需要修改 iomux.c 代码让 GPIO0_D1，GPIO0_D2 工作在 PIN_CONFIG_MUX_FUNC2 模式。
 
 另外，RK2108 的固件是默认编译成XIP模式的，需要烧录到 Flash 才可运行，JTAG 无法直接下载此类型固件到 SRAM。如果需要使用 JTAG 上位机（Ozone，JLinkExe）下载固件 rtthread.elf，需要关闭 XIP 开关（参考下文）。
-
-
 
 ## 6. 文件系统
 
@@ -240,20 +232,20 @@ sudo umount ./rootfs
 # 此时root.img就是你要的根文件系统了
 ```
 
-##### 烧录 root 分区：
+### 烧录 root 分区：
 
-###### Linux 下操作方式：
+#### Linux 下操作方式：
 
 ```
 sudo upgrade_tool db rk2108_db_loader.bin
 sudo upgrade_tool wl 0x1100 root.img
 ```
 
-###### Windows 下操作方式：
+#### Windows 下操作方式：
 
 ![root分区](./Rockchip_Developer_FAQ_RK2108_EVB_CN/root.png)
 
-##### 从板上读取 root 分区：
+### 从板上读取 root 分区：
 
 仅支持 Linux 上操作：
 
@@ -264,11 +256,9 @@ $sudo upgrade_tool 选择1，进入操作模式
 Rockusb>RL 0x1100 0x6f00 root_out.img
 ```
 
-
-
 ## 7.其他问题
 
-1. #### 如何提交补丁
+1. ### 如何提交补丁
 
    git checkout -b xxx //新建本地分支,分支名为 xxx
 
@@ -278,12 +268,10 @@ Rockusb>RL 0x1100 0x6f00 root_out.img
 
    其他目录下的补丁: **git push rk xxx:refs/for/develop**
 
-
-2. #### 怎么关闭XIP
+2. ### 怎么关闭XIP
 
    ```
    vi rt-thread/bsp/rockchip/rk2108/rtconfig.py
    ```
 
    搜索 "XIP"， 默认是 = 'Y'，如需关闭 XIP ，改完 = 'N'
-
