@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-303
 
-发布版本：1.0.1
+发布版本：1.1.0
 
-日期：2019.12
+日期：2020.04
 
 文件密级：内部资料
 
@@ -65,8 +65,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **日期**   | **版本** | **作者** | **修改说明**           |
 | ---------- | -------- | --------  | ---------------------- |
-| 2019-11-25 | V1.0.0   | conway    | 初始版本               |
-| 2019-12-28 | V1.0.1 | conway    | 更新按键功能和代码说明 |
+| 2019-11-25 | V1.0.0   | Conway.Chen | 初始版本               |
+| 2019-12-28 | V1.0.1 | Conway.Chen | 更新按键功能和代码说明 |
+| 2020-04-29 | V1.1.0 | Conway.Chen | 更新板级适配说明，并更新LED部分等 |
 
 ## **目录**
 
@@ -120,8 +121,10 @@ make menuconfig
 [*]     Enable debug                                              #debug
 [*]     Enable Wi-FI                                              #Wi-FI test module
 -*-     Enable TF card                                            #TF card test module
+[ ]     Enable LCD                                                #LCD test module
 [*]     Enable camera                                             #camera test module
 [ ]         camera save multiple photos in TF card                #照片保存模式
+[ ]     Enable Battery Check                                      #battery check module
 [*]     Enable record                                             #record test module
 [ ]         record data save in TF card                           #录音数据是否保存
 (4)         record time                                           #录音时间设置
@@ -246,6 +249,7 @@ void record_play(void);
 
 camera测试照片保存在TF卡，格式为jpeg。照片默认只保留最新一张，可设置为保存多张
 camera测试成功,提示音“摄像头测试成功”;测试失败，提示音“摄像头测试失败”
+导致camera测试失败原因，如SD卡不存在、摄像头读取数据buffer长度异常
 
 #### **2.5.1 编译配置**
 
@@ -308,20 +312,21 @@ make menuconfig 配置路径：(top menu) → Components Config → LED → Enab
 
 ```C
 src/components/factory_test/factory_test.c
-LedInit(BOARD_LED_STORY_EYE_ID);            //初始化
+LedInit();                                  //初始化所有的LED,并且为每个LED创建一个线程，所以不能重复调用。
 LedControl(BOARD_LED_STORY_EYE_ID, 1);      //电平控制
-LedFlashingOn(BOARD_LED_STORY_CHARGE_ID);   //LED闪烁线程
+LedFlashingOn(BOARD_LED_STORY_CHARGE_ID);   //BOARD_LED_STORY_CHARGE_ID这个灯，启动闪烁
 
-src/bsp/RK2206/board/rk2206_story/board.c
+src/bsp/RK2206/board/rk2206_base.c
 struct led led_config[] =                   //LED配置数组
 {
-    {BOARD_LED_STORY_EYE_ID, BOARD_LED_STORY_EYE_PIN, NULL, GPIO_LOW, 0, 0},
-    {BOARD_LED_STORY_CHARGE_ID, BOARD_LED_STORY_CHARGE_PIN, NULL, GPIO_HIGH, 0, 0},
-//数组元素代表了： LED设备id、引脚、指针NULL固定、灯灭的电平、数字0固定、数字0固定
+    {BOARD_LED_STORY_EYE_ID, BOARD_LED_STORY_EYE_PIN, GPIO_LOW, 0},                 //LED_CONTROL
+    {BOARD_LED_STORY_CHARGE_ID, BOARD_LED_STORY_CHARGE_PIN, GPIO_HIGH, 0},          //Charge_LED
+//数组元素代表了： LED设备id、引脚、指针NULL固定、灯灭的电平、数字0固定
 //新增LED控制，在此增加数组元素
 };
 
-src/bsp/RK2206/board/rk2206_story/board.h
+src/bsp/RK2206/board/rk2206_base.h
+#define BOARD_LED_NUM 2                     //LED的板载数量
 /*led id*/                                  //定义LED设备id,为0开始顺序整数
 #define BOARD_LED_STORY_EYE_ID      0
 #define BOARD_LED_STORY_CHARGE_ID   1
@@ -338,7 +343,7 @@ src/bsp/hal/lib/hal/inc/hal_pinctrl.h       //引脚定义
 #define GPIO_PIN_C5 (0x00200000U)
 #define GPIO_PIN_C7 (0x00800000U)
 
-src/bsp/RK2206/board/rk2206_story/iomux.c   //led配置iomux
+src/bsp/RK2206/board/rk2206_iomux_base.c    //LED 配置iomux
 void iomux_config_led(void)
 {
     HAL_PINCTRL_SetIOMUX(GPIO_BANK0,
@@ -347,3 +352,53 @@ void iomux_config_led(void)
                          PIN_CONFIG_MUX_FUNC0);
 }
 ```
+
+### 2.9 LCD测试模块
+
+目前LCD显示模块的工厂测试，请查看文档《Rockchip_RK2206_Introduction_PCBA_EVB_V11_CN.md》。
+
+## 3 工厂测试模式帮助板级适配
+
+### 3.1 编译时如何选择板级配置
+
+RK2206 SDK支持多种板级配置，在make menuconfig选择指定单板即可。
+
+```
+(top menu) → Target Options → Board Options → Hardware Board Config
+( ) RK2206 FPGA
+( ) RK2206 EVB
+( ) RK2206 EVB_V11                      #这里指定是单板RK2206 EVB_V11
+(X) RK2206 STORY                        #这里指定是单板RK2206 STORY
+( ) RK2206 STORY_V11
+```
+
+### 3.2 如何新增加一个板级配置
+
+RK2206对不同单板，实际大部分硬件接口相同，差异性是少部分，常见于LED引脚，ADC检测电压通道，LCD背光使能引脚等。
+
+RK2206 SDK定义了一个通用硬件配置模板，这个模板采用了__WEAK语法，所有的单板都会使用这个硬件配置，硬件差异处使用**同名定义**在自己的单板文件定义，差异处会自动覆盖__WEAK定义的同名函数。
+
+- 通用硬件接口
+
+```
+src/bsp/RK2206/board/rk2206_base.c
+src/bsp/RK2206/board/rk2206_base.h
+```
+
+- 差异处用**与通用硬件接口里同名函数**定义在自己的board文件中，注意_WEAK不要一起复制过去。
+
+以单板rk2206_evb_v11为例
+
+```
+src/bsp/RK2206/board/rk2206_evb_v11/board.c
+src/bsp/RK2206/board/rk2206_evb_v11/board.h
+src/bsp/RK2206/board/rk2206_evb_v11/iomux.c
+src/bsp/RK2206/board/rk2206_evb_v11/iomux.h
+```
+
+- 总结
+
+对于一个新的单板（称为 My_board），先用工厂测试判断各模块功能，测试失败模块，查看模块硬件差异。
+
+比如把src/bsp/RK2206/board目录下，把rk2206_evb_v11复制为rk2206_My_board。删除rk2206_My_board文件里的一些无关内容，加上自己的硬件差异。
+
