@@ -1,8 +1,6 @@
-Rockchip Developer Guide RT-Thread Power                        {#Rockchip_Developer_Guide_RT-Thread_Power_CN}
-============
 # Rockchip RT-Thread 电源配置说明
 
-发布版本：1.0
+发布版本：V1.1.0
 
 作者邮箱：<zhangqing@rock-chips.com>
 
@@ -35,9 +33,10 @@ Rockchip Developer Guide RT-Thread Power                        {#Rockchip_Devel
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**       |
-| ---------- | -------- | -------- | ------------------ |
-| 2019-07-17 | V1.0     | Elaine   | 第一次临时版本发布 |
+| **日期**   | **版本** | **作者** | **修改说明**                     |
+| ---------- | -------- | -------- | :------------------------------- |
+| 2019-07-17 | V1.0     | Elaine   | 第一次临时版本发布               |
+| 2020-03-06 | V1.1.0   | Tony.xie | 增加SOC集成LDO等电源模块支持描述 |
 
 ---
 
@@ -49,7 +48,7 @@ Rockchip Developer Guide RT-Thread Power                        {#Rockchip_Devel
 
 * 支持 I2C 接口的 PMIC 调压、使能输出（如：RK808、RK818、RK809、RK817...）
 * 支持 I2C 接口的独立 DCDC 调压、使能输出（如：SYR82X、TCS452X...）
-* 支持 SOC 内部调压、使能输出（如：PISCES 内部封装的 LDO）
+* 支持针对 SOC 集成的 LDO 等电源模块的调压、使能输出（如：RK2108、PISCES...）
 
 ## 2 软件
 
@@ -226,30 +225,30 @@ const rt_uint32_t regulator_init_num = HAL_ARRAY_SIZE(regulator_inits);
 #endif
 ```
 
-**desc 参数详解**：
+1. **desc 参数详解**
 
-**flag**：现在有三种：REGULATOR_FLG_I2C8、REGULATOR_FLG_LOCK、REGULATOR_FLG_INTREG
-    **REGULATOR_FLG_I2C8**：8 位 I2C 传输的设备
-    **REGULATOR_FLG_INTREG**：内部 SOC 调压设备
-    **REGULATOR_FLG_LOCK**：是否需要锁（I2C 的设备都是需要的，内部调压的需要看场景和应用）
-**desc.i2c_desc**：
-    **flag**：需要配置的主要：PWR_FLG_FIXED、PWR_FLG_ALWAYSON、PWR_FLG_ENMASK
-        **PWR_FLG_FIXED**：固定电压，不支持电压调整
-        **PWR_FLG_ALWAYSON**：常开，不支持关闭输出
-        **PWR_FLG_ENMASK**：使能位是否带有 mask（RK808、RK818 没有 MASK 功能，RK816、RK805、RK817、RK809 都有 MASK 功能）
-    **info**：ePWR_ID pwrId，用于 desc 结构的获取
-    **i2c8.name**：i2c0\i2c1...用于 i2c 的 device 的获取
-    **i2c8.i2cAddr**：i2c 地址
-    **PWR_DESC_I2C8_SHIFT_RUN**：运行电压配置（寄存器，偏移）
-    **PWR_DESC_I2C8_SHIFT_SSPD**：休眠电压配置（寄存器，偏移）
-    **PWR_DESC_I2C8_SHIFT_EN**：使能输出(寄存器, 偏移)
-    **voltMask**：电压 mask
-    **PWR_DESC_LINEAR_VOLT**：电压设置步进(最小电压, 最大电压, 步进值)
-**desc.intreg_desc**：(同 i2c_desc 类似)：
-    **PWR_INTREG_SHIFT_RUN**：运行电压配置（寄存器，偏移）
-    **PWR_INTREG_SHIFT_SSPD**：休眠电压配置（寄存器，偏移）
+* **flag**：支持下面几种配置
+    * **REGULATOR_FLG_I2C8**：8 位 I2C 传输的设备
+    * **REGULATOR_FLG_INTREG**：内部 SOC 调压设备
+    * **REGULATOR_FLG_LOCK**：是否需要锁（I2C 的设备都是需要的，内部调压的需要看场景和应用）
+* **desc.i2c_desc**：
+    * **flag**：支持下面几种配置
+        * **PWR_FLG_FIXED**：固定电压，不支持电压调整
+        * **PWR_FLG_ALWAYSON**：常开，不支持关闭输出
+        * **PWR_FLG_ENMASK**：使能位是否带有 mask（RK808、RK818 没有 MASK 功能，RK816、RK805、RK817、RK809 都有 MASK 功能）
+    * **info**：ePWR_ID，各路regulator对应的pwrId，用于 desc 结构的获取
+* **i2c8.name**：i2c0\i2c1...用于 i2c 的 device 的获取
+* **i2c8.i2cAddr**：i2c 地址
+* **PWR_DESC_I2C8_SHIFT_RUN**：运行电压配置（寄存器，偏移）
+* **PWR_DESC_I2C8_SHIFT_SSPD**：休眠电压配置（寄存器，偏移）
+* **PWR_DESC_I2C8_SHIFT_EN**：使能输出(寄存器, 偏移)
+* **voltMask**：电压 mask
+* **PWR_DESC_LINEAR_VOLT**：电压设置步进(最小电压, 最大电压, 步进值)
+* **desc.intreg_desc**：(同 i2c_desc 类似)：
+    * **PWR_INTREG_SHIFT_RUN**：运行电压配置（寄存器，偏移）
+    * **PWR_INTREG_SHIFT_SSPD**：休眠电压配置（寄存器，偏移）
 
-**init 参数详解**：
+2. **init 参数详解**
 
 ```c
 DUMP_REGULATOR("vdd_npu", PWR_ID_DSP_CORE, 875000),
