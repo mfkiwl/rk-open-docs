@@ -2,9 +2,9 @@
 
 文件标识：RK-JC-CS-001
 
-发布版本：1.0.0
+发布版本：1.0.1
 
-日       期：2019.11
+日       期：2020.3
 
 文件密级：公开资料
 
@@ -69,6 +69,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-09-18 | V0.0.1   | HuangZihan | 初始版本         |
 | 2019-09-22 | V0.0.2   | CWW        | 增加工程配置说明 |
 | 2019-11-27 | V1.0.0   | CWW        | 修改文档排版     |
+| 2020-03-05 | V1.0.1   | Chad.Ma    | 增加3.5小节      |
 
 ---
 
@@ -256,6 +257,49 @@ include/sdkconfig.h
 
 ```bash
 app/wlan_demo/gcc/.config
+```
+
+### **3.5 资源文件的打包**
+
+根据项目是否支持GUI，将需要加入用户分区的资源文件放入对应工程目录的resource/userdata/或resource/userdata_gui目录中。例如：
+
+```bash
+app/wlan_demo/resource/userdata      #不支持GUI的资源路径
+app/wlan_demo/resource/userdata_gui  #支持GUI的资源路径
+```
+
+项目Makefile中会根据项目配置来选择对应的userdata路径。
+
+```makefile
+ifeq ($(CONFIG_COMPONENTS_GUI), y)
+USERDATA_PATH := app/$(PROJECT)/resource/userdata_gui
+else
+USERDATA_PATH := app/$(PROJECT)/resource/userdata
+endif
+```
+
+配置文件中，确定分区表以后，若项目编译成功，会根据设置的分区表信息自动解析并打包当前指定工程中的资源文件，生成相应的用户分区文件系统（FAT 12）的userdata.img，并最终合并到Firmware.img固件中。
+
+相关Makefile：
+
+```bash
+app/project.mk   #工程Makefile
+```
+
+生成用户分区userdata.img镜像：
+
+```makefile
+echo "Making $(USERDATA_NAME) from $(RESOURCE_PATH) with size($(USERDATA_PART_SIZE) K)"
+dd of=$(USERDATA_NAME) bs=1K seek=$(USERDATA_PART_SIZE) count=0 2>&1 || fatal "Failed to dd image!"
+mkfs.fat -F 12 $(USERDATA_NAME)
+MTOOLS_SKIP_CHECK=1 mcopy -bspmn -D s -i $(USERDATA_NAME) $(RESOURCE_PATH)/* ::/
+mv $(USERDATA_NAME) $(IMAGE_TOOL_PATH)
+```
+
+生成后userdata.img的路径：
+
+```bash
+Path_to_SDK/tools/firmware_merger/userdata.img
 ```
 
 ## **4 工程编译**
