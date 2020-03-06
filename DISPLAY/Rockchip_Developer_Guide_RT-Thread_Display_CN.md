@@ -1,10 +1,10 @@
 # **DISPLAY**开发指南
 
-发布版本：1.0
+发布版本：V1.3
 
 作者邮箱：hjc@rock-chips.com
 
-日期：2019.07
+日期：2020-03-06
 
 文件密级：公开资料
 
@@ -31,6 +31,7 @@
 | 2019-07-15 | V1.0     | 黄家钗   | 初始发布                        |
 | 2019-08-15 | V1.1     | 黄家钗   | 调整格式、加入Color Key使用说明 |
 | 2019-11-18 | V1.2     | 黄家钗   | 加入更新lut的方法及AOD模式说明  |
+| 2020-03-06 | V1.3     | 黄家钗   | 加入图层z序配置说明             |
 |            |          |          |                                 |
 
 ---
@@ -125,27 +126,27 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 
 | **Parameters**           | **Description**                                              |
 | ------------------------ | ------------------------------------------------------------ |
-| bool winEn               | 图层控制开关 0：关闭图层，1：打开图层                         |
-| uint8_t winId            | 图层制定，0,1,2 分别表示 win0,win1,win2                        |
-| uint8_t zpos             | 预留                                                         |
-| uint8_t format           | 格式配置，可以配置的值参考 rt-thread/include/rtdef.h          |
-| uint32_t yrgbAddr        | RGBX 格式地址或者 YUV 数据 Y 分量地址                             |
-| uint32_t cbcrAddr        | YUV 数据 UV 分量地址                                            |
-| uint16_t xVir            | 虚宽，需要 4Byte 对齐                                          |
-| uint16_t srcX            | 图层在屏上显示位置的 X 坐标                                    |
-| uint16_t srcY            | 图层在屏上显示位置的 Y 坐标                                    |
+| bool winEn               | 图层控制开关 0：关闭图层，1：打开图层                        |
+| uint8_t winId            | 图层指定，0,1,2 分别表示 win0,win1,win2                      |
+| uint8_t zpos             | 图层z序配置，0,1,2 表示图层从低到高的顺序                    |
+| uint8_t format           | 格式配置，可以配置的值参考 rt-thread/include/rtdef.h         |
+| uint32_t yrgbAddr        | RGBX 格式地址或者 YUV 数据 Y 分量地址                        |
+| uint32_t cbcrAddr        | YUV 数据 UV 分量地址                                         |
+| uint16_t xVir            | 虚宽，需要 4Byte 对齐                                        |
+| uint16_t srcX            | 图层在屏上显示位置的 X 坐标                                  |
+| uint16_t srcY            | 图层在屏上显示位置的 Y 坐标                                  |
 | uint16_t srcW            | 图层在屏上显示的宽                                           |
 | uint16_t srcH            | 图层在屏上显示的高                                           |
 | uint8_t hwFormat         | 驱动转换成硬件的配置，应用层无需配置                         |
 | uint16_t hwCrtcX         | 驱动转换成硬件的配置，应用层无需配置                         |
 | uint16_t hwCrtcY         | 驱动转换成硬件的配置，应用层无需配置                         |
-| uint16_t xLoopOffset     | X 方向 loop 配置                                                |
-| uint16_t yLoopOffset     | Y 方向 loop 配置                                                |
-| bool alphaEn             | alpha 使能配置                                                |
+| uint16_t xLoopOffset     | X 方向 loop 配置                                             |
+| uint16_t yLoopOffset     | Y 方向 loop 配置                                             |
+| bool alphaEn             | alpha 使能配置                                               |
 | uint8_t alphaMode        | alpha 模式，全局 alpha：VOP_ALPHA_MODE_USER_DEFINED 或者<br />per-pixel：alpha VOP_ALPHA_MODE_PER_PIXEL |
 | uint8_t alphaPreMul      | 是否 alpha 预乘：YES:VOP_PREMULT_ALPHA, <br />NO:VOP_NON_PREMULT_ALPHA |
 | uint8_t alphaSatMode     | 是否修改 alpha 的值：1：alpha = alpha +   alpha[7]，<br />0：alpha value no   change，建议配置为 0 |
-| uint8_t globalAlphaValue | 全局 alpha 的值：0~0xff                                        |
+| uint8_t globalAlphaValue | 全局 alpha 的值：0~0xff                                      |
 | uint32_t *lut            | bpp 格式查找表，可以参考 display_test.c 中的定义，也可以用户自定义 |
 
 ### 4.4 struct VOP_POST_SCALE_INFO
