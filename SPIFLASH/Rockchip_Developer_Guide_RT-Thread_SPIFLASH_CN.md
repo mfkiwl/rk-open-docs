@@ -2,7 +2,7 @@
 
 文件标识：RK-KF-YF-080
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
 日期：2020-02-21
 
@@ -65,9 +65,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本号** | **作者** | **修改日期** | **修改说明** |
-| ---------- | -------- | :----------- | ------------ |
-| V1.0.0     | 林鼎强   | 2020-02-21   | 初始版本     |
+| **版本号** | **作者** | **修改日期** | **修改说明**       |
+| ---------- | -------- | :----------- | ------------------ |
+| V1.0.0     | 林鼎强   | 2020-02-21   | 初始版本           |
+| V1.0.1     | 陈谋春   | 2020-03-05   | 修改无序列表的缩进 |
 
 **目录**
 
@@ -112,9 +113,9 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 
 - MTD 框架层
 - RTOS Driver 层，完成以下逻辑:
-  - RTOS 设备框架注册
-  - 注册控制器及操作接口到 HAL_SNOR 协议层
-  - 封装读写擦除接口给用户
+    - RTOS 设备框架注册
+    - 注册控制器及操作接口到 HAL_SNOR 协议层
+    - 封装读写擦除接口给用户
 - 基于 SPI Nor 传输协议的 HAL_SNOR 协议层
 - 控制器层
 
@@ -123,18 +124,18 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 **基于 FSPI 控制器的 RT-Thread 实现**：
 
 - OS 驱动层：drv_snor.c 实现:
-  - 基于 FSPI HAL层读写接口封装 SPI_Xfer，并注册 FSPI host 及 SPI_Xfer 至 HAL_SNOR 协议层
-  - 封装 HAL_SNOR 协议层提供的读写擦除接口
-  - 注册 OS 设备驱动到 MTD 框架层
+    - 基于 FSPI HAL层读写接口封装 SPI_Xfer，并注册 FSPI host 及 SPI_Xfer 至 HAL_SNOR 协议层
+    - 封装 HAL_SNOR 协议层提供的读写擦除接口
+    - 注册 OS 设备驱动到 MTD 框架层
 - 协议层：HAL 开发包中的 hal_snor.c 实现 SPI Nor flash 的协议层
 - 控制器层：HAL 开发包中的 hal_fspi.c 实现 FSPI 控制器驱动代码
 
 **基于 SPI 控制器的 RT-Thread 实现**：
 
 - OS 驱动层：drv_snor.c 实现:
-  - 基于 SPI OS driver 读写接口封装 SPI_Xfer，并注册 SPI host 和 SPI_Xfer 至 HAL_SNOR 协议层；
-  - 封装 HAL_SNOR 协议层提供的读写擦除接口
-  - 注册 OS 设备驱动到 MTD 框架层
+    - 基于 SPI OS driver 读写接口封装 SPI_Xfer，并注册 SPI host 和 SPI_Xfer 至 HAL_SNOR 协议层；
+    - 封装 HAL_SNOR 协议层提供的读写擦除接口
+    - 注册 OS 设备驱动到 MTD 框架层
 - 协议层：HAL 开发包中的 hal_snor.c 实现 SPI Nor flash 的协议层
 - 控制器层：HAL 开发包中的 hal_spi.c 实现 SPI 控制器 low layer 驱动代码，SpiDevice.c 代码实现 RTOS SPI DRIVER 的设备注册和接口封装
 
