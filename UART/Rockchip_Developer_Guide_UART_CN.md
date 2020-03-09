@@ -61,12 +61,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**  |
-| ---------- | -------- | -------- | ------------- |
-| 2017-12-21 | V1.0.0   | 洪慧斌   | 初始发布      |
-| 2019-02-14 | V1.1.0   | 洪慧斌   | 更新版本      |
-| 2019-11-13 | V1.2.0   | 洪慧斌   | 支持Linux4.19 |
-| 2020-02-26 | V1.3.0   | 洪慧斌   | 增加文档头    |
+| **日期**   | **版本** | **作者** | **修改说明**                             |
+| ---------- | -------- | -------- | ---------------------------------------- |
+| 2017-12-21 | V1.0.0   | 洪慧斌   | 初始发布                                 |
+| 2019-02-14 | V1.1.0   | 洪慧斌   | 更新版本                                 |
+| 2019-11-13 | V1.2.0   | 洪慧斌   | 支持Linux4.19                            |
+| 2020-02-26 | V1.3.0   | 洪慧斌   | 增加文档头                               |
+| 2020-0309  | V1.4.0   | 洪慧斌   | 增加5、6章节，增加fiq debugger更详细说明 |
 
 ---
 [TOC]
@@ -74,15 +75,17 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ## 1 Rockchip UART 功能特点
 
-UART （Universal Asynchronous Receiver/Transmitter），以下是 linux 4.4 uart 驱动支持的一些特性︰
+* 支持5, 6, 7, 8 bits，1和1.5个停止位
+* 支持奇校验和偶校验，不支持mark和space校验
+* 支持FIFO，一般为32字节或者64字节
+* 最高支持 4M 波特率，一般只要CLK能分的出来就可以支持
+* 4个引脚TX RX RTS CTS
+* 支持硬件自动流控（RTS+CTS），部分不支持，详细参看数据手册
+* 支持中断传输模式和DMA 传输模式
 
-* 最高支持 4M 波特率
-* 部分串口支持硬件自动流控，部分不支持，详细参看数据手册
-* 支持中断传输模式和 DMA 传输模式
+## 2 Linux内核软件
 
-## 2 内核软件
-
-### 2.1 代码路径
+### 2.1 Linux驱动路径
 
 <u>采用</u>的是 8250 通用驱动，类型是 16550A
 
@@ -97,7 +100,7 @@ drivers/tty/serial/8250/8250_port.c         端口相关的接口
 drivers/tty/serial/earlycon.c               解析命令行参数，并提供注册early con接口
 ```
 
-### 2.2 内核配置
+### 2.2 Linux menuconfig配置
 
 ```
 Device Drivers  --->
@@ -113,7 +116,7 @@ Device Drivers  --->
 		 [*] Support for Synopsys DesignWare 8250 quirks
 ```
 
-### 2.3 使能串口设备
+### 2.3 使能串口设备/dev/ttySx
 
 #### 2.3.1 使能 uart0
 
@@ -121,7 +124,7 @@ Device Drivers  --->
 
 ```c
 &uart0 {
-		status = "okay";
+	status = "okay";
 };
 ```
 
@@ -168,6 +171,8 @@ Date:   Mon Nov 5 15:56:03 2018 +0800
 
 驱动会根据 aliase，来对应串口编号，如下： serial0 最终会生成 ttyS0，serial3 会生成 ttyS3 设备。
 
+如果想把uart3变成ttyS0，可以这么改serial0 = &uart3; serial3 = &uart0;
+
 ```c
 	aliases {
 		serial0 = &uart0;
@@ -178,7 +183,7 @@ Date:   Mon Nov 5 15:56:03 2018 +0800
 	};
 ```
 
-### 2.4 DTS 节点配置
+### 2.4 Linux DTS 节点配置
 
 以 uart0 DTS 节点为例：
 
@@ -194,6 +199,7 @@ uart0: serial@ff180000 {
 		reg-shift = <2>;
 		reg-io-width = <4>;
 		dmas = <&dmac_peri 0>, <&dmac_peri 1>;
+		注意：以上是不能修改，以下是可以在板级配置里修改的
 		dma-names = "tx", "rx";
 		pinctrl-names = "default";
 		pinctrl-0 = <&uart0xfer &uart0cts &uart0_rts>;
@@ -222,13 +228,7 @@ pinctrl-0 = <&uart0xfer &uart0cts &uart0_rts>;
 
 #### 2.4.2 关于 DMA 的使用
 
-​	和中断传输模式相比，使用 DMA 并不一定能提高传输速度，相反可能略降低传输速度。
-
-因为现在 CPU 的性能都很高，传输瓶颈在外设，而且启动 DMA 还会消耗额外的资源。
-
-但整体上看中断模式会占用更多的 CPU 资源。只有传输数据量很大时，DMA 的使用
-
-对 CPU 负载的减轻效果才会比较明显。
+​	和中断传输模式相比，使用 DMA 并不一定能提高传输速度。因为现在 CPU 的性能都很高，传输瓶颈在外设，而且启动 DMA 还会消耗额外的资源。但整体上看中断模式会占用更多的 CPU 资源。只有传输数据量很大时，DMA 的使用对 CPU 负载的减轻效果才会比较明显。
 
 ​	关于 DMA 使用的几点建议：
 
@@ -243,49 +243,6 @@ pinctrl-0 = <&uart0xfer &uart0cts &uart0_rts>;
 ​	dma-names = "tx", "rx";  使能 DMA 发送和接收
 
 ​	dma-names = "!tx", "!rx";  禁止 DMA 发送和接收
-
-​	dmas = <&dmac_peri 0>, <&dmac_peri 1>; 这里的 0 和 1 是外设和 DMAC 连接的通道号，DMAC 通过这个号来识别外设。通过手册查找 Req number，如下图
-
-![dma_map](Rockchip_Developer_Guide_Linux4.4_UART\dma_map.jpg)	 
-
-&dmac_peri 要根据手册确认外设属于哪个 DMAC，来选择，一般 DMAC1 是 dmac_peri，
-
-DMAC0 是 dmac_bus。
-
-如下：
-
-```c
-amba {
-compatible = "arm,amba-bus";
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		dmac_bus: dma-controller@ff6d0000 {
-			compatible = "arm,pl330", "arm,primecell";
-			reg = <0x0 0xff6d0000 0x0 0x4000>;
-			interrupts = <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH 0>,
-				     <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH 0>;
-			#dma-cells = <1>;
-			clocks = <&cru ACLK_DMAC0_PERILP>;
-			clock-names = "apb_pclk";
-			peripherals-req-type-burst;
-		};
-
-		dmac_peri: dma-controller@ff6e0000 {
-			compatible = "arm,pl330", "arm,primecell";
-			reg = <0x0 0xff6e0000 0x0 0x4000>;
-			interrupts = <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH 0>,
-				     <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH 0>;
-			#dma-cells = <1>;
-			clocks = <&cru ACLK_DMAC1_PERILP>;
-			clock-names = "apb_pclk";
-			peripherals-req-type-burst;
-		};
-	};
-```
-
-注意：
 
 有些不需要使用 DMA 的场景，也可以考虑收发都关闭 DMA，如下
 
@@ -313,7 +270,7 @@ dma-names = "!tx", "rx";
 
 #### 2.4.3 波特率配置说明
 
-​	波特率=时钟源/16/DIV。（DIV 是分频系数）
+​	波特率=时钟源/DIV/16。（DIV 是分频系数）
 
 ​	目前的代码会根据波特率大小来设置时钟，一般 1.5M 以下的波特率都可以分出来。1.5M 以上的波特率，可能会经过小数分频或整数分频。如果以上都分不出来，则需要修改 PLL。但修改 PLL 有风险，会影响其他模块。可以通过 redmine 提需求。
 
@@ -352,7 +309,32 @@ root@android:/ # cat /sys/kernel/debug/clk/clk_summary | grep uart
 
 ### 3.1 FIQ debugger, ttyFIQ0 设备作为 console
 
-#### 3.1.1 DTS 使能 fiq_debugger 节点，禁止对应 uart 节点
+#### 3.1.1 menuconfig配置
+
+```c
+Device Drivers  --->
+  [*] Staging drivers  --->
+    Android  --->
+      [*] FIQ Mode Serial Debugger
+		[*]   Keep serial debugger active
+		[ ]   Don't disable wakeup IRQ when debugger is active
+		[*]   Console on FIQ Serial Debugger port
+		[*]   Put the FIQ debugger into console mode by default
+		[*]   Uart FIQ is captured by trust zone, then passed to non-secure world
+		[ ]   Install uart DT overlay
+		[*]   Console write by thread
+```
+
+#### 3.1.2 驱动
+
+```
+fiq debugger驱动
+drivers/staging/android/fiq_debugger/fiq_debugger.c
+fiq debugger平台实现
+drivers/soc/rockchip/rk_fiq_debugger.c
+```
+
+#### 3.1.3 DTS 使能 fiq_debugger 节点，禁止对应 uart 节点
 
 ```c
 fiq_debugger: fiq-debugger {
@@ -374,9 +356,13 @@ fiq_debugger: fiq-debugger {
 
 该节点驱动加载后会注册/dev/ttyFIQ0 设备，需要注意的是 rockchip,serial-id 即便改了，注册的也是 ttyFIQ0。
 
-rockchip,irq-mode-enable = <0>;  这个如果为 1，串口中断方式采用的是 irq，一般不会遇到问题。但如果是 0，用的是 FIQ 模式，有些带有 trust firmeware 的平台就需要谨慎用，这可能会因为 trust firmeware 版本和内核版本不匹配出问题。
+rockchip,irq-mode-enable = <0>;  这个如果为 1，串口中断方式采用的是 IRQ，一般不会遇到问题。但如果是 0，用的是 FIQ模式，有些带有 trust firmeware 的平台就需要谨慎用，这可能会因为 trust firmeware 版本和内核版本不匹配出问题。当然正常情况下SDK发布的默认采用fiq模式是没问题的，简单说如果遇到串口打log或者命令行无法输入的问题，可以配为0测试，是否更稳定。
 
-#### 3.1.2 使能 early printk 功能
+rockchip,serial-id = <2>;  和pinctrl-0 = <&uart2c_xfer>; 这两个都需要配，而且要对应。虽然驱动会根据rockchip,serial-id找到uart2这个节点，并获取相关资源，比如串口基地址，中断号等，那为什么不也直接获取pinctrl配置呢，因为如果uart2已经被disable，uart8250驱动不会去注册uart2，更不会去配置pinctrl了。
+
+interrupts = <GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH 0>;  这个用户不需要配置，只是一个辅助中断，保持默认即可。
+
+#### 3.1.4 使能 early printk 功能
 
 添加一下参数，其中 0xff1a0000 是 uart2 的物理基地址，不同的串口基地址不一样。
 
@@ -390,7 +376,7 @@ chosen {
 };
 ```
 
-#### 3.1.3 安卓 parameter.txt 配置 console 设备
+#### 3.1.5 安卓 parameter.txt 配置 console 设备
 
 一般以下参数可以不指定，会用默认的 console device，比如上面注册的 ttyFIQ0。但如果指定为 ttyS2 的话，就不能敲命令了。
 
@@ -402,11 +388,7 @@ commandline：androidboot.console=ttyFIQ0  console=ttyFIQ0
 
 #### 3.2.1 uart2 作为 console
 
-添加以下配置，其中 0xff1a0000 是 uart2 的物理基地址，不同的串口基地址不一样。
-
-一般后面参数不加 115200 等波特率，用 uboot 或 loader 起来后配置的波特率即可。
-
-如果配了波特率可能会出问题，因为内核 early con 对这块的支持不是很好。
+添加以下配置，其中 0xff1a0000 是 uart2 的物理基地址，不同的平台，不同的设备串口基地址不一样，需要根据实际使用的串口配这个地址。一般后面参数不加 115200 等波特率，用 uboot 或 loader 起来后配置的波特率即可。如果配了波特率可能会出问题，因为内核 early con 对这块的支持不是很好。
 
 ```c
 chosen {
@@ -434,6 +416,10 @@ commandline：androidboot.console=ttyS2 console=ttyS2
 
 **注意 ：3.1 和 3.2 不能同时存在，否则打印有问题。 fiq debugger 的 rockchip,serial-id = <x>; 与 ttySx 互斥，就是说某个串口被 fiq debugger 驱动用了，就不能作为普通串口用。**
 
+修改串口打印口
+
+loader，uboot，trust，optee，linux等都会通过串口打印log，一般默认是UART2打印，需要修改串口打印口到其他串口，如果不关心内核之前的log，可以按照3.1或3.2章节只改linux这个块。如果需要修改以上几个软件的打印log请参照各自的文档介绍。
+
 ### 3.3 关掉串口打印功能
 
 #### 3.3.1 去掉或禁止 3.1 或 3.2 的所有配置
@@ -447,9 +433,9 @@ Device Drivers  --->
 			[ ] Console on 8250/16550 and compatible serial port
 ```
 
-如果不想修改这个配置的，需要再 command line 增加 console= ，什么都不指定，表示不适用 console。
+如果不想修改这个配置的，需要在 command line 增加 console= ，什么都不指定，表示不适用 console。
 
-#### 3.3.3 安卓去掉 recovery 对 console 的使用，否则恢复出场设置的时候会卡住
+#### 3.3.3 安卓去掉 recovery 对 console 的使用，否则恢复出厂设置的时候会卡住
 
 ```
 android/device/rockchip/common/recovery/etc/init.rc
@@ -459,7 +445,7 @@ seclabel u:r:recovery:s0
 ```
 
 ---
-## 4 调试串口设备
+## 4 调试串口驱动
 调试串口设备最好不要用 echo cat 等命令来粗鲁地调试，最好用测试的 APK 软件，或找我司 FAE 获取 ts_uart 测试 bin 文件。在命令行输入 ts_uart 会有使用帮助。
 
 ```
@@ -492,3 +478,105 @@ seclabel u:r:recovery:s0
 /dev/ttySx            0666   system       system
 ```
 
+步骤：
+
+### 4.1 保证已经生成/dev/ttySx设备
+
+### 4.2 采用内部loop back模式自发自收
+
+```
+ts_uart m init.rc 1500000 0 0 0 /dev/ttySx
+```
+
+发收不一致：
+
+ ```
+ Sending data from file to port...
+ send:1172, receive:1172 total:5600
+ send:3441, receive:3537 total:3441 这边多收了96字节
+ +++++++position:96 src:60 but dst:00
+ +++++++position:97 src:61 but dst:01
+ ```
+
+如果测试失败，说明当前驱动存在问题，或者有其他程序也在使用该设备。
+
+采用 lsof | grep ttySx 命令，可以查看有哪些程序打开了/dev/ttySx。
+
+### 4.3 测试发送
+
+```
+ts_uart s init.rc 1500000 0 0 0 /dev/ttySx
+```
+
+发送成功：
+
+```
+ Written 660872 bytes to port
+ Time taken 00000004 sec, 00976802 usec
+```
+
+成功执行以上命令，测量TX是否有波形，如果没有，请检测硬件是否连接正常，软件上检测pinctrl配置，iomux寄存器配置，iodomain电源域配置等。
+
+### 4.4 测试接收
+
+```
+ts_uart r init.rc 1500000 0 0 0 /dev/ttySx
+```
+
+接收超时：
+
+```
+Waited until timeout; no data was available to read. Exiting...
+```
+
+请检测硬件是否连接正常，软件上检测pinctrl配置，iomux寄存器配置，iodomain电源域配置等。
+
+数据出错：
+
+```
+error[0] is 0x22
+```
+
+请测量波特率是否准确，一个是主控发送时的波特率，一个是对方发送时的波特率，两边的波特率要一致。
+
+波特率测量，可以采用发送0x55，然后量出某个高电平或者低电平的时间T，1/T就是波特率。
+
+### 4.5 测试流控是否起作用
+
+* 验证CTS：
+
+```
+ts_uart s init.rc 1500000 1 0 0 /dev/ttyS0
+```
+
+这里流控打开了，手动拉高CTS，发送应该是卡住的， 释放CTS（变为低电平），发送完成
+
+* 验证RTS：
+
+在中断传输模式下，传输过程中，硬件上需要测量主控UART的RTS是否会拉高，即表示流控起作用了。
+
+## 5 串口运用程序编写与调试
+
+### 5.1 串口设备初始化，读写操作等
+
+遵循POSIX标准，可以参考<http://digilander.libero.it/robang/rubrica/serial.htm>
+
+参考ts_uart源码，可以找我司FAE工程师获取
+
+git hub上开源的串口代码也很多，可自行查阅参考
+
+<https://github.com/malloc82/uart_test/tree/master/src>
+
+### 5.2 传输异常调试
+
+以蓝牙为例，如果蓝牙能打开，但是不稳定，发送或接受包会报错，那么就需要知道数据是多了还是少了，或者数据是否出错，如果没有蓝牙协议分析仪，那么有个简单办法，拿两个串口小板其RX分别接到主控的TX和RX上，抓取传输过程中的数据。再配合运用程序把发送和接收的包打印出来，就可以知道问题了。比如数据少了，或者数据出错了，一目了然。
+
+## 6 其他串口
+
+如果RK UART数量或者功能不满足需求时，可采用USB转UART，SPI转UART。
+
+* USB转UART：PL2303，FT232等
+
+* SPI转UART: WK2124 等
+
+* 单个UART转多个UART：WK2166 等
