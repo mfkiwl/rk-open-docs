@@ -2,11 +2,11 @@
 
 文件标识：RK-JC-YF-316
 
-发布版本：0.0.1
+发布版本：V1.0.0
 
-日       期：2019.12
+日期：2020-03-10
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 ---
 
@@ -64,9 +64,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
  **修订记录**
 
-| **日期**   | **版本** | **作者**  | **修改说明** |
-| ---------- | -------- | :-------- | ------------ |
-| 2019-12-10 | V0.0.1   | Zain Wang | 初始版本     |
+| **日期**   | **版本** | **作者**  | **修改说明**                     |
+| ---------- | -------- | :-------- | -------------------------------- |
+| 2019-12-10 | V0.0.1   | Zain Wang | 初始版本                         |
+| 2020-03-10 | V1.0.0   | Zain Wang | 更新英文图片<br>修改一些名词描述 |
 
 ---
 
@@ -76,16 +77,16 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **1 Linux USB Gadget 简介**
+## **1 Linux-USB Gadget API Framework**
 
-USB Gadget 是运行在USB Peripheral 上配置USB功能的子系统。
+USB Gadget 是运行在USB Peripheral 上配置USB功能的子系统，正常可被枚举的USB设备至少有3层逻辑层，有些功能还会在用户空间多跑一层逻辑代码。Gadget API就是具体功能和硬件底层交互的中间层。
 
-正常可被枚举的USB设备一般包括四个代码层：
+从下到上，逻辑层分布为：
 
-- **USB Controller**: 直接控制USB硬件，代码和硬件相关性很强，封装接口复杂，且操作性差，无法直接使用。
-- **USB Gadget**: 进一步封装USB Controller，主要负责管理USB ep端点具体功能，连接Upper Level，封装USB功能实现Upper Level的底层支撑，部分功能也可没有Upper Level，直接保留ep节点给Userspace，例如adb (ffs)。
-- **Upper Level**: Kernel 上具体的功能驱动或框架，例如PCM, Serial等，上承Userspace，下接USB Gadget，提供丰富的Userspace接口供用户使用。
-- **Additional Layers**: 部分Gadget 功能可能需要上层软件参与枚举，例如MTP，UVC等。
+- **USB Controller**: USB上最底层的软件代码，直接与硬件交互，并抽象出endpoint概念，用于管理数据流的进出，并供给USB Gadget层调用。
+- **USB Gadget**: 进一步封装USB Controller，调用USB Controller实现硬件无关的软件配置。例如，在ep0协议上运行各种class-specific协议来启动特定功能，并管理端点的进出信息等。
+- **Upper Level**: 大部分的Gadget驱动都会连接到具体的Linux驱动或框架，通过连接这些具体功能的驱动或框架让USB正常工作。
+- **Additional Layers**: 除开以上3层代码，还有可能有其他多出的代码层，比如kernel里的网络协议栈，也有可能是一个用户上层应用，通过调用POSIX系统的标准接口实现，如`open()`, `close()`, `read()` and `write()`。
 
 ![USB Layers](resources/USB_Layers.png)
 
@@ -116,9 +117,13 @@ CONFIG_USB_CONFIGFS_F_UAC2
 CONFIG_USB_CONFIGFS_F_UVC
 ~~~
 
-### **1.2 USB Configfs**
+### **1.2 USB configfs**
 
-Configfs 是一套基于可读写空间的文件系统，与Sysfs类似，都可以在Userspace上直接查看或修改节点内容，相较过去的ioctl方式，Configfs和Sysfs可直接使用Shell命令配置查看，对用户更加友好。除此之外，Configfs对比Sysfs还提供了对象创建和销毁功能，减少对Kernal固件的依赖。**Configfs中，Kernel可以将可能用到的功能都配置上，由Userspace上选择是否打开，而不是将USB功能固定在Kernel固件上**。
+configfs 是一套基于可读写空间的文件系统，与sysfs类似，也有不同。
+
+sysfs的节点都是由kernel创建并注册到sysfs里。sysfs中，用户通过readdir/read等方式读取节点属性，也可以通过write方式修改。sysfs的重点在于，所有节点的创建销毁，都是由Kernel发起，Kernel控制sysfs节点的生命周期，sysfs只是一个查看这些节点的窗口。
+
+configfs通过用户使用mkdir创建，rmdir销毁。节点内容是在mkdir后出现，这些内容可用通过read/write修改。和sysfs一样，readdir可以批量查看这些内容，symlink可以方便管理内容。不同的是，节点内容的生命周期完全由用户决定。支持这个功能的Kernel模块必须响应用户操作。
 
 ## **2 USB Gadget 使用**
 
@@ -136,7 +141,7 @@ usbdevice # /usr/bin/
 
 ~~~
 
-![USB Manager](D:\rockchip\doc\Rockchip_USB_guide\resources\USB_Manager.png)
+![USB Manager](resources/USB_Manager.png)
 
 用户可直接操作S50usbdevce脚本，修改.usb_config配置想要的USB功能。
 
@@ -150,9 +155,9 @@ USB功能配置成功会有如下log，表明进入USB Ready:
 
 ### **2.2 功能配置**
 
-USB 功能配置写在/etc/init.d/.usb_config中，运行状态下，临时修改USB功能可以修改/tmp/.usb_config，并运行/etc/init.d/S50usbdevice restart。
+USB 功能配置写在/etc/init.d/.usb_config中，运行状态下，修改USB功能可以修改/tmp/.usb_config，并运行/etc/init.d/S50usbdevice restart。
 
-目前USB Gadget 自动配置支持以下选项：
+目前 USB Gadget 自动配置支持以下选项（配置在.usb_config中）：
 
 ~~~ shell
 usb_adb_en
@@ -181,7 +186,7 @@ ADB 需要上层应用**adbd**才能正常启动，Buildroot中需要打开adbd�
 BR2_PACKAGE_ANDROID_TOOLS_ADBD
 ~~~
 
-确保系统中存在adbd后，执行下列命令并接入OTG线连接PC，
+确保系统中存在adbd后，执行下列命令并接入USB线连接PC，
 
 ~~~shell
 echo usb_adb_en > /tmp/.usb_config
@@ -190,7 +195,7 @@ echo usb_adb_en > /tmp/.usb_config
 
 即可在PC上通过adb devices看到设备
 
-Note: Linux 上adb devices如果无法看到设备，请执行
+Note: Linux 上使用adb devices如果无法看到设备，请执行
 
 ~~~shell
 adb kill-server
@@ -228,7 +233,7 @@ card 2: rk3xxx [rk3xxx], device 0: USB Audio [USB Audio]
 
 UAC 测试流程需要搭建音频数据流的回环，可以同时测试UAC的Playback和Capture功能：
 
-![UAC Test](D:\rockchip\doc\Rockchip_USB_guide\resources\UAC_Test_Follow.png)
+![UAC Test](resources/UAC_Test_Follow.png)
 
 (1) PC 向Device播放音频文件
 
@@ -241,7 +246,7 @@ aplay -D "plughw:2,0" -f S16_LE -r 48000 -c 2 /userdata/test.wav
 
 Windows:
 
-右键右下的声音图标->"打开声音设置"->"选择输出设备，选中Device设备（一般识别为Source/Sink，设备名与Windows版本相关），并打开播放器，播放音乐
+右键右下的声音图标->"Open Sound Settings"->选择输出设备，选中Device设备（一般识别为Source/Sink，设备名与Windows版本相关），并打开播放器，播放音乐
 
 ![Windows UAC Output](resources/Windows_UAC_Output.png)
 
@@ -261,11 +266,11 @@ arecord -D "hw:2,0" -f S16_LE -r 44100 -c 2 -t raw -N | aplay -D "hw:1,0" -f S16
 
 Windows:
 
-右键右下角的声音图标->"打开声音设置"->"选择输入设备，选中Device设备（一般识别为Source/Sink，设备名与Windows版本相关）
+右键右下角的声音图标->"Open Sound Settings"->"选择输入设备，选中Device设备（一般识别为Source/Sink，设备名与Windows版本相关）
 
 ![Windows UAC Input](resources/Windows_UAC_Input.png)
 
-点击设备属性，勾选侦听此设备，选择“通过此设备播放”指向PC原播放设备。
+点击Device properties->Additional device properties，勾选Listen to this device，选择“Play through this device”指向PC原播放设备。
 
 ![Windows UAC Capture](resources/Windows_UAC_Capture.png)
 
@@ -353,7 +358,7 @@ UMS与MTP有以下区别：
 
 ~~~shell
 echo usb_ums_en > /tmp/.usb_config
-echo "ums_block=/dev/block/by-name/userdata" >> /tmp/.usb_config # 操作userdata分区，可替换为IMAGE文件，例如/userdata/ums_shared.img
+echo "ums_block=/dev/block/by-name/userdata" >> /tmp/.usb_config # 可用镜像文件替换具体分区，例如/userdata/ums_shared.img
 /etc/init.d/S50usbdevice restart
 ~~~
 
