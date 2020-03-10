@@ -2,7 +2,7 @@
 
 文件标识：RK-SM-YF-329
 
-发布版本：V0.0.2
+发布版本：V1.0.0
 
 日期：2020-02-24
 
@@ -68,6 +68,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | ---------- | -------- | :---------- | ---------------------- |
 | 2020-02-11 | V0.0.1   | Zhihua Wang | 初始版本               |
 | 2020-02-24 | V0.0.2   | Zhihua Wang | 增加命令参数-i，-c说明 |
+| 2020-03-10 | V1.0.0   | Zhihua Wang | 增加应用流程图         |
 
 ---
 
@@ -149,15 +150,71 @@ void
 ```c
 #define DEFAULT_FACE_NUMBER 1000 表示默认人脸数据库最大支持人脸数量
 #define DEFAULT_FACE_PATH "/userdata" 开机默认从这个目录加载jpg文件获取特征值
-#define FACE_SCORE 0.9 人脸检测的人脸分数最小要求
+#define FACE_SCORE_RGB 0.55 RGB人脸检测的分数最小要求
+#define FACE_SCORE_IR 0.7 IR人脸检测的分数最小要求
+#define FACE_SCORE_LANDMARK 0.9 RGB人脸特征值的分数最小要求
 #define FACE_SCORE_REGISTER 0.9999 人脸注册的人脸分数最小要求
 #define FACE_REGISTER_CNT 5 人脸注册时连续读到的多少次人脸特征值均在数据库里面，提示已经注册
-#define FACE_REAL_SCORE 0.9 活体检测分数最小要求
+#define FACE_REAL_SCORE 0.7 活体检测分数最小要求
 #define LICENCE_PATH "/userdata/key.lic" rockface人脸授权key存放路径
 #define FACE_DATA_PATH "/usr/lib" rockface data存放路径
 #define MIN_FACE_WIDTH(w) ((w) / 5) 人脸检测、特征值提取人脸框宽度最小要求
 #define CONVERT_RGB_WIDTH 640 用于算法的RGB图像宽度
 #define CONVERT_IR_WIDTH 640 用于算法的IR图像宽度
+#define FACE_TRACK_FRAME 0 人脸跟踪最大跟踪时间(帧)
+#define FACE_RETRACK_TIME 1 人脸跟踪再次跟踪时间(秒)
+```
+
+**应用流程图**
+
+```mermaid
+graph TD
+	start(开始) --> isp_get[获取ISP帧]
+	isp_get --> isp_rga[旋转90度]
+	isp_rga --> face_detect[人脸检测]
+	face_detect --> face_track[人脸跟踪]
+	face_track --> conditionA{人脸检测成功}
+	conditionA -- YES --> paint_box[UI绘制人脸]
+	paint_box --> isp_expo[局部曝光]
+	conditionA -- NO --> paint_box_clear[UI清空人脸]
+	paint_box_clear --> isp_expo_def[默认曝光]
+	isp_expo --> isp_put[归还ISP帧]
+	isp_expo_def --> isp_put[归还ISP帧]
+	face_track --> conditionB{符合跟踪}
+	conditionB -- YES --> rgb_rga[RGA缩放]
+	rgb_rga --> get_feature[等待并获取特征值]
+	get_feature --> search[搜索特征值]
+	search --> find{特征值存在}
+	find -- YES --> find_return[返回特征值]
+	find -- NO --> register[符合注册]
+	register -- YES --> find_return[返回特征值]
+	register -- NO --> find_return_null[返回空]
+	find_return_null --> clear_ui[清空UI]
+	find_return --> delete{符合删除}
+	delete -- YES --> delete_from[删除特征值]
+	delete -- NO --> conditionC{识别成功}
+	conditionC -- NO --> clear_ui_2[清空UI]
+	conditionC -- YES --> conditionD{CIF运行}
+	conditionD -- YES --> wiat_ir{等待获取IR帧}
+	wiat_ir -- YES --> ir_detect[IR人脸检测]
+	ir_detect --> conditionE{人脸检测成功}
+	conditionE -- YES --> liveness[活体检测]
+	liveness --> conditonF{活体检测成功}
+	conditonF -- YES --> real[返回活体]
+	wiat_ir -- NO --> fake[返回非活体]
+	conditionE -- NO --> fake[返回非活体]
+	conditonF -- NO --> fake[返回非活体]
+	conditionD -- NO --> fake[返回非活体]
+	fake --> paint_name_y[UI绘制name,黄框]
+	real --> paint_name_g[UI绘制name,绿框]
+	real --> conditonG{非注册且非上一人}
+	conditonG -- YES --> pass[通行]
+	fake --> clear_track[清除跟踪]
+	clear_ui_2 --> next[等待获取特征值]
+	delete_from --> next[等待获取特征值]
+	clear_track --> next[等待获取特征值]
+	pass --> next[等待获取特征值]
+	conditonG -- NO --> next[等待获取特征值]
 ```
 
 ### **2.2 datebase**
