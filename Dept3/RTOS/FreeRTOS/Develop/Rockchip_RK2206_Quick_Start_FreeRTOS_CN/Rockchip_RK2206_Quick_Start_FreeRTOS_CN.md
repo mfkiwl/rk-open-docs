@@ -1,12 +1,12 @@
-# Rockchip RK2206 FreeRTOS Quick Start
+# Rockchip RK2206 FreeRTOS 快速入门
 
 文件标识：RK-JC-CS-001
 
-发布版本：1.0.1
+发布版本：V1.1.0
 
-日       期：2020.3
+日期：2020-03-11
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 ---
 
@@ -64,12 +64,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ## **修订记录**
 
-| **日期**   | **版本** | **作者**   | **修改说明**     |
-| ---------- | -------- | :--------- | ---------------- |
-| 2019-09-18 | V0.0.1   | HuangZihan | 初始版本         |
-| 2019-09-22 | V0.0.2   | CWW        | 增加工程配置说明 |
-| 2019-11-27 | V1.0.0   | CWW        | 修改文档排版     |
-| 2020-03-05 | V1.0.1   | Chad.Ma    | 增加3.5小节      |
+| **日期**   | **版本** | **作者**   | **修改说明**                                               |
+| ---------- | -------- | :--------- | ---------------------------------------------------------- |
+| 2019-09-18 | V0.0.1   | HuangZihan | 初始版本                                                   |
+| 2019-09-22 | V0.0.2   | CWW        | 增加工程配置说明                                           |
+| 2019-11-27 | V1.0.0   | CWW        | 修改文档排版                                               |
+| 2020-03-05 | V1.0.1   | Chad.Ma    | 增加3.5小节                                                |
+| 2020-03-11 | V1.1.0   | Aaron.sun  | 修改4.1增加输出信息的说明，增加4.3描述脚本，修订标题，标点 |
 
 ---
 
@@ -108,9 +109,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
           └── share
    ```
 
-2. 下载工具链压缩包并解压到个人指定目录：
+2. 下载工具链压缩包并解压到指定目录：
 
-   如果用户将工具链解压并安装到个人指定目录，需要在根目录gcc.mk文件中指定其工具链安装位置，如下配置“CROSS_COMPILE”变量：
+   如果用户将工具链解压并安装到指定目录，需要在根目录gcc.mk文件中指定其工具链安装位置，如下配置“CROSS_COMPILE”变量：
 
    ```makefile
    # --------------------------------------------------------------------
@@ -203,18 +204,17 @@ make menuconfig
 
 - ESC 键：返回上级菜单或退出
 
-- 英文问号：调出帮助菜单（退出帮助菜单，请按回车键）。
+- 英文问号：调出帮助菜单（退出帮助菜单，请按回车键）
 
 - 空格、Y 键``或``N 键：使能/禁用 [*] 配置选项
 
-- 英文问号 ：调出有关高亮选项的帮助菜单
+- 英文问号：调出有关高亮选项的帮助菜单
 
 - / 键：寻找配置项目
 
 - S键：保存当前配置
 
 <div style="page-break-after: always;"></div>
-
 ### **3.2 保存配置**
 
 以app/wlan_demo工程，rk2206_defconfig为默认配置为例：
@@ -306,7 +306,7 @@ Path_to_SDK/tools/firmware_merger/userdata.img
 
 ### **4.1 工程编译**
 
-在SDK的目录中，有许多例子： story_robot， test_demo，wlan_demo等，本实例使用wlan_demo来做示范：
+在SDK的目录中，有许多例子： story_robot，test_demo，wlan_demo等，了解更多请参考《Rockchip_RK2206_Developer_Guide_RKOS_App_Structure_CN》本实例使用wlan_demo来做示范：
 
 工程编译文件在各自私有工程的gcc目录下，如wlan_demo的编译工程：
 
@@ -331,13 +331,22 @@ make help               #打印详细命令说明
 make htmldocs           #生成系统API接口说明文档
 ```
 
-在 SDK的根目录/image 中会生成固件，image目录有三个文件：
+在 SDK的根目录/image 中会生成固件，image目录有三个文件和一个debug目录：
 
 | **文件名**       | **备注**       |
 | ---------------- | -------------- |
 | Firmware.img     | 镜像文件       |
 | RKSmartBoot.bin  | Loader文件     |
 | update.img       | OTA差异包文件  |
+
+debug目录下的文件：
+
+| **文件名**       | **备注**                     |
+| ---------------- | ---------------------------- |
+| .config          | 当前固件对应的config文件     |
+| rk2206_defconfig | 当前固件默认保存的config文件 |
+| wlan_demo.elf    | elf文件                      |
+| wlan_demo.map    | map文件                      |
 
 ### **4.2 清除编译**
 
@@ -347,6 +356,62 @@ make htmldocs           #生成系统API接口说明文档
 make clean	    #清除生成的编译文件
 make distclean	#清除生成的编译文件、配置文件、Doxygen文档以及生成的固件
 ```
+
+### 4.3 脚本编译
+
+在SDK根目录下执行./script/build.sh可以进行脚本编译，其参数如下：
+
+| **参数**               | **备注**                                                     |
+| ---------------------- | ------------------------------------------------------------ |
+| -l, --list             | 列出所有工程下的所有defconfig：./script/build.sh -l          |
+| -h, --help             | 帮助命令: ./script/build.sh -l                               |
+| -a, --all              | 编译默认chip下的所有defconfig: ./script/build.sh -a          |
+| -p, --project          | 编译默认工程下的所有默认chip的defconfig: ./script/build.sh -p |
+| 版本号，工程名，配置名 | 指定版本号，工程名，配置名称的编译: ./script/build.sh V1.10.0 story_robot rk2206_story_defconfig |
+| 空                     | 不输入任何参数按默认信息编译                                 |
+
+vi ./scribpt/build.sh可以修改默认配置信息
+
+```bash
+#!/bin/bash
+  2
+  3 TOP_DIR=$(pwd)
+  #DVERSION默认版本号
+  4 DVERSION=V1.10.0
+  #DIC默认芯片名
+  5 DIC=rk2206
+  #DPROJECT默认APP名称
+  6 DPROJECT=story_robot
+  #DCONFIG默认配置名称
+  7 DCONFIG=rk2206_story_defconfig
+  8 VERSION=$1
+  9 VERSION=${VERSION:-$DVERSION}
+ 10 TARGET_PROJECT=$2
+ 11 TARGET_PROJECT=${TARGET_PROJECT:-$DPROJECT}
+ 12 TARGET_BOARD_CONFIG=$3
+ 13 TARGET_BOARD_CONFIG=${TARGET_BOARD_CONFIG:-$DCONFIG}
+ 14 TARGET_PROJECT_DIR=app/$TARGET_PROJECT/gcc
+```
+
+编译结果存在根目录下的IMAGE_RELEASE目录中, 以下以./script/build.sh -a为例进行说明
+
+RK2206_ALL_V1.10.0_20200310.1415_RELEASE_TEST
+
+| **字段**      | **备注**                                                     |
+| ------------- | ------------------------------------------------------------ |
+| RK2206        | 芯片名                                                       |
+| ALL           | 所有APP的统称，非-a 参数时，ALL会被APP名称替代，比如：STORY_ROBOT |
+| V1.10.0       | 固件版本                                                     |
+| 20200310.1415 | 固件日期                                                     |
+| RELEASE_TEST  | 固件用途                                                     |
+固件目录中包含的内容如下：
+
+| **文件名**                               | **备注**                                                     |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| IMAGE-STORY_ROBOT-RK2206_STORY_DEFCONFIG | 固件目录，内容详见 4.1 工程编译中描述的image，格式如下：IMAGE -- 固定标识，STORY_ROBOT -- APP名称，非-a参数时，APP名称显示在上级目录，RK2206_STORY_DEFCONFIG--固件默认配置 |
+| PATCHES                                  | 按照SDK目录的组织方式，存放相对于远程仓库的本地提交以及本地未提交的补丁 |
+| build_cmd_info                           | 编译信息                                                     |
+| manifest_20200311.1431.xml               | 本地所有仓库的mainifest                                      |
 
 ## **5 固件烧录**
 
@@ -385,7 +450,7 @@ RK2206_EVB板：
 
 Windows开发升级工具存储路径为：/tools/Rockchip_Develop_Tool_v2.63.zip
 
-选择4.1章节所编译生成的Loader和image文件,点击“执行”按钮开始升级。
+选择4.1章节所编译生成的Loader和image文件，点击“执行”按钮开始升级。
 
 ![](./resources/Rockchip_5_2_1_step1.png)
 
