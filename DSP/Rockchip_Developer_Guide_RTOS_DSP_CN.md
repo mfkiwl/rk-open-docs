@@ -2,11 +2,11 @@
 
 文件标识：RK-KF-YF-302
 
-发布版本：1.4
+发布版本：V1.5.0
 
-日       期：2019.10
+日期：2020-03-10
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 ------
 
@@ -36,11 +36,12 @@
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
-| 2019-06-24 | V1.0     | 廖华平   | 初始版本     |
-| 2019-08-02 | V1.1     | 谢科迪   | 增加 Floating License 服务器安装说明 |
-| 2019-09-03 | V1.2 | 廖华平 | 增加固件打包说明 |
-| 2019-10-10 | V1.3 | 廖华平 | 增加rkos说明 |
-| 2019-10-16 | V1.4 | 廖华平 | 增加ubuntu安装说明 |
+| 2019-06-24 | V1.0.0   | 廖华平   | 初始版本     |
+| 2019-08-02 | V1.1.0   | 谢科迪   | 增加 Floating License 服务器安装说明 |
+| 2019-09-03 | V1.2.0 | 廖华平 | 增加固件打包说明 |
+| 2019-10-10 | V1.3.0 | 廖华平 | 增加rkos说明 |
+| 2019-10-16 | V1.4.0 | 廖华平 | 增加ubuntu安装说明 |
+| 2020-03-10 | V1.5.0 | 廖华平 | 增加配置文件安装描述图 |
 
 ------
 
@@ -224,9 +225,15 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 
 ![Xtensa_Configuration](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Configuration.png)
 
+![Xtensa_Install_config_1](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Install_config_1.png)
+
+![Xtensa_Install_config_2](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Install_config_2.png)
+
+![Xtensa_Install_config_3](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Install_config_3.png)
+
 点击 Next 并且选择文件“HiFi3Dev181203_win32.tgz”后，会提示安装 RG-2018.9，这时候点击“Manage Xtensa Tools”安装“XtensaTools_RG_2018_9_win32.tgz”，安装完成后，点击“Add Build”，就可以进行数据包的安装操作。
 
-数据包安装完成后，会在工具栏看到"C:(Active configuration)"栏目中看到 HiFi3Dev181304，点击并选中：
+数据包安装完成后，会在工具栏看到"C:(Active configuration)"栏目中看到 HiFi3Dev181203，点击并选中：
 
 ![HiFi3Dev181304](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304.png)
 
@@ -271,7 +278,15 @@ sudo apt-get install redhat-lsb.i686 -y
 
 ### 2.5 DSP 固件生成
 
-工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 CMD 控制台，找到工程根目录，运行固件生成脚本“generate_dsp_fw.bat 项目名“，如果是 PISCES 项目，项目名对应的就是 PISCES，脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，运行 HifiFirmwareGenerator.exe 进行固件打包，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
+工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 CMD 控制台，找到固件生成脚本 generate_dsp_fw.bat 文件，进入到该文件所在目录，运行“generate_dsp_fw.bat 项目名“，如果是 RK2108 项目，项目名对应的就是 RK2108。
+
+注意：首次打包，可能会出现“无法找到指定文件”的错误，请参考2.6章节中修改ToolsPath参数，指定为工具安装目录，如：
+
+```
+<ToolsPath>C:\usr\xtensa\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin</ToolsPath>
+```
+
+generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，并调用 HifiFirmwareGenerator.exe 打包固件，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
 
 - ssh://git@10.10.10.29:29418/rk/dsp/DspFirmwareGenerator
 - <https://github.com/LiaoHuaping/DspFirmwareGenerator>
