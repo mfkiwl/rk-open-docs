@@ -2260,7 +2260,7 @@ f_audio_source f_midi power state subsystem uevent
 
   `/sys/kernel/debug/usb/uvcvideo`  (UVC设备调试接口)
 
-- Debugfs for controllers：参考 [5.2.1.3 USB 2.0 OTG 调试接口](#5.2.1.3 USB 2.0 OTG 调试接口)，[5.2.2.3 USB 2.0 Host 调试接口](#5.2.2.3 USB 2.0 Host 调试接口)，[5.3.1.3 USB 3.0 OTG 调试接口](#5.3.1.3 USB 3.0 OTG 调试接口)
+- Debugfs for controllers：参考 [5.3.1.3 USB 2.0 OTG 调试接口](#5.3.1.3 USB 2.0 OTG 调试接口)，[5.3.2.3 USB 2.0 Host 调试接口](#5.3.2.3 USB 2.0 Host 调试接口)，[5.3.3.3 USB 3.0 OTG 调试接口](#5.3.3.3 USB 3.0 OTG 调试接口)
 
 - trace for usb gadget/dwc3/xHCI：
 
@@ -2282,19 +2282,19 @@ f_audio_source f_midi power state subsystem uevent
 
   作用：通过软件方法，强制设置 USB 2.0 OTG 切换到 Host mode 或者 Device mode，而不受 USB 硬件电路的 OTG ID 电平影响。
 
-  USB 2.0 OTG 切换命令请参考 [5.1.1 USB 2.0 PHY 驱动开发](#5.1.1 USB 2.0 PHY 驱动开发) 中的 USB 2.0 PHY 调试接口说明。
+  USB 2.0 OTG 切换命令请参考 [5.2.1 USB 2.0 PHY 驱动开发](#5.2.1 USB 2.0 PHY 驱动开发) 中的 USB 2.0 PHY 调试接口说明。
 
 - USB 3.0 OTG 切换命令
 
   作用：通过软件方法，强制设置 USB 3.0 OTG 切换到 Host mode 或者 Device mode，而不受 USB 硬件电路的 OTG ID 电平或者 Type-C 接口的影响。
 
-  USB 3.0 OTG 切换命令请参考 [5.3.1.3 USB 3.0 OTG 调试接口](#5.3.1.3 USB 3.0 OTG 调试接口) 中的 USB 3.0 OTG 切换命令说明。
+  USB 3.0 OTG 切换命令请参考 [5.3.3.3 USB 3.0 OTG 调试接口](#5.3.3.3 USB 3.0 OTG 调试接口) 中的 USB 3.0 OTG 切换命令说明。
 
 - USB 3.0 force USB 2.0 only 命令
 
   作用：强制 USB 3.0 Host 控制器和 PHY 工作于 USB 2.0 only 的模式。
 
-  USB 3.0 force USB 2.0 only 命令请参考 [5.1.2 USB 3.0 PHY 驱动开发](#5.1.2 USB 3.0 PHY 驱动开发)
+  USB 3.0 force USB 2.0 only 命令请参考 [5.2.2 USB 3.0 PHY 驱动开发](#5.2.2 USB 3.0 PHY 驱动开发)
 
 - USB 眼图测试命令
 
