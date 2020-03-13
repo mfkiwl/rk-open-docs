@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-333
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2020-02-20
+日期：2020-03-13
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -65,13 +65,16 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **日期**   | **版本** | **作者** | **修改说明**           |
 | ---------- | -------- | --------  | ---------------------- |
-| 2020-02-20 | V1.0.0   | Conway Chen | 初始版本               |
+| 2020-03-13 | V1.0.0   | Conway Chen | 初始版本               |
+| 2020-03-13 | V1.0.1   | Conway Chen | SDK授权码更改为make menuconfig配置，文档同步更新 |
 
 ## **目录**
 
-## **1 物联网平台介绍**
+[TOC]
 
-### **1.1 RK2206 SDK 物联网平台**
+## 1 物联网平台介绍
+
+### 1.1 RK2206 SDK 物联网平台
 
 瑞芯微RK2206芯片目前支持物联网平台如下：
 
@@ -83,7 +86,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 make menuconfig
-
+配置路径： (top menu) → IoT Function
 (top menu) → IoT Function Rockchip RKOS V2.0.0 SDK Configuration
 [*] AiSpeech Platfrom
 (10)    ai dialog exit of timeout
@@ -95,59 +98,87 @@ make menuconfig
 [*] YHK Platfrom
 ```
 
-### **1.2 物联网平台授权码介绍**
+### 1.2 物联网平台授权码介绍
 
 目前RK2206SDK 支持的物联网平台，使用的是测试授权码，仅供测试使用。测试授权码不能用于量产（试产），测试授权码可授权的设备数量有限。OEM生产时，请务必联系对应物联网平台，获取官方正式授权码。
 
-### **1.3 物联网平台授权码软件配置**
+## 2 物联网平台授权码软件配置
 
-获取官方物联网平台的正式授权码等信息,定义相关宏和函数即可(无需指定在特定文件定义，只要保证有编译到，例如当前使用应用为story_robot，授权函数定义在app/story_robot/src/MainSever.c,SDK即可自动extern引用),编译时自动使用，无需其他操作，请确保函数名和以下一致。
+获取官方物联网平台的正式授权码等信息，在make  menuconfig对应物联网平台选项卡处修改
 
-- 玩瞳科技授权码软件配置
+如果你选择了物联网平台
 
-定义以下函数和宏:
+- 不填入相关授权码，将会默认使用测试授权码(不能用于量产、试产)
 
-```c
-#define LICENSE_TEXT        "官方正式授权码文本"
-#define DEVICE_ID           "设备ID"
-void get_wt_info(char ** lincese, char ** devid)
-{
-    *lincese = LICENSE_TEXT;
-    *devid = DEVICE_ID;
-}
+- 填入向物联网平台申请的官方授权码，将会使用填入的授权码
+
+### 2.1 玩瞳科技授权码
+
+make menuconfig
+配置路径： (top menu) → IoT Function → Wan Tong Platfrom → Wan Tong Platfrom
+填入两项官方授权信息，对应wan tong platform license / wan tong device id
+
+```
+(top menu) → IoT Function
+                              Rockchip RKOS V2.0.0 SDK Configuration
+[] AiSpeech Platfrom
+()    ai dialog exit of timeout
+[ ]     AiSpeech platform info setting
+[ ] Dueros Cloud
+[ ] Echo Cloud
+[ ] Tuling Platfrom
+[*] Wan Tong Platfrom
+[ ]     Device ID get from SN(otherwise use default test id)  #选上代表设备ID使用烧录的SN，否则是使用默认测试ID
+[*]     Wan Tong Platform info setting  #向官方云平台申请的授权码设置
+()          wan tong platform license   #申请的license
+()          wan tong device id          #申请的device id
+[] YHK Platfrom
 ```
 
-- 思必驰授权码软件配置
+### 2.2 思必驰授权码
 
-定义以下函数和宏:
+make menuconfig
+配置路径： (top menu) → IoT Function →AiSpeech Platfrom
+填入三项官方授权信息，对应AiSpeech product ID / AiSpeech product key / Aispeech product secret
 
-```c
-#define PRODUCTID           "产品ID"       //最大24byte
-#define PRODUCTKEY          "产品key"      //最大24byte
-#define PRODUCTSECRET       "产品加密的key" //最大64byte
-void get_aispeech_info(char ** productKey, char ** productSecret, char ** product_id)
-{
-    *productKey = PRODUCTKEY;
-    *productSecret = PRODUCTSECRET;
-    *product_id = PRODUCTID;
-}
+```
+(top menu) → IoT Function
+                              Rockchip RKOS V2.0.0 SDK Configuration
+[] AiSpeech Platfrom
+()    ai dialog exit of timeout
+[*]     AiSpeech platform info setting
+()          AiSpeech product ID     #"产品ID"，最大24byte
+()          AiSpeech product key    #"产品key"，最大24byte
+()          Aispeech product secret #"产品加密的key"，最大64byte
+[ ] Dueros Cloud
+[ ] Echo Cloud
+[ ] Tuling Platfrom
+[ ] Wan Tong Platfrom
+[] YHK Platfrom
 ```
 
-- EchoCloud授权码软件配置
+### 2.3 EchoCloud授权码
 
-定义以下函数和宏:
+make menuconfig
+配置路径： (top menu) → IoT Function → EchoCloud
+填入三项官方授权信息，对应echo cloud produt channel uuid / echo cloud device id / echo cloud hash key
 
-```c
-#define CHANNLE_UUID    "产品UUID"     //最大40byte
-#define HASH_KEY        "产品HASH_KEY" //最大64byte
-#define FW_VERSION      "产品固件版本"   //最大24byte
-#define DEV_ID          "产品设备ID"    //最大40byte
-
-void get_echo_info(char **channel_uuid, char ** hash_key, char **fw_version, char **dev_id);
-{
-    *channel_uuid = CHANNLE_UUID;
-    *hash_key = HASH_KEY;
-    *fw_version = FW_VERSION;
-    *dev_id = DEV_ID;
-}
+```
+(top menu) → IoT Function
+                              Rockchip RKOS V2.0.0 SDK Configuration
+[] AiSpeech Platfrom
+()    ai dialog exit of timeout
+[ ]     AiSpeech platform info setting
+[ ] Dueros Cloud
+[*] Echo Cloud
+[*]     echo cloud platform info setting
+()          echo cloud produt channel uuid  #"产品UUID"，最大40byte
+()          echo cloud device id            #"产品设备ID"，最大40byte
+()          echo cloud hash key             #"产品HASH_KEY"，最大64byte
+()                                          #这个空不用管，是使用SDK内部固件版本号
+[ ] Tuling Platfrom
+[] Wan Tong Platfrom
+[]     Device ID get from SN(otherwise use default test id)
+[ ]     Wan Tong Platform info setting
+[] YHK Platfrom
 ```
