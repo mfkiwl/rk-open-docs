@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-104
 
-发布版本：V1.0.1
+发布版本：V1.1.0
 
-日期：2020-05-27
+日期：2020-05-28
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | ---------- | -------- | :----------- | :----------- |
 | V1.0.0     | 谢修鑫   | 2020-03-04   | 初始版本     |
 | V1.0.1     | 谢修鑫   | 2020-05-27   | 修正格式     |
+| V1.1.0     | 许盛飞   | 2020-05-28   | 更新低功耗相关说明 |
 
 **目录**
 
@@ -277,12 +278,22 @@ void pm_runtime_release(ePM_RUNTIME_ID runTimeId)
 
 低功耗的主要操作如下：
 
-1. 关闭不用模块的CLOCK，参考前面章节Clock Gating操作
-2. 关闭不用模块的Power Domain，参考前面章节Power Gating操作
-3. 关闭不用模块、外设的外部供电
-4. 配置唤醒相关信号源
-5. 系统时钟切换到32k或更低模式
+1. 配置休眠模式
+2. 判断是否需要将系统休眠时钟切换到32K
+3. 可选择配置GPIO, TIMER, TIMEOUT中断作为休眠时唤醒系统的信号源
 
 #### 2.7.2 具体实现
 
-开发中，待补充
+1. 配置休眠模式，根据进入休眠时PD_DSP, PD_AUDIO的状态，决定休眠时，是否关闭对应的PD,VD及系统休眠时钟是否切换到32k，在下面的函数中实现对应的操作。
+
+```c
+static void SOC_SleepModeInit(struct PMU_REG *pPmu)
+```
+
+2. 配置唤醒信号源，使能的唤醒源产生的中断能在系统休眠时唤醒系统。支持GPIO，TIMER，TIMEOUT等唤醒源的使能配置，默认使能GPIO，TIMER唤醒源, TIMEOUT主要用于开发时调试验证使用。
+
+更改默认唤醒源，如disable GPIO中断唤醒功能，只需要将下面的函数中value变量对应的唤醒源宏去掉。
+
+```c
+static void SOC_WakeupSourceConfig(struct PMU_REG *pPmu)
+```
