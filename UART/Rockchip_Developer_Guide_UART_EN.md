@@ -1,6 +1,6 @@
 # UART Development Guide
 
-ID: RK-XX-XX-nnn
+ID: RK-KF-YF-089
 
 Release Version: V1.3.0
 
