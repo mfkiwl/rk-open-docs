@@ -1,6 +1,6 @@
 # DS5 EXTERNAL DEBUG连接简介
 
-文件标识：RK-XX-XX-nnn
+文件标识：RK-SM-YF-044
 
 发布版本：V2.1.0
 
