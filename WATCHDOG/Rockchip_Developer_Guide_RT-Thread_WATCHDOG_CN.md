@@ -1,12 +1,12 @@
-# Rockchip Developer Guide RT-Thread WATCHDOG
+# RT-Thread WATCHDOG开发指南
+
+文件标识：RK-KF-YF-103
 
 发布版本：V1.0.0
 
-作者邮箱：<xxm@rock-chips.com>
-
 日期：2020.02.21
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 ------
 
