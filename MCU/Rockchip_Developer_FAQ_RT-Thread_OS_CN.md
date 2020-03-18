@@ -1,10 +1,10 @@
 # Rockchip RT-Thread FAQ For OS
 
-文件标识：RK-XX-XX-nnn
+文件标识：RK-SM-YF-042
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2020-03-09
+日期：2020-03-17
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -46,7 +46,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文提供一个标准模板供套用。后续模板以此份文档为基础改动。
+本文收集了开发过程中和 OS 相关的常见问题，以及相关解决方案。
 
 **产品版本**
 
@@ -66,6 +66,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0    | 陈谋春 | 2020-03-09 | 初始版本     |
+| V1.0.1 | 陈谋春 | 2020-03-17 | 修正链接 |
 
 **目录**
 
@@ -116,7 +117,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 - 没有正确配置编译环境
 
-    menuconfig 命令依赖于两个开发包 `libncurses5-dev build-essential`，所以在执行 menuconfig 之前需要先正确配置你的编译环境，具体可以参考[开发指南](../../quick-start/Rockchip_Developer_Guide_RT-Thread/Rockchip_Developer_Guide_RT-Thread_CN.html#2)。
+    menuconfig 命令依赖于两个开发包 `libncurses5-dev build-essential`，所以在执行 menuconfig 之前需要先正确配置你的编译环境，具体可以参考[开发指南](../../quick-start/Rockchip_Developer_Guide_RT-Thread/Rockchip_Developer_Guide_RT-Thread_CN.html#2-开发环境搭建)。
 
 - 在 Windows 平台上打开过 Kconfig 文件
 
