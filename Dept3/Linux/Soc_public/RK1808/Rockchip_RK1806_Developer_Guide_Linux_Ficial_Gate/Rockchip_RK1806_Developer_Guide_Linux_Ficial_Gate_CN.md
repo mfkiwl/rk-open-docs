@@ -2,9 +2,9 @@
 
 文档标识：RK-KF-YF-330
 
-发布版本：1.0.0
+发布版本：V1.1.0
 
-日期：2020.02
+日期：2020-03-19
 
 文件密级：公开资料
 
@@ -64,9 +64,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
  **修订记录**
 
-| **日期**   | **版本** | **作者**    | **修改说明** |
-| ---------- | -------- | :---------- | ------------ |
-| 2020-02-11 | V1.0.0   | Jianhua Lin | 初始版本     |
+| **日期**   | **版本** | **作者**    | **修改说明**  |
+| ---------- | -------- | :---------- | ------------- |
+| 2020-02-11 | V1.0.0   | Jianhua Lin | 初始版本      |
+| 2020-03-19 | V1.1.0   | Jianhua Lin | 修改uboot配置 |
 
 ---
 
@@ -113,7 +114,7 @@ switching to board: /home/ljh/1806/release_sdk/device/rockchip/rk1806/BoardConfi
 进入工程 uboot 目录下执行 make.sh
 
 ```shell
-1806/release_sdk/u-boot$ ./make.sh rk1808
+1806/release_sdk/u-boot$ ./make.sh rk1806
 ```
 
 ### 3.3 **编译kernel**
@@ -178,6 +179,22 @@ ficial_gate -f 30000 -e -i -c
  #include <dt-bindings/sensor-dev.h>
 -#include "rk1808.dtsi"
 +#include "rk1806.dtsi"
+```
+
+3：RK1808的开发板想要运行RK1806 SDK，需要把BoardConfig_ficial_gate.mk中的uboot配置改成rk1808
+
+```shell
+--- a/rk1806/BoardConfig_ficial_gate.mk
++++ b/rk1806/BoardConfig_ficial_gate.mk
+@@ -3,7 +3,7 @@
+ # Target arch
+ export RK_ARCH=arm64
+ # Uboot defconfig
+-export RK_UBOOT_DEFCONFIG=rk1806
++export RK_UBOOT_DEFCONFIG=rk1808
+ # Kernel defconfig
+ export RK_KERNEL_DEFCONFIG=rk1806_linux_defconfig
+ # Kernel dts
 ```
 
  注： SDK版本必须升级到rk1808_linux_release_v1.1.2_20191120.xml及以上才支持RK1806。
