@@ -1,12 +1,38 @@
 # **Rockchip Secure Boot Application Note**
 
-Version: 2.1
+ID:  RK-SM-YF-024
 
-Email: zyf@rock-chips.com / hjh@rock-chips.com / cf@rock-chips.com
+Release Version: V2.2.0
 
-Date: 2019.10
+Release Date: 2020-03-19
 
-Classification level: Publicity
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
+
+---
+
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Fuzhou Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -26,7 +52,7 @@ Classification level: Publicity
 
 **MaskRom:** BootROM, Boot Read-Only Memory in SOC
 
-**loader:** Boot loader, generally means Miniloader or SPL(uboot)
+**loader:** Boot Loader/First Loader, generally means RKMiniloader or SPL(uboot)
 
 **OBM CODE:**  Generally means the code compiled or trusted by OEM/OBM
 
@@ -68,18 +94,19 @@ The relative tool revision:
 
 | **Revision** | **Date**   | **Description**                                   | **Author** |
 | ------------ | ---------- | ------------------------------------------------- | ---------- |
-| 1.0          | 2014-11-05 | Original document                                 | ZYF        |
-| 1.1          | 2015-12-21 | Update secure boot tool                           | YBC        |
-| 1.2          | 2016-02-02 | Update secure boot tool                           | YHC        |
-| 1.3          | 2016-09-29 | Re-edit                                           | ZYF        |
-| 1.4          | 2016-11-15 | Add detailed description of workflow              | Joshua     |
-| 1.5          | 2016-11-16 | 1. Add terms and definitions.2. Add eFuse layout. | Joshua     |
-| 1.6          | 2017-02-15 | Add RK3328 and RK3228H.                           | ZYF        |
-| 1.7          | 2017-05-19 | Add sequence chart and note                       | ZZJ        |
-| 1.8          | 2017-10-30 | Refactor the format and add hardware info         | CW         |
-| 1.9          | 2018-06-05 | Add OTP program public key hash flow              | CF         |
-| 2.0          | 2018-11-09 | Add RK3336、PX30 and RK3308 OTP layout            | CF         |
-| 2.1          | 2019-10-29 | Fix some error                                    | ZYF/CF     |
+| V1.0.0       | 2014-11-05 | Original document                                 | ZYF        |
+| V1.1.0       | 2015-12-21 | Update secure boot tool                           | YBC        |
+| V1.2.0       | 2016-02-02 | Update secure boot tool                           | YHC        |
+| V1.3.0       | 2016-09-29 | Re-edit                                           | ZYF        |
+| V1.4.0       | 2016-11-15 | Add detailed description of workflow              | Joshua     |
+| V1.5.0       | 2016-11-16 | 1. Add terms and definitions.2. Add eFuse layout. | Joshua     |
+| V1.6.0       | 2017-02-15 | Add RK3328 and RK3228H.                           | ZYF        |
+| V1.7.0       | 2017-05-19 | Add sequence chart and note                       | ZZJ        |
+| V1.8.0       | 2017-10-30 | Refactor the format and add hardware info         | CW         |
+| V1.9.0       | 2018-06-05 | Add OTP program public key hash flow              | CF         |
+| V2.0.0       | 2018-11-09 | Add RK3336、PX30 and RK3308 OTP layout            | CF         |
+| V2.1.0       | 2019-10-29 | Fix some error                                    | ZYF/CF     |
+| V2.2.0       | 2020-03-19 | Fix some error                                    | ZYF        |
 
 ---
 <div STYLE="page-break-after: always;"></div>
@@ -89,7 +116,6 @@ The relative tool revision:
 
 ---
 <div STYLE="page-break-after: always;"></div>
-
 ## 1 Architecture
 
 ### 1.1 Secure Boot Process
@@ -461,10 +487,10 @@ Table 6-1 Hardware parameters
 
 | Chip Part Number | eFusePower | Programming Mode               | VQPS Current Requirement | Pull-down Resistance Value | eFusePower Pin Number | Remark          |
 | ---------------- | ---------- | ------------------------------ | ------------------------ | -------------------------- | --------------------- | --------------- |
-| RK3126/RK3126C  | 2.5V       | Power by PCBA test board       | >50mA                    | None                       | PIN68                 | Reused with ADC |
+| RK3126/RK3126C   | 2.5V       | Power by PCBA test board       | >50mA                    | None                       | PIN68                 | Reused with ADC |
 | RK3128           | 2.5V       | Onboard or powered by external | >50mA                    | <=10K                      | R10                   |                 |
-| RK3168/RK3188   | 1.5V       | Onboard or powered by external | >50mA                    | <=510R                     | Y10                   |                 |
-| RK3228/RK3229   | 1.6V       | Onboard or powered by external | >50mA                    | <=100R                     | R10                   |                 |
+| RK3168/RK3188    | 1.5V       | Onboard or powered by external | >50mA                    | <=510R                     | Y10                   |                 |
+| RK3228/RK3229    | 1.6V       | Onboard or powered by external | >50mA                    | <=100R                     | R10                   |                 |
 | RK3288           | 1.5V       | Onboard or powered by external | >50mA                    | <=510R                     | P19                   |                 |
 | RK3368           | 1.5V       | Onboard or powered by external | >50mA                    | <=47R                      | Y10                   |                 |
 | RK3399           | 1.8V       | Onboard or powered by external | >50mA                    | <=1K                       | AD23                  |                 |
@@ -527,7 +553,7 @@ RK3228H,RK3328,RK3326,RK3308 and PX30 support OTP programming. Public key hash n
 
 1. First, follow the above steps to burn signed firmware. If the machine can start normally，the signature process is correct. Then OTP can be programed.
 
-2. The signature tool uses version of SecureBootTool V1.9 or more. Open the config.ini file in the tools directory. Find "sign_flag="，set"sign_flag=0x20"(bit 5 set 1) which enable write OTP in RKloader.  Save config.ini file. Reopen SecureBootTool.exe to sign firmware or RKLoader.
+2. The signature tool uses version of SecureBootTool V1.9 or more. Open the config.ini file in the tools directory. Find "sign_flag="，set"sign_flag=0x20"(bit 5 set 1) which enable write OTP in RKMiniLoader.  Save config.ini file. Reopen SecureBootTool.exe to sign firmware or RKMiniLoader.
 
 ![6-6 SecureBootTool](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-6-SecureBootTool.png)
 
@@ -537,7 +563,7 @@ Figure 6-6-1 SecureBootTool
 
 Figure 6-6-2 config.ini
 
-3. Use re-signed firmware or RKLoader burnning. After burnning, restart the machine. The RKLoader will be responsible for generating hash of public key and writing it to OTP during startup and enable secure boot.
+3. Use re-signed firmware or RKMiniLoader burnning. After burnning, restart the machine. The RKMiniLoader will be responsible for generating hash of public key and writing it to OTP during startup and enable secure boot.
 
 ![6-6 OTP program flow](Rockchip_Developer_Guide_Secure_Boot_Application_Note/6-6-OTP-program-flow.png)
 
@@ -557,9 +583,9 @@ Open the signed firmware and connect the device which has programmed eFuse to th
 
 Figure 7-1 Upgrade tool 1
 
-Click the ‘Upgrade’ button to start firmware upgrade and wait it to be completed:
+Select ‘Upgrade’ option and Click "Run" button to start firmware upgrade and wait it to be completed:
 
-![7-2Upgrade-tool 2](Rockchip_Developer_Guide_Secure_Boot_Application_Note/7-2Upgrade-tool 2.png)
+![7-2Upgrade-tool-2](Rockchip_Developer_Guide_Secure_Boot_Application_Note/7-2Upgrade-tool-2.png)
 
 Figure 7-2 Upgrade tool 2
 
@@ -611,12 +637,12 @@ There has a 128-bit unique CPU ID for each SOC. The Signed Tools read the CPU ID
 
 ```mermaid
 graph LR
-    cpuid[<font size=8>CPU<br>ID]-->signed[<font size=8>Signed<br><br>Tools]
-    signed--<font size=6>RSA<br><br>Decryption-->certificate[<font size=8>Certi-<br><br>ficate]
-    certificate--<font size=6>RSA<br><br>Encryption-->verify{<font size=8>uboot<br><br>verify?}
+    cpuid[<font size=8><br>CPU<br><br>ID]-->signed[<font size=8><br>Signed<br><br>Tools]
+    signed--<font size=6><br>RSA<br><br>Decryption-->certificate[<font size=8><br>Certi-<br><br>ficate]
+    certificate--<font size=6><br>RSA<br><br>Encryption-->verify{<font size=8><br>uboot<br><br>verify?<br>}
     cpuid-->verify
-    verify--<font size=6>PASS-->disable[<font size=8>disable<br><br>secure<br><br>boot]
-    verify--<font size=6>NOT<br><br>PASS-->do_nothing[<font size=8>do<br><br>nothing]
+    verify--<font size=6><br>PASS-->disable[<font size=8><br>disable<br><br>secure<br><br>boot<br>]
+    verify--<font size=6><br>NOT<br><br>PASS-->do_nothing[<font size=8><br>do<br><br>nothing<br>]
     style cpuid fill:#ff8,stroke:#333,stroke-width:4px;
     style signed fill:#ccf,stroke:#333,stroke-width:4px;
     style certificate fill:#ccf,stroke:#333,stroke-width:4px;
