@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-332
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日       期：2020-02-06
+日       期：2020-03-27
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -68,6 +68,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者**    | **修改说明** |
 | ---------- | -------- | :---------- | ------------ |
 | 2020-02-06 | V1.0.0   | Nickey Yang | 初始版本     |
+| 2020-03-27 | V1.0.1   | Nickey Yang | 修订格式     |
 
 ---
 
@@ -202,7 +203,7 @@ make rk3288_defconfig   #defconfig位于configs目录下
 
 上述的步骤是默认配置，当有客制化的需求时，需要增加或移除一些包，或者修改包的编译配置选项，Debian10支持图形化和直接修改配置的更改方式。
 
-#### 3.3.1 直接修改
+#### **3.3.1 直接修改**
 
 在configs/rk3288_defconfig 中直接添加
 
@@ -210,7 +211,7 @@ make rk3288_defconfig   #defconfig位于configs目录下
  BR2_PACKAGE_RKTOOLKIT=y
 ```
 
-#### 3.3.2 图形化修改
+#### **3.3.2 图形化修改**
 
 以添加rktoolkit为示例，
 
@@ -242,7 +243,7 @@ make menuconfig
 
 编译rktoolkit，并打包进根文件系统中。
 
-#### 3.3.3保存配置
+#### **3.3.3保存配置**
 
 ```
 make savedefconfig
@@ -250,9 +251,9 @@ make savedefconfig
 
 上述命令会把output/.config配置保存回configs/rk3288_defconfig。
 
-## 4常见问题
+## **4常见问题**
 
-### 4.1 提示mkdir权限不够
+### **4.1 提示mkdir权限不够**
 
 make rk3288_defconfig时出现如下log：
 
@@ -265,7 +266,7 @@ make: *** [/output/build/buildroot-config/conf] Error 1
 
 解决：因为Makefile中需要的$CURDIR变量为空，重启一个shell终端即可。
 
-### 4.2 public key is not available
+### **4.2 public key is not available**
 
 编译过程中出现 public key is not available的相关log:
 
