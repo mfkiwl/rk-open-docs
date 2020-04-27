@@ -1,6 +1,6 @@
 # GNU MCU Eclipse OpenOCD
 
-文件标识：RK-XX-XX-nnn
+文件标识：RK-KF-YF-91
 
 发布版本：V1.0.0
 
@@ -52,7 +52,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **芯片名称** | **内核版本** |
 | ------------ | ------------ |
-|              |              |
+|      all      |              |
 
 **读者对象**
 
@@ -87,7 +87,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 * OpenOCD 是一个开源的调试软件，可以适配各种JTAG/SWD适配器，支持ARM，RISCV等架构
 
-* ftdi  采用ft2232h，USB转JTAG/SWD芯片，可以做为JTAG/SWD适配器，速度快，稳定性高
+* ftdi  采用ft2232h，USB转JTAG/SWD芯片，可以作为JTAG/SWD适配器，速度快，稳定性高
 
 ## 2 操作系统环境
 
@@ -151,7 +151,7 @@ tar -xzvf eclipse.tar.gz
 
 ### 3.3 GNU MCU Eclipse OpenOCD
 
-* 点击下图滤色瓢虫右边的三角按钮，点击Debug Configurations。
+* 点击下图绿色瓢虫右边的三角按钮，点击Debug Configurations。
 
 ![img](Rockchip_Developer_Guide_GNU_MCU_Eclipse_OpenOCD/6.png)
 
@@ -161,11 +161,11 @@ tar -xzvf eclipse.tar.gz
 
 * Main菜单
 
-可以不用改动。
+默认。
 
 * Debugger菜单
 
-1的路径会随着eclipse.tar.gz的解压路径变化，但是2的路径只能用绝对路径（没办法用环境变量或者相对路径），所以需要把1的路径拷贝并覆盖2的路径。3是指定gdb的路径，这里需要注意对于ARM32位，要用32位的gdb，对于ARM64，要用64位的gdb。
+1的路径会随着eclipse.tar.gz的解压路径变化，但是2的路径只能用绝对路径（无法用环境变量或者相对路径），所以需要把1的路径拷贝并覆盖2的路径。3是指定gdb的路径，这里需要注意对于ARM32位，要用32位的gdb，对于ARM64，要用64位的gdb。
 
 ![img](Rockchip_Developer_Guide_GNU_MCU_Eclipse_OpenOCD/4.png)
 
@@ -207,7 +207,7 @@ tar -xzvf eclipse.tar.gz
 
 * 最后一步，如上图右下角，点击Apply 保存配置，点击Debug开始调试。
 
-注意：如果需要添加芯片，可以右击左侧配置名，点击Duplicate，复制一份出来。
+注意：如果需要添加芯片，可以右击左侧配置名，点击Duplicate，复制一份芯片配置，并在此基础上修改。
 
 ![img](Rockchip_Developer_Guide_GNU_MCU_Eclipse_OpenOCD/15.png)
 
@@ -217,7 +217,7 @@ tar -xzvf eclipse.tar.gz
 
 以上就是CDT的debug界面：
 
-区域1的小甲壳虫右边，点一下，可以选择要调试的芯片，然后连接芯片，进入调试模式。
+区域1的小甲壳虫右边，单击，可以选择要调试的芯片，然后连接芯片，进入调试模式。
 
 区域2：
 
