@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-329
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2020-02-24
+日期：2020-04-29
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2020-02-11 | V0.0.1   | Zhihua Wang | 初始版本               |
 | 2020-02-24 | V0.0.2   | Zhihua Wang | 增加命令参数-i，-c说明 |
 | 2020-03-10 | V1.0.0   | Zhihua Wang | 增加应用流程图         |
+| 2020-04-29 | V1.0.1   | Zhihua Wang | 修改key.lic路径        |
 
 ---
 
@@ -156,7 +157,7 @@ void
 #define FACE_SCORE_REGISTER 0.9999 人脸注册的人脸分数最小要求
 #define FACE_REGISTER_CNT 5 人脸注册时连续读到的多少次人脸特征值均在数据库里面，提示已经注册
 #define FACE_REAL_SCORE 0.7 活体检测分数最小要求
-#define LICENCE_PATH "/userdata/key.lic" rockface人脸授权key存放路径
+#define LICENCE_PATH "/oem/key.lic" rockface人脸授权key存放路径
 #define FACE_DATA_PATH "/usr/lib" rockface data存放路径
 #define MIN_FACE_WIDTH(w) ((w) / 5) 人脸检测、特征值提取人脸框宽度最小要求
 #define CONVERT_RGB_WIDTH 640 用于算法的RGB图像宽度
