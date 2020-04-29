@@ -237,9 +237,6 @@ code {
     pre {
         word-wrap: break-word;
     }
-    h2 {
-        page-break-before: always;
-    }
 }
 
 .md-fences {
