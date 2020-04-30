@@ -46,13 +46,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文主要描述了RV1109 Linux SDK的基本使用方法，旨在帮助开发者快速了解并使用RV1109 SDK开发包。
+本文主要描述了RV1126/RV1109 Linux SDK的基本使用方法，旨在帮助开发者快速了解并使用RV1126/RV1109 SDK开发包。
 
 **产品版本**
 
 | **芯片名称** | **内核版本** |
 | ------------ | ------------ |
-| RV1109   | Linux 4.19 |
+| RV1126/RV1109   | Linux 4.19 |
 
 **读者对象**
 
@@ -186,8 +186,8 @@ Recovery编译命令：./build.sh recovery
 ### 查看Recovery详细编译命令
 ./build.sh -h recovery
 ###Current SDK Default [ recovery ] Build Command###
-source envsetup.sh rockchip_puma_recovery
-/home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_puma_recovery
+source envsetup.sh rockchip_rv1126_rv1109_recovery
+/home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
 ```
 
 ### 3.5 Rootfs编译
@@ -198,7 +198,7 @@ Rootfs编译命令：./build.sh rootfs
 ### 查看Roofs详细编译命令
 ./build.sh -h rootfs
 ###Current SDK Default [ rootfs ] Build Command###
-source envsetup.sh rockchip_puma
+source envsetup.sh rockchip_rv1126_rv1109
 make
 ```
 
@@ -292,7 +292,9 @@ EVB板支持如下功能：
 
 ### 5.1 如何访问3路RTSP和1路RTMP网络码流
 
-使用网线接到EVB板的网口，上电开机。默认会自动获取IP地址。使用串口或ADB连上EVB板子运行**ifconfig eth0**获取**设备IP地址**。
+使用网线接到EVB板的网口，上电开机。默认会自动获取IP地址。
+
+#### 5.1.1 使用串口或ADB连上EVB板子获取设备IP地址
 
 ```shell
 ifconfig eth0
@@ -315,6 +317,15 @@ eth0      Link encap:Ethernet  HWaddr 02:E0:F9:16:7E:E9
 奇偶校验：none
 流控：none
 ```
+
+#### 5.1.2 使用RK IPCamera Tool获取设备IP地址
+
+安装SDK目录tools/windows/RK_IPCamera_Tool-V1.1.zip工具。打开工具，通过EVB板网口连接到电脑所
+在局域网，查看RK IPCamera Tool工具设备总数列表获取设备IP地址。
+
+![](resources/RK_IPCamera_Tool.jpg)
+
+#### 5.1.3 访问网络码流
 
 使用支持RTSP或RTMP的播放器访问，例如（VLC播放器）。
 
