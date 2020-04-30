@@ -2,7 +2,7 @@
 
 文档标识：RK-FB-YF-359
 
-发布版本：V0.0.1
+发布版本：V0.1
 
 日期：2020-04-28
 
@@ -60,7 +60,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
-| 2020-04-28 | V0.0.1 | CWW | 初始 Alpha版本 |
+| 2020-04-28 | V0.1 | CWW | 初始 Alpha版本 |
 |            |          |          |                |
 
 ## **目录**
@@ -85,7 +85,7 @@ SDK通过瑞芯微代码服务器对外发布获取。其编译开发环境，�
 RV1109_Linux_SDK 下载命令如下：
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m puma_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -95,12 +95,12 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rv1109_linux_sdk_alpha_v0.0.1_20200428.tar.bz2 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 rv1126_rv1109_linux_sdk_alpha_v0.1_20200428.tar.bz2 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
-mkdir rv1109
-tar xjf rv1109_linux_sdk_alpha_v0.0.1_20200428.tar.bz2 -C rv1109
-cd rv1109
+mkdir rv1126_rv1109
+tar xjf rv1126_rv1109_linux_sdk_alpha_v0.1_20200428.tar.bz2 -C rv1126_rv1109
+cd rv1126_rv1109
 .repo/repo/repo sync -l
 .repo/repo/repo sync
 ```
