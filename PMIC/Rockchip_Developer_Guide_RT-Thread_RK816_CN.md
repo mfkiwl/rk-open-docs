@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-074
 
-发布版本：1.0.0
+发布版本：1.1.0
 
-日期：2020-01-06
+日期：2020-05-26
 
 文件密级：公开资料
 
@@ -64,9 +64,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2020-01-06 | V1.0.0   | 陈健洪   | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**     |
+| ---------- | -------- | -------- | ---------------- |
+| 2020-01-06 | V1.0.0   | 陈健洪   | 初始版本         |
+| 2020-05-26 | V1.1.0   | 陈健洪   | 增加电池温度功能 |
 
 [TOC]
 
@@ -80,6 +81,7 @@ RK816 是一款高性能 PMIC，RK816 集成 4 个大电流 DCDC、1个升压BOO
 - pwrkey： power 按键检测
 - charger：控制电池充电电流、电池充电电压、系统输入电流
 - fuel gauge：电池电量统计
+- NTC sensor：电池温度检测
 
 ## 1 PMIC
 
@@ -583,7 +585,111 @@ rt_device_control(device, RT_DEVICE_CTRL_FG_GET, &status);
   fg_rk816 1 // 1：使能调试信息  0：关闭
   ```
 
-## 6 其他文档
+## 6. NTC Sensor
+
+### 6.1 驱动文件
+
+```c
+bsp/rockchip/common/drivers/pmic/rk816_sensor.c
+bsp/rockchip/common/drivers/pmic/rk816_sensor.h
+
+// 用户层接口
+components/drivers/sensors/sensor.c
+components/drivers/include/drivers/sensor.h
+```
+
+### 6.2 配置使能
+
+```c
+CONFIG_RT_USING_SENSOR
+CONFIG_RT_USING_SENSOR_RK816
+```
+
+### 6.3 基础概念
+
+电池温度检测原理：电池在不同的温度下有不同的内阻，用户通过某种方式获取到电池阻值后，根据电池规格书上的"温度-阻值"表获即可取对应的电池温度。一般情况下，温度和阻值成反比关系。
+
+RK816内部会提供一个类似恒流源的模块，通过TS脚对电池输出大小固定的电流脉冲，这样在电池端就会产生一定压降。RK816通过TS脚采集电池NTC脚上内阻压降反推出当前电池的阻值，然后根据"温度-阻值"表获取当前电池温度。
+
+### 6.4 板级定义
+
+用户需要在board.c 定义电池的NTC配置信息。比如：
+
+```c
+// 1. 数组内可定义任意多个值
+// 2. rk816支持的最大ntc值为110000，请勿超过
+static const rt_uint32_t rk816_ntc_table[] = {
+    42450, 33930, 27280, 22070, 17960, 14700, 12090, /* -10 ~ 20'C */
+    10000, 8310,  6490,  5830,  4910,  4160,  3540,  /* 25  ~ 55'C */
+};
+
+struct rk816_sensor_platform_data rk816_sensor_pdata =
+{
+    .ntc_table = &rk816_ntc_table[0],
+    .ntc_num = 14,            // 等价于：ARRAY_SIZE(rk816_ntc_table)
+    .ntc_degree_min = -10,    // rk816_ntc_table[0]对应的温度，即最低温度。
+    .ntc_degree_step = 5,     // 温度步进，即上述各ntc值之间的步进
+};
+```
+
+### 6.5 用户接口
+
+```c
+rt_size_t rt_device_read (rt_device_t dev, rt_off_t pos, void *buffer,rt_size_t size);
+```
+
+**范例：**
+
+```c
+rt_device_t dev = RT_NULL;
+struct rt_sensor_data sensor_data;
+
+device = rt_device_find("temp_rk816");
+if (device == RT_NULL)
+{
+	return -RT_ERROR;
+}
+
+// 此处仅供示例参考（省略返回值判断）
+// 1. 温度会被保存在：sensor_data.data.temp
+// 2. 温度单位：摄氏度*10。
+res = rt_device_read(dev, 0, &sensor_data, 1);
+...
+```
+
+### 6.6 测试命令
+
+框架提供了cmd实现：
+
+```c
+./components/drivers/sensors/sensor_cmd.c
+```
+
+支持的命令：
+
+```c
+msh />sensor
+
+sensor  [OPTION] [PARAM]
+         probe <dev_name>      Probe sensor by given name
+         info                  Get sensor info
+         sr <var>              Set range to var
+         sm <var>              Set work mode to var
+         sp <var>              Set power mode to var
+         sodr <var>            Set output date rate to var
+         read [num]            Read [num] times sensor
+                               num default 5
+```
+
+RK816支持的命令：
+
+```c
+sensor probe temp_rk816  // 必须先执行此命令完成驱动probe，然后才能执行其它命令
+sensor info              // sensor信息（意义不大）
+sensor read              // 读取温度
+```
+
+## 7 其他文档
 
 《Rockchip_Developer_Guide_RT-Thread_Power_CN.md》
 
