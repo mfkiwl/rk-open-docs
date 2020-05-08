@@ -112,7 +112,7 @@ cd rv1126_rv1109
 软件相关开发可以参考工程目录下的快速入门文档：
 
 ```shell
-<SDK>/docs/Soc_public/RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
 ```
 
 ## 4 硬件开发指南
@@ -120,7 +120,7 @@ cd rv1126_rv1109
 硬件相关开发可以参考工程目录下的用户使用指南文档：
 
 ```shell
-<SDK>/docs/Soc_public/RV1109/Rockchip_RV1126_RV1109_User_Guide_CN.pdf
+<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_User_Guide_CN.pdf
 ```
 
 ## 5 SSH 公钥操作说明
@@ -182,5 +182,4 @@ ssh-add ~/.ssh/id_rsa
 
 ### 5.4 参考文档
 
-更多详细说明，可参考文档 sdk/docs/RKTools manuals/Rockchip SDK Kit 申请指南 V1.6-
-201905.pdf。
+更多详细说明，可参考文档 sdk/docs/Tools/Rockchip SDK Kit 申请指南 V1.6-201905.pdf。
