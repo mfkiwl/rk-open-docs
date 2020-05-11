@@ -1,10 +1,10 @@
-# Rockchip RV1126/RV1109 Linux SDK 快速入门
+# RV1126/RV1109 Linux SDK 快速入门
 
 文档标识：RK-JC-YF-360
 
-发布版本：V0.0.1
+发布版本：V0.0.2
 
-日期：2020-04-28
+日期：2020-05-09
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -58,16 +58,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 本文档（本指南）主要适用于以下工程师：
 
-技术支持工程师
-
-软件开发工程师
+- 技术支持工程师
+- 软件开发工程师
 
 **修订记录**
 
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V0.0.1 | CWW | 2020-04-28 | 初始版本     |
-|            |          |              |              |
+| V0.0.2 | CWW | 2020-05-09 | 更新5.1.2节RK IPCamera Tool界面 |
 
 ## **目录**
 
@@ -320,10 +319,18 @@ eth0      Link encap:Ethernet  HWaddr 02:E0:F9:16:7E:E9
 
 #### 5.1.2 使用RK IPCamera Tool获取设备IP地址
 
-安装SDK目录tools/windows/RK_IPCamera_Tool-V1.1.zip工具。打开工具，通过EVB板网口连接到电脑所
-在局域网，查看RK IPCamera Tool工具设备总数列表获取设备IP地址。
+安装SDK目录tools/windows/RK_IPCamera_Tool-V1.1.zip工具。打开工具，通过EVB板网口连接到电脑所在局域网，查看RK IPCamera Tool工具设备总数列表获取设备IP地址。
 
-![](resources/RK_IPCamera_Tool.jpg)
+![](resources/RK_IPCamera_ToolCN.png)
+
+**说明：**
+
+1. 点击“开启搜索”，进行设备搜索
+2. 选择一个设备
+3. 取消自动获取IP，改为静态IP
+4. 设置静态IP
+5. 设置IP
+6. 打开预览
 
 #### 5.1.3 访问网络码流
 
