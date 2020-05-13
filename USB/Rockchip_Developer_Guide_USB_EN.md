@@ -2,27 +2,25 @@
 
 ID: RK-KF-YF-097
 
-Release Version: V1.2.2
+Release Version: V1.4.0
 
-Release Date: 2020-02-19
+Release Date: 2020-06-11
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -46,7 +44,7 @@ The purpose of this manual is to show you the hardware circuits of USB, how to c
 
 | Chipset name                                                 |    Kernel version     |
 | :----------------------------------------------------------- | :-------------------: |
-| RK3399、RK3368、RK3366、RK3328、RK3288、RK312X、RK3188、RK30XX、RK3308、RK3326、PX30 | Linux-4.4、Linux-4.19 |
+| RK3399Pro、RK3399、RK3368、RK3366、RK3328、RK3288、RK3228、RK312X、RK3188、RK30XX、RK3308、RK3326、RK1808、RK1108、PX30 | Linux-4.4、Linux-4.19 |
 
 **Intended Audience**
 
@@ -65,31 +63,42 @@ Hardware development engineers
 | 2019-03-11 | v1.2    | william.wu             | Fix style issues by markdownlint                             |
 | 2019-11-12 | v1.2.1  | william.wu             | Modify document name，support Linux-4.19                     |
 | 2020-02-19 | v1.2.2  | william.wu             | Add DISCLAIMER，Trademark Statement, etc.                    |
+| 2020-05-13 | v1.4.0  | jianing.ren            | Correct the content of most chapters to improve readability<br />Add new chapters "5.1 Linux USB Driver Framework" and "7 USB Common Debug Methods And Commands"<br /> Add analysis of common problems |
 
 ---
 [TOC]
 
 ## 1 Overview
 
-### 1.1 USB Controllers IP
+### 1.1 RK USB Controllers Solution
 
-Rockchip SOC usually has several USB controllers built in, and different controllers are independent of each other. Please get detailed information in the chip TRM. Because some USB controllers have limitations on usage, it is important to clarify the requirements of the scheme and the limitations of the controller before determining the design scheme of USB. The built-in USB controllers of each chip are shown in Table 1-1.
+Rockchip SoC usually has several USB controllers built in, and different controllers are independent of each other. Please get detailed information in the chip TRM. Because some USB controllers have limitations on usage, it is important to clarify the requirements of the scheme and the limitations of the controller before determining the design scheme of USB. The built-in USB controllers of each chip are shown in Table 1-1.
 
 Table 1‑1 USB Controllers List
 
-| **Chip** | **USB 2.0 HOST（EHCI&OHCI）** | **USB HSIC（EHCI）** | **USB 2.0/3.0 OTG（DWC3/XHCI）** | **USB 2.0 OTG （DWC2）** |
+| **Chip** | **USB 2.0 HOST（EHCI&OHCI）** | **USB HSIC（EHCI）** | **USB 2.0/3.0 OTG（DWC3/xHCI）** | **USB 2.0 OTG （DWC2）** |
 | :------: | :---------------------------: | :------------------: | :------------------------------: | :----------------------: |
-|  RK3399  |              ×2               |          ×1          |                ×2                |            0             |
-|  RK3368  |              ×1               |          ×1          |                0                 |            ×1            |
-|  RK3366  |              ×1               |          0           |                ×1                |            ×1            |
-|  RK3328  |              ×1               |          0           |                ×1                |            ×1            |
-|  RK3288  |               0               |          ×1          |                0                 |      ×2（HOST+OTG）      |
-|  RK312X  |              ×1               |          0           |                0                 |            ×1            |
-|  RK3188  |              ×1               |          ×1          |                0                 |            ×1            |
-|  RK30XX  |              ×1               |          0           |                0                 |            ×1            |
-|  RK3308  |              ×1               |          0           |                0                 |            x1            |
-|  RK3326  |               0               |          0           |                0                 |            x1            |
-|   PX30   |              x1               |          0           |                0                 |            x1            |
+| RK3399Pro |             2               |          1           |                2                 |            0            |
+|  RK3399  |              2               |          1           |                2                 |            0            |
+|  RK3368  |              1               |          1           |                0                 |            1            |
+|  RK3366  |              1               |          0           |                1                 |            1            |
+|  RK3328  |              1               |          0           |                1                 |            1            |
+|  RK3288  |              0               |          1           |                0                 |      2（HOST+OTG）      |
+|  RK3228  |              3               |          0           |                0                 |            1            |
+|  RK312X  |              1               |          0           |                0                 |            1            |
+|  RK3188  |              1               |          1           |                0                 |            1            |
+|  RK30XX  |              1               |          0           |                0                 |            1            |
+|  RK3308  |              1               |          0           |                0                 |            1            |
+|  RK3326  |              0               |          0           |                0                 |            1            |
+|  RK1808  |              1               |          0           |                1                 |            0            |
+|  RK1108  |              1               |          0           |                0                 |            1            |
+|   PX30   |              1               |          0           |                0                 |            1            |
+
+**Note：**
+
+1. In the table, the number N indicates that it supports N independent USB controllers.
+2. In the table, "EHCI/OHCI" indicates that the USB controller integrates the EHCI controller and OHCI controller. "DWC3/xHCI" indicates that the USB controller integrates the DWC3 controller and xHCI controller.
+3. RK3288 supports two independent DWC2 controllers. One DWC2 supports OTG function and the other DWC2 only supports Host function.
 
 ### 1.2 USB 2.0 Host
 
@@ -103,15 +112,11 @@ Compatible Specification
 
 Features
 
-- Support high-speed(480Mbps), full-speed(12Mbps) andlow-speed(1.5Mbps)
+- Support high-speed(480Mbps), full-speed(12Mbps) andlow-speed(1.5Mbps). The block diagram of the USB 2.0 Host controller is shown in Figure 1-1.
 
-![USB2.0-HostController-Block-Diagram](Rockchip-Developer-Guide-USB/USB2.0-HostController-Block-Diagram.png)
+![USB2.0-HostController-Block-Diagram](Rockchip-Developer-Guide-USB/USB2.0-Host-Controller-Block-Diagram.png)
 
 Figure 1-1 USB 2.0 Host Controller Block Diagram
-
-![USB2.0-USB 2.0-PHYBlock-Diagram](Rockchip-Developer-Guide-USB/USB2.0-USB2.0-PHYBlock-Diagram.png)
-
-Figure 1-2 USB 2.0 PHY Block Diagram
 
 ### 1.3 USB 2.0 OTG
 
@@ -121,7 +126,13 @@ Compatible Specification
 
 Features
 
-- Operates in High-Speed and Full-Speed mode
+- Supports Host mode and Device mode
+
+- Support OTG ID detection, and automatically switch between Host mode and Device mode by ID status
+
+- Does not support ADP/SRP/HNP protocols
+
+- Supports high speed, full speed, and low speed in Host mode, and only supports high speed and full speed in Device mode
 
 - Support 9 channels in host mode
 
@@ -141,15 +152,9 @@ Features
 
 ![USB2.0-OTG-Block-Diagram](Rockchip-Developer-Guide-USB\USB2.0-OTG-Block-Diagram.png)
 
-Figure 1‑3 USB 2.0 OTG Block Diagram
+Figure 1‑2 USB 2.0 OTG Block Diagram
 
-### 1.4 USB 2.0 PHY
-
-Host Port: used for USB 2.0 host controller
-
-OTG Port: used for USB 3.0 OTG controller with TypeC PHY to compriseas fully feature TypeC
-
-### 1.5 USB 3.0 OTG
+### 1.4 USB 3.0 OTG
 
 Compatible Specification
 
@@ -185,6 +190,18 @@ DWC3 Features
 
 - Flexible Descriptor with rich set of features to support bufferinterrupt moderation, multiple transfers, isochronous, control, and scatteredbuffering support
 
+- USB 3.0 Dual-Role Device(DRD) Features
+
+- Static Device operation
+
+- Static Host operation
+
+- USB 3.0/USB 2.0 OTG A device and B device basing on ID
+
+- UFP/DFP and Data Role Swap Defined in USB TypeC Specification
+
+- Not support USB 3.0/USB 2.0 OTG session request protocol(SRP), hostnegotiation protocol(HNP) and Role Swap Protocol(RSP)
+
 USB 3.0 xHCI Host Features
 
 - Support up to 64 devices
@@ -199,21 +216,21 @@ USB 3.0 xHCI Host Features
 
 - Support xHCI Debug Capability
 
-- USB 3.0 Dual-Role Device (DRD) Features
+![USB30-OTG-BlockDiagram](Rockchip-Developer-Guide-USB/USB3-OTG-Block-Diagram.png)
 
-- Static Device operation
+Figure 1‑3 USB 3.0 OTG Block Diagram
 
-- Static Host operation
+### 1.5 USB 2.0 PHY
 
-- USB 3.0/USB 2.0 OTG A device and B device basing on ID
+The USB 2.0 PHY supports two designs, one port and two ports. Figure 1-4 below is a block diagram that supports two ports.
 
-- UFP/DFP and Data Role Swap Defined in USB TypeC Specification
+![USB2.0-PHY-Block-Diagram](Rockchip-Developer-Guide-USB\USB2.0-PHY-Block-Diagram.png)
 
-- Not support USB 3.0/USB 2.0 OTG session request protocol(SRP), hostnegotiation protocol(HNP) and Role Swap Protocol(RSP)
+Figure 1‑4 USB 2.0 PHY Block Diagram
 
-![USB30-OTG-BlockDiagram](Rockchip-Developer-Guide-USB/USB30-OTG-BlockDiagram.png)
+- Host Port: connect to USB 2.0 Host controller via UTMI+
 
-Figure 1‑4 USB 3.0 OTG Block Diagram
+- OTG Port: connect to USB 3.0 OTG controller or USB 2.0 logic module of USB 2.0 OTG controller via UTMI+
 
 ### 1.6 Type-C USB 3.0 PHY
 
@@ -229,7 +246,7 @@ Figure 1‑4 USB 3.0 OTG Block Diagram
 
 - Support Normal and Flipped orientation
 
-![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-USB/TypC-PHY-BlockDiagram.png)
+![TypC-PHY-BlockDiagram](Rockchip-Developer-Guide-USB/Type-C-PHY-Block-Diagram.png)
 
 Figure 1‑5 TypeC PHY Block Diagram
 
@@ -237,98 +254,112 @@ Figure 1‑5 TypeC PHY Block Diagram
 
 ## 2 Hardware Circuits and Signals
 
-### 2.1 USB 2.0 HOST Hardware Circuits
+### 2.1 USB 2.0 Host Hardware Circuits
 
 This chapter introduces the hardware circuit design and signal of USB 2.0 HOST. According to the type of USB 2.0 PHY used, it can be divided into common USB 2.0 HOST hardware circuit and USB 2.0 HSIC hardware circuit.
 
-#### 2.1.1 Common USB 2.0 HOST Hardware Circuit
+#### 2.1.1 Common USB 2.0 Host Hardware Circuit
 
 USB 2.0 works at 480MHz clock, it is suggested that the width of USB 2.0 DP/DM lines should be 7-8 MIL and 90 Ω impedance differential. It is better to layout on the surface layer and cover the ground, and no interference source on the edge and no other signal line on the right upper and lower layers.
 
-The hardware signal reference circuit of USB 2.0 HOST controller is shown in Figure 2-1, and the VBUS control circuit and interface circuit of USB 2.0 HOST are shown in Figure 2-2（Reference to RK3399 EVB）.
+Example (USB 2.0 HOST hardware circuit design of RK3399 SoC).
 
-![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-USB/USB-20-HOST-SoCsignal-Pin.png)
+- The SoC pins of the USB 2.0 Host controller are shown in Figure 2-1
+
+![USB-20-HOST-SoCsignal-Pin](Rockchip-Developer-Guide-USB/USB2.0-HOST-Pin.png)
 
 Figure 2‑1 USB 2.0 HOST pin in SoC
 
-![HSIC-Hardware-of-Controller](Rockchip-Developer-Guide-USB/HSIC-Hardware-of-Controller.png)![USB-20-HOST-VBUSGPIO-Pin](Rockchip-Developer-Guide-USB/USB-20-HOST-VBUSGPIO-Pin.png)
+- The control circuit and interface circuit of USB 2.0 Host VBUS are shown in Figure 2-2 and Figure 2-3
 
-Figure 2‑2 USB 2.0 HOST VBUS control circuit and interface circuit
+![USB2.0-Host-interface](Rockchip-Developer-Guide-USB\USB2.0-Host-interface.png)
+
+Figure 2-2 USB 2.0 Host VBUS control circuit and interface circuit
+
+![USB-20-HOST-VBUSGPIO-Pin](Rockchip-Developer-Guide-USB/USB2.0-HOST-VBUS-GPIO-Pin.png)
+
+Figure 2‑3 USB 2.0 Host VBUS GPIO controller pin
 
 #### 2.1.2 USB 2.0 HSIC Hardware Circuit
 
 HSIC (High Speed Inter Chip) uses 240 MHz DDR signal, so the transmission rate is 480 Mbps, the same as USB 2.0, and the typical line impedance is 50 Ω. It is suggested that the maximum length of the line should not exceed 10 cm on the PCB.
 
-As shown in Figure 2-3, USIC_STROBE is 240MHz DDR signal line, USIC_DATA is data line. The power supply voltage is only 0.9V and 1.2V, and standard voltage of signal transmission is 1.2V, which has lower power consumption than USB 2.0 PHY.
+As shown in Figure 2-4, USIC_STROBE is 240MHz DDR signal line, USIC_DATA is data line. The power supply voltage is only 0.9V and 1.2V, and standard voltage of signal transmission is 1.2V, which has lower power consumption than USB 2.0 PHY.
+
+Example (USB 2.0 HSIC hardware circuit design of RK3399 SoC)
 
 ![HSIC-Hardware](Rockchip-Developer-Guide-USB/HSIC-Hardware.png)
 
-Figure 2‑3 USB 2.0 HSIC pin in SoC
+Figure 2‑4 USB 2.0 HSIC pin in SoC
 
-### 2.2 USB 2.0/3.0 OTG Hardware Circuits
+### 2.2 USB OTG Hardware Circuits
 
 #### 2.2.1 USB 2.0 OTG Hardware Circuit
 
-The complete USB 2.0 OTG reference circuit is shown in Figures 2-4 ～ 2-7（Reference to PX30 EVB）.
-
-![USB2.0-OTG-控制器硬件信号](Rockchip-Developer-Guide-USB\USB2.0-OTG-控制器硬件信号.png)
-
-Figure 2-4 USB 2.0 OTG pin in SoC
-
-![OTG-PORT-电路图](Rockchip-Developer-Guide-USB\OTG-PORT-电路图.png)
-
-Figure 2-5  USB 2.0 OTG Micro-Interface
-
-![OTG-DET-电路图](Rockchip-Developer-Guide-USB\OTG-DET-电路图.png)
-
-Figure 2-6  USB 2.0 OTG_DET circuit
-
-![OTG-DRV-电路图](Rockchip-Developer-Guide-USB\OTG-DRV-电路图.png)
-
-Figure 2-7 USB 2.0 OTG_DRV circuit
+USB 2.0 OTG related hardware signals:
 
 - OTG_DP/OTG_DM: USB differential signal D+/D-, need to place 2.2Ω series resistance on each signal line.
-- USB_DET: Input signal, used for OTG Peripheral mode to determine whether to connect to Host or USB charger. Default is low level 0V. If connect to Host or USB charger, the high level is 3.0 ~ 3.2 V.
+- USB_DET: Input signal, used for OTG Peripheral mode to determine whether to connect to Host or USB charger. Default is low level 0V. If connect to Host or USB charger, the high level is 3.0~3.2 V.
 - USB_ID: Input signal, used to determine whether to switch to Host mode or Peripheral mode. Default is high level 1.8V (pull-up inside chip), and OTG works as Peripheral mode. The USB_ID will be pull-down to the ground if connect with OTG-Host cable, and the USB driver will swith OTG to Host mode if the USB_ID level changes from high to low voltage.
 - USB_RBIAS: Base resistance of USB 2.0 PHY. Because the resistance of the resistor will affect the amplitude of the USB signal, so please strictly follow the resistance design of the SDK reference schematic diagram.
 - VCC5V0_OTG:  When OTG work as Peripheral mode, it's the input origin signal of USB_DET. When OTG work as Host mode, it's supply VBUS 5V for USB Devices.
 - USB_AVDD_1V0/USB_AVDD_1V8/USB_AVDD_3V3: Power supply for USB 2.0 PHY.
 
+USB 2.0 OTG PHY power supply：**USB_AVDD_1V0**，**USB_AVDD_1V8**，**USB_AVDD_3V3**
+
+The complete USB 2.0 OTG reference circuit is shown in Figures 2-5 ~ 2-8（Reference to PX30 EVB）.
+
+![USB2.0-OTG-pin](Rockchip-Developer-Guide-USB\USB2.0-OTG-pin.png)
+
+Figure 2-5 USB 2.0 OTG pin in SoC
+
+![USB2.0-OTG_Interface](Rockchip-Developer-Guide-USB\USB2.0-OTG-Interface.png)
+
+Figure 2-6 USB 2.0 OTG Micro-Interface
+
+![USB2.0-OTG-VBUS-DET](Rockchip-Developer-Guide-USB\USB2.0-OTG-VBUS-DET.png)
+
+Figure 2-7 USB 2.0 OTG_DET circuit
+
+![USB2.0-OTG-VBUS-DRV](Rockchip-Developer-Guide-USB\USB2.0-OTG-VBUS-DRV.png)
+
+Figure 2-8 USB 2.0 OTG_DRV circuit
+
 #### 2.2.2 USB 3.0 OTG Hardware Circuit
 
 The maximum transmission rate of USB 3.0 OTG is 5Gbps, which is downward compatible with USB 2.0 OTG function. The physical interface is Type-C or Type-A. The USB 3.0 OTG supports 4-wire differential signal lines up to 3 meters and 11-inch PCB. In order to avoid interference and reduce electromagnetic interference, the 5Gbps signal is transmitted by differential signal on long cable.
 
-Figure 2-8 ~ 2-13 is the Type-C USB 3.0 related circuit design of RK3399 platform.
+Figure 2-9 ~ 2-14 is the Type-C USB 3.0 related circuit design of RK3399 platform.
 
-![table-GND-kernel4.4](Rockchip-Developer-Guide-USB/table-GND-kernel4.4.png)
+![Type-C-Interface-pin](Rockchip-Developer-Guide-USB/Type-C-Interface-pin.png)
 
-![tabel-socketkernel4.4](Rockchip-Developer-Guide-USB/tabel-socketkernel4.4.png)
+![Type-C-Interface-Receptacle](Rockchip-Developer-Guide-USB/Type-C-Interface-Receptacle.png)
 
-![Type-C-Interface-Definition](Rockchip-Developer-Guide-USB/Type-C-Interface-Definition.png)
+![Type-C-Cable](Rockchip-Developer-Guide-USB/Type-C-Cable.png)
 
-Figure 2‑8 Type-C interface definition
+Figure 2‑9 Type-C interface definition
 
 ![USB3-OTG-Controller-SoC-Signal-Pin](Rockchip-Developer-Guide-USB/USB3-OTG-Controller-SoC-Signal-Pin.png)
 
-Figure 2‑9 USB 3.0 OTG pin in SoC
+Figure 2‑10 USB 3.0 OTG pin in SoC
 
 ![USB3-OTG-Type-C-Interface](Rockchip-Developer-Guide-USB/USB3-OTG-Type-C-Interface.png)
 
-Figure 2‑10 USB 3.0 OTG Type-C interface
+Figure 2‑11 USB 3.0 OTG Type-C interface
 
-![USB3-Type-C-pd／cc-Circuit（FUSB302）](Rockchip-Developer-Guide-USB/USB3-Type-C-pd／cc-Circuit（FUSB302）.png)
+![USB3-Type-FUSB302](Rockchip-Developer-Guide-USB/USB3-Type-C-FUSB302.png)
 
-Figure 2‑11 USB 3.0 Type-C CC detection circuit（FUSB302）
+Figure 2‑12 USB 3.0 Type-C CC detection circuit（FUSB302）
 
-![USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-USB/USB3-VBUS-Circuit-1（GPIO-contoller-output-5V）.png)
+![USB3-Type-C-VBUS-Control-Circuit-1（GPIO-contoller-output-5V）](Rockchip-Developer-Guide-USB/USB3-Type-C-VBUS-Control-Circuit-1.png)
 
-![kernel4.4](Rockchip-Developer-Guide-USB/USB-017-kernel4.4.png)
+![USB3-Type-C-VBUS-GPIO](Rockchip-Developer-Guide-USB\USB3-Type-C-VBUS-GPIO.png)
 
-Figure 2‑12 USB 3.0 VBUS Control Circuit-1（Control by GPIO）
+Figure 2‑13 USB 3.0 VBUS Control Circuit-1（Control by GPIO）
 
-![USB3-VBUS-Circuit-2（RK818-output5V）](Rockchip-Developer-Guide-USB/USB3-VBUS-Circuit-2（RK818-output5V）.png)
+![USB3-Type-C-VBUS-Control-Circuit-2](Rockchip-Developer-Guide-USB/USB3-Type-C-VBUS-Control-Circuit-2.png)
 
-Figure 2‑13 USB 3.0 VBUS Control-2（Control by RK818）
+Figure 2‑14 USB 3.0 VBUS Control-2（Control by RK818）
 
 ---
 ## 3 Kernel USB CONFIG
@@ -376,7 +407,9 @@ Device Drivers  --->
 
 "Rockchip INNO USB 3.0 PHY Driver" is used for USB 3.0 PHY with Innosilicon IP block, e.g. RK3328；
 
-### 3.2 USB HOST CONFIG
+### 3.2 USB Host CONFIG
+
+The configuration of the USB Host module is located at
 
 ```makefile
 
@@ -406,7 +439,7 @@ Select the OHCI configurations to support USB 1.1 HOST.
 
 Select the EHCI configurations to support USB 2.0 HOST.
 
-Seletc the xHCI configurations to support USB 3.0 HOST.
+Select the xHCI configurations to support USB 3.0 HOST.
 
 Note: In order to cut the Kernel core, the rk3308_linux_defconfig used for RK3308 doesn't support USB HOST. But actually, RK3308 SoC integrates one USB 2.0 Host controller (EHCI&OHCI). Select the OHCI/EHCI configurations and the related device class drivers if you want to use USB 2.0 HOST interface on RK3308 Board.
 
@@ -691,29 +724,39 @@ Device Drivers --->
 There are many other USB devices that may be used, such as GPS, Printer, etc. It may need Vendor customized driver or standard Class driver. If you need to support these USB devices, you can search methods via internet to support them. Rockchip platforms have no special requirements, you can directly refer to those methods.
 
 ---
-## 4 USB Device Tree Development
-
-It cancels the traditional device files since Linux-3.x and replaces them with the Device Tree (DT). Therefore, now the information about hardware description of the kernel needs to be configurated in DT. This chapter introduces how to develop the USB DT.  
+## 4 USB DTS Configuration
 
 ### 4.1 USB 2.0/3.0 PHY DTS
 
-USB 2.0 PHY configuration mainly includes PHY clock, interrupt configuration and VBUS Supply configuration.
+USB PHY is divided into USB 2.0 PHY and USB 3.0 PHY. These two PHYs are independent of each other, and their characteristics are quite different, so you need to configure DTS separately.
 
-USB 3.0 PHY configuration mainly includes PHY clock, interrupt configuration, Reset and Type-C PHY status register address.
+**Note:** The USB PHY DTS configuration of the RK3399 SoC is more flexible and complicated, please refer to the document:
+
+`Rockchip_RK3399_Developer_Guide_USB_DTS_CN`
 
 #### 4.1.1 USB 2.0 PHY DTS
 
-```
-Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb2.txt
-```
+Rockchip series SoCs mainly use two USB 2.0 PHY IPs: Innosilicon IP and Synopsis IP. The hardware design of these two IPs is different, so the corresponding PHY DTS configuration is also different. Most of the Rockchip series USB 2.0 PHYs use Innosilicon IP.
 
-Example (RK3399 USB 2.0 PHY0 DTS):
+1. **USB 2.0 PHY DTS Configuration Document**
 
-USB 2.0 PHY parent node: RK3399 USB 2.0 PHY registers are in GRF, so use GRF node as the parent of USB 2.0 PHY, and use the base address of GRF.
+Innosilicon USB 2.0 PHY DTS configuration document (for SoCs other than RK3188/RK3288)
 
-USB 2.0 PHY node: RK3399 USB 2.0 PHY is a combphy, it comprises with a Host port and a OTG port. And both of these two port use the same reference input clock and the same 480MHz out clock. And also use the same address offset of GRF for USB PHY configuration.
+`Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb2.txt`
 
-USB 2.0 PHY sub-nodes: A sub-node is required for each port the phy provides. The sub-node name is used to identify Host or OTG port, "otg-port " is the name of otg port, "host-port" is the name of host port. These two port has different interrupts.
+Synopsis USB 2.0 PHY DTS Configuration document (for RK3188/RK3288 SoC)
+
+`Documentation/devicetree/bindings/phy/rockchip-usb-phy.txt`
+
+2. **USB 2.0 PHY DTS Example**
+
+Example (RK3399 USB 2.0 PHY0 DTS)
+
+- USB 2.0 PHY parent node: RK3399 USB 2.0 PHY registers are in GRF, so use GRF node as the parent of USB 2.0 PHY, and use the base address of GRF.
+
+- USB 2.0 PHY node: RK3399 USB 2.0 PHY is a combphy, it comprises with a Host port and a OTG port. And both of these two port use the same reference input clock and the same 480MHz out clock. And also use the same address offset of GRF for USB PHY configuration.
+
+- USB 2.0 PHY sub-nodes: A sub-node is required for each port the phy provides. The sub-node name is used to identify Host or OTG port, "otg-port" is the name of otg port, "host-port" is the name of host port. These two port has different interrupts.
 
 ```c
 
@@ -753,11 +796,11 @@ grf: syscon@ff770000 {
 
 ```
 
-For Host port and OTG port host mode, we may need to config regulator for USB VBUS 5V in board DTS, it's
+For Host port and OTG port host mode, we may need to config regulator for USB VBUS 5V in board DTS, it's an optional property.
 
-an optional property.
+Example (RK3399 USB 2.0 Host VBUS regulator property in DTS)
 
-Example (RK3399 USB 2.0 HOST VBUS regulator property in DTS)
+The control method of RK3399 USB 2.0 Host VBUS is: if GPIO is pulled high, the VBUS 5V output is enabled; when GPIO is pulled low, the VBUS 5V output is closed. In DTS, regulator is used to configure GPIO. Among them, the attribute "regulator-always-on" indicates that after the system is started, the GPIO is pulled up to enable the VBUS 5V output until the system is shut down.
 
 ```c
 
@@ -780,7 +823,7 @@ usb2 {
 
 ```
 
-Set the “phy-supply” property to the regulator “vcc5v0_host“ that provides power to VBUS 5V.
+Set the “phy-supply” property to the regulator “vcc5v0_host“ that provides power to VBUS 5V. In this way, the core code of the PHY framework will automatically parse the attribute and control the GPIO corresponding to the USB VBUS.
 
 ```c
 u2phy0_host: host-port {
@@ -791,25 +834,41 @@ u2phy0_host: host-port {
 
 #### 4.1.2 USB 3.0 PHY DTS
 
-```
-Documentation/devicetree/bindings/phy/phy-rockchip-typec.txt
-```
+Rockchip series SoCs mainly use three types of USB 3.0 PHY IP: Type-C PHY IP, Innosilicon USB 3.0 PHY IP and Innosilicon USB 3.0 CombPhy IP. These three IPs have different hardware designs, so their corresponding PHY DTS configurations are also different.
 
-Example (RK3399 Type-C0 USB 3.0 PHY)：
+1. USB 3.0 PHY DTS Configuration Document
+
+Type-C PHY DTS configuration document(for RK3399/RK3399Pro SoC)
+
+`Documentation/devicetree/bindings/phy/phy-rockchip-typec.txt`
+
+Innosilicon USB 3.0 PHY DTS configuration document(for RK3228H/RK3228 Soc)
+
+`Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb3.txt`
+
+Innosilicon USB 3.0 Combphy configuration document(for RK1808 SoC, USB 3.0 & PCIe Combphy)
+
+`Documentation/devicetree/bindings/phy/phy-rockchip-inno-combophy.txt`
+
+2. USB 3.0 PHY DTS Example
+
+Example (RK3399 Type-C0 USB 3.0 PHY)
 
 Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY. So the tcphy0 has two sub-nodes "tcphy0_dp" and "tcphy0_usb3".
 
-rockchip,grf : phandle to the syscon managing the "general register files" .
+main DTS attribute description:
 
-rockchip,typec-conn-dir : the register of type-c connector direction.
+- rockchip,grf : phandle to the syscon managing the "general register files" .
 
-rockchip,usb3tousb2-en : the register of type-c force usb3 to usb2 enable.
+- rockchip,typec-conn-dir : the register of type-c connector direction.
 
-rockchip,external-psm : the register of type-c phy external psm clock.
+- rockchip,usb3tousb2-en : the register of type-c force usb3 to usb2 enable.
 
-rockchip,pipe-status : the register of type-c phy pipe status.
+- rockchip,external-psm : the register of type-c phy external psm clock.
 
-rockchip,uphy-dp-sel : the register of type-c phy selection for DP.
+- rockchip,pipe-status : the register of type-c phy pipe status.
+
+- rockchip,uphy-dp-sel : the register of type-c phy selection for DP.
 
 ```c
 
@@ -852,19 +911,34 @@ tcphy0: phy@ff7c0000 {
 
 *There are 2 type-c phys for RK3399, and they are almost identical.*
 
+*This document only describes the configuration of RK3399 USB 3.0 Type-C PHY in DTSI. In fact, there are some related configurations in DTS such as the extcon attribute and the hardware attributes of CC chip (FUSB302). For details, please refer to the document:*
+
+`Rockchip_RK3399_Developer_Guide_USB_DTS_CN`
+
 ### 4.2 USB 2.0 Controller DTS
 
-There are there different architectures controllers:
+There are two different architectures controllers:
 
-- EHCI (Enhanced Host Controller Interfac, only support USB 2.0)
-- OHCI (Open Host Controller Interface, support USB 1.1 & 1.0)
+- EHCI (Enhanced Host Controller Interfac, only support USB 2.0) and OHCI (Open Host Controller Interface, support USB 1.1 & 1.0)
 - DWC2 (DesignWare Cores USB 2.0 Hi-Speed On-The-Go (OTG), support USB 2.0 & 1.1 & & 1.0)
 
-#### 4.2.1 USB 2.0 HOST Controller DTS
+The following describes the two different architectures of the USB 2.0 controller DTS.
 
-EHCI controller DTS
+#### 4.2.1 USB 2.0 Host Controller DTS
 
-Example (RK3399 USB 2.0 Host0)
+1. **USB 2.0 Host Controller DTS configuration document**
+
+   `Documentation/devicetree/bindings/usb/usb-ehci.txt`
+
+   `Documentation/devicetree/bindings/usb/usb-ohci.txt`
+
+2. **USB 2.0 Host Controller DTS example**
+
+Example (DTS of RK3399 USB 2.0 Host0 EHCI & OHCI Controller)
+
+The compatible of the EHCI controller is fixed as “generic-ehci”, and the compatible of the OHCI controller is fixed as “generic-ohci”. In addition, EHCI and OHCI multiplex the same clocks and phys.
+
+Attribute "power-domains" needs to be configured only when the SoC's USB 2.0 Host controller supports the power-domains function.
 
 ```c
 
@@ -880,14 +954,6 @@ usb_host0_ehci: usb@fe380000 {
 	power-domains = <&power RK3399_PD_PERIHP>;
 	status = "disabled";
 };
-
-```
-
-OHCI controller DTS
-
-Example (RK3399 USB 2.0 Host0)
-
-```c
 
 usb_host0_ohci: usb@fe3a0000 {
 	compatible = "generic-ohci";
@@ -906,23 +972,45 @@ usb_host0_ohci: usb@fe3a0000 {
 
 #### 4.2.2 USB 2.0 OTG Controller DTS
 
-```
-Documentation/devicetree/bindings/usb/dwc2.txt
-Documentation/devicetree/bindings/usb/generic.txt
-```
+1. **USB 2.0 OTG Controller DTS configuration document**
 
-DWC2 controller DTS
+The USB 2.0 OTG uses a DWC2 controller. In the Linux-4.4 kernel, the DWC2 controller driver has two versions (dwc2 driver and dwc_otg_310 driver). Among them, the dwc_otg_310 driver is an older version of the driver only used for RK3288/RK3368 SoC. In the Linux-4.19 kernel, DWC2 controller use the dwc2 driver version for all SoCs and is no longer compatible with the old dwc_otg_310 driver.
 
-Example (RK3328 USB 2.0 OTG)
+DTS configuration file for dwc2 driver (for Linux-4.4 and newer kernels)
+
+`Documentation/devicetree/bindings/usb/dwc2.txt`
+
+`Documentation/devicetree/bindings/usb/generic.txt`
+
+DTS configuration document for dwc_otg_310 driver (only for Linux-4.4,  RK3288/RK3368 SoC)
+
+`Documentation/devicetree/bindings/usb/rockchip-usb.txt`
+
+2. **USB 2.0 OTG Controller example**
+
+Example (DTS of RK3328 USB 2.0 OTG)
+
+Main attribute as follows:
 
 - dr_mode: shall be one of "host", "peripheral" and "otg" ( Refer to usb/generic.txt).
 - g-rx-fifo-size: size of rx fifo size in gadget mode.
-
 - g-np-tx-fifo-size: size of non-periodic tx fifo size in gadget mode.
 - g-tx-fifo-size: size of tx fifo per endpoint (except ep0) in gadget mode.
 - g-use-dma: enable dma usage in gadget driver.
 - phys: phy provider specifier.
 - phy-names: shall be "usb2-phy".
+
+Among them, "g-np-tx-fifo-size", "g-rx-fifo-size" and "g-tx-fifo-size" are used for fifo configuration in device mode, which can be configured accroding to the actual USB device application of the product. The requirements are described as follows:
+
+1. "g-np-tx-fifo-size" configure the endpoint 0 fifo of the device. It is recommended to fix it to 16 (unit: 4Bytes);
+
+2. "g-rx-fifo-size" configure the receiving fifo of the device OUT Endpoint. All OUT Endpoints share one receiving fifo. It is recommended to fix it to 275 (unit: 4Bytes);
+
+3. "g-tx-fifo-size" configure the sending fifo of the device IN Endpoint, each IN Endpoint has a dedicated sending fifo. The corresponding tx-fifo can be configured according to the number of IN Endpoints actually used. When configuring tx-fifo, there are two principles:
+
+    1) tx-fifo cannot be smaller than EP max-packet;
+
+    2) The larger the tx-fifo, the better the transmission performance, so if the tx-fifo is large enough, it is recommended to configure it to be 2 times or larger than the EP max-packet;
 
 ```c
 
@@ -947,87 +1035,160 @@ usb20_otg: usb@ff580000 {
 
 ### 4.3 USB 3.0 Controller DTS
 
-#### 4.3.1 USB 3.0 HOST Controller DTS
+#### 4.3.1 USB 3.0 Host Controller DTS
 
-USB 3.0 HOST controller is xHCI, integrated in DWC3 OTG IP, so it is not necessary to configure DTS separately for xHCI. We only need to configure DWC3 DTS, and set the "dr_mode" attribute of DWC3 to "otg" or "host".
+USB 3.0 Host controller is xHCI, integrated in DWC3 OTG IP, so it is not necessary to configure DTS separately for xHCI. We only need to configure DWC3 DTS, and set the "dr_mode" attribute of DWC3 to "otg" or "host".
 
 #### 4.3.2 USB 3.0 OTG Controller DTS
 
-```
-Documentation/devicetree/bindings/usb/dwc3-rockchip.txt
-```
+1. **USB 3.0 OTG Controller DTS Configuration Document**
 
-Example (RK3328 SoC)：
+The USB 3.0 OTG uses a DWC3 controller. Linux-4.4 and Linux-4.19 or later kernel versions have different USB 3.0 OTG DTS configurations because Linux-4.19 USB DWC3 controller driver has been upgraded significantly compared to Linux-4.4 (for specific differences, please refer to [5.3.1 USB 3.0 OTG Controller Driver Development](# 5.3.1 USB 3.0 OTG Controller Driver Development))
+
+Linux-4.4 USB 3.0 OTG controller DTS configuration document
+
+`Documentation/devicetree/bindings/usb/dwc3.txt` (DWC3 Controller common attribute configuration description)
+`Documentation/devicetree/bindings/usb/generic.txt` (USB Controller common attribute configuration description)
+`Documentation/devicetree/bindings/usb/rockchip,dwc3.txt` (for RK3399/RK1808 SoC)
+`Documentation/devicetree/bindings/usb/rockchip-inno,dwc3.txt`  (for RK3328/RK3228H SoC)
+
+Linux-4.19 and newer kernel USB 3.0 OTG Controller DTS configuration document
+
+`Documentation/devicetree/bindings/usb/dwc3.txt` (DWC3 Controller common attribute configuration description)
+`Documentation/devicetree/bindings/usb/generic.txt` (USB Controller common attribute configuration description)
+`Documentation/devicetree/bindings/usb/rockchip-inno,dwc3.txt`  (for RK3328/RK3228H SoC)
+
+**Differences in DTS configuration between Linux-4.4 and 4.19 USB 3.0 controllers**
+
+- DWC3's power-domains, restets and extcon attribute have different reference locations. In Linux-4.4 kernel, these three attributes are placed on the parent node (usbdrd3) of the DWC3 controller, while in Linux-4.19 kernel, these three attributes are moved to the child nodes (usbdrd_dwc3) of the DWC3 controller;
+- When configuring Type-C to Type-A USB 2.0/3.0 OTG DTS, it is necessary to add the configuration of the extcon attribute in the USB controller sub-node (usbdrd_dwc3) to support software switching OTG mode in Linux-4.19 kernel, but not in Linux-4.4 kernel.
+
+2. **USB 3.0 OTG Controller DTS Example**
+
+Example (RK3399 USB 3.0 OTG DTS in Linux-4.4 kernel)
+
+The USB 3.0 OTG DTS includes a parent node "usbdrd3_0" and a child node "usbdrd_dwc3_0". For all SoCs except for RK3328/RK3228H supporting DWC3 controller, compatible attribute in the parent node must add "rockchip, rk3399-dwc3". The child nodes of all SoCs are configured as "snps, dwc3". The role of the parent node is to configure chip-level related attributes, such as clocks, power-domains, and reset. The role of the child node is to configure the controller-related attributes in which the quirk attribute is applicable to the DWC3 controllers of all SoCs.
 
 ```c
+usbdrd3_0: usb0 {
+        compatible = "rockchip,rk3399-dwc3";
+        clocks = <&cru SCLK_USB3OTG0_REF>, <&cru SCLK_USB3OTG0_SUSPEND>,
+             <&cru ACLK_USB3OTG0>, <&cru ACLK_USB3_GRF>;
+        clock-names = "ref_clk", "suspend_clk",
+                  "bus_clk", "grf_clk";
+        power-domains = <&power RK3399_PD_USB3>;
+        resets = <&cru SRST_A_USB3_OTG0>;
+        reset-names = "usb3-otg";
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+        status = "disabled";
 
-usbdrd3: usb@ff600000 {
-	compatible = "rockchip,rk3328-dwc3";
-	clocks = <&cru SCLK_USB3OTG_REF>, <&cru SCLK_USB3OTG_SUSPEND>,
-			 <&cru ACLK_USB3OTG>;
-	clock-names = "ref_clk", "suspend_clk",
-			      "bus_clk";
-	#address-cells = <2>;
-	#size-cells = <2>;
-	ranges;
-	status = "disabled";
-
-	usbdrd_dwc3: dwc3@ff600000 {
-		compatible = "snps,dwc3";
-		reg = <0x0 0xff600000 0x0 0x100000>;
-		interrupts = <GIC_SPI 67 IRQ_TYPE_LEVEL_HIGH>;
-		dr_mode = "host";
-		phys = <&u3phy_utmi>, <&u3phy_pipe>;
-		phy-names = "usb2-phy", "usb3-phy";
-		phy_type = "utmi_wide";
-		snps,dis_enblslpm_quirk;
-		snps,dis-u2-freeclk-exists-quirk;
-		snps,dis_u2_susphy_quirk;
-		snps,dis-u3-autosuspend-quirk;
-		snps,dis_u3_susphy_quirk;
-		snps,dis-del-phy-power-chg-quirk;
-		snps,tx-ipgap-linecheck-dis-quirk;
-		status = "disabled";
-	};
-};
-
+        usbdrd_dwc3_0: dwc3@fe800000 {
+            compatible = "snps,dwc3";
+            reg = <0x0 0xfe800000 0x0 0x100000>;
+            interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH 0>;
+            dr_mode = "otg";
+            phys = <&u2phy0_otg>, <&tcphy0_usb3>;
+            phy-names = "usb2-phy", "usb3-phy";
+            phy_type = "utmi_wide";
+            snps,dis_enblslpm_quirk;
+            snps,dis-u2-freeclk-exists-quirk;
+            snps,dis_u2_susphy_quirk;
+            snps,dis-del-phy-power-chg-quirk;
+            snps,tx-ipgap-linecheck-dis-quirk;
+            snps,xhci-slow-suspend-quirk;
+            snps,xhci-trb-ent-quirk;
+            snps,usb3-warm-reset-on-resume-quirk;
+            status = "disabled";
+        };
+    };
 ```
 
 ## 5 USB Driver Development
 
-### 5.1 USB PHY Drivers
+### 5.1 Linux USB Driver Framework
 
-#### 5.1.1 USB 2.0 PHY Driver
+The Linux USB protocol stack is a layered architecture, as shown in Figure 5-1 below. The left is the USB device driver, the right is the USB host driver, and the bottom layer is the driver for the different USB controllers and PHYs of the Rockchip SoCs.
 
-USB 2.0 PHY Driver code (For Innosilicon IP):
+![Linux_usb_driver_architecture](Rockchip-Developer-Guide-USB\Linux_usb_driver_architecture.png)
 
-`drivers/phy/phy-rockchip-inno-usb2.c`
+Figure 5-1 Linux USB driver framework
 
-USB 2.0 PHY Driver code (For Synopsis IP, only used for RK3188/RK3288):
+### 5.2 USB PHY Drivers
 
-`drivers/phy/rockchip/phy-rockchip-usb.c`
+This chapter mainly introduces the driver code of PHY briefly. If you want to know more about the hardware framework, register description, signal adjustment of PHY, please refer to the document
 
-For the time being, most of SoCs except RK3188/RK3288 use Innosilicon IP, it supports the following feature:
+`Rockchip_Developer_Guide_Linux_USB_PHY_CN`
+
+#### 5.2.1 USB 2.0 PHY Driver
+
+Rockchip SoCs mainly use two USB 2.0 PHY IPs: Innosilicon IP and Synopsis IP. The hardware design of these two IPs is different, so a separate USB PHY driver is required. At the same time, SoCs with the same USB 2.0 PHY IP use the same driver, instead of each SoC having a dedicated driver.
+
+1. **USB 2.0 PHT driver code**
+
+- Innosilicon USB 2.0 PHY Driver code
+
+  `drivers/phy/phy-rockchip-inno-usb2.c`
+
+- Synopsis USB 2.0 PHY Driver code (only used for RK3188/RK3288):
+
+  `drivers/phy/rockchip/phy-rockchip-usb.c`
+
+For the time being, most of SoCs except RK3188/RK3288 use Innosilicon IP, so this chapter mainly introduces Innosilicon IP.
+
+2. **Innosilicon USB 2.0 PHY IP feature**
 
 - Fully compliant with USB specification Rev 2.0
 - Support 480Mbps/12Mbps/1.5Mbps serial data transmission
 - Support all test modes defined in USB2.0 Specification
 - Support one port of one PHY, or two ports of one PHY (Comprises with one OTG port and one Host port)
-- OTG Port support dual-role device, fully support Battery Charge 1.2 Specification
+- OTG Port support dual-role device
+- fully support Battery Charge 1.2 Specification
 
-The USB 2.0 PHY driver need to exclusively configure  PHY for different SoCs with a special *_phy_cfgs.
+3. **USB 2.0 PHY driver's important structure**
 
-Example  (RK3399 USB 2.0 PHY configurations):
+In the USB 2.0 PHY driver, there is an important structure rockchip_usb2phy_cfg, which is mainly used to operate the USB PHY related registers. When adding a new SoC support for Innosilicon USB 2.0 PHY, the main job is to add the corresponding rkxxxx_phy_cfgs structure.
 
-RK3399  supports two independent USB 2.0 PHYs. Each PHY comprises with one OTG port and one Host port. OTG port is used for USB3.0 OTG controller with Type-C USB 3.0 PHY to comprise as fully feature Type-C. Host port is used for USB2.0 host controller.
+```c
+struct rockchip_usb2phy_cfg {
+        unsigned int    reg;
+        unsigned int    num_ports;
+        int (*phy_tuning)(struct rockchip_usb2phy *);
+        struct usb2phy_reg      clkout_ctl;
+        const struct rockchip_usb2phy_port_cfg  port_cfgs[USB2PHY_NUM_PORTS];
+        const struct rockchip_chg_det_reg       chg_det;
+};
+```
 
-- reg: the address offset of grf for usb-phy config.
-- num_ports: specify how many ports that the phy has.
-- phy_tuning: used for phy default parameters tunning.
-- clkout_ctl: keep on/turn off output 480MHz clk of phy.
-- chg_det: charger detection registers, used for charger detection.
-- USB2PHY_PORT_OTG: index of OTG port.
-- USB2PHY_PORT_HOST: index of Host port.
+The members of the rockchip_usb2phy_cfg structure are described as follows:
+
+- reg: the offset address of the USB PHY in the GRF module. This address should be the same as the corresponding reg attrbute of the DTS USB 2.0 PHY. The purpose is to match the configuration of the DTS PHY and the PHY in the driver.
+- num_ports: defines the number of ports supported by the USB PHY. For example, if OTG port and Host port are supported, num_ports is 2.
+- phy_tuning: used for USB PHY signal adjustment, such as increasing pre-emphasis and increasing signal amplitude.
+- clkout_ctl: controls the USB PHY's 480MHz output clock.
+- port_cfgs: register configuration of USB PHY port.
+- chg_det: register configuration related to charge detection.
+
+4. **USB 2.0 PHY state machine**
+
+The USB 2.0 PHY driver has three works that are used to handle different state machines:
+
+- rockchip_chg_detect_work: charge detection function for OTG port device mode;
+
+- rockchip_usb2phy_otg_sm_work: detect the connection status of the OTG port and control the PHY to enter/exit suspend;
+
+- rockchip_usb2phy_sm_work: detect the connection status of the host port and control the PHY to enter/exit suspend;
+
+In the driver, dev_dbg log has been added in key places, which makes it easy to view the state machine rotation during device connection and disconnection.
+
+5. **USB 2.0 PHY Driver Development Example **
+
+Example (RK3399 USB 3.0 PHY driver)
+
+RK3399  supports two independent USB 2.0 PHYs. Each PHY comprises with one OTG port and one Host port. OTG port is used for USB3.0 OTG controller with Type-C USB 3.0 PHY to comprise as fully feature Type-C. Host port is used for USB2.0 host controller. The detailed rk3399_phy_cfgs structure code is as follows:
+
+The registers in port_cfgs is mainly used for PHY suspend mode control, VBUS level status detection, OTG ID level status detection, DP/DM line level status detection, etc. For the specific function description of each member, please refer to the notes of the structure members in the driver.
 
 ```c
 static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
@@ -1134,81 +1295,80 @@ static const struct rockchip_usb2phy_cfg rk3399_phy_cfgs[] = {
 
 ```
 
-**USB 2.0 PHY debug interface:**
+6. **USB 2.0 PHY Debug Interface**
 
 ```sh
-
-rk3326_evb:/sys/devices/platform/ff2c0000.syscon/ff2c0000.syscon:usb2-phy@100 # ls
+/sys/devices/platform/[u2phy dev name] # ls
 driver          extcon   of_node  phy   subsystem
 driver_override modalias otg_mode power uevent
 
 ```
 
-**otg_mode:** Show & store the current value of otg mode for otg port, used to force OTG to Host mode or Peripheral mode.
+Note：[U2phy dev name] in the USB 2.0 PHY full path needs to be modified to the specific PHY node name corresponding to the SoC.
 
-For example, force mode for RK3326 board USB:
+The "**otg_mode**" node is used to switch the OTG Device/Host mode by software, and it is not affected by the OTG ID level status.
 
-1. Force host mode
+For example：
 
-```sh
-echo host > /sys/devices/platform/<u2phy dev name>/otg_mode
-```
+- Force host mode
 
-2. Force peripheral mode
+  `echo host > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-```sh
-echo peripheral > /sys/devices/platform/<u2phy dev name>/otg_mode
-```
+- Force device mode
 
-3. Force otg mode
+  `echo peripheral > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-```sh
-echo otg > /sys/devices/platform/<u2phy dev name>/otg_mode
-```
+- Force otg mode
 
-Legacy Usage:
+  `echo otg > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-1. Force host mode
+At the same time, the node is still compatible with the old order of Linux-3.10 and earlier, namely:
 
-```sh
-echo 1 > /sys/devices/platform/<u2phy dev name>/otg_mode
-```
+- Force host mode
 
-2. Force peripheral mode
+  `echo 1 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-```sh
-echo 2 > /sys/devices/platform/<u2phy dev name>/otg_mode
-```
+- Force device mode
 
-3. Force otg mode
+  `echo 2 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-```sh
-echo 0 > /sys/devices/platform/<u2phy dev name>/otg_mode
-```
+- Force otg mode
 
-#### 5.1.2 USB 3.0 PHY Drivers
+  `echo 0 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-USB 3.0 PHY Driver code (For Type-C IP, RK3399):
+#### 5.2.2 USB 3.0 PHY Drivers
+
+Rockchip SoCs mainly use three types of USB 3.0 PHY IP: Type-C PHY IP, Innosilicon USB 3.0 PHY IP and Innosilicon USB 3.0 CombPhy IP. These three IPs have different hardware designs, so they need separate USB PHY drivers.
+
+Note that all three USB 3.0 PHY IPs only support SuperSpeed, so they must be used together with USB 2.0 PHY to fully support the USB 3.0 protocol(supporting HighSpeed/FullSpeed/LowSpeed).
+
+The three different USB 3.0 PHY IP drivers are briefly described below.
+
+1. **Type-C PHY Driver**
+
+- **Type-C USB 3.0 PHY driver code**
 
 `drivers/phy/rockchip/phy-rockchip-typec.c`
 
-USB 3.0 PHY Driver code (For USB 3.0 IP, RK3228H/RK3328):
+- **Type-C USB 3.0 PHY driver example**
 
-`drivers/phy/rockchip/phy-rockchip-inno-usb3.c`
+Example (RK3399 Type-C PHY)
 
-USB 3.0 PHY Driver code (For USB 3.0 Combphy IP, RK1808):
+Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY. Please refer to [1.6 USB 3.0 Type-C PHY](#1.6 USB 3.0 Type-C PHY) to learn about Type-C PHY's features.
 
-`drivers/phy/rockchip/phy-rockchip-inno-combphy.c`
+In the probe function of Type-C PHY driver, rockchip_dp_phy_ops of "dp-port" and rockchip_usb3_phy_ops of "usb3-port" are created respectively, that is, the operation functions of USB 3.0 PHY and DP PHY such as power_on and power_off are independent and do not affect each other.
 
-1. Example (RK3399 Type-C PHY):
+The Type-C PHY driver can support the following 4 working modes:
 
-Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY. Type-C PHY supports the following features:
+- USB 3.0 only: only works in USB 3.0 mode, such as a Type-C to Type-A USB 3.0 adapter cable;
 
-- Support USB3.0 (SuperSpeed only)
-- Support USB TypeC and DisplayPort Alt Mode
-- Support Normal and Flipped orientation
+- DP only: only works in DP mode, such as connecting a DP cable;
 
-Type-C PHY driver create independent PHY and phy_ops for USB 3.0 and DP.
+- USB 3.0 + DP 2 lanes: support USB 3.0 and DP 2 lanes work at the same time, such as connecting Type-C dongle;
+
+- USB 2.0 + DP 4 lanes: support USB 2.0 and DP 4 lanes work at the same time, such as connecting Type-C VR headset;
+
+In order to support the above four working modes, the Type-C PHY needs to be combined with a CC chip (FUSB302 chip is recommended) to detect the type of the inserted Type-C cable. The CC chip sends a message to the Type-C PHY using the extcon notification mechanism.
 
 Important USB 3.0 phy_ops:
 
@@ -1220,7 +1380,15 @@ Other important functions for USB 3.0:
 - tcphy_cfg_usb3_to_usb2_only: used to force USB 3.0 works on USB 2.0 only.
 - tcphy_cfg_usb3_pll: config PHY PLL for USB 3.0.
 
-2. Example (RK3328 USB 3.0 PHY):
+2. **Innosilicon USB 3.0 PHY Driver**
+
+- **Innosilicon USB 3.0 PHY driver code**
+
+`drivers/phy/rockchip/phy-rockchip-inno-usb3.c`
+
+- **Innosilicon USB 3.0 PHY driver example**
+
+Example (RK3328 USB 3.0 PHY).
 
 RK3328 USB 3.0 PHY is  combination of USB 3.0 PHY and USB 2.0 PHY. Some key features of the USB3.0 PHY are:
 
@@ -1231,26 +1399,79 @@ RK3328 USB 3.0 PHY is  combination of USB 3.0 PHY and USB 2.0 PHY. Some key feat
 - Holding registers to stage transmit and receive data
 - Supports direct disparity control for use in transmitting compliance pattern
 - 8b/10b encode/decode and error indication
+- Can not detect peripheral disconnection
 
-USB 3.0 Driver use U3PHY_TYPE_UTMI for index of USB 2.0 PHY and use U3PHY_TYPE_PIPE for index of USB 3.0 PHY.
+The Innosilicon USB 3.0 PHY driver has two special features:
 
-Important USB 3.0 phy_ops:
+- The USB 2.0 PHY and USB 3.0 PHY operation functions are implemented at the same time (although the two PHYs are independent from the hardware), which is different from other USB 3.0 PHYs. In the driver, “U3PHY_TYPE_UTMI” and “U3PHY_TYPE_PIPE” are used as the indexes of USB 2.0 PHY and USB 3.0 PHY respectively. For details, please refer to the following functions in the driver code:
 
-- rockchip_u3phy_power_on: used for USB 3.0 Controller to power on the USB 2.0 and USB 3.0 block.
-- rockchip_u3phy_power_off: used for USB 3.0 Controller to power off the USB 2.0 and USB 3.0 block.
+  rockchip_u3phy_port_init (): Initializes the USB 2.0 port and USB 3.0 port of USB 3.0.
 
-Other important functions for USB 3.0:
+  rockchip_u3phy_power_on (): Turn on the clock, and configure the USB 2.0 PHY to Normal mode, and configure the USB 3.0 PHY to enter the P0 state.
 
-- rockchip_u3phy_usb2_only_fops: used to force USB 3.0 to works on USB 2.0 only via "**u3phy_mode**" in debugfs.
-- rockchip_u3phy_on_init/rockchip_u3phy_on_shutdown/rockchip_u3phy_on_disconnect: used for USB core and USB controller to reinit PHY/shutdown PHY/disconnect PHY. Generally, the USB 3.0 PHY hardware needs to detect the disconnection by itself, however, RK3328/RK3228H  lost the ability to detect the disconnection.
+  rockchip_u3phy_power_off (): Configure the USB 2.0 PHY to suspend mode, configure the USB 3.0 PHY to enter P3 state, and turn off the clock to save the overall power consumption of the PHY.
 
-3. Example (RK1808 USB 3.0 Comb-PHY):
+- In order to solve the USB 3.0 PHY cannot detect the disconnection status of the peripheral, a special function has been added, which is different from other USB 3.0 PHYs. For details, please refer to the following functions in the driver:
 
-RK1808 USB 3.0 combphy is a combination of USB 3.0 SuperSpeed PHY and PCIe PHY, and the USB 3.0 PHY and PCIe PHY can't works at the same time.
+  rockchip_u3phy_on_disconnect (): When the USB HUB core driver determines that the peripheral has been disconnected by detecting changes in the state of the linkstate, it will call the disconnect function through the notifier registered by the PHY to complete a series of soft disconnect operations.
+
+  rockchip_u3phy_on_shutdown (): This function is provided to the DWC3 controller driver call, and its role is to reset the USB3 PHY during the soft disconnect process.
+
+  rockchip_u3phy_on_init (): This function is provided to the DWC3 controller driver call. Its role is to release the reset signal of the USB 3.0 PHY at the end of the soft disconnect process;
+
+The Innosilicon USB 3.0 PHY supports software commands to force the PHY to work only in USB 2.0 only mode:
+
+- Command to configure USB 3.0 PHY to USB 2.0 only mode
+
+`echo u2> /sys/kernel/debug/[phy name]/u3phy_mode`
+
+- Command to configure USB 3.0 PHY to support both USB 3.0 and USB 2.0 mode (default after driver initialization)
+
+`echo u3> /sys/kernel/debug/[phy name]/u3phy_mode`
+
+Note: [phy name] needs to be modified to the specific PHY node name corresponding to the SoC.
+
+3. **Innosilicom USB 3.0 CombPhy Driver**
+
+- **Innosilicon USB 3.0 CombPhy driver code**
+
+`drivers/phy/rockchip/phy-rockchip-inno-combphy.c`
+
+- **Innosilicon USB 3.0 CombPhy driver example**
+
+Example (RK1808 USB 3.0 combphy)
+
+RK1808 USB 3.0 combphy is a combination of USB 3.0 SuperSpeed PHY and PCIe PHY, and the USB 3.0 PHY and PCIe PHY can't works at the same time. In the driver, PHY interface function rockchip_combphy_xlate() is registered and provided to USB 3.0 controller driver and PCIe driver to configure the USB 3.0 CombPHY to work at the type required by the controller.
+
+If you are using USB 3.0, configure the USB 3.0 controller DTS's phys attribute to
+
+```c
+phys = <&u2phy_otg>, <&combphy PHY_TYPE_USB3>;
+phy-names = "usb2-phy", "usb3-phy";
+
+```
+
+If you are using PCIe, configure the PCIe controller DTS's phys attribute to
+
+```
+phys = <&combphy PHY_TYPE_PCIE>;
+phy-names = "pcie-phy";
+
+```
 
 For USB 3.0 PHY, it only supports SuperSpeed, and it works with USB 2.0 PHY OTG port to comprise as fully feature USB 3.0/2.0/1.1/1.0.
 
-Important USB 3.0 phy_ops:
+Some key features of the USB3.0 CombPhy are:
+
+- Supports 5.0Gb/s serial data transmission rate
+- Utilizes 8-bit, 16-bit or 32- bit parallel interface to transmit and receive USB SuperSpeed data
+- Allows integration of high speed components into a single functional block as seen by the device designer
+- Data and clock recovery from serial stream on the USB SuperSpeed bus
+- Holding registers to stage transmit and receive data
+- Supports direct disparity control for use in transmitting compliance pattern
+- 8b/10b encode/decode and error indication
+
+Important USB 3.0 PHY and PCIe PHY multiplex phy_ops:
 
 - rockchip_combphy_init: prepare PHY reference clock, set PHY type and init PHY regitsters
 - rockchip_combphy_exit: unprepare PHY reference clock
@@ -1259,67 +1480,486 @@ Important USB 3.0 phy_ops:
 
 Other important functions for USB 3.0:
 
-- rk1808_combphy_low_power_control: used for lower power control for USB 3.0 PHY when system enter
-
-   deepsleep
+- rk1808_combphy_low_power_control: used for lower power control for USB 3.0 PHY when system enter deepsleep
 
 - u3phy_mode_store/u3phy_mode_show: used to force USB 3.0 to works on USB 2.0 only via "**u3phy_mode**" in sysfs.
 
   It needs to reinit the xHCI when switch between USB 2.0 only and USB 2.0/3.0 mode dynamically. In order to reinit the xHCI, we use the "**otg_mode**" node in sysfs to remove/add xHCI HCD.
 
-  ```sh
-  1. Default is USB 3.0 OTG mode, config to USB 2.0 only mode
-     echo u2 > /sys/devices/platform/<u3phy dev name>/u3phy_mode
-     echo host > /sys/devices/platform/<u2phy dev name>/otg_mode
+```c
+1. Default is USB 3.0 OTG mode, config to USB 2.0 only mode
+   echo u2 > /sys/devices/platform/[u3phy dev name]/u3phy_mode
+   echo host > /sys/devices/platform/[u2phy dev name]/otg_mode
 
-  2. Default is USB 3.0 Host mode, config to USB 2.0 only mode
-     echo otg > /sys/devices/platform/<u2phy dev name>/otg_mode
-     echo u2 > /sys/devices/platform/<u3phy dev name>/u3phy_mode
-     echo host > /sys/devices/platform/<u2phy dev name>/otg_mode
+2. Default is USB 3.0 Host mode, config to USB 2.0 only mode
+   echo otg > /sys/devices/platform/[u2phy dev name]/otg_mode
+   echo u2 > /sys/devices/platform/[u3phy dev name]/u3phy_mode
+   echo host > /sys/devices/platform/[u2phy dev name]/otg_mode
 
-  3. Default is USB 2.0 only Host mode, config to USB 3.0 mode
-     echo otg > /sys/devices/platform/<u2phy dev name>/otg_mode
-     echo u3 > /sys/devices/platform/<u3phy dev name>/u3phy_mode
-     echo host > /sys/devices/platform/<u2phy dev name>/otg_mode
-  ```
+3. Default is USB 2.0 only Host mode, config to USB 3.0 mode
+   echo otg > /sys/devices/platform/[u2phy dev name]/otg_mode
+   echo u3 > /sys/devices/platform/[u3phy dev name]/u3phy_mode
+   echo host > /sys/devices/platform/[u2phy dev name]/otg_mode
+```
 
-### 5.2 USB Controller Drivers
+Note：
 
-#### 5.2.1 USB 3.0 OTG Driver
+- [u3phy dev name] and [u2phy dev name] need to be modified to the specific PHY node names corresponding to the SoC;
+- USB's default mode, which is determined by the attribute "dr_mode" in the DTS of the DWC3 controller;
 
-##### 5.2.1.1 USB 3.0 OTG  Driver Overview
+### 5.3 USB Controller Drivers
 
-USB 3.0 OTG Driver code:
-​`drivers/usb/dwc3/*` （USB 3.0 OTG Global  core and Peripheral driver）
-​`drivers/usb/host/xhci*` （USB 3.0 Host driver）
+#### 5.3.1 USB 2.0 OTG Driver
+
+##### 5.3.1.1 USB 2.0 OTG Driver Framework
+
+The USB 2.0 OTG uses a DWC2 controller. The system-level block diagram is shown in Figure 5-2 below. The DWC2 controller has both AHB master interface and AHB slave interface. This is because that the DWC2 controller has internal DMA to move data between USB FIFO and Memory via the AHB bus.
+At the same time, please note that the green box in the figure is hardware IP optional function. The DWC2 controller of the Rockchip SoC does not support external DMA function and endp_multi_proc_interrupt. The interface protocol for communication with the USB PHY is UTMI +.
+
+![USB2.0-OTG-Controller-System-Level-Block-Diagram](Rockchip-Developer-Guide-USB/USB2.0-OTG-Controller-System-Level-Block-Diagram.png)
+
+Figure 5-2 DWC2 controller system-level block diagram
+
+Figure 5-3 below illustrates the interrupt handling hierarchy of the DWC2 controller. From the figure, it can be seen that DWC2 supports device interrupt/host interrupt/OTG interrupt. These three types of interrupts also include sub-interrupts. All interrupts are connected to the chip's interrupt processing module through a total interrupt signal.
+
+![USB2.0-OTG-Interrupt-Hierarchy](Rockchip-Developer-Guide-USB/USB2.0-OTG-Interrupt-Hierarchy.png)
+
+Figure 5-3 Interrupt level of DWC2 controller
+
+##### 5.3.1.2 USB 2.0 OTG Driver Overview
+
+1. **USB 2.0 OTG Controller driver code**
+
+The Rockchip platform have two sets of DWC2 controller drivers: dwc2 driver and dwc_otg_310 driver
+
+- dwc2 driver: (used for most SoCs)
+
+`drivers/usb/dwc2/*`
+
+- dwc_otg_310 driver: (Legacy driver, only used for RK3288/RK3368)
+
+`drivers/usb/dwc_otg_310/*`
+
+2. **USB 2.0 OTG controller driver code structure description**
+
+Considering Linux-4.19 and newer kernel, the DWC2 controllers of all chips have used the dwc2 driver instead of the old dwc_otg_310 driver, so this document focuses on the dwc2 driver.
+
+USB OTG 2.0 is a Dual-Role Device controller, which supports both device and host functions
+and is fully compliant with OTG Supplement to USB2.0 specification, and support high-speed
+(480Mbps), full-speed (12Mbps), low-speed (1.5Mbps) transfer.
+
+The structure of the dwc2 driver code is as follows:
+
+```c
+~/src/android_Q/kernel/drivers/usb/dwc2$ tree .
+├── core.c (dwc2 core reset, configure core param and other general operations)
+├── core.h
+├── core_intr.c (dwc2 general interrupt events, including otg intr, id intr, wakeup intr, etc.)
+├── debugfs.c (dwc2 debug interface, such as printing register information)
+├── debug.h
+├── gadget.c (all tasks related to dwc2 gadget mode, such as gadget initialization, gadget interrupt event)
+├── hcd.c (dwc2 host mode related tasks and core init, phy init, device/host mode switching)
+├── hcd_ddma.c (dwc2 descriptor DMA related tasks)
+├── hcd.h
+├── hcd_intr.c (handling of all interrupt events in dwc2 host mode)
+├── hcd_queue.c (dwc2 host mode transmission queue processing)
+├── hw.h
+├── Kconfig
+├── Makefile
+├── pci.c (initialization of pci bus interface, Rockchip dwc2 uses AHB bus)
+└── platform.c (implement dwc2 probe, initialize dwc2 lowlevel hw resources according to core_params configuration of different chips)
+```
+
+##### 5.3.1.3 USB 2.0 OTG Debug Interface
+
+- DWC2 Driver Debug Interface
+
+Example (RK3328 SoC):
+
+```sh
+rk3328_box:/sys/kernel/debug/ff580000.usb # ls
+ep0   ep2out ep4out ep6out ep8in  ep9in  fifo    state
+ep1in ep3in  ep5in  ep7in  ep8out ep9out regdump testmode
+
+```
+
+**ep*in/out:** Shows the state of the given endpoint (one is registered for each available).
+
+**fifo:** Show the FIFO information for the overall fifo and all the periodic transmission FIFOs.
+
+**state:** shows the overall state of the hardware and some general information about each of the endpoints available to the system.
+
+**regdump:** Gets register values of core.
+
+**testmode:** Modify the current usb test mode.
+
+- DWC_OTG_310 Driver Debug Interface
+
+Example (RK3288 SoC):
+
+```sh
+rk3288:/sys/devices/platform/ff580000.usb # ls
+busconnected  fr_interval gsnpsid   modalias       regoffset     uevent
+buspower      gadget      guid      mode           regvalue      usb5
+bussuspend    ggpio       gusbcfg   mode_ch_tim_en remote_wakeup wr_reg_test
+devspeed      gnptxfsiz   hcd_frrem pools          spramdump
+disconnect_us gotgctl     hcddump   power          subsystem
+driver        gpvndctl    hprt0     rd_reg_test    test_sq
+enumspeed     grxfsiz     hptxfsiz  regdump        udc
+
+rk3328_box:/sys/devices/platform/ff580000.usb/driver # ls
+bind       dwc_otg_conn_en force_usb_mode uevent vbus_status
+debuglevel ff580000.usb    op_state       unbind versio
+
+```
+
+**busconnected:** Gets or sets the Core Control Status Register.
+
+**fr_interval:** On read, shows the value of HFIR Frame Interval. On write, dynamically reload HFIR register during runtime. The application can write a value to this register only after the Port Enable bit of the Host Port Control and Status register (HPRT.PrtEnaPort) has been set.
+
+**gsnpsid:** Gets the value of the Synopsys ID Regester.
+
+**regoffset:** Sets the register offset for the next Register Access.
+
+**buspower:**  Gets or sets the Power State of the bus (0 - Off or 1 - On).
+
+**guid:** Gets or sets the value of the User ID Register.
+
+**regvalue:** Gets or sets the value of the register at the offset in the regoffset attribute.
+
+**bussuspend:** Suspends the USB bus.
+
+**ggpio:** Gets the value in the lower 16-bits of the General Purpose IO Register or sets the upper 16 bits.
+
+**gusbcfg:** Gets or sets the Core USB Configuration Register.
+
+**mode_ch_tim_en:** This bit is used to enable or disable the host core to wait for 200 PHY clock cycles at the end of Resume to change the opmode signal to the PHY to 00 after Suspend or LPM.
+
+**remote_wakeup:** On read, shows the status of Remote Wakeup. On write, initiates a remote wakeup of the host. When bit 0 is 1 and Remote Wakeup is enabled, the Remote Wakeup signalling bit in the Device Control Register is set for 1 milli-second.
+
+**wr_reg_test:** Displays the time required to write the GNPTXFSIZ register many times (the output shows the number of times the register is written).
+
+**devspeed:** Gets or sets the device speed setting in the DCFG register.
+
+**gnptxfsiz:** Gets or sets the non-periodic Transmit Size Register.
+
+**spramdump:** Dumps the contents of core registers.
+
+**disconnect_us:** On read, shows the status of disconnect_device_us. On write, sets disconnect_us which causes soft disconnect for 100us. Applicable only for device mode of operation.
+
+**gotgctl:** Gets or sets the Core Control Status Register.
+
+**hcddump:** Dumps the current HCD state.
+
+**gpvndctl:** Gets or sets the PHY Vendor Control Register.
+
+**hprt0:** Gets or sets the value in the Host Port Control and Status Register.
+
+**rd_reg_test:** Displays the time required to read the GNPTXFSIZ register many times (the output shows the number of times the register is read).
+
+**test_sq:** Gets or sets the usage of usb controler test_sq attribute.
+
+**enumspeed:** Gets the device enumeration Speed.
+
+**grxfsiz:** Gets or sets the Receive FIFO Size Register.
+
+**hptxfsiz:** Gets the value of the Host Periodic Transmit FIFO.
+
+**regdump:** Dumps the contents of core registers.
+
+**dwc_otg_conn_en:** Enable or disable connect to PC in device mode.
+
+**force_usb_mode:** Force work mode of core (0 - Normal, 1 - Host, 2 - Device).
+
+**vbus_status:** Gets the Voltage of VBUS.
+
+**debuglevel:** Gets or sets the driver Debug Level.
+
+**op_state:** Gets or sets the operational State, during transations (a_host>>a_peripherial and b_device=>b_host) this may not match the core but allows the software to determine transitions.
+
+**version:** Gets the Driver Version.
+
+#### 5.3.2 USB 2.0 Host Driver
+
+##### 5.3.2.1 USB 2.0 Host Controller framework
+
+The USB 2.0 Host controller is composed of a USB 2.0 EHCI controller and a USB 1.1 OHCI controller. The green box in Figure 5-4 is the hardware IP optional function. The USB 2.0 Host controller of the Rockchip SoC is configured as an EHCI controller and an OHCI controller, and communicate with the USB PHY by UTMI + interface. Both EHCI and OHCI use internal DMA to access system memory via the AHB bus. EHCI is responsible for handling HighSpeed transmission transactions, and OHCI is responsible for handling FullSpeed and LowSpeed transmission transactions.
+
+![Rockchip-Developer-Guide-USB\USB2.0-Host-Controller-System-Level-Block-Diagram.png](Rockchip-Developer-Guide-USB\USB2.0-Host-Controller-System-Level-Block-Diagram.png)
+
+Figure 5-4 EHCI & OHCI controller system-level block diagram
+
+##### 5.3.2.2 USB 2.0 Host Driver Overview
+
+1. **USB 2.0 Host driver code**
+
+`drivers/usb/host/ehci*` （USB 2.0 Host Driver）
+
+`drivers/usb/host/ohci*` （USB 1.1/1.0 Host Driver）
+
+2. **USB 2.0 Host driver code structure description**
+
+The ehci driver code structure is as follows:
+
+Other ehci driver files not listed are platform ehci drivers implemented by different Vendors, such as ehci-exynos.c. Rockchip's EHCI controller design conforms to the standard EHCI controller specifications, so the general platform ehci driver "ehci-platform.c" is used.
+
+```sh
+~/src/android_Q/kernel/drivers/usb/host$ tree
+├── ehci-dbg.c (ehci debugfs debugging interface, such as printing ehci register information)
+├── ehci.h
+├── ehci-hcd.c (Initialization of ehci controller, interrupt event processing, urb queue management, etc.)
+├── ehci-hub.c (control and status query of ehci root hub, bus suspend/resume)
+├── ehci-mem.c (allocation and initialization of ehci mem, allocation and initialization of qtd/qh resources)
+├── ehci-pci.c (Initialization of pci bus interface, Rockchip ehci uses AHB bus, does not use this driver)
+├── ehci-platform.c (ehci universal platform driver, implement ehci probe, register ehci hcd with usb bus, enable ehci controller)
+├── ehci-q.c (processing of ehci qtd/qh transmission queue)
+├── ehci-sched.c (cyclic transmission scheduling processing of ehci interrupt, iso, split iso)
+├── ehci-sysfs.c (ehci sysfs debugging interface, display companion controller, display uframe_periodic_max)
+├── ehci-timer.c (task processing related to ehci timer)
+```
+
+Important EHCI Structure:
+
+```c
+static const struct hc_driver ehci_hc_driver = {
+	.description =		hcd_name,
+	.product_desc =		"EHCI Host Controller",
+	.hcd_priv_size =	sizeof(struct ehci_hcd),
+	/*
+	 * generic hardware linkage
+	 */
+	.irq =			ehci_irq,
+	.flags =		HCD_MEMORY | HCD_USB2 | HCD_BH,
+	/*
+	 * basic lifecycle operations
+	 */
+	.reset =		ehci_setup,
+	.start =		ehci_run,
+	.stop =			ehci_stop,
+	.shutdown =		ehci_shutdown,
+	/*
+	 * managing i/o requests and associated device resources
+	 */
+	.urb_enqueue =		ehci_urb_enqueue,
+	.urb_dequeue =		ehci_urb_dequeue,
+	.endpoint_disable =	ehci_endpoint_disable,
+	.endpoint_reset =	ehci_endpoint_reset,
+	.clear_tt_buffer_complete =	ehci_clear_tt_buffer_complete,
+	/*
+	 * scheduling support
+	 */
+	.get_frame_number =	ehci_get_frame,
+	/*
+	 * root hub support
+	 */
+	.hub_status_data =	ehci_hub_status_data,
+	.hub_control =		ehci_hub_control,
+	.bus_suspend =		ehci_bus_suspend,
+	.bus_resume =		ehci_bus_resume,
+	.relinquish_port =	ehci_relinquish_port,
+	.port_handed_over =	ehci_port_handed_over,
+	/*
+	 * device support
+	 */
+	.free_dev =		ehci_remove_device,
+};
+
+```
+
+The structure of ochi driver code is as follows:
+
+Other ohci driver files not listed are platform ohci drivers implemented by different Vendors, such as ohci-exynos.c. The OHCI controller design of the Rockchip chip conforms to the standard OHCI controller specifications, so the general platform ohci driver "ohci-platform.c" is used.
+
+```sh
+~/src/android_Q/kernel/drivers/usb/host$ tree
+├── ohci-dbg.c (ohci debugfs debugging interface, such as printing ohci register information)
+├── ohci.h
+├── ohci-hcd.c (initialization of ohci controller, interrupt event processing, urb queue management, etc.)
+├── ohci-hub.c (control and status query of ohci root hub, bus suspend/resume)
+├── ohci-mem.c (allocation and initialization of ohci mem, allocation and initialization of td/ed resources)
+├── ohci-pci.c (Initialization of pci bus interface, Rockchip ohci uses AHB bus, does not use this driver file)
+├── ohci-platform.c (ohci universal platform driver, implement ohci probe, register ohci hcd with usb bus, enable ohci controller)
+├── ohci-q.c (handling of ohci td/ed transmission queue)
+```
+
+Important OHCI Structures:
+
+```c
+static const struct hc_driver ohci_hc_driver = {
+	.description =          hcd_name,
+	.product_desc =         "OHCI Host Controller",
+	.hcd_priv_size =        sizeof(struct ohci_hcd),
+	/*
+	 * generic hardware linkage
+	*/
+	.irq =                  ohci_irq,
+	.flags =                HCD_MEMORY | HCD_USB11,
+	/*
+	* basic lifecycle operations
+	*/
+	.reset =                ohci_setup,
+	.start =                ohci_start,
+	.stop =                 ohci_stop,
+	.shutdown =             ohci_shutdown,
+	/*
+	 * managing i/o requests and associated device resources
+	*/
+	.urb_enqueue =          ohci_urb_enqueue,
+	.urb_dequeue =          ohci_urb_dequeue,
+	.endpoint_disable =     ohci_endpoint_disable,
+	/*
+	* scheduling support
+	*/
+	.get_frame_number =     ohci_get_frame,
+	/*
+	* root hub support
+	*/
+	.hub_status_data =      ohci_hub_status_data,
+	.hub_control =          ohci_hub_control,
+#ifdef CONFIG_PM
+	.bus_suspend =          ohci_bus_suspend,
+	.bus_resume =           ohci_bus_resume,
+#endif
+	.start_port_reset =	ohci_start_port_reset,
+};
+
+```
+
+##### 5.3.2.3 USB 2.0 Host Debug Interface
+
+Example (RK3399 USB 2.0 EHCI/OHCI)
+
+- **EHCI Driver Debug Interface**
+
+（Need to enable CONFIG_DYNAMIC_DEBUG）
+
+```sh
+
+rk3399_box:/sys/kernel/debug/usb/ehci/fe380000.usb # ls
+async bandwidth periodic registers
+
+rk3399:/sys/devices/platform/fe380000.usb # ls
+companion driver_override of_node power     uevent              usb5
+driver    modalias        pools   subsystem uframe_periodic_max usbmon
+
+```
+
+**async:** Dump a snapshot of the Async Schedule.
+
+**bandwidth:** Dump the HS Bandwidth Table.
+
+**periodic:** Dump a snapshot of the Periodic Schedule.
+
+**registers:** Dump Capability Registers, Interrupt Params and Operational Registers.
+
+**companion**: Print EHCI's companion controller information
+
+**uframe_periodic_max**: Displays the maximum usable microframe bandwidth for EHCI periodic transmission, the default is 100 (unit: microseconds), and the maximum can be configured to 125 microseconds
+
+- **OHCI Driver Debug Interface**
+
+（Need to enable CONFIG_DYNAMIC_DEBUG）
+
+```sh
+rk3399_box:/sys/kernel/debug/usb/ohci/fe3a0000.usb # ls
+async periodic registers
+
+```
+
+**async:** Display Control and Bulk Lists together, for simplicity
+
+**periodic:** Dump a snapshot of the Periodic Schedule (and load)
+
+**registers:** Dump driver info, then registers in Spec order and other registers mostly affect Frame Timings
+
+#### 5.3.3 USB 3.0 OTG Driver
+
+##### 5.3.3.1 USB 3.0 OTG Controller Framework
+
+USB 3.0 OTG Controller is DWC3 Controller, as shown in Figure 5-5 below.
+
+![USB3-OTG-System-Level-Block-Diagram](Rockchip-Developer-Guide-USB\USB3-OTG-System-Level-Block-Diagram.png)
+
+Figure 5-5 DWC3 controller system-level block diagram
 
 USB 3.0 OTG Controller is Synopsys DesignWare Core USB 3.0 Controller integrated with xHCI USB 3.0 host controller. It can act as static host, static device, USB2.0/3.0 OTG A device or B device basing on the status of input ID from USB2.0 PHY or DFP/UFP/Data Role Swap defined in USB TypeC specification. It can perform data transmission between host and device as host or device for Super-Speed/High-Speed/Full-Speed/Low-Speed.
 
-Important driver files:
+The characteristics of the USB3.0 controller are as follows:
 
-`drivers/usb/dwc3/core.c`  allocate common resource, initialize core registers and setup phy.
+- Support USB 3.0/2.0/1.1/1.0 protocol
 
-`drivers/usb/dwc3/gadget.c, ep0.c` allocate device resource, handle device transmission.
+- Integrated xHCI Host controller
 
-`drivers/usb/dwc3/host.c` allocate host resource, register xHCI device.
+- Only DRD mode (dule role) is supported, OTG mode is not supported
 
-`drivers/usb/dwc3/dwc3-rockchip.c` rockchip vendor special driver for RK3399, RK1808 and so on.
+- Device and Host functions cannot be used at the same time
 
-`drivers/usb/dwc3/dwc3-rockchip-inno.c` rockchip vendor special driver only for RK3228H/RK3328.
+- The USB2.0 Port and USB3.0 Port of Host can be used independently at the same time
 
-`drivers/usb/dwc3/debug.c,debugfs.c, trace.c` create debug interface and trace for dwc3.
+- Only DMA mode is supported, Slave mode is not supported
 
-`drivers/usb/host/xhci.c` initialize xhci_hc_driver to provide basic operation, e.g. xhci_run, xhci_stop, urb_enqueue, urb_dequeue, etc.
+- Requires System Memory (Sram/Dram)
 
-`drivers/usb/host/xhci-dbg.c, xhci-debugfs.c, xhci-trace.c` create debug interface and trace.
+- xHCI is a standard USB3.0 Host controller, with the PC USB 3.0 interface. And, it can support Force USB2.0 only mode.
 
-`drivers/usb/host/xhci-hub.c` handle xHCI root hub control and state.
+##### 5.3.3.2 USB 3.0 OTG  Driver Overview
 
-`drivers/usb/host/xhci-mem.c` allocate memory resource (segments, stream...) for xHCI.
+1. **USB 3.0 OTG driver code**
+   ​`drivers/usb/dwc3/*` （USB 3.0 OTG Global  core and Peripheral driver）
+   ​`drivers/usb/host/xhci*` （USB 3.0 Host driver）
 
-`drivers/usb/host/xhci-ring.c`  prepare and handle TRB ring, handle xHCI irq.
+2. **USB 3.0 OTG driver code structure description**
 
-`drivers/usb/host/xhci-plat.c` xHCI host controller driver platform Bus Glue.
+Linux-4.19 USB DWC3 controller driver has been greatly upgraded compared to Linux-4.4, but the code file structure remains basically the same. The differences are mainly reflected in:
+
+- Linux-4.19 added drd.c driver file for dynamic switching of dule rote mode;
+
+- Linux-4.19 deletes the **dwc3-rockchip.c** file and uses the generic driver dwc3-of-simple.c instead;
+
+- Linux-4.19 still retains dwc3-rockchip-inno.c, which is dedicated to RK3328/RK3228H chip;
+
+Linux-4.19 DWC3 and xHCI driver code structure is as follows:
+
+```sh
+~/src/kernel-4.19/drivers/usb/dwc3$ tree .
+├── core.c (implementation of dwc3 core probe, allocate various resources, initialize controller, PM runtime management)
+├── core.h
+├── debugfs.c (implementation of dwc3 debugfs debug interface)
+├── debug.h
+├── drd.c (dwc3 drd/otg mode dynamic switching processing)
+├── dwc3-of-simple.c (dwc3 universal platform driver, realize the first level dwc3_of_simple_probe of dwc3, and call the second level dwc3_probe of dwc3 core through of_platform_populate)
+├── dwc3-pci.c (Initialization of pci bus interface, Rockchip dwc3 uses AXI bus, does not use this driver file)
+├── dwc3-rockchip-inno.c (glue layer for RK3328/RK3228H, increase the realization of disconnect work)
+├── ep0.c (task processing of dwc3 gadget ep0)
+├── gadget.c (dwc3 gadget endpoint task processing except ep0, interrupt entry function implementation)
+├── gadget.h
+├── host.c (dwc3 host resource allocation, and call xhci_plat_probe of xHCI through platform_device_add)
+├── io.h
+├── Kconfig
+├── Makefile
+├── trace.c (Dwc3 trace implementation, Linux-based trace interface)
+├── trace.h
+└── ulpi.c (code implementation of ulpi phy interface, Rockchip dwc3 does not use ulpi)
+
+~/src/kernel-4.19/drivers/usb/host$ tree
+├── xhci.c (initialize xhci_hc_driver, start xHCI controller, manage urb queue, etc.)
+├── xhci-dbg.c (realize debug function for printing log)
+├── xhci-dbgcap.c (xHCI hardware module debug capability function is not supported by Rockchip)
+├── xhci-dbgcap.h
+├── xhci-debugfs.c (xHCI debugfs debugging interface)
+├── xhci-debugfs.h
+├── xhci-ext-caps.c (xHCI extended capability function implementation, not supported by Rockchip)
+├── xhci-ext-caps.h
+├── xhci.h
+├── xhci-hub.c (xHCI root hub control and status query, bus suspend/resume)
+├── xhci-mem.c (xHCI mem management, including allocation, initialization, release and other operations)
+├── xhci-pci.c (Initialization of pci bus interface, Rockchip xHCI uses AXI bus, does not use this driver file)
+├── xhci-plat.c (xHCI universal platform driver, implement xhci_plat_probe, Rockchip uses this driver)
+├── xhci-plat.h
+├── xhci-ring.c (management of xHCI transfer/command/event ring)
+├── xhci-trace.c (xHCI trace implementation, Linux-based trace interface)
+└── xhci-trace.h
+```
 
 Important Gadget Structure:
 
@@ -1397,418 +2037,143 @@ static const struct hc_driver xhci_hc_driver = {
 
 ```
 
-##### 5.2.1.2 USB 3.0 OTG Debug Interface
+##### 5.3.3.3 USB 3.0 OTG Debug Interface
 
-Example (RK3399 USB 3.0 OTG0)
+Example (Linux-4.19 RK3399 USB 3.0 OTG0)
 
 ```sh
 
-rk3399_box:/sys/kernel/debug/usb@fe800000 # ls
-host_testmode     rk_usb_force_mode
+console:/sys/kernel/debug/fe800000.dwc3 # ls
+ep0in  ep1in  ep2in  ep3in  ep4in  ep5in  ep6out     lsp_dump regdump
+ep0out ep1out ep2out ep3out ep4out ep5out link_state mode     testmode
 
-rk3399_box:/sys/kernel/debug/fe800000.dwc3 # ls
-ep0in  ep1in  ep2in  ep3in  ep4in  ep5in  ep6in      mode    testmode
-ep0out ep1out ep2out ep3out ep4out ep5out link_state regdump
-
-rk3399_box:/sys/kernel/debug/fe800000.dwc3/ep0in # ls
+console:/sys/kernel/debug/fe800000.dwc3/ep0in # ls
 descriptor_fetch_queue rx_info_queue    trb_ring
 event_queue            rx_request_queue tx_fifo_queue
 rx_fifo_queue          transfer_type    tx_request_queue
 
+console:/sys/kernel/debug/usb/xhci/xhci-hcd.0.auto # ls
+command-ring ports          reg-ext-legsup:00   reg-op
+devices      reg-cap        reg-ext-protocol:00 reg-runtime
+event-ring   reg-ext-dbc:00 reg-ext-protocol:01
+
 ```
 
-- **host_testmode**
+Common debugging nodes：
 
-  Enables USB2/USB3 HOST Test Modes (U2: J, K SE0 NAK, Test_packet,Force Enable; U3: Compliance mode)
+**mode:** dr_mode read or store
 
-  For example， set testmodes for RK3399 board USB:
+**testmode**: Set DWC3 to enter HighSpeed test mode for eye diagram test
 
-1. set Test packet for Type-C0 USB2 HOST:
+**link_state:** Link state read or store
 
-```sh
-echo test_packet > /sys/kernel/debug/usb@fe800000/host_testmode
-```
+**regdump:** Dump registers of DWC3
 
-2. set compliance mode for Type-C0 USB3 HOST normal orientation:
+**ep*in/out:** Directory of EP debug files
 
-```sh
-echo test_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
-```
+**descriptor_fetch_queue:** Dump the available DescFetchQ space of EP
 
-3. set compliance mode for Type-C0 USB3 HOST flip orientation:
+**rx_info_queue:** Dump the available RXInfoQ space of EP
 
-```sh
-echo test_flip_u3 > /sys/kernel/debug/usb@fe800000/host_testmode
-```
+**trb_ring:** Dump the TRB pool of EP
 
-4. check the testmode status:
+**event_queue:** Dump the avaliable EventQ space of EP
 
-```sh
-cat /sys/kernel/debug/usb@fe800000/host_testmode
-```
+**rx_request_queue:** Dump the avaliable RxReqQ space of EP
 
-The log maybe like this:
-​U2: test_packet     /* means that U2 in test mode */
-​U3: compliance mode /* means that U3 in test mode */
+**tx_fifo_queue:** Dump the avaliable TxFIFO space of EP
 
-- **rk_usb_force_mode**
+**rx_fifo_queue:** Dump the avaliable RxFIFO  space of EP
 
-  force dr_mode of DWC3 controller
+**transfer_type:** Print the Transfer Type of EP
 
-  (**Note: the dr_mode of DTS must be "otg" and extcon of DTS must be config to null**).
+**tx_request_queue:** Dump the abaliable TxReqQ space of EP
 
-  For example， set force mode for RK3399 board USB:
+**command-ring**: Print the status information of xHCI command ring
 
-1. Force host mode:
+**event-ring**: Print the status information of xHCI event ring
 
-```sh
-echo host > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
-```
+**reg-op**: Print xHCI register status information
 
-2. Force peripheral mode:
+- **USB 3.0 OTG tracepoint**
 
-```sh
-echo peripheral > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
-```
+`sys/kernel/debug/tracing/events/xhci-hcd`
+`sys/kernel/debug/tracing/events/dwc3`
 
-3. Force otg mode:
+For more details, please refer to：
 
-```sh
-echo otg > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
-```
+`sys/kernel/debug/tracing/README`
 
-- **ep*in/out:** Directory of EP debug files
-- **mode:** dr_mode read or store
-- **link_state:** Link state read or store
-- **regdump:** Dump registers of DWC3
-- **descriptor_fetch_queue:** Dump the available DescFetchQ space of EP
-- **rx_info_queue:** Dump the available RXInfoQ space of EP
-- **trb_ring:** Dump the TRB pool of EP
-- **event_queue:** Dump the avaliable EventQ space of EP
-- **rx_request_queue:** Dump the avaliable RxReqQ space of EP
-- **tx_fifo_queue:** Dump the avaliable TxFIFO space of EP
-- **rx_fifo_queue:** Dump the avaliable RxFIFO  space of EP
-- **transfer_type:** Print the Transfer Type of EP
-- **tx_request_queue:** Dump the abaliable TxReqQ space of EP
+- **USB 3.0 OTG switch command**
 
-**Note:**
+Function: Through software method, force OTG to work in Host mode or Device mode without being affected by USB hardware circuit.
 
-*The xHCI driver has no debug interface, but you can open debug information by adding CONFIG_DYNAMIC_DEBUG to the config file*
+**Linux-4.4 USB 3.0 OTG switch command**
 
-#### 5.2.2 USB 2.0 OTG Driver
-
-##### 5.2.2.1 USB 2.0 OTG Driver Overview
-
-USB 2.0 OTG Drivers：
-
-`drivers/usb/dwc2/*`
-
-`drivers/usb/dwc_otg_310/*` (Legacy driver, only used for RK3288/RK3368)
-
-USB OTG 2.0 is a Dual-Role Device controller, which supports both device and host functions
-and is fully compliant with OTG Supplement to USB2.0 specification, and support high-speed
-(480Mbps), full-speed (12Mbps), low-speed (1.5Mbps) transfer.
-
-Important driver files:
-
-`drivers/usb/dwc2/core.c` The Core code provides basic services for accessing and managing the  DWC_otg hardware. These services are used by both the Host Controller Driver and the Peripheral Controller Driver.
-
-`drivers/usb/dwc2/core_intr.c` This file contains the common interrupt handlers.
-
-`drivers/usb/dwc2/gadget.c` This file contains the core PCD code, and implements the Linux usb_ep_ops API and usb_gadget_ops API.
-
-`drivers/usb/dwc2/hcd.c` This file contains the core HCD code, and implements the Linux hc_driver API.
-
-`drivers/usb/dwc2/hcd_intr.c` This file contains the interrupt handlers for Host mode.
-
-`drivers/usb/dwc2/hcd_ddma.c` This file contains the Descriptor DMA implementation for Host mode.
-
-`drivers/usb/dwc2/platform.c` This file contains core params for different Vendor SoCs, and creates the driver components required to control the device (core, HCD, and PCD) and initializes the device.
-
-`drivers/usb/dwc2/debugfs.c` This file contains the debugfs for both Host mode and Device mode.
-
-##### 5.2.2.2 USB 2.0 OTG Debug Interface
-
-1. DWC2 Driver Debug Interface
-
-   Example (RK3328 SoC):
-
-   ```sh
-
-   rk3328_box:/sys/kernel/debug/ff580000.usb # ls
-   ep0   ep2out ep4out ep6out ep8in  ep9in  fifo    state
-   ep1in ep3in  ep5in  ep7in  ep8out ep9out regdump testmode
-
-   ```
-
-   **ep*in/out:** Shows the state of the given endpoint (one is registered for each available).
-
-   **fifo:** Show the FIFO information for the overall fifo and all the periodic transmission FIFOs.
-
-   **state:** shows the overall state of the hardware and some general information about each of the endpoints available to the system.
-
-   **regdump:** Gets register values of core.
-
-   **testmode:** Modify the current usb test mode.
-
-2. DWC_OTG_310 Driver Debug Interface
-
-   Example (RK3288 SoC):
-
-   ```sh
-
-   rk3288:/sys/devices/platform/ff580000.usb # ls
-   busconnected  fr_interval gsnpsid   modalias       regoffset     uevent
-   buspower      gadget      guid      mode           regvalue      usb5
-   bussuspend    ggpio       gusbcfg   mode_ch_tim_en remote_wakeup wr_reg_test
-   devspeed      gnptxfsiz   hcd_frrem pools          spramdump
-   disconnect_us gotgctl     hcddump   power          subsystem
-   driver        gpvndctl    hprt0     rd_reg_test    test_sq
-   enumspeed     grxfsiz     hptxfsiz  regdump        udc
-
-   rk3328_box:/sys/devices/platform/ff580000.usb/driver # ls
-   bind       dwc_otg_conn_en force_usb_mode uevent vbus_status
-   debuglevel ff580000.usb    op_state       unbind versio
-
-   ```
-
-   **busconnected:** Gets or sets the Core Control Status Register.
-
-   **fr_interval:** On read, shows the value of HFIR Frame Interval. On write, dynamically reload HFIR register during runtime. The application can write a value to this register only after the Port Enable bit of the Host Port Control and Status register (HPRT.PrtEnaPort) has been set.
-
-   **gsnpsid:** Gets the value of the Synopsys ID Regester.
-
-   **regoffset:** Sets the register offset for the next Register Access.
-
-   **buspower:**  Gets or sets the Power State of the bus (0 - Off or 1 - On).
-
-   **guid:** Gets or sets the value of the User ID Register.
-
-   **regvalue:** Gets or sets the value of the register at the offset in the regoffset attribute.
-
-   **bussuspend:** Suspends the USB bus.
-
-   **ggpio:** Gets the value in the lower 16-bits of the General Purpose IO Register or sets the upper 16 bits.
-
-   **gusbcfg:** Gets or sets the Core USB Configuration Register.
-
-   **mode_ch_tim_en:** This bit is used to enable or disable the host core to wait for 200 PHY clock cycles at the end of Resume to change the opmode signal to the PHY to 00 after Suspend or LPM.
-
-   **remote_wakeup:** On read, shows the status of Remote Wakeup. On write, initiates a remote wakeup of the host. When bit 0 is 1 and Remote Wakeup is enabled, the Remote Wakeup signalling bit in the Device Control Register is set for 1 milli-second.
-
-   **wr_reg_test:** Displays the time required to write the GNPTXFSIZ register many times (the output shows the number of times the register is written).
-
-   **devspeed:** Gets or sets the device speed setting in the DCFG register.
-
-   **gnptxfsiz:** Gets or sets the non-periodic Transmit Size Register.
-
-   **spramdump:** Dumps the contents of core registers.
-
-   **disconnect_us:** On read, shows the status of disconnect_device_us. On write, sets disconnect_us which causes soft disconnect for 100us. Applicable only for device mode of operation.
-
-   **gotgctl:** Gets or sets the Core Control Status Register.
-
-   **hcddump:** Dumps the current HCD state.
-
-   **gpvndctl:** Gets or sets the PHY Vendor Control Register.
-
-   **hprt0:** Gets or sets the value in the Host Port Control and Status Register.
-
-   **rd_reg_test:** Displays the time required to read the GNPTXFSIZ register many times (the output shows the number of times the register is read).
-
-   **test_sq:** Gets or sets the usage of usb controler test_sq attribute.
-
-   **enumspeed:** Gets the device enumeration Speed.
-
-   **grxfsiz:** Gets or sets the Receive FIFO Size Register.
-
-   **hptxfsiz:** Gets the value of the Host Periodic Transmit FIFO.
-
-   **regdump:** Dumps the contents of core registers.
-
-   **dwc_otg_conn_en:** Enable or disable connect to PC in device mode.
-
-   **force_usb_mode:** Force work mode of core (0 - Normal, 1 - Host, 2 - Device).
-
-   **vbus_status:** Gets the Voltage of VBUS.
-
-   **debuglevel:** Gets or sets the driver Debug Level.
-
-   **op_state:** Gets or sets the operational State, during transations (a_host>>a_peripherial and b_device=>b_host) this may not match the core but allows the software to determine transitions.
-
-   **version:** Gets the Driver Version.
-
-#### 5.2.3 USB 2.0 HOST Driver
-
-##### 5.2.3.1 USB 2.0 HOST Driver Overview
-
-USB 2.0 Host Driver code：
-
-`drivers/usb/host/ehci*` （USB 2.0 Host Driver）
-
-`drivers/usb/host/ohci*` （USB 1.1/1.0 Host Driver）
-
-Important driver files:
-
-`drivers/usb/host/ehci-dbg.c, ohci-dbg.c` create debug interface for EHCI and OHCI.
-
-`drivers/usb/host/ehci-hcd.c, ohci-hcd.c` initialize ehci_hc_driver and ohci_hc_driver to provide basic operation, e.g. reset, start, stop, urb_enqueue, urb_dequeue, etc.
-
-`drivers/usb/host/ehci-hub.c, ohci-hub.c` handle EHCI/OHCI root hub control and state.
-
-`drivers/usb/host/ehci-mem.c, ohci-mem.c` allocate memory resource and qtd for EHCI/OHCI.
-
-`drivers/usb/host/ehci-q.c, ohci-q.c` EHCI/OHCI hardware queue manipulation.
-
-`drivers/usb/host/ehci-sched.c` handle EHCI scheduled transaction.
-
-`drivers/usb/host/ehci-platform.c, ohci-platform.c` EHCI/OHCI host controller driver platform Bus Glue.
-
-Important EHCI Structure:
+Linux-4.4  old command (only used for RK3399)：
 
 ```c
-
-static const struct hc_driver ehci_hc_driver = {
-	.description =		hcd_name,
-	.product_desc =		"EHCI Host Controller",
-	.hcd_priv_size =	sizeof(struct ehci_hcd),
-	/*
-	 * generic hardware linkage
-	 */
-	.irq =			ehci_irq,
-	.flags =		HCD_MEMORY | HCD_USB2 | HCD_BH,
-	/*
-	 * basic lifecycle operations
-	 */
-	.reset =		ehci_setup,
-	.start =		ehci_run,
-	.stop =			ehci_stop,
-	.shutdown =		ehci_shutdown,
-	/*
-	 * managing i/o requests and associated device resources
-	 */
-	.urb_enqueue =		ehci_urb_enqueue,
-	.urb_dequeue =		ehci_urb_dequeue,
-	.endpoint_disable =	ehci_endpoint_disable,
-	.endpoint_reset =	ehci_endpoint_reset,
-	.clear_tt_buffer_complete =	ehci_clear_tt_buffer_complete,
-	/*
-	 * scheduling support
-	 */
-	.get_frame_number =	ehci_get_frame,
-	/*
-	 * root hub support
-	 */
-	.hub_status_data =	ehci_hub_status_data,
-	.hub_control =		ehci_hub_control,
-	.bus_suspend =		ehci_bus_suspend,
-	.bus_resume =		ehci_bus_resume,
-	.relinquish_port =	ehci_relinquish_port,
-	.port_handed_over =	ehci_port_handed_over,
-	/*
-	 * device support
-	 */
-	.free_dev =		ehci_remove_device,
-};
+RK3399 Type-C0 USB OTG switch command
+1.Force host mode
+  echo host > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
+2.Force peripheral mode
+  echo peripheral > sys/kernel/debug/usb@fe800000/rk_usb_force_mode
 
 ```
 
-Important OHCI Structures:
+Linux-4.4  new command (only used for RK3399/RK1808)：
 
 ```c
+RK3399 Type-C0 USB OTG switch command
+1.Force host mode
+  echo host > sys/devices/platform/usb0/dwc3_mode
+2.Force peripheral mode
+  echo peripheral > sys/devices/platform/usb0/dwc3_mode
 
-static const struct hc_driver ohci_hc_driver = {
-	.description =          hcd_name,
-	.product_desc =         "OHCI Host Controller",
-	.hcd_priv_size =        sizeof(struct ohci_hcd),
-	/*
-	 * generic hardware linkage
-	*/
-	.irq =                  ohci_irq,
-	.flags =                HCD_MEMORY | HCD_USB11,
-	/*
-	* basic lifecycle operations
-	*/
-	.reset =                ohci_setup,
-	.start =                ohci_start,
-	.stop =                 ohci_stop,
-	.shutdown =             ohci_shutdown,
-	/*
-	 * managing i/o requests and associated device resources
-	*/
-	.urb_enqueue =          ohci_urb_enqueue,
-	.urb_dequeue =          ohci_urb_dequeue,
-	.endpoint_disable =     ohci_endpoint_disable,
-	/*
-	* scheduling support
-	*/
-	.get_frame_number =     ohci_get_frame,
-	/*
-	* root hub support
-	*/
-	.hub_status_data =      ohci_hub_status_data,
-	.hub_control =          ohci_hub_control,
-#ifdef CONFIG_PM
-	.bus_suspend =          ohci_bus_suspend,
-	.bus_resume =           ohci_bus_resume,
-#endif
-	.start_port_reset =	ohci_start_port_reset,
-};
+RK1808 USB OTG switch command
+1.Force host mode
+  echo host > sys/devices/platform/usb/dwc3_mode
+2.Force peripheral mode
+  echo peripheral > sys/devices/platform/usb/dwc3_mode
 
 ```
 
-##### 5.2.3.2 USB 2.0 HOST Debug Interface
+**Linux-4.19 USB 3.0 OTG switch command** （used for all SoCs with DWC3 Controller）
 
-1. **EHCI Driver Debug Interface**
+```c
+RK3399 Type-C0 USB OTG switch command
+1.Force host mode
+  echo host > sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode
+2.Force peripheral mode
+  echo peripheral > sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode
 
-（Need to enable CONFIG_DYNAMIC_DEBUG）
-
-```sh
-
-rk3399_box:/sys/kernel/debug/usb/ehci/fe380000.usb # ls
-async bandwidth periodic registers
-
-```
-
-**async:** Dump a snapshot of the Async Schedule.
-
-**bandwidth:** Dump the HS Bandwidth Table.
-
-**periodic:** Dump a snapshot of the Periodic Schedule.
-
-**registers:** Dump Capability Registers, Interrupt Params and Operational Registers.
-
-2. **OHCI Driver Debug Interface**
-
-（Need to enable CONFIG_DYNAMIC_DEBUG）
-
-```sh
-
-rk3399_box:/sys/kernel/debug/usb/ohci/fe3a0000.usb # ls
-async periodic registers
+For other SoCs, the method is similar, just search for the otg_mode node under the sys/devices/platform path, and then set the node。
 
 ```
-
-**async:** Display Control and Bulk Lists together, for simplicity
-
-**periodic:** Dump a snapshot of the Periodic Schedule (and load)
-
-**registers:** Dump driver info, then registers in Spec order and other registers mostly affect Frame Timings
 
 ---
 ## 6 Android USB Gadget Configuration
 
-Since Linux-3.11, USB Gadgets have been configured in the framework of ConfigFS, and the android.c file in the Gadget directory has been deleted from the kernel.
+### 6.1 USB Gadget Configfs Framework
 
-For instructions on how to use Android ConfigFS Gadgets, please refer to Linaro's official website:
+Since Linux-3.11, USB Gadgets have been configured in the framework of Configfs, and the android.c file in the Gadget directory has been deleted from the kernel. Device class drivers that support the Configfs framework are moved to the directory  `drivers/usb/gadget/function` .
+
+For instructions on how to use Android ConfigFS Gadgets, please refer to:
+
+```
+Documentation/ABI/testing/configfs-usb-gadget-xxxx.txt
+Documentation/filesystems/configfs/configfs.txt
+Documentation/usb/gadget_configfs.txt
+Documentation/usb/gadget-testing.txt
+```
+
+[Kernel USB Gadget Configfs Interface](https://events.static.linuxfound.org/sites/events/files/slides/USB%20Gadget%20Configfs%20API_0.pdf)
+
+[TIZEN USB](https://wiki.tizen.org/Category:USB)
 
 [https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets](https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets)
 
-### 6.1 USB Gadget CONFIG
-
-Refer to [3.4 USB Gadget CONFIG](#3.4 USB Gadget CONFIG)
-
-### 6.2 USB Gadget Init Script
+### 6.2 USB Gadget Configuration File
 
 USB-related scripts in Android include:
 
@@ -1906,7 +2271,47 @@ The Kernel USB Gadget Framework only supports one USB Gadget at the same time. A
 
 2. set dr_mode = "otg" in usbdrd_dwc3_1 node in DTS.
 
-### 6.3 USB Gadget Debug Interface
+   ```c
+   &usbdrd_dwc3_1 {
+           status = "okay";
+           dr_mode = "otg";  /* Configure Type-C1 USB Controller to OTG mode */
+           extcon = <&fusb1>; /* Note：extcon should be configured according to actual hardware */
+   };
+   ```
+
+### 6.3 USB VID And PID Configuration
+
+USB VID and PID configuration need to follow the following principles:
+
+- VID is fixed at 0x2207 (authorized by USB-IF)
+
+- PID can be defined according to product requirements, but the upper 8 bits must be 0 to avoid conflicts with Maskrom/Loader USB PID
+
+- VID and PID of accessory need to be configured as defined by Google
+
+- USB-IF stipulates that VID is unique to each Vendor, and the same VID cannot be authorized for different Vendors
+
+VID and PID commonly used in the Andorid platform are defined as follows:
+
+| USB Function  |  VID   |  PID   |
+| :-----------: | :----: | :----: |
+|      MTP      | 0x2207 | 0x0001 |
+|      PTP      | 0x2207 | 0x0002 |
+|     RNDIS     | 0x2207 | 0x0003 |
+|     MIDI      | 0x2207 | 0x0004 |
+|      UVC      | 0x2207 | 0x0005 |
+|      ADB      | 0x2207 | 0x0006 |
+|    MTP,ADB    | 0x2207 | 0x0011 |
+|    PTP,ADB    | 0x2207 | 0x0012 |
+|   RNDIS,ADB   | 0x2207 | 0x0013 |
+|   MIDI,ADB    | 0x2207 | 0x0014 |
+|    UVC,ADB    | 0x2207 | 0x0015 |
+|   ACCESSORY   | 0x18d1 | 0x18d1 |
+| ACCESSORY,ADB | 0x18d1 | 0x2d01 |
+
+### 6.4 USB Gadget Debug Interface
+
+- **Configfs Configure Interface**
 
 The kernel provides device nodes to view key configuration information for USB Gadgets, as follows:
 
@@ -1941,17 +2346,116 @@ echo fe800000.dwc3 > config/usb_gadget/g1/UDC
 
 Unbind USB Device Controller
 
-```
+```shell
 echo none > config/usb_gadget/g1/UDC
+```
+
+- **View USB Device Connection Status**
+
+```shell
+rk3399:/sys/class/udc/fe800000.dwc3 # ls
+a_alt_hnp_support device          is_selfpowered srp
+a_hnp_support     function        maximum_speed  state
+b_hnp_enable      is_a_peripheral power          subsystem
+current_speed     is_otg          soft_connect   uevent
+
+rk3399:/sys/class/android_usb/android0 # ls
+f_audio_source f_midi power state subsystem uevent
 ```
 
 ---
 
-## 7 Analysis of Common USB Questions
+## 7 USB Common Debug Methods And Commands
 
-### 7.1 Device Enumeration Log
+### 7.1 USB Common Debug Methods
 
-#### 7.1.1 USB 2.0 OTG Normal Boot Log
+1. **Common USB Debug Instruments And Software Tools**
+
+- Multimeter: for simple voltage test, such as: USB VBUS, OTG_ID and USB PHY power supply.
+
+- High-bandwidth oscilloscope: used to measure the signal quality of the USB eye diagram, USB charging detection and handshake signals, USB VBUS voltage collapse, etc.
+
+- USB protocol analyzer: Analyze the USB communication protocol flow, and locate whether it is a host problem or a device problem.
+
+- Windows tools: BusHound software is used to grab USB bus packets; Usbview software is used to view detailed descriptor information of USB devices.
+
+- Linux tools: usbmon is a tool for grabbing USB bus packets; vusb-analyzer graphical tool is used to parse the data captured by usbmon; lsusb command is used to view detailed descriptor information of USB devices.
+
+For more information, please refer to the documentation:
+
+`Documentation/usb/usbmon.txt`
+
+[《USB Debugging and Profiling Techniques》](https://elinux.org/images/1/17/USB_Debugging_and_Profiling_Techniques.pdf)
+
+2. **Common USB Debug Interface**
+
+- Sysfs entry in host: `/sys/bus/usb/*` (view USB devices and drivers supported by the system)
+
+- Debugfs entry in host:
+
+  `/sys/kernel/debug/usb/devices` (view all USB device information on the USB bus)
+
+  `/sys/kernel/debug/*.dwc3` (DWC3 controller debug interface)
+
+  `/sys/kernel/debug/usb/usbmon` (USBMon packet capture tool)
+
+  `/sys/kernel/debug/usb/xhci` (xHCI controller debug interface)
+
+  `/sys/kernel/debug/usb/uvcvideo` (UVC device debug interface)
+
+- Debugfs for controllers: refer to [5.2.1.3 USB 2.0 OTG Debug Interface](# 5.2.1.3 USB 2.0 OTG Debug Interface), [5.2.2.3 USB 2.0 Host Debug Interface](# 5.2.2.3 USB 2.0 Host debug interface), [5.3.1.3 USB 3.0 OTG Debug Interface](# 5.3.1.3 USB 3.0 OTG Debug Interface)
+
+- trace for usb gadget/dwc3/xHCI:
+
+  `/sys/kernel/debug/tracing/events/gadget` (trace Gadget Driver interacting with Device Controller Driver)
+
+  `/sys/kernel/debug/tracing/events/dwc3` (trace DWC3 controller transmission process)
+
+  `/sys/kernel/debug/tracing/events/xhci-hcd` (trace xHCI controller transmission process)
+
+- Print usb host uvc log: `echo 0xffff>/sys/module/uvcvideo/parameters/trace`
+
+- Print usb devio driver log: `echo 1>/sys/module/usbcore/parameters/usbfs_snoop`
+
+### 7.2 USB Common Commands
+
+This chapter mainly describes the specific commands for Rockchip USB driver USB, including 2.0 OTG switch command, USB 3.0 OTG switch command, USB 3.0 force USB 2.0 only command and USB eye diagram test command.
+
+- USB 2.0 OTG switch command
+
+  Function: Through software method, force USB 2.0 OTG to Host mode or Device mode without being affected by OTG ID level.
+
+  For the USB 2.0 OTG switch command, please refer to the description of the USB 2.0 PHY debug interface in [5.1.1 USB 2.0 PHY Driver Development](# 5.1.1 USB 2.0 PHY Driver Development).
+
+- USB 3.0 OTG switch command
+
+  Function: Through software method, force USB 3.0 OTG to Host mode or Device mode without being affected by OTG ID level or Type-C interface.
+
+  For the USB 3.0 OTG switch command, please refer to the USB 3.0 OTG switch command description in [5.3.1.3 USB 3.0 OTG Debug Interface](# 5.3.1.3 USB 3.0 OTG Debug Interface).
+
+- USB 3.0 force USB 2.0 only command
+
+  Function: Force USB 3.0 Host controller and PHY to work in USB 2.0 only mode.
+
+  For USB 3.0 force USB 2.0 only command, please refer to [5.1.2 USB 3.0 PHY driver development](# 5.1.2 USB 3.0 PHY driver development)
+
+- USB eye diagram test command
+
+  Function: Set the USB 3.0/2.0 controller to test mode.
+
+  For the USB eye diagram test command, please refer to the document
+
+  `Rockchip_Developer_Guide_USB_SQ_Test_CN`
+
+---
+
+## 8 Analysis of Common USB Questions
+
+### 8.1 Device Enumeration Log
+
+#### 8.1.1 USB 2.0 OTG Normal Boot Log
+
+Default mode is device when booting without USB cable.
 
 ```c
 
@@ -1965,7 +2469,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.2 USB 2.0 Device Normal Connection Log
+#### 8.1.2 USB 2.0 Device Normal Connection Log
 
 ```c
 
@@ -1985,7 +2489,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.3 USB 2.0 Device Disconnect Log
+#### 8.1.3 USB 2.0 Device Disconnect Log
 
 ```c
 
@@ -1995,7 +2499,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.4 USB 2.0 HOST Enumerate LS Device Log
+#### 8.1.4 USB 2.0 Host Enumerate LS Device Log
 
 ```c
 
@@ -2007,7 +2511,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.5 USB 2.0 HOST Enumerate FS Device Log
+#### 8.1.5 USB 2.0 Host Enumerate FS Device Log
 
 ```c
 
@@ -2020,7 +2524,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.6 USB 2.0 HOST Enumerate HS Device Log
+#### 8.1.6 USB 2.0 Host Enumerate HS Device Log
 
 ```c
 
@@ -2043,7 +2547,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.7 USB 2.0 HOST-LS/FS/HS Device Disconnect Log
+#### 8.1.7 USB 2.0 Host-LS/FS/HS Device Disconnect Log
 
 ```c
 [  443.151067] usb 1-1: USB disconnect, devicenumber 3
@@ -2060,7 +2564,7 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-#### 7.1.9 USB 3.0 HOST Enumerate SS Device Log
+#### 8.1.9 USB 3.0 Host Enumerate SS Device Log
 
 ```c
 
@@ -2082,15 +2586,22 @@ echo none > config/usb_gadget/g1/UDC
 
 ```
 
-### 7.2 Analysis of Common Questions
+### 8.2 Analysis of Common Questions
 
-#### 7.2.1 USB Hardware Circuit Problem
+#### 8.2.1 USB Hardware Circuit Problem
 
 1. Use multimeter to measure the voltage of PHY power supply, VCC5V0_OTG, USB_DET, USB_ID.
 2. Measuring voltage ripple of PHY power supply with oscilloscope.
 3. Test USB eye diagram with oscilloscope.
 
-#### 7.2.2 USB Device Problem
+#### 8.2.2 USB Device Problem
+
+The phenomenon that the USB Device is normally connected to the PC mainly includes:
+
+1. The serial port output normal log, see [8.1.2 USB 2.0 Device Normol Connection Log](#8.1.2 USB 2.0 Device Normal Connection Log);
+2. The drive letter appears on the PC, but it cannot be accessed by default; (Windows 7 and MAC OS may only appear in the device manager);
+3. "USB connected" logo appears in the status bar of the device UI;
+4. Open the prompt window of USB connected. The default is charger only mode. After selecting "MTP" or "PTP", the PC can access the drive letter.
 
 **Issue-1**: When the USB is plug in, the PC does not respond, and no usb enumeration log.
 
@@ -2126,7 +2637,7 @@ Without the following log:
 
 This issue is always caused by USB_DET voltage abnormality. Use multimeter to measure the voltage of USB_DET. Normally, the voltage is low (0V) when USB cable is unplugged. If the voltage is still high (~3V) after USB cable is unplugged, it will cause the disconnection issue.
 
-#### 7.2.3 USB Host Problem
+#### 8.2.3 USB Host Problem
 
 **Issue-1：**No USB enumeration log when USB device plug into the USB Host port.
 
@@ -2147,17 +2658,17 @@ DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte
 
 The dwc2 otg driver requires the transfer buffer address of urb must be 4 bytes aligned. Generally, the buffer address of urb is allocated in USB class drivers, so try to fix this issue in corresponding USB class driver.
 
-#### 7.2.4 USB Camera Problem
+#### 8.2.4 USB Camera Problem
 
 1. USB camera cannot be turned on
 
-   First, check whether there is a camera device node video0 or Video1 in the / dev directory. If not, check whether the kernel is configured correctly. If there are nodes, make sure that USB camera is inserted before the system boots, because Rockchip SDK doesn't support USB camera hot-plug by default. If you want to support USB Camera hot plug-in, please contact the Engineer in charge of Camera to support you. The USB driver doesn't need to be modified.
+   First, check whether there is a camera device node video0 or Video1 in the /dev directory. If not, check whether the kernel is configured correctly. If there are nodes, make sure that USB camera is inserted before the system boots, because Rockchip SDK doesn't support USB camera hot-plug by default. If you want to support USB Camera hot plug-in, please contact the Engineer in charge of Camera to support you. The USB driver doesn't need to be modified.
 
 2. Image jitter, no image and abnormal exit of camera application
 
    It may be caused by frame loss of USB driver. You need to use USB analyzer to analyze the actual USB communication data.
 
-#### 7.2.5 USB Charge Detection
+#### 8.2.5 USB Charge Detection
 
 USB 2.0 PHY supports charging detection of BC1.2 standard. It can detect four charging types: SDP/CDP/standard DCP (D+/D-short connection) and non-standard DCP (D+/D-not short connection).
 
@@ -2177,21 +2688,21 @@ BC1.2 spec requires D + and D - in USB Charger to be short connected to match th
 
 The USB charging type detection process is shown in the following figure:
 
-![USB-065-kernel4.4](Rockchip-Developer-Guide-USB/USB-065-kernel4.4.png)
+![USB-BCD-Process](Rockchip-Developer-Guide-USB/USB-BCD-Process.png)
 
-Figure 7‑1 USB Charging Detection Process
+Figure 8‑1 USB Charging Detection Process
 
 In the typical SDP detection process, the D+/D- signals is shown as follows:
 
-![USB-066-kernel4.4](Rockchip-Developer-Guide-USB/USB-066-kernel4.4.png)
+![USB-BCD-SDP-Detection](Rockchip-Developer-Guide-USB/USB-BCD-SDP-Detection.png)
 
-Figure 7‑2 SDP detection signals
+Figure 8‑2 SDP detection signals
 
 In the typical DCP detection process, the D+/D- signals is shown as follows:
 
- ![USB-067-kernel4.4](Rockchip-Developer-Guide-USB/USB-067-kernel4.4.png)
+ ![USB-BCD-DCP-Detection](Rockchip-Developer-Guide-USB/USB-BCD-DCP-Detection.png)
 
-Figure 7‑3 DCP detection signals
+Figure 8‑3 DCP detection signals
 
 If connected to an USB charger, but it is found that charging is slow, may be the DCP is misdetected as SDP, resulting in charging current set to 500 mA. This problem may happens when the USB cable connection is unstable or the charging detection driver is wrong.
 
@@ -2199,10 +2710,65 @@ Try to fix it step by step:
 
 1. Capture the uart log when connected to the USB charger and judge the charging type by the prompt of the log. The normal charging type log should be DCP.
 2. If the log shows that the charge type is SDP, then an error detection has occurred. First, try to change an USB cable, and test again, if this issue still exits, please use oscilloscope to capture D+/D- signals when USB cable plug in, and send both the error kernel log and  D+/D- signals to us.
-
 3. If the connection is a USB charger and the logs show it's DCP, it indicates that the software detects normally, but if the charging is still slow, it may be a problem of charging IC or battery.
 
-### 7.3 About PC USB Driver
+#### 8.2.6 USB Transfer Rate Problem
+
+The main factors affecting the transmission rate:
+
+- USB signal quality
+
+- USB controller bus frequency
+
+- CPU/DDR operating frequency
+
+- Read and write performance of storage media
+
+- File system format of storage device
+
+- USB device class driver
+
+Reference:
+
+`Rockchip_Developer_Guide_Linux_USB_Performance_Analysis_CN`
+
+#### 8.2.7 USB Enumeration Rate
+
+Pay attention to the printed log of the USB enumeration. "high-speed" means recognized as USB 2.0, and "super-speed" means recognized as USB 3.0.
+
+#### 8.2.8 USB3.0 Recognized Problem
+
+After the USB3.0 device is plugged in, nothing happens, how to troubleshoot?
+
+According to the definition of USB3.0 enumeration process, it is generally stuck at the Link Training process of USB 3.0 PHY, that is, the problem of USB PHY signal. You can use the USB3.0 analyzer to capture the Link Training process and combine it with the LTSSM state machine described in the USB 3.0 Spec for analysis.
+
+#### 8.2.9 USB 3.0 Disk Copy Problem
+
+- Confirm whether the VBUS supply current meets the requirements
+
+- On the PC side, perform the same operation for comparison
+
+- Use USB 3.0 analyzer to capture communication protocol
+
+- Reduce the size of the data block transmitted once, update the xHCI driver, and open the xHCI debug log
+
+#### 8.2.10 USB3.0 Camera Transmission Problem
+
+It is generally related to the efficiency of USB access to the DDR bus.
+
+Optimization means:
+
+- ddr fixed frequency 800MHz;
+
+- Improve USB QOS;
+
+- Optimize the interrupt processing efficiency of uvc driver, put memcpy operation in the lower half;
+
+- urb buffer uses kmalloc allocation instead of the default dma_alloc_coherent method;
+
+- If the RK platform is for UVC Gadget, you can dynamically allocate TxFIFO to increase the size of TxFIFO;
+
+### 8.3 About PC USB Driver
 
 The developers often use USB download mode (rockusb) and USB debug mode (ADB) on Rockchip platforms during development stage.
 
@@ -2216,6 +2782,7 @@ The developers often use USB download mode (rockusb) and USB debug mode (ADB) on
 
 ---
 
-## 8 USB Signal Quality Test
+## 9 USB Signal Quality Test
 
-Refer to the document《Rockchip-Developer-Guide-USB-SQ-Test》.
+Refer to the document《Rockchip_Developer_Guide_USB_SQ_Test_CN》.
+
