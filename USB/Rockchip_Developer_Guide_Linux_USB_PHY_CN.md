@@ -2,17 +2,15 @@
 
 文件标识：RK-KF-YF-102
 
-发布版本：V1.1.1
+发布版本：V1.2.0
 
-日期：2020-02-19
+日期：2020-06-11
 
 文件密级：□绝密   □秘密   ■内部资料   □公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -49,9 +47,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 本文档提供 Rockchip 平台 USB PHYs 的开发指南，通过该文档可以更加快速地了解 USB PHYs 的硬件设计框架、主要寄存器说明、PHY 的功耗管理、PHY 的 tuning 流程以及 PHY 的常见问题处理等。本文档可作为 USB PHYs 驱动开发的参考文档，但不能替代 PHY 的手册。
 
 **产品版本**
-| **芯片名称**                                 | **内核版本** |
-| ---------------------------------------- | -------- |
-| 所有芯片(包括 29 系列、30 系列、31 系列、32 系列、33 系列、PX 系列、1108) | 所有内核版本   |
+| **芯片名称**                                                 | **内核版本** |
+| ------------------------------------------------------------ | ------------ |
+| 所有芯片(包括 29 系列、30 系列、31 系列、32 系列、33 系列、PX 系列、1108、1126/1109) | 所有内核版本 |
 
 **读者对象**
 本文档（本指南）主要适用于以下工程师：
@@ -61,11 +59,12 @@ Fuzhou Rockchip Electronics Co., Ltd.
 技术支持工程师
 
 **修订记录**
-| **日期**   | **版本** | **作者** | **修改说明**                                       |
-| ---------- | -------- | -------- | -------------------------------------------------- |
-| 2018-05-21 | V1.0     | 吴良峰   | 初始版本                                           |
-| 2019-01-09 | V1.1     | 吴良峰   | 使用 markdownlint 修订格式                         |
-| 2020-02-19 | V1.11    | 吴良峰   | 增加免责声明，商标声明，以及版权声明，修改文档规范 |
+| **日期**   | **版本** | **作者**           | **修改说明**                                       |
+| ---------- | -------- | ------------------ | -------------------------------------------------- |
+| 2018-05-21 | V1.0     | 吴良峰             | 初始版本                                           |
+| 2019-01-09 | V1.1     | 吴良峰             | 使用 markdownlint 修订格式                         |
+| 2020-02-19 | V1.11    | 吴良峰             | 增加免责声明，商标声明，以及版权声明，修改文档规范 |
+| 2020-06-10 | V1.2.0   | 任家宁<br />吴良峰 | 增加2.3章节 NaNeng USB2.0 PHY                      |
 
 ---
 [TOC]
@@ -84,13 +83,14 @@ Rockchip 采用的 USB PHY 主要有如下四种：
 
 表 1-1 Rockchip 平台 USB PHY 支持列表
 
-| 芯片/PHY                                   |  USB2 PHY [Inno]   | USB3 PHY [Inno] | USB2 PHY [Synopsys] | Type-C PHY [Cadence] |
-| :--------------------------------------- | :----------------: | :-------------: | :-----------------: | :------------------: |
-| RK3066<br />RK3188<br />RK3288           |         N          |        N        |  Y<br />[1 × port]  |          N           |
-| RK302X<br />                             | Y<br />[1 × port]  |        N        |          N          |          N           |
-| RK303X<br />RK312X<br />RK322X<br />RK3308<br />RK3326<br />RK3368<br />PX30 | Y<br />[2 × ports] |        N        |          N          |          N           |
-| RK3228H<br />RK3328<br />                |         Y          |        Y        |          N          |          N           |
-| RK3399                                   |         Y          |        N        |          N          |          Y           |
+| 芯片/PHY                                                     |  USB2 PHY [Inno]   | USB3 PHY [Inno] | USB2 PHY [Synopsys] | USB2 PHY [NaNeng]  | Type-C PHY [Cadence] |
+| :----------------------------------------------------------- | :----------------: | :-------------: | :-----------------: | :----------------: | :------------------: |
+| RK3066<br />RK3188<br />RK3288                               |         N          |        N        |  Y<br />[1 × port]  |         N          |          N           |
+| RK302X<br />                                                 | Y<br />[1 × port]  |        N        |          N          |         N          |          N           |
+| RK303X<br />RK312X<br />RK322X<br />RK3308<br />RK3326<br />RK3368<br />PX30 | Y<br />[2 × ports] |        N        |          N          |         N          |          N           |
+| RK3228H<br />RK3328<br />                                    |         Y          |        Y        |          N          |         N          |          N           |
+| RK3399                                                       |         Y          |        N        |          N          |         N          |          Y           |
+| RV1126<br />RV1109                                           |         N          |        N        |          N          | Y<br />[1 × ports] |          N           |
 
 ---
 ## 2 USB2.0 PHY
@@ -109,8 +109,8 @@ Innosilicon USB2.0 PHY 的硬件框架如下图 2-1 所示，主要包括五个�
 
 表 2-1 Inno USB2.0 PHY Port0 主要寄存器
 
-|   Bit    | Reset Value  | Description                              |
-| :------: | :----------: | ---------------------------------------- |
+|   Bit    | Reset Value  | Description                                                  |
+| :------: | :----------: | ------------------------------------------------------------ |
 |   2:0    |    3'b000    | HS eye diagram adjust, open HS pre-emphasize function to increase HS slew rate, only used when large cap loading is attached.<br />001:open pre-emphasize in sof or eop state<br />010: open pre-emphasize in chirp state<br />100: open pre-emphasize in non-chirp state<br />111: always open pre-emphasize<br />该寄存器用于 HS 眼图预加重的调整，**建议设置为 3'b100**<br />**see Note2** |
 | 115, 4:3 |    3’b011    | Hs slew rate tuning bits, more one represents larger slew rate , 111 the maximum and 001 the minimum, 000 will shut down the high speed driver output<br />该寄存器用于 HS 眼图的 slew rate 调整。但**作用很小**。 |
 |  16:13   |   4'b1100    | A port squelch trigger point configure<br />4b’0000 : 112.5mv<br />4b’0001 : 150mv<br />4b’0010 : 87.5mv<br />4b’0011 : 162.5mv<br />4b’0100 : 100mv<br />4b’0101 : 137.5mv<br />4b’0110 : 75mv<br />4b’0111 : 150mv<br />4b’1000 : 125mv<br />4b’1001 : 162.5mv<br />4b’1010 : 100mv<br />4b’1011 : 175mv<br />4b’1100 : 150mv(default)<br />4b’1101 : 187.5mv<br />4b’1110 : 125mv<br />4b’1111 : 200mv<br />该寄存器用于噪声阈值调整，建议用默认值 150mv。通过调整噪声阈值，可以解决 USB 外设异常断开的问题，参考：[4.2 通过调整噪声阈值解决 USB HS 设备枚举失败的问题](#4.2 通过调整噪声阈值解决 USB HS 设备枚举失败的问题) |
@@ -177,8 +177,8 @@ PHY 的供电有三路 3.3V，1.8V 和 1.0V，如下表 2-2 所示。如果实�
 
 表 2-3 运行时的  Inno USB2.0 PHY 功耗管理寄存器
 
-| Bit  | Reset Value | Suspend Value | Description                              |
-| :--: | :---------: | ------------- | :--------------------------------------- |
+| Bit  | Reset Value | Suspend Value | Description                                                  |
+| :--: | :---------: | ------------- | :----------------------------------------------------------- |
 |  8   |    1'b0     | 1'b1          | utmi_dmpulldown<br />0 : DM 15 KOhm pull down disabled<br />1: DM 15 Kohm pull down enable |
 |  7   |    1'b0     | 1'b1          | utmi_dppulldown<br />0 : DP 15 KOhm pull down disabled<br />1 : DP 15 Kohm pull down enable |
 |  6   |    1'b1     | 1'b1          | utmi_termselect<br /> GRF termination select between FS/HS speed<br />1 : Full-speed terminations are enabled.<br />0 : High-speed terminations are enabled. |
@@ -216,20 +216,20 @@ PHY 的供电有三路 3.3V，1.8V 和 1.0V，如下表 2-2 所示。如果实�
 
 表 2-5  Inno USB2.0 PHY 二级低功耗寄存器配置
 
-| Bit  | Reset Value | Suspend Value | Description                              |
-| :--: | :---------: | :-----------: | ---------------------------------------- |
-|  46  |    1'b0     |     1'b1      | Battery charging related register        |
+| Bit  | Reset Value | Suspend Value | Description                                                  |
+| :--: | :---------: | :-----------: | ------------------------------------------------------------ |
+|  46  |    1'b0     |     1'b1      | Battery charging related register                            |
 | 127  |    1'b0     |     1'b1      | vbus voltage level detection function power down，active high |
 
 **Note**：在二级低功耗的配置下，linestate 和 bvalid 中断都会失效，只有 id 中断起作用。
 
 表 2-6  Inno USB2.0 PHY 低功耗数据 （以 PX30/RK3326 实测数据为例）
 
-|     供电电源     | 运行时低功耗  | 待机一级低功耗 | 待机二级低功耗  |
-| :----------: | :-----: | :-----: | :------: |
-| USB_AVDD_1V0 | 0.27 mA | 0.27 mA | 0.006 mA |
-| USB_AVDD_1V8 | 0.73 mA | 0.1 mA  | 0.02 mA  |
-| USB_AVDD_3V3 |  0 mA   |  0 mA   |   0 mA   |
+|   供电电源   | 运行时低功耗 | 待机一级低功耗 | 待机二级低功耗 |
+| :----------: | :----------: | :------------: | :------------: |
+| USB_AVDD_1V0 |   0.27 mA    |    0.27 mA     |    0.006 mA    |
+| USB_AVDD_1V8 |   0.73 mA    |     0.1 mA     |    0.02 mA     |
+| USB_AVDD_3V3 |     0 mA     |      0 mA      |      0 mA      |
 
 #### 2.1.5 PHY clk 管理
 
@@ -349,8 +349,8 @@ Synopsys USB2.0 PHY 的硬件框架如下图 2-2 所示，主要包括三个子�
 
 表 2-7 Synopsys USB2.0 PHY 主要寄存器
 
-|        Signal        | I/O  | Description                              |
-| :------------------: | :--: | ---------------------------------------- |
+|        Signal        | I/O  | Description                                                  |
+| :------------------: | :--: | ------------------------------------------------------------ |
 |   COMPDISTUNE[2:0]   |  I   | Disconnect Threshold Adjustment<br />Function: This bus adjusts the voltage level for the threshold used to detect a disconnect event at the host.<br />111: + 4.5%<br />110: + 3%<br />101: + 1.5%<br />100: Design default<br />011: – 1.5%<br />010: – 3%<br />001: – 4.5%<br />000: – 6% |
 |     OTGTUNE[2:0]     |  I   | VBUS Valid Threshold Adjustment<br />Function: This bus adjusts the voltage level for the VBUS Valid threshold.<br />111: + 9%<br />110: + 6%<br />101: + 3%<br />100: Design default<br />011: – 3%<br />010: – 6%<br />001: – 9%<br />000: – 12% |
 |    SQRXTUNE[2:0]     |  I   | Squelch Threshold Adjustment<br />Function: This bus adjusts the voltage level for the threshold used to detect valid high-speed data.<br />111: – 20%<br />110: – 15%<br />101: – 10%<br />100: – 5%<br />011: Design default<br />010: + 5%<br />001: + 10% |
@@ -368,7 +368,7 @@ Synopsys USB2.0 PHY 的硬件框架如下图 2-2 所示，主要包括三个子�
 
 表 2-8 Synopsys USB2.0 PHY REXT
 
-|      芯片       |   参考电阻 REXT   |
+|     芯片      | 参考电阻 REXT |
 | :-----------: | :-----------: |
 | RK3066/RK3188 | 43.2 Ω (± 1%) |
 |    RK3288     |     200 Ω     |
@@ -381,10 +381,10 @@ Synopsys USB2.0 PHY 的硬件框架如下图 2-2 所示，主要包括三个子�
 
 表 2-9 Synopsys USB2.0 PHY power supplies
 
-|      芯片       |          Analog power supplies           | Digital power supply |
-| :-----------: | :--------------------------------------: | :------------------: |
+|     芯片      |             Analog power supplies             | Digital power supply |
+| :-----------: | :-------------------------------------------: | :------------------: |
 | RK3066/RK3188 | 3.3 V (+ 10%, – 7%) <br />2.5 V (+ 10%, – 7%) | 1.1 V (+ 10%, – 7%)  |
-|    RK3288     |     3.3 V (± 10%)<br />1.8 V (± 10%)     |    1.0 V (± 10%)     |
+|    RK3288     |       3.3 V (± 10%)<br />1.8 V (± 10%)        |    1.0 V (± 10%)     |
 
 ##### 2.2.4.2 PHY 的功耗管理
 
@@ -398,8 +398,8 @@ Synopsys USB2.0 PHY 的待机功耗管理与 Inno USB2.0 PHY 有所不同。Syno
 
 表 2-10 Synopsys USB2.0 PHY 待机低功耗配置
 
-|  Bit  | Reset Value | Suspend Value | Description                              |
-| :---: | :---------: | :-----------: | ---------------------------------------- |
+|  Bit  | Reset Value | Suspend Value | Description                                                  |
+| :---: | :---------: | :-----------: | ------------------------------------------------------------ |
 | SIDDQ |    1'b0     |     1'b1      | Function: This test signal enables you to perform IDDQ testing by powering down all analog blocks. Before asserting SIDDQ, ensure that VDATSRCENB0, VDATDETENB0, DCDENB0, BYPASSSEL0, ADPPRBENB0, and TESTBURNIN are set to 1'b0.<br />1: The analog blocks are powered down.<br />0: The analog blocks are powered up.<br />Note：如果有使能 Bypass Uart 的功能，在待机时，需要关闭 Bypass 功能（BYPASSSEL0 = 1'b0），否则会增加 PHY 的功耗。 |
 
 #### 2.2.5 PHY clk 管理
@@ -408,7 +408,202 @@ Synopsys USB2.0 PHY 的 clk 管理与 Inno USB2.0 PHY 类似，也是通过 GRF 
 
 #### 2.2.6 PHY tuning 流程
 
-Synopsys USB2.0 PHY 的兼容性比较好，所以一般不用 tuning PHY。如果因为硬件电路设计问题，需要进行 tuning，可以根据表 1-8 Synopsys USB2.0 PHY 主要寄存器的说明进行调整，tuning 的流程相比 Inno USB2.0 PHY 简单得多，主要调整眼图的预加重（TXPREEMPAMPTUNE[1:0]  ）和斜率（TXRISETUNE[1:0]）。
+Synopsys USB2.0 PHY 的兼容性比较好，所以一般不用 tuning PHY。如果因为硬件电路设计问题，需要进行 tuning，可以根据表 2-7 Synopsys USB2.0 PHY 主要寄存器的说明进行调整，tuning 的流程相比 Inno USB2.0 PHY 简单得多，主要调整眼图的预加重（TXPREEMPAMPTUNE[1:0]  ）和斜率（TXRISETUNE[1:0]）。
+
+### 2.3 NaNeng USB2.0 PHY
+
+#### 2.3.1 PHY 的硬件框架
+
+NaNeng USB2.0 PHY的硬件框架如下图 2-3 所示
+
+![Block-Diagram-of-NaNeng-USB2-PHY](Rockchip-Developer-Guide-USB-PHY/Block-Diagram-of-NaNeng-USB2-PHY.png)
+
+图 2-3 Block Diagram of NaNeng USB 2.0 PHY
+
+- **Phase locked loop(PLL) and clock divider**
+
+通过获取 12MHz 参考时钟输入并使用频率合成，PLL 模块生成一个 480MHz 高速时钟用于 USB 数据发送和接收。 同时，它产生不同的分频时钟，包括 CLK_480，以用于后续功能。
+
+- **IO Transceiver (XCVR)**
+
+USB IO 收发器包括 HS 收发器和 FS 收发器，用于根据实际应用支持高速或全速模式。 每个 IO 收发器包括三个模块，分别是接收器 IO（RCV），发送器 IO（XMIT）和控制模块。 该模块用于将来自发送器的数字数据流转换为符合 USB 电气规格的差分信号，反之亦然，将输入的差分 USB 信号转换为数据流并发送至 USB 接收器模块。
+
+- **USB Transmitter**
+
+根据 DATA_BUS16_8 的状态，USB 发送器将从 DATA_IN 中获取 16/8 位并行数据总线，并在经过必要的处理后将其转换为串行数据流，然后发送至 IO 收发器模块。USB 发送器处理数据并执行 SYNC 插入，EOP 插入，NRZI 编码和位填充等功能。 该模块还包含用于 UTIM 协议处理的 line-status 控制和传输状态机。
+
+- **USB Receiver**
+
+通过从 XCVR 获取数据流，USB 接收器将使用 CDR（Clock Data Recovery）从传入数据流中提取的恢复时钟来采样并锁存传入数据。 USB 接收器还负责数字数据处理功能，例如位去填充，NRZI 解码，SYNC 字段和 EOP 字段的删除和剥离。
+
+同时，实现了接收器状态机，用于 UTMI 接收器协议处理，有关此状态机的详细信息，请参阅 UTMI 接口规范。
+
+高速 DLL 和全速 DLL 分别用于 HS 和 FS 模式下的 CDR 时钟相位跟踪和相位调整。DLL 相位校准是自动执行的，不需要任何外部校准过程。
+
+为了补偿高速模式下 USB 发送器和 USB 接收器之间的频率偏移，USB 接收器还实现了一个弹性缓冲器。 可以通过监视 UTMI 接口信号 RXERROR 来观察缓冲区的上溢或下溢状态。
+
+- **Bandgap reference**
+
+带隙模块是一个内部参考发生器，用于为 IP 上的所有电路提供参考电压/电流。 带隙模块在不同的工艺，电源电压和温度条件下变化很小，并且不需要任何外部组件即可完成工作。
+
+- **Termination Resister Calibration**
+
+校准模块使用外部电阻作为参考，以在任何 PVT 下获得准确的 45Ω 端接，校准将在加电并打开带隙参考后开始，耗时约 **300us**。
+
+- **Charge Detector**
+
+充电检测支持 BC1.2，当 USB 2.0 PHY 用作便携式设备时，它可以检测包括 CDP，DCP 和 SDP 的充电端口。 当 USB 2.0用作主机或 OTG 设备时，可以将其配置为 SDP 或 CDP。
+
+#### 2.3.2 主要寄存器说明
+
+表 2-11 NaNeng USB2.0 PHY 主要寄存器
+
+|      Bit      |     Field Name     | Reset Value | Description                                                  |
+| :-----------: | :----------------: | :---------: | ------------------------------------------------------------ |
+|  FC_REG00[5]  |    cfg_hs_strg     |    1'b1     | HS TX strong power mode<br/>正常使用时，该 bit 必须置 1。<br />特殊用法：在 chirp K 阶段设置该 bit 为 0，大约可以提高 chirp K 幅值 10mV |
+|  FC_REG00[6]  |  cfg_sel_strength  |    1'b0     | HS TX stronger edge driver enable signal<br/>**该寄存器用于 HS 眼图的 Slew rate 调整**<br />置 1 可以改善眼图的 Slew rate，但无法提高幅值。 |
+|  FC_REG00[7]  |     cfg_sel_pw     |    1’b0     | HS TX edge delay select signal<br/>Bypass signal of VDDA detect function:  <br/>0: normal mode<br/>1: bypass mode, VDDA detect function is disable<br/>**该寄存器用于 HS 眼图的 Slew rate 调整**<br />置1 可以改善眼图的 Slew rate，但可能会导致眼图过冲。所以使用时，请务必测试眼图确认效果。 |
+|  FC_REG02[2]  | cfg_rcal_sel_voff  |    1'b1     | Calibration code select signal, default value: 4’b1<br/> 0: select calibration code<br/> 1: select cfg_rcal_voff[3:0]<br/>如果设置为 0 就会触发一次电阻校准<br />RV1126/RV1109 PHY 驱动在初始化阶段会触发一次电阻校准功能，并把校准值 rcal_out[3:0] 写入 cfg_rcal_voff[3:0] ，然后关闭电阻校准功能。 |
+| FC_REG02[4:3] |   cfg_rref[1:0]    |    2'b00    | Reference resister select signal<br/> 00: 200 ohm<br/> 01: 390 ohm<br/> 10: 1K ohm<br/> 11: 2Kohm<br />默认使用 200 ohm 外部参考电阻 |
+| FC_REG04[6:3] | cfg_rcal_voff[3:0] |   4'b0111   | Register code for termination resister<br/>**该寄存器用于 HS 眼图的幅值调整**<br />该寄存器只有在 FC_REG02[2] 为 1 时生效<br /> 理论上，cfg_rcal_voff 值越大，对应的内部 45Ω 电阻越小，对应的眼图幅值越大<br />设置为 4'b1111，内部 45Ω 电阻最小，对应眼图幅值最大<br />设置为 4'b0001，内部 45Ω 电阻最大，对应眼图幅值最小<br />设置为 4‘b0000，无效 |
+|  FC_REG06[0]  |     LS_PAR_EN      |    1'b1     | LS mode with parallel enable<br/>作 Host 时，为了识别低速设备必须将该 bit 位置 1 |
+|  FC_REG08[4]  |   cfg_swcal_byps   |    1'b0     | Bypass signal of TX swing calibration function<br/> 0: normal mode<br/> 1: bypass mode<br/>当PHY的供电电压不是标准的 0.8V，1.8V 和 3.3V时，触发电压自校准<br />电压校准只有在 chirp K 的前 500us 生效；如果已做过一次电压校准，即使 bypass tx 电压校准，校准过的电流源仍然会保持住；从 bypass 切换到 normal，可以强制触发一次电压校准，但最好是在 chirpk 前 500us 让 phy 自己去判断校准 |
+|  FC_REG08[5]  |  cfg_byps_charge   |    1'b0     | Bypass signal of charge detection <br/> 0: normal mode<br/> 1: bypass mode<br/>在系统进入待机时，通过 bypass 充电检测功能可以降低 phy 的休眠功耗 |
+|  FC_REG0D[4]  |   rcal_trim_done   |     RO      | 电阻校准的状态（只读）<br />为 1 表示电阻校准完成<br/>正常情况，电阻校准耗时约为 300us，也即 cfg_rcal_sel_voff 设置为 0 后 ，等待 200 - 300us 该bit 位会置 1，表示校准完成<br/>更多信息，请参考 [2.3.3 参考电阻RREF电阻的说明](#2.3.3 参考电阻RREF电阻的说明) |
+| FC_REG0D[3:0] |      rcal_out      |     RO      | 电阻自校准得到的电阻 Code，只有在 FC_REG02[2] cfg_rcal_sel_voff 设置为 0 时生效<br />理论上，外部参考电阻越小，对应的电阻 Code 值越大，眼图幅值也越大 |
+
+#### 2.3.3 参考电阻RREF电阻的说明
+
+参考电阻 RREF 在 PHY 手册中规定有四种阻值，由寄存器 FC_REG02[4:3] 控制，默认为 200Ω。具体参考 [2.3.2 主要寄存器说明](#2.3.2 主要寄存器说明)。
+
+**改变参考电阻可以在一定程度上调整眼图的幅度，这种方法与改变 cfg_rcal_voff[3:0] 的方法效果一样，本质都是改变 PHY 内部的 45Ω 终端电阻。理论上，参考电阻越小，PHY 内部的 45Ω 电阻也越小，对应眼图幅度就越大**。
+
+**Note:**
+
+1. 参考电阻只有在 FC_REG02[2] cfg_rcal_sel_voff 为 0，才能生效。具体参考  [2.3.2 主要寄存器说明](#2.3.2 主要寄存器说明)；
+2. 参考电阻的取值为标准值的 ±10%（45Ω 内部电阻的 PVT 偏差）；
+3. 电阻校准期间 Rref 引脚会检测到持续 300us 的高电平，默认 200Ω 参考电阻下幅值为 400mV。参考电阻越大，电压越大，如果电压超过 2V 就会判断为参考电阻断开（高阻态），此时只会维持 3.5 us 就会将rcal_trim_done 置为 1；
+4. RREF 200 Ω的电阻建议用 1% 的精密电阻，在 PCB 上放置离管脚越近越好；
+
+#### 2.3.4 PHY 的供电及功耗管理
+
+##### 2.3.4.1 PHY 的供电
+
+PHY 的供电有三路 3.3V，1.8V 和 0.8V，如下表 2-12 所示。
+
+表 2-12 NaNeng USB2.0 PHY power supplies
+
+| Supply Voltage | Min  | Typ  | Max  | Unit |
+| :------------: | :--: | :--: | :--: | :--: |
+|    USB_VDDA    | 0.72 | 0.80 | 0.88 |  V   |
+|   USB_VCCA18   | 1.62 | 1.80 | 1.98 |  V   |
+|   USB_VCCA33   | 2.97 | 3.30 | 3.63 |  V   |
+
+##### 2.3.4.2 PHY 的功耗管理
+
+- **运行时的 PHY 功耗管理**
+
+NaNeng USB2.0 PHY 的运行功耗管理与 Inno USB2.0 PHY 类似，也是通过 GRF寄存器中的 utmi_sel，utmi_suspend_n，utmi_opmode，utmi_xcvrselect，utmi_termselect，utmi_dppulldown 以及 utmi_dmpulldown 来控制 USB2.0 PHY 进入 suspend。寄存器的具体配置方法，请参考 [2.1.4.2 PHY 的功耗管理](#2.1.4.2 PHY 的功耗管理)章节。
+
+**Note: **与 Inno USB 2.0 PHY 不同的是，NaNeng USB2.0 PHY 在进入 suspend 时，需要将utmi_opmode 设置为2'b01 non-driving
+
+- **待机时的 PHY 功耗管理**
+
+待机时的 PHY 功耗管理有如下两种方法，**推荐使用方法 2**。
+
+**方法 1：关闭 PHY 的供电**
+
+关闭 PHY 的供电是最直接的节省功耗的方法，但有两个限制：
+
+1. PHY 的三路供电 3.3V，1.8V ，0.8V 以及 VDD_logic 要同时关闭，否则会导致这四路电之间的漏电。
+2. 关闭 PHY 的供电，则不支持 USB 唤醒系统（Remote wakeup）的功能。
+
+**方法 2：设置 PHY 进入低功耗模式 （suspend mode）**
+
+该方法是通过 GRF 寄存器来控制 PHY 进入低功耗模式。
+
+NaNeng USB2.0 PHY 一共有三种功耗模式，分别为 normol mode，PLL-only mode 和 suspend mode。
+
+USB2.0 PHY 驱动中，会根据 USB 实际的工作场景，动态切换三种功耗模式。
+
+- normal mode
+
+  High-speed operation: 设置 SUSPENDM = 1, OPMODE[1:0] = 00, XCVRSELECT = 0, TERMSELECT = 0
+
+  Full-speed operation: 设置 SUSPENDM = 1, OPMODE[1:0] = 00, XCVRSELECT = 1, TERMSELECT = 1
+
+  系统正常运行，并且 USB 正常工作时，PHY 进入 normal mode
+
+- PLL-only mode
+
+  设置 SUSPENDM = 0, PLL_EN = 1
+
+  系统正常运行，并且 USB 不工作，只需保持 480 MHz clock给系统其它模块使用，PHY 进入PLL-only mode
+
+- suspend mode
+
+  设置 OPMODE[1:0] = 01, SUSPENDM = 0, PLL_EN = 0
+
+  系统进入待机时，PHY 进入 suspend mode
+
+表 2-13  NaNeng USB2.0 PHY 功耗数据 （以 RV1126 实测数据为例）
+
+|   供电电源   | normol mode (hs) | PLL-only mode | suspend mode |
+| :----------: | :--------------: | :-----------: | :----------: |
+| USB_AVDD_0V8 |     5.65 mA      |   0.5436 mA   |   12.90 uA   |
+| USB_AVCC_1V8 |     9.54 mA      |    1.75 mA    |  165.00 uA   |
+| USB_AVCC_3V3 |     0.56 mA      |   0.1504 mA   |   10.85 uA   |
+
+#### 2.3.5 PHY clk 管理
+
+以 RV1126/RV1109 为例，PHY 的 REFCLK 为 12MHz，有两路可以选择：
+
+xin_osc0_usbphyref 和 clk_gpll_mux。默认选择 xin_osc0_usbphyref。
+
+PHY 输出给 USB 控制器的时钟主要有 480 MHz clk 和 utmi clk，这两个时钟如果没有管理好，会导致 USB 控制器工作异常。对于这两个时钟的管理，需要注意以下两点：
+
+- **480 MHz clk 的管理**
+
+只受 GRF 寄存器的 PLL_EN 控制，当 PLL_EN 设置为 1 时，CLK480M 开启，要等待 200～500us 时钟才会稳定；反之当 PLL_EN 设置为 0 时，CLK480M 关闭。
+
+- **utmi clk 的管理**
+
+只受 SUSPENDM（对应 GRF 寄存器 suspend_n）控制，当 PHY 进入 suspend，utmi clk 会被关闭。
+
+当 PHY 退出 suspend，utmi clk 会被重新开启，PHY手册上介绍需要等待 500us， utmi clk 才能稳定。但在 RV1126 / RV1109 实际测试中，只有延时不低于 **2.5ms** 后，PHY 才可以正常工作
+
+#### 2.3.6 PHY tuning 流程
+
+NaNeng USB2.0 PHY 的兼容性比较好，所以一般不用 tuning PHY。如果因为硬件电路设计问题，需要进行 tuning，可以根据表 2-11 NaNeng USB2.0 PHY 主要寄存器的说明进行调整，tuning 的流程相比 Inno USB2.0 PHY 简单得多，主要调整眼图的预加重（FC_REG00[6] cfg_sel_strength）和内部电阻（FC_REG04[6:3]  cfg_rcal_voff[3:0]）。
+
+NaNeng USB2.0 PHY 是通过 APB 总线读写内部寄存器，APB 读数据一定要在 PHY 获取数据稳定后，否则只能读到上一次的数据。所以需要设置 GRF prdy要比 rden 大，为了代码更容易理解，将这部分也放在了 tuning 函数中。
+
+#### 2.3.7 VBUS 输入电压的要求
+
+VBUS18 是一个 1.8V 电源域的模拟输入管脚，能承受的电压范围就 1.8V ± 10%，折合到 1.62V～2.08V 这个范围。需要将输入的 VBUS 5V 通过一个分压网络，分压得到 1.8V 供给 VBUS18。**请注意，该管脚无法耐受到 3V 这样一个超额电压**。
+建议该管脚上的分压电阻使用精度为 1% 的精密电阻，因为该管脚电压会影响到其他部分电路的功能。
+
+#### 2.3.8 OTG PHY 的联动控制
+
+OTG PHY 是指 PHY 可以支持动态切换 Device/Host 的功能。
+
+与其他 USB 2.0 PHY 不同的是，NaNeng OTG PHY 需要软件设置，才能支持动态切换 Device/Host 的功能。
+
+PHY IP 设计时，通过 OTG_SUSPENDM、LS_PAR_EN、IDDIG 的联动机制，来实现 OTG PHY Device/Host 的动态切换，这三者的硬件关系如下：
+
+1. OTG_SUSPENDM 受 IDDIG 控制。规则如下：
+
+   当 IDDIG 为 1，则 OTG_SUSPENDM 为 0；
+   当 IDDIG 为 0，则 OTG_SUSPENDM 为 1；
+
+2. LS_PAR_EN 受 OTG_SUSPENDM 控制。规则如下：
+
+   当 OTG 作 HOST 时，OTG_SUSPENDM 为 1，对应 LS_PAR_EN 也为 1，支持 HS/FS/LS;
+   当 OTG 作 Device 时，OTG_SUSPENDM 为 0，对应 LS_PAR_EN 也为 0，仅支持 HS/FS，不支持 LS;
+
+因此，在 PHY 驱动初始化时，需要通过配置 GRF 寄存器，设置 OTG_SUSPENDM 由 IDDIG 控制，设置 LS_PAR_EN 由 OTG_SUSPENDM 控制，并且，设置 IDDIG 由  PHY 的 ID_PULLUP 控制，同时，默认将 ID_PULLUP 置为 1，即 ID pin 为高电平, PHY 默认作 Device 功能。
+
+当插入 OTG cable 时，cable 会将 ID pin 拉低到地，触发 PHY 内部的联动机制，硬件自动切换 PHY 作 Host 功能。
 
 ---
 ## 3 USB3.0 PHY
@@ -437,8 +632,8 @@ USB3 PHY 寄存器的说明，请参考 Inno USB3.0 PHY 手册 “Table 6.1 USB3
 
 表 3-1  Inno USB3.0 PHY 参考电阻 RBIAS
 
-|       芯片       |                参考电阻 RBIAS                |
-| :------------: | :--------------------------------------: |
+|      芯片      |               参考电阻 RBIAS               |
+| :------------: | :----------------------------------------: |
 | RK3228H/RK3328 | 2K ± 1% external resistance bias to ground |
 
 #### 3.1.4 PHY 的供电及功耗管理
@@ -449,9 +644,9 @@ USB3 PHY 寄存器的说明，请参考 Inno USB3.0 PHY 手册 “Table 6.1 USB3
 
 表 3-2 Inno USB3.0 PHY power supplies
 
-|       芯片       | Parameter |                  Notes                   | Min  | Typical | Max  |
-| :------------: | :-------: | :--------------------------------------: | :--: | :-----: | :--: |
-| RK3228H/RK3328 |  VCCA1P8  |   1.8 V analog supply voltage for CDR    | 1.62 |   1.8   | 1.98 |
+|      芯片      | Parameter |                            Notes                             | Min  | Typical | Max  |
+| :------------: | :-------: | :----------------------------------------------------------: | :--: | :-----: | :--: |
+| RK3228H/RK3328 |  VCCA1P8  |             1.8 V analog supply voltage for CDR              | 1.62 |   1.8   | 1.98 |
 | RK3228H/RK3328 |  VCCD1P0  | 1.0 V analog supply voltage for PLL，CDR and clock tree power | 0.9  |   1.0   | 1.1  |
 
 ##### 3.1.4.2 PHY 的功耗管理
@@ -460,12 +655,12 @@ USB3 PHY 寄存器的说明，请参考 Inno USB3.0 PHY 手册 “Table 6.1 USB3
 
 表 3-3  Inno USB3.0 PHY 功耗
 
-| Power State |  理论功耗  |              实际功耗（RK3228H）               |
-| :---------: | :----: | :--------------------------------------: |
-|     P0      | 60 mW  | 120 mW<br />VCCA1P8 ：47.9 mA<br />VCCD1P0 ：35 mA |
-|     P1      | 40 mW  |                   N.A                    |
-|     P2      | 20 mW  | 76 mW<br />VCCA1P8 ：32.7 mA<br />VCCD1P0 ：18.1 mA |
-|     P3      | 1.1 mW |                  < 1 mW                  |
+| Power State | 理论功耗 |                 实际功耗（RK3228H）                 |
+| :---------: | :------: | :-------------------------------------------------: |
+|     P0      |  60 mW   | 120 mW<br />VCCA1P8 ：47.9 mA<br />VCCD1P0 ：35 mA  |
+|     P1      |  40 mW   |                         N.A                         |
+|     P2      |  20 mW   | 76 mW<br />VCCA1P8 ：32.7 mA<br />VCCD1P0 ：18.1 mA |
+|     P3      |  1.1 mW  |                       < 1 mW                        |
 
 **Note：**
 
@@ -487,18 +682,18 @@ USB3 PHY P3 state 低功耗的控制流程，请参考驱动：
 
 表 3-4 P3 state 的 USB3 GRF 寄存器配置
 
-|     Signal     | I/O  | Description                              |
-| :------------: | :--: | ---------------------------------------- |
+|     Signal     | I/O  | Description                                                  |
+| :------------: | :--: | ------------------------------------------------------------ |
 | pipe_pd_i[1:0] |  I   | PIPE Power Up/Down<br />Power states for USB 3.0 mode:<br />2’b00: P0 , normal operation<br />2’b01: P1 , low recovery time latency, power saving state<br />2’b10: P2 , longer recovery time latency, lower power state<br />2’b11: P3, lowest power state. |
 
 表 3-5 P3 state 的 USB3 PHY 寄存器低功耗配置
 
-| Offset | Bit  | Default | Suspend | Description                              |
-| :----: | :--: | :-----: | :-----: | ---------------------------------------- |
-| 0x1a8  |  4   |  1'b 0  |  1'b 1  | ldo power down control                   |
-|  0x44  |  4   |  1'b 0  |  1'b 1  | Band-gap power down control              |
-| 0x150  |  6   |  1'b 1  |  1'b 0  | tx bias enable                           |
-|  0x80  |  2   |  1'b 0  |  1'b 1  | tx cm power down control                 |
+| Offset | Bit  | Default | Suspend | Description                                 |
+| :----: | :--: | :-----: | :-----: | ------------------------------------------- |
+| 0x1a8  |  4   |  1'b 0  |  1'b 1  | ldo power down control                      |
+|  0x44  |  4   |  1'b 0  |  1'b 1  | Band-gap power down control                 |
+| 0x150  |  6   |  1'b 1  |  1'b 0  | tx bias enable                              |
+|  0x80  |  2   |  1'b 0  |  1'b 1  | tx cm power down control                    |
 |  0xc0  | 4:3  | 1'b 11  | 2'b 00  | bit3: tx obs enable<br />bit4: rx cm enable |
 
 **Note**：需要在进入 P3 state 后，才能关闭上述寄存器，进入 suspend 低功耗。在低功耗状态，USB3 PHY 不能检测任何事件。如果要打开这些寄存器，需要在退出 P3 state 的 **1μs** 之前，将这些寄存器全部打开，然后再设置 PHY 进入 P0 state。
@@ -610,11 +805,11 @@ Type-C PHY 的寄存器偏移地址计算方法比较复杂，需要遵循两个
 
 表 3-7 Type-C PHY 参考电阻
 
-|     Name     |  Min  | Typ  |  Max  | Unit | Descriptions                             |
-| :----------: | :---: | :--: | :---: | :--: | ---------------------------------------- |
+|     Name     |  Min  | Typ  |  Max  | Unit | Descriptions                                                 |
+| :----------: | :---: | :--: | :---: | :--: | ------------------------------------------------------------ |
 |     rext     | 497.5 | 500  | 502.5 |  Ω   | There needs to be an external resistor component that needs to be connected at rext ball while internal resistor or current is getting calibrated. Package routing from rext ball to its respective bump should not contribute more than 0.05Ω. |
-|  aux_pullup  |  __   | 100k |  __   |  Ω   | AUX port pull-up resistance              |
-| aux_pulldown |  __   | 100k |  __   |  Ω   | AUX port pull-down resistance            |
+|  aux_pullup  |  __   | 100k |  __   |  Ω   | AUX port pull-up resistance                                  |
+| aux_pulldown |  __   | 100k |  __   |  Ω   | AUX port pull-down resistance                                |
 
 **Note**: RK3399 EVB 的 Type-C REXT 采用的电阻为 499 ± 1% Ω
 
@@ -754,7 +949,7 @@ Type-C PHY 的 tuning，请参考文档《USB3-DP Driver Capability》，该文�
 
 2. 3238H MPW 改版 USB IP 修正：
 
-- 修改 switch MOS 尺寸
+- 修改 switch MOS 尺寸
 
   解决了 USB3.0 Port U2 的眼图中有 6 根离散的线，导致指标临界的问题。
 
