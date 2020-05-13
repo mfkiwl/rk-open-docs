@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-515
 
-发布版本：V0.1.0
+发布版本：V0.2.0
 
-日期：2020-05-11
+日期：2020-05-19
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -61,6 +61,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-05-11 | V0.1.0 | HJC | 初始 Alpha版本 |
+| 2020-05-19 | V0.2.0 | HJC | 更新文档路径 |
 |            |          |          |                |
 
 ## **目录**
@@ -106,14 +107,14 @@ cd rv1109
 .repo/repo/repo sync -c
 ```
 
-后续开发者可根据 FAE 窗口定期发布的更新说明，通过 “repo/repo/repo sync -c”命令同步更新。
+后续开发者可根据 FAE 窗口定期发布的更新说明，通过 “.repo/repo/repo sync -c”命令同步更新。
 
 ## 3 软件开发指南
 
 软件相关开发可以参考工程目录下的快速入门文档：
 
 ```shell
-<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_Smart_Camera_CN.pdf
+<SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_Smart_Camera_CN.pdf
 ```
 
 ## 4 硬件开发指南
@@ -121,7 +122,7 @@ cd rv1109
 硬件相关开发可以参考工程目录下的用户使用指南文档：
 
 ```shell
-<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_User_Guide_CN.pdf
+<SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
 ```
 
 ## 5 SSH 公钥操作说明
@@ -183,5 +184,4 @@ ssh-add ~/.ssh/id_rsa
 
 ### 5.4 参考文档
 
-更多详细说明，可参考文档 sdk/docs/RKTools manuals/Rockchip SDK Kit 申请指南 V1.6-
-201905.pdf。
+更多详细说明，可参考文档 <SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf。

@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-516
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-05-07
+日期：2020-05-19
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -68,6 +68,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0 | HuangJC | 2020-05-07 | 初始版本     |
+| V1.1.0 | HuangJC | 2020-05-19 | 修改编译命令     |
 |            |          |              |              |
 
 ## **目录**
@@ -177,7 +178,7 @@ Default option is 'allsave'.
 Server $ ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 Server $ cd kernel
-Server $ make ARCH=arm rv1109_defconfig
+Server $ make ARCH=arm rv1126_defconfig
 Server $ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
@@ -202,7 +203,7 @@ Kernel编译命令：`./build.sh kernel`
 Server $ ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 Server $ cd kernel
-Server $ make ARCH=arm rv1109_defconfig
+Server $ make ARCH=arm rv1126_defconfig
 Server $ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
@@ -214,8 +215,8 @@ Recovery编译命令：`./build.sh recovery`
 ### 查看Recovery详细编译命令
 Server $ ./build.sh -h recovery
 ###Current SDK Default [ recovery ] Build Command###
-Server $ source envsetup.sh rockchip_puma_recovery
-Server $ /home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_puma_recovery
+Server $ source envsetup.sh rockchip_rv1126_rv1109_recovery
+Server $ /home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
 ```
 
 ### 3.6 Rootfs编译
@@ -226,7 +227,7 @@ Rootfs编译命令：`./build.sh rootfs`
 ### 查看Roofs详细编译命令
 Server $ ./build.sh -h rootfs
 ###Current SDK Default [ rootfs ] Build Command###
-Server $ source envsetup.sh rockchip_puma
+Server $ source envsetup.sh rockchip_rv1126_rv1109_uvcc
 Server $ make
 ```
 
@@ -416,14 +417,14 @@ make mpp-rebuild
 
 ```diff
 buildroot目录下
-diff --git a/configs/rockchip_puma_defconfig b/configs/rockchip_puma_defconfig
+diff --git a/configs/rockchip_rv1126_rv1109_uvcc_defconfig b/configs/rockchip_rv1126_rv1109_uvcc_defconfig
 index 0f04334e40..8d9a10fd06 100644
---- a/configs/rockchip_puma_defconfig
-+++ b/configs/rockchip_puma_defconfig
+--- a/configs/rockchip_rv1126_rv1109_uvcc_defconfig
++++ b/configs/rockchip_rv1126_rv1109_uvcc_defconfig
 @@ -7,6 +7,7 @@
  #include "bt.config"
  #include "video_mpp.config"
- #include "puma_arm.config"
+ #include "rv1126_rv1109_arm.config"
 +#include "gdb.config"
  BR2_TOOLCHAIN_EXTERNAL_PATH="$(TOPDIR)/../prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf"
  BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX="arm-linux-gnueabihf"
