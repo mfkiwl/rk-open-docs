@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-359
 
-Release Version: V0.1
+Release Version: V0.2
 
-Release Date: 2020-04-28
+Release Date: 2020-05-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -56,6 +56,7 @@ This document (this guide) is mainly intended for:
 | **Date** | **Version** | **Author** | **Revision History** |
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-04-28 | V0.1 | CWW | Initial Alpha version |
+| 2020-05-15 | V0.2 | CWW | update docs path |
 |            |          |          |                |
 
 <div style="page-break-after: always;"></div>
@@ -93,24 +94,24 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rv1126_rv1109_linux_sdk_alpha_v0.1_20200428.tar.bz2  as an example. After getting an initialization package, you can get the source code by running the following command:
+Take rv1126_rv1109_linux_sdk_alpha_v0.2_20200515.tar.bz2  as an example. After getting an initialization package, you can get the source code by running the following command:
 
 ```shell
 mkdir rv1126_rv1109
-tar xjf rv1126_rv1109_linux_sdk_alpha_v0.1_20200428.tar.bz2 -C rv1126_rv1109
+tar xjf rv1126_rv1109_linux_sdk_alpha_v0.2_20200515.tar.bz2 -C rv1126_rv1109
 cd rv1126_rv1109
 .repo/repo/repo sync -l
-.repo/repo/repo sync
+.repo/repo/repo sync -c
 ```
 
-Developers can update via `.repo/repo/repo sync` command according to update instructions that are regularly released by FAE window.
+Developers can update via `.repo/repo/repo sync -c` command according to update instructions that are regularly released by FAE window.
 
 ## 3 Software Development Guide
 
 For software development, you can refer to the quick start document in the project directory:
 
 ```shell
-<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+<SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
 ```
 
 ## 4 Hardware Development Guide
@@ -118,7 +119,7 @@ For software development, you can refer to the quick start document in the proje
 Please refer to user guides in the project directory for hardware development:
 
 ```shell
-<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_User_Guide_CN.pdf
+<SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
 ```
 
 ## 5 SSH Public Key Operation Introduction
@@ -179,4 +180,4 @@ Keep the private key file properly. Do not grant second authorization to third p
 
 ### 5.4 Reference Documents
 
-For more details, please refer to document “sdk/docs/Tools/Rockchip SDK Kit Application GuideV1.6-201905.pdf”.
+For more details, please refer to document “<SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf”.

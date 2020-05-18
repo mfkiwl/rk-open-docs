@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-359
 
-发布版本：V0.1
+发布版本：V0.2
 
-日期：2020-04-28
+日期：2020-05-15
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -61,6 +61,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-04-28 | V0.1 | CWW | 初始 Alpha版本 |
+| 2020-05-15 | V0.2 | CWW | 更新文档路径 |
 |            |          |          |                |
 
 ## **目录**
@@ -95,24 +96,24 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rv1126_rv1109_linux_sdk_alpha_v0.1_20200428.tar.bz2 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 rv1126_rv1109_linux_sdk_alpha_v0.2_20200515.tar.bz2 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rv1126_rv1109
-tar xjf rv1126_rv1109_linux_sdk_alpha_v0.1_20200428.tar.bz2 -C rv1126_rv1109
+tar xjf rv1126_rv1109_linux_sdk_alpha_v0.2_20200515.tar.bz2 -C rv1126_rv1109
 cd rv1126_rv1109
 .repo/repo/repo sync -l
-.repo/repo/repo sync
+.repo/repo/repo sync -c
 ```
 
-后续开发者可根据 FAE 窗口定期发布的更新说明，通过 “repo/repo/repo sync”命令同步更新。
+后续开发者可根据 FAE 窗口定期发布的更新说明，通过 “.repo/repo/repo sync -c”命令同步更新。
 
 ## 3 软件开发指南
 
 软件相关开发可以参考工程目录下的快速入门文档：
 
 ```shell
-<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+<SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
 ```
 
 ## 4 硬件开发指南
@@ -120,12 +121,12 @@ cd rv1126_rv1109
 硬件相关开发可以参考工程目录下的用户使用指南文档：
 
 ```shell
-<SDK>/docs/Soc_internal/RV1109/Rockchip_RV1126_RV1109_User_Guide_CN.pdf
+<SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
 ```
 
 ## 5 SSH 公钥操作说明
 
-请根据《Rockchip SDK 申请及同步指南》文档说明操作，生成 SSH 公钥，发邮件至fae@rock-chips.com，申请开通 SDK 代码。
+请根据<SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf文档说明操作，生成 SSH 公钥，发邮件至fae@rock-chips.com，申请开通 SDK 代码。
 该文档会在申请开通权限流程中，释放给客户使用。
 
 ### 5.1 多台机器使用相同 SSH 公钥
@@ -182,4 +183,4 @@ ssh-add ~/.ssh/id_rsa
 
 ### 5.4 参考文档
 
-更多详细说明，可参考文档 sdk/docs/Tools/Rockchip SDK Kit 申请指南 V1.6-201905.pdf。
+更多详细说明，可参考文档<SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf。
