@@ -1,19 +1,53 @@
-# **DISPLAY**开发指南
+# RT-Thread DISPLAY 开发指南
 
-发布版本：V1.3
+文件标识：RK-KF-YF-105
 
-作者邮箱：hjc@rock-chips.com
+发布版本：V1.3.1
 
-日期：2020-03-06
+日期：2020.05.20
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
+------
+
+**免责声明**
+
+本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有© 2019福州瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+福州瑞芯微电子股份有限公司
+
+Fuzhou Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+------
+
 **前言**
 
 **概述**
 
 **产品版本**
+
 | **芯片名称**            | **RT Thread 版本** |
 | ----------------------- | :---------------- |
 | 全部支持 RT Thread 的芯片 |                   |
@@ -26,15 +60,16 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**                    |
-| ---------- | -------- | -------- | ------------------------------- |
-| 2019-07-15 | V1.0     | 黄家钗   | 初始发布                        |
-| 2019-08-15 | V1.1     | 黄家钗   | 调整格式、加入Color Key使用说明 |
-| 2019-11-18 | V1.2     | 黄家钗   | 加入更新lut的方法及AOD模式说明  |
-| 2020-03-06 | V1.3     | 黄家钗   | 加入图层z序配置说明             |
-|            |          |          |                                 |
+| **日期**   | **版本** | **作者** | **修改说明**                       |
+| ---------- | -------- | -------- | ---------------------------------- |
+| 2019-07-15 | V1.0.0   | 黄家钗   | 初始发布                           |
+| 2019-08-15 | V1.1.0   | 黄家钗   | 调整格式、加入 Color Key 使用说明  |
+| 2019-11-18 | V1.2.0   | 黄家钗   | 加入更新 lut 的方法及 AOD 模式说明 |
+| 2020-03-06 | V1.3.0   | 黄家钗   | 加入图层 z 序配置说明              |
+| 2020-05-20 | V1.3.1   | 黄家钗   | 修改格式                           |
+|            |          |          |                                    |
 
----
+------
 [TOC]
 ---
 
@@ -46,7 +81,7 @@ Rockchip RT-Thread 显示驱动基于 RT-Thread IO 设备驱动模型向 OS 注�
 
 CRTC：显示控制器，在 rockchip 平台是 SOC 内部 VOP(部分文档也称为 LCDC)模块的抽象；
 Plane：图层，在 rockchip 平台是 SOC 内部 VOP(LCDC)模块 win 图层的抽象；
-Encoder/Connector：输出转换器的软件抽象，指 RGB、LVDS、DSI、eDP、HDMI 等显示接口， Pisces 中特指 MIPI DSI。
+Encoder/Connector：输出转换器的软件抽象，指 RGB、LVDS、DSI、eDP、HDMI 等显示接口；
 Panel：各种 LCD、HDMI 等显示设备的抽象；
 
 ### 1.2 显示通路
@@ -233,9 +268,9 @@ colorMatrixCoe[3][3] = {
 
 有些屏本身有对齐要求，以 S6E3HC2 屏为例：
 
-配置为 1440x3120 的时候 DSC 的 slice 大小为 720x65，所以区域刷新时显示的位置需要按720x65对齐，显示区域的大小需要按 720x195 对齐；
+配置为 1440x3120 的时候 DSC 的 slice 大小为 720x65，所以区域刷新时显示的位置需要按 720x65 对齐，显示区域的大小需要按 720x195 对齐；
 
-配置为 720x1560 的时候 DSC 的 slice 大小为 360x52，所以区域刷新时显示的位置需要按 360x52 对齐，显示区域的大小需要按360x390对齐。
+配置为 720x1560 的时候 DSC 的 slice 大小为 360x52，所以区域刷新时显示的位置需要按 360x52 对齐，显示区域的大小需要按 360x390 对齐。
 
 ## 6 屏配置说明
 
@@ -256,9 +291,9 @@ cd bsp/rockchip-pisces
 
 2. 拷贝当前目录下的一个.h 文件 new_panel.h，参考本文 6.4 章节并根据屏 spec 的定义，修改文件中屏的配置参数；
 
-3. 回到上一级目录 cd ../;即目录 bsp/rockchip-common/drivers/目录下；
+3. 回到上一级目录 cd ../；即 bsp/rockchip-common/drivers/目录下；
 
-4. 打开 Kconfig 文件 ，搜索”Panel Type”,参考其他 config RT_USING_PANEL_配置定义新屏的配置 RT_USING_PANEL_NEW_PANEL；
+4. 打开 Kconfig 文件 ，搜索 ”Panel Type”，参考其他 config RT_USING_PANEL 配置定义新屏的配置 RT_USING_PANEL_NEW_PANEL；
 
 ![6-2_panel](Rockchip_Developer_Guide_RT-Thread_Display/6-2_panel.png)
 
@@ -301,7 +336,7 @@ cd bsp/rockchip-pisces
 
 ![6-5-1_dsi-cmd](Rockchip_Developer_Guide_RT-Thread_Display/6-5-1_dsi-cmd.png)
 
-前 3 个字节（16 进制），分别代表 Data Type，Delay，Payload Length。从第四个字节开始的数据代表长度为 Length 的实际有效 Payload.
+前 3 个字节（16 进制），分别代表 Data Type，Delay，Payload Length，从第四个字节开始的数据代表长度为 Payload Length 的实际有效数据。
 
 2. 第一条命令的解析如下：
 
@@ -512,7 +547,7 @@ RT_ASSERT(ret == RT_EOK);
 
 ![7-3-1](Rockchip_Developer_Guide_RT-Thread_Display/7-3-1.png)
 
-- 红色区域为 win0 图层，坐标为(X0,Y0),大小为(W0,H0),此时配置:
+- 红色区域为 win0 图层，坐标为 (X0,Y0)，大小为 (W0,H0)，此时配置:
 
 ```c
 win_config->winId = 0;
@@ -524,7 +559,7 @@ win_config->srcW = W0;
 win_config->srcH = H0;
 ```
 
-- 绿色区域为 win1 图层，坐标为(X1,Y1),大小为(W1,H1),此时配置:
+- 绿色区域为 win1 图层，坐标为 (X1,Y1)，大小为 (W1,H1)，此时配置:
 
 ```c
 win_config->winId = 1;
@@ -572,7 +607,7 @@ RT_ASSERT(ret == RT_EOK);
 
 ![7-3-2](Rockchip_Developer_Guide_RT-Thread_Display/7-3-2.png)
 
-- 红色区域为 win0 图层，坐标为(X0,Y0),大小为(W0,H0),此时配置:
+- 红色区域为 win0 图层，坐标为 (X0,Y0)，大小为 (W0,H0)，此时配置:
 
 ```c
 win_config->winId = 0;
@@ -584,7 +619,7 @@ win_config->srcW = W0;
 win_config->srcH = H0;
 ```
 
-- 绿色区域为 win1 图层，坐标为(X1,Y1),大小为(W1,H1),此时配置:
+- 绿色区域为 win1 图层，坐标为 (X1,Y1)，大小为 (W1,H1)，此时配置:
 
 ```c
 win_config->winId = 1;
@@ -629,17 +664,17 @@ ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_COMMIT, NULL);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-## 8 Color Key使用说明
+## 8 Color Key 使用说明
 
-VOP支持关键色全透的效果即指定图层中某一种颜色实现透视到下一图层或者背景层的效果，驱动提供win_config中的colorKey参数用来配置color key功能，其中bit[23, 0]分别表示RGB三个分量的关键色数据，bit24用来表示打开或者关闭color key功能。
+VOP 支持关键色全透的效果即指定图层中某一种颜色实现透视到下一图层或者背景层的效果，驱动提供win_config 中的 colorKey 参数用来配置 color key 功能，其中 bit[23, 0] 分别表示 RGB 三个分量的关键色数据，bit24 用来表示打开或者关闭 color key 功能。
 
-下面分别以RGB888和RGB565两中格式说明color key配置方法，R_VAL，G_VAL，B_VAL分别表示要透视的RGB三个分量的值：
+下面分别以 RGB888 和 RGB565 两中格式说明 color key 配置方法，R_VAL，G_VAL，B_VAL 分别表示要透视的RGB 三个分量的值：
 
 ```c
 #define COLOR_KEY_EN	BIT(24)
 ```
 
-### 8.1 RGB888格式配置Color Key的方法
+### 8.1 RGB888 格式配置 Color Key 的方法
 
 1. 实现红色全透，配置:
 
@@ -665,7 +700,7 @@ win_config->colorKey = 0x0000FF | COLOR_KEY_EN;
 win_config->colorKey = (R_VAL << 16) | (G_VAL << 8) | (B_VAL) | COLOR_KEY_EN;
 ```
 
-### 8.2 RGB565格式配置Color Key的方法
+### 8.2 RGB565 格式配置 Color Key 的方法
 
 1. 实现红色全透，配置：
 
@@ -697,19 +732,19 @@ B_VAL_CONFIG = B_VAL << 3;  //B[4,0] -> B[7,0]
 win_config->colorKey = (R_VAL_CONFIG  << 16) | (G_VAL_CONFIG << 8) | B_VAL_CONFIG  | COLOR_KEY_EN;
 ```
 
-### 8.3 关闭Color Key的方法
+### 8.3 关闭 Color Key 的方法
 
 ```c
 win_config->colorKey = 0;
 ```
 
-## 9 更新lut的方法
+## 9 更新 lut 的方法
 
-图层的lut在使用时需要打开lut_en，打开lut_en后lut会被保护起来，即此时无法读写lut的寄存器，如果在不同的场景切换需要更新lut的配置，而lut_en的开关需要帧生效，所以更新lut需要按如下步骤操作:
+图层的 lut 在使用时需要打开 lut_en，打开 lut_en 后 lut 会被保护起来，即此时无法读写 lut 的寄存器，如果在不同的场景切换需要更新 lut 的配置，而 lut_en 的开关需要帧生效，所以更新 lut 需要按如下步骤操作:
 
 1. 关闭lut
 
-   (1) 设置图层的格式为非bpp格式，即不能是以下几种格式
+   (1) 设置图层的格式为非 bpp 格式，即不能是以下几种格式
 
    ```c
    RTGRAPHIC_PIXEL_FORMAT_GRAY1
@@ -719,15 +754,15 @@ win_config->colorKey = 0;
    RTGRAPHIC_PIXEL_FORMAT_RGB332,
    ```
 
-   (2) 关闭所有图层，在屏幕无显示内容的位置刷新一阵32x32大小的图片，32x32不是固定大小，目的就是刷新一帧无效的显示让关闭lut_en生效，同时不影响当前屏幕上的显示。
+   (2) 关闭所有图层，在屏幕无显示内容的位置刷新一帧 32x32 大小的图片，32x32 不是固定大小，目的就是刷新一帧无效的显示让关闭 lut_en 生效，同时不影响当前屏幕上的显示。
 
-2. 更新lut
+2. 更新 lut
 
-   更新lut数组，调用RK_DISPLAY_CTRL_LOAD_LUT更新lut
+   更新 lut 数组，调用 RK_DISPLAY_CTRL_LOAD_LUT 更新 lut。
 
 3. 配置新的一帧
 
-   将win中的格式设置为对应的bpp格式刷一帧，此时新的lut生效。
+   将 win 中的格式设置为对应的 bpp 格式刷一帧，此时新的 lut 生效。
 
 ## 10 参考文档
 
