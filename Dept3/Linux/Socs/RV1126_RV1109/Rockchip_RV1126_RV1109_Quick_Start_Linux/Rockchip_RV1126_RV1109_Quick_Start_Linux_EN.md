@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V0.0.2
+Release Version: V0.0.3
 
-Release Date: 2020-05-09
+Release Date: 2020-05-20
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -41,6 +41,7 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 **Overview**
 
 The document presents the basic usage of  Rockchip RV1126/RV1109 Linux SDK, aiming to help engineers get started with RV1126/RV1109 Linux SDK faster.
+After the SDK is downloaded, you can check docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt to confirm the current SDK version.
 
 **Product Version**
 
@@ -61,6 +62,7 @@ This document (this guide) is mainly intended for:
 | ---------- | --------| :--------- | ------------ |
 | V0.0.1 | CWW | 2020-04-28 | Initial version  |
 | V0.0.2 | CWW | 2020-05-09 | Update the interface of RK IPCamera Tool |
+| V0.0.3 | CWW | 2020-05-20 | Add libssl-dev and expect for building environment |
 
 **Contents**
 
@@ -74,7 +76,7 @@ This document (this guide) is mainly intended for:
 Please install software packages with below commands to set up a building environment:
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect
 ```
 
 **Ubuntu 17.04 or later version system:**

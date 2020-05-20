@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V0.0.2
+发布版本：V0.0.3
 
-日期：2020-05-09
+日期：2020-05-20
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -47,6 +47,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 **概述**
 
 本文主要描述了RV1126/RV1109 Linux SDK的基本使用方法，旨在帮助开发者快速了解并使用RV1126/RV1109 SDK开发包。
+SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，确认当前SDK版本。
 
 **产品版本**
 
@@ -67,6 +68,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | ---------- | --------| :--------- | ------------ |
 | V0.0.1 | CWW | 2020-04-28 | 初始版本     |
 | V0.0.2 | CWW | 2020-05-09 | 更新5.1.2节RK IPCamera Tool界面 |
+| V0.0.3 | CWW | 2020-05-20 | 编译环境添加libssl-dev和expect |
 
 ## **目录**
 
@@ -80,7 +82,7 @@ Ubuntu 16.04系统：
 编译环境搭建所依赖的软件包以及安装命令如下：
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect
 ```
 
 Ubuntu 17.04系统：
