@@ -64,10 +64,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
  **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
+| **版本** | **日期** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
-| V0.0.1   | 钟勇汪   | 2019-09-05 | 初始版本     |
-| V0.1.0   | 钟勇汪   | 2020-03-30 | 修改文档目录 |
+| V0.0.1   | 2019-09-05 | 钟勇汪 | 初始版本     |
+| V0.1.0   | 2020-03-30 | 钟勇汪 | 修改文档目录 |
 
 ## **目录**
 
@@ -136,6 +136,8 @@ cd .repo/manifests
 git log rk2108_release.xml
 ```
 
+或通过 RKDocs/RK2108_RT-Thread_Release_Note.txt 查看当前 SDK 的版本。
+
 ### 3.4 SDK代码更新
 
 ```shell
@@ -144,21 +146,44 @@ git log rk2108_release.xml
 
 ## 4 RK2108 RT-Thread工程目录介绍
 
-工程目录下的bsp/rockchip/common/hal，components/hifi3， applications/rk_iot_app，Rockchip-docs-release这几个目录各自对应一个git工程，提交需要在各自的目录下进行。以下是SDK主要目录对应的说明：
+以下是SDK主要目录对应的说明：
 
-- ChangeLog.md : RT-Thread的官方版本记录
-- applications：此目录是Rockchip提供的各种应用demo源码
-- bsp: 所有的芯片相关代码都在这个目录，只需要关注下一级rockchip目录
-- bsp/rockchip/rk2108/: rk2108目录，编译脚本需要在此目录下运行
-- bsp/rockchip/tools: Rockchip升级工具和打包工具
-- components: 系统各个组件。其中hifi3 子目录是DSP源码，使用方法请参考文档User Guide->Driver->DSP
-- examples: RTT例子程序和测试代码
-- include: RTT官方头文件目录
-- Rockchip-docs-release/：Rockchip工程文档目录
-- src: RTT内核源码
-- third_party: 第三方代码目录
-- third_party/audio/audio_server: Rockchip 提供的音频编解码库和播放器
-- tools: RTT官方工具目录，包括menuconfig和编译脚本
+```shell
+├── applications           # Rockchip应用demo源码
+├── AUTHORS
+├── bsp                    # 所有芯片相关代码
+│   ├── rockchip
+│   │   ├── common
+│   │   │   ├── drivers    # Rockchip OS适配层通用驱动
+│   │   │   ├── hal        # Rockchip HAL(硬件抽象层)实现
+│   │   │   └── tests      # Rockchip 驱动测试代码
+│   │   ├── rk2108         # RK2108 主目录
+│   │   │   ├── board      # 板级配置
+│   │   │   ├── build      # 编译主目录，存放中间文件
+│   │   │   ├── build.sh   # RK2108 编译脚本
+│   │   │   ├── drivers    # RK2108 私有驱动目录
+│   │   │   ├── dsp_fw     # 存放 dsp 固件
+│   │   │   ├── Image      # 存放固件
+│   │   │   ├── tests      # RK2108 私有测试代码
+│   │   │   ├── start      # 启动相关代码
+│   │   └── tools          # Rockchip 通用工具
+├── ChangeLog.md
+├── components             # 系统各个组件，包括文件系统，shell和框架层等驱动
+│   ├── hifi3
+│   │   └── rkdsp          # DSP工程目录，使用方法请参考文档《Rockchip_Developer_Guide_RTOS_DSP_CN.pdf》
+├── documentation          # RT-Thread官方文档
+├── examples               # RT-Thread例子程序和测试代码
+├── include                # RT-Thread官方头文件目录
+├── Kconfig
+├── libcpu
+├── LICENSE
+├── README.md
+├── README_zh.md
+├── RKDocs                # Rockchip 文档
+├── src                   # RT-Thread内核源码
+├── third_party           # Rockchip增加的第三方代码的目录
+└── tools                 # RT-Thread官方工具目录，包括menuconfig和编译脚本
+```
 
 ## 5 SDK编译说明
 
@@ -260,5 +285,4 @@ ssh-add ~/.ssh/id_rsa
 
 ### 6.4 参考文档
 
-更多详细说明，可参考文档 sdk/docs/RKTools manuals/Rockchip SDK Kit 申请指南 V1.6-
-201905.pdf。
+更多详细说明，可参考文档 <SDK>/RKdocs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf。
