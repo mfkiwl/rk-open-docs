@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-302
 
-发布版本：V1.5.0
+发布版本：V1.6.0
 
-日期：2020-03-10
+日期：2020-05-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -42,6 +42,7 @@
 | 2019-10-10 | V1.3.0 | 廖华平 | 增加rkos说明 |
 | 2019-10-16 | V1.4.0 | 廖华平 | 增加ubuntu安装说明 |
 | 2020-03-10 | V1.5.0 | 廖华平 | 增加配置文件安装描述图 |
+| 2020-05-22 | V1.6.0 | 钟勇汪 | 修改编译工具源码路径 |
 
 ------
 
@@ -215,9 +216,9 @@ sudo update-rc.d flexlm enable
 
 ### 2.3 Xplorer 工具安装
 
-#### 2.3.1 Window环境
+#### 2.3.1 Windows环境
 
-Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cadence 官网，LICENSE 需要联系 Cadence 获取，我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“。
+Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到  [Cadence 官方网站申请](https://ip.cadence.com/support/sdk-evaluation-request)，License 需要联系 Cadence 获取，我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“。
 
 工具安装好后，需要先安装数据包“HiFi3Dev181203_win32.tgz”，数据包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
 
@@ -243,9 +244,9 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到 Cad
 
 #### 2.3.2 Ubuntu环境
 
-由于开发工具在Ubuntu环境下有未知的ui适配问题和使用问题，所以我们建议尽量在windows下开发。
+由于开发工具在Ubuntu环境下有未知的UI适配问题和使用问题，所以我们建议尽量在windows下开发。
 
-Ubuntu 64bit下我们推荐的工具安装包为“Xplorer-8.0.8-linux-x64-installer.bin”，如果是32bit的系统，推荐工具安装包“Xplorer-7.0.9-linux-installer”。配置包为“HiFi3Dev181203_linux.tgz”和“XtensaTools_RG_2018_9_linux.tgz”。安装过程和Window一致。
+Ubuntu 64bit 版本系统，我们推荐的工具安装包为“Xplorer-8.0.8-linux-x64-installer.bin”，如果是Ubuntu 32bit 版本系统，推荐工具安装包“Xplorer-7.0.9-linux-installer”。配置包为“HiFi3Dev181203_linux.tgz”和“XtensaTools_RG_2018_9_linux.tgz”。安装过程和Windows一致。
 
 因为配置包为32bit，为了兼容64bit系统，需要执行以下命令：
 
@@ -272,7 +273,7 @@ sudo apt-get install redhat-lsb.i686 -y
 
 工程目录在根目录的 Projects 下，存放不同工程的配置文件和工程文件。
 
-通过 ”File” -->  ”Import” -->  ”Genaral” -->  ”Existing Projects into Workspace”导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 Canary。
+通过 ”File” -->  ”Import” -->  ”Genaral” -->  ”Existing Projects into Workspace”导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 RK2206。
 
 在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
@@ -288,10 +289,13 @@ sudo apt-get install redhat-lsb.i686 -y
 
 generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，并调用 HifiFirmwareGenerator.exe 打包固件，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
 
-- ssh://git@10.10.10.29:29418/rk/dsp/DspFirmwareGenerator
-- <https://github.com/LiaoHuaping/DspFirmwareGenerator>
+<SDK>/components/hifi3/rkdsp/tools/source_code/HifiFirmwareGenerator
 
-同时脚本会使用执行程序“FirmwareArrayGenerator.exe”将rkdsp.bin转换为头文件rkdsp_fw.h，数组名为”dsp_fw“。不同文件的加载方式在3.2中有介绍。
+同时脚本会使用执行程序“FirmwareArrayGenerator.exe”将rkdsp.bin转换为头文件rkdsp_fw.h，数组名为”dsp_fw“。FirmwareArrayGenerator.exe 的源码存于：
+
+<SDK>/components/hifi3/rkdsp/tools/source_code/FirmwareArrayGenerator
+
+不同文件的加载方式请参考3.2节的说明。
 
 ### 2.6 固件打包配置文件
 
@@ -338,7 +342,7 @@ bsp/rockchip/common/tests/dsp_test.c
 
 ### 3.2 配置
 
-打开 DSP driver 配置如下，下面以rk2108工程为例：
+打开 DSP driver 配置如下，下面以RK2108工程为例：
 
 ```
 RT-Thread bsp drivers  --->
@@ -352,16 +356,16 @@ RT-Thread bsp drivers  --->
             (-1)  Config dsp debug uart port
 ```
 
-”Enable firmware loader to dsp“表示 dsp 驱动启动的时候，会下载 dsp 固件；
+”Enable firmware loader to dsp“表示 DSP 驱动启动的时候，会下载 DSP 固件；
 
 “Dsp firmware path”有两个选项有以下两个选项：
 
 - 一个选项是”Store firmware data in file“，固件使用flash中的rkdsp.bin，固件地址在“Dsp firmware path”中指定。“/rkdsp.bin”可以是文件系统中的路径，也可以是一个固件节点（在setting.ini中加入dsp固件分区）。
 - 另一个选项是“Store firmware data in builtin ”，表示将DSP固件编入到m4的固件中，编译的时候会将工程目录dsp_fw目录下的rkdsp_fw.h编译进入，rkdsp_fw.h在2.4的操作中生成。因为工程默认支持XIP，DSP固件会被编译到XIP中。使用这种方式的好处是简单方便，不需要走文件系统操作。但是尽量在支持XIP的时候使用，否则DSP固件会被加载到M4的内存中，浪费内存空间。
 
-“Enable dsp send trace to cm4”表示使能 trace 功能，使得部分 dsp 中的打印 log 可以在 mcu 中打印出来，那么打印 log 就不需要依赖于单独的串口。
+“Enable dsp send trace to cm4”表示使能 trace 功能，使得部分 DSP 中的打印 log 可以在 ARM 中打印出来，那么打印 log 就不需要依赖于单独的串口。
 
-“Config dsp debug uart port”表示设置DSP打印的uart端口。如果值是-1那么将不会设置。DSP代码中默认使用UART0。
+“Config dsp debug uart port”表示设置DSP打印的 UART 端口。如果值是-1那么将不会设置。DSP代码中默认使用UART0。
 
 ### 3.3 驱动调用
 
@@ -377,11 +381,11 @@ rt_device_close(dsp_dev);
 
 调用 rt_device_open 时候，会调用到驱动的“rk_dsp_open”函数，会执行启动 DSPcore 以及下载固件，并且将 DSP 代码运行起来。
 
-调用“rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work)”的时候，传入 work 指针，驱动会通过 mailbox 将 work 发送给 dsp，dsp 解析 work，并进行相应的算法操作，将 work 处理结果传回来。调用“rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work)”可以取回 DSP 的算法处理结果，如果 DSP 仍在处理中，那么该函数会阻塞，直到 dsp 处理完成。
+调用“rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work)”的时候，传入 work 指针，驱动会通过 mailbox 将 work 发送给 DSP，DSP 解析 work，并进行相应的算法操作，将 work 处理结果传回来。调用“rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work)”可以取回 DSP 的算法处理结果，如果 DSP 仍在处理中，那么该函数会阻塞，直到 DSP 处理完成。
 
 ### 3.4 测试case
 
-打开 dsp test和audio test 配置如下：
+打开 DSP TEST 和 AUDIO TEST 配置如下：
 
 ```
 RT-Thread bsp test case  --->
@@ -450,9 +454,9 @@ BSP Driver  --->
 
 menuconfig选项和3.2基本一致，这里说下两个不同的地方：
 
-rkdsp_fw.h的存放目录改为了"src/driver/dsp/dsp_fw"。
+1. rkdsp_fw.h的存放目录改为了"src/driver/dsp/dsp_fw"。
 
-添加了“Enable dsp jtag”选项，表示使能DSP JTAG。
+2. 添加了“Enable dsp jtag”选项，表示使能DSP JTAG。
 
 ### 4.3 驱动调用
 
@@ -469,7 +473,7 @@ rkdev_close(dsp_dev);
 rkdev_delete(DEV_CLASS_DSP, 0, NULL);
 ```
 
-调用说明可以参考3.3中的介绍，只是函数名有些不同，执行方式是一样的。
+调用说明可以参考3.3节中的介绍，只是函数名有些不同，执行方式是一样的。
 
 ### 4.4 测试case
 
@@ -500,4 +504,4 @@ config end
 
 MCU 和 DSP 通过 Mailbox 进行通信，Mailbox 包含 4 个通道，一个通道传输 32bit 的 CMD 和 Data 数据。每次发送消息，CMD 通道传输命令码，表示这次消息进行哪些操作；Data 通道传输数据，一般为 work 或者 config 的 buffer 指针。命令码存于在 drv_dsp.h 中，DSP_CMD_WORK、DSP_CMD_READY、DSP_CMD_CONFIG 等。
 
-当 DSP 启动后，DSP 会进行自身的初始化等操作。初始化完成后，DSP 会发送 DSP_CMD_READY 命令，MCU 端接收到后，会调用“rk_dsp_config”函数对 dsp 进行 trace 等相关信息的配置。DSP 接收到 DSP_CMD_CONFIG 并且配置完成后，会发送 DSP_CMD_CONFIG_DONE，表示配置已经完成，可以进行算法工作。这三次消息发送相当于一个握手过程，握手完成后就可以进行算法调用。
+当 DSP 启动后，DSP 会进行自身的初始化等操作。初始化完成后，DSP 会发送 DSP_CMD_READY 命令，MCU 端接收到后，会调用“rk_dsp_config”函数对 DSP 进行 trace 等相关信息的配置。DSP 接收到 DSP_CMD_CONFIG 并且配置完成后，会发送 DSP_CMD_CONFIG_DONE，表示配置已经完成，可以进行算法工作。这三次消息发送相当于一个握手过程，握手完成后就可以进行算法调用。
