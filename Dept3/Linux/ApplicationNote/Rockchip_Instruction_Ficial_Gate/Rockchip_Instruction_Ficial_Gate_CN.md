@@ -2,7 +2,7 @@
 
 文件标识：RK-SM-YF-329
 
-发布版本：V2.0.0
+发布版本：V2.0.1
 
 日期：2020-05-21
 
@@ -46,7 +46,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
  **概述**
 
- 本文主要描述了ficial_gate应用各个模块的使用说明。
+ 本文主要描述了ficial_gate应用各个模块的使用说明。ficial_gate应用基于librkfacial.so，具体接口参考《Rockchip_Instruction_Rkfacial_CN.pdf》，源代码和文档路径位于SDK/external/rkfacial。
 
 **产品版本**
 
@@ -71,6 +71,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2020-03-10 | V1.0.0   | Zhihua Wang | 增加应用流程图               |
 | 2020-04-29 | V1.0.1   | Zhihua Wang | 修改key.lic路径              |
 | 2020-05-21 | V2.0.0   | Zhihua Wang | 拆分代码为ui和librkfacial.so |
+| 2020-05-22 | V2.0.1   | Zhihua Wang | 增加rkfacial说明             |
 
 ---
 
