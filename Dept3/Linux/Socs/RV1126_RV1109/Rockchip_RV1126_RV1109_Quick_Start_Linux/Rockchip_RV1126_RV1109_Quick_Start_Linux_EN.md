@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V0.0.3
+Release Version: V1.0.0
 
-Release Date: 2020-05-20
+Release Date: 2020-05-25
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -63,6 +63,7 @@ This document (this guide) is mainly intended for:
 | V0.0.1 | CWW | 2020-04-28 | Initial version  |
 | V0.0.2 | CWW | 2020-05-09 | Update the interface of RK IPCamera Tool |
 | V0.0.3 | CWW | 2020-05-20 | Add libssl-dev and expect for building environment |
+| V1.0.0 | CWW | 2020-05-25 | 1. update chapter 3 & 4.4 & 4.5<br>2. add fast boot compile guide<br>3. add chapter 5.4 |
 
 **Contents**
 
@@ -105,7 +106,30 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 
 ## 3 SDK Building Introduction
 
-### 3.1 To View Building Commands
+### 3.1 To Select Board Configure
+
+SDK Download Address:
+
+```shell
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
+```
+
+| Board Configuration                                 | Comment                |
+| ----------------------------------------------- | ---------------------- |
+| device/rockchip/rv1126_rv1109/BoardConfig.mk    | General Version        |
+| device/rockchip/rv1126_rv1109/BoardConfig-tb.mk | Support Fast Boot      |
+
+Command of select board configure:
+
+```shell
+### select general version board configuration
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
+
+### select fast boot board configuration
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
+```
+
+### 3.2 To View Building Commands
 
 Execute the following command in the root directory: `./build.sh -h|help`
 
@@ -145,66 +169,59 @@ To view detailed building commands for some modules, for example: `./build.sh -h
 ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 cd kernel
-make ARCH=arm rv1109_defconfig
+make ARCH=arm rv1126_defconfig
 make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
-### 3.1 U-Boot Building
+[^Note]: The detailed compilation commands are based on the actual SDK version, mainly because the configuration may be different. build.sh compilation command is fixed.
 
-U-Boot building command: `./build.sh uboot`
+### 3.3 U-Boot Building
 
 ```shell
+### U-Boot building command
+./build.sh uboot
+
 ### to view detailed U-Boot build command
 ./build.sh -h uboot
-###Current SDK Default [ uboot ] Build Command###
-cd u-boot
-./make.sh rv1126
 ```
 
-### 3.2 Kernel Building
-
-Kernel building command: `./build.sh kernel`
+### 3.4 Kernel Building
 
 ```shell
+### Kernel building command
+./build.sh kernel
+
 ### to view detailed Kernel build command
 ./build.sh -h kernel
-###Current SDK Default [ kernel ] Build Command###
-cd kernel
-make ARCH=arm rv1109_defconfig
-make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
-### 3.4 Recovery Building
-
-Recovery building command:`./build.sh recovery`
+### 3.5 Recovery Building
 
 ```shell
+### Recovery building command
+./build.sh recovery
+
 ### to view detailed Recovery build command
 ./build.sh -h recovery
-###Current SDK Default [ recovery ] Build Command###
-source envsetup.sh rockchip_rv1126_rv1109_recovery
-/home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
 ```
 
-### 3.5 Rootfs Building
-
-Rootfs building command:`./build.sh rootfs`
+### 3.6 Rootfs Building
 
 ```shell
+### Rootfs building command
+./build.sh rootfs
+
 ###  to view detailed Roofs build command
 ./build.sh -h rootfs
-###Current SDK Default [ rootfs ] Build Command###
-source envsetup.sh rockchip_rv1126_rv1109
-make
 ```
 
-### 3.6 Firmware Package
+### 3.7 Firmware Package
 
 Firmware packaging command: `./mkfirmware.sh`
 
 Firmware directory: rockdev
 
-### 3.7 Full Automatic Building
+### 3.8 Full Automatic Building
 
 Enter the project root directory and execute the following command to automatically complete all buildings:
 
@@ -239,7 +256,11 @@ As shown below, after building and generating the firmware, device needs to ente
 
 ![](resources/window-flash-firmwareEN.png)
 
-Note: before upgrade, please install the latest USB driver, which is in the below directory:
+Note:
+
+1. In addition to MiniLoader All.bin and parameter.txt, the actual partition to be burned is based on rockdev / parameter.txt configuration.
+
+2. before upgrade, please install the latest USB driver, which is in the below directory:
 
 ```shell
 <SDK>/tools/windows/DriverAssitant_v4.91.zip
@@ -250,6 +271,7 @@ Note: before upgrade, please install the latest USB driver, which is in the belo
 The Linux upgrade tool (Linux_Upgrade_Tool should be v1.49 or later versions) is located in "tools/linux" directory. Please make sure your board is connected to MASKROM/loader rockusb, if the generated firmware is in rockdev directory, upgrade commands are as below:
 
 ```shell
+### In addition to MiniLoader All.bin and parameter.txt, the actual partition to be burned is based on rockdev / parameter.txt configuration.
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
 sudo ./upgrade_tool di -p rockdev/parameter.txt
 sudo ./upgrade_tool di -u rockdev/uboot.img
@@ -358,4 +380,32 @@ For detailed operation instructions on the web, please refer to the documents un
 Use a player to access RTSP main stream: rtsp://**IP address of the device**/live/mainstream.
 
 The default authorization test time of the SDK's face recognition function is 30 ~ 60 minutes. When the authorization is invalid, the main stream preview will prompt "gace algorithm software is not authorized", and you have to restart to test again.
+
+### 5.4 How to Debug With EVB via Network
+
+#### 5.4.1 Debug With SSH
+
+Connect EVB with network, get EVB board's IP address with the Chapter 5.1.2 [Get Device IP Address by RK IPCamera Tool](#### 5.1.2 Get Device IP Address by RK IPCamera Tool). Ensure that the PC can ping the EVB board.
+
+```shell
+### Clean last login message (EVB IP address: 192.168.1.159)
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R 192.168.1.159
+### Command of SSH
+ssh root@192.168.1.159
+### input the default passwd：rockchip
+```
+
+#### 5.4.2 Debug With SCP
+
+```shell
+### Upload the test-file from PC to EVB board dirctory /userdata
+scp test-file root@192.168.1.159:/userdata/
+root@192.168.1.159's password:
+### input the default passwd：rockchip
+
+### Download the EVB file (/userdata/test-file) to PC
+scp root@192.168.1.159:/userdata/test-file test-file
+root@192.168.1.159's password:
+### input the default passwd：rockchip
+```
 

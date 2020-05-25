@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V0.0.3
+发布版本：V1.0.0
 
-日期：2020-05-20
+日期：2020-05-25
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V0.0.1 | CWW | 2020-04-28 | 初始版本     |
 | V0.0.2 | CWW | 2020-05-09 | 更新5.1.2节RK IPCamera Tool界面 |
 | V0.0.3 | CWW | 2020-05-20 | 编译环境添加libssl-dev和expect |
+| V1.0.0 | CWW | 2020-05-25 | 1. 更新第3节以及第4.4和4.5节<br>2. 增加快速开机版本编译<br>3. 增加5.4节 |
 
 ## **目录**
 
@@ -110,7 +111,29 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 
 ## 3 SDK编译说明
 
-### 3.1 查看编译命令
+### 3.1 选择不同板级配置
+
+SDK下载地址：
+
+```shell
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
+```
+
+| 支持的板级配置                                  | 备注                   |
+| ----------------------------------------------- | ---------------------- |
+| device/rockchip/rv1126_rv1109/BoardConfig.mk    | 通用版本的板级配置     |
+| device/rockchip/rv1126_rv1109/BoardConfig-tb.mk | 支持快速开机的板级配置 |
+
+切换板级配置命令：
+
+```shell
+### 选择通用版本的板级配置
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
+### 选择快速开机的板级配置
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
+```
+
+### 3.2 查看编译命令
 
 在根目录执行命令：./build.sh -h|help
 
@@ -150,66 +173,59 @@ Default option is 'allsave'.
 ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 cd kernel
-make ARCH=arm rv1109_defconfig
+make ARCH=arm rv1126_defconfig
 make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
-### 3.1 U-Boot编译
+[^注]: 详细的编译命令以实际对应的SDK版本为准，主要是配置可能会有差异。build.sh编译命令是固定的。
 
-U-Boot编译命令：./build.sh uboot
+### 3.3 U-Boot编译
 
 ```shell
+### U-Boot编译命令
+./build.sh uboot
+
 ### 查看U-Boot详细编译命令
 ./build.sh -h uboot
-###Current SDK Default [ uboot ] Build Command###
-cd u-boot
-./make.sh rv1126
 ```
 
-### 3.2 Kernel编译
-
-Kernel编译命令：./build.sh kernel
+### 3.4 Kernel编译
 
 ```shell
+### Kernel编译命令
+./build.sh kernel
+
 ### 查看Kernel详细编译命令
 ./build.sh -h kernel
-###Current SDK Default [ kernel ] Build Command###
-cd kernel
-make ARCH=arm rv1109_defconfig
-make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
-### 3.4 Recovery编译
-
-Recovery编译命令：./build.sh recovery
+### 3.5 Recovery编译
 
 ```shell
+### Recovery编译命令
+./build.sh recovery
+
 ### 查看Recovery详细编译命令
 ./build.sh -h recovery
-###Current SDK Default [ recovery ] Build Command###
-source envsetup.sh rockchip_rv1126_rv1109_recovery
-/home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
 ```
 
-### 3.5 Rootfs编译
-
-Rootfs编译命令：./build.sh rootfs
+### 3.6 Rootfs编译
 
 ```shell
+### Rootfs编译命令
+./build.sh rootfs
+
 ### 查看Roofs详细编译命令
 ./build.sh -h rootfs
-###Current SDK Default [ rootfs ] Build Command###
-source envsetup.sh rockchip_rv1126_rv1109
-make
 ```
 
-### 3.6 固件打包
+### 3.7 固件打包
 
 固件打包命令：./mkfirmware.sh
 
 固件目录：rockdev
 
-### 3.7 全自动编译
+### 3.8 全自动编译
 
 进入工程根目录执行以下命令自动完成所有的编译：
 
@@ -246,7 +262,11 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 
 ![](resources/window-flash-firmware.jpg)
 
-注：烧写前，需安装最新 USB 驱动，驱动详见：
+注：
+
+1. 除了MiniLoaderAll.bin和parameter.txt，实际需要烧录的分区根据rockdev/parameter.txt配置为准。
+
+2. 烧写前，需安装最新 USB 驱动，驱动详见：
 
 ```shell
 <SDK>/tools/windows/DriverAssitant_v4.91.zip
@@ -257,6 +277,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.49 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
 ```shell
+### 除了MiniLoaderAll.bin和parameter.txt，实际需要烧录的分区根据rockdev/parameter.txt配置为准。
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
 sudo ./upgrade_tool di -p rockdev/parameter.txt
 sudo ./upgrade_tool di -u rockdev/uboot.img
@@ -365,4 +386,32 @@ http://设备IP地址
 使用播放器访问RTSP主码流：rtsp://**设备IP地址**/live/mainstream
 
 SDK的人脸识别功能默认授权的测试时间是30~60分钟，授权失效后主码流预览会有“人脸算法软件未授权”提示，需要重启才能再测试。
+
+### 5.4 如何通过网络调试EVB板
+
+#### 5.4.1 通过SSH登陆EVB板调试
+
+接上以太网，通过第5.1.2节 [使用RK IPCamera Tool获取设备IP地址](#### 5.1.2 使用RK IPCamera Tool获取设备IP地址)获取EVB板IP地址。保证PC电脑可以ping通EVB板。
+
+```shell
+### 清除上次登陆信息（EVB板的IP地址192.168.1.159）
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R 192.168.1.159
+### 使用SSH命令登陆
+ssh root@192.168.1.159
+### 输入默认密码：rockchip
+```
+
+#### 5.4.2 通过SCP调试
+
+```shell
+### 从PC端上传文件test-file到EVB板的目录/userdata
+scp test-file root@192.168.1.159:/userdata/
+root@192.168.1.159's password:
+### 输入默认密码：rockchip
+
+### 下载EVB板上的文件/userdata/test-file下载到PC端
+scp root@192.168.1.159:/userdata/test-file test-file
+root@192.168.1.159's password:
+### 输入默认密码：rockchip
+```
 
