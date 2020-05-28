@@ -119,7 +119,7 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 - 基于 SPI Nor 传输协议的 HAL_SNOR 协议层
 - 控制器层
 
-![SPIMemory_Layer](Rockchip_Developer_Guide_FreeRTOS_SPIFLASH_CN/SPIFLASH_Layer.png)
+![SPIMemory_Layer](Rockchip_Developer_Guide_RTOS_SPIFLASH_CN/SPIFLASH_Layer.png)
 
 **基于 FSPI 控制器的 FreeRTOS 实现**：
 
