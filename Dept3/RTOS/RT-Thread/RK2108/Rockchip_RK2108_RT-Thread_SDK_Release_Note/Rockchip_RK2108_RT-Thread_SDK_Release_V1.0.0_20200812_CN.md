@@ -2,17 +2,15 @@
 
 文档标识：RK-FB-YF-356
 
-发布版本：V0.1.0
+发布版本：V1.0.0
 
-日期：2020-03-30
+日期：2020-08-12
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **福州瑞芯微电子股份有限公司**
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -42,7 +40,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **前言**
+**前言**
 
 **概述**
 
@@ -66,18 +64,21 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **版本** | **日期** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
-| V0.0.1   | 2019-09-05 | 钟勇汪 | 初始版本     |
-| V0.1.0   | 2020-03-30 | 钟勇汪 | 修改文档目录 |
-
-## **目录**
+| V0.0.1   | 2019-09-05 | Chris Zhong | 初始版本     |
+| V0.1.0   | 2020-03-30 | Chris Zhong | 修改文档目录 |
+| V1.0.0 | 2020-08-12 | Chris Zhong | 正式发布 |
 
 ---
+
+**目录**
+
 [TOC]
+
 ---
 
 ## 概述
 
-本SDK是基于RT-Thread v3.1.2 的软件开发包，包含RT-Thread系统开发用到的系统源码、驱动、工具、应用软件包。本SDK还包含开发文档，工具使用文档。适配RK2108芯片平台，适用于RK2108 EVB开发板及基于RK2108平台开发的所有产品。
+本SDK是基于RT-Thread v3.1.3 的软件开发包，包含RT-Thread系统开发用到的系统源码、驱动、工具、应用软件包。本SDK还包含开发文档，工具使用文档。适配RK2108芯片平台，适用于RK2108 EVB开发板及基于RK2108平台开发的所有产品。
 
 ## 主要支持功能
 
@@ -118,11 +119,11 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 为方便客户快速获取SDK源码，瑞芯微技术窗口通常会提供对应版本的SDK初始压缩包，开发者可以通过这种方式，获得SDK代码的初始压缩包，该压缩包解压得到的源码，与通过repo下载的源码是一致的。
 
-以RK2108_RT-Thead_SDK_Beta_V0.1.0_20200330.tar.gz为例，获取到该初始压缩包后，通过如下命令可检出源码：
+以RK2108_RT-Thead_SDK_Release_V1.0.0_20200812.tar.gz为例，获取到该初始压缩包后，通过如下命令可检出源码：
 
 ```shell
-tar zxvf RK2108_RT-Thead_SDK_Beta_V0.1.0_20200330.tar.gz
-cd RK2108_RT-Thead_SDK_Beta_V0.1.0_20200330
+tar zxvf RK2108_RT-Thead_SDK_Release_V1.0.0_20200812.tar.gz
+cd RK2108_RT-Thead_SDK_Release_V1.0.0_20200812
 .repo/repo/repo sync -l
 .repo/repo/repo sync
 ```
@@ -170,7 +171,7 @@ git log rk2108_release.xml
 ├── ChangeLog.md
 ├── components             # 系统各个组件，包括文件系统，shell和框架层等驱动
 │   ├── hifi3
-│   │   └── rkdsp          # DSP工程目录，使用方法请参考文档《Rockchip_Developer_Guide_RTOS_DSP_CN.pdf》
+│   │   └── rkdsp          # DSP工程目录，使用方法请参考文档<SDK>/RKDocs/develop/Rockchip_Developer_Guide_RTOS_DSP_CN.pdf
 ├── documentation          # RT-Thread官方文档
 ├── examples               # RT-Thread例子程序和测试代码
 ├── include                # RT-Thread官方头文件目录
@@ -212,7 +213,7 @@ export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 编译命令如下：
 
 ```shell
-cd RK2108_RT-Thead_SDK_Beta_V0.1.0_20200330
+cd RK2108_RT-Thead_SDK_Release_V1.0.0_20200812
 cd bsp/rockchip/rk2108
 cp board/开发板名称/defconfig .config
 scons --menuconfig  //修改参加编译的模块开关，退出后会生成rtconfig.h文件，此文件参与最终的编译
@@ -225,7 +226,9 @@ scons --menuconfig  //修改参加编译的模块开关，退出后会生成rtco
 Image/Firmware.img
 ```
 
-RK2108 RT-Thread SDK更详细编译、调试以及刷机说明，使用浏览器打开Rockchip-docs-release/index.html文档，跳转到Quick Start章节。
+RK2108 RT-Thread SDK更详细编译、调试以及刷机说明，请参考文档：
+
+<SDK>/RKDocs/manuals/Rockchip_RK2108_Quick_Start_RT-Thread_CN.pdf
 
 ## SSH 公钥操作说明
 
@@ -285,4 +288,4 @@ ssh-add ~/.ssh/id_rsa
 
 ### 参考文档
 
-更多详细说明，可参考文档 <SDK>/RKdocs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf。
+更多详细说明，可参考文档 <SDK>/RKDocs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf。
