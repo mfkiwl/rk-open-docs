@@ -2,17 +2,15 @@
 
 文件标识：RK-SM-YF-363
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-05-21
+日期：2020-06-08
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **福州瑞芯微电子股份有限公司**
+**版权所有** **© 2020** **瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -64,9 +62,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
  **修订记录**
 
-| **日期**   | **版本** | **作者**    | **修改说明** |
-| ---------- | -------- | :---------- | ------------ |
-| 2020-05-21 | V1.0.0   | Zhihua Wang | 初始版本     |
+| **日期**   | **版本** | **作者**    | **修改说明**     |
+| ---------- | -------- | :---------- | ---------------- |
+| 2020-05-21 | V1.0.0   | Zhihua Wang | 初始版本         |
+| 2020-06-08 | V1.1.0   | Zhihua Wang | 修改用户信息回调 |
 
 ---
 
@@ -168,8 +167,8 @@ graph TD
 	conditionE -- NO --> fake[返回非活体]
 	conditonF -- NO --> fake[返回非活体]
 	conditionD -- NO --> fake[返回非活体]
-	fake --> paint_name_y[UI绘制name,黄框]
-	real --> paint_name_g[UI绘制name,绿框]
+	fake --> paint_info_y[UI绘制信息,黄框]
+	real --> paint_info_g[UI绘制信息,绿框]
 	real --> conditonG{非注册且非上一人}
 	conditonG -- YES --> pass[通行]
 	fake --> clear_track[清除跟踪]
@@ -494,15 +493,15 @@ bottom  人脸矩形框底部的坐标
 
 void
 
-#### void shadow_paint_name(char *name)
+#### void shadow_paint_info(struct user_info *info, bool real)
 
 **说明**
 
-发送绘制名字消息给UI。
+发送用户信息消息给UI。
 
 **参数**
 
-name    用户名
+info    用户信息
 
 **返回**
 
@@ -828,15 +827,15 @@ cb           UI绘制人脸框回调
 
 void
 
-#### void register_rkfacial_paint_name(rkfacial_paint_name_callback cb)
+#### void register_rkfacial_paint_info(rkfacial_paint_info_callback cb)
 
 **说明**
 
-注册UI绘制人名回调
+注册UI绘制用户信息回调
 
 **参数**
 
-cb           UI绘制人名回调
+cb           UI绘制用户信息回调
 
 **返回**
 
