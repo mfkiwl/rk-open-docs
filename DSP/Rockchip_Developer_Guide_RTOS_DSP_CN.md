@@ -1,14 +1,44 @@
-# DSP 开发指南
+# Rockchip DSP 开发指南
 
 文件标识：RK-KF-YF-302
 
-发布版本：V1.6.0
+发布版本：V1.7.0
 
-日期：2020-05-22
+日期：2020-06-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
-------
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有** **© 2020** **瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     www.rock-chips.com
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： fae@rock-chips.com
+
+---
 
 **前言**
 
@@ -43,12 +73,15 @@
 | 2019-10-16 | V1.4.0 | 廖华平 | 增加ubuntu安装说明 |
 | 2020-03-10 | V1.5.0 | 廖华平 | 增加配置文件安装描述图 |
 | 2020-05-22 | V1.6.0 | 钟勇汪 | 修改编译工具源码路径 |
+| 2020-06-18 | V1.7.0 | 吴佳健 | 更新打包工具说明 |
 
-------
+---
+
+**目录**
 
 [TOC]
 
-------
+---
 
 ## 1 Rockchip DSP 简介
 
@@ -61,8 +94,6 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 目前，Rockchip SoC 上集成的 DSP 说明如下：
 
 - RK2108、RK2206 和 PISCES集成 HIFI3 DSP。
-
-------
 
 ## 2 HIFI3 软件环境搭建
 
@@ -279,19 +310,23 @@ sudo apt-get install redhat-lsb.i686 -y
 
 ### 2.5 DSP 固件生成
 
-工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 CMD 控制台，找到固件生成脚本 generate_dsp_fw.bat 文件，进入到该文件所在目录，运行“generate_dsp_fw.bat 项目名“，如果是 RK2108 项目，项目名对应的就是 RK2108。
+工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 CMD 控制台，找到固件生成脚本 generate_dsp_fw.bat 文件，进入到该文件所在目录执行该脚本，使用方式如下：
 
-注意：首次打包，可能会出现“无法找到指定文件”的错误，请参考2.6章节中修改ToolsPath参数，指定为工具安装目录，如：
-
+```shell
+generate_dsp_fw.bat <project name> [config file]
+其中<project name>为必选项，用于指定工程名，如RK2108
+[config file]为可选项，用于指定打包配置文件，如FwConfig.xml（不指定则默认为FwConfig.xml）
 ```
-<ToolsPath>C:\usr\xtensa\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin</ToolsPath>
-```
 
-generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 和执行程序拷贝到 tool 目录下，并调用 HifiFirmwareGenerator.exe 打包固件，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
+注意：若出现“无法找到指定文件”的错误，请确认当前Xplorer中Project是否正确选择，generate_dsp_fw.bat基于工程目录下Makefile自动查找工具路径、Target、Configuration等，如果当前选择的工程不正确，则对应的Makefile不会生成，正确生成的Makefile如下图所示：
+
+![Makefile](Rockchip_Developer_Guide_RTOS_DSP/Makefile.png)
+
+generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 、Bin2Array.xml、固件等拷贝至 tool 目录下，并调用 HifiFirmwareGenerator.exe 打包固件，最终固件存放于 tools/HifiFirmwareGenerator/output/rkdsp.bin。HifiFirmwareGenerator.exe 的源码存于：
 
 <SDK>/components/hifi3/rkdsp/tools/source_code/HifiFirmwareGenerator
 
-同时脚本会使用执行程序“FirmwareArrayGenerator.exe”将rkdsp.bin转换为头文件rkdsp_fw.h，数组名为”dsp_fw“。FirmwareArrayGenerator.exe 的源码存于：
+同时脚本会执行程序“FirmwareArrayGenerator.exe”根据Bin2Array.xml配置将rkdsp.bin转换为相应的C数组文件。FirmwareArrayGenerator.exe 的源码存于：
 
 <SDK>/components/hifi3/rkdsp/tools/source_code/FirmwareArrayGenerator
 
@@ -301,16 +336,58 @@ generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 和执行程�
 
 在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 Xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
 
-- CoreName：编译的 Core 的名称，当前使用的是 HiFi3Dev181203。
-- ==**ToolsPath：安装 Xplorer 的工具目录，这需要开发人员手动更改。**==
+- CoreName：编译的 Core 的名称，脚本会根据Makefile自动替换`tag_corename`字段，开发人员也可手动更改。
+- **ToolsPath：安装 Xplorer 的工具目录，脚本会根据Makefile自动替换`tag_toolspath`字段，开发人员也可手动更改。**
 - ExecutableFile：输入固件名。
-- ExternalFile：除 DSP 固件外，额外需要打包的文件名。如没有，置空即可。
-- ExternalAddr：额外需要打包的文件需要加载的地址。
 - SourceCodeMemStart：DSP 端代码内存空间的起始地址。
-- SourceCodeMemEnd: DSP 端代码内存空间的结束地址。
+- SourceCodeMemEnd：DSP 端代码内存空间的结束地址。
 - DestinationCodeMemStart：MCU 端对应的代码内存空间的地址，因为可能存在内存空间映射情况不同的情况。比如同一块物理内存地址 TCM，DSP 的访问的地址是 0x30000000，MCU 访问的地址是 0x20400000，它们分别对应 SourceCodeMemStart 和 DetinationCodeMemStart。如果地址映射相同，那么填入对应即可。
+- Image：输出固件。用于支持可拆分DSP固件。
+- Image/Name：固件名，用以区分固件类型。MAIN为主要固件，生成固件名为rkdsp.bin，生成的固件中包含各Section头信息（地址，大小等），用于CPU解析加载DSP固件使用；EXT为额外固件，生成固件名为ext_rkdsp.bin，无Section头信息，按Section地址顺序排列，使用时打包至CPU固件，烧录至Flash指定位置，DSP运行时直接读取对应数据，无需CPU加载。
+- Image/AddrRange：指定属于该固件的Section地址范围。以XIP为例，地址范围为0x60000000~0x60800000，则该范围内的Section将打包至指定固件中（一般为EXT固件）。需要额外注意，生成固件过程中，会将所有代码段解析至Section数组中，按FwConfig.xml中Image的排列顺序分发代码段，如某一代码段在该Image的范围内，则打包至Image并从Section数组中移除，如果当前Image未指定AddrRange，则默认当前Section数组中所有Section都打包至当前Image，因此有指定AddrRange的Image一定要写在未指定AddrRange的Image之前，如下：
 
-### 2.7 Map 配置信息修改
+```xml
+<Image>
+    <Id>2056</Id>
+    <Name>EXT</Name>
+    <Type>Permanent</Type>
+    <AddrRange>0x60000000:0x60800000</AddrRange>
+</Image>
+<Image>
+    <Id>2046</Id>
+    <Name>MAIN</Name>
+    <Type>Permanent</Type>
+</Image>
+```
+
+若MAIN写在EXT之前，打包MAIN时，Section数组内所有Section都将打包至MAIN，则打包EXT时，已无有效Section。或在MAIN内也添加AddrRange字段限制，则可以无视排序顺序。AddrRange可分段多次指定，如下：
+
+```xml
+<Image>
+    <Id>2056</Id>
+    <Name>EXT</Name>
+    <Type>Permanent</Type>
+    <AddrRange>0x60000000:0x60800000</AddrRange>
+</Image>
+<Image>
+    <Id>2046</Id>
+    <Name>MAIN</Name>
+    <Type>Permanent</Type>
+    <AddrRange>0x30000000:0x30010000</AddrRange>
+    <AddrRange>0x30200000:0x30280000</AddrRange>
+</Image>
+```
+
+### 2.7 固件转换配置文件
+
+在工程目录下存在Bin2Array.xml文件，用以指定转换模板。文件中字段说明如下：
+
+- Type：生成的C数组类型。
+- Name：生成的C数组名称。
+- Input：待转换的.bin文件。
+- Output：转换输出文件。
+
+### 2.8 Map 配置信息修改
 
 Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在 ”T:(active build target) ” -->  ”Modify”，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“ <工具安装目录> \XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
 
@@ -361,11 +438,13 @@ RT-Thread bsp drivers  --->
 “Dsp firmware path”有两个选项有以下两个选项：
 
 - 一个选项是”Store firmware data in file“，固件使用flash中的rkdsp.bin，固件地址在“Dsp firmware path”中指定。“/rkdsp.bin”可以是文件系统中的路径，也可以是一个固件节点（在setting.ini中加入dsp固件分区）。
-- 另一个选项是“Store firmware data in builtin ”，表示将DSP固件编入到m4的固件中，编译的时候会将工程目录dsp_fw目录下的rkdsp_fw.h编译进入，rkdsp_fw.h在2.4的操作中生成。因为工程默认支持XIP，DSP固件会被编译到XIP中。使用这种方式的好处是简单方便，不需要走文件系统操作。但是尽量在支持XIP的时候使用，否则DSP固件会被加载到M4的内存中，浪费内存空间。
+- 另一个选项是“Store firmware data in builtin ”，表示将DSP固件编入到m4的固件中，编译的时候会将工程目录dsp_fw目录下的rkdsp_fw.c[^1]编译，rkdsp_fw.c参考[2.5节 DSP 固件生成](#2.5 DSP 固件生成)中的操作生成。因为工程默认支持XIP，DSP固件会被编译到XIP中。使用这种方式的好处是简单方便，不需要走文件系统操作。但是尽量在支持XIP的时候使用，否则DSP固件会被加载到M4的内存中，浪费内存空间。
 
 “Enable dsp send trace to cm4”表示使能 trace 功能，使得部分 DSP 中的打印 log 可以在 ARM 中打印出来，那么打印 log 就不需要依赖于单独的串口。
 
 “Config dsp debug uart port”表示设置DSP打印的 UART 端口。如果值是-1那么将不会设置。DSP代码中默认使用UART0。
+
+注[^1]:实际目标文件由menuconfig中RT_DSPFW_FILE_NAME指定。
 
 ### 3.3 驱动调用
 
