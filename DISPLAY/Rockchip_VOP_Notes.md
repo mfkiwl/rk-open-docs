@@ -2,7 +2,7 @@
 
 文件标识：RK-KF-YF-086
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
 日期：2020-05-20
 
@@ -59,7 +59,7 @@ Rockchip 图形/显示模块开发工程师
 | **版本** | **作者** | **日期**   | **修改说明** |
 | --------- | --------- | ---------- | -------------- |
 |  V1.0.0   | 黄家钗 | 2020-05-20 | 初始版本     |
-|  |  |  |  |
+| V1.1.0 | 闫孝军 | 2020-05-25 | 加入 MCU 接口描述 |
 
 ---
 
@@ -67,7 +67,7 @@ Rockchip 图形/显示模块开发工程师
 
 ---
 
-## 1 VOP 架构版本
+## VOP 架构版本
 
 目前 Rockchip 平台 VOP 模块主要区分 full 架构和 lite 架构，lite架构是 Rockchip 平台第一代视频输出处理模块，最大可以支持到 2k 分辨率；full 架构基于 lite 架构做了全新设计和升级，最大可以支持到 4k 分辨率。
 
@@ -78,7 +78,7 @@ Rockchip 图形/显示模块开发工程师
 | VOP lite | RK3066/PX2/RK3188/PX3/RK3036/RK312X/PX3se/Sofia 3G-R/RV1108/RK3326/PX30/<br/>RK3308/RK1808/RK2108/RV1109/RV1126 |
 | VOP full | RK322X/RK332X/RK322XH/RK3368/PX5/RK3399                      |
 
-## 2 VOP lite 版本共性问题
+## VOP lite 版本共性问题
 
 1. 鼠标层不支持虚宽；
 2. 更新 lut 寄存器需要先 disable lut，无法动态更新；
@@ -86,7 +86,7 @@ Rockchip 图形/显示模块开发工程师
 4. 不支持 alpha+scale 模式；
 5. 不支持 global alplha * pixel alpha 模式；
 
-## 3 VOP full 版本共性问题
+## VOP full 版本共性问题
 
 1. 鼠标层不支持虚宽；
 
@@ -102,9 +102,109 @@ Rockchip 图形/显示模块开发工程师
 
    ![vop_yuv420](Rockchip_VOP_Notes/vop_yuv420.jpg)
 
-## 4 各平台特殊问题
+## MCU(i8080) 接口问题
 
-### 4.1 RK3288
+1. **MCU 接口没有区分命令和显示数据**
+
+   MCU 接口上传输的不仅有送屏幕显示的数据，还有对屏幕的控制命令，但是目前 RK VOP 并没有对命令和显示数据做区分，这导致如果开启了 dither 模式，发送给屏幕的命令也会被当作显示数据进行 dither 处理，导致最终发送到屏幕的命令发生变化，无法被屏幕正确接收。
+
+   按照 VOP 的设计逻辑，只要屏幕是非 24 bit 的，即使没有开启 dither up/down 控制位，VOP 也会对命令按照丢弃低位的模式做 24—>18/16 的转换，导致最终发送出去的命令被改变。
+
+   Dither 是为了优化非 24 位屏幕显示效果的一种非常有用的功能，关闭该功能会导致很多场景下显示过度不自然，呈现色阶现象。
+
+   针对这个问题，目前我们有两种 workaround 方式：
+
+   1. 把命令字按 RGB 三原色拆分，然后再向高位移位的方式扩展成 24 位(因为 dither 只会对每个颜色的低位进行处理)，来规避 dither 处理带来的改变。
+
+      ```c
+      RGB565->RGB888:
+      B = cmd & 0x1f; G = (cmd & 0xe0) >> 5; R = 0
+      B + (G << (8 + (8 - 6))) + R
+      RGB666->RGB888:
+      B = cmd & 0x3f; G = (cmd & 0xc0) >> 6; R = 0
+      B + (G << (8 + (8 - 6))) + R
+      ```
+
+      补丁如下：
+
+      ```c
+      commit e0d873e8159d2b1941b9d9441b561d6e9545b7ba
+      Author: Andy Yan <andy.yan@rock-chips.com>
+      Date:   Wed May 13 15:45:34 2020 +0800
+
+          drm/rockchip: Convert MCU cmd from rgb565/rgb666 to rgb888
+
+          VOP wrongly treated MCU cmd as normal rgb data and pass it
+          to dither module when output mode is rgb565/rgb666, then
+          the cmd output from vop io is changed.
+
+          Here we convert the MCU cmd data from rgb565/rgb666 to rgb88,
+          so that we can get the original cmd data after dither module.
+
+          Signed-off-by: Andy Yan <andy.yan@rock-chips.com>
+          Change-Id: I7919dfb9d4f6279b82636d68cd7b211047bf1b46
+      ```
+
+      这种方案的缺点是：每次发命令的时候(init、suspend、resume)移位拼接操作需要消耗一定的 CPU 时间。
+
+      从目前 upstream 的趋势看，屏幕会作为一个跨平台的驱动独立存在，所以并不好去单独修改屏幕的驱动来适配 RK 这一个特殊的平台，只能把这个移位扩展的操作放在 VOP 驱动中。
+
+      而且，VOP 开关的初期，有可能存在一个无 dither 的中间态(比如 mcu hold 功能开启导致后面 output mode 跟新不生效)，导致扩展成 24 位后反而出错。
+
+   2. 利用 VOP 的 MCU_HOLD
+
+      MCU 发送命令的时候，需要打开 MCU_HOLD，MCU_HOLD 打开后，后续对 output mode、dither 的设置不会立刻生效，需要等待 MCU 屏幕发送命令的过程完成，释放 MCU_HOLD 后，output mode 和  dither 相关设置才会生效。所以可以利用这一特性，如果使用的是 MCU 接口的屏幕，初始化的时候先打开 MCU_HOLD、再设置 outpu mode、dither 等功能，这时候由于 MCU_HOLD 的作用，output mode 和 dither 的设置不会生效，可以正确的把 MCU 初始化命令发送出去。
+
+      补丁如下：
+
+      ```
+      commit cb6bdbb8745276f58a150d0255869e1b0ece3702
+      Author: Andy Yan <andy.yan@rock-chips.com>
+      Date:   Fri May 15 10:55:42 2020 +0800
+
+          drm/rockchip: vop: Set mcu mode before setting output mode and dither
+
+          When drive vop into mcu mode with mcu_hold enabled,
+          the following setting of output mode and dither will
+          not take effect until mcu_hold released.
+
+          So we can send mcu cmd at the default output P888 mode,
+          this give us a changce to avoid the cmd data to be changed
+          by dither module.
+
+          Change-Id: I6b0a23d2cfdacd9b81d0956bea6cedd2dcdde4f6
+          Signed-off-by: Andy Yan <andy.yan@rock-chips.com>
+
+      drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+      ```
+
+      这个方案也有其局限性：屏幕初始化的时候可以正常工作，但是如果系统要进入 suspend ，需要对屏幕发命令让屏幕进入 standby 模式的话，由于系统正常工作模式下 output mode 和 dither 功能都已经生效，这时候 MCU_HOLD  就无法消除 dither对 MCU 命令的改变。所以目前系统休眠的时候，直接对屏幕下电复位，忽略对 standby 命令的处理。
+
+      相比之下，第二种方案的代价最小，所以我们暂时使用第二种方案。
+
+2. **MCU 模式下 dither 处理错误**
+
+   MCU 模式下会对  CRU 送给 VOP 的 dclk 再进行 mcu_pix_total 级分频，即每 mcu_pix_total 个 dclk cycle 传输一个像素。
+
+   但是 VOP 在进行 dither 处理的时候，却误认为传输了 mcu_pix_total 个像素，导致整个 dither 逻辑出错。最终 dither 后在屏幕上显示的数据有噪点(qt **sub-attaq**)。甚至遇到某些显示的场景，屏幕无法显示正确的动态画面，处于卡死状态(qt 的 **deform** )，需要对屏幕进行复位才能退出这种状态。
+
+   该问题目前没有可以规避的方案，只能关闭 dither 功能，代价是在很多场景下，屏幕上会出现过渡不自然的色阶。
+
+3. **CS、RD 时序不规范**
+
+   RD 为读使能信号，在写操作的时候，RD 应该保持为高电平，但是在 RK 平台上却表现为方波。而且 RK VOP 并不支持 MCU 读功能。
+
+   CS 是 MCU 屏幕的 chip select 信号，在目前能看到的几款屏幕 spec 上，要求选中屏幕时，该信号为稳定的低电平，但是 RK VOP 输出的却是方波信号。
+
+   ![](Rockchip_VOP_Notes/mcu-hx8357-write-seq.jpg)
+
+   ![](Rockchip_VOP_Notes/mcu-ili9488-write-sequence.jpg)
+
+按照 IC 的解释，这三个 MCU 相关的问题，在 RK 所有的 VOP(RK3308 除外) 上都存在。
+
+## 各平台特殊问题
+
+### RK3288
 
 1. auto gating 功能和 bcsh 功能无法同时使用，否则帧中断无法产生，该问题在  RK3288W 上已修正；
 
@@ -150,11 +250,11 @@ Rockchip 图形/显示模块开发工程师
 
     ![multi_area_use0](Rockchip_VOP_Notes/multi_area_use0.jpg)
 
-### 4.2 RK3036
+### RK3036
 
 1. win1 支持缩放但不支持 yuv 格式，最大只能支持 720p 输入，win0 最大可以支持 yuv/rgb 1080p 输入；
 
-### 4.3 RK3128/PX3SE
+### RK3128/PX3SE
 
 1. mmu 的寄存器可以写但是不能读，dts 按如下配置，mmu 驱动不去读 iommu 寄存器：
 
@@ -164,7 +264,7 @@ Rockchip 图形/显示模块开发工程师
 	};
 	```
 
-### 4.4 RK322X
+### RK322X
 
 1. 图层 RGB 和 YUV 数据切换有问题，rk fb 框架的处理方法是在切换过程通过 win_dbg 寄存器插入一帧黑色的效果来规避，但 drm 框架下目前还未复现到该问题， rk fb 显示框架的修改记录 :
 
@@ -186,7 +286,7 @@ Rockchip 图形/显示模块开发工程师
        Signed-off-by: Mark Yao <mark.yao@rock-chips.com>
    ```
 
-### 4.5 RK322XH/RK332X
+### RK322XH/RK332X
 
 1. layer2 和 layer1 无法同时打开 global alpha 和 per-pixelalpha；
 
@@ -212,7 +312,7 @@ Rockchip 图形/显示模块开发工程师
    }
    ```
 
-### 4.6 RK3368/PX5
+### RK3368/PX5
 
 1. 后级 bcsh 的 csc 转换精度太低 [6bit]，打开 bcsh 后出现色阶问题；
 
@@ -238,7 +338,7 @@ Rockchip 图形/显示模块开发工程师
 
    (3) 地址需要 64 byte 对齐；
 
-### 4.7 RK3399
+### RK3399
 
 1. 多区域限制
 
@@ -258,7 +358,7 @@ Rockchip 图形/显示模块开发工程师
 
    (2) 图层源数据的大小需要按 16x8 对齐；
 
-### 4.8 RK3326/PX30
+### RK3326/PX30
 
 1. 打开 win2 多区域，在带宽不够的时候出现 iommu pagefault 异常问题，从 log 看有两种异常：
 
@@ -310,11 +410,10 @@ Rockchip 图形/显示模块开发工程师
 
     ![multi_area_use0](Rockchip_VOP_Notes/multi_area_use0.jpg)
 
-### 4.9 RK1808
+### RK1808
 
 1. vop lite 只有 win1 图层，且不支持缩放，在产品中限制较多；
 
-### 4.10 RV1109/RV1126
+### RV1109/RV1126
 
-1. mcu + dither 场景在一个 wr cycle 中会出现 mcu_total个dither 数据，可能会出现显示横条纹的现象；
-2. BT656 输出只有 EAV 没有 SAV，可能导致在一些 BT656 输入模块无法识别。
+1. BT656 输出只有 EAV 没有 SAV，可能导致在一些 BT656 输入模块无法识别。
