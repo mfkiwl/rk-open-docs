@@ -239,6 +239,17 @@ code {
     }
 }
 
+@media print, (overflow-block: paged) or (overflow-block: optional-paged)
+{
+    hr
+    {
+        page-break-after: always; /* CSS 2 */
+             break-after: region; /* CSS 3+ */
+        /* minimal layout disruption: */
+        height: 0.1mm; visibility: hidden;
+    }
+}
+
 .md-fences {
 	background-color: #f8f8f8;
 }
