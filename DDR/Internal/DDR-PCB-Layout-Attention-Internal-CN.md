@@ -1,14 +1,46 @@
-# **DDR 布板注意事项**
+# DDR 布板注意事项
 
-发布版本：1.3
+文件标识：RK-SM-YF-38
 
-作者邮箱：hcy@rock-chips.com
+发布版本：V1.4.0
 
-日期：2018.10.08
+日期：2020-06-02
 
-文件密级：内部资料
+文件密级：□绝密   □秘密   ■内部资料   □公开
 
----------
+---
+
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有© 2020瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
 
 **前言**
 记录所有平台的 DDR 布板注意事项
@@ -17,18 +49,15 @@
 
 **产品版本**
 
-| **芯片名称**                                 | **内核版本** |
-| ---------------------------------------- | -------- |
-| 所有芯片(包括 28 系列、29 系列、30 系列、31 系列、32 系列、33 系列、PX 系列、1108A) | 所有内核版本   |
-
+| **芯片名称**                                                 | **内核版本** |
+| ------------------------------------------------------------ | ------------ |
+| 所有芯片(包括 28 系列、29 系列、30 系列、31 系列、32 系列、33 系列、PX 系列、1108A、RV11系列) | 所有内核版本 |
 
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
 
 硬件工程师
-
-
 
 **修订记录**
 
@@ -38,11 +67,16 @@
 | 2017.11.09 | V1.1   | 陈炜     | 更改某些表述                     |
 | 2017.01.14 | V1.2   | 汤云平    | 增加 RK3326 描述及 LPDDR2/LPDDR3 要求 |
 | 2018.10.08 | V1.3   | 陈有敏    | 增加总容量 3GB 说明和 RK3399 单通道布线要求   |
+| 2020.06.02 | V1.4.0 | 汤云平 | 增加RV1126/RV1109相关要求 |
 
---------------------
+**目录**
+
+---
 [TOC]
-------
-## 名词说明
+---
+
+## 1 名词说明
+
 - **颗粒**：指各种 DDR memory，DDR3 memory、DDR4 memory、LPDDR3 memory、LPDDR4 memory、LPDDR2 memory
 
 - **CS**：主控或 DDR memory 的片选信号
@@ -61,8 +95,8 @@
 
   ![AXI_SPLIT](DDR-PCB-Layout-Attention-Internal\AXI_SPLIT.png)
 
------
-## 总的要求
+---
+## 2 总的要求
 总的要求适用于所有平台，各款主控的特殊要求，后面单独列出
 
 **1、DQ 的交换，不能超出该组 byte，只能在 byte 内部进行交换。有些主控有特殊要求，byte 内部都不能交换，见具体主控的特殊要求**
@@ -131,8 +165,8 @@ LPDDR4 有大于 2 个 CS 的颗粒，如果使用，只能用到 2 个 CS
 
   ![DRAM_3GB](DDR-PCB-Layout-Attention-Internal\1x_channel_DRAM_3GB.png)
 
-----
-##  RK3399 特殊要求
+---
+##  3 RK3399 特殊要求
 **1、 CS2 是 CS0 的复制信号，CS3 是 CS1 的复制信号，其行为与被复制信号完全一样**
 
 因此对于 DDR3，LPDDR3，实际只能使用 2 个 CS。CS2，CS3 主要是给 LPDDR4 使用的，因为 LPDDR4 颗粒一个 channel 是 16bit，当要让主控达到 32bit、2CS 时，就需要用到 4 根 CS 信号。
@@ -181,8 +215,8 @@ LPDDR4 有大于 2 个 CS 的颗粒，如果使用，只能用到 2 个 CS
 
  因此对于单通道使用场景（channel 0 有接 DRAM，channel 1 没有接 DRAM），也需要对 channel 1 进行供电（DDR1_AVDD_0V9,DDR1_CLK_VDD,DDR1_VDD），否则 channel 1 上的 controller 和 PHY 无法完成初始化，影响 DDR 变频功能。
 
------
-## RK3326、PX30 特殊要求
+---
+## 4 RK3326、PX30 特殊要求
 **1、支持的位宽组合方式**
 
 1. 32bit 最大位宽（大容量 16bit+小容量 16bit），举例：256x16+128x16=768MB。
@@ -212,3 +246,39 @@ AXI SPLIT 模式下，要求所有颗粒的 column,bank 是相同的。
 | 6    | 16bit 固定位宽                    | 8bit 固定位宽，接 Byte0（row<=cs0 上的颗粒 row）    | 支持   |
 
 **5、常规应用同其他平台一致。**
+
+---
+
+## 5 RV1126/RV1109需求
+
+**1、DQ对调**
+
+1. DDR3：所有DQ顺序组内可任意对调，DQS组间可任意对调。
+
+2. DDR4：由于read training使用了MPR的stagger mode，DDR4颗粒不同DQ上返回的数据会有4种类型，假设将返回的4种数据类型分别命名为pattern0-3的话，颗粒的DQ0，DQ4，DQ8，DQ12返回pattern0。DQ1，DQ5，DQ9，DQ13返回pattern1。DQ2，DQ6，DQ10，DQ14返回pattern2。DQ3，DQ7，DQ11，DQ15返回pattern3。在做read training时PHY可以配置每个DQ返回的数据类型。由于loader代码中在做read training时每个DQ的pattern是写死的，为了保证一个loader能够兼容所有的模板，确定其中一种连接方式的pattern顺序写入到loader中后，后续其他DDR4模板需要保证PHY DQ上连接的DQ与loader中设置的返回pattern一致，否则read training会报错。例如当前PHY DQ0连接到颗粒的DQ14，实际返回的是pattern2，则新模板可以将DQ0连接到DQ10，DQ14均可。目前Loader是按模板“RV1126_RV1109_EVB_DDR4P216DD6_V10_2020219”设置的。
+
+3. LPDDR3：由于MRR的数据是从DQ0-7返回，Loader中目前将MRR返回的数据按模板“RV1126_RV1109_EVB_LP3S178P132SD6_V10_20191227”的连接顺序对调后得到正确的MRR值。所以后续模板必须与该模板的DQ0-7保持一致的连接顺序，否则MRR的结果会出错。
+
+4. LPDDR4：由于CA Training会用到所有的DQ，所以所有的DQ需要保持一一对应。
+
+5. DDR3/4有高低16bit贴不同容量颗粒需求的模版、总位宽16bit的模版、以及16bit/32bit兼容的模版，这3种模版必须保持一样的PHY和DQS对应关系，不允许这3种模版对应关系变化。
+
+   原因：对于16bit位宽模式颗粒必须连接在DQS0和DQS1上，高低16bit贴不同容量颗粒必须是DQS0和DQS1上贴大容量的那颗颗粒。而这一版本的PHY提供了PHY的BYTE整组对调的功能，具体参考PHY文档“4.4.1 DQ PAD Map”章节。如loader设置上将PHY的DQS2组和DQS1组对调的话，可以看做PHY IO上命名的DQS2组实际上已经是DQS1组了。这时候16bit模式实际上就需要将PHY的DQS0和DQS2连接到颗粒上。目前DDR3/DDR4 loader配置是按模板“RV1126&RV1109_EVB_DDR3P216SD6_V10_20191227”和“RV1126_RV1109_EVB_DDR4P216DD6_V10_2020219”配置的，其他模板也需要遵循这两个模板的顺序。
+
+**2、等长控制**
+
+1. 对于CA/CMD：LPDDR4由于目前CA training还未搞定所以也需要做等长，待CA training搞定后LP4的CA可以不做等长。其他类型的颗粒必须等长。虽然DDR3/DDR4可以开2T mode，但是在做read/write training，wrlvl，read gate时PHY并不会使用2T mode所以也不能因为可以开2T mode来放宽。
+
+2. CLK和DQS之间的相位差控制在±640ps左右。
+
+   原因：1. 颗粒wrlvl的原理决定DQS和CLK的相位差不能超过1个cycle。2. PHY wrlvl的原理是CLK固定一个de-skew值，DQS的de-skew从0开始增大寻找DQS与CLK上升沿对齐的点。PHY的de-skew一共64个单位每个单位20ps。目前CLK de-skew的default值设置为0x20，所以CLK与DQS之间的相位差可以是-640ps到640ps。与硬件约定CLK和DQS之间的相位差控制在±150ps内。
+
+3. 对于DQS/DQ所有类型的颗粒都可以不做等长，但是需要保证如下几点：
+
+   1. DQS和DQ之间的长度差控制在200ps内。
+
+      原因：read training和write training时DQS的de-skew保持在中间值0x20附近，DQ从0增大到0x3f。为了给DQ左右各留到400ps左右的margin以取到中间值。所以实际DQ相对DQS的长度差需要控制在±200ps内。
+
+   2. 由于de-skew受温度电压影响会有±20%的误差。De-skew每个单位典型值是20ps实际值可能是16-24ps。由于不等长是通过de-skew来补偿的，当DQS和DQ之间的长度差200ps时，DQS和DQ设置的de-skew差为10个。这时候实际补偿值可能会是160-240ps。会吃掉±40ps的margin，需要保证在极限频率下能够多预留这±40ps的margin出来，否则的话需要考虑减小DQS与DQ的长度差。
+
+   3. 由于write training PHY没做DM的training，PHY直接将DM和组内的DQ0设置为一样的de-skew值。所以实际需要让DM0和DQ0，DM1和DQ8，DM2和DQ16，DM3和DQ24等长。
