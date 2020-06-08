@@ -2,17 +2,15 @@
 
 文档标识：RK-KF-YF-330
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-04-26
+日期：2020-06-08
 
 文件密级：公开资料
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **福州瑞芯微电子股份有限公司**
+**版权所有** **© 2020** **瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -46,7 +44,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
  **概述**
 
- RK1806 Facial Gate SDK主要针对门锁闸机类产品开发使用，采用32位的rootfs。该SDK包含Ficial Gate闸机应用，该应用利用RK自研算法rockface实现了人脸检测，人脸特征点提取，人脸识别，活体检测流程。该SDK默认使用PS5268 RGB摄像头做人脸识别，HM2056红外摄像头做活体检测。
+ RK1806 Facial Gate SDK主要针对门锁闸机类产品开发使用，采用32位的rootfs。该SDK包含QFacialGate闸机应用，该应用利用RK自研算法rockface实现了人脸检测，人脸特征点提取，人脸识别，活体检测流程。该SDK默认使用PS5268 RGB摄像头做人脸识别，HM2056红外摄像头做活体检测。
 
 **产品版本**
 
@@ -69,13 +67,14 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2020-02-11 | V1.0.0   | Jianhua Lin | 初始版本          |
 | 2020-03-19 | V1.1.0   | Jianhua Lin | 修改uboot配置     |
 | 2020-04-26 | V1.2.0   | Jianhua Lin | 增加webserver说明 |
+| 2020-06-08 | V1.3.0   | Jianhua Lin | 修改闸机应用介绍  |
 
 ---
 
 ## **目录**
 
----
 [TOC]
+
 ---
 
 ## 1 **SDK** 获取
@@ -133,9 +132,9 @@ switching to board: /home/ljh/1806/release_sdk/device/rockchip/rk1806/BoardConfi
 ljh@SYS3:~/1806/release_sdk$ ./build.sh rootfs
 ```
 
-## 4 **Ficial Gate 应用**
+## 4  **QFacialGate 应用**
 
-SDK中包含了Ficial Gate 闸机应用，该应用利用RK自有算法rockface实现了人脸检测，人脸特征点提取，人脸识别，活体检测流程。
+SDK中包含了QFacialGate 闸机应用，该应用用QT做UI，通过Rkfacial库调用RK自有算法rockface，实现人脸检测，人脸特征点提取，人脸识别，活体检测。
 
 具体包含以下功能：
 
@@ -143,19 +142,21 @@ SDK中包含了Ficial Gate 闸机应用，该应用利用RK自有算法rockface�
 
 2. 使用SQLITE3作为数据库来存储人脸特征值和用户名。
 
-3. 利用MiniGui实现用户注册，删除注册数据，人脸框跟踪及用户名显示等操作。
+3. 实现用户注册，删除注册数据，人脸框跟踪及用户名显示等操作。
 
 4. 利用ALSA接口实现各流程语音播报功能。
 
 开机后在控制台运行下面命令启动应用：
 
 ```shell
-ficial_gate -f 30000 -e -i -c
+export QT_QPA_FB_DRM=1
+export QT_QPA_PLATFORM=linuxfb:rotation=0
+QFacialGate -f 30000 &
 ```
 
-该应用的具体说明文档请参考：
+Rkfacial库各接口说明请参考：
 
- sdk/app/ficial_gate/doc/Rockchip_Instruction_Ficial_Gate_CN.pdf
+sdk/external/rkfacial/doc/Rockchip_Instruction_Rkfacial_CN.pdf
 
 注： SDK中包含了RK自研算法rockface，但需要获取授权使用。具体获取授权流程请 联系业务并参考sdk/external/rockface/auth/README.md文档。
 
