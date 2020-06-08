@@ -2,23 +2,21 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.0.0
+Release Version: V1.1.0
 
-Release Date: 2020-05-25
+Release Date: 2020-06-08
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -64,11 +62,14 @@ This document (this guide) is mainly intended for:
 | V0.0.2 | CWW | 2020-05-09 | Update the interface of RK IPCamera Tool |
 | V0.0.3 | CWW | 2020-05-20 | Add libssl-dev and expect for building environment |
 | V1.0.0 | CWW | 2020-05-25 | 1. update chapter 3 & 4.4 & 4.5<br>2. add fast boot compile guide<br>3. add chapter 5.4 |
+| V1.1.0 | CWW | 2020-06-08 | 1. update company name<br>2. update document style<br>3. update chapter 2|
+
+---
 
 **Contents**
 
----
 [TOC]
+
 ---
 
 ## 1   Set up an Development Environment
@@ -88,7 +89,9 @@ In addition to the above software packages, the following dependencies is needed
 sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 ```
 
-## 2 SDK Project Directory Introduction
+## 2 SDK Configuration Framework Introduction
+
+### 2.1 SDK Project Directory Introduction
 
 There are buildroot, app, kernel, u-boot, device, docs, external and other directories in the project directory. Each directory or its sub-directories will correspond to a git project, and the commit should be done in the respective directory.
 
@@ -103,6 +106,10 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 - rockdev: stores building output firmware.
 - tools: stores some commonly used tools.
 - u-boot: U-Boot code.
+
+### 2.2 SDK Configuration Framework
+
+![](resources/SDK_Configuration_Framework.jpg)
 
 ## 3 SDK Building Introduction
 
@@ -211,7 +218,7 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ### Rootfs building command
 ./build.sh rootfs
 
-###  to view detailed Roofs build command
+###  to view detailed Rootfs build command
 ./build.sh -h rootfs
 ```
 
