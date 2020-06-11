@@ -1,6 +1,6 @@
 # ISP20 RkAiq 开发参考
 
-文件标识：RK-KF-GX-nnn
+文件标识：RK-KF-GX-601
 
 发布版本：V1.0.0
 
