@@ -20,7 +20,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -63,6 +63,7 @@ This document (this guide) is mainly intended for:
 | V0.0.3 | CWW | 2020-05-20 | Add libssl-dev and expect for building environment |
 | V1.0.0 | CWW | 2020-05-25 | 1. update chapter 3 & 4.4 & 4.5<br>2. add fast boot compile guide<br>3. add chapter 5.4 |
 | V1.1.0 | CWW | 2020-06-08 | 1. update company name<br>2. update document style<br>3. update chapter 2|
+| V1.1.1 | CWW | 2020-06-16 | fix company name |
 
 ---
 
