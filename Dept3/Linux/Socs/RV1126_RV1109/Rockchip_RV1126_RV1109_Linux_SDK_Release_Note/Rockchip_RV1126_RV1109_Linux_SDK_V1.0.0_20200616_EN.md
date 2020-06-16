@@ -2,27 +2,25 @@
 
 ID: RK-FB-YF-359
 
-Release Version: V0.2
+Release Version: V1.0.0
 
-Release Date: 2020-05-15
+Release Date: 2020-06-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -35,8 +33,6 @@ Customer service Fax:  +86-591-83951833
 Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 **Preface**
 
@@ -57,17 +53,16 @@ This document (this guide) is mainly intended for:
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-04-28 | V0.1 | CWW | Initial Alpha version |
 | 2020-05-15 | V0.2 | CWW | update docs path |
+| 2020-06-16 | V1.0.0 | CWW | update official version |
 |            |          |          |                |
 
-<div style="page-break-after: always;"></div>
+---
 
 **Contents**
 
----
 [TOC]
----
 
-<div style="page-break-after: always;"></div>
+---
 
 ## 1 Overview
 
@@ -94,11 +89,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rv1126_rv1109_linux_sdk_alpha_v0.2_20200515.tar.bz2  as an example. After getting an initialization package, you can get the source code by running the following command:
+Take rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 as an example. After getting an initialization package, you can get the source code by running the following command:
 
 ```shell
 mkdir rv1126_rv1109
-tar xjf rv1126_rv1109_linux_sdk_alpha_v0.2_20200515.tar.bz2 -C rv1126_rv1109
+tar xjf rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 -C rv1126_rv1109
 cd rv1126_rv1109
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c
