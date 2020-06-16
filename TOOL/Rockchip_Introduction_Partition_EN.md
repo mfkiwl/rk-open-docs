@@ -2,9 +2,9 @@
 
 ID:  RK-SM-YF-016
 
-Release Version: V1.4.1
+Release Version: V1.5.0
 
-Release Date: 2020-02-21
+Release Date: 2020-06-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -71,6 +71,7 @@ Software development engineers
 | V1.3.0 | Yifeng.Zhao | 2013-04-15 | Add GPIO configurations |
 | V1.4.0 | Yifeng.Zhao | 2018-01-23 | Add GPT configurations |
 | V1.4.1 | Yifeng.Zhao | 2020-02-21 | Modify style |
+| V1.5.0 | Jason.Zhu | 2020-06-16 | Add partition definition specification |
 
 ---
 
@@ -257,3 +258,9 @@ The last partition needs to specify parameter "grow" , the tool will allocate th
 | TRUST     | 0x4000            | 0x6000             | 0x4000             | 4MB      |
 
 Note:  Using NAND FLASH, The address 0x40 may write with the loader image，its share 0-4MB space with the parameter, and the valid data will not be overwritten.
+
+## 3. Partition Definition Specification
+
+1. All partitions which are written by bootrom, pre-loader, uboot and trust must be palced before recovery partition.
+2. Any new partitions added by the customer,  which are written by the pre-loader, uboot and trust, should be placed before the recovery partition;
+3. The misc, vbmeta and security partitions which is used by rockchip should be placed before the recovery partition.
