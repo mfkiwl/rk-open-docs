@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-086
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-05-20
+日期：2020-06-17
 
 文件密级：□绝密   □秘密   ■内部资料   □公开
 
@@ -60,6 +60,7 @@ Rockchip 图形/显示模块开发工程师
 | --------- | --------- | ---------- | -------------- |
 |  V1.0.0   | 黄家钗 | 2020-05-20 | 初始版本     |
 | V1.1.0 | 闫孝军 | 2020-05-25 | 加入 MCU 接口描述 |
+| V1.2.0 | 黄家钗 | 2020-06-17 | 加入VOP full RGB88格式问题 |
 
 ---
 
@@ -101,6 +102,56 @@ Rockchip 图形/显示模块开发工程师
 6. YUV420 数据显示出现 uv 错位问题，和 IC 确认是由于 VOP 做 YUV420 上采样到 YUV444 导致 uv 数据偏移，通过 SCL_OFFSET 调整 uv offset 稍有改善但是和走 GPU 合成对比效果差距明显，以下是具体效果：
 
    ![vop_yuv420](Rockchip_VOP_Notes/vop_yuv420.jpg)
+
+7. 处理 RGB888 格式时 Red、Blue 两种颜色反掉问题：
+
+   RGB888 格式的数据内存中从高位到低位分别是 R[7,0], G[7,0], B[7,0]，而 VOP full 版本在处理这种格式时把高 8bit 当作蓝色分量，低 8bit 当作红色分量，导致 R、B 两种颜色颠倒；
+
+   VOP full 处理 ARGB8888/RGB565 以及 VOP lite 处理 ARGB8888/RGB888/RGB565 时高位按 Red 分量处理，低位按 Blue 分量处理，显示正常。
+
+   uboot 提交信息：
+
+   ```c
+   commit f4e3a1733233bf759ab0c517e4e222273bda333e
+   Author: Sandy Huang <hjc@rock-chips.com>
+   Date:   Wed Jun 17 15:32:11 2020 +0800
+
+       drm/rockchip: change 8bit bmp decoder result from BGR565 to RGB565
+
+       Signed-off-by: Sandy Huang <hjc@rock-chips.com>
+       Change-Id: I0ca715bd69bc9ff1a61c98f766ecab2458737b27
+
+   commit 59cf3802954fce437255445eea1333f3dc8407a9
+   Author: Sandy Huang <hjc@rock-chips.com>
+   Date:   Tue Jun 16 18:21:31 2020 +0800
+
+       drm/rockchip: fix rgb888 format color incorrect
+
+       vop full need to do rb swap when deal with rgb888/bgr888;
+
+       Signed-off-by: Sandy Huang <hjc@rock-chips.com>
+       Change-Id: I60fac72b21720fcf4f406c56fe7d9dc21ebf7635
+   ```
+
+   kernel 提交信息：
+
+   ```c
+   commit afa25c0117e86a95ae5f7edfe063f7c7ef63530c
+   Author: Sandy Huang <hjc@rock-chips.com>
+   Date:   Fri May 15 14:40:00 2020 +0800
+
+       drm/rockchip: vop: fix rb swap error when deal with rgb888 format
+
+       1. VOP full need to do rb swap to show rgb888 format color correctly
+       2. uboot change bmp decoder result from BGR565 to RGB565 format;
+
+       so this commit depend on uboot commit:
+           59cf3802954 ("drm/rockchip: fix rgb888 format color incorrect")
+           f4e3a173323 ("drm/rockchip: change 8bit bmp decoder result")
+
+       Change-Id: I2e0329b8c3f35d4ec1e224f0570575934c889dca
+       Signed-off-by: Sandy Huang <hjc@rock-chips.com>
+   ```
 
 ## MCU(i8080) 接口问题
 
