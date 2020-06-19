@@ -60,8 +60,7 @@ Rockchip Electronics Co., Ltd.
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-04-28 | V0.1 | CWW | 初始 Alpha版本 |
 | 2020-05-15 | V0.2 | CWW | 更新文档路径 |
-| 2020-06-16 | V1.0.0 | CWW | 更新正式版本|
-|            |          |          |                |
+| 2020-06-16 | V1.0.0 | CWW | 更新正式版本，增加智能USB Camera下载说明 |
 
 ---
 
@@ -74,13 +73,16 @@ Rockchip Electronics Co., Ltd.
 ## 1  概述
 
 本SDK系统是基于 Buildroot 2018.02-rc3开发，内核基于 Kernel 4.19，引导基于 U-boot v2017.09，适用于 RV1126/RV1109 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
-本 SDK 具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
+开发包适用但不限于智能IPC/智能闸机/智能门铃/智能USB camera等产品，提供灵活的数据通路组合接口，满足客户自由组合的客制化需求。
+具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
 ## 2 SDK 获取说明
 
 SDK通过瑞芯微代码服务器对外发布获取。其编译开发环境，参考第 3节 [软件开发指南](## 3 软件开发指南)。
 
-**获取 SDK 方法: 从瑞芯微代码服务器获取源码**
+### 2.1 RV1126/RV1109 Linux 通用软件包获取方法
+
+#### 通过代码服务器下载
 
 获取 RV1126/RV1109 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请SDK，同步提供SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 5 节  [SSH 公钥操作说明](## 5 SSH 公钥操作说明)。
 
@@ -96,6 +98,8 @@ repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用
 git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
+#### 通过本地压缩包解压获取
+
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
 以 rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
@@ -108,6 +112,22 @@ cd rv1126_rv1109
 ```
 
 后续开发者可根据 FAE 窗口定期发布的更新说明，通过 “.repo/repo/repo sync -c”命令同步更新。
+
+### 2.2 智能USB Camera 软件包获取方式
+
+针对智能USB Camera产品，我们提供了专门的SDK软件配置，提供包括UVC、UAC、ePTZ、AI数据传输的整套方案，适用于智能会议系统、智慧屏等产品。
+智能USB Camera SDK 下载命令如下：
+
+```shell
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+```
+
+如果已经下载了RV1126/RV1109 Linux 通用软件包（rv1126_rv1109_linux_sdk_vX.X.X_2020XXXX.tar.bz2），可以通过以下方式切换到智能USB Camera 软件包
+
+```shell
+.repo/repo/repo init -m rv1126_rv1109_linux_ai_camera_release.xml
+.repo/repo/repo sync -c
+```
 
 ## 3 软件开发指南
 

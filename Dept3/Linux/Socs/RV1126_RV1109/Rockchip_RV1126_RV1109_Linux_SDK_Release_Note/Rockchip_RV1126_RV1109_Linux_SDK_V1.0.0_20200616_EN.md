@@ -52,9 +52,8 @@ This document (this guide) is mainly intended for:
 | **Date** | **Version** | **Author** | **Revision History** |
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-04-28 | V0.1 | CWW | Initial Alpha version |
-| 2020-05-15 | V0.2 | CWW | update docs path |
-| 2020-06-16 | V1.0.0 | CWW | update official version |
-|            |          |          |                |
+| 2020-05-15 | V0.2 | CWW | Update docs path |
+| 2020-06-16 | V1.0.0 | CWW | Update official version, update for Smart USB Camera SDK |
 
 ---
 
@@ -66,13 +65,19 @@ This document (this guide) is mainly intended for:
 
 ## 1 Overview
 
-This SDK is based on Buildroot 2018.02-rc3, with kernel 4.19 and U-boot v2017.09. It is suitable for RV1126/RV1109 EVB development boards and all other Linux products developed based on it. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
+This SDK is based on Buildroot 2018.02-rc3, with kernel 4.19 and U-boot v2017.09. It is suitable for RV1126/RV1109 EVB development boards and all other Linux products developed based on it.
 
-## 2 How to Get the SDK
+The development kit is applicable to but not limited to Smart IPC/Smart Gate/Smart Doorbell/Smart USB camera and other products. It provides flexible interface to to meet customers' customized requirements.
+
+For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
+
+## 2 How to get the SDK
 
 SDK is released by Rockchip server. Please refer to [Chapter 3 Software Development Guide](## 3 Software Development Guide) to build a development environment.
 
-**The way to get the SDK source code from Rockchip code server:**
+### 2.1 How to get RV1126/RV1109 Linux SDK
+
+#### Getting from Rockchip source code repositories
 
 To get RV1126/RV1109 Linux SDK software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window. About Rockchip server SSH public key authorization, please refer to [Chapter 5 SSH  Public Key Operation Introduction](## 5 Public Key Operation Introduction).
 
@@ -88,6 +93,8 @@ Repo, a tool built on Python script by Google to help manage git repositories, i
 git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
+#### Getting from local package
+
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
 Take rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 as an example. After getting an initialization package, you can get the source code by running the following command:
 
@@ -100,6 +107,22 @@ cd rv1126_rv1109
 ```
 
 Developers can update via `.repo/repo/repo sync -c` command according to update instructions that are regularly released by FAE window.
+
+### 2.2 How to get Smart USB Camera SDK
+
+For Smart USB Camera products, we provide special SDK software configuration, including UVC, UAC, ePTZ, AI solution, suitable for smart conferencing system, smart screen and other products.
+Download the Smart USB Camera SDK command as follows:
+
+```shell
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+```
+
+If you have got RV1126/RV1109 Linux SDK package(rv1126_rv1109_linux_sdk_vX.X.X_2020XXXX.tar.bz2)，you can switch to Smart USB Camera SDK as follows:
+
+```shell
+.repo/repo/repo init -m rv1126_rv1109_linux_ai_camera_release.xml
+.repo/repo/repo sync -c
+```
 
 ## 3 Software Development Guide
 
