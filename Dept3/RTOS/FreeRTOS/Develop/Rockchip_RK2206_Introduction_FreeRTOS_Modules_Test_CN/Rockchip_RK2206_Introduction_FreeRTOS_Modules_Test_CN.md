@@ -1,18 +1,16 @@
-# **Rockchip RK2206 FreeRTOS Modules Introduction**
+# Rockchip RK2206 FreeRTOS Modules Introduction
 
 文件标识：RK-SM-CS-001
 
-发布版本：1.0.2
+发布版本：V1.1.0
 
-日       期：2019.11
+日期：2020-06-24
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
+**免责声明**
 
-## **免责声明**
-
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,47 +20,45 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
-网址：     www.rock-chips.com
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
 
 客户服务电话： +86-4007-700-590
 
 客户服务传真： +86-591-83951833
 
-客户服务邮箱： fae@rock-chips.com
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
-## **前言**
+**前言**
 
 **概述**
 
-本文主要针对RK2206 FreeRTOS SDK的基本模块测试方法进行说明。
-
 **产品版本**
 
-| **芯片名称** | **内核版本**     |
-| ------------ | ---------------- |
+| **芯片名称** | **内核版本** |
+| ------------ | ------------ |
 | RK2206       | FreeRTOS V10.0.1 |
 
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
 
-​        技术支持工程师
+技术支持工程师
 
-​        软件开发工程师
+软件开发工程师
 
-## **修订记录**
+**修订记录**
 
 | **日期**   | **版本** | **作者** | **修改说明**           |
 | ---------- | -------- | -------- | ---------------------- |
@@ -82,8 +78,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-11-27 | V1.0.0   | CWW      | 修改文档排版           |
 | 2019-12-26 | V1.0.1   | Jair Wu  | 更新播放、录音测试命令 |
 | 2019-12-26 | V1.0.2   | Conway   | 更新Wi-Fi频偏测试说明  |
+| 2020-06-24 | V1.1.0   | Conway   | 更新xmode等日志和说明  |
 
-## **目录**
+---
+
+**目录**
 
 [TOC]
 
@@ -125,6 +124,7 @@ RK2206>file.ls /f
 
 ~~~
 audio.tx -D sound3p -t 10 -f 2
+将会有10s的滴鸣
 ~~~
 
 测试log：
@@ -898,9 +898,16 @@ RK2206>[     30030 I] [wifi] lpw is r (499 1 141)
 
 ## **9 iperf测试**
 
-电脑端将软件iperf.exe放在任意目录下，命令行进入该目录，命令将在该目录下执行。
+iperf.exe测试电脑端与设备端通信速度。使用前连接网络，电脑端和设备端需要在同一网段，若无法通信，查看开发板是否ping通电脑ip。(ping的命令格式是ip.ping -p 192.168.43.1 -n 10)。
 
-[^注]: 电脑端和设备端需要在同一网段，若无法通信，查看开发板是否ping通电脑ip。(ping的命令格式是ip.ping -p 192.168.43.1 -n 10)
+连接Wi-Fi
+
+```
+wifi.start sta
+wifi.connect Wi-Fi名 Wi-Fi密码
+```
+
+电脑端将软件iperf.exe放在任意目录下，命令行进入该目录，命令将在该目录下执行。
 
 ### **9.1 设备做发送端**
 
@@ -1035,6 +1042,8 @@ W=640; H=480; mplayer /media/cif.out -loop 0 -demuxer rawvideo -fps 30 -rawvideo
 
 ## **11 xmodem文件导出测试**
 
+XModem是一种在串口通信中广泛使用的异步文件传输协议，通过串口通讯导出嵌入式设备文件。
+
 开启配置COMPONENTS_SHELL_XMODEM
 
 测试命令：
@@ -1054,7 +1063,7 @@ RK2206>uart_xmodem w A:\music5s.wav
 [A.14.00][000432.309906]
 ```
 
-2. 打开电脑端串口调试软件的Xmodem接收功能，选择保存目录后开始传输，直至传输完成，可按Ctrl+C 取消传输
+2. 打开电脑端串口调试软件的Xmodem接收功能（如SecureCRT软件点击Transfer->receive Xmodem），选择保存目录后开始传输，直至传输完成，可按Ctrl+C 取消传输
 
 ```
 RK2206>uart_xmodem w A:\music5s.wav
@@ -1087,7 +1096,8 @@ RK2206>sd.read 0 0x8e9c 4
 测试log:
 
 ```
-RK2206>sd.write 0 0x8e9c 4 0x77create thread classId = -1, objectid = 8, name = SdTestTask, remain = 4085528
+RK2206>sd.write 0 0x8e9c 4 0x77
+create thread classId = -1, objectid = 8, name = SdTestTask, remain = 4085528
 [A.14.00][001588.482627]
 RK2206>DevID = 0, LBA = 36508, blks = 4 value = 0x77
 [A.SdTes][001588.489430]
@@ -1095,7 +1105,8 @@ RK2206>DevID = 0, LBA = 36508, blks = 4 value = 0x77
 [A.SdTes][001588.507076]delete thread classId = -1, objectid = 8, name = SdTestTask, remain = 4069136.
 [A.SdTes][001588.519801]
 
-RK2206>sd.read 0 0x8e9c 4create thread classId = -1, objectid = 3, name = SdTestTask, remain = 6211448
+RK2206>sd.read 0 0x8e9c 4
+create thread classId = -1, objectid = 3, name = SdTestTask, remain = 6211448
 [A.14.00][000029.571868]
 RK2206>DevID = 0, LBA = 36508, blks = 4
 [A.SdTes][000029.581561]
@@ -1110,6 +1121,7 @@ RK2206>DevID = 0, LBA = 36508, blks = 4
 [A.SdTes][000029.678728][38110a20]77 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
 [A.SdTes][000029.687951][38110a30]77 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
 [A.SdTes][000029.704184][38110a40]77 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
+忽略部分相同日志
 ```
 
 ### **12.2 读写速度测试命令**
@@ -1130,11 +1142,11 @@ RK2206>file.test 512 512 1
 测试log:
 
 ```
-[A.14.00][000068.429157]total clk = 3022, 6853, 6853read: LBA = 0x000001fc, Len = 1, readus = 34497
-[A.14.00][000068.442706]total clk = 2410, 6854, 6854read: LBA = 0x000001fd, Len = 1, readus = 34557
-[A.14.00][000068.454297]total clk = 2790, 6855, 6855read: LBA = 0x000001fe, Len = 1, readus = 34626
-[A.14.00][000068.464846]total clk = 2558, 6856, 6856read: LBA = 0x000001ff, Len = 1, readus = 34689
-  test end: totalsize = 262144, blocksize = 512, writerate = 30577 byte/s, readrate = 7710117 byte/s
+忽略部分日志
+[A.14.00][000148.570621]read: LBA = 0x000001fd, Len = 1, readus = 406013
+[A.14.00][000148.576914]read: LBA = 0x000001fe, Len = 1, readus = 406804
+[A.14.00][000148.583243]read: LBA = 0x000001ff, Len = 1, readus = 407620
+  test end: totalsize = 262144, blocksize = 512, writerate = 287754 byte/s, readrate = 644088 byte/s
 ```
 
 ### **12.3 读写一致性测试命令**
@@ -1151,20 +1163,16 @@ sd.test 0 0x8e9c 4
 测试log:
 
 ```
-K2206>
-RK2206>sd.test 0 0x8e9c 4create thread classId = -1, objectid = 4, name = SdTestTask, remain = 6146584
-[A.14.00][005590.823303]
+RK2206>sd.test 0 0x8e9c 4
+
+[A.14.00][000074.915332]create thread classId = -1, objectid = 9, name = SdTestTask, remain = 6033872
+[A.14.00][000074.918640]
 RK2206>DevID = 0, LBA = 36508, blks = 4
-[A.SdTes][005590.837009]
-[A.SdTes][005590.851304]  Sd write-read-compare Test Successfully 0
-[A.SdTes][005590.855812]
-[A.SdTes][005590.863215]  Sd write-read-compare Test Successfully 1
-[A.SdTes][005590.876049]
-[A.SdTes][005590.882452]  Sd write-read-compare Test Successfully 2
-[A.SdTes][005590.893286]
-[A.SdTes][005590.900238]  Sd write-read-compare Test Successfully 3
-[A.SdTes][005590.909515]
-[A.SdTes][005590.921914]  Sd write-read-compare Test Successfully 4
+[A.SdTes][000074.924352]
+[A.SdTes][000074.936250]  Sd Test Successfully
+[A.SdTes][000074.936288]
+[A.SdTes][000074.937335]delete thread classId = -1, objectid = 9, name = SdTestTask, remain = 6025672.
+[A.SdTes][000074.946026]
 ```
 
 ## **13 系统命令说明**
