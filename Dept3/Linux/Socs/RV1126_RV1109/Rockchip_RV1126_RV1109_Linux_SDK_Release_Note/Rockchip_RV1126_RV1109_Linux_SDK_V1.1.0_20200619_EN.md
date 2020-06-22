@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-359
 
-Release Version: V1.0.0
+Release Version: V1.1.0
 
-Release Date: 2020-06-16
+Release Date: 2020-06-19
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -53,7 +53,8 @@ This document (this guide) is mainly intended for:
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-04-28 | V0.1 | CWW | Initial Alpha version |
 | 2020-05-15 | V0.2 | CWW | Update docs path |
-| 2020-06-16 | V1.0.0 | CWW | Update official version, update for Smart USB Camera SDK |
+| 2020-06-16 | V1.0.0 | CWW | Update official version |
+| 2020-06-19 | V1.1.0 | CW | Update for Smart USB Camera SDK |
 
 ---
 
