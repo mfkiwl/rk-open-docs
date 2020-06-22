@@ -4,7 +4,7 @@ ID: RK-JC-YF-360
 
 Release Version: V1.1.0
 
-Release Date: 2020-06-08
+Release Date: 2020-06-22
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -64,6 +64,7 @@ This document (this guide) is mainly intended for:
 | V1.0.0 | CWW | 2020-05-25 | 1. update chapter 3 & 4.4 & 4.5<br>2. add fast boot compile guide<br>3. add chapter 5.4 |
 | V1.1.0 | CWW | 2020-06-08 | 1. update company name<br>2. update document style<br>3. update chapter 2|
 | V1.1.1 | CWW | 2020-06-16 | fix company name |
+| V1.2.0 | HJC | 2020-06-22 | Add smart usb camera product section |
 
 ---
 
@@ -417,3 +418,124 @@ root@192.168.1.159's password:
 ### input the default passwd：rockchip
 ```
 
+## 6 Smart USB Camera Product
+
+The smart USB camera product supports the following functions:
+
+- Support standard UVC camera function, up to 4K preview (RV1126)
+- Support a variety of NN algorithms, including face detection, human posture or bone detection, face key point detection and tracking, and support third-party algorithm expansion
+- Support USB composite device stable transmission (RNDIS/ UAC / ADB, etc.)
+- Support NN preprocessing and data post-processing path
+- Support preview of multiple terminal devices such as smart TV or PC
+- Support for eptz function
+
+### 6.1 Product Building Introduction
+
+The compilation and configuration of the smart USB camera product is based on the public SDK and adopts the separate rv1126_rv1109_linux_Ai_camera_release.xml Code list management update.
+
+#### 6.1.1 To Select Board Configure
+
+SDK download address ：
+
+```shell
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+```
+
+| Board Configuration                               | Comment                       |
+| ------------------------------------------------- | ----------------------------- |
+| device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk | Smart USB Camera board config |
+|                                                   |                               |
+
+Command of selecting board configure :
+
+```shell
+### To select Smart USB Camera board config
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk
+```
+
+#### 6.1.2 Building
+
+The building command of the intelligent USB camera product is the same as that of the SDK. Please refer to the SDK Building Introduction in Section 3.
+
+### 6.2 Product Software Framework
+
+The overall structure is as follows：
+
+![](resources/uvcc/smart_display_ai_camera_module_sw_arch.png)
+
+The corresponding relationship between rv1109 / rv1126 end application and source code program is as follows:
+
+> **1.main app : source code patch:<SDK>/app/smart_display_service：Responsible for RNDIS server function implementation, command processing, NN data forwarding and other operations；**
+>
+> **2.AI app : source code patch: <SDK>/app/mediaserver： Responsible for sending all camera data to NPU for corresponding NN algorithm processing, and passing it to main app through shared memory mechanism ;**
+>
+> **3.uvc app:source code patch:  <SDK>/external/uvc_app: Responsible for the implementation and control of the complete functions of UVC camera.**
+
+#### 6.2.1 uvc_app
+
+Please refer to：
+
+```shell
+<SDK>/external/uvc_app/doc/zh-cn/uvc_app.md
+```
+
+#### 6.2.2 mediaserver
+
+Please refer to：
+
+```shell
+<SDK>/docs/Linux/AppcationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
+```
+
+#### 6.2.3 Other
+
+For other Linux application framework or module materials, please refer to the corresponding documents in the following directory：
+
+```shell
+<SDK>/docs/Linux/
+```
+
+### 6.3  Function Introduction
+
+#### 6.3.1 How To Preview For USB Camera
+
+Use USB cable to connect the USB OTG port of EVB with the host computer, such as the USB host port of TV or PC, and power on. By default, the UVC camera application and rndis service will be started automatically. Use serial port to connect EVB board and run ifconfig usb0 to obtain the pre configured IP address of rndis virtual network port.
+
+```shell
+RK $ ifconfig usb0
+usb0      Link encap:Ethernet  HWaddr 8E:F3:7D:36:13:34
+          inet addr:172.16.110.6  Bcast:172.16.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4884 errors:0 dropped:16 overruns:0 frame:0
+          TX packets:4843 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:257305 (251.2 KiB)  TX bytes:787936 (769.4 KiB)
+```
+
+Use serial port to connect the PC end of EVB board as follows：
+
+```shell
+Baud rate：1500000
+Data bits：8
+Stop bit：1
+Parity：none
+Flow control：none
+```
+
+Android smart TV uses RKAICameraTest application or other standard camera applications. PC side recommends the use of a third-party UVC camera application such as Amcap or Potplayer. When it is opened, you can see the preview, and the switching format or resolution can refer to the application switching of upper computer.
+
+![](/resources/uvcc/uvc_camera_open.jpg)
+
+#### 6.3.2 How To Test AI Model Post-processing
+
+Open the RKAICameraTest application on the TV terminal, click the rndis button to connect with rndis after seeing the preview, click the settings button to select the "model algorithm switching" option after success, select the model algorithm to be used, which is the face detection algorithm by default, and then click the "Ai post-processing switch", when the face appears in front of the camera, you can see the AI processing effect:
+
+![](resources/uvcc/uvc_camera_ai.jpg)
+
+![](resources/uvcc/uvc_camera_setting.jpg)
+
+#### 6.3.3 How To Test EPTZ
+
+Open the RKAICameraTest application at the TV end, click the rndis button to connect to rndis after seeing the preview, click the settings button to select the "eptz mode switch" option after the countdown is completed, and then open the application, at this time, the top left corner of the interface will display whether it is the eptz model or the general intelligent preview mode:
+
+![](resources/uvcc/uvc_camera_eptz.jpg)

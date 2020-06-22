@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-06-08
+日期：2020-06-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V0.0.3 | CWW | 2020-05-20 | 编译环境添加libssl-dev和expect |
 | V1.0.0 | CWW | 2020-05-25 | 1. 更新第3节以及第4.4和4.5节<br>2. 增加快速开机版本编译<br>3. 增加5.4节 |
 | V1.1.0 | CWW | 2020-06-08 | 1. 更新公司名称<br>2. 更新文档排版<br>3. 更新第2节|
+| V1.2.0 | HJC | 2020-06-22 | 增加智能USB Camera产品章节 |
 
 ---
 
@@ -422,3 +423,124 @@ root@192.168.1.159's password:
 ### 输入默认密码：rockchip
 ```
 
+## 6 智能USB Camera产品配置
+
+智能USB Camera产品支持如下功能：
+
+- 支持标准UVC Camera功能，最高支持4k预览（RV1126）
+- 支持多种NN算法，包括人脸检测，人体姿态或骨骼检测，人脸关键点检测跟踪等，支持第三方算法扩展
+- 支持USB复合设备稳定传输（RNDIS/UAC/ADB等）
+- 支持NN前处理和数据后处理通路
+- 支持智能电视或PC等多种终端设备预览
+- 支持EPTZ功能
+
+### 6.1 产品编译说明
+
+智能USB Camera产品编译配置基于公版SDK，采用单独的rv1126_rv1109_linux_ai_camera_release.xml代码清单管理更新。
+
+#### 6.1.1 选择对应板级配置
+
+SDK下载地址：
+
+```shell
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+```
+
+| 支持的板级配置                                    | 备注                         |
+| ------------------------------------------------- | ---------------------------- |
+| device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk | 智能USB Camera产品的板级配置 |
+|                                                   |                              |
+
+切换板级配置命令：
+
+```shell
+### 选择智能USB Camera版本的板级配置
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk
+```
+
+#### 6.1.2 编译命令
+
+智能USB Camera产品的编译命令同SDK，参考**第三节SDK编译说明**即可。
+
+### 6.2 产品软件框架
+
+总体结构如下：
+
+![](resources/uvcc/smart_display_ai_camera_module_sw_arch.png)
+
+其中,RV1109/RV1126端应用与源码程序对应关系如下：
+
+> **1.main app 对应<SDK>/app/smart_display_service：负责RNDIS 服务端功能实现，命令处理，NN数据转发等操作；**
+>
+> **2.AI app 对应<SDK>/app/mediaserver：负责将一路camera数据送到NPU做对应NN算法处理，通过共享内存机制传递给main app；**
+>
+> **3.uvc app 对应<SDK>/external/uvc_app:：负责UVC camera完整功能的实现和控制。**
+
+#### 6.2.1 uvc_app
+
+请参考：
+
+```shell
+<SDK>/external/uvc_app/doc/zh-cn/uvc_app.md
+```
+
+#### 6.2.2 mediaserver
+
+请参考：
+
+```shell
+<SDK>/docs/Linux/AppcationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
+```
+
+#### 6.2.3 其它
+
+其它linux应用框架或模块资料，请参考下列目录对应文档：
+
+```shell
+<SDK>/docs/Linux/
+```
+
+### 6.3  功能说明
+
+#### 6.3.1 如何显示USB Camera预览
+
+使用USB线连接EVB的USB OTG口与上位机，如TV端或PC端USB host 口，上电开机。默认会自动启动UVC camera应用及RNDIS服务。使用串口连上EVB板子运行ifconfig usb0可获取预配置的RNDIS 虚拟网口IP地址。
+
+```shell
+RK $ ifconfig usb0
+usb0      Link encap:Ethernet  HWaddr 8E:F3:7D:36:13:34
+          inet addr:172.16.110.6  Bcast:172.16.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4884 errors:0 dropped:16 overruns:0 frame:0
+          TX packets:4843 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:257305 (251.2 KiB)  TX bytes:787936 (769.4 KiB)
+```
+
+使用串口连接EVB板子的PC端配置如下：
+
+```shell
+波特率：1500000
+数据位：8
+停止位：1
+奇偶校验：none
+流控：none
+```
+
+Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端推荐使用如Amcap或Potplayer等第三方UVC camera应用，打开即可看到预览，切换格式或分辨率参考上位机上camera应用的设置菜单中功能切换即可。
+
+![](resources/uvcc/uvc_camera_open.jpg)
+
+#### 6.3.2 如何测试AI模型后处理
+
+在电视端打开RKAICameraTest应用，看到预览后点击RNDIS按钮连接RNDIS，成功后点击SETTINGS按钮选择“模型算法切换”选项，选择要使用的模型算法，默认为人脸检测算法，然后点击“AI后处理开关”，当人脸在镜头前出现即可看到AI处理效果：
+
+![](resources/uvcc/uvc_camera_ai.jpg)
+
+![](resources/uvcc/uvc_camera_setting.jpg)
+
+#### 6.3.3 如何测试EPTZ功能
+
+在电视端打开RKAICameraTest应用，看到预览后点击RNDIS按钮连接RNDIS，成功后点击SETTINGS按钮选择“EPTZ模式切换”选项，在倒计时完成后，再打开应用即可，此时在界面左上角会显示是EPTZ模型还是普通智能预览模式：
+
+![](resources/uvcc/uvc_camera_eptz.jpg)
