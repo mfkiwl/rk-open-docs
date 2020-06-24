@@ -1,65 +1,64 @@
-# **RK2206 PCBA Developer Guide**
+# 工厂测试使用指南
 
 文件标识：RK-KF-YF-303
 
-发布版本：1.1.0
+发布版本：V1.1.1
 
-日期：2020.04
+日期：2020-06-24
 
-文件密级：内部资料
-
-------
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
-商标声明
+**商标声明**
 
 “Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-版权所有 © 2019 福州瑞芯微电子股份有限公司
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
-网址：     www.rock-chips.com
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
 
 客户服务电话： +86-4007-700-590
 
 客户服务传真： +86-591-83951833
 
-客户服务邮箱： fae@rock-chips.com
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
-------
+---
 
-## **前言**
+**前言**
 
 **概述**
 
-本文主要针对RK2206 Story Board 的工厂测试说明。
+本文提供一个标准模板供套用。后续模板以此份文档为基础改动。
 
 **产品版本**
 
-| **芯片名称** | **内核版本**     |
-| ------------ | ---------------- |
+| **芯片名称** | **内核版本**    |
+| ------------ | ------------     |
 | RK2206       | FreeRTOS V10.0.1 |
 
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
 
-1. 技术支持工程师
-2. 软件开发工程师
+技术支持工程师
+
+软件开发工程师
 
 **修订记录**
 
@@ -68,10 +67,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-11-25 | V1.0.0   | Conway.Chen | 初始版本               |
 | 2019-12-28 | V1.0.1 | Conway.Chen | 更新按键功能和代码说明 |
 | 2020-04-29 | V1.1.0 | Conway.Chen | 更新板级适配说明，并更新LED部分等 |
+| 2020-06-24 | V1.1.1 | Conway.Chen | 更新按键定义           |
 
-## **目录**
+---
+
+**目录**
 
 [TOC]
+
+---
 
 ## **1 工厂模式说明**
 
@@ -190,21 +194,27 @@ app/story_robot/src/player/play_menu_task.h
 进入工厂测试的按键，由这两个宏决定，这里表示按住配网键，再开机
 ```
 
-播放器按键键值和功能定义：
+工厂测试的按键定义
 
 ```
-/app/story_robot/src/player/play_menu_task.h
-#define KEY_FUN_VOLUME_DOWN     KEY_VAL_FFD_SHORT_UP
-#define KEY_FUN_VOLUME_UP       KEY_VAL_UP_SHORT_UP
-#define KEY_FUN_PREV_MUSIC      KEY_VAL_ESC_SHORT_UP
-#define KEY_FUN_NEXT_MUSIC      KEY_VAL_DOWN_SHORT_UP
-#define KEY_FUN_PLAY_PAUSE      KEY_VAL_PLAY_SHORT_UP
-#define KEY_FUN_AI_START        KEY_VAL_MENU_SHORT_UP
-#define KEY_FUN_PICTURE_BOOK_S  KEY_VAL_VOL_PRESS_START
-#define KEY_FUN_CHANGE          KEY_VAL_VOL_SHORT_UP
-#define KEY_FUN_AIRKISS         KEY_VAL_FFW_PRESS_START
-#define KEY_FUN_FACTORY_TEST_START    KEY_FUN_AIRKISS
-#define KEY_FUN_FACTORY_TEST_ENTER    (KEY_FUN_AIRKISS|KEY_STATUS_PRESS)
+src/components/factory_test/factory_test.c
+#if (defined CONFIG_BOARD_RK2206_EVB || defined CONFIG_BOARD_RK2206_EVB_V11)
+#define KEY_CAMERA                          KEY_VAL_FFW_SHORT_UP
+#define KEY_RECORD_BODY_MICROPHONE          KEY_VAL_FFW_PRESS_START
+#define KEY_RECORD_BODY_MICROPHONE_PLAER    KEY_VAL_UP_PRESS_START
+#define KEY_LCD                             KEY_VAL_ESC_SHORT_UP
+
+#elif (defined CONFIG_BOARD_RK2206_STORY || defined CONFIG_BOARD_RK2206_STORY_V11)
+#define KEY_CAMERA                          KEY_VAL_FFW_SHORT_UP
+#define KEY_RECORD_BODY_MICROPHONE          KEY_VAL_DOWN_PRESS_START
+#define KEY_RECORD_BODY_MICROPHONE_PLAER    KEY_VAL_FFW_PRESS_START
+#define KEY_LCD                             KEY_VAL_ESC_SHORT_UP
+#else
+#define KEY_CAMERA                          KEY_VAL_FFW_SHORT_UP
+#define KEY_RECORD_BODY_MICROPHONE          KEY_VAL_DOWN_PRESS_START
+#define KEY_RECORD_BODY_MICROPHONE_PLAER    KEY_VAL_FFW_PRESS_START
+#define KEY_LCD                             KEY_VAL_ESC_SHORT_UP
+#endif
 ```
 
 ### **2.2 增加厂测按键功能**
