@@ -2,17 +2,15 @@
 
 文件标识：RK-KF-YF-074
 
-发布版本：1.1.0
+发布版本：V1.2.0
 
-日期：2020-05-26
+日期：2020-06-29
 
-文件密级：公开资料
-
-------
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -38,7 +36,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 客户服务传真： +86-591-83951833
 
-客户服务邮箱： [fae@rock-chips.com]
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ------
 
@@ -64,10 +62,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**     |
-| ---------- | -------- | -------- | ---------------- |
-| 2020-01-06 | V1.0.0   | 陈健洪   | 初始版本         |
-| 2020-05-26 | V1.1.0   | 陈健洪   | 增加电池温度功能 |
+| **版本号** | **作者** | **修改日期** |     **修改说明**     |
+| ---------- | -------- | :----------- | :------------------: |
+| V1.0.0     | 陈健洪   | 2020-01-06   |       初始版本       |
+| V1.1.0     | 陈健洪   | 2020-05-26   |   增加电池温度功能   |
+| V1.2.0     | 陈健洪   | 2020-06-29   | 完善Charger和NTC章节 |
+
+**目录**
 
 [TOC]
 
@@ -321,6 +322,20 @@ components/drivers/pm/charger.c
 components/drivers/include/drivers/charger.h
 ```
 
+用户只能通过`rt_device_control()`访问charger设备：
+
+```c
+rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg)
+
+// rt_device_control() 中的cmd 定义，“充电参数”指：充电电压、电流、输入电压等。
+#define RT_DEVICE_CTRL_CHAGER_LIMIT_GET     (1) // 获取charger支持的各充电参数的最小、最大值
+#define RT_DEVICE_CTRL_CHAGER_STATUS_GET    (2) // 获取当前的充电参数
+#define RT_DEVICE_CTRL_CHAGER_BATVOL_SET    (3) // 设置电池充电电压，即满充电压值，单位：mV
+#define RT_DEVICE_CTRL_CHAGER_BATCUR_SET    (4) // 设置电池的充电电流，单位：mA
+#define RT_DEVICE_CTRL_CHAGER_FNSCUR_SET    (5) // 设置电池的充电截止电流，单位：mA
+#define RT_DEVICE_CTRL_CHAGER_SRCCUR_SET    (6) // 设置来自适配器端的输入电流，单位：mA
+```
+
 ### 4.2 配置使能
 
 ```
@@ -330,43 +345,51 @@ CONFIG_RT_USING_CHARGER_RK816
 
 ### 4.3 基础概念
 
+- 最大充电电流
+
+  RK816 带有智能电源路径管理功能，来自适配器的供电优先给系统使用，剩余的再给电池充电。软件上配置的允许向电池充电的最大剩余电流值称之为最大充电电流。
+
+  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_BATCUR_SET`。
+
 - 最大输入电流
 
   软件上配置可从适配器获取的最大电流，称之为“最大输入电流”。例如 5V/2A 的适配器，我们一般软件配置最大输入电流为 2A（也可以设置为 1.8A...）。
 
-- 最大充电电流
-
-  RK816 有智能电源路径管理功能，来自适配器的电优先供应给系统使用，剩余的再给电池充电，软件上配置的允许向电池充电的最大剩余电流值称之为最大充电电流。
+  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_SRCCUR_SET`。
 
 - 最大充电电压
 
   电池满充状态的电压。
 
+  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_BATVOL_SET`。
+
 - 充电截止电流
 
   PMIC对电池停止充电的最小电流阈值。
 
+  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_FNSCUR_SET`。
+
 - 采样电阻
 
-  板子上电池端正负极端之间的采样电阻，PMIC通过采样电阻完成电压、电流的采集。通过改变采样电阻的阻值，用户可以扩展充电电流和充电截止电流的档位（放大或缩小）。硬件设计上，通常采用20mR采样电阻。
+  板子上电池端正负极端之间的采样电阻，PMIC通过采样电阻完成电压、电流的采集。通过改变采样电阻的阻值，用户可以扩展充电电流和充电截止电流的档位（放大或缩小）。硬件设计上，通常采用20mR采样电阻。该参数需要在板级配置中进行指定（见后续章节）。
 
 ### 4.4 硬件档位
 
 根据采样电阻的阻值不同，用户可以扩展充电电流和充电截止电流的档位（放大或缩小），但是最大充电电压、最大输入电流不受影响。如下是根据寄存器定义顺序列举的硬件档位：
 
-- 最大充电电压档位：
+- 最大充电电压档位(7个档位)：
 
 ```c
 [4050, 4100, 4150, 4200, 4250, 4300, 4350]
 ```
 
-- 最大输入电流档位：
+- 最大输入电流档位(7个档位)：
 
 ```c
 [450, 80, 850, 1000, 1250, 1500, 1750, 2000]  // 注意：第2项是80，不是800
 ```
 
-- 最大充电电流档位：
+- 最大充电电流档位(8个档位，不同采样电阻有不同的档位值)：
 
 ```c
 10mR:     [2000, 2400, 2800, 3200, 3600, 4000, 4500, 4800]
@@ -375,7 +398,7 @@ CONFIG_RT_USING_CHARGER_RK816
 100mR:    [200,   240,  280,  320,  360,  400,  450,  480]
 ```
 
-- 充电截止电流档位：
+- 充电截止电流档位(4个档位，不同采样电阻有不同的档位值)：
 
 ```c
 10mR:     [300, 400, 600, 800]
@@ -384,9 +407,15 @@ CONFIG_RT_USING_CHARGER_RK816
 100mR:    [30,   40,  60,  80]
 ```
 
+注意事项:
+
+- 上述不同采样电阻对应的参数档位值是固定的，不允许用户修改；
+- 用户只能通过`rt_device_control()`的方式访问设备，并且只能传递上述列出的具体档位值。例如：100mR采样电阻情况下配置最大充电电流，只有8个档位值可以被传递：200,   240,  280,  320,  360,  400,  450,  480；40mR下也是8个档位值可以被传递：500,   600,  700,  800,  900, 1000, 1125, 1200。
+- 用户不需要通过`rt_device_control()`接口传递采样电阻的阻值。这个阻值需要通过板级配置定义(见后续章节)，rk816_charger.c驱动初始化时会自动去获取该配置。
+
 ### 4.5 板级定义
 
-用户需要在board.c 定义采样电阻的阻值（单位：毫欧）。比如：
+用户只需要根据板子的实际硬件设计，在board.c 定义采样电阻的阻值（单位：毫欧）。比如：
 
 ```c
 struct rk816_charger_platform_data rk816_charger_pdata =
@@ -397,29 +426,54 @@ struct rk816_charger_platform_data rk816_charger_pdata =
 
 ### 4.6 用户接口
 
+上述章节已提到用户需要通过`rt_device_control()`接口访问charger设备，如下给出更详细使用说明：
+
 ```c
 rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg)
 
-// rt_device_control() 中的cmd 定义：
-#define RT_DEVICE_CTRL_CHAGER_LIMIT_GET     (1) /* Get min, max */
-#define RT_DEVICE_CTRL_CHAGER_STATUS_GET    (2) /* Get current configure */
-#define RT_DEVICE_CTRL_CHAGER_BATVOL_SET    (3) /* Set battery charge voltage */
-#define RT_DEVICE_CTRL_CHAGER_BATCUR_SET    (4) /* Set battery charge current */
-#define RT_DEVICE_CTRL_CHAGER_FNSCUR_SET    (5) /* Set battery finish current */
-#define RT_DEVICE_CTRL_CHAGER_SRCCUR_SET    (6) /* Set adapter input source current */
+// rt_device_control() 中的cmd 定义，“充电参数”指：充电电压、电流、输入电压等。
+#define RT_DEVICE_CTRL_CHAGER_LIMIT_GET     (1) // 获取charger支持的各充电参数的最小、最大值
+#define RT_DEVICE_CTRL_CHAGER_STATUS_GET    (2) // 获取当前的充电参数
+#define RT_DEVICE_CTRL_CHAGER_BATVOL_SET    (3) // 设置电池充电电压，即满充电压值，单位：mV
+#define RT_DEVICE_CTRL_CHAGER_BATCUR_SET    (4) // 设置电池的充电电流，单位：mA
+#define RT_DEVICE_CTRL_CHAGER_FNSCUR_SET    (5) // 设置电池的充电截止电流，单位：mA
+#define RT_DEVICE_CTRL_CHAGER_SRCCUR_SET    (6) // 设置来自适配器端的输入电流，单位：mA
 ```
 
-用户通过上述接口可获取、配置charger的硬件档位。
+- RT_DEVICE_CTRL_CHAGER_LIMIT_GET：
 
-- 获取：PMIC 硬件档位的最大/最小值。包括：充电电压、充电电压、 输入电流、充电截止电流。
-- 配置：配置硬件档位。包括：充电截止电压、最大充电电流、最大输入电流、充电截止电流。
+  使用：rt_device_control(device, RT_DEVICE_CTRL_CHAGER_LIMIT_GET, &limit);
+
+  limit为`struct rt_charger_limit` 类型变量，保存了从charger读的充电电压、充电电流、输入电流、截止电流的max和min档位。
+
+- RT_DEVICE_CTRL_CHAGER_STATUS_GET：
+
+  使用：rt_device_control(device, RT_DEVICE_CTRL_CHAGER_STATUS_GET, &status);
+
+  status为`struct rt_charger_status` 类型变量，保存了从charger读的当前充电电压、充电电流、输入电流、截止电流值。
+
+- RT_DEVICE_CTRL_CHAGER_BATVOL_SET：
+
+  使用：rt_device_control(device, RT_DEVICE_CTRL_CHAGER_BATVOL_SET, &voltage);
+
+  voltage为rt_int32_t类型变量，用于配置充电电压。
+
+- RT_DEVICE_CTRL_CHAGER_BATCUR_SET：
+
+- RT_DEVICE_CTRL_CHAGER_FNSCUR_SET：
+
+- RT_DEVICE_CTRL_CHAGER_SRCCUR_SET：
+
+  类同RT_DEVICE_CTRL_CHAGER_BATVOL_SET的使用。
+
+> 建议阅读bsp/rockchip/common/drivers/pmic/rk816_charger.c中的rk816_charger_control()函数实现。
 
 **注意事项**
 
-用户配置的硬件档位建议严格按照"硬件档位"章节给出的列表。否则：
+配置的档位值应该严格按照前面章节给出的档位表。否则：
 
-- 超出min，max档位，返回配置失败；
-- 未超出min，max档位，但是没有准确匹配时，取小一档进行配置；
+- 配置的档位值超出min，max档位时，返回失败；
+- 配置的档位值未超出min，max档位，但是没有准确匹配时则取小一档进行配置；
 
 **使用范例**
 
@@ -427,7 +481,8 @@ rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg)
 struct rt_charger_status status;
 struct rt_charger_limit limit;
 rt_device_t device;
-rt_uint32_t volt = 4350;
+rt_uint32_t bat_volt = 4350;
+rt_uint32_t bat_cur = 240;
 
 device = rt_device_find("charger");
 if (device == RT_NULL)
@@ -435,10 +490,14 @@ if (device == RT_NULL)
 	return -RT_ERROR;
 }
 
-// 此处仅供示例参考（省略返回值判断）
-rt_device_control(device, RT_DEVICE_CTRL_CHAGER_LIMIT_GET, &limit);
-rt_device_control(device, RT_DEVICE_CTRL_CHAGER_STATUS_GET, &status);
-rt_device_control(device, RT_DEVICE_CTRL_CHAGER_BATVOL_SET, &volt);
+// 此处仅供示例参考
+ret = rt_device_control(device, RT_DEVICE_CTRL_CHAGER_LIMIT_GET, &limit);
+...
+ret = rt_device_control(device, RT_DEVICE_CTRL_CHAGER_STATUS_GET, &status);
+...
+ret = rt_device_control(device, RT_DEVICE_CTRL_CHAGER_BATVOL_SET, &bat_volt);
+...
+ret = rt_device_control(device, RT_DEVICE_CTRL_CHAGER_BATCUR_SET, &bat_cur);
 ...
 ```
 
@@ -631,6 +690,8 @@ struct rk816_sensor_platform_data rk816_sensor_pdata =
     .ntc_degree_step = 5,     // 温度步进，即上述各ntc值之间的步进
 };
 ```
+
+上面的`rk816_ntc_table`数据需要从电池规格书中获取，规格书上通常会有电阻温度和内阻的表格数据。
 
 ### 6.5 用户接口
 
