@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-102
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-03-13
+日期：2020-06-28
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -12,7 +12,7 @@
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +22,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2019福州瑞芯微电子股份有限公司**
+**版权所有© 2020瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -66,6 +66,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | V1.0.1   | 林涛     | 2019-09-03 | 更新文件路     |
 | V1.0.2   | 林涛     | 2020-02-21 | 更新磁盘挂载   |
 | V1.1.0   | 林涛     | 2020-03-13 | 更新格式化操作 |
+| V1.2.0   | 林涛     | 2020-06-28 | 新增板级配置   |
 
 ---
 [TOC]
@@ -124,6 +125,29 @@ RT-Thread components  --->
         (22)  The priority level value of mmcsd thread
         (16)  mmcsd max partition
         [ ]   Enable SDIO debug log output
+```
+
+如果需要修改线宽或者通信频率，请在板级文件中调整。freq_max为最大运行频率,
+不得配置高于50MHz；flags为支持的模式，如果需要支持8线，则改为MMCSD_BUSWIDTH_8,
+如果仅需支持1线，则直接去掉MMCSD_BUSWIDTH_4 属性即可。
+
+```c
+RT_WEAK struct rk_mmc_platform_data rk_mmc_table[] =
+{
+
+#ifdef RT_USING_SDIO0
+
+    {
+        .flags = MMCSD_BUSWIDTH_4 | MMCSD_MUTBLKWRITE | MMCSD_SUP_SDIO_IRQ | MMCSD_SUP_HIGHSPEED,
+        .irq = SDIO_IRQn,
+        .base = SDIO_BASE,
+        .clk_id = CLK_SDIO_PLL,
+        .freq_min = 100000,
+        .freq_max = 50000000,
+        .control_id = 0,
+    },
+
+#endif
 ```
 
 执行命令可以看到已经生成的串口设备：
