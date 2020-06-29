@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.2.0
+发布版本：V1.2.1
 
-日期：2020-06-22
+日期：2020-06-29
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -70,6 +70,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.0.0 | CWW | 2020-05-25 | 1. 更新第3节以及第4.4和4.5节<br>2. 增加快速开机版本编译<br>3. 增加5.4节 |
 | V1.1.0 | CWW | 2020-06-08 | 1. 更新公司名称<br>2. 更新文档排版<br>3. 更新第2节|
 | V1.2.0 | HJC | 2020-06-22 | 增加智能USB Camera产品章节 |
+| V1.2.1 | CWW | 2020-06-29 | 1. 更新4.4章节<br>2. 增加编译环境安装fakeroot工具 |
 
 ---
 
@@ -85,7 +86,7 @@ Ubuntu 16.04系统：
 编译环境搭建所依赖的软件包以及安装命令如下：
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot
 ```
 
 Ubuntu 17.04系统：
@@ -261,7 +262,7 @@ SDK 提供 Windows 烧写工具(工具版本需要 V2.71 或以上)，工具位�
 
 ```shell
 tools/
-├── windows/AndroidTool
+├── windows/RKDevTool
 ```
 
 如下图，编译生成相应的固件后，设备烧写需要进入 MASKROM 或 BootROM 烧写模式，
