@@ -2,9 +2,9 @@
 
 文件标识：RK-FB-YF-358
 
-发布版本：V1.1.0
+发布版本：V1.1.1
 
-日期：2020-06-04
+日期：2020-06-29
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | ---------- | :----------- | ------------------------------- |
 | V1.0.0     | Fenrir Lin | 2020-04-28   | 初始版本                        |
 | V1.1.0     | Fenrir Lin | 2020-06-04   | 增加ispserver和onvif_server部分 |
+| V1.1.1     | CWW        | 2020-06-29   | 更新RK_OEM编译打包命令          |
 
 ---
 
@@ -226,7 +227,7 @@ web前端，采用Angular 8框架。
 ng build --prod
 #将编译生成在app/ipcweb-ng/dist目录下的文件，都移动到device/rockchip/oem/oem_ipc/www路径下
 #在SDK根目录下
-make rk_oem-dirclean && make rk_oem #重新编译oem
+make rk_oem-dirclean && make rk_oem target-finalize #重新编译oem
 ./mkfirmware.sh #打包oem.img,再进行烧写
 ```
 
@@ -377,7 +378,7 @@ web后端，采用ngingx+fastcgi，调试可以使用curl、postman或者直接�
 ```shell
 #在SDK根目录下
 make ipcweb-backend-dirclean && make ipcweb-backend
-make rk_oem-dirclean && make rk_oem #重新编译oem
+make rk_oem-dirclean && make rk_oem target-finalize #重新编译oem
 ./mkfirmware.sh #打包oem.img，再进行烧写
 ```
 
