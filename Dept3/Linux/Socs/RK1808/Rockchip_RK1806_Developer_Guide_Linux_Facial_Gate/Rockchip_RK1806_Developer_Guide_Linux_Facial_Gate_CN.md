@@ -1,10 +1,10 @@
-# Rockchip RK1806 Linux Ficial Gate Developer Guide
+# Rockchip RK1806 Linux Facial Gate Developer Guide
 
 文档标识：RK-KF-YF-330
 
-发布版本：V1.3.0
+发布版本：V1.3.1
 
-日期：2020-06-08
+日期：2020-06-29
 
 文件密级：公开资料
 
@@ -68,6 +68,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-03-19 | V1.1.0   | Jianhua Lin | 修改uboot配置     |
 | 2020-04-26 | V1.2.0   | Jianhua Lin | 增加webserver说明 |
 | 2020-06-08 | V1.3.0   | Jianhua Lin | 修改闸机应用介绍  |
+| 2020-06-29 | V1.3.1   | Jianhua Lin | 更改文档的文件名  |
 
 ---
 
