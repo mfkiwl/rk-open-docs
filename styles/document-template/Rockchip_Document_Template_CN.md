@@ -50,7 +50,7 @@ Rockchip Electronics Co., Ltd.
 
 | **芯片名称** | **内核版本** |
 | ------------ | ------------ |
-| RK2206       | FrerRTOS V10.1.0       |
+| RK2206       | FreeRTOS V10.0.1 |
 
 **读者对象**
 
