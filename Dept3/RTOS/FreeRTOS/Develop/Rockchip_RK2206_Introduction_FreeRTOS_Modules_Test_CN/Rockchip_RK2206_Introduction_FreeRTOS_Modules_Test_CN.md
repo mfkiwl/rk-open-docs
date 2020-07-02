@@ -44,6 +44,8 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
+本文主要针对RK2206 FreeRTOS SDK的基本模块测试方法进行说明。
+
 **产品版本**
 
 | **芯片名称** | **内核版本** |
