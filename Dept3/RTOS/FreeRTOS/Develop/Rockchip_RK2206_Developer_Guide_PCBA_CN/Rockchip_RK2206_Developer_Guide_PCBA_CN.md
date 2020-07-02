@@ -44,7 +44,7 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文提供一个标准模板供套用。后续模板以此份文档为基础改动。
+本文主要针对RK2206 Story Board 的工厂测试说明。
 
 **产品版本**
 
