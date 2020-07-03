@@ -2,17 +2,15 @@
 
 文档标识：RK-SM-YF-345
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-03-18
+日期：2020-07-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **福州瑞芯微电子股份有限公司**
+**版权所有** **© 2020** **瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -64,16 +62,19 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | RK3399      | Y               | Y              | N           |
 | RK3399Pro      | Y               | Y              | N           |
 
-## **修订记录**
+ **修订记录**
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
 | 2020-03-18 | V1.0.0   | Caesar Wang   | 初始版本     |
-
-## **目录**
+| 2020-07-03 | V1.1.0   | Caesar Wang   | 增加屏幕参数调整说明     |
 
 ---
+
+ **目录**
+
 [TOC]
+
 ---
 
 ## Rockchip Linux Graphics介绍
@@ -392,3 +393,48 @@ RT5651： aplay -D plughw:0,0 /dev/urandom
 HDMI声卡测试: aplay -D plughw:1,0 /dev/urandom
 SPDIF声卡测试： aplay -D plughw:2,0 /dev/urandom
 ```
+
+### 屏幕参数调整
+
+在 Linux 平台上可以通过 modetest 对屏幕的色调、饱和度、对比度和亮度（hue, saturation, contrast and brightness）等参数进行调整。
+
+需要 libdrm 和 kernel 的 drm 驱动去支持 atomic 属性。
+
+- [libdrm](https://github.com/rockchip-linux/buildroot/blob/rockchip/2018.02-rc3/package/libdrm/0009-modetest-Add-option-to-enable-atomic-capabilities.patch)
+
+```
+331017ae06a modetest: Add option to enable atomic capabilities
+```
+
+- [Kernel](https://github.com/rockchip-linux/kernel)
+
+```
+3fdcc6dc0779 drm/rockchip: dsi: add support legacy api to set property
+0de45ac60e93 drm/bridge: analogix_dp: add support legacy api to set property
+ad0afccfcd79 drm/rockchip: lvds: add support legacy api to set property
+1210fcf23a85 drm/rockchip: rgb: add support legacy api to set property
+```
+
+使用modetest和modetest -w选项设置 -w <obj_id>:<prop_name>:<value>  设置相关属性。
+
+比如设置EDP屏幕的色调：
+
+modetest -M rockchip 可以获取eDP屏幕Connectors id是92。
+
+```
+Connectors:
+id      encoder status          name            size (mm)       modes   encoders
+92      91      connected       eDP-1           129x171         1       91
+  modes:
+        name refresh (Hz) hdisp hss hse htot vdisp vss vse vtot)
+  1536x2048 60 1536 1548 1564 1612 2048 2056 2060 2068 200000 flags: nhsync, nvsync; type: preferred
+...
+```
+
+设置EDP屏幕的hue值为60，默认hue值是50，可以调整范围是0~100。
+
+```
+modetest -M rockchip -a -w 92:hue:60
+```
+
+同理可以设置lvds/hdmi/mipi等其他屏幕的色调、饱和度、对比度和亮度等参数。
