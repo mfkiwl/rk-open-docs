@@ -67,13 +67,13 @@ Software development engineers
 [TOC]
 
 ------
-## 1 Reference
+## Reference
 
 《Rockchip-Secure-Boot-Application-Note.md》
 
 《Rockchip_Developer_Guide_Linux4.4_SecureBoot_CN.pdf》
 
-## 2 Terminology
+## Terminology
 
 AVB : Android Verified Boot
 
@@ -89,11 +89,11 @@ ProductUnlock Key (PUK)：used to unlock the device
 
 **With clear responsibility, each key is independent, which can reduce the risk of key disclosure.**
 
-## 3 Overview
+## Overview
 
 This document introduces Rockchip secure boot process which includes secure and integrity verification. Secure verification is to verify encrypted keys. The process is to read the hash of the public key from secure storage(OTP & efuse), then compare it with the calculated hash of the public key to see if they are the same, and then use the public key to decrypt the hash of the image. Integrity verification is to verify the integrity of the image. The process is to load the image from the memory, calculate the hash of the image and compare it with the decrypted hash to see if they are the same.
 
-## 4 Example of Communication Encryption
+## Example of Communication Encryption
 
 The secure boot process of the device is similar as the verification process of the data encryption during communication. It can help understand avb verification process through this example. Assuming now Alice is sending digital information to Bob. In order to ensure the confidentiality, authenticity, integrity and non-repudiation of the information transmission, it needs to encrypt and sign the information digitally when transmitted. The transmission process is:
 
@@ -121,11 +121,11 @@ DES algorithm mentioned above can be changed to other algorithm, such as AES enc
 
 ![secure-communicate](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/secure-communicate.png)
 
-## 5 AVB
+## AVB
 
 AVB is the abbreviation of Android Verified Boot. It is a set of image verification process designed by Google, which is mainly used to verify boot system and other images. Rockchip Secure Boot Process is a whole set of Secure Boot verification solution referring to the AVB verification method and Communication Encryption.
 
-### 5.1 AVB support features
+### AVB support features
 
 - Secure verification
 - Integrity verification
@@ -133,7 +133,7 @@ AVB is the abbreviation of Android Verified Boot. It is a set of image verificat
 - Persistent partition
 - Support chained partitions
 
-### 5.2 image signature and key & certificate generation
+### image signature and key & certificate generation
 
 ```shell
 #!/bin/sh
@@ -224,7 +224,7 @@ The whole signing process:
 
 ![general_key_cer](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/general_key_cer.png)
 
-### 5.3 AVB lock
+### AVB lock
 
 ```shell
 fastboot oem at-lock-vboot
@@ -232,7 +232,7 @@ fastboot oem at-lock-vboot
 
 Refer to fastboot command support chapters on how to enter fastboot.
 
-### 5.4 AVB unlock
+### AVB unlock
 
 Currently Rockchip uses strict secure verification, which requires to add config in the corresponding defconfig:
 
@@ -365,7 +365,7 @@ if __name__ == '__main__':
 	challenge_verify()
 ```
 
-### 5.5 Enable AVB in U-boot
+### Enable AVB in U-boot
 
 It requires trust support to enable avb. Need to configure U-Boot in defconfig file:
 
@@ -410,7 +410,7 @@ CONFIG_ROCKCHIP_EFUSE=y
 CONFIG_ROCKCHIP_OTP=y
 ```
 
-### 5.6 Kernel modification
+### Kernel modification
 
 System, vendor, oem and other partitions are verified by loading dm-verify module of kernel, so need to enable this module.
 
@@ -464,7 +464,7 @@ firmware {
 };
 ```
 
-### 5.7 Android SDK configuration instruction
+### Android SDK configuration instruction
 
 #### AVB Enable
 
@@ -496,7 +496,7 @@ These variables mainly include three types:
   - `BOARD_CACHEIMAGE_PARTITION_SIZE`
   - `BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE`
 
-### 5.8 New contents in CMDLINE
+### New contents in CMDLINE
 
 ```
 Kernel command line: androidboot.verifiedbootstate=green androidboot.slot_suffix=_a dm="1 vroot none ro 1,0 1031864 verity 1 PARTUUID=b2110000-0000-455a-8000-44780000706f PARTUUID=b2110000-0000-455a-8000-44780000706f 4096 4096 128983 128983 sha1 90d1d406caac04b7e3fbf48b9a4dcd6992cc628e 4172683f0d6b6085c09f6ce165cf152fe3523c89 10 restart_on_corruption ignore_zero_blocks use_fec_from_device PARTUUID=b2110000-0000-455a-8000-44780000706f fec_roots 2 fec_blocks 130000 fec_start 130000" root=/dev/dm-0 androidboot.vbmeta.device=PARTUUID=f24f0000-0000-4e1b-8000-791700006a98 androidboot.vbmeta.avb_version=1.1 androidboot.vbmeta.device_state=unlocked androidboot.vbmeta.hash_alg=sha512 androidboot.vbmeta.size=6528 androidboot.vbmeta.digest=41991c02c82ea1191545c645e2ac9cc7ca08b3da0a2e3115aff479d2df61feaccdd35b6360cfa936f6f4381e4557ef18e381f4b236000e6ecc9ada401eda4cae androidboot.vbmeta.invalidate_on_error=yes androidboot.veritymode=enforcing
@@ -528,7 +528,7 @@ avbtool make_vbmeta_image --include_descriptors_from_image boot.img --include_de
 
 If for Android SDK, enabling BOARD_AVB_ENABLE will add these information to vbmeta.
 
-## 6 Partition reference
+## Partition reference
 
 Add vbmeta partition and security partition when avb is enabled. The vbmeta partition is used to save the image verification information and the security partition is used to save the encrypted secure data.
 
@@ -562,7 +562,7 @@ TYPE: GPT
 CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00002000@0x00008000(trust_a),0x00002000@0x0000a000(trust_b),0x00001000@0x0000c000(misc),0x00001000@0x0000d000(vbmeta_a),0x00001000@0x0000e000(vbmeta_b),0x00020000@0x0000e000(boot_a),0x00020000@0x0002e000(boot_b),0x00100000@0x0004e000(system_a),0x00300000@0x0032e000(system_b),0x00100000@0x0062e000(vendor_a),0x00100000@0x0072e000(vendor_b),0x00002000@0x0082e000(oem_a),0x00002000@0x00830000(oem_b),0x0010000@0x00832000(factory),0x00008000@0x842000(factory_bootloader),0x00080000@0x008ca000(oem),-@0x0094a000(userdata)
 ```
 
-## 7 Fastboot command support
+## Fastboot command support
 
 In U-Boot, input the following command can enter fastboot:
 
@@ -570,7 +570,7 @@ In U-Boot, input the following command can enter fastboot:
 fastboot usb 0
 ```
 
-### 7.1 Fastboot support command overview
+### Fastboot support command overview
 
 ```shell
 fastboot flash < partition > [ < filename > ]
@@ -596,7 +596,7 @@ fastboot oem at-get-vboot-unlock-challenge
 fastboot oem at-reset-rollback-index
 ```
 
-### 7.2 Fastboot usage
+### Fastboot usage
 
 1. `fastboot flash < partition > [ < filename > ]`
 
@@ -838,7 +838,7 @@ Function: reset rollback data of the device
 
 For example: `fastboot oem at-reset-rollback-index`
 
-## 8 Image flashing (Windows)
+## Image flashing (Windows)
 
 ![firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/firmware-download.png)
 
@@ -846,13 +846,13 @@ A/B System flashing
 
 ![AB-firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/AB-firmware-download.png)
 
-## 9 pre loader verified
+## pre loader verified
 
 Refer to 《Rockchip-Secure-Boot-Application-Note.md》
 
 ![1-3MaskRom-to-loader-sequence](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/1-3MaskRom-to-loader-sequence.png)
 
-## 10 U-boot verified
+## U-boot verified
 
 The verification process of OTP device:
 
@@ -862,7 +862,7 @@ The verification process of efuse device:
 
 ![uboot-verify](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/uboot-verify-efuse.png)
 
-## 11 System boot verification
+## System boot verification
 
 ![system-verify-boot](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/system-verify-boot.png)
 
@@ -872,9 +872,9 @@ avb: Use avb method to load and verify the partition.
 
 slotselect: The partition includes A/B.  "androidboot.slot_suffix=_a" parameter of cmdline will be used when loading the partition.
 
-## 12 AVB operation and verification process based on linux environment
+## AVB operation and verification process based on linux environment
 
-### 12.1 Operation process
+### Operation process
 
 1. Generate a whole set of android image.
 
@@ -965,6 +965,6 @@ fastboot oem fuse at-rsa-perm-attr
 
 Refer to 《Rockchip-Secure-Boot-Application-Note.md》
 
-### 12.2 Verification process
+### Verification process
 
 to-do.

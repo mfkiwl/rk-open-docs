@@ -254,7 +254,7 @@ ota_status ota_verify_img(ota_verify verify)
 
 ## **2 OTA接口使用说明**
 
-### 2.1 OTA配置
+### OTA配置
 
 打开menuconfig ，Components Config中选中OTA配置，可配置OTA的打开与关闭。
 
@@ -360,7 +360,7 @@ OTA 模块已提供 Http 和 File 两种协议下载固件，此外还支持扩�
    return ota_update_image_todo(url, ota_update_xxxx_init, ota_update_xxxx_get);
    ```
 
-#### 2.4.2 升级固件
+#### 升级固件
 
 1、以本地升级为例。
 

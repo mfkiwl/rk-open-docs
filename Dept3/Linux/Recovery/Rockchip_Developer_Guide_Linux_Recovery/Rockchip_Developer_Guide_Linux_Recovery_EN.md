@@ -78,15 +78,15 @@ Software development engineers
 
 ---
 
-## 1 OTA Upgrading
+## OTA Upgrading
 
-### 1.1 Overview
+### Overview
 
 OTA (Over-the-Air) is a space download technology. OTA upgrading is the standard software upgrading method provided by Android system. It is powerful and can upgrade system without loss, mainly through network such as WIFI, 3G/4G to download OTA package and upgrade automatically, also support to download OTA package to SD card or USB Flash drive to upgrade. OTA package is very small, generally from several MB to a dozen MB.
 
 This document mainly introduces the local upgrading program of recovery execution process and technical details when using OTA technology to upgrade, to help customers understand the upgrading process and notices during development.
 
-### 1.2 Build
+### Build
 
 - **rootfs main system**
 
@@ -147,9 +147,9 @@ refer to the following build method:
 6. `./mkfirmware.sh`
 7. Flash recovery.img
 
-### 1.3 Upgrading Process
+### Upgrading Process
 
-#### 1.3.1 Firmware Preparation for Upgrade
+#### Firmware Preparation for Upgrade
 
 Modify `tools/linux/Linux_Pack_Firmware/rockdev/package-file`  based on the partition configuration that needs to be upgraded,
 
@@ -165,7 +165,7 @@ If the error “Error！imageHead.uiTag !=0x57464B52” occurs during upgrading,
 
 ![image error head](resource/image-err-head.png)
 
-#### 1.3.2 Upgrading Process
+#### Upgrading Process
 
 - Put the upgrading firmware update.img in the root directory of the SD card or U disk or in the /userdata directory of the device.
 
@@ -185,13 +185,13 @@ Upgrading flow chart is as follows:
 
 ![the detialed flow chart of recovery](resource/recovery-flow-en.png "recpvery flow")
 
-### 1.4 Restore the Factory Mode
+### Restore the Factory Mode
 
 The readable and writable configuration files are saved in the userdata partition. There are some default configuration parameters with factory firmware and users may generate or modify the configuration files after using for a period of time. Sometimes users want to erase these data, and then they need to restore the factory configuration.
 
 Directly run `update`without adding any parameter or adding  `factory/reset` parameters will enter recovery to restore the factory mode.
 
-### 1.5 Notices
+### Notices
 
 - When packing update.img, need to pay attention to that, full partition upgrading is not necessary for firmware upgrading, you can change the package-file to remove the partition which is no need to upgrade, and in this way you will reduce the size of upgrading package (update.img).
 
@@ -201,9 +201,9 @@ Directly run `update`without adding any parameter or adding  `factory/reset` par
 
 - If putting the update.img package in userdata partition of flash, need to ensure that userdata.img is not packed in package-file. Because it may cause the damage of the file system, and make the oem or userdata partitions fail to mount after upgrading successfully. If upgrading from SD card or U disk, userdata.img can be packed to update userdata partition. It will resize userdata partition after upgrading.
 
-## 2 Debugging
+## Debugging
 
-### 2.1 Check the Log of Recovery Mode
+### Check the Log of Recovery Mode
 
 Create a hidden file in the directory: `buildroot/output/rockchip_rkxxxx_recovery/target`:
 
@@ -223,7 +223,7 @@ After upgrading successfully, check log files in the directory of userdata/recov
 cat userdata/recovery/log
 ```
 
-### 2.2 With and Without Panels
+### With and Without Panels
 
 If it failed during recovery process and prompt below log:
 
@@ -268,7 +268,7 @@ Build after modifying:
 5. `./mkimage.sh`
 6. Flash `rockdev/recovery.img`
 
-#### 2.2.1. Rotation and Display of Device with Panels
+#### Rotation and Display of Device with Panels
 
 - If you need to do some rotation during the recovery upgrade process according to the orientation of the display device, you can follow the introduction below.
 
@@ -286,7 +286,7 @@ ROTATION_LEFT: rotate 270 ° clockwise
 - If you need to adjust the brightness of UI display, you can modify the last parameter `alpha` transparency in the gr_color interface. Maximum 255 means opaque, minimum 0 means fully transparent.
 - Replace the background picture displayed in the UI in recovery. You can replace the image files in the `external/recovery/res/images` directory by yourself, keeping the file names unchanged.
 
-### 2.3. Upgrade in Debian and Ubuntu System
+### Upgrade in Debian and Ubuntu System
 
 Like the recovery upgrade in Buildroot, this recovery OTA upgrade solution also supports upgrades in Debian or Ubuntu systems. For upgrade in recovery mode needs to identify and write the firmware data of different device partition nodes through each partition node of the device, Buildroot system uses the alias method (by-name) in udev to make the device partition nodes universal and easy to identify. Debian or Ubuntu systems lack such a method, which leads to a situation where recovery does not work properly in practice. Therefore, you only need to identify the nodes of the device partition in the Debian or Ubuntu system like Buildroot system, recovery will work normally.
 
@@ -296,7 +296,7 @@ Detailed method to modify is as follows:
 
 Copy to the corresponding path under Debian or Ubuntu, like rootfs/overlay-debug/lib/udev/rules.d/, where rkxxxx  is one of Rockchip chipset (RK3308, RK3328, RK3399, RK3326  and so on), the purpose of the modification is to change each partition node like `/dev/mmcblk0p0` ,`/dev/mmcblk0p1`, `/dev/mmcblk0p2`, `/dev/mmcblk0p3` ... in Debian system or Ubuntu system to `/dev/block/by-name/uboot`, `/dev/block/by-name/misc`, `/dev/block/by-name/boot`, `/dev/block/by-name/rootfs`... on so on after booting.
 
-## 3 Upgrade by SD Card Boot Disk
+## Upgrade by SD Card Boot Disk
 
 This chapter mainly describes how to make SD card boot disk and relative upgrading issues in order to meet the upgrading requirement of bare chip using SD card to boot.
 
@@ -362,9 +362,9 @@ sdboot update will update from /mnt/sdcard/sdupdate.img
 start with main.
 ```
 
-## 4 Appendix
+## Appendix
 
-### 4.1. The misc Partition Introduction
+### The misc Partition Introduction
 
 Misc actually is the first four letters of miscellaneous, which means sundry, mixture and mess.
 
@@ -392,7 +392,7 @@ It will take RK3308 misc partition as an example below, use the tool such as win
 
 For the supported commands in recovery, please refer to the contents of struct OPTIONS in external/recovery/recovery.c.
 
-#### 4.1.1 Select misc.img
+#### Select misc.img
 
 The misc.img is a frequently used file in the SDK root directory device`device/rockchip/rockimg`. When generating firmware, choose which misc.img file to copy based on the configuration.
 
@@ -415,9 +415,9 @@ vim BoardConfig.mk
 
 As shown from the above figure, `wipe_all-misc.img` is used as the firmware of the misc partition by default. After flash this misc firmware, the user (/userdata or /data) partition and the customize (/ oem) partition will be formatted. If you want to boot into the normal system without going into recovery mode, you can modify the specific file of misc image in BoardConfig.mk as blank-misc.img. Then rebuild to generate a new firmware.
 
-### 4.2 Recovery Usage in Different Cases
+### Recovery Usage in Different Cases
 
-#### 4.2.1 First Power up
+#### First Power up
 
 The device have been flashed misc.img and recovery.img will enter the first power up process.
 
@@ -458,7 +458,7 @@ executed '/usr/sbin/resize2fs' done
 executed '/usr/sbin/resize2fs' return 0
 ```
 
-#### 4.2.2 Restore the Factory Configuration
+#### Restore the Factory Configuration
 
 Run `update` program in Command line, the device will enter recovery mode and start formatting, and it will automatically enter normal system after formatting.
 
@@ -480,7 +480,7 @@ USB_SDP_CHARGER
 [ 10.891460] random: nonblocking pool is initialized
 ```
 
-#### 4.2.3 Upgrade
+#### Upgrade
 
 Run`update ota /xxx/update.img`, the device will enter recovery and start upgrading.
 
@@ -500,9 +500,9 @@ librkupdate_ui_print = parameter writing....
 librkupdate_###### Download trust ... #######
 ```
 
-### 4.3  FAQ
+### FAQ
 
-#### 4.3.1  “cannot find or open a drm device ”
+#### “cannot find or open a drm device ”
 
 For Non RK3308 platforms, after the device enters recovery mode, usually it will to see below log printed from serial port:
 
@@ -562,7 +562,7 @@ make recovery-dirclean && make recovery
 ./mkfirmware.sh
 ```
 
-#### 4.3.2 Default Command For misc Partition Firmware Modification
+#### Default Command For misc Partition Firmware Modification
 
 If you want to modify the different recovery commands packaged in the misc firmware, or use a empty misc partition firmware. Please refer to the following modification:
 
@@ -570,7 +570,7 @@ Modify the mkfirmware.sh in the project root directory:
 
 ![misc chose in mkfirmware.sh](resource/misc-chose.png "misc chose in mkfirmware.sh")
 
-#### 4.3.3 Set userdata Partition as vfat File System
+#### Set userdata Partition as vfat File System
 
 The userdata partition is ext2/ext4 file system in the SDK by default, if  you want to change it to vfat32 file system, please refer to following modification:
 
@@ -661,7 +661,7 @@ mcopy -i $USERDATA_IMG $USERDATA_DIR/* ::/ >/dev/null 2>&1
 export RK_USERDATA_FS_TYPE=vfat
 ```
 
-#### 4.3.4 Do not Format the userdata or data Partition
+#### Do not Format the userdata or data Partition
 
 The `wipe_all-misc.img` is configured in the BoardConfig.mk , but sometimes users don't want to  format user or custom (userdata or oem) partitions. in this case, the recovery code `external/recovery/reocvery.c` should be modified: the code in the main function as shown below, delete the code in the red box below, rebuild the the recovery partition firmware and flash the firmware.
 

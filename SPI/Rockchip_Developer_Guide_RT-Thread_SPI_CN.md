@@ -75,7 +75,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 Rockchip SPI 功能特点
+## Rockchip SPI 功能特点
 
 SPI（Serial Peripheral Interface）
 
@@ -86,9 +86,9 @@ SPI（Serial Peripheral Interface）
 * 32级FIFO深度（部分芯片是64级）
 * 数据采样时钟RXD可配置
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 框架代码：
 
@@ -112,7 +112,7 @@ bsp/rockchip-common/drivers/drv_spi.h
 bsp/rockchip-common/tests/spi_test.c
 ```
 
-### 2.2 配置
+### 配置
 
 打开串口配置，同时会生成/dev/spi0..2设备。
 
@@ -125,7 +125,7 @@ RT-Thread bsp drivers  --->
         [*]   Enable SPI2
 ```
 
-### 2.3 SPI测试
+### SPI测试
 
 使能SPI测试程序：
 
@@ -155,7 +155,7 @@ SPI测试命令：
 	example: spi_test loop spi2_0 10 1024
 ```
 
-### 2.4  SPI 使用配置
+### SPI 使用配置
 
 SPI控制器作为MASTER时可以支持0-50MHz（个别平台可以配置更高频率），作为SLAVE时可以支持0-20Mhz。
 

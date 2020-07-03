@@ -40,11 +40,11 @@
 
 ***
 
-## 1 Webview & Browser & Chrome
+## Webview & Browser & Chrome
 
    在本文开始前，有必要明确一下这三者的差别，Webview 是 Android 框架层的核心组件，所有应用都可以通过内嵌 Webview 的方式很方便的集成 Web 功能，而不需要自己去移植庞大复杂的 Web Engine；而 Browser 则是 Andr-oid 提供的一个全功能网页浏览器，其本质也是通过 Webview 来实现的；最后一个 Chrome 则是基于 Chromium 开源工程的，和桌面上最流行的 Chrome 浏览器是同一份代码编译的。
 
-## 2 HTML5
+## HTML5
 
    HTML5 是 W3C 最新的 Web 标准，用来取代之前的 HTML、XHTML 以及 HTML DOM，增加了很多新的特性：
 
@@ -60,9 +60,9 @@
 
    很多人把 HTML5 和音视频、游戏划等号，这其实是不对，HTML5 包含的新特性非常多，我上面列的也并不完整，有兴趣的可以看完整的[HTML5 规范](https://www.w3.org/TR/html5/)。
 
-## 3 Webview FAQ
+## Webview FAQ
 
-### 3.1 如何升级 Webview
+### 如何升级 Webview
 
    Web Engine 本身非常庞大，外围依赖模块又多，并且又是完全开放的，所以随着系统组件或网页内容的更新，难免会有一些 BUG 和兼容性问题，目前最新的 Webview 已经是基于 Chromium 主线分支，版本发布和 Chrome 一样，也是每个月一个稳定版本。所以对于 Browser，还有其他基于 Webview 实现的应用，如果有碰到未知问题，都可以尝试升级 Webview 看能否解决。Android 5.1 开始大致的升级步骤如下（老版本的 Android 和最新版本的 Web-view 不兼容）：
 
@@ -175,11 +175,11 @@ PRODUCT_COPY_FILES += \
 cp external/chromium-webview/prebuilt/$ARCH/webview.apk
 ```
 
-### 3.2 视频无法播放
+### 视频无法播放
 
    这里说的视频如果没有特别说明，都是指的 HTML5 Video，无法播放指的是必现的那种，不是随机或特定条件下触发的无法播放。
 
-#### 3.2.1 手势限制
+#### 手势限制
 
    Android 上的 HTML5 Video 默认都要通过手势（触摸和鼠标操作都算）来触发，如果网页直接在一些非手势触发的侦听里直接调用 HTML5 Video 的 play 函数，是会被直接忽略掉的。如果不喜这个特性，可以通过如下代码来关闭：
 
@@ -197,7 +197,7 @@ public WebSettings getSettings() {
     }
 ```
 
-#### 3.2.2 安全限制
+#### 安全限制
 
    从某个版本的 Webview 开始，不再允许 HTTPS 和 HTTP 混用，即 HTTPS 的网页是不允许嵌入 HTTP 的内容的，所以就有一些客户反应，Android 6.0 开始的 Webview 无法播放 QQ 视频，认真看一下 logcat 就会发现是视频的 URL 不符合这条安全规则被阻止了。如果不喜这个特性，可以通过如下代码来关闭：
 
@@ -205,11 +205,11 @@ public WebSettings getSettings() {
 webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 ```
 
-#### 3.2.3 其他问题
+#### 其他问题
 
    还有一些比较少见的播放限制也会导致无法播放，例如视频源在本地时要保证视频的访问权限，视频在全屏播放的时候需要电源锁的权限，这些都需要 APK 在 Manifest 里正确声明，这个问题 logcat 会抛一个异常出来并且注明是哪个权限失败了；还有就是 GPU 的最大纹理会限制视频的最高分辨率，所以一些老的 GPU 可能会不支持 4k 视频，这个 logcat 也会有明确的提示，并且打开 Chrome，在地址栏输入*chrome://gpu*，然后下拉找到*Video Acceleration Information*这个表格，里面有详细的视频限制。
 
-### 3.3 视频卡顿
+### 视频卡顿
 
    目前最常见的视频卡顿大致分如下几类：
 
@@ -234,11 +234,11 @@ webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
   [^4]: /path_to_android/frameworks/base/media/java/android/media/MediaCodecList.java
 
-### 3.4 视频无法循环或自动播放
+### 视频无法循环或自动播放
 
    循环和自动播放都是网页通过属性来控制，具体可以参见这两个 Demo：[loop](http://www.w3school.com.cn/tags/av_prop_loop.asp) & [autoplay](http://www.w3school.com.cn/tags/av_prop_autoplay.asp)。其他音视频接口和属性完整描述可参见[W3C](http://www.w3school.com.cn/tags/html_ref_audio_video_dom.asp)。
 
-### 3.5 动画或游戏卡顿
+### 动画或游戏卡顿
 
    动画和游戏主要有两种实现 CSS 和 HTML5 Canvas，这两种方式都是支持 GPU 硬件加速的，但是 Chromium 有个黑名单机制，会根据 GPU 和各种软件驱动版本来决定是否开启硬件加速，以解决各种兼容性 BUG。所以如果碰到网页动画卡顿，并且更新到新版本也解决不了的时候，可以用 Chrome 打开地址*chrome://gpu*，就会看到当前系统的硬件加速情况，类似如下：
 
@@ -250,11 +250,11 @@ webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
    上图就表示，PowerVR Rogue 全系列在 Android 系统下，如果 GPU 驱动版本小于 1.8 则关闭 Canvas & Rasterizat-ion 两个加速。这时候我们就知道只要升级一下 PowerVR 的驱动到 1.8 以上的版本即可。
 
-### 3.6 黑屏、白屏和闪烁
+### 黑屏、白屏和闪烁
 
    碰到这种问题一般先看 logcat 上有没有明确的报错，比如 Graphics Buffer 溢出，GPU 奔溃或 OpenGL 报错，框架层异常等，然后请这些外围模块的工程师协助。当然还有一种情况就是 logcat 找不到明显报错，这时候可以尝试升级 Webview 版本，还不行的话就升级 GPU 驱动版本，大部分情况下这些问题都是 Webview 和图形驱动的兼容问题导致。
 
-### 3.7 如何修改 UserAgent
+### 如何修改 UserAgent
 
    修改 UserAgent 目的是为了伪装设备端，比如伪装成 Desktop 或 Ipad 等，可以通过如下代码修改 Webview 的 Use-rAgent：
 
@@ -280,7 +280,7 @@ PRODUCT_COPY_FILES += \
 
    ==注意==：修改 UserAgent 可能会导致兼容变差，例如你伪装成 Ipad 的 Safari 浏览器，结果服务器返回的页面就用了 Safari 才能支持的一些特性，那就会出问题了。
 
-### 3.8 如何实现网址过滤
+### 如何实现网址过滤
 
    Android 本身不支持网址过滤功能，要实现这个功能，有三种方式：
 
@@ -304,7 +304,7 @@ PRODUCT_COPY_FILES += \
 
   这种方法可以实现最灵活也最严格的管控，很多防火墙都是这样实现的，很难绕过。具体方法可以参考这个[教程](https://blog.csdn.net/zhanglianyu00/article/details/50177873)。
 
-### 3.9 无法打开下载文件
+### 无法打开下载文件
 
    这个主要是由于服务器给文件设置了错误的 mime-type，例如给 APK 设置了*text/plain*，这就导致了浏览器报给下载管理器的类型错了，会导致直接通过消息和下载管理器打开会失败，通过文件管理器可以正确打开。要修正这个问题可以这样修改：
 
@@ -332,11 +332,11 @@ index 7a24aa4..8c1441d 100755
              }
 ```
 
-### 3.10 是否支持 Adobe Flash
+### 是否支持 Adobe Flash
 
    Adobe 从 Android 4.3 版本开始停止了对 Android 上 Flash 插件的支持，我们最后可支持插件的版本是 Android 5.1。目前的替代方案有两个：Adobe AIR 和 HTML5，新的内容可以用这两个来实现，这里更推荐后者。而原来旧的 Flash 内容，如果有源文件（即 fla 文件），可以通过新版本的 Adobe Flash 开发工具直接倒出成两个替代方案。
 
-### 3.11 崩溃和 ANR 如何处理
+### 崩溃和 ANR 如何处理
 
    对于这两类问题，在丢到我这边来处理前，我希望能做到这几点，来尽量提高处理效率。
 
@@ -358,7 +358,7 @@ index 7a24aa4..8c1441d 100755
 
   ==注意==：Android 6.0 开始 Webview 也是预制 APK 形式发布，所以也没有符号表了，如果崩溃在 libwebviewchromium.so 就没法 debug，而 Chrome 一直都是 APK 发布，但是其崩溃会自动给 Google 发错误信息，Google 会有选择的抽一些来看。
 
-### 3.12 视频有声无影
+### 视频有声无影
 
    这种问题都可以先试一下这样修改能否解决：
 
@@ -368,11 +368,11 @@ index 7a24aa4..8c1441d 100755
 # start
 ```
 
-## 4 How to build Webview
+## How to build Webview
 
    有兴趣可以参见 Google 的[说明文档](https://chromium.googlesource.com/chromium/src/+/master/docs/android_build_instructions.md)。需要注意的是，Chromium 的提交非常频繁，所以最新分支稳定性不保证，甚至不一定能编译过，如果要出固件的话最好是基于稳定分支 LKGR，或则基于指定的稳定版本，可以参考最新版本的 Chrome，通过地址栏输入*chrome://version*可以看到版本。切换指定版本可以参考这个[说明文档](https://www.chromium.org/developers/how-tos/get-the-code/working-with-release-branches)。
 
-## 5 How to debug
+## How to debug
 
    有时候某些网页元素显示异常，需要看网页的 Layout 信息，在旧版本的 Android(4.2 & before)，可以通过在地址栏输入*about:debug*等特殊地址来启动 dump，Layout 信息会以文本形式输出在/sdcard 目录。新版本的 Webview 没有类似的调试手段，但是 Chrome 可以实现远程调试，具体步骤参见[Google 文档](https://developers.google.com/web/tools/chrome-devtools/remote-debugging/?hl=zh-cn)。
 

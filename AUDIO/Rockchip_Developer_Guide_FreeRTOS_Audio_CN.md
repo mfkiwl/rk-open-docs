@@ -67,15 +67,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 概述
+## 概述
 
 Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音频声卡驱动，本文档主要描述音频框架，音频通路，代码配置以及应用场景。
 
-## 2 软件框架
+## 软件框架
 
 ![](Rockchip_Developer_Guide_FreeRTOS_Audio_CN/FreeRTOS_Audio_SW_Framework.png)
 
-### 2.1 Driver 层驱动文件
+### Driver 层驱动文件
 
 音频驱动位于`src/driver/audio`目录中
 
@@ -89,7 +89,7 @@ Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音�
 | pdm        | drv_pdm.c      | pdm数字音频接口驱动。                                        |
 | vad        | drv_vad.c      | 语音检测模块驱动，系统休眠时，vad实时检测音频，达到阈值，唤醒系统，配合DSP用于语音识别。 |
 
-### 2.2 HAL 层驱动文件
+### HAL 层驱动文件
 
 音频驱动位于`src/bsp/hal`目录中，hal层驱动负责对控制器硬件配置的抽象封装，封装出的API一般给硬件无关层驱动调用。
 
@@ -103,7 +103,7 @@ Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音�
 | pdm     | lib/hal/src/hal_pdm.c | pdm控制器API封装。 |
 | vad | lib/hal/src/hal_vad.c | vad控制器API封装。 |
 
-### 2.3 Driver 层测试用例
+### Driver 层测试用例
 
 测试用例和工具位于`src/subsys/shell`目录中
 
@@ -113,9 +113,9 @@ Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音�
 | tcapure | tcapure.c           | 用于录制音频， 可录制WAV音频于文件系统中。        |
 | tplay   | tplay.c             | 用于播放音乐，可播放文件系统中的WAV音频。         |
 
-## 3 常用接口说明
+## 常用接口说明
 
-### 3.1 IO模型接口
+### IO模型接口
 
 音频应用开发接口调用
 
@@ -128,7 +128,7 @@ Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音�
 | rkdev_read    | 从声卡读取数据，比如录音场景。     |
 | rkdev_close   | 关闭声卡。                         |
 
-### 3.2 控制接口
+### 控制接口
 
 | CMD                            | Description                                                  |
 | ------------------------------ | ------------------------------------------------------------ |
@@ -139,9 +139,9 @@ Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音�
 | RK_AUDIO_CTL_PCM_RELEASE       | 释放声卡的dma buffer。                                       |
 | RK_AUDIO_CTL_PCM_BUFFER_STATUS | 查询dma buffer的状态，指针位置，一般用于查询buffer空间余量。 |
 
-## 4 常用数据结构说明
+## 常用数据结构说明
 
-### 4.1 struct audio_buf
+### struct audio_buf
 
 音频buffer的描述， 用于配置声卡的dma buffer，一般传入申请的uncache buffer，如果是cache buffer，那么需要做相应的clean/invalidate cache操作。
 
@@ -153,7 +153,7 @@ Rockchip RKOS 音频驱动基于 FreeRTOS IO 设备驱动模型向 OS 注册音�
 
 NOTE：1 frame = channels * sample bits / 8。
 
-### 4.2 struct audio_buf_status
+### struct audio_buf_status
 
 描述音频buffer的状态。
 
@@ -162,7 +162,7 @@ NOTE：1 frame = channels * sample bits / 8。
 | hw_ptr   | 硬件指针位置，表示dma传输了多少数据，单位是uframe。          |
 | appl_ptr | 应用指针位置，表示应用程序读或者写了多少数据，单位是uframe。 |
 
-### 4.3 struct audio_params
+### struct audio_params
 
 描述音频的参数：采样率， 声道数，位宽。
 
@@ -172,7 +172,7 @@ NOTE：1 frame = channels * sample bits / 8。
 | sampleBits | 位宽。      |
 | channels   | 声道数。    |
 
-### 4.4 struct audio_card_desc
+### struct audio_card_desc
 
 描述一个声卡的构成，一般在板级文件board.c中定义相应的声卡。
 
@@ -190,22 +190,22 @@ NOTE：1 frame = channels * sample bits / 8。
 | trcm_mode    | 仅用于I2STDM接口，表示是否启用trcm模式。                     |
 | mclkfs       | 描述mclk与lrck的分频比。一般用于根据lrck，自动计算相应的mclk。 |
 
-## 5 开发要点
+## 开发要点
 
-### 5.1 添加一个新的声卡
+### 添加一个新的声卡
 
 根据硬件原理图，确定相应声卡使用的数字音频接口， codec。这里以硬件使用i2s1连接es8388为例。
 
 - 芯片自带codec，需要实现相应hal driver，做到最大程度的共用性。
 - 第三方codec，可只移植driver驱动。
 
-#### 5.1.1 添加codec驱动
+#### 添加codec驱动
 
 ```
 待支持
 ```
 
-#### 5.1.2 添加板级声卡描述
+#### 添加板级声卡描述
 
 在`src/bsp/RK2206/board/rk2206_[evb/story]/board.c`添加声卡描述
 
@@ -238,7 +238,7 @@ menuconfig DRIVER_CODEC
         default n
 ```
 
-#### 5.1.3 menuconfig配置
+#### menuconfig配置
 
 通过menuconfig配置使能相应的声卡。
 
@@ -250,7 +250,7 @@ menuconfig DRIVER_CODEC
 [ ] Enable PA Control (NEW)
 ```
 
-#### 5.1.4 测试
+#### 测试
 
 通过以上步骤，一个声卡添加使能完成，可通过audio.rx /audio.tx对声卡录放音。
 
@@ -290,7 +290,7 @@ audio.tx -D sound3p -t 10 -f 2
 audio.rx -D sound3c -r 16000 -c 2 -b 16 -p 1024 -n 2 -t 10 -f 2
 ```
 
-### 5.2 VAD使用
+### VAD使用
 
 如果需要语音唤醒，则需要配置VAD，VAD的中断可配置为由CPU响应或者由DSP响应：
 
@@ -307,9 +307,9 @@ audio.rx -D sound3c -r 16000 -c 2 -b 16 -p 1024 -n 2 -t 10 -f 2
 
 再结合DSP，即可测试语言唤醒以及关键词识别。
 
-### 5.3 编程示例
+### 编程示例
 
-#### 5.3.1 录音示例
+#### 录音示例
 
 1. 暂时支持8个声卡，devid如下
 
@@ -392,7 +392,7 @@ rk_dma_free(abuf.buf);
 rkdev_close(audio_dev);
 ```
 
-#### 5.3.2 放音示例
+#### 放音示例
 
 放音基本同录音示例，读数据如下
 

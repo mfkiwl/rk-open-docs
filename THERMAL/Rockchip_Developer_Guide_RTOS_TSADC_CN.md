@@ -71,9 +71,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1  HAL TSADC 配置
+## HAL TSADC 配置
 
-### 1.1  HAL CONFIG
+### HAL CONFIG
 
 依赖driver开启：
 
@@ -83,7 +83,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 #endif
 ```
 
-### 1.2  HAL 差异部分
+### HAL 差异部分
 
 不同芯片差异部分在hal_bsp.c,主要定义tsadc的CLK ID，CLK频率，还有一些硬件信息：
 
@@ -112,7 +112,7 @@ const struct HAL_TSADC_DEV g_tsadcDev =
 - `polarity`：TSHUT脚极性，根据硬件信息设置，TSHUT_LOW_ACTIVE：TSHUT默认高电平，高温是TSHUT拉低， TSHUT_HIGH_ACTIVE：TSHUT默认低电平，高温是TSHUT拉高；
 - `mode`：TSHUT后行为，根据硬件信息设置，TSHUT_MODE_CRU：TSHUT产生后复位CRU方式重启系统，TSHUT_MODE_GPIO： TSHUT后拉高或者拉低TSHUT脚复位硬件电路；
 
-### 1.3  HAL 常用 API
+### HAL 常用 API
 
 ```c
 HAL_Status HAL_TSADC_Enable_AUTO(int chn, eTSADC_tshutPolarity polarity, eTSADC_tshutMode mode);
@@ -121,9 +121,9 @@ HAL_Check HAL_TSADC_IsEnabled_AUTO(int chn);
 int HAL_TSADC_GetTemperature_AUTO(int chn);
 ```
 
-## 2 RKOS TSADC配置
+## RKOS TSADC配置
 
-### 2.1  RKOS TSADC CONFIG
+### RKOS TSADC CONFIG
 
 ```c
 make menuconfig
@@ -132,7 +132,7 @@ make menuconfig
 	-*- Enable TSADC
 ```
 
-### 2.2  RKOS 常用API
+### RKOS 常用API
 
 ```c
 rk_err_t TsadcEnable(void);
@@ -140,7 +140,7 @@ rk_err_t TsadcDisable(void);
 int TsadcGetTempByAutoMode(int chn);
 ```
 
-### 2.3  RKOS 使用示例
+### RKOS 使用示例
 
 使用示例：
 
@@ -150,9 +150,9 @@ int temp;
 temp = TsadcGetTempByAutoMode(0);/* 通道0温度 */
 ```
 
-## 3 TEST
+## TEST
 
-### 3.1  CONFIG配置
+### CONFIG配置
 
 ```c
 Components Config  --->
@@ -160,7 +160,7 @@ Components Config  --->
         [*]     Enable PM_TEST Shell
 ```
 
-### 3.2  USAGE
+### USAGE
 
 ```c
 "    tsadc <channel>    get the temperature of <channel>\r\n"

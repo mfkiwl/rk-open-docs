@@ -38,7 +38,7 @@ Software development engineers
 
 -----
 
-## 1 Overview
+## Overview
 
 CPUFreq is a framework model defined by the kernel developer to dynamically change the CPU frequency and voltage according to the specified governor. It can be effective to lower power consumption of the CPU with taking into account the performance of the CPU. CPUFreq framework consists of governor, core, driver, stats. The software architecture is as below:
 
@@ -62,7 +62,7 @@ CPUFreq stats：Provide statistics about cpufreq.
 
 -----
 
-## 2 Code Path
+## Code Path
 
 Governor related code:
 
@@ -97,9 +97,9 @@ drivers/soc/rockchip/rockchip_opp_select.c    /* interface for changing opp */
 
 -----
 
-## 3 Configuration
+## Configuration
 
-### 3.1 Menuconfig
+### Menuconfig
 
 ```c
 CPU Power Management  --->
@@ -124,7 +124,7 @@ CPU Power Management  --->
 
 Through "Default CPUFreq governor", you can select the frequency scaling governor and modify it according to the actual product requirements.
 
-### 3.2 Clock Configuration
+### Clock Configuration
 
 According to the actual situation of  platform, add the "clock" property to the CPU node, in which is generally the DTSI file. If you need more detail about configuration description of clock, please refer to the related Rockchip clock development documentation.
 
@@ -192,7 +192,7 @@ cpu cpu0: failed to get clock: -2
 cpufreq-dt: probe of cpufreq-dt failed with error -2
 ```
 
-### 3.3 Regulator Configuration
+### Regulator Configuration
 
 According to the actual product hardware power solution, add the “cpu-supply” property to the CPU node, in which is generally board-level DTS file. For detailed configuration instructions of Regulator, please refer to the development documentation related to Regulator and PMIC.
 
@@ -265,7 +265,7 @@ For big.LITTLE  core platforms please add  “cpu-supply” to each CPU node, ta
 
 Note: If the regulator is not configured, the cpufreq driver can still be loaded successfully. It is considered that the CPU frequency will be changed without changing voltage. But when the frequency over some value, it may be crash due to the low voltage.
 
-### 3.4 OPP Table Configuration
+### OPP Table Configuration
 
 The kernel puts the related configuration of frequency and voltage in the devicetree. These nodes make up by configuration information is called OPP Table. The OPP Table node contains  the frequency and voltage of OPP nodes, leakage configuration properties, and PVTM configuration properties.
 
@@ -276,7 +276,7 @@ Documentation/devicetree/bindings/opp/opp.txt
 Documentation/power/opp.txt
 ```
 
-#### 3.4.1 Add OPP Table
+#### Add OPP Table
 
 According to the actual situation of the platform, add an OPP Table node and add the "operating-points-v2" property under each CPU node, generally in the DTSI file. Take RK3328 as an example:
 
@@ -348,7 +348,7 @@ cpu cpu0: OPP-v2 not supported
 cpu cpu0: couldn't find opp table for cpu:0, -19
 ```
 
-#### 3.4.2 Delete OPP
+#### Delete OPP
 
 If the developer needs to delete some frequency points, the following method can be used.
 
@@ -384,11 +384,11 @@ Method 2: Re-quote the "OPP Table" node in the board-level DTS and add "status =
 };
 ```
 
-### 3.5 Modify OPP Table According to Leakage
+### Modify OPP Table According to Leakage
 
 IDDQ (Integrated Circuit Quiescent Current) , we also call it leakage. The CPU's leakage means the quiescent current of CPU when provide a specific voltage. At chip producing, the leakage value will be written to eFuse or OTP.
 
-#### 3.5.1 Modify Voltage According to Leakage
+#### Modify Voltage According to Leakage
 
 Background: we find that the Vmin of small leakage chips is larger than big leakage chips from test, so we can reduce the voltage for big leakage chips to reduce power consumption and improve performance.
 
@@ -442,11 +442,11 @@ cpu0_opp_table: cpu0-opp-table {
 
 To turn off this feature, you can delete property "rockchip, leak-voltage-sel" , then OPP will use the voltage specified by "opp-microvolt".
 
-### 3.6 Modify OPP Table According to PVTM
+### Modify OPP Table According to PVTM
 
 CPU PVTM (Process-Voltage-Temperature Monitor) is a module located near CPU, which can reflect the difference in performance between chips. It is affected by process, voltage and temperature.
 
-#### 3.6.1 Modify Voltage According to PVTM
+#### Modify Voltage According to PVTM
 
 Background: we find that the Vmin of small PVTM chips is larger than big PVTM chips from test, so we can reduce the voltage for big PVTM chips to reduce power consumption and improve performance.
 
@@ -538,7 +538,7 @@ cpu0_opp_table: opp_table0 {
 
 To turn off this feature,  you can delete the property "rockchip, pvtm-voltage-sel" , OPP will use the voltage specified by "opp-microvolt".
 
-### 3.7 Modify OPP Table According to IR-Drop
+### Modify OPP Table According to IR-Drop
 
 IR-Drop is a phenomenon that a voltage drop or rise in power and ground networks in integrated circuits. Here we consider it as the ripple voltage case by power ripple and board layout.
 
@@ -587,7 +587,7 @@ The board-level DTS is configured as follows:
 
 To turn off this feature, delete property “rockchip,board-irdrop”.
 
-### 3.8 Wide Temperature Configuration
+### Wide Temperature Configuration
 
 Wide temperature usually means ambient temperature is from − 40℃ to + 85℃.
 
@@ -633,7 +633,7 @@ cpu0_opp_table: opp_table0 {
 
 -----
 
-## 4 User Interface Introduction
+## User Interface Introduction
 
 Non-big.Little platforms, such as RK3288, RK3326, RK3328, all cores share one clock and have the same user interface "/sys/devices/system/cpu/cpufreq/policy0/ ".
 
@@ -662,9 +662,9 @@ stats/trans_table             /* record frequency scaling times of each frequenc
 
 -----
 
-## 5 FAQ
+## FAQ
 
-### 5.1 Maximum Frequency of Different Platforms
+### Maximum Frequency of Different Platforms
 
 | **Chipset** | **ARM Core**      | **the Maximum Frequency**      |
 | ----------- | ----------------- | ------------------------------ |
@@ -675,7 +675,7 @@ stats/trans_table             /* record frequency scaling times of each frequenc
 | RK3368      | 4 * A53 + 4 * A53 | 1512MHz(big) + 1200MHz(little) |
 | RK3399      | 2 * A72 + 4 * A53 | 1800MHz(big) + 1416MHz(little) |
 
-### 5.2 How to Check OPP Table
+### How to Check OPP Table
 
 Input command below:
 
@@ -700,7 +700,7 @@ Take PX30 as an example
                      1512000000      1350000     1350000     1350000
 ```
 
-### 5.3 How to Change Voltage of OPP
+### How to Change Voltage of OPP
 
 Method 1: modify each voltage of OPP directly.
 
@@ -792,7 +792,7 @@ After change:
 };
 ```
 
-### 5.4 How to Fix Frequency
+### How to Fix Frequency
 
 Method 1: Set governor to userspace in menuconfig and set CPU frequency in cru devicetree node.
 
@@ -869,7 +869,7 @@ echo 408000 > /sys/devices/system/cpu/cpufreq/policy4/scaling_setspeed
 
 Notice: Setting CPU frequency through cpufreq node usually change voltage at the same time, except two frequencies hold the same voltage.
 
-### 5.5 How to Check Current Frequency
+### How to Check Current Frequency
 
 The user interface  of cpufreq and debugfs interface of clock allow to check frequency.
 
@@ -895,7 +895,7 @@ cat /sys/kernel/debug/clk/armclkl/clk_rate /* LITTLE core frequency*/
 cat /sys/kernel/debug/clk/armclkb/clk_rate /* big core frequency */
 ```
 
-### 5.6 How to Check Current Voltage
+### How to Check Current Voltage
 
 For non  big.LITTLE core chipset, command ad below
 
@@ -912,7 +912,7 @@ cat /sys/kernel/debug/regulator/vdd_core_l/voltage /* LITTLE core voltage*/
 cat /sys/kernel/debug/regulator/vdd_core_b/voltage /* big core voltage*/
 ```
 
-### 5.7 How to Set Voltage and Frequency Separately
+### How to Set Voltage and Frequency Separately
 
 Set cpufreq governor to userspace, refer to chapter 5.4 method 3.
 
@@ -960,7 +960,7 @@ cat /sys/kernel/debug/regulator/vdd_core_b/voltage            /* get big core vo
 
 Notice:  Before raise frequency, increasing voltage first. Before reduce frequency, decrease frequency and then decrease voltage.
 
-### 5.8 How to Check the Voltage of the OPP
+### How to Check the Voltage of the OPP
 
 If support modifying voltage according to PVTM, input command below:
 
@@ -988,7 +988,7 @@ Similarly, if support modifying voltage according to leakage, input the followin
 dmesg | grep leakage
 ```
 
-### 5.9 How to Check Current Leakage
+### How to Check Current Leakage
 
 ​ Input command below
 

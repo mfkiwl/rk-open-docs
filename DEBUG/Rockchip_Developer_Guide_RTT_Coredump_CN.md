@@ -75,11 +75,11 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 Coredump功能说明
+## Coredump功能说明
 
 ​	针对机器测试无法连接串口等实时获取调试信息的场景。这种情况下，如果机器出现死机，只能重启，但是重启后又看不到有用信息。针对MCU类型的产品，SRAM比较小，可以把整个SRAM空间和指令空间按一定格式保存到文件或者某个分区，然后拷贝到PC上，进行分析。
 
-## 2 代码
+## 代码
 
 ```
 bsp/rockchip/common/drivers/coredump/drv_coredump.c
@@ -97,7 +97,7 @@ drv_coredump_flash.c 未经过文件系统，直接保存到flash的实现，比
 
 drv_coredump_sdcard.c 经过文件系统，保存到/sdcard/目录，比如SD卡或者EMMC等存储设备。
 
-## 3 编译配置
+## 编译配置
 
 ```
 RT-Thread rockchip common drivers  --->
@@ -124,9 +124,9 @@ RL 0x7000 0xa81 core_dump.bin
 * coredump to sd卡和flash时，assert会coredump到sd卡，exception会coredump到flash。
 * coredump to flash only时，exception和assert 都会coredump到flash。
 
-## 4 测试
+## 测试
 
-### 4.1 Windows环境
+### Windows环境
 
 * 在串口命令行执行coredump命令，触发assert，死机
 
@@ -163,7 +163,7 @@ RL 0x7000 0xa81 core_dump.bin
 
 ![img](Rockchip_Developer_Guide_RTT_Coredump_CN/4.png)
 
-### 4.2 Linux环境
+### Linux环境
 
 主要介绍如何导出core_dump.bin，其他步骤请参考4.1章节。
 
@@ -172,7 +172,7 @@ sudo upgrade_tool db Image/rk2108_db_Loader.bin
 sudo upgrade_tool rl 0x7000 0x305 core_dump.bin
 ```
 
-## 5 解析
+## 解析
 
 ARM MCU ECLIPSE + GDB + OPENOCD + 虚拟适配器 + 虚拟cortex-m设备。
 

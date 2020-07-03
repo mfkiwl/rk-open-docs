@@ -75,7 +75,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 ImageConvert.exe制作GUI图像资源
+## ImageConvert.exe制作GUI图像资源
 
 SDK支持开机循环播放图片，使用特定GUI图像资源，资源制作工具位于SDK下tools/ImageConvert.exe。
 
@@ -104,11 +104,11 @@ bird4_(0,0).bmp
 
 ![ImageConvert.png](resources/ImageConvert.png)
 
-## 2 GUI图像资源的使用
+## GUI图像资源的使用
 
 使用生成的图片资源Image.uis，用于开机自动播放图片。
 
-### 2.1图片资源存储于内部Flash(即A盘)
+### 图片资源存储于内部Flash(即A盘)
 
 1. 资源存放
 
@@ -149,7 +149,7 @@ make menuconfig（输入/搜索）
 关闭 FRAME_BUFFER
 ```
 
-### 2.2图片资源存储于TF卡（即C盘）
+### 图片资源存储于TF卡（即C盘）
 
 1. 资源存放
 
@@ -190,6 +190,6 @@ make menuconfig配置
 关闭 FRAME_BUFFER
 ```
 
-## 3 开机效果
+## 开机效果
 
 ![demo_show](resources/test.png)

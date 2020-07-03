@@ -80,9 +80,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 shell命令简介
+## shell命令简介
 
-### 1.1 配置shell
+### 配置shell
 
 RK2206 SDK支持用户通过shell命令进行操作控制与调试。用户可通过命令make menuconfig进行打开或关闭配置。
 
@@ -92,7 +92,7 @@ Components Config  --->
         [ ] Enable Command shell
 ```
 
-### 1.2 初识shell
+### 初识shell
 
 如果**CONFIG_COMPONENTS_SHELL**配置打开，系统开机后将会显示如下信息：
 
@@ -162,11 +162,11 @@ RK2206>music.play.help
 
 随着软件版本的不断完善与更新，支持的命令也将随之更新。
 
-## 2 shell命令开发
+## shell命令开发
 
 RK2206 SDK支持用户自定义shell命令，可以根据需求打开或者关闭部分shell命令。
 
-### 2.1 创建shell命令文件
+### 创建shell命令文件
 
 RK2206 SDK shell命令接口文件存放路径为：./src/subsys/shell/，文件命名规则为shell_xxx.c。用户可将自己的shell命令接口文件存储在该目录下。下面以一个简单的例子shell_music.c来描述shell文件结构，详细内容可参考其他shell命令接口文件：
 
@@ -242,7 +242,7 @@ music_shell_delete()：music shell命令的反初始化函数；
 
 music_shell_play()，music_shell_pause()，music_shell_stop()三个函数music shell命令控制函数，实现了简单的音乐播放控制。
 
-### 2.2 增加shell命令宏控制
+### 增加shell命令宏控制
 
 RK2206 SDK支持2种增加shell命令方式。一种是参考shell_music.c，另一种方式可以参考shell_io.c（推荐参考）。
 本文档主要介绍参考shell_music.c方式。
@@ -255,7 +255,7 @@ Components Config  --->
         [*]     Enable Audio Music Shell
 ```
 
-### 2.3 增加shell命令
+### 增加shell命令
 
 当shell命令文件创建完成后，shell命令接口函数需要在shell命令列表中调用，才能通过串口输入命令执行。shell命令列表文件为./src/subsys/shell/shell_cmddata.c。
 
@@ -296,17 +296,17 @@ SHELL_CMD ShellMusicName[] =
 #endif
 ```
 
-### 2.4 注意事项
+### 注意事项
 
-#### 2.4.2 使用注意事项
+#### 使用注意事项
 
 为了避免上述问题的发生，用户在使用shell命令时，尽量遵循以下流程，以music shell为例：
 
 ![shell命令操作流程](resources/shell.png)
 
-## 3 shell命令详解
+## shell命令详解
 
-### 3.1 shell命令格式说明
+### shell命令格式说明
 
 ```
 RK2206>cmd[.<sub cmd | sub cmd package>...][ parameter...]
@@ -325,7 +325,7 @@ RK2206>cmd[.<sub cmd | sub cmd package>...][ parameter...]
 
 *命令的具体使用参见后面章节描述*。
 
-### 3.2 system
+### system
 
 系统命令列表可通过system.help查看，如下：
 
@@ -352,13 +352,13 @@ RK2206>system.help
 
 随着软件版本的不断完善与更新，支持的命令也将随之更新。
 
-#### 3.2.1 系统复位命令
+#### 系统复位命令
 
 ```
 RK2206>system.reset
 ```
 
-#### 3.2.2 idle1
+#### idle1
 
 设定系统一级休眠时间：设定时间到后，系统进入一级休眠状态。
 
@@ -378,7 +378,7 @@ RK2206>system.idle1 <time>
 RK2206>system.idle1 1000    //设定一级休眠时间为1000秒
 ```
 
-### 3.3 系统命令task
+### 系统命令task
 
 task命令可以通过task.help查看支持的子命令及帮助说明。对于子命令，可以通过task.*subcmd*.help来查看子命令的帮助说明。
 
@@ -395,19 +395,19 @@ RK2206>task.help
 
 随着软件版本的不断完善与更新，支持的命令也将随之更新。
 
-#### 3.3.1 查看当前系统运行的线程状态
+#### 查看当前系统运行的线程状态
 
 ```
 RK2206>task.list
 ```
 
-#### 3.3.2 查看当前系统堆使用情况
+#### 查看当前系统堆使用情况
 
 ```
 RK2206>task.lw
 ```
 
-### 3.4 查看设备
+### 查看设备
 
 dev命令可以通过dev.help查看支持的子命令及帮助说明。对于子命令，可以通过dev.*subcmd*.help来查看子命令的帮助说明。
 
@@ -422,13 +422,13 @@ RK2206>dev.help
 
 随着软件版本的不断完善与更新，支持的命令也将随之更新。
 
-#### 3.4.1 查看当前系统运行的设备状态
+#### 查看当前系统运行的设备状态
 
 ```
 RK2206>dev.list
 ```
 
-### 3.5 查看系统固件信息命令
+### 查看系统固件信息命令
 
 fw命令可以通过fw.help查看支持的子命令及帮助说明。对于子命令，可以通过fw.*subcmd*.help来查看子命令的帮助说明。
 
@@ -447,7 +447,7 @@ RK2206>fw.help
 
 随着软件版本的不断完善与更新，支持的命令也将随之更新。
 
-#### 3.5.1 查看固件的内存使用及分布信息
+#### 查看固件的内存使用及分布信息
 
 ```
 RK2206>fw.inf </m | /s>
@@ -464,7 +464,7 @@ RK2206>fw.inf </m | /s>
 RK2206>fw.inf /m      //按空间地址排序查看内存空间分布情况
 ```
 
-#### 3.5.2 查看当前加载到内存运行的代码段信息
+#### 查看当前加载到内存运行的代码段信息
 
 ```
 RK2206>fw.list

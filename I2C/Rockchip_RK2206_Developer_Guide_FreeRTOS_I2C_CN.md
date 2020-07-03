@@ -74,7 +74,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 ---
 [TOC]
 ---
-## 1  I2C 总线接口用途
+## I2C 总线接口用途
 
 用于外接 I2C 外设的总线规范，方便用户实现对不同外接设备的控制和访问I2C 总线控制器通过串行数据（SDA）线和串行时钟 （SCL）线在连接到总线的器件间传递信息。Rockchip I2C 控制器支持下列功能:
 
@@ -82,9 +82,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 - 仅支持主模式下的 I2C 总线
 - 软件可编程时钟频率支持 Standard mode(100K)， Fast mode(400K)， Fast+ mode(1000K)
 
-## 2  I2C  配置
+## I2C  配置
 
-### 2.1 menuconfig 配置
+### menuconfig 配置
 
 在 menuconfig 里面将控制器的驱动勾选 DRIVER_I2C，并同时根据当前的硬件情况，勾选所使用的 I2C bus, 可多选。
 
@@ -109,7 +109,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
             [*] Enable I2C Shell
 ```
 
-### 2.2 板级文件配置
+### 板级文件配置
 
 板级配置，请修改对应工程的 board.c 文件里的 I2cDevHwInit() 函数，主要包含两个配置：
 
@@ -138,15 +138,15 @@ INIT API void I2cDevHwInit(uint32 DevID, uint16 *speed)
 }
 ```
 
-## 3 代码和 API 使用
+## 代码和 API 使用
 
-### 3.1 代码位置
+### 代码位置
 
 - 控制器驱动层代码 ./src/driver/i2c/I2cDevice.c
 - 控制器 HAL 层代码 ./src/bsp/hal/lib/hal/src/hal_i2c.c
 - I2C shell 测试代码 ./src/subsys/shell/shell_i2c.c
 
-### 3.2 I2C API 接口
+### I2C API 接口
 
 ```c
 extern rk_err_t I2CDev_Delete(uint8 DevID, void *arg);
@@ -157,9 +157,9 @@ extern rk_err_t I2cDev_SendData(HDC dev, uint8 *RegCmd, uint32 size, I2C_CMD_ARG
 extern rk_size_t I2cDev_ReadData(HDC dev, uint8 *DataBuf, uint32 size, I2C_CMD_ARG *Rx_arg);
 ```
 
-### 3.3  API 接口使用
+### API 接口使用
 
-#### 3.3.1 创建 I2C 实例
+#### 创建 I2C 实例
 
 使用 I2CDev_Create() 创建，rkdev_open()得到 I2C device，再这个动作之前可以先 find，如果已经创建了，可以直接使用，例子:
 
@@ -177,7 +177,7 @@ extern rk_size_t I2cDev_ReadData(HDC dev, uint8 *DataBuf, uint32 size, I2C_CMD_A
     }
 ```
 
-#### 3.3.2 I2C Write
+#### I2C Write
 
 调用 I2cDev_SendData() 往I2C 总线发送数据，函数参数依次为 I2C device，数据 buffer 指针，数据长度(单位byte)，设备地址，寄存器地址，寄存器地址长度格式， 返回值为寄存器地址长度 + 数据长度。以下是实例:
 
@@ -208,7 +208,7 @@ int i2c_write(uint16 addr, uint16 reg_addr, size_t reg_len,
 }
 ```
 
-#### 3.3.3 I2C Read
+#### I2C Read
 
 调用 I2cDev_ReadData() 从I2C 总线接收数据，函数参数依次为 I2C device，数据 buffer 指针，数据长度(单位byte)，设备地址，寄存器地址，寄存器地址长度格式， 返回值为数据长度。以下是实例:
 
@@ -239,9 +239,9 @@ int i2c_read(uint16 addr, uint16 reg_addr, size_t reg_len,
 }
 ```
 
-## 4 SHELL 测试与输出
+## SHELL 测试与输出
 
-### 4 .1 I2C 读测试
+### I2C 读测试
 
 依次输入 i2c，设备地址，i2c 寄存器地址，i2c 寄存器地址长度，所读取的字节数．以下例子为测试 codec 读测试。
 
@@ -250,7 +250,7 @@ RK2206>i2c_test read i2c2 0x51 0x10 1 1
  recv[0]: 0x8
 ```
 
-### 4 .1 I2C 写测试
+### I2C 写测试
 
 依次输入 i2c，设备地址，i2c 寄存器地址，i2c 寄存器地址长度，所发送的数据，所发送的字节数．以下例子为测试 codec 写测试。
 

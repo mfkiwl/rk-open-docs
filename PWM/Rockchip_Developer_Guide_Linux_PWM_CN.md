@@ -96,7 +96,7 @@ echo 1 > enable
 
 PWM 的连续模式使用最多，且背光使用较为频繁。
 
-### 1. Backlight DTS
+### Backlight DTS
 
 以下是 DTS 文件中背光很常见的背光配置节点：
 
@@ -148,14 +148,14 @@ backlight: backlight {
 - default-brightness-level 表示默认的背光，它存在于开机时候，如背光驱动初始化到安卓用户层设置下来新的背光这段时间，表示为第 200 个元素的背光亮度。
 - enable-gpios 表示背光使能脚，这个根据电路原理图配置即可；有的硬件没有这个背光使能脚，那么将这个配置删除，背光驱动通过配置 brightness-levels 数组的第 0 个元素将背光关闭。
 
-### 2. PWM Backlight 调试
+### PWM Backlight 调试
 
 如何确定背光灭的 brightness-level 值，通过命令行调试背光亮度， echo xxx > sys/class/backlight/backlight/brightness。
 当 PWM 设置为正极性时，可以通过 echo xxx > sys/class/backlight/backlight/brightness 到背光节点，xxx 的范围为 0~255，这时观察亮度变化，如 x 为背光亮度为 0 的点，y 为客户接受的背光最亮的点。这时重新调整 brightness-level 表，就可以将数组第一个值改为 x，最大值改为 y，中间值需均匀变化，凑成 256 个 元素，且有一个元素值为 255。当 PWM 为负极性时，则反之。
 
 ## 常见问题
 
-### 1. PWM 在 U-Boot 与 kernel 之间的衔接问题
+### PWM 在 U-Boot 与 kernel 之间的衔接问题
 
 - U-Boot 如果有用 PWM 调压功能，到了 kernel 阶段，此时 PWM 仍然是工作状态， 需要根据当前 PWM 的硬件状态，将 PWM clock count 调整与当前 PWM 状态一致。否则可能会出现 clock 架构发现无人使用的 PWM clock，将其关闭后，导致 PWM 无法工作，出现类似 PWM 调压电压不够导致的死机问题等。以上的补丁已经修正，确保 PWM 驱动: drivers/pwm/pwm-rockchip.c，更新到下面的提交点:
 
@@ -166,7 +166,7 @@ backlight: backlight {
 
 - U-Boot 与 kernel 所配置的极性和周期不一致，也会导致中间出现切换，可能会导致 PWM 占空比发生变化，出现类似 PWM 调压电压不够导致的死机问题等，所以要保持 U-Boot 与 kernel 的极性和周期一致。
 
-### 2. PWM Regulator 时 PWM pin 脚上下拉配置问题
+### PWM Regulator 时 PWM pin 脚上下拉配置问题
 
 由于在做 reboot 的时候，很多情况是不复位 GRF 里面的寄存器，而 PWM 控制器会发生复位，这就会在 reboot 起来后改变 PWM Regulator 的默认电压，所以要在 kernel 中配置 PWM pin 脚上下拉与默认的上下拉一致，不能配置为 none。该问题只针对 PWM 作为调压时才需要修改，作为其他功能可以不需要关注。
 
@@ -193,7 +193,7 @@ backlight: backlight {
 };
 ```
 
-### 3. PWM 波形无法示波器测到
+### PWM 波形无法示波器测到
 
 如果示波器测试不到波形，从两方面入手：
 

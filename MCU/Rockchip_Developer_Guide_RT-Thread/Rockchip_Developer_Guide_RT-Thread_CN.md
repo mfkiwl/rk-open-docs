@@ -49,14 +49,14 @@
 
 ---
 
-## 1 介绍
+## 介绍
 
    RT-Thread是一个集实时操作系统（RTOS）内核、中间件组件和开发者社区于一体的技术平台，RT-Thread也是一个组件完整丰富、高度可伸缩、简易开发、超低功耗、高安全性的物联网操作系统。RK2108 SDK 基于最新的RT-Thread v3.1.3 版本开发，支持音频编解码，Camera，WIFI，BT，MCU显示接口，SDIO，SPI，I2C，UART，支持外接SPI Flash。
 
-## 2 开发环境搭建
+## 开发环境搭建
 
 <!--
-### 2.1 代码下载
+### 代码下载
 
    目前我司的 RT-Thread SDK 是通过 repo 来管理的，具体下载命令如下：
 
@@ -76,7 +76,7 @@ repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.1
 .repo/repo/repo sync
 ```
 
-### 2.2 环境配置
+### 环境配置
 -->
    本SDK推荐的编译环境是64位的 Ubuntu16.04 或 Ubuntu18.04 ， 在其它 Linux 上尚未测试过, 所以推荐安装与RK开发者一致的发行版。
 
@@ -96,7 +96,7 @@ tar xvf gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
 export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 ```
 
-## 3 目录结构
+## 目录结构
 
    RT-Thread 的标准目录结构如下：
 
@@ -162,11 +162,11 @@ bsp/rockchip
 `-- tools                           # rockchip 通用工具
 ```
 
-## 4 配置和编译
+## 配置和编译
 
    RT-Thread 用 SCons 来实现编译控制，SCons 是一套由 Python 语言编写的开源构建系统，类似于 GNU Make。它采用不同于通常 Makefile 文件的方式，而使用 SConstruct 和 SConscript 文件来替代。这些文件也是 Python 脚本，能够使用标准的 Python 语法来编写。所以在 SConstruct、SConscript 文件中可以调用 Python 标准库进行各类复杂的处理，而不局限于 Makefile 设定的规则。
 
-### 4.1 基础编译打包命令
+### 基础编译打包命令
 
    编译命令如下：
 
@@ -210,7 +210,7 @@ rm -rf build
 scons -h
 ```
 
-### 4.2 模块配置
+### 模块配置
 
    进入到对应的工程目录，如 bsp/rockchip/rk2108 目录下，并运行工程配置工具 menuconfig。
 
@@ -246,7 +246,7 @@ cp board/xxx/defconfig .config             ; 拷贝要修改的板子的默认�
 scons menuconfig                           ; 修改配置项
 ```
 
-### 4.3 保存配置
+### 保存配置
 
    上一节我们看到配置信息是保存在 .config，同时在每一个板级配置目录下都有一个默认配置 defconfig，如果没有执行 menuconfig，会用默认的 rtconfig.h 参与编译。
 
@@ -270,7 +270,7 @@ RK2108_AUDIODEMO_MAINBOARD_V10 板对应的配置文件为：
 bsp/rockchip/rk2108/board/audio_demo_rk2108_v10/defconfig
 ```
 
-### 4.4 板级配置
+### 板级配置
 
    所有的板级配置都放在芯片 BSP 主目录下的 board 目录下，例如 RK2108 的板级配置的目录结构如下：
 
@@ -324,7 +324,7 @@ vi defconfig              # 修改RT_BOARD_NAME = “new_board"
 
    常规的板级配置大致可以分为如下几类：晶振频率、频率电压、IOMUX、存储分区和挂载配置。本章先讨论前三个，另外两个在后面章节细述。
 
-#### 4.4.1 晶振频率
+#### 晶振频率
 
    默认晶振频率是24M，如果板子的晶振刚好是这个频率，请跳过这个配置步骤，否则可以通过 menuconfig 修改 PLL_INPUT_OSC_RATE ，单位是 HZ，例如配置26M晶振：PLL_INPUT_OSC_RATE = 26000000，配置成功后可以在 rtconfig.h 里找到如下定义：
 
@@ -332,7 +332,7 @@ vi defconfig              # 修改RT_BOARD_NAME = “new_board"
 #define PLL_INPUT_OSC_RATE 26000000
 ```
 
-#### 4.4.2 频率电压
+#### 频率电压
 
    本章只会简单介绍 CPU、DSP 和 SRAM 的频率电压表配置，关于 DVFS 和 电源管理的原理和高级配置请参考相应模块的详细文档。
 
@@ -516,7 +516,7 @@ static const struct dvfs_table dvfs_core_table[] =
 };
 ```
 
-#### 4.4.3 IOMUX
+#### IOMUX
 
    MCU 芯片的管脚有限，大部分功能都存在 IO 复用的情况，所以每个功能模块都要根据实际板图配置 IOMUX ，以 rk2108b_evb 为例，代码路径为：board/rk2108b_evb/iomux.c，这里选了其中比较复杂的 LCDC 的 IOMUX，具体如下：
 
@@ -608,7 +608,7 @@ RT_UNUSED void i2s_iomux_config(void)
 }
 ```
 
-### 4.5 XIP 模式说明
+### XIP 模式说明
 
    RK2108 支持 XIP 方式运行，即代码可以直接在 NOR FLASH 中执行 。要编译生成 XIP 格式的固件有两种方式：直接修改 rtconfig.py 和设置环境变量 RTT_BUILD_XIP，具体如下：
 
@@ -625,7 +625,7 @@ XIP = 'Y'
 export RTT_BUILD_XIP=Y
 ```
 
-### 4.6 Scons 编译脚本
+### Scons 编译脚本
 
    大部分驱动和应用并不需要关心编译脚本，目前的编译脚本会自动搜索驱动、板级配置、应用和测试等目录的所有源文件进行编译，所以即使增加模块，一般也不需要改脚本。只有在目录结构有变更，或者需要修改编译标志的时候会需要改动编译脚本。
 
@@ -750,7 +750,7 @@ CPPDEFINES                                         # 全局宏定义
 ASFLAGS                                            # 全部汇编标志
 ```
 
-### 4.7 静态库编译
+### 静态库编译
 
    RT-Thread 支持静态库编译，模块可以先剥离成一个独立的 Group，每一个 Group 都是一个独立的编译单元，可以有自己的编译标志和链接标志，也可以很方便的编译成静态库，下面以 FileTest 模块为例，先看看这个模块的编译脚本 /path/to/rtthread/examples/file/SConscript，具体如下：
 
@@ -809,7 +809,7 @@ group = DefineGroup('file-test', src, depend = ['RT_USING_FILE_TEST'], CPPPATH =
 
    综上，某些不方便开源的模块，可以按上述方法做成静态库，以库文件的形式对外发布。
 
-### 4.8 分区表配置
+### 分区表配置
 
    分区表用于把一块存储介质分成若干个逻辑分区，每个分区可独立操作，实现内容隔离。下面是2108分区表的参考例子，存储介质被分成四个分区：System、UserPart1-3，**<u>需要注意的是其中 PartOffset 和 PartSize 必须64KB对齐</u>**，这个例子已经按64KB对齐了：
 
@@ -860,7 +860,7 @@ File=../../Image/root.img #需要预制根文件系统的时候，指向做好�
 
    每个新板子移植的时候可以参考上面的例子，写自己的分区配置，并放到板子的主目录，编译脚本会搜索 board/xxx/setting.ini 把分区表打包到最后的固件里，其中xxx是模块配置时选的板级目录名，对应的配置项是 RT_BOARD_NAME 。**<u>如果在板子的主目录搜不到分区配置，编译脚本会使用公共的分区表</u>**，其路径是 board/common/setting.ini 。
 
-### 4.9 分区挂载
+### 分区挂载
 
    如果想通过文件系统对分区进行读写，则需要先让文件系统挂载起来，有两个方法可以做到：配置挂载表和应用程序自己调用 dfs_mount 函数。这里只介绍第一种方式，步骤如下：
 
@@ -898,7 +898,7 @@ File=../../Image/root.img #需要预制根文件系统的时候，指向做好�
    };
 ```
 
-### 4.10 固件打包
+### 固件打包
 
    固件打包是为了把系统需要的各种固件打包在一起，如分区表、loader、OS和根文件系统，2108的固件打包脚本是放在 bsp/rockchip/rk2108/mkimage.sh ，目前的编译脚本在编译完成后会自动触发固件打包，因此只需执行 scons 命令即可一步完成编译和打包 。以下是mkimage.sh的内容：
 
@@ -931,14 +931,14 @@ else
 fi
 ```
 
-## 5 固件烧录
+## 固件烧录
 
    在烧录固件前，需要让板子进入到升级模式，RK2108 支持两种升级模式：Recovery 模式和 MaskRom 模式。下面是进入到2种模式的方法：
 
 1. 在 USB 口连着电脑的前提下，按住 RECOVERY 键不松开，短按 RESET 键，让板子进入到 Recovery 模式后松开 RECOVERY 按键；
 2. 在 USB 口连着电脑的前提下，用镊子短接核心板上的2个 MASROM 触点不松开，短按 RESET 键，让板子进入到 MaskRom 模式后松开镊子。
 
-### 5.1 Linux版烧录工具及命令
+### Linux版烧录工具及命令
 
    Linux 系统下可以使用如下脚本完成固件烧录
 
@@ -956,7 +956,7 @@ bsp/rockchip/rk2108/update_fimeware.sh
 ../tools/upgrade_tool rd
 ```
 
-### 5.2 Windows版升级工具
+### Windows版升级工具
 
    打开 bsp/rockchip/tools 目录下的 Rockchip_Develop_Tool_v2.63，如首次使用此工具，需要安装它目录下的驱动：DriverAssitant_v4.91。打开升级工具：
 
@@ -967,7 +967,7 @@ bsp/rockchip/rk2108/update_fimeware.sh
 第2项“Firmware”选择 bsp/rockchip/rk2108/Image/Firmware.img
 ```
 
-## 6 根文件系统制作和烧写
+## 根文件系统制作和烧写
 
    目前 RK2108 默认支持的根文件系统是 FAT 格式的，下面是制作 FAT 的根文件系统的方法：
 
@@ -1009,7 +1009,7 @@ mkfs -t elm root                                          # 格式化root分区
 
    关于如何通过 USB 读写板上的 root 分区文件的方法，请参考：《Rockchip_Developer_Guide_RT-Thread_USB_CN》文档的“USB MSC 使用示例”章节。
 
-## 7 驱动开发
+## 驱动开发
 
    驱动的开发实际上分两个部分：HAL 和 Driver，前者可以参考 HAL 的开发指南，这里主要说明后者开发过程中的注意事项：
 
@@ -1145,7 +1145,7 @@ static void udelay(unsigned long usec) {
 
    如果两个模块有先后顺序以来，可以放到上面的不同初始化组里，来控制顺序。当然也自己在代码里去控制，举例，如果有两个模块 A 和 B，A 的初始化依赖于 B 的初始化，则最好只把 B 的初始化 EXPORT 出来，然后在 B 里再去调用 A 的初始化。
 
-## 8 测试用例
+## 测试用例
 
    提交驱动的同时，最好同步提交测试程序，目前我们的 BSP 测试被分为两个部分：公共和私有，前者是可以多个芯片共用的测试，后者是这个芯片特有的测试，目录分别如下：
 
@@ -1253,9 +1253,9 @@ finsh >> tc_start("bsp_spi")  ;  遍历所有spi测试用例
 finsh >> tc_start("")               ； 调用所有测试用例
 ```
 
-## 9 调试
+## 调试
 
-### 9.1 内存问题
+### 内存问题
 
    目前 RT-Thread 上我们配置了三种堆：系统堆、large 和 uncache，后两者是可选的。下面通过一个表格来说明三者的差异：
 
@@ -1397,7 +1397,7 @@ address: 0x62028de8
 
    **<u>需要注意的，memcheck 只能检查一小部分的内存越界，即刚好冲了内存块管理结构的前 12 字节才能检查到，所以即使 memcheck 没检查出错误，也不代表没有越界存在。</u>**
 
-### 9.2 死锁问题
+### 死锁问题
 
    对于死锁问题，RT-Thread 也提供了几个命令，可以列出所有的任务同步和通信的状态，通过这些就可以比较容易定位死锁关系：两个死锁线程的名字，死锁的锁名字，这些信息可以大幅缩小排查范围，具体命令如下：
 
@@ -1422,7 +1422,7 @@ shrx     000 0
 heap     001 0
 ```
 
-### 9.3 模块调试
+### 模块调试
 
    RT-Thread 提供了大部分内核模块的调试 log 开关，默认情况下都是关闭的，开发者可以根据需求打开，具体如下：
 
@@ -1443,7 +1443,7 @@ heap     001 0
 #define RT_DEBUG_MODULE_CONFIG   /* 动态模块加载的相关信息 */
 ```
 
-### 9.4 Fault 调试
+### Fault 调试
 
    目前我们默认启用了 CMBacktrace，出现 Fault 后会自动打印堆栈和调用信息，可以用自带的测试命令 cmb_test 来看 dump 的格式，具体如下：
 
@@ -1497,7 +1497,7 @@ cd /path_to_rtthread_home/bsp/rockchip/rk2108
 addr2line -e rtthread.elf -a -f 04010abe 04010a9d 0400c325 0400afad
 ```
 
-### 9.5 Backtrace
+### Backtrace
 
    为了方便调试，我们封装了一个简单的 Backtrace，提供打印堆栈和高级 ASSERT 功能如下：
 
@@ -1507,7 +1507,7 @@ void dump_call_stack(void);
 #define RT_BACKTRACE_ASSERT(EX)
 ```
 
-### 9.6 Cache一致性
+### Cache一致性
 
    RK2108 有两个 Cache：ICache 和 Dcache ，所以外设如果存在和 CPU 共用内存的场景，就必须要考虑 Cache 一致性的问题，在这个过程中需要注意两点：共用的内存要保持 Cache Line 对齐，在合适的位置做 Cache Maintain。
 

@@ -74,9 +74,9 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 概述
+## 概述
 
-### 1.1 功能概述
+### 功能概述
 
 ![isp20_flow_chart](resources/isp20_flow_chart.png)
 
@@ -88,7 +88,7 @@ RkAiq具体实现可以参考Linux/Multimedia/camera/目录中的文档《Rockch
 
 本文着重介绍应用层如何获取经过ISP20处理后的数据流。
 
-### 1.2 数据流概述
+### 数据流概述
 
 | **entity name** | **video id** | **max width**                        | **support output fmt** |
 | :-------------- | :----------- | :----------------------------------- | :--------------------- |
@@ -155,9 +155,9 @@ ISP20可以输出四路数据流，如表1所示，entity name及对应的设备
 /sys/class/video4linux/video9/name:rkisp-statistics
 ```
 
-## 2 数据流获取
+## 数据流获取
 
-### 2.1 基于RKMEDIA获取数据流
+### 基于RKMEDIA获取数据流
 
 RKMEDIA是RockChip Linux平台的多媒体库，详情请阅读docs/Linux/Multimedia/目录中的文档《Rockchip_Instructions_Linux_Rkmedia_CN.pdf》，本文着重介绍摄像头采集接口部分。
 
@@ -167,7 +167,7 @@ RKMEDIA是RockChip Linux平台的多媒体库，详情请阅读docs/Linux/Multim
 # ./camera_cap_test -h
 ```
 
-#### 2.1.1 bypass节点数据流获取
+#### bypass节点数据流获取
 
 bypass这路数据流比较特殊，**其不支持设置分辨率**，其输出分辨率由ISP输入的分辨率决定，可以通过media-ctl查看拓扑结构确定ISP输入的分辨率。
 
@@ -207,7 +207,7 @@ camera_cap_test -i /dev/video13 -o output.yuv -w 2688 -h 1520 -f image:nv12
 camera_cap_test -i rkispp_m_bypass -o output.yuv -w 2688 -h 1520 -f image:nv12
 ```
 
-#### 2.1.2 三路scale down节点数据流获取
+#### 三路scale down节点数据流获取
 
 三路scale down节点支持缩放，每一路支持的最大分辨率如[1.2 数据流概述](## 1.2 数据流概述)中的表1所示，同时也支持entity name和/dev/videoX来抓取数据流，以scale0为例：
 
@@ -219,7 +219,7 @@ camera_cap_test -i rkispp_scale0 -o output.yuv -w 2688 -h 1520 -f image:nv12
 
 **建议三路scale输出的分辨率相加后未超过主码流的分辨率**
 
-#### 2.1.3 FBC格式数据获取
+#### FBC格式数据获取
 
 ISP20支持输出FBC格式数据，**仅rkispp_m_bypass（/dev/video13）支持输出FBC格式数据**，FBC格式数据有两种，FBC0与FBC2。其区别如下：
 
@@ -275,7 +275,7 @@ camera_cap_test -i /dev/video13 -o output.yuv -w 2688 -h 1520 -f image:fbc2
 
 **注意：此分辨率也不支持设置，建议主码流采用FBC格式数据（对带宽占用比较友好）。**
 
-### 2.2 基于v4l2-utils获取数据流
+### 基于v4l2-utils获取数据流
 
 ISP20驱动支持V4L2接口，因此获取数据流可以用v4l-utils包中的v4l2-ctl工具，**在调试过程中，建议先使用该工具检验能否成功出图。**
 
@@ -291,7 +291,7 @@ v4l2-ctl -d /dev/video13 --set-ctrl="exposure=234,analogue_gain=76"  \
 --stream-mmap=4 --stream-to=/tmp/output.nv12 --stream-count=1 --stream-poll
 ```
 
-## 3 RkAiq 3A Server独立进程
+## RkAiq 3A Server独立进程
 
 当Sensor输出RAW BAYER RGB格式时，如RGGB,BGGR,GBRG,GRBG等，需要ISP20提供一系列图像处理算法来优化图像效果，此时需要RkAiq模块介入。
 
@@ -304,7 +304,7 @@ Ispserver具体实现可以阅读docs/Linux/Multimedia/camera/目录中的文档
 - 已经在支持列表中的，在external/camera_engine_rkaiq/iqfiles/目录下会有一份对应的xml文件
 - 否则**请向业务窗口发起模组调试申请**
 
-### 3.1 如何确认RkAiq版本
+### 如何确认RkAiq版本
 
 - 从源码中查看
 
@@ -313,7 +313,7 @@ Ispserver具体实现可以阅读docs/Linux/Multimedia/camera/目录中的文档
   #define RK_AIQ_VERSION "v0.1.6"           # 输出的v0.1.6是librkaiq.so的版本号
   ```
 
-#### 3.1.1 如何确认RkAiq所匹配的ISP20驱动版本号
+#### 如何确认RkAiq所匹配的ISP20驱动版本号
 
 - 从kernel源码中查看ISP以及ISPP驱动版本
 
@@ -335,7 +335,7 @@ Ispserver具体实现可以阅读docs/Linux/Multimedia/camera/目录中的文档
   [    0.340370] rkispp ffb60000.rkispp: rkispp driver version: v00.01.00
   ```
 
-### 3.2 如何确认3A是否正常工作
+### 如何确认3A是否正常工作
 
 如果产品带屏幕，可以直接预览，如果是IPC类产品，可以打开网页预览，针对没有屏幕也不是IPC类产品，可以通过[2 数据流获取](## 2 数据流获取)中的方法获取数据流，来确认AE, AWB等是否正常。
 
@@ -351,12 +351,12 @@ Ispserver具体实现可以阅读docs/Linux/Multimedia/camera/目录中的文档
 
 可以看到进程号705即是ispserver。
 
-#### 3.2.1 没有看到ispserver进程
+#### 没有看到ispserver进程
 
 - 查看/var/log/syslog中是否有rkaiq相关的错误，如有看具体错误是什么，是否Sensor模组对应的xml没有找到，或不匹配。
 - 在shell中执行`ispserver`，从另一个shell中抓图。获取ispserver对应的错误信息。
 
-#### 3.2.2 如何确定Sensor IQ配置文件(xml)文件名及路径
+#### 如何确定Sensor IQ配置文件(xml)文件名及路径
 
 Sensor iq文件由三部分组成，
 

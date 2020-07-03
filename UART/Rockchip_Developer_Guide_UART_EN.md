@@ -68,7 +68,7 @@ Software Engineer
 [TOC]
 ---
 
-## 1 Rockchip UART Feature
+## Rockchip UART Feature
 
 UART（Universal Asynchronous Receiver/Transmitter)
 
@@ -78,9 +78,9 @@ The features supported by the Linux 4.4 uart driver:
 * Some serial ports support hardware automatic flow control, some don't support. See the data sheet for details.
 * Support interrupt transfer mode and DMA transfer mode
 
-## 2 Linux Software
+## Linux Software
 
-### 2.1 Source Code Path
+### Source Code Path
 
 The type is 16550A, which is compatible with 8250 driver.
 
@@ -93,7 +93,7 @@ The type is 16550A, which is compatible with 8250 driver.
 7. drivers/tty/serial/8250/8250_port.c        port related interface
 8. drivers/tty/serial/earlycon.c                     support  early console for printk
 
-### 2.2 Kernel Configuration
+### Kernel Configuration
 
 ```c
 Device Drivers  --->
@@ -109,9 +109,9 @@ Device Drivers  --->
 		 [*] Support for Synopsys DesignWare 8250 quirks
 ```
 
-### 2.3 Enable UART Device
+### Enable UART Device
 
-#### 2.3.1 Enable DTS  uart0
+#### Enable DTS  uart0
 
 Add the following code to the board-level DTS file:
 
@@ -121,7 +121,7 @@ Add the following code to the board-level DTS file:
 };
 ```
 
-#### 2.3.2 Device drive registration log
+#### Device drive registration log
 
 ```c
 [0.464875] Serial: 8250/16550 driver, 5 ports, IRQ sharing disabled
@@ -132,7 +132,7 @@ Add the following code to the board-level DTS file:
 
 The successful registration of the device likes the above log. If pin-ctrl conflicts with other drivers, it will report the log of pin-ctrl configuration fail.
 
-#### 2.3.3 Serial device
+#### Serial device
 
 The legacy driver will register 5 ttySx devices. However, if the serial port without enable by method of Chapter 2.3.1, although there are device nodes, they cannot be operated.
 
@@ -173,7 +173,7 @@ The driver will number the serial port according to aliase, as follows: "serial0
 	};
 ```
 
-### 2.4 DTS node Configuration
+### DTS node Configuration
 
 Take the uart0 DTS node as an example:
 
@@ -204,7 +204,7 @@ Board level dts file added:
 };
 ```
 
-#### 2.4.1 Pin-ctrl Configuration
+#### Pin-ctrl Configuration
 
 Sometimes a serial port has multiple sets of IOMUX configurations, which need to be configured according to the actual situation.
 
@@ -215,7 +215,7 @@ pinctrl-0 = <&uart0xfer &uart0cts &uart0_rts>;
 
 Where "uart0_cts" and "uart0_rts" are hardware flow control pins, which only means that the pins are configured as corresponding function pins, and does not mean that hardware flow control is enabled. Enabling hardware flow control needs to be set from the application layer. **It should be noted that if hardware flow control is enabled, uart0_cts and uart0_rts must be matched at the same time. If it does not need hardware flow control, you can remove uart0_cts and uart0_rts.**
 
-#### 2.4.2 DMA transfer mode
+#### DMA transfer mode
 
 Compared with the interrupt transfer mode, using DMA does not necessarily increase the transfer speed, but may slightly reduce the transfer speed. Because the performance of the CPU is now very high, the difficulty of improving the transmission performance is in the peripheral, otherwise, starting the DMA will consume additional resources. But overall, the interrupt mode will take up more CPU resources. Only when the amount of transmitted data is large, the mitigation effect on the CPU load will be more obvious.
 
@@ -300,7 +300,7 @@ And generates log below:
 [  498.889713] dw-apb-uart ff0a0000.serial: got rx dma channels only
 ```
 
-#### 2.4.3 Baud Rate Configuration Instructions
+#### Baud Rate Configuration Instructions
 
 ​	Baud rate = clock source / 16 / DIV. (DIV is the division factor)
 
@@ -324,7 +324,7 @@ root@android:/ # cat /sys/kernel/debug/clk/clk_summary | grep uart
              pclk_uart4_pmu               1            1    48285715          0 0
 ```
 
-#### 2.4.4 Serial port wake-up system
+#### Serial port wake-up system
 
 ​	For this feature, the kernel needs to be patched and the SOC trust firmware may need to be modified. If you need, please consult the one who maintain the trust firmware.
 
@@ -337,11 +337,11 @@ root@android:/ # cat /sys/kernel/debug/clk/clk_summary | grep uart
 
 ---
 
-## 3 Linux serial port print
+## Linux serial port print
 
-### 3.1 FIQ debugger, ttyFIQ0  device as console
+### FIQ debugger, ttyFIQ0  device as console
 
-#### 3.1.1 DTS enable  node fiq_debugger，disable the corresponding node of uart
+#### DTS enable  node fiq_debugger，disable the corresponding node of uart
 
 ```c
 fiq_debugger: fiq-debugger {
@@ -365,7 +365,7 @@ The node will register the" /dev/ttyFIQ0 "device after driver loading. It is not
 
 Rockchip, irq-mode-enable = <0>: If this value is "1 "and the serial port interrupt mode uses irq, generally no problem. But if it is 0 and it uses FIQ mode, and some platforms with trust firmware need to be used with caution. This may be a failure due to mismatch of trust firmware version and the kernel version.
 
-#### 3.1.2 Enable early printk
+#### Enable early printk
 
 Add the following parameters, where 0xff1a0000 is the physical base address of uart2. And the different serial port are different base addresses.
 
@@ -379,7 +379,7 @@ chosen {
 };
 ```
 
-#### 3.1.3 Android parameter.txt  configure console device
+#### Android parameter.txt  configure console device
 
 Generally, the following parameters can be specified by the default console device, such as ttyFIQ0 registered above, will be used. But if you specify ttyS2, you can't type the command.
 
@@ -387,9 +387,9 @@ Generally, the following parameters can be specified by the default console devi
 commandline：androidboot.console=ttyFIQ0  console=ttyFIQ0
 ```
 
-### 3.2 ttySx as console
+### ttySx as console
 
-#### 3.2.1 uart2 as console
+#### uart2 as console
 
 Add the following parameters, where 0xff1a0000 is the physical base address of uart2. And the different serial port are different base addresses.
 
@@ -407,13 +407,13 @@ chosen {
 };
 ```
 
-#### 3.2.2 Enable early printk
+#### Enable early printk
 
 ```c
 console=uart8250,mmio32,0xff1a0000  //It already contains the function of early printk
 ```
 
-#### 3.2.3 Android parameter.txt  configure console device
+#### Android parameter.txt  configure console device
 
 Generally, the following parameters can be specified by the default console device, such as ttyS2 registered above, will be used. But if you specify ttyFIQ0, you can't type the command.
 
@@ -423,11 +423,11 @@ commandline：androidboot.console=ttyS2 console=ttyS2
 
 Note: console from chapter 3.1 and  chapter 3.2 can not exist at the same time, otherwise print error. rockchip,`serial-id = <x>`  of FIQ debugger and ttySx are mutually exclusive, which means that a serial port is used by the fiq debugger driver, it can not be used as a common serial port.
 
-### 3.3 Turn off the serial port printing
+### Turn off the serial port printing
 
-#### 3.3.1 Remove or disable all configurations of chapter 3.1 or 3.2
+#### Remove or disable all configurations of chapter 3.1 or 3.2
 
-#### 3.3.2 Remove the configuration of the 8250 driver console
+#### Remove the configuration of the 8250 driver console
 
 ```c
 Device Drivers  --->
@@ -438,7 +438,7 @@ Device Drivers  --->
 
 If you do not want to modify this configuration, you need to add "console=" and specify nothing at the command line, which means that the console is not applicable.
 
-#### 3.3.3 Removes recovery on the console at Android device, otherwise it will get stuck as reset
+#### Removes recovery on the console at Android device, otherwise it will get stuck as reset
 
 ```c
 android/device/rockchip/common/recovery/etc/init.rc
@@ -448,7 +448,7 @@ seclabel u:r:recovery:s0
 ```
 
 ---
-## 4 Debug serial device
+## Debug serial device
 It is better to use the tested APK software instead of  command "echo cat "to debug the serial device. Or, consult Rockchip FAE to get the ts_uart test bin file. Entering ts_uart on the command line will get the relevant help information.
 
 ```c

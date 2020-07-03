@@ -72,7 +72,7 @@ Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 RT-Thread Rockchip SDIO 功能特点
+## RT-Thread Rockchip SDIO 功能特点
 
 SDIO （Secure Digital Input and Output）
 
@@ -80,9 +80,9 @@ SDIO （Secure Digital Input and Output）
 * 仅支持 Highspeed 模式, 1/4/8 线宽
 * 支持 DMA 传输模式
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 SDIO 框架：
 
@@ -103,7 +103,7 @@ bsp/rockchip/common/drivers/drv_sdio.c
 bsp/rockchip/common/drivers/drv_sdio.h
 ```
 
-### 2.2 配置
+### 配置
 
 打开 SDIO 配置，如果是 SD 卡和 eMMC，会生成/dev/sdioX 设备；如果是 SDIO 设备，需要 SDIO 的
 function driver(例如 wifi 驱动)里面调用 sdio_register_driver 后才会出现对应的 wifi 驱动节点
@@ -161,14 +161,14 @@ sd1           Block Device     0
 
 ```
 
-### 2.3 调试
+### 调试
 
 * 将 RT_SDIO_DEBUG 配置选上后，则会输出更多 SDIO/SD/EMMC 协议栈的执行流程信息。
 * 将 bsp/rockchip-common/drivers/drv_sdio.c 中的 RK_MMC_DBG 配置后，则会输出更多控制器驱动执行信息。
 * 请务必在板级配置中设置好 IOMUX，IO 电源设置，卡电源设置，对应 gpio bank 的 io domain，以及确保控制器的输出时钟为偶数分频所得。
 * 如果wifi驱动有多个线程同时对function进行读写，请使用mmcsd_host_lock和mmcsd_host_unlock接口进行互斥保护。
 
-### 2.4 EMMC或者SD Card挂载
+### EMMC或者SD Card挂载
 
 (1) 需要开启的DFS的支持与elmfatfs文件系统格式的支持
 

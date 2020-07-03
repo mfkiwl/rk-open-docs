@@ -61,15 +61,15 @@ Software development engineers
 [TOC]
 ---
 
-## 1 Introduction
+## Introduction
 
-### 1.1 Overview
+### Overview
 
 Weston is the official implementation reference of Wayland open source display protocol, and Weston 3.0 drm back-end is used in Rockchip Buildroot SDK by default.
 
 [^Note]: For more details about Weston and Wayland, please refer to the official website：<https://wayland.freedesktop.org>.
 
-### 1.2 Configuration Methods
+### Configuration Methods
 
 There are multiple ways to configure Rockchip Buildroot SDK Weston:
 
@@ -104,9 +104,9 @@ e. udev rules
 
 Part of the configurations of input devices in Weston should be set by `udev rules`.
 
-## 2 Configuration
+## Configuration
 
-### 2.1 Status Bar Configuration
+### Status Bar Configuration
 
 Weston supports setting the background color and position of status bar in the `shell` section of weston.ini configuration file, and setting the quick start program in the `launcher` section, for example:
 
@@ -162,7 +162,7 @@ Currently, Weston does not support setting the size of status bar. You have to m
             }
 ```
 
-### 2.2 Background Configuration
+### Background Configuration
 
 Weston supports setting the background pattern and color in the `shell` section of the weston.ini configuration file, such as
 
@@ -180,7 +180,7 @@ Weston supports setting the background pattern and color in the `shell` section 
     # The color format is ARGB8888, effective when no background pattern is set
 ```
 
-### 2.3 Idle Time and Lock Screen Configuration
+### Idle Time and Lock Screen Configuration
 
 The idle timeout of Weston can be configured in the startup parameters or in the `core` section of weston.ini, such as:
 
@@ -216,7 +216,7 @@ Lock screen of Weston can be configured in the `shell` section of weston.ini, su
     # background of lock screen
 ```
 
-### 2.4 Color Format Configuration
+### Color Format Configuration
 
 The default display format of Weston in the Buildroot SDK is ARGB8888. For some low-performance platforms, you can configure RGB565 in the `core` section in the weston.ini, such as:
 
@@ -241,7 +241,7 @@ You can also configure the display format of each screen individually in the `ou
     # xrgb8888|rgb565|xrgb2101010
 ```
 
-### 2.5 Display Orientation Configuration
+### Display Orientation Configuration
 
 Display orientation of screens can be configured in the `output` section of weston.ini, such as
 
@@ -262,7 +262,7 @@ If you want to configure the orientation dynamically, the dynamic configuration 
     echo "output:eDP-1::rotate180" > /tmp/.weston_drm.conf # eDP-1 rotates 180 degrees
 ```
 
-### 2.6 Resolution and Scale Configuration
+### Resolution and Scale Configuration
 
 Screen's resolution and scale of Weston can be configured in the `output` section of weston.ini, such as:
 
@@ -300,7 +300,7 @@ If you want to configure resolution and scaling dynamically, the dynamic configu
 
 This kind of scale depends on Rockchip's RGA 2D acceleration.
 
-### 2.7 Freeze the Screen
+### Freeze the Screen
 
 When Weston is started, there will be a black screen that switches between boot logo and UI display temporarily. If you want to prevent this black screen, you can freeze the Weston screen content temporarily through the following dynamic configuration file:
 
@@ -328,7 +328,7 @@ Or
     					echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # unfreeze  after 1 second
 ```
 
-### 2.8 Multi-screen Configuration
+### Multi-screen Configuration
 
 The Buildroot SDK Weston supports multi-screen with the same or different display and hot plug functions. You can distinction different screens based on the name of drm (obtained through Weston startup log or /sys/class/drm/card0-\<name\>). Some configurations can be set by environment variables, for example:
 
@@ -358,7 +358,7 @@ It also supports disabling the specified screen individually in the `output` sec
     # off|current|preferred|<WIDTHxHEIGHT@RATE>
 ```
 
-### 2.9 Configuration of Input Devices
+### Configuration of Input Devices
 
 The Weston service requires at least one input device by default. If there is no input device, the special settings in the `core` section of weston.ini is needed:
 
@@ -392,7 +392,7 @@ The calibration parameters can be obtained by Weston calibration tool: buildroot
 
 The third and sixth parameters should be divided by the screen's width and height respectively. Taking the resolution of 1280x800 as an example, the final calibration parameter is 1.013788 0.0 -0.061495 (that is, -78.713867 divided by 1280) 0.0 1.332709 -0.276154 (that is -220.923355 divided by 800).
 
-### 2.10 Configuration on the Platform without GPU
+### Configuration on the Platform without GPU
 
 The Weston in the SDK uses GPU for render acceleration by default. For platforms without GPUs, Rockchip RGA 2D acceleration can also be used instead.
 

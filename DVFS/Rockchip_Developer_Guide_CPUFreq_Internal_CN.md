@@ -39,7 +39,7 @@
 
 -----
 
-## 1 概述
+## 概述
 
 CPUFreq 是内核开发者定义的一套支持根据指定的 governor 动态调整 CPU 频率和电压的框架模型，它能有效地降低 CPU 的功耗，同时兼顾 CPU 的性能。CPUFreq framework 由 governor、core、driver、stats 组成，软件架构如下：
 
@@ -69,7 +69,7 @@ CPUFreq stats：提供 cpufreq 有关的统计信息。
 
 -----
 
-## 2 代码路径
+## 代码路径
 
 Governor 相关代码：
 
@@ -104,9 +104,9 @@ drivers/soc/rockchip/rockchip_opp_select.c    /* 修改电压表相关接口 */
 
 -----
 
-## 3 配置方法
+## 配置方法
 
-### 3.1 Menuconfig 配置
+### Menuconfig 配置
 
 ```c
 CPU Power Management  --->
@@ -131,7 +131,7 @@ CPU Power Management  --->
 
 通过“Default CPUFreq governor”配置项，可以选择变频策略，开发者可以根据实际产品需求进行修改。
 
-### 3.2 Clock 配置
+### Clock 配置
 
 根据平台的实际情况，在 CPU 节点下增加“clock”属性，一般在 DTSI 文件中。Clock 的详细配置说明，请参考clock 相关的开发文档。
 
@@ -199,7 +199,7 @@ cpu cpu0: failed to get clock: -2
 cpufreq-dt: probe of cpufreq-dt failed with error -2
 ```
 
-### 3.3 Regulator 配置
+### Regulator 配置
 
 根据实际产品硬件使用的电源方案，在 CPU 节点下增加“cpu-supply”属性，一般在板级 DTS 文件中。Regulator 的详细配置说明，请参考 Regulator 和 PMIC 相关的开发文档。
 
@@ -272,7 +272,7 @@ cpufreq-dt: probe of cpufreq-dt failed with error -2
 
 注意：如果 regulator 没有配置，cpufreq 驱动仍然可以加载成功，认为只调频不调压，频率比较高时，可能会因为电压偏低而出现死机的现象。
 
-### 3.4 OPP Table 配置
+### OPP Table 配置
 
 Linux4.4 内核将频率、电压相关的配置放在了 devicetree 中，我们将这些配置信息组成的节点，称之为OPP Table。OPP Table 节点包含描述频率和电压的 OPP 节点、leaakge 相关配置属性、PVTM 相关配置属性等。OPP 的详细配置说明，可以参考如下文档：
 
@@ -281,7 +281,7 @@ Documentation/devicetree/bindings/opp/opp.txt
 Documentation/power/opp.txt
 ```
 
-#### 3.4.1 增加 OPP Table
+#### 增加 OPP Table
 
 根据平台的实际情况，增加一个 OPP Table 节点，并在每个 CPU 节点下增加“operating-points-v2”属性，一般在 DTSI 文件中。以 RK3328 为例：
 
@@ -348,7 +348,7 @@ cpu cpu0: OPP-v2 not supported
 cpu cpu0: couldn't find opp table for cpu:0, -19
 ```
 
-#### 3.4.2 删除 OPP
+#### 删除 OPP
 
 如果开发者需要删除某些频点，可以使用如下方法。
 
@@ -384,11 +384,11 @@ cpu0_opp_table: opp_table0 {
 };
 ```
 
-### 3.5 根据 leakage 调整 OPP Table
+### 根据 leakage 调整 OPP Table
 
 IDDQ(Integrated Circuit Quiescent Current)集成电路静止电流，指 CMOS 电路静态时从电源获取的电流，我们也称之为 leakage。CPU 的 leakage 指给 CPU 提供特定的电压，测得的静态电流值。在芯片生产过程中，会将 leakage 写到 eFuse 或者 OTP 中。
 
-#### 3.5.1 根据 leakage 调整电压
+#### 根据 leakage 调整电压
 
 背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较小，通过这一特性可以根据 leakage 值降低大 leakage 芯片的电压，以降低功耗和提高性能。
 
@@ -440,7 +440,7 @@ cpu0_opp_table: cpu0-opp-table {
 
 如需关闭该项功能，可以删除“rockchip,leakage-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
-#### 3.5.2 根据 leakage 调整最高频
+#### 根据 leakage 调整最高频
 
 背景：通过测试芯片的 Vmin，发现相同频率下，小 leakage 的芯片 Vmin 比较大，大 leakage 的芯片 Vmin 比较小，并且小 leakage 的 Vmin 超出了芯片允许的最高电压，这种情况需要根据 leakage 限制最高频，以防止电压过高，影响芯片寿命。
 
@@ -485,11 +485,11 @@ cpu0_opp_table: opp_table0 {
 
 如需关闭该项功能，可以删除“rockchip,leakage-scaling-sel”属性。
 
-### 3.6 根据 PVTM 调整 OPP Table
+### 根据 PVTM 调整 OPP Table
 
 CPU PVTM(Process-Voltage-Temperature Monitor)是一个位于 CPU 附近，能反应出不同芯片之间性能差异的模块，它受工艺、电压、温度的影响。
 
-#### 3.6.1 根据 PVTM 调整电压
+#### 根据 PVTM 调整电压
 
 背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片Vmin 比较小，通过这一特性可以根据 PVTM 值降低大 PVTM 芯片的电压，以降低功耗和提高性能。
 
@@ -569,7 +569,7 @@ cpu0_opp_table: opp_table0 {
 
 如需关闭该项功能，可以删除“rockchip,pvtm-voltage-sel”属性，这时使用 opp-microvolt 指定的电压。
 
-#### 3.6.2 根据 PVTM 调整最高频
+#### 根据 PVTM 调整最高频
 
 背景：通过测试芯片的 Vmin，发现相同频率和电压下，PVTM 值小的芯片 Vmin 比较大，PVTM 值大的芯片Vmin 比较小，并且 PVTM 值小的芯片 Vmin 超出了芯片允许的最高电压，这种情况需要根据 PVTM 限制最高频，以防止电压过高，影响芯片寿命。
 
@@ -620,7 +620,7 @@ cpu0_opp_table: opp_table0 {
 
 如需关闭该项功能，可以删除“rockchip,pvtm-scaling-sel”属性。
 
-### 3.7 根据 IR-Drop 调整 OPP Table
+### 根据 IR-Drop 调整 OPP Table
 
 IR-Drop 是指出现在集成电路中电源和地网络上电压下降或升高的一种现象。在这里我们理解为由于电源纹、电路板布线等因素导致的压降。
 
@@ -678,7 +678,7 @@ cpu0_opp_table: cpu0-opp-table {
 
 如需关闭该项功能，可以删除“rockchip,board-irdrop”属性。
 
-### 3.8 根据 bin 调整最高频
+### 根据 bin 调整最高频
 
 背景：在 CP(Chip Probe)测试阶段，会将芯片的特殊功能区分、最高频区分、bin 区分等信息写人到 eFuse 或者 OTP 中，用于区分芯片的性能。
 
@@ -726,7 +726,7 @@ cpu0_opp_table: opp_table0 {
 
 如需关闭该项功能，可以删除“rockchip,bin-scaling-sel”属性。
 
-### 3.9 宽温配置
+### 宽温配置
 
 宽温通常指环境温度为-40~85℃。
 
@@ -764,7 +764,7 @@ cpu0_opp_table: opp_table0 {
 
 -----
 
-## 4 用户态接口介绍
+## 用户态接口介绍
 
 非大小核的平台，如 RK3288、RK3326、RK3328 等，所有 CPU 共用一个 clock，用户态接口也是相同的，在/sys/devices/system/cpu/cpufreq/policy0/目录下。
 
@@ -793,9 +793,9 @@ stats/trans_table             /* 记录CPU在每个频率上的变频次数 */
 
 -----
 
-## 5 常见问题
+## 常见问题
 
-### 5.1 各平台 CPU 的最高
+### 各平台 CPU 的最高
 
 | **产品名称** | **ARM 核**         | **最高主频**                   |
 | ------------ | ----------------- | ------------------------------ |
@@ -806,7 +806,7 @@ stats/trans_table             /* 记录CPU在每个频率上的变频次数 */
 | RK3368       | 4 * A53 + 4 * A53 | 1512MHz(big) + 1200MHz(little) |
 | RK3399       | 2 * A72 + 4 * A53 | 1800MHz(big) + 1416MHz(little) |
 
-### 5.2 如何查看频率电压表
+### 如何查看频率电压表
 
 执行如下命令：
 
@@ -831,7 +831,7 @@ cat /sys/kernel/debug/opp/opp_summary
                      1512000000      1350000     1350000     1350000
 ```
 
-### 5.3 如何修改电压
+### 如何修改电压
 
 方法一：直接修改 OPP 节点中每个档位的电压。以 CPU 816MHz 抬压 25000uV 为例：
 
@@ -914,7 +914,7 @@ opp-816000000 {
 };
 ```
 
-### 5.4 如何定频
+### 如何定频
 
 方法一：在 menuconfig 中将 governor 设置为 userspace。开机后 CPU 频率为 CRU 节点中设置频率。
 
@@ -991,7 +991,7 @@ echo 408000 > /sys/devices/system/cpu/cpufreq/policy4/scaling_setspeed
 
 注意：通过 cpufreq 节点设置 CPU 频率时，通常电压也会被改变，除非两个频点的电压相同。
 
-### 5.5 如何查看当前频率
+### 如何查看当前频率
 
 可以通过 cpufreq 的用户接口和 clock 的 debug 接口两种方法查看频率。
 
@@ -1017,7 +1017,7 @@ cat /sys/kernel/debug/clk/armclkl/clk_rate /* 小核频率 */
 cat /sys/kernel/debug/clk/armclkb/clk_rate /* 大核频率 */
 ```
 
-### 5.6 如何查看当前电压
+### 如何查看当前电压
 
 非大小核平台，执行如下命令：
 
@@ -1034,7 +1034,7 @@ cat /sys/kernel/debug/regulator/vdd_core_l/voltage /* 小核电压 */
 cat /sys/kernel/debug/regulator/vdd_core_b/voltage /* 小核电压 */
 ```
 
-### 5.7 如何单独调频调压
+### 如何单独调频调压
 
 关闭 CPU 自动变频，参考 5.3 中的方法三。
 
@@ -1074,7 +1074,7 @@ cat /sys/kernel/debug/regulator/vdd_core_b/voltage            /* 查看小核电
 
 注意：升频时，先升压再升频，降频时，先降频再降压。
 
-### 5.8 如何查看当前电压的档位
+### 如何查看当前电压的档位
 
 如果是通过 PVTM 调压，执行如下命令
 
@@ -1102,7 +1102,7 @@ dmesg | grep pvtm
 dmesg | grep leakage
 ```
 
-### 5.9 如何查看 leakage
+### 如何查看 leakage
 
 执行如下命令
 

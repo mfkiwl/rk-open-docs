@@ -77,11 +77,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 RKOS简要说明
+## RKOS简要说明
 
 RKOS是建立在FreeRTOS V10.0.1内核之上的一套操作系统，包括任务管理、设备管理、应用管理、电源管理、固件管理、GUI管理和shell命令，本文只讲述调度相关的API。
 
-### 1.1 FreeRTOS特性介绍
+### FreeRTOS特性介绍
 
 FreeRTOS是一个迷你的实时操作系统内核。作为一个轻量级的操作系统，包含：任务管理、时间管理、信号量、消息队列、内存管理、记录功能、软件定时器、协程等功能，可基本满足较小系统的需要。主要特性有：
 
@@ -107,7 +107,7 @@ FreeRTOS是一个迷你的实时操作系统内核。作为一个轻量级的操
 
 如需了解详细的FreeRTOS信息，请参考FreeRTOS V7.4.2版本的相关文档。
 
-### 1.2 RKOS与FreeRTOS
+### RKOS与FreeRTOS
 
 RKOS使用FreeRTOS如下功能：
 
@@ -141,7 +141,7 @@ RKOS使用FreeRTOS如下功能：
 
 * Heap分2个内存池，大池（供RKOS, 任务栈，消息队列大成员），小池（FreeRTOS 任务控制块，信号量，消息队列等）
 
-### 1.3 RKOS特点
+### RKOS特点
 
 * 面向对象的思维，用C语言来实现
 
@@ -157,13 +157,13 @@ RKOS使用FreeRTOS如下功能：
 
 * 独特的任务管理框架，使得任务的实现更加容易
 
-## 2 RKOS基础API
+## RKOS基础API
 
-### 2.1 任务的创建与删除
+### 任务的创建与删除
 
 使用本章节的AP创建的任务，不受任务管理器管理，创建者负责管理被创建任务。
 
-#### 2.1.1 rkos_task_create
+#### rkos_task_create
 
 **功能：创建任务**
 
@@ -179,7 +179,7 @@ RKOS使用FreeRTOS如下功能：
 | para          | void *        | 任务入口参数                                                 |
 | return        | HTC           | typedef void * HTC如果任务创建成功，返回的任务句柄，失败返回NULL |
 
-#### 2.1.2 rkos_task_delete
+#### rkos_task_delete
 
 **功能：删除任务**
 
@@ -190,9 +190,9 @@ RKOS使用FreeRTOS如下功能：
 | hTask         | HTC      | typedef void * HTC；任务句柄，rkos_task_create的返回值 |
 | return        | void     | 无返回值                                               |
 
-### 2.2 Timer的创建，启动，停止，删除，获取参数
+### Timer的创建，启动，停止，删除，获取参数
 
-#### 2.2.1 rkos_create_timer
+#### rkos_create_timer
 
 **功能：创建Timer**
 
@@ -206,7 +206,7 @@ RKOS使用FreeRTOS如下功能：
 | pfCall        | pRkosTimerCallBack | typedef void (* pRkosTimerCallBack)(pTimer)typedef void * pTimerTimer回调函数，参数是rkos_create_timer返回值 |
 | return        | pTimer             | typedef void * pTimer创建成功：Timer 句柄，创建失败返回NULL  |
 
-#### 2.2.2 rkos_start_timer
+#### rkos_start_timer
 
 **功能：启动Timer**
 
@@ -217,7 +217,7 @@ RKOS使用FreeRTOS如下功能：
 | timer         | pTimer   | typedef void * pTimerTimer 句柄，rkos_create_timer返回值     |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:启动成功，RK_ERROR： 启动失败 |
 
-#### 2.2.3 rkos_stop_timer
+#### rkos_stop_timer
 
 **功能：停止Timer**
 
@@ -228,7 +228,7 @@ RKOS使用FreeRTOS如下功能：
 | timer         | pTimer   | typedef void * pTimerTimer 句柄，rkos_create_timer返回值     |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:停止成功，RK_ERROR： 停止失败 |
 
-#### 2.2.4 rkos_get_timer_param
+#### rkos_get_timer_param
 
 **功能：获取回调参数**
 
@@ -239,7 +239,7 @@ RKOS使用FreeRTOS如下功能：
 | timer         | pTimer   | typedef void * pTimerTimer 句柄，rkos_create_timer返回值 |
 | return        | void *   | 创建Timer的时指定的参数rkos_create_timer 形参para        |
 
-#### 2.2.5 rkos_delete_timer
+#### rkos_delete_timer
 
 **功能：删除timer**
 
@@ -250,7 +250,7 @@ RKOS使用FreeRTOS如下功能：
 | timer         | pTimer   | typedef void * pTimerTimer 句柄，rkos_create_timer返回值     |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:删除成功，RK_ERROR： 删除失败 |
 
-#### 2.2.6 rkos_mod_timer
+#### rkos_mod_timer
 
 **功能：改变Timer周期**
 
@@ -263,9 +263,9 @@ RKOS使用FreeRTOS如下功能：
 | BlockTime     | int      | 调用此函数，最大允许的阻塞时间，-1为无穷大，单位tick, rkos中1个tick 10ms |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:删除成功，RK_ERROR： 删除失败 |
 
-### 2.3 消息队列的创建、删除、发送、接收
+### 消息队列的创建、删除、发送、接收
 
-#### 2.3.1 rkos_queue_create
+#### rkos_queue_create
 
 **功能：创建消息队列**
 
@@ -277,7 +277,7 @@ RKOS使用FreeRTOS如下功能：
 | blocksize     | uint32   | typedef  unsigned long  uint32单个消息的大小                 |
 | return        | pQueue   | typedef void * pQueue创建成功:返回消息队列的句柄，大池消耗内存blockcnt * blocksize 个字节。创建失败：返回NULL |
 
-#### 2.3.2 rkos_queue_delete
+#### rkos_queue_delete
 
 **功能：删除消息队列**
 
@@ -288,7 +288,7 @@ RKOS使用FreeRTOS如下功能：
 | pQue          | pQueue   | typedef void * pQueue消息队列的句柄，rkos_queue_create返回值 |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:删除成功，RK_ERROR： 删除失败 |
 
-#### 2.3.3 rkos_queue_send
+#### rkos_queue_send
 
 **功能：向消息队列中发送消息**
 
@@ -301,7 +301,7 @@ RKOS使用FreeRTOS如下功能：
 | time          | uint32   | 调用该函数，任务最大阻塞时间，单位tick,rkos中1个tick 10ms. MAX_DELAY表示永久性阻塞直到发送成功。 |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:发送成功，RK_ERROR： 发送失败 |
 
-#### 2.3.4 rkos_queue_receive
+#### rkos_queue_receive
 
 **功能：从消息对了中接收消息**
 
@@ -314,9 +314,9 @@ RKOS使用FreeRTOS如下功能：
 | time          | uint32   | 调用该函数，任务最大阻塞时间，单位tick,rkos中1个tick 10ms. MAX_DELAY表示永久性阻塞直到接收成功。 |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS：接收成功，RK_ERROR： 接收失败 |
 
-### 2.4 信号量的创建，删除，获取，释放
+### 信号量的创建，删除，获取，释放
 
-#### 2.4.1 rkos_semaphore_create
+#### rkos_semaphore_create
 
 **功能：创建信号量**
 
@@ -328,7 +328,7 @@ RKOS使用FreeRTOS如下功能：
 | InitCnt       | uint32     | typedef  unsigned long  uint32初始信号个数                   |
 | return        | pSemaphore | typedef void * pSemaphore创建成功:返回信号量的句柄创建失败：返回NULL |
 
-#### 2.4.2 rkos_semaphore_delete
+#### rkos_semaphore_delete
 
 **功能：删除信量**
 
@@ -339,7 +339,7 @@ RKOS使用FreeRTOS如下功能：
 | pSem          | pSemaphore | typedef void * pSemaphore信号量的句柄，rkos_semaphore_create返回值 |
 | return        | rk_err_t   | typedef  int   rk_err_tRK_SUCCESS:删除成功，RK_ERROR： 删除失败 |
 
-#### 2.4.3 rkos_semaphore_take
+#### rkos_semaphore_take
 
 **功能：获取信号量**
 
@@ -351,7 +351,7 @@ RKOS使用FreeRTOS如下功能：
 | time          | uint32     | 调用该函数，任务最大阻塞时间，单位tick,rkos中1个tick 10ms. MAX_DELAY表示永久性阻塞直到获取成功。 |
 | return        | rk_err_t   | typedef  int   rk_err_tRK_SUCCESS:获取成功，RK_ERROR： 获取失败 |
 
-#### 2.4.4 rkos_semaphore_give
+#### rkos_semaphore_give
 
 **功能：释放信号量**
 
@@ -362,7 +362,7 @@ RKOS使用FreeRTOS如下功能：
 | pSem          | pSemaphore | typedef void * pSemaphore信号量的句柄，rkos_semaphore_create返回值 |
 | return        | rk_err_t   | typedef  int   rk_err_tRK_SUCCESS：释放成功，RK_ERROR： 释放失败 |
 
-#### 2.4.5 rkos_semaphore_give_fromisr
+#### rkos_semaphore_give_fromisr
 
 **功能：中断服务程序中释放信号量**
 
@@ -373,9 +373,9 @@ RKOS使用FreeRTOS如下功能：
 | pSem          | pSemaphore | typedef void * pSemaphore信号量的句柄，rkos_semaphore_create返回值 |
 | return        | rk_err_t   | typedef  int   rk_err_tRK_SUCCESS：释放成功，RK_ERROR： 释放失败 |
 
-### 2.5 互斥量的创建
+### 互斥量的创建
 
-#### 2.5.1 rkos_mutex_create
+#### rkos_mutex_create
 
 **功能：创建互斥量**
 
@@ -385,9 +385,9 @@ RKOS使用FreeRTOS如下功能：
 | ------------- | ---------- | ------------------------------------------------------------ |
 | return        | pSemaphore | typedef void * pSemaphore创建成功:返回互斥量的句柄创建失败：返回NULL |
 
-### 2.6 任务释放CPU资源的Delay
+### 任务释放CPU资源的Delay
 
-#### 2.6.1 rkos_sleep
+#### rkos_sleep
 
 **功能：释放时间片的延迟**
 
@@ -397,23 +397,23 @@ RKOS使用FreeRTOS如下功能：
 | ------------- | -------- | ------------------------------------------------------------ |
 | ms            | uint32   | typedef  unsigned long  uint32延迟时间，单位MS，当小于1个TICK的值时，延迟1个TICK，RKOS中1个TICK等于10MS |
 
-### 2.7 临界区的进入和退出
+### 临界区的进入和退出
 
-#### 2.7.1 rkos_critical_enter
+#### rkos_critical_enter
 
 **功能：进入临界区**
 
 原型：void rkos_critical_enter(void)
 
-#### 2.7.2 rkos_critical_exit
+#### rkos_critical_exit
 
 **功能：退出临界区**
 
 原型：void rkos_critical_exit(void)
 
-### 2.8 内存的申请和释放
+### 内存的申请和释放
 
-#### 2.8.1 rkos_memory_malloc
+#### rkos_memory_malloc
 
 **功能：申请内存资源**
 
@@ -424,7 +424,7 @@ RKOS使用FreeRTOS如下功能：
 | size          | uint32   | typedef  unsigned long  uint32申请内存的期望SIZE, 单位BYTE. |
 | return        | void *   | 申请成功：返回内存的地址申请失败：返回NULL                  |
 
-#### 2.8.2 rkos_memory_free
+#### rkos_memory_free
 
 **功能：释放内存资源**
 
@@ -434,7 +434,7 @@ RKOS使用FreeRTOS如下功能：
 | ------------- | -------- | ----------------------------------------------------------- |
 | buf           | void *   | 内存地址，rkos_memory_malloc或者rkos_memory_realloc的返回值 |
 
-#### 2.8.3 rkos_memory_realloc
+#### rkos_memory_realloc
 
 **功能：改变内存资源的大小**
 
@@ -450,7 +450,7 @@ void  * rkos_memory_realloc(void * pv, uint32 size)
 | size          | uint32   | typedef  unsigned long  uint32期望SIZE，单位BYTE.           |
 | return        | void *   | 改变成功：返回内存的地址改变失败：返回NULL                  |
 
-### 2.9 RKOS任务状态迁移图
+### RKOS任务状态迁移图
 
 ![img](.\resources\State_transition.png)
 
@@ -520,9 +520,9 @@ void  * rkos_memory_realloc(void * pv, uint32 size)
 
 18. 和17事件同时发生，1-16事件产生，可能产生18事件。
 
-## 3 任务管理
+## 任务管理
 
-### 3.1 任务类
+### 任务类
 
 RKOS的任务分为2种，一种是静态任务，另一种是动态任务，2种任务仅仅是注册接口不相同，其他的完全一样。
 
@@ -557,7 +557,7 @@ RKOS的任务分为2种，一种是静态任务，另一种是动态任务，2�
 | Idle2EventTime | uint32                  | 二级休眠触发时间                                             |
 | suspendmode    | uint32                  | 休眠模式：DISABLE_MODE    0X00  拒绝休眠ENABLE_MODE     0x01  使能休眠FORCE_MODE      0X02  强制休眠 |
 
-### 3.2 任务对象
+### 任务对象
 
 任务类本身无法运行，必须被实例化成对象才能运行，每个任务对象在堆里有一个控制块，任务管理器将这些对象用指针串接在一起，构成一个对象链，如下图：
 
@@ -567,11 +567,11 @@ RKOS的任务分为2种，一种是静态任务，另一种是动态任务，2�
 
 ![img](.\resources\task_obj_2.png)
 
-### 3.3 任务管理器
+### 任务管理器
 
 任务管理器本身也是一个任务，优先级比较高，但比实时性要求高的任务（如播放任务）的优先级要低，任务管理负责RKOS上所有任务的创建，删除，休眠等操作。
 
-#### 3.3.1 任务的创建
+#### 任务的创建
 
 l 非托管模式：创建者直接在自己栈里创建任务，没有任务切换。
 
@@ -583,7 +583,7 @@ l 异步托管模式：创建者将要创建的任务信息发送到任务管理
 
 ![img](.\resources\task_create_process.png)
 
-#### 3.3.2 任务删除
+#### 任务删除
 
 l 非托管模式：删除者直接在自己栈里删除任务，没有任务切换。
 
@@ -595,16 +595,16 @@ l 异步托管模式：删除者将要删除的任务信息发送到任务管理
 
 ![img](.\resources\task_delete.png)
 
-#### 3.3.3 任务的休眠
+#### 任务的休眠
 
 任务管理器会在休眠时钟的驱动下，逐个对任务列表上任务进行检查，达到休眠条件的任务将被休眠。休眠时钟是RKOS休眠模块产生的，详见休眠机制。
 
 task_sleep
 ![img](.\resources\task_sleep.png)
 
-### 3.4 任务管理器API
+### 任务管理器API
 
-#### 3.4.1 rktm_enable_task_suspend
+#### rktm_enable_task_suspend
 
 **功能：打开任务休眠功能**
 
@@ -614,7 +614,7 @@ task_sleep
 | ------------- | -------- | ---------------------------- |
 | hTask         | HTC      | typedef void * HTC；任务句柄 |
 
-#### 3.4.2 rktm_disable_task_suspend
+#### rktm_disable_task_suspend
 
 **功能：关闭任务休眠功能**
 
@@ -624,19 +624,19 @@ task_sleep
 | ------------- | -------- | ---------------------------- |
 | hTask         | HTC      | typedef void * HTC；任务句柄 |
 
-#### 3.4.3 rktm_disable_create_task
+#### rktm_disable_create_task
 
 **功能：禁止创建任务**
 
 原型：void rktm_disable_create_task(void);
 
-#### 3.4.4 rktm_enable_create_task
+#### rktm_enable_create_task
 
 **功能：使能创建任务**
 
 原型：void rktm_enable_create_task(void);
 
-#### 3.4.5 rktm_idle_tick
+#### rktm_idle_tick
 
 **功能：任务管理器休眠时钟，调用一次视为1个CLK**
 
@@ -646,7 +646,7 @@ task_sleep
 | ------------- | -------- | ------------------------------------------------------------ |
 | return        | rk_err_t | typedef  int   rk_err_tRK_SUCCESS:发送成功，RK_ERROR： 发送失败 |
 
-#### 3.4.6 rktm_get_task_runtime
+#### rktm_get_task_runtime
 
 **功能：获取任务消耗CPU时间，单位为TICK，获取之后清零。**
 
@@ -657,7 +657,7 @@ task_sleep
 | hTask         | HTC      | typedef void * HTC；任务句柄 |
 | return        | uint32   | tick                         |
 
-#### 3.4.7 rktm_get_current_task_handle
+#### rktm_get_current_task_handle
 
 **功能：获取当前任务的句柄**
 
@@ -667,7 +667,7 @@ task_sleep
 | ------------- | -------- | -------------------------------- |
 | return        | HTC      | typedef void * HTC；当前任务句柄 |
 
-#### 3.4.8 rktm_get_task_name
+#### rktm_get_task_name
 
 **功能：获取当前任务的名称**
 
@@ -678,7 +678,7 @@ task_sleep
 | hTask         | HTC      | typedef void * HTC；任务句柄 |
 | return        | void *   | 任务名指针                   |
 
-#### 3.4.9 rktm_delete_task
+#### rktm_delete_task
 
 **功能：删除动态任务**
 
@@ -689,7 +689,7 @@ task_sleep
 | hTask         | HTC      | typedef void * HTC；任务句柄，为NULL表示当前任务句柄 |
 | return        | rk_err_t | RK_SUCCESS：删除成功，RK_ERROR：删除失败             |
 
-#### 3.4.10 rktm_create_task
+#### rktm_create_task
 
 **功能：创建动态任务**
 
@@ -716,7 +716,7 @@ void \* para);
 | para          | void *              | 执行入口函数参数                                             |
 | return        | HTC                 | typedef void * HTC：任务句柄，为NULL表示创建失败             |
 
-#### 3.4.11 rktm_delete_static_task
+#### rktm_delete_static_task
 
 **功能：删除静态任务**
 
@@ -729,7 +729,7 @@ void \* para);
 | Mode          | uint32   | typedef  unsigned long  uint32删除模式：SYNC_MODE 同步托管模式ASYNC_MODE 异步托管模式DIRECT_MODE 非托管模式 |
 | return        | rk_err_t | RK_SUCCESS：删除成功，RK_ERROR：删除失败                     |
 
-#### 3.4.12 rktm_create_static_task
+#### rktm_create_static_task
 
 **功能：创建静态任务**
 
@@ -743,7 +743,7 @@ void \* para);
 | Mode          | uint32   | typedef  unsigned long  uint32删除模式：SYNC_MODE 同步托管模式ASYNC_MODE 异步托管模式DIRECT_MODE 非托管模式 |
 | return        | rk_err_t | RK_SUCCESS:创建成功，RK_ERROR：创建失败                      |
 
-#### 3.4.13 rktm_get_next_handle
+#### rktm_get_next_handle
 
 **功能：获取下一个任务句柄**
 
@@ -755,7 +755,7 @@ void \* para);
 | TaskClassID   | uint32   | typedef  unsigned long  uint32赛选条件，不满足此条件的不被获取， 0XFFFFFFFF表示获取所有 |
 | return        | HTC      | typedef void * HTC要获取的任务句柄，为NULL表示获取失败       |
 
-#### 3.4.14 rktm_get_first_handle
+#### rktm_get_first_handle
 
 **功能：获取第一个任务句柄**
 
@@ -766,7 +766,7 @@ void \* para);
 | TaskClassID   | uint32   | typedef  unsigned long  uint32赛选条件，不满足此条件的不被获取， 0XFFFFFFFF表示获取所有 |
 | return        | HTC      | typedef void * HTC要获取的任务句柄，为NULL表示获取失败       |
 
-#### 3.4.15 rktm_get_total_cnt
+#### rktm_get_total_cnt
 
 **功能：获取任务个数**
 
@@ -777,7 +777,7 @@ void \* para);
 | TaskClassID   | uint32   | typedef  unsigned long  uint32赛选条件，不满足此条件的不被获取，0XFFFFFFFF表示获取所有 |
 | return        | uint32   | typedef  unsigned long  uint32满足条件的任务总数             |
 
-#### 3.4.16 rktm_find_task
+#### rktm_find_task
 
 **功能：查找任务**
 
@@ -789,7 +789,7 @@ void \* para);
 | TaskObjectID  | uint32   | typedef  unsigned long  uint32静态任务对象ID   |
 | return        | HTC      | typedef void * HTC任务句柄，为NULL表示查找失败 |
 
-#### 3.4.17 rktm_get_heap_totalsize
+#### rktm_get_heap_totalsize
 
 **功能：获取Heap总量**
 
@@ -799,7 +799,7 @@ void \* para);
 | ------------- | -------- | -------------------------------------------------- |
 | return        | uint32   | typedef  unsigned long  uint32堆的总大小，单位字节 |
 
-#### 3.4.18 rktm_get_heap_freesize
+#### rktm_get_heap_freesize
 
 **功能：获取Heap剩余总量**
 
@@ -809,7 +809,7 @@ void \* para);
 | ------------- | -------- | -------------------------------------------------- |
 | return        | uint32   | typedef  unsigned long  uint32堆的总大小，单位字节 |
 
-#### 3.4.19 rktm_get_task_stack_totalsize
+#### rktm_get_task_stack_totalsize
 
 **功能：获取任务栈总SIZE**
 
@@ -820,7 +820,7 @@ void \* para);
 | hTask         | HTC      | typedef void * HTC；任务句柄                           |
 | return        | uint32   | typedef  unsigned long  uint32任务栈的总大小，单位字节 |
 
-#### 3.4.20 rktm_get_task_stack_freesize
+#### rktm_get_task_stack_freesize
 
 **功能：获取任务栈剩余**
 
@@ -831,7 +831,7 @@ void \* para);
 | hTask         | HTC      | typedef void * HTC；任务句柄                             |
 | return        | uint32   | typedef  unsigned long  uint32任务栈的剩余大小，单位字节 |
 
-#### 3.4.21 rktm_get_task_state
+#### rktm_get_task_state
 
 **功能：获取任务状态**
 
@@ -842,7 +842,7 @@ void \* para);
 | hTask         | HTC      | typedef void * HTC；任务句柄                                 |
 | return        | uint32   | typedef unsigned long uint32 0：Runing --- 运行态 1：Ready --- 就绪态 2：Blocked --- 阻塞态 3: Suspend --- 挂起态 4: Deleted --- 删除态 |
 
-### 3.5 3种任务创建API对比说明
+### 种任务创建API对比说明
 
 本文所指的任务统称为线程，但是每个API创建出来任务性质不同，使用场景不同。
 

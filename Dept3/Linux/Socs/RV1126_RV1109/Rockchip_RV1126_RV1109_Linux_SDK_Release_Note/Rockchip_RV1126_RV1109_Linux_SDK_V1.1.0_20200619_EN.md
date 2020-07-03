@@ -64,7 +64,7 @@ This document (this guide) is mainly intended for:
 
 ---
 
-## 1 Overview
+## Overview
 
 This SDK is based on Buildroot 2018.02-rc3, with kernel 4.19 and U-boot v2017.09. It is suitable for RV1126/RV1109 EVB development boards and all other Linux products developed based on it.
 
@@ -72,11 +72,11 @@ The development kit is applicable to but not limited to Smart IPC/Smart Gate/Sma
 
 For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
 
-## 2 How to get the SDK
+## How to get the SDK
 
 SDK is released by Rockchip server. Please refer to [Chapter 3 Software Development Guide](## 3 Software Development Guide) to build a development environment.
 
-### 2.1 How to get RV1126/RV1109 Linux SDK
+### How to get RV1126/RV1109 Linux SDK
 
 #### Getting from Rockchip source code repositories
 
@@ -109,7 +109,7 @@ cd rv1126_rv1109
 
 Developers can update via `.repo/repo/repo sync -c` command according to update instructions that are regularly released by FAE window.
 
-### 2.2 How to get Smart USB Camera SDK
+### How to get Smart USB Camera SDK
 
 For Smart USB Camera products, we provide special SDK software configuration, including UVC, UAC, ePTZ, AI solution, suitable for smart conferencing system, smart screen and other products.
 Download the Smart USB Camera SDK command as follows:
@@ -125,7 +125,7 @@ If you have got RV1126/RV1109 Linux SDK package(rv1126_rv1109_linux_sdk_vX.X.X_2
 .repo/repo/repo sync -c
 ```
 
-## 3 Software Development Guide
+## Software Development Guide
 
 For software development, you can refer to the quick start document in the project directory:
 
@@ -133,7 +133,7 @@ For software development, you can refer to the quick start document in the proje
 <SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
 ```
 
-## 4 Hardware Development Guide
+## Hardware Development Guide
 
 Please refer to user guides in the project directory for hardware development:
 
@@ -141,12 +141,12 @@ Please refer to user guides in the project directory for hardware development:
 <SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
 ```
 
-## 5 SSH Public Key Operation Introduction
+## SSH Public Key Operation Introduction
 
 Please follow the introduction in the “Rockchip SDK Application and Synchronization Guide” to generate an SSH public key and send the email to [fae@rock-chips.com](mailto:fae@rock-chips.com), applying for permission to download SDK code.
 This document will be released to customers during the process of applying for permission.
 
-### 5.1 Multi-device Use the Same SSH Public Key
+### Multi-device Use the Same SSH Public Key
 
 If the same SSH public key should be used in different devices, you can copy the SSH private key file id_rsa to “~/.ssh/id_rsa” of the device you want to use.
 
@@ -170,7 +170,7 @@ Please enter the following command in console to solve:
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 5.2 Switch Different SSH Public Keys on the Same Device
+### Switch Different SSH Public Keys on the Same Device
 
 You can configure SSH according to the ssh_config documentation.
 
@@ -191,12 +191,12 @@ As shown in the figure, SSH uses the file “~/.ssh1/id_rsa” of another direct
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 5.3 Key Authority Management
+### Key Authority Management
 
 Server can monitor download times and IP information of a key in real time. If an abnormality is found, download permission of the corresponding key will be disabled.
 
 Keep the private key file properly. Do not grant second authorization to third parties.
 
-### 5.4 Reference Documents
+### Reference Documents
 
 For more details, please refer to document “<SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf”.

@@ -72,9 +72,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 [TOC]
 
-## 1 物联网平台介绍
+## 物联网平台介绍
 
-### 1.1 RK2206 SDK 物联网平台
+### RK2206 SDK 物联网平台
 
 瑞芯微RK2206芯片目前支持物联网平台如下：
 
@@ -98,11 +98,11 @@ make menuconfig
 [*] YHK Platfrom
 ```
 
-### 1.2 物联网平台授权码介绍
+### 物联网平台授权码介绍
 
 目前RK2206SDK 支持的物联网平台，使用的是测试授权码，仅供测试使用。测试授权码不能用于量产（试产），测试授权码可授权的设备数量有限。OEM生产时，请务必联系对应物联网平台，获取官方正式授权码。
 
-## 2 物联网平台授权码软件配置
+## 物联网平台授权码软件配置
 
 获取官方物联网平台的正式授权码等信息，在make  menuconfig对应物联网平台选项卡处修改
 
@@ -112,7 +112,7 @@ make menuconfig
 
 - 填入向物联网平台申请的官方授权码，将会使用填入的授权码
 
-### 2.1 玩瞳科技授权码
+### 玩瞳科技授权码
 
 make menuconfig
 配置路径： (top menu) → IoT Function → Wan Tong Platfrom → Wan Tong Platfrom
@@ -135,7 +135,7 @@ make menuconfig
 [] YHK Platfrom
 ```
 
-### 2.2 思必驰授权码
+### 思必驰授权码
 
 make menuconfig
 配置路径： (top menu) → IoT Function →AiSpeech Platfrom
@@ -157,7 +157,7 @@ make menuconfig
 [] YHK Platfrom
 ```
 
-### 2.3 EchoCloud授权码
+### EchoCloud授权码
 
 make menuconfig
 配置路径： (top menu) → IoT Function → EchoCloud

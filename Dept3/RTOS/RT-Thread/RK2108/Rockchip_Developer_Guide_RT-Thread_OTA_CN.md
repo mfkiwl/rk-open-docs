@@ -77,11 +77,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 OTA概述
+## OTA概述
 
 OTA模块为系统提供设备端本地或在线升级固件的功能。此文档用以解释说明 OTA 模块相关概念和定义，介绍并指导开发者使用 SDK 中的 OTA 方案。OTA 模块的开发需要开发者了解固件分区结构，相关的内容可以参考文档《RK2206_Firmware_Structure_User_Guide.pdf》。
 
-### 1.1 OTA升级原理
+### OTA升级原理
 
 RK2108 RT-Thread SDK 中的 OTA 采用A/B系统更新的方案，也称为无缝更新，类似Android系统的OTA升级。A/B升级确保可运行的启动系统在OTA更新期间能够保留在Flash上。这样就降低更新之后设备无法启动的可能性，也就是说，用户需要将设备送到维修/保修中心进行更换和刷机的情况将有所减少。
 
@@ -95,9 +95,9 @@ RK2108 RT-Thread SDK 中的 OTA 采用A/B系统更新的方案，也称为无缝
 
 系统首先从Fw slot A分区加载程序与数据，根据配置选择从本地或通过网络更新另外一个Fw slot的固件数据。
 
-### 1.2 相关概念与定义
+### 相关概念与定义
 
-#### 1.2.1 OTA protocol
+#### OTA protocol
 
 OTA protocol 表示 OTA 升级时下载固件的协议。在 ota.h 中定义如下：
 
@@ -112,7 +112,7 @@ typedef enum ota_protocol {
 
 OTA_PROTOCOL_HTTP 表示通过http协议升级，即下载升级，通过http协议获取到Firmware.img的升级包数据然后写入固件分区升级。
 
-#### 1.2.2 OTA verify
+#### OTA verify
 
 OTA verify 表示对下载完固件的校验算法。为保证固件在 OTA 下载和升级 Flash 过程中不出错，采用 Jhash 算法对固件进行校验。
 
@@ -129,7 +129,7 @@ typedef enum ota_verify {
 unsigned int jshash(unsigned int hash, char *str, unsigned int len)
 ```
 
-#### 1.2.3 Firmware header结构体
+#### Firmware header结构体
 
 ```c
 typedef struct _FIRMWARE_HEADER
@@ -148,9 +148,9 @@ typedef struct _FIRMWARE_HEADER
 }FIRMWARE_HEADER, *PFIRMWARE_HEADER;//head is 512 bytes
 ```
 
-## 2 接口使用说明
+## 接口使用说明
 
-### 2.1 代码位置
+### 代码位置
 
 OTA相关代码请参考：
 
@@ -172,7 +172,7 @@ Path_to_SDK/components/ota/
 └── SConscript
 ```
 
-### 2.2 接口说明
+### 接口说明
 
 下面简要说明 OTA 模块提供的接口。
 
@@ -296,9 +296,9 @@ int user_slot_set_pending(uint32_t slot)
 int user_slot_set_active(uint32_t slot)
 ```
 
-### 2.3 使用示例
+### 使用示例
 
-#### 2.3.1 本地升级
+#### 本地升级
 
 假设固件存放在eMMC Flash中，且挂载的路径为/sdcard，固件路径path为“/sdcard/Firmware.img”。
 
@@ -319,7 +319,7 @@ OTA相关配置：
 
 ![image-20200302115954654](Rockchip_Developer_Guide_RT-Thread_OTA/fw_local_update.png)
 
-#### 2.3.2 在线升级
+#### 在线升级
 
 在线升级是指升级固件存放在远程某个http 服务器中，通过指定升级固件的URL下载来升级固件的方式。
 
@@ -344,9 +344,9 @@ OTA相关配置：
 
 ![image-20200302151205996](Rockchip_Developer_Guide_RT-Thread_OTA/fw_http_update.png)
 
-## 3 固件编译与生成
+## 固件编译与生成
 
-### 3.1 编译固件
+### 编译固件
 
 如果使用OTA功能，需要使用更新后的编译脚本。
 

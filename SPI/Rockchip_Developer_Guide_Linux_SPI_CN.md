@@ -78,7 +78,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Rockchip SPI 功能特点
+## Rockchip SPI 功能特点
 
 SPI （serial peripheral interface），以下是 linux 4.4 spi 驱动支持的一些特性︰
 
@@ -92,9 +92,9 @@ SPI （serial peripheral interface），以下是 linux 4.4 spi 驱动支持的�
 
 * 框架支持 slave 和 master 两种模式
 
-## 2 内核软件
+## 内核软件
 
-### 2.1 代码路径
+### 代码路径
 
 ```c
 drivers/spi/spi.c    		 spi驱动框架
@@ -104,7 +104,7 @@ drivers/spi/spi-rockchip-test.c  spi测试驱动，需要自己手动添加到Ma
 Documentation/spi/spidev_test.c  用户态spi测试工具
 ```
 
-### 2.2 内核配置
+### 内核配置
 
 ```c
 Device Drivers  --->
@@ -112,7 +112,7 @@ Device Drivers  --->
 		<*>   Rockchip SPI controller driver
 ```
 
-### 2.3 DTS 节点配置
+### DTS 节点配置
 
 ```c
 &spi1 {     						//引用spi 控制器节点
@@ -145,7 +145,7 @@ max-freq 和 spi-max-frequency 的配置说明：
 * max-freq 不要低于 24M，否则可能有问题。
 * 如果需要配置 spi-cpha 的话， max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
 
-### 2.3 SPI 设备驱动
+### SPI 设备驱动
 
 设备驱动注册:
 
@@ -209,13 +209,13 @@ static inline int
 spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
 ```
 
-### 2.4 User mode SPI device 配置说明
+### User mode SPI device 配置说明
 
 User mode SPI device 指的是用户空间直接操作 SPI 接口，这样方便众多的 SPI 外设驱动跑在用户空间，
 
 不需要改到内核，方便驱动移植开发。
 
-#### 2.4.1 内核配置
+#### 内核配置
 
 ```c
 Device Drivers  --->
@@ -223,7 +223,7 @@ Device Drivers  --->
 		[*]   User mode SPI device driver support
 ```
 
-#### 2.4.2 DTS 配置
+#### DTS 配置
 
 ```c
 &spi0 {
@@ -237,7 +237,7 @@ Device Drivers  --->
 };
 ```
 
-#### 2.4.3 内核补丁
+#### 内核补丁
 
 ```c
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
@@ -256,17 +256,17 @@ MODULE_DEVICE_TABLE(of, spidev_dt_ids);
 
 说明：较旧的内核可能没有 2.4.1 和 2.4.3 ，需要手动添加，如果已经包含这两个的内核，只要添加 2.4.2 即可。
 
-#### 2.4.4 使用说明
+#### 使用说明
 
 驱动设备加载注册成功后，会出现类似这个名字的设备：/dev/spidev1.1
 
 请参照 Documentation/spi/spidev_test.c
 
-### 2.5 SPI 做 slave
+### SPI 做 slave
 
 SPI 做 slave 使用的接口和 master 模式一样，都是 spi_read 和 spi_write。
 
-#### 2.5.1 Linux 4.4 配置
+#### Linux 4.4 配置
 
 内核补丁，请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
 
@@ -337,7 +337,7 @@ dts 配置：
 
 注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
 
-#### 2.5.2 Linux 4.19 配置
+#### Linux 4.19 配置
 
 Linux 4.19 引入 SPI slave 框架，因此主控代码 spi-rockchip.c 添加了探测 SPI slave 模式的支持：
 
@@ -362,7 +362,7 @@ of_property_read_bool(pdev->dev.of_node, "spi-slave")
 
 注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
 
-#### 2.5.3 测试
+#### 测试
 
 spi 做 slave，要先启动 slave read，再启动 master write，不然会导致 slave 还没读完，master 已经写完了。
 
@@ -374,9 +374,9 @@ slave write，master read 也是需要先启动 slave write，因为只有 maste
 
 再 master:  `echo read 0 1 16 > /dev/spi_misc_test`
 
-## 3 SPI 内核测试驱动
+## SPI 内核测试驱动
 
-### 3.1 内核驱动
+### 内核驱动
 
 ```c
 drivers/spi/spi-rockchip-test.c
@@ -385,7 +385,7 @@ drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
 ```
 
-### 3.2 DTS 配置
+### DTS 配置
 
 ```c
 &spi0 {
@@ -411,7 +411,7 @@ drivers/spi/Makefile
 };
 ```
 
-### 3.3 驱动 log
+### 驱动 log
 
 ```c
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
@@ -423,7 +423,7 @@ drivers/spi/Makefile
 这是驱动注册成功的标志
 ```
 
-### 3.4 测试命令
+### 测试命令
 
 ```c
 echo write 0 10 255 > /dev/spi_misc_test
@@ -439,7 +439,7 @@ echo setspeed id 频率（单位 Hz） > /dev/spi_misc_test
 
 如果需要，可以自己修改测试 case。
 
-## 4 常见问题
+## 常见问题
 
 * 调试前确认驱动有跑起来
 * 确保 SPI 4 个引脚的 IOMUX 配置无误

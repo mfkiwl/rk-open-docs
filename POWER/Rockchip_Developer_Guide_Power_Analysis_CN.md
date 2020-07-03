@@ -41,13 +41,13 @@
 [TOC]
 
 ---
-## 1. 基础概念
+## 基础概念
 
-### 1.1 频率（clk）和电压（voltage）
+### 频率（clk）和电压（voltage）
 
 SoC 内部一般会包含很多模块，比如:ARM,GPU,DDR,I2C,SPI,USB 等，每个模块工作的时候，数字逻辑部分需要一个合适频率和对应的电压，模块频率越高，需要的电压也会越高，频率和电压是功耗的两个重要参数。
 
-### 1.2 电压域 VD（voltage domain）和电源域 PD（power domain）
+### 电压域 VD（voltage domain）和电源域 PD（power domain）
 
 SoC 内部的各个模块，一般都有数字逻辑部分和 IO 部分，数字逻辑部分主要负责运算和状态控制，IO 部分主要负责接口信号传输（有些模块没有 IO，比如：ARM，GPU 等），数字逻辑和 IO 的供电一般都是分开的，IO 部分的功耗比较固定，而数字逻辑部分的功耗受频率和电压影响变化很大，为了优化功耗，把芯片内部数字逻辑部分按模块划分成电压域和电源域。
 
@@ -68,7 +68,7 @@ SoC 内部的各个模块，一般都有数字逻辑部分和 IO 部分，数字
 
 ![rk3399_vd_pd.png](./Rockchip_Developer_Guide_Power_Analysis/rk3399_vd_pd.png)
 
-### 1.3 DCDC(Direct Current)和 LDO(low dropout regulator)
+### DCDC(Direct Current)和 LDO(low dropout regulator)
 
 SoC 的外部供电主要分为 DCDC 和 LDO 两种：
 
@@ -84,7 +84,7 @@ SoC 的外部供电主要分为 DCDC 和 LDO 两种：
 
 ![rk3126_rk816.png](./Rockchip_Developer_Guide_Power_Analysis/rk3126_rk816.png)
 
-### 1.4 静态功耗和动态功耗
+### 静态功耗和动态功耗
 
 - 静态功耗是指 SoC 内部模块没有工作时，晶体管的泄露电流所消耗的功耗，静态功耗大小随温度和电压的升高而增大。
 - 动态功耗是指 SoC 内部模块工作时，内部电路翻转所消耗的功耗，动态功耗大小随频率和电压的升高而增大。
@@ -95,7 +95,7 @@ SoC 的外部供电主要分为 DCDC 和 LDO 两种：
     P(d)= C * V^2 * F
 ```
 
-### 1.5 DVFS(Dynamic Voltage and Frequency Scaling)、CPUFREQ 和 DEVFREQ
+### DVFS(Dynamic Voltage and Frequency Scaling)、CPUFREQ 和 DEVFREQ
 
 模块工作频率越高，电压越高，则功耗也越大，所以需要通过动态调整频率电压优化功耗，当系统空闲时，降低频率和电压，系统繁忙时，提高频率和电压。
 
@@ -103,7 +103,7 @@ SoC 的外部供电主要分为 DCDC 和 LDO 两种：
 - CPUFREQ 是指动态调节 CPU 频率的软件框架，包含几种不同的调频策略，细节请查看文档《Rockchip-Developer-Guide-Linux4.4-CPUFreq-CN》；
 - DEVFREQ 是指动态调节外设(不包含 CPU)频率的软件框架，包含几种不同的调频策略，细节请查看《Rockchip-Developer-Guide-Linux4.4-Devfreq》；
 
-## 2. 功耗测量
+## 功耗测量
 
 优化功耗之前，需要把各路电源的电压和电流都测量出来，分析数据，然后再做对应的优化。
 
@@ -113,14 +113,14 @@ SoC 的外部供电主要分为 DCDC 和 LDO 两种：
 cat /sys/class/thermal/thermal_zone0/temp
 ```
 
-### 2.1 测量方法
+### 测量方法
 
 在电路上串联一个电阻 R，测量电阻两端的电压差 U， 则电流 I=U/R，一般电阻用 0.01 欧姆，需要根据电流大小调整电阻大小。
 以 RK3399 EVB 板为例，采用电压测量法，在 VDD_CPU_B,VDD_CPU_L,VCC_1V8,VCC_DDR 输出端都串联了 0.01 欧姆电阻，如下图：
 
 ![rk3399_rk808.png](./Rockchip_Developer_Guide_Power_Analysis/rk3399_rk808.png)
 
-### 2.2 测量工具
+### 测量工具
 
 由于需要测量的电源有很多路，使用多路电压电流采集器可以有效地提高测试效率。PowerMeterage 是 RockChip 开发的电压电流采集工具，可以同时测量 20 路功耗数据，界面如下：
 
@@ -130,9 +130,9 @@ PowerMeterage 硬件连接如下：
 
 ![powerme1.png](./Rockchip_Developer_Guide_Power_Analysis/powerme1.png)
 
-## 3. 功耗数据分析
+## 功耗数据分析
 
-### 3.1 计算理论功耗
+### 计算理论功耗
 
 使用 PowerMeterage 工具，分解各路功耗，DCDC 按~80%-90%的效率折算到电池端，LDO 输出电流等于输入电流，把 DCDC，LDO 和其他电源都折算到电池端，加起来估算总功耗，如果和实测电池端的功耗相差太大，则可能存在漏电，需要进一步分析。
 
@@ -151,7 +151,7 @@ PowerMeterage 硬件连接如下：
 | LDO   | VCC3V0_PMU | 3.01    | 1.20        | 1.20                 |                      |
 | 电池端   | VBAT    | 3.81    | 94.60       | 92.67                | 理论值和实测值相近    |
 
-### 3.2 对比 EVB 数据
+### 对比 EVB 数据
 
 分解的各路功耗数据，在相同场景下和 EVB 上的数据做对比，确认是否存在异常，比如下面是 RK3326 EVB 板和客户样机在静态桌面下的功耗对比，可以看出来客户板子的 ARM、LOG 两路功耗存在异常，需要进一步分析。
 
@@ -167,9 +167,9 @@ PowerMeterage 硬件连接如下：
 | LDO      | VCC3V0_PMU | 3.01     | 1.20    | 3.01     | 1.40   |
 | 电源端     | VBAT     | 3.81     | 94.60   | 3.81      | 191.6 |
 
-### 3.3 各路数据分析
+### 各路数据分析
 
-#### 3.3.1 VDD_CORE/VDD_CPU/VDD_ARM
+#### VDD_CORE/VDD_CPU/VDD_ARM
 
 这三个名字是指同一个电源，即：ARM 核心的电源，主要从以下几个方面分析功耗：
 
@@ -292,7 +292,7 @@ cat /proc/interrupts
 ...
 ```
 
-#### 3.3.2 VDD_GPU
+#### VDD_GPU
 
 VDD_GPU 的功耗主要是确认频率电压表是否正常，实测电压和设置电压是否一致，用的是 devfreq 节点。
 
@@ -342,7 +342,7 @@ cat /sys/class/devfreq/ff400000.gpu/load
 0@200000000Hz
 ```
 
-#### 3.3.3 VDD_LOGIC
+#### VDD_LOGIC
 
 VDD_LOGIC 里面一般会包含很多模块，为了方便功耗管理，内部又会划分成很多个 PD，主要从以下几个方面分析功耗：
 
@@ -422,38 +422,38 @@ dmc_ondemand
 其他设置频率和电压的命令与GPU devfreq一样。
 ```
 
-#### 3.3.4 VCC_DDR
+#### VCC_DDR
 
 VCC_DDR 主要是给 DDR 颗粒和 SoC 上 DDR-IO 部分供电，影响 VCC_DDR 功耗的参数有：DDR 频率，DDR 的负载，DDR 低功耗配置，DDR 颗粒类型等。相同条件下，不同厂商的 DDR 颗粒，功耗可能也会有很大的差异。
 
-#### 3.3.5 VCC_IO
+#### VCC_IO
 
 VCC_IO 主要是给 SoC 上的 IO Pad 和一些外设供电，主要从以下几个方面分析功耗：
 
 - 外设模块的工作状态，是否存在漏电。
 - SoC 上的 IO 管脚状态是否与外设匹配，比如，IO 输出高，而接的外设管脚是低电平。
 
-### 3.4 常见场景分析
+### 常见场景分析
 
-#### 3.4.1 静态桌面
+#### 静态桌面
 
 主要是显示模块在工作，CPU，GPU，DDR 应该降到最低频率，并且进入低功耗状态，VDD_CPU,VDD_GPU,VDD_LOGIC 都调到 opp-table 的最低电压，确认 clk_summary，pm_genpd_summary 的状态，确认外设模块（WIFI、BT 等）都处于关闭状态。静态桌面一般作为其他场景功耗的基础，所以需要优先把功耗调到最优状态。
 
-#### 3.4.2 视频播放
+#### 视频播放
 
 主要是视频解码器(VPU/RKVDEC)在工作，GPU 一般处于关闭状态，重点确认 DDR 的运行频率和 VDD_LOGIC 的电压是否正常。
 
-#### 3.4.3 游戏
+#### 游戏
 
 主要是 CPU 和 GPU 在工作，重点分析 CPU 和 GPU 的负载，频率变化，VDD_CPU 和 VDD_GPU 的电压是否正常。
 
-#### 3.4.4 二级待机
+#### 二级待机
 
 一般情况下，VDD_CPU 和 VDD_GPU 会关闭电源，VDD_LOG 只保留部分唤醒模块供电，所以重点分析 IO，DDR 颗粒和一些外设的功耗。
 
-## 4. 功耗优化策略
+## 功耗优化策略
 
-### 4.1 CPU 优化
+### CPU 优化
 
 - 调整 cpufreq 参数。
 
@@ -532,7 +532,7 @@ echo 1112 > /dev/cpuctl/mygroup/tasks
 /dev/cpuctl/mygroup/cpu.shares
 ```
 
-### 4.2 DDR 优化
+### DDR 优化
 
 - 场景变频：不同场景配置不同 DDR 频率，4K 视频，录像，双屏显示等。
 
@@ -594,7 +594,7 @@ cat /sys/class/devfreq/dmc/load                                       <
 
 - DDR DEVFREQ 更详细的配置和优化请查看文档《Rockchip-Developer-Guide-Linux4.4-Devfreq》。
 
-### 4.3 温控优化
+### 温控优化
 
 当温度升高到一定程度时，功耗会急剧上升，并且在高压的情况下，表现更明显。
 
@@ -613,7 +613,7 @@ cat /sys/class/devfreq/dmc/load                                       <
 };
 ```
 
-### 4.4 电源优化
+### 电源优化
 
 - 降压电路，压降和电流较大时，建议使用 DCDC，提高效率，减小功耗。
 

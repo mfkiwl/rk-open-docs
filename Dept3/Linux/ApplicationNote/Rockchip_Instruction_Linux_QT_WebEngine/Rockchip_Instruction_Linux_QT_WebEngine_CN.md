@@ -80,16 +80,16 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1.Qt WebEngine
+## Qt WebEngine
 
-### 1.1 概述
+### 概述
 
 Qt WebEngine模块提供了一个web浏览器, 在不使用本地浏览器的情况下, 它可以很容易地把Web内容嵌入到Qt应用程序中。
 Qt WebEngine为渲染HTML, XHTML和SVG文档, 使用CSS和JavaScript, 提供了C++类和QML类型。
 
 此文主要介绍Buildroot和Debian中Qt WebEngine的嵌入使用，以及其调用从ffmpeg/mpp/vpu的multivideo硬解流程。
 
-### 1.2 架构
+### 架构
 
 Qt WebEngine中的功能分为以下模块：
 
@@ -102,9 +102,9 @@ Qt WebEngine Core Module：用于与Chromium交互的Qt-WebEngine核心模块
 
 更多详细内容可以参考[QT官方文档](https://doc.qt.io/qt-5/qtwebengine-overview.html).
 
-## 2 不同系统Qt WebEngine的支持
+## 不同系统Qt WebEngine的支持
 
-### 2.1 Buildroot
+### Buildroot
 
 Rockchip Linux 支持的Buildroot基于2018.02-rc3上开发，Qt WebEngine是基于5.12.2版本开发。
 Buildroot支持Qt WebEngine需要打开config（BR2_PACKAGE_QT5WEBENGINE）以及相关配置，目前最新发布的SDK已经支持此功能，默认配置是关闭，需要打开如下配置：
@@ -156,7 +156,7 @@ cd /usr/lib/qt/examples/webenginewidgets/simplebrowser
 
 Buildroot编译时候已经指定了opengles，所以只需要处理前面的context问题，启动时候加参数--disable-es3-gl-context让chromium使用es2，因chromium视频硬解功能，需要访问一些设备节点，所以启动simplebrowser需要加--no-sandbox参数。
 
-### 2.2 Debian
+### Debian
 
 Rockchip Linux Debian 9（stretch）官方Qt为5.7，不支持WebEngine，SDK中使用的Qt相关包是基于buster源更新，版本为5.11，所以手动安装时候需要修改源。
 

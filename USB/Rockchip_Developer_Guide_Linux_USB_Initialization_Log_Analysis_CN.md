@@ -69,7 +69,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Linux USB 子系统简介
+## Linux USB 子系统简介
 
 在 Linux 系统中，提供了主机侧和设备侧视角的 USB 驱动框架及通用驱动程序。
 
@@ -77,7 +77,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 - 设备侧分为 Gadget 框架、Devices 控制器驱动和各设备类 Function 驱动。
 
 ---
-## 2 Rockchip SoC USB 控制器列表
+## Rockchip SoC USB 控制器列表
 
 | 芯片\控制器  | EHCI&OHCI | DWC2 | DWC3 |
 | ------- | :-------: | :--: | :--: |
@@ -92,15 +92,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | RK3399  |     Y     |  N   |  Y   |
 
 ---
-## 3 Kernel 3.10
+## Kernel 3.10
 
-### 3.1 适用芯片
+### 适用芯片
 
 本章节介绍 Linux Kernel 3.10 初始化日志，主要适用于 RV1108、RK312X、RK3288、RK322X、RK322XH、RK3328、RK3368 等有运行 Kernel 3.10 SDK 的平台。
 
-### 3.2 主机侧日志
+### 主机侧日志
 
-#### 3.2.1 USB CORE
+#### USB CORE
 
 ```Log
 
@@ -113,7 +113,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 以上是 Linux Kernel 3.10 启动阶段 USB 模块最早输出的 3 句 log。01 行表示注册 USB 文件系统，系统正常启动后，对应生成/sys/bus/usb/目录；02 行表示成功注册 USB HUB 驱动；03 行表明注册 USB 通用设备驱动，即 usb_generic_driver。通常 USB 设备都是以设备的身份先与 usb_generic_driver 匹配，成功之后，会分裂出接口，当对接口调用 device_add()后，会引起接口和接口驱动的匹配。
 
-#### 3.2.2 设备类驱动
+#### 设备类驱动
 
 ```Log
 
@@ -152,9 +152,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ```
 
-#### 3.2.3 Host 控制器驱动
+#### Host 控制器驱动
 
-##### 3.2.3.1 EHCI
+##### EHCI
 
 ```Log
 
@@ -180,7 +180,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
 - EHCI 控制器被枚举为一个 USB2.0 Root HUB (hub 3-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (3)。
 
-##### 3.2.3.2 OHCI
+##### OHCI
 
 ```Log
 
@@ -205,7 +205,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
 - OHCI 控制器被枚举为一个 USB1.1 Root HUB (hub 4-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (4)。
 
-##### 3.2.3.3 DWC2 Host
+##### DWC2 Host
 
 ```Log
 
@@ -229,7 +229,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本（version 3.10a 21-DEC-2012）等信息。
 - DWC2 HOST 控制器被枚举为一个 USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (5)。
 
-##### 3.2.3.4 DWC3 Host
+##### DWC3 Host
 
 ```Log
 
@@ -262,11 +262,11 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 
 - XHCI 控制器分别被枚举为一个 USB3.0 Root HUB (hub 1-0:1.0)和一个 USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出两个 HUB 分别被分配到的 BUS Number。
 
-## 3.3 设备侧日志
+## 设备侧日志
 
 目前，运行 Kernel 3.10 SDK 的 Rockchip 芯片上仅集成 DWC2 IP，所以 Devices 控制器仅 DWC2 一个，内核使用 dwc_otg_310 驱动，位于 drivers/usb/dwc_otg_310 目录。
 
-### 3.3.1 DWC2 Peripheral
+### DWC2 Peripheral
 
 ```Log
 
@@ -287,7 +287,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 01-02 行：控制器软件版本（version 3.10a 21-DEC-2012），IP 版本：3.10a
 - 控制器当前的工作模式和部分参数的配置。
 
-### 3.3.2 DWC2 Peripheral 枚举日志
+### DWC2 Peripheral 枚举日志
 
 ```Log
 01 [    9.208851]  [otg id chg] last id -1 current id 64
@@ -324,23 +324,23 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 18－22 行为 USB 枚举成功，并通过 UEVENT 事件通知 Android 层 Gadget 连接成功。
 
 ---
-## 4 Kernel 4.4
+## Kernel 4.4
 
-### 4.1 适用芯片
+### 适用芯片
 
 本章节介绍 Linux Kernel 4.4 初始化日志，主要适用于 RK312X、RK3288、RK322X、RK322XH、RK3328、RK3366、RK3368，RK3399 等有运行 Kernel 4.4 SDK 的平台。
 
-### 4.2 主机侧日志
+### 主机侧日志
 
-#### 4.2.1 USB CORE 及设备类驱动
+#### USB CORE 及设备类驱动
 
 跟 Linux Kernel 3.10 相同，usbcore 注册 USB 文件系统、注册 USB HUB 驱动，以及注册 USB 通用设备驱动，log 同[Linux Kernel 3.10](#3.2.1 USB CORE) 。
 
 设备类驱动亦同[Kernel 3.10](#3.2.2 设备类驱动)，log 和配置方式也相同。
 
-#### 4.2.2 Host 控制器驱动
+#### Host 控制器驱动
 
-##### 4.2.3.1 EHCI
+##### EHCI
 
 ```Log
 01 [    0.869076] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
@@ -366,7 +366,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
 - EHCI 控制器被枚举为一个 USB2.0 Root HUB (hub 2-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (2)。
 
-##### 4.2.3.2 OHCI
+##### OHCI
 
 ```Log
 
@@ -391,7 +391,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器驱动版本等信息。
 - OHCI 控制器被枚举为一个 USB1.1 Root HUB (hub 3-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (3)。
 
-##### 4.2.3.3 DWC2 Host
+##### DWC2 Host
 
 ```Log
 
@@ -417,7 +417,7 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器部分配置信息。
 - DWC2 HOST 控制器被枚举为一个 USB2.0 Root HUB (hub 1-0:1.0)，同时也可以看出该 HUB 被分配的 BUS Number (1)。
 
-##### 4.2.3.4 DWC3 Host
+##### DWC3 Host
 
 ```Log
 01 [    0.942624] xhci-hcd xhci-hcd.7.auto: xHCI Host Controller
@@ -450,17 +450,17 @@ DWC3 Host 集成 XHCI 控制器，上述为 XHCI 控制器初始化完整打印�
 - 控制器基本信息，包括中断号、设备虚拟地址、控制器版本等信息。
 - XHCI 控制器分别被枚举为一个 USB3.0 Root HUB (hub 4-0:1.0)和一个 USB2.0 Root HUB (hub 5-0:1.0)，同时也可以看出两个 HUB 被分配到的 BUS Number。
 
-## 4.3 设备侧日志
+## 设备侧日志
 
 目前，Rockchip SoC 除 RK3399 芯片外，其它芯片都是集成 DWC2 OTG IP，RK3399 集成 DWC3 OTG IP，支持 USB3.0，所以设备侧 log 分 dwc2 和 dwc3 阐述。
 
 Kernel 4.4，DWC2 使用 drivers/usb/dwc2 目录驱动；DWC3 使用 drivers/usb/dwc3 目录驱动。
 
-### 4.3.1 DWC2/DWC3 Peripheral
+### DWC2/DWC3 Peripheral
 
 Kernel 4.4，开机在没有连接 USB 线的情况下，对于 DWC2，如果控制器为 OTG 模式，日志同[DWC2 Host](#4.2.3.3 DWC2 Host)；如果为 Peripheral 模式，则没有特别 log 输出；DWC3 跟 DWC2 类似。
 
-### 4.3.2 DWC2 Peripheral 枚举日志
+### DWC2 Peripheral 枚举日志
 
 ```Log
 01 [   18.566773] read descriptors
@@ -483,7 +483,7 @@ Kernel 4.4，开机在没有连接 USB 线的情况下，对于 DWC2，如果控
 - 06 行表示枚举成功，Gadget 通过 Uevent 向 Android 发送 Connected 消息；
 - 10 行 Gadget 通过 Uevent 向 Android 发送 Configured 消息；表示 Gadget 配置成功。
 
-### 4.3.3 DWC3 Peripheral 枚举日志
+### DWC3 Peripheral 枚举日志
 
 ```Log
 01 [   13.924130] fusb302 4-0022: CC connected in 1 as UFP

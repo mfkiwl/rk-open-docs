@@ -41,7 +41,7 @@
 
 -----
 
-## 1 概述
+## 概述
 
 Thermal 是内核开发者定义的一套支持根据指定 governor 控制系统温度，以防止芯片过热的框架模型。Thermal framework 由 governor、core、cooling device、sensor driver 组成，软件架构如下：
 
@@ -65,7 +65,7 @@ Thermal cooling device：发热源或者可以降温的设备，比如 CPU、GPU
 
 -----
 
-## 2 代码路径
+## 代码路径
 
 Governor 相关代码：
 
@@ -98,9 +98,9 @@ drivers/thermal/rk3368_thermal.c      /* RK3368平台tsadc驱动 */
 
 -----
 
-## 3 配置方法
+## 配置方法
 
-### 3.1 Menuconfig 配置
+### Menuconfig 配置
 
 ```c
 <*> Generic Thermal sysfs driver  --->
@@ -125,7 +125,7 @@ drivers/thermal/rk3368_thermal.c      /* RK3368平台tsadc驱动 */
 
 通过“Default Thermal governor”配置项，可以选择温控策略，开发者可以根据实际产品需求进行修改。
 
-### 3.2 Tsadc 配置
+### Tsadc 配置
 
 Tsadc 在温控中作为 thermal sensor，用于获取温度，通常需要在 DTSI 和 DTS 都做配置。
 
@@ -186,11 +186,11 @@ DTS 的配置，主要用于选择通过 CRU 复位还是 GPIO 复位，低电�
 
 参考文档"Documentation/devicetree/bindings/thermal/rockchip-thermal.txt"。
 
-### 3.3 Power allocator 策略配置
+### Power allocator 策略配置
 
 Power allocator 温控策略引入 PID（比例-积分-微分）控制，根据当前温度，动态给各 cooling device 分配 power，温度低的时候可分配的 power 比较大，即可以运行的频率高，随着温度上升，可分配的 power 逐渐减小，可运行的频率也逐渐降低，从而达到根据温度限制频率。
 
-#### 3.3.1 CPU 配置
+#### CPU 配置
 
 CPU 在温控中作为 cooling device，节点中需要包含#cooling-cells、dynamic-power-coefficient 属性。
 
@@ -220,7 +220,7 @@ cpu_b0: cpu@100 {
 };
 ```
 
-#### 3.3.2 GPU 配置
+#### GPU 配置
 
 GPU 在温控中作为 cooling device，节点需要包含#cooling-cells 属性和 power_model 子节点。
 
@@ -257,7 +257,7 @@ gpu: gpu@ff9a0000 {
 };
 ```
 
-#### 3.3.3 Thermal Zone 配置
+#### Thermal Zone 配置
 
 Termal zone 节点主要用于配置温控策略相关的参数并生成对应的用户态接口。
 
@@ -359,7 +359,7 @@ thermal_zones: thermal-zones {
 
 参考文档"Documentation/devicetree/bindings/thermal/thermal.txt"、"Documentation/thermal/power_allocator.txt"。
 
-#### 3.3.4 温控参数调整
+#### 温控参数调整
 
 有些参数是跟芯片相关，一般不需要修改。有些参数需要根据产品实际情况调整，通常情况可以按以下步骤进行：
 
@@ -610,7 +610,7 @@ echo 0 > /sys/kernel/debug/tracing/tracing_on  /* 暂停抓取数据 */
 echo 0 > /sys/kernel/debug/tracing/trace       /* 清空之前的数据 */
 ```
 
-## 4 用户态接口介绍
+## 用户态接口介绍
 
 用户态接口在/sys/class/thermal/目录下，具体内容和 DTSI 中 thermal zone 节点的配置对应。有的平台 thermal zone 节点下只有一个子节点，对应/sys/class/thermal/目录下也只有 thermal_zone0 子目录；有的平台有两个子节点，对应/sys/class/thermal/目录下就会有 thermal_zone0 和 thermal_zone1 子目录。通过用户态接口可以切换温控策略，查看当前温度等。
 
@@ -650,9 +650,9 @@ cdev0_weight			/* 该cooling devic在计算power时扩大的倍数 */
 
 -----
 
-## 5 常见问题
+## 常见问题
 
-### 5.1 关温控
+### 关温控
 
 方法一：menuconfig 中默认温控策略设置为 user_space。
 
@@ -689,7 +689,7 @@ echo 0 > /sys/class/thermal/thermal_zone0/cdev1/cur_state
 echo 0 > /sys/class/thermal/thermal_zone0/cdev2/cur_state
 ```
 
-### 5.2 获取当前温度
+### 获取当前温度
 
 直接查看用户态接口 thermal_zone0 或者 thermal_zone1 目录下的 temp 节点即可。
 

@@ -76,7 +76,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 系统死机分析
+## 系统死机分析
 
 系统死机最常见的原因是访问非法内存，会触发硬FAULT中断，硬FAULT中会打印死机现场，结合响应的工具，可以还原死机的堆栈，详细请参考《Rockchip_RK2206_User_Manual_Panic_Info_CN.pdf》或者本文第4节，中断现场打印完之后，会打印RKOS相关信息，LOG如下：
 
@@ -136,7 +136,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 如果栈不够，FreeRTOS会上报异常到RKOS, RKOS触发异常死机，输出现场，分析同上。
 
-## 2 线程死锁分析
+## 线程死锁分析
 
 线程死锁卡死，通过LOG不好分析，可以通过命令task.list 先查看所有的线程状态：
 
@@ -207,7 +207,7 @@ PC call-8: 0307c39a: f000 f9bd 2800 d0f4 2000 b003
 
 然后参考《Rockchip_RK2206_User_Manual_Panic_Info_CN.pdf》 或者本文第4节的方法可以打印。
 
-## 3 看门狗复位分析
+## 看门狗复位分析
 
 RKOS在IDLE线程进行喂狗，引起看门狗复位原因是看门狗长时间获取不到时间片，具体情况如下：
 
@@ -265,7 +265,7 @@ RKOS在IDLE线程进行喂狗，引起看门狗复位原因是看门狗长时间
     total used memory block cnt = 150totalsize = 179860  Remaining = 97932
 ```
 
-## 4 make dump命令
+## make dump命令
 
 在app/test_demo/gcc,  app/story_robot/gcc,  app/wlan_demo/gcc目录下执行make dump, 复制堆栈信息回车，然后CRTL+D可以快速定位出问题的函数, 如果要dump其他固件的信息，需要将同名elf文件复制到该目录下.
 

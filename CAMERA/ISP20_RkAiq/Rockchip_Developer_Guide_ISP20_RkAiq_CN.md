@@ -82,9 +82,9 @@ ISP模块软件开发工程师
 
 ---
 
-## 1 概述
+## 概述
 
-### 1.1 概述
+### 概述
 
 ISP20 包含了一系列的图像处理算法模块，主要包括：暗电流矫正、坏点矫正、3A、HDR、镜头阴影矫正、
 镜头畸变矫正、3DLUT、去噪（包括RAW域去噪，多帧降噪，颜色去噪等）、锐化等。ISP20包括硬件算法实现
@@ -92,14 +92,14 @@ ISP20 包含了一系列的图像处理算法模块，主要包括：暗电流�
 RkAiq软件模块主要实现的功能为：从ISP驱动获取图像统计，结合IQ Tuning参数，使用一系列算法计算出
 新的ISP、Sensor等硬件参数，不断迭代该过程，最终达到最优的图像效果。
 
-### 1.2 功能描述
+### 功能描述
 
 ![isp20_system](resources/isp20_system.png)
 <center>**图1-1 ISP20 系统框图**</center>
 
 ISP20总体软硬件框图如图1-1所示。Sensor输出数据流给ISP HW，ISP HW再输出经过一系列图像处理算法后的图像。RkAiq不断从ISP HW获取统计数据，并经过3A等算法生成新的参数反馈给各硬件模块。Tuning tool可在线实时调试参数，调试好后可保存生成新的iq参数文件。
 
-### 1.2.1 RkAiq架构
+### RkAiq架构
 
 ![RkAiq_arch](resources/Rkaiq_arch.png)
 <center>**图1-2 RkAiq总体架构图**</center>
@@ -111,7 +111,7 @@ ISP20 RkAiq软件设计思路如图1-2所示。主要分成以下四个部分：
 3. customer 3A libs。客户可根据算法库接口定义实现自己的3A算法库，或者其他算法库。将自定义算法库注册给RkAiq lib动态库后，可根据提供的接口选择跑自定义库还是跑Rk库。
 4. IQ file。iq tuning结果文件，保存的是算法相关参数以及CIS等一些系统静态参数。
 
-### 1.2.2 软件架构
+### 软件架构
 
 ![software_framework](resources/software_framework.png)
 <center>**图1-3 软件架构框图**</center>
@@ -126,7 +126,7 @@ ISP20 软件框图如图1-3所示。主要分成以下三层：
     RkAiq lib可直接集成进应用。
 3. user layer。用户应用层。
 
-### 1.2.3 软件流程
+### 软件流程
 
 ![flow_chart](resources/flow_chart.png)
 <center>**图1-4 流程图**</center>
@@ -157,14 +157,14 @@ RkAiq接口调用流程如图1-4所示。图中虚线框部分为可选部分，
 
 ---
 
-## 2 系统控制
+## 系统控制
 
-### 2.1 功能概述
+### 功能概述
 
 系统控制部分包含了AIQ 公共属性配置，初始化 AIQ、运行 AIQ、退
 出AIQ，设置 AIQ各模块等功能。
 
-### 2.2 API参考
+### API参考
 
 **rk_aiq_uapi_sysctl_init**
 
@@ -642,7 +642,7 @@ rk_aiq_uapi_sysctl_get3AStats(const rk_aiq_sys_ctx_t* ctx,
 - 头文件：rk_aiq_user_api_sysctl.h
 - 库文件：librkaiq.so
 
-### 2.3 数据类型
+### 数据类型
 
 **rk_aiq_working_mode_t**
 
@@ -766,11 +766,11 @@ typedef struct {
 | awb_stats_v200 | awb统计信息 |
 | af_stats | af统计信息 |
 
-## 3 AE
+## AE
 
-### 3.1 概述
+### 概述
 
-### 3.2 重要概念
+### 重要概念
 
 - 曝光时间： sensor 积累电荷的时间，是 sensor pixel 从开始曝光到电量被读出的这
 - 段时间。
@@ -780,9 +780,9 @@ typedef struct {
 - 抗闪烁：由于电灯的电源工频与 sensor 的帧率不匹配而导致的画面闪烁，一般通
 - 过限定曝光时间和修改 sensor 的帧率来达到抗闪烁的效果。
 
-### 3.3 功能描述
+### 功能描述
 
-### 3.4 API参考
+### API参考
 
 **rk_aiq_user_api_ae_setExpSwAttr**
 
@@ -1126,7 +1126,7 @@ rk_aiq_user_api_ae_getHdrExpAttr(const rk_aiq_sys_ctx_t* ctx, Uapi_HdrExpAttr_t*
 - 头文件：rk_aiq_user_api_ae.h、rk_aiq_uapi_ae_int.h
 - 库文件：librkaiq.so
 
-### 3.5 数据类型
+### 数据类型
 
 **CalibDb_AecDayNightMode_t**
 
@@ -1618,24 +1618,24 @@ typedef struct Uapi_HdrExpAttr_s {
 
 - Cam1x6FloatMatrix_t
 
-## 4 AWB
+## AWB
 
-### 4.1 概述
+### 概述
 
 (todo)
 
-### 4.2 重要概念
+### 重要概念
 
 - 色温：色温是按绝对黑体来定义的， 光源的辐射在可见区和绝对黑体的辐射完
   全相同时，此时黑体的温度就称此光源的色温。
 - 白平衡：在不同色温的光源下，白色在传感器中的响应会偏蓝或偏红。白平衡算
   法通过调整 R, G, B 三个颜色通道的强度，使白色真实呈现。
 
-### 4.3  AWB模块工作原理
+### AWB模块工作原理
 
 (todo)
 
-### 4.4 API参考
+### API参考
 
 **rk_aiq_user_api_awb_SetAttrib**
 
@@ -1761,7 +1761,7 @@ rk_aiq_user_api_awb_QueryWBInfo(const rk_aiq_sys_ctx_t* sys_ctx, rk_aiq_wb_querr
 - 头文件：rk_aiq_user_api_awb.h、rk_aiq_uapi_awb_int.h
 - 库文件：librkaiq.so
 
-### 4.5 数据类型
+### 数据类型
 
 **rk_aiq_wb_op_mode_t**
 
@@ -2001,17 +2001,17 @@ typedef struct rk_aiq_wb_querry_info_s {
 | cctGloabl |   |
 | awbConverged |   |
 
-## 5 FEC
+## FEC
 
-### 5.1 概述
+### 概述
 
 （todo）
 
-### 5.2 重要概念
+### 重要概念
 
 - 畸变实际上指的是你拍出来的物体相对于物体本身而言的失真。
 
-### 5.3 API参考
+### API参考
 
 **rk_aiq_user_api_afec_enable**
 
@@ -2071,15 +2071,15 @@ XCamReturn rk_aiq_user_api_afec_disable(const rk_aiq_sys_ctx_t* sys_ctx);
 - 头文件：rk_aiq_user_api_afec.h、rk_aiq_uapi_afec_int.h
 - 库文件：librkaiq.so
 
-## 6 IMGPROC
+## IMGPROC
 
-### 6.1 概述
+### 概述
 
 imgproc API是AIQ提供的相对简单、宏观的设置接口。如曝光时间、增益的设置，白平衡场景的设置等。
 
-### 6.2 AE
+### AE
 
-#### 6.2.1 API参考
+#### API参考
 
 **rk_aiq_uapi_setExpMode**
 
@@ -2441,7 +2441,7 @@ XCamReturn rk_aiq_uapi_getExpPwrLineFreqMode(const rk_aiq_sys_ctx_t* ctx, expPwr
 - 头文件：rk_aiq_user_api_imgproc.h
 - 库文件：librkaiq.so
 
-#### 6.2.2 数据类型
+#### 数据类型
 
 **opMode_t**
 
@@ -2556,9 +2556,9 @@ typedef enum antiFlickerMode_e {
 | ANTIFLICKER_NORMAL_MODE | 普通模式  |
 | ANTIFLICKER_AUTO_MODE | 自动选择模式  |
 
-### 6.3 AWB
+### AWB
 
-#### 6.3.1 API参考
+#### API参考
 
 **rk_aiq_uapi_setWBMode**
 
@@ -2858,7 +2858,7 @@ XCamReturn rk_aiq_uapi_getMWBCT(const rk_aiq_sys_ctx_t* ctx, rk_aiq_wb_cct_t *ct
 - 头文件：rk_aiq_user_api_imgproc.h
 - 库文件：librkaiq.so
 
-#### 6.3.2 数据类型
+#### 数据类型
 
 **rk_aiq_wb_op_mode_t**
 
@@ -2894,9 +2894,9 @@ typedef enum rk_aiq_wb_op_mode_s {
 
 ---
 
-## 7 debug信息
+## debug信息
 
-### 7.1 版本获取
+### 版本获取
 
 1. aiq提供了版本发布日期、aiq版本、iq解析器版本及isp各个算法模块的版本信息；
 
@@ -2940,7 +2940,7 @@ typedef enum rk_aiq_wb_op_mode_s {
     ************************ VERSION INFOS END ************************
 ```
 
-### 7.2 log开关
+### log开关
 
 1. aiq采用64bits表示所有模块的log级别，表示各个模块的位图及说明如下：
 
@@ -3003,13 +3003,13 @@ typedef enum rk_aiq_wb_op_mode_s {
    0x4014
 ```
 
-### 7.3 动态抓取raw/yuv图像
+### 动态抓取raw/yuv图像
 
-#### 7.3.1 抓取raw图原理说明
+#### 抓取raw图原理说明
 
    目前软件isp的数据流粗略流程为： sensor(raw) -> csi-tx -> isp-rx -> ... -> isp-> ... ->ispp -> ... -> out-yuv, 其中csi-tx -> isp-rx的raw图数据可以在aiq的hwi层获取到。aiq根据/tmp/capture_cnt中间文件获取用户想保存raw文件的帧数，aiq将对应帧数的raw图写入/tmp目录下。
 
-#### 7.3.2  抓raw图步骤
+#### 抓raw图步骤
 
 1. 运行应用程序，如运行rkisp_demo，其他应用程序也支持
 
@@ -3037,7 +3037,7 @@ typedef enum rk_aiq_wb_op_mode_s {
        -rw-r--r-- 1 root root     381 Aug 15 20:40 meta_data
 ```
 
-#### 7.3.3  运行rkisp_demo,抓raw及对应的yuv图像步骤
+#### 运行rkisp_demo,抓raw及对应的yuv图像步骤
 
 1. 加--sync-to-raw参数，运行rkisp_demo，只有rkisp_demo支持
 

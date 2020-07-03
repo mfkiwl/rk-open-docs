@@ -62,13 +62,13 @@
 
 ---
 
-## 1 方案概述
+## 方案概述
 
-### 1.1 概述
+### 概述
 
 本章主要描述时钟子系统的相关的重要概念、时钟方案、总体流程、代码结构。
 
-### 1.2 重要概念
+### 重要概念
 
 **时钟子系统**
 
@@ -82,7 +82,7 @@
 
 clock 相关的器件包括：用于产生 clock 的 Oscillator（有源振荡器，也称作谐振荡器）或者 Crystal（无源振荡器，也称晶振）；用于倍频的 PLL（锁相环，Phase Locked Loop）；用于分频的 divider；用于多路选择的 Mux；用于 clock enable 控制的与门；使用 clock 的硬件模块（可称作 consumer）；等等。
 
-### 1.3 时钟方案
+### 时钟方案
 
 每一个 SOC 都有自己的时钟分配方案，主要是包括 PLL 的设置，各个 CLK 的父属性、DIV、MUX 等。芯片不同，时钟方案是有差异的。
 
@@ -94,7 +94,7 @@ clock 相关的器件包括：用于产生 clock 的 Oscillator（有源振荡�
 
 图表 1‑2 时钟分配示例图
 
-### 1.4 总体流程
+### 总体流程
 
 ![1-3-clk-configuration-flow](Rockchip_Developer_Guide_Linux3.10_Clock/1-3-clk-configuration-flow.png)
 
@@ -108,7 +108,7 @@ clock 相关的器件包括：用于产生 clock 的 Oscillator（有源振荡�
 
 3. 选择 clk 的 parent。
 
-### 1.5 代码结构
+### 代码结构
 
 CLOCK 的软件框架由 CLK 的 Device Tree（clk 的寄存器描述、clk 之间的树状关系等）、Device driver 的 CLK 配置和 CLK API 三部分构成。这三部分的功能、CLK 代码路径如表 1-1 所示。
 
@@ -122,15 +122,15 @@ CLOCK 的软件框架由 CLK 的 Device Tree（clk 的寄存器描述、clk 之�
 
 ---
 
-## 2 CLOCK 开发指南
+## CLOCK 开发指南
 
-### 2.1 概述
+### 概述
 
 本章描述如何修改时钟配置、使用 API 接口及调试 CLK 程序。
 
-### 2.2 时钟的相关概念
+### 时钟的相关概念
 
-#### 2.2.1 PLL
+#### PLL
 
 锁相环，是由 24M 的晶振输入，然后内部锁相环锁出相应的频率。这是 SOC 所有 CLOCK 的时钟的源。SOC 的所有总线及设备的时钟都是从 PLL 分频下来的。RK 平台主要 PLL 有:
 
@@ -158,7 +158,7 @@ CLOCK 的软件框架由 CLK 的 Device Tree（clk 的寄存器描述、clk 之�
 
 图表 ‑1 总线时钟结构
 
-#### 2.2.2 GATING
+#### GATING
 
 CLOCK 的框架中有很多的 GATING，主要是为了降低功耗使用，在一些设备关闭，CLOCK 不需要维持的时候，可以关闭 GATING，节省功耗。
 
@@ -168,9 +168,9 @@ RK CLOCK 的框架的 GATING 是按照树的结构，有父子属性。GATING �
 
 ![2-2-GATING](Rockchip_Developer_Guide_Linux3.10_Clock/2-2-GATING.png)图表 ‑2GATING 示例图
 
-### 2.3 时钟配置
+### 时钟配置
 
-#### 2.3.1 时钟初始化配置
+#### 时钟初始化配置
 
 ```c
 arch/arm64/dts/rockchip/rk33xx.dtsi
@@ -246,7 +246,7 @@ CLOCK TREE 初始化时是否默认 enable：
 }
 ```
 
-#### 2.3.2 Driver 的时钟配置
+#### Driver 的时钟配置
 
 1. 获取 CLK 指针
 
@@ -271,9 +271,9 @@ Driver code：
 	dev->clk = devm_clk_get(NULL, "clk_saradc");
 ```
 
-### 2.4  CLOCK API 接口
+### CLOCK API 接口
 
-#### 2.4.1 主要的 CLK API
+#### 主要的 CLK API
 
 1. **头文件**
 
@@ -331,7 +331,7 @@ prepare/unprepare，enable/disable 的说明：
 
 （返回值小于 0，设置 CLK 失败）
 
-#### 2.4.2 示例
+#### 示例
 
 DTS
 
@@ -387,7 +387,7 @@ Driver code
 	}
 ```
 
-### 2.5 CLOCK 调试
+### CLOCK 调试
 
 1. **CLOCK DEBUGS:**
 
@@ -462,11 +462,11 @@ Address: Operational Base + offset (0x00d0)
 
 ---
 
-## 3 常见问题分析
+## 常见问题分析
 
-### 3.1 PLL 设置
+### PLL 设置
 
-#### 3.1.1 PLL 类型查找
+#### PLL 类型查找
 
 不同芯片 PLL 相关的寄存器、PLL 计算公式等会有一些差异，使用 PLL 类型来区分芯片不同，去计算并设置 PLL 的参数。
 
@@ -488,7 +488,7 @@ Address: Operational Base + offset (0x00d0)
 	return &clk_pll_ops_312xplus;
 ```
 
-#### 3.1.2 PLL 回调函数的定义
+#### PLL 回调函数的定义
 
 ```c
 	static const struct clk_ops clk_pll_ops_312xplus = {
@@ -498,7 +498,7 @@ Address: Operational Base + offset (0x00d0)
 	};
 ```
 
-#### 3.1.3 PLL 频率表格定义
+#### PLL 频率表格定义
 
 ```c
 	struct pll_clk_set *clk_set = (struct pll_clk_set *)(rk312xplus_pll_com_table);
@@ -512,7 +512,7 @@ Address: Operational Base + offset (0x00d0)
 	};
 ```
 
-#### 3.1.4 PLL 计算公式
+#### PLL 计算公式
 
 ```c
 	VCO = 24M * FBDIV / REFDIV (450M ~ 2200M)
@@ -537,9 +537,9 @@ FOUT = 1188 / 2/ 1 = 594M
 
 （注意：但是使用自动计算的时候，VCO 不能保证尽量大，如果对 PLL 的 jitter 有要求的不建议使用。）
 
-### 3.2 部分特殊时钟的设置
+### 部分特殊时钟的设置
 
-#### 3.2.1 LCDC 显示相关的时钟
+#### LCDC 显示相关的时钟
 
 LCDC 的 DCLK 是根据当前屏幕的分辨率决定的，所以不同产品间会有很大差异。所以 RK 平台上 LCDC 的 DCLK 一般是独占一个 PLL 的。由于要独占一个 PLL，所以这个 PLL 的频率会根据屏的要求变化。所以一般此 PLL 要求是可以自动计算 PLL 参数的。而且一些其他对时钟有要求的时钟尽量不要挂在此 PLL 下面。如下表中：
 
@@ -581,7 +581,7 @@ drivers/clk/rockchip/clk-ops.c
 	};
 ```
 
-#### 3.2.2 EMMC、SDIO、SDMMC
+#### EMMC、SDIO、SDMMC
 
 这几个时钟有要求必须是偶数分频得到的，而且控制器内部还有默认的二分频。也就是说如果 EMMC 需要 50M，那边 CLOCK 要给 EMMC 提供 100M 的时钟。并且 100M 是由 PLL 偶数分频得到的。
 
@@ -616,7 +616,7 @@ arch/arm/dts/rk3xxx-clocks.dtsi
 
 EMMC 的驱动中可以通过 clk\_set\_rate 接口去修改频率。
 
-#### 3.2.3 小数分频
+#### 小数分频
 
 I2S、UART 等有小数分频的。对于小数分频设置时有一个要求，就是小数分频的频率跟小数分频的 parent 有一个 20 倍的关系，如果不满足 20 倍关系，输出的 CLK 会有较大的抖动及频偏。
 
@@ -624,6 +624,6 @@ I2S、UART 等有小数分频的。对于小数分频设置时有一个要求，
 
 图表 3‑1 小数分频时钟示意图
 
-#### 3.2.4 以太网时钟
+#### 以太网时钟
 
 对于以太网的时钟，一般要求是精准的，百兆以太网要求 50M 精准的频率，千兆以太网要求 125M 精准的频率。一般有以太网需求的，PLL 也要是精准的时钟输出。如果说当前的时钟方案由于其他的原因不能出精准的时钟，那么以太网就要使用外部时钟晶振。这个是根据项目需求及实际的产品方案定的。

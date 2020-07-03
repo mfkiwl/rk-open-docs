@@ -70,9 +70,9 @@ Rockchip结构光模组RMSL(Rockchip Module Structured Light)是一款成熟的�
 [TOC]
 ---
 
-## 1. RMSL模组接口简介
+## RMSL模组接口简介
 
-### 1.1 概述
+### 概述
 
 Rockchip RMSL模组是USB即插即用设备，它可以同时有三路输出，即Depth, RGB, IR。其中Depth输出YUYV数据，RGB及IR输出MJPG数据。
 
@@ -82,7 +82,7 @@ Rockchip RMSL模组是USB即插即用设备，它可以同时有三路输出，�
 | RGB       | 1920x1080        | MJPG      | 30fps    | 彩色视频输出，可解码为NV12格式 |
 | IR        | 640x480          | MJPG      | 15fps    | 红外视频输出，可解码为NV12格式 |
 
-### 1.2 RMSL模组的型号
+### RMSL模组的型号
 
 RK RMSL模组的型号可从SN码中获取，当前支持的RK结构光型号如下：
 
@@ -90,7 +90,7 @@ RK RMSL模组的型号可从SN码中获取，当前支持的RK结构光型号如
 | :------:        | :------------:    | :------: |
 | RMSL201-1301    | R2011301xxxxxxxxx | USB      |
 
-### 1.3 Buildroot中配置
+### Buildroot中配置
 
 在Buildroot Linux SDK中，开发接口及参考demo位于app/demo/rmsl目录下。默认SDK发布版本没有编译该程序，需要用户将Buildroot编译宏开关`BR2_PACKAGE_APP_DEMO_RMSL`使能后才可以编译。该程序依赖的如下应用包也需要使能。
 
@@ -104,7 +104,7 @@ RK RMSL模组的型号可从SN码中获取，当前支持的RK结构光型号如
 - 若未发现该宏开关或无rmsl demo代码，请更新到最新SDK，或通过[github仓库](https://github.com/rockchip-linux/demo)获取。
 - external/camera_engine_rkisp/需要更新到`86dc5bf1 apps: rkisp_api: add usb camera supports`。若SDK未更新到最新，可通过[github仓库](https://github.com/rockchip-linux/camera_engine_rkisp)获取。
 
-### 1.4 编译和运行
+### 编译和运行
 
 在SDK目录下，通过如下命令进行模块编译，
 
@@ -246,7 +246,7 @@ UVC IR: /dev/video9: draw in (640, 480)[640 x 480]
     -rawvideo w=640:h=480:size=$((640*480*2)):format=rgb16
 ```
 
-## 2 demo代码简介
+## demo代码简介
 
 代码位于app/demo/rmsl/目录，包含了RMSL的设置、查询接口，获取数据流并解码、显示功能。
 
@@ -265,7 +265,7 @@ app/demo/rmsl/
 └── vpu_decode.h
 ```
 
-### 2.1 RMSL控制接口
+### RMSL控制接口
 
 **获取版本**
 
@@ -374,13 +374,13 @@ int rmsl_get_point_cloud_depth(const uint16_t *pIn, struct rmsl_pc *pc_out,
 - 小于0表示错误
 - 大于0表示模组原始的帧数据已经是深度图，不需要计算。（目前无此场景）
 
-### 2.2 获取数据流
+### 获取数据流
 
 在rmsl_linux_demo中，使用到了rkisp_api.so获取数据流。与普通的USB Camera模组相比，要多一个初始化操作。
 
 rkisp_api.so详细接口请参考《Rockchip_Developer_Guide_Linux_Camera_EN.pdf》。
 
-### 2.3 解码
+### 解码
 
 该demo中使用Rockchip MPP库解码MJPG。将从rkisp_api获取到的数据流交给MPP解码。MPP要求源数据拷贝一次，考虑到MJPG的每帧的数据量很小，性能上几无影响。解码后的Buffer由RGA分配，这里主要是因为后级需要有可能需要RGA拷贝以便显示。
 
@@ -400,7 +400,7 @@ rkisp_api.so详细接口请参考《Rockchip_Developer_Guide_Linux_Camera_EN.pdf
 - rga_bo_fd，RGA buffer句柄
 - rga_bo.ptr，RGA buffer的虚拟地址
 
-### 2.4 显示
+### 显示
 
 为尽可能高效地处理数据流并兼顾Rockchip不同芯片的特性，rmsl_linux_demo的显示直接使用了libdrm的接口，将三幅图像通过RGA拷贝到目标Buffer的具体偏移处，最后送到Rockchip VOP的overlay显示层。
 
@@ -431,7 +431,7 @@ rkisp_api.so详细接口请参考《Rockchip_Developer_Guide_Linux_Camera_EN.pdf
 - 如果有多个overlay层可用，NV12格式可以直接用单独的层显示。共需要三个overlay层，两个用作彩色及红外NV12帧显示，另一个给深度图显示。这样可以省去RGA转码及/或拷贝部分。RGB Camera也可以达到30fps的帧率。
 - 多线程化可提升并发性，特别是在需要处理点云图时，涉及到浮点运算
 
-#### 2.4.1 与QT应用程序结合
+#### 与QT应用程序结合
 
 用户如需要QT应用程序来实现如菜单、按键等UI组件，可预留出视频区域，并在需要视频显示时，以rmsl_linux_demo作为参考，将overlay层固定到预留区域中。
 
@@ -439,8 +439,8 @@ rkisp_api.so详细接口请参考《Rockchip_Developer_Guide_Linux_Camera_EN.pdf
 
 以上仅是提供一种参考思路，请开发工程师自由发挥。
 
-## 3 常见QA
+## 常见QA
 
-### 3.1 打开Camera后设备断开
+### 打开Camera后设备断开
 
 原因是供电不足导致，请使用外接电源的USB hub供电。

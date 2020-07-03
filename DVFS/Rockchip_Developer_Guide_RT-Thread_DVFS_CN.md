@@ -73,15 +73,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 RT-Thread DVFS 功能特点
+## RT-Thread DVFS 功能特点
 
 * 管理一个 IC 模块对应的频率、电压需求
 * 支持多个 IC 模块公用一路 regulator 电源
 * 支持不同驱动/应用对同一个 IC 模块频率、电压进行申请。
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 **Regulator req 接口：**
 
@@ -129,9 +129,9 @@ void dvfs_desc_init(struct rk_dvfs_desc *dvfs_array, uint32_t  cnt);
 void dvfs_init(void);
 ```
 
-### 2.2 配置
+### 配置
 
-#### 2.2.1 开 DVFS 配置
+#### 开 DVFS 配置
 
 ```c
 RT-Thread rockchip common drivers  --->
@@ -139,7 +139,7 @@ RT-Thread rockchip common drivers  --->
         [*] Enble dvfs
 ```
 
-#### 2.2.2 开 Regulator req 配置
+#### 开 Regulator req 配置
 
 ```c
 RT-Thread rockchip common drivers  --->
@@ -147,7 +147,7 @@ RT-Thread rockchip common drivers  --->
         [*] Enable request regulator vol
 ```
 
-#### 2.2.2 开 CLK req 配置
+#### 开 CLK req 配置
 
 ```
 RT-Thread rockchip common drivers  --->
@@ -155,7 +155,7 @@ RT-Thread rockchip common drivers  --->
         [*] Enable request clk
 ```
 
-#### 2.2.3 开调测 log
+#### 开调测 log
 
 ```c
 RT-Thread rockchip common drivers  --->
@@ -163,11 +163,11 @@ RT-Thread rockchip common drivers  --->
         [*] Enable request clk
 ```
 
-### 2.3 Regulator Req 使用说明
+### Regulator Req 使用说明
 
 这个功能在多个 IC 模块公用一路电源时使用，功能为从各个模块的电压申请中找出最高的电压进行配置
 
-#### 2.3.1 初始化配置
+#### 初始化配置
 
 ```c
 static uint32_t core_pwr_req[2];
@@ -197,7 +197,7 @@ void rt_hw_board_init()
 }
 ```
 
-#### 2.3.2 使用说明
+#### 使用说明
 
 1. 通过 regulator 的 id 申请一个 struct req_pwr_desc 的描述指针和一个 req_id,其中 req_id 用于管理是那个模块申请的电压，函数如下：
 
@@ -212,11 +212,11 @@ rt_err_t regulator_req_set_voltage(struct req_pwr_desc *req_pwr, uint8_t req_id,
                                    uint32_t volt)
 ```
 
-### 2.4 CLK Req 使用说明
+### CLK Req 使用说明
 
 该功能在多个引用或模块申请某一个模块性能时使用，如 MCU 300M 时申请 SRAM 运行 300M，VOP 模块申请 SRAM 运行 200M，通过这个功能会选择 300M 作为 SRAM 的运行频率
 
-#### 2.4.1 初始化配置
+#### 初始化配置
 
 ```c
 static uint32_t clk_shrm_req[2];
@@ -246,7 +246,7 @@ void rt_hw_board_init()
 }
 ```
 
-#### 2.4.2 使用说明
+#### 使用说明
 
 1. 通过 clk id 申请一个 struct req_clk_desc 的描述指针和一个 req_id,其中 req_id 用于管理是那个模块申请的频率，函数如下：
 
@@ -260,11 +260,11 @@ struct req_clk_desc  *clk_get_req_rate_id(eCLOCK_Name clk_id, uint8_t *req_id);
 rt_err_t clk_req_set_rate(struct req_clk_desc *req_clk, uint8_t req_id, uint32_t rate);
 ```
 
-### 2.5 dvfs 使用
+### dvfs 使用
 
 通过 clk id 配置一个模块的频率同时根据预先配置的频率电压表，配置对应的电压。
 
-#### 2.5.1 初始化配置
+#### 初始化配置
 
 ```c
 static struct dvfs_table dvfs_core_table[] =
@@ -324,7 +324,7 @@ struct rk_dvfs_desc dvfs_data[] =
     dvfs_desc_init(&dvfs_data, HAL_ARRAY_SIZE(dvfs_data));
 ```
 
-#### 2.5.2 使用说明
+#### 使用说明
 
 1. 通过 clk id 申请一个 struct rk_dvfs_desc 的描述指针和一个针对 clk 的 req_id（dvfs_clk_req_id）。函数如下：
 

@@ -77,13 +77,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Rockchip RK3399Pro NPU 介绍
+## Rockchip RK3399Pro NPU 介绍
 
-### 1.1 概述
+### 概述
 
 采用高性能AI处理芯片RK3399Pro，集成神经网络处理器NPU，算力高达3.0Tops，兼容多种AI框架，灵活应用于各种智能产品。
 
-### 1.2 NPU (Neural Process Unit) 介绍
+### NPU (Neural Process Unit) 介绍
 
 NPU是专门研究神经网络的过程单元。它的设计目的是加速机器视觉等人工智能领域的神经网络算法以及自然语言处理。人工智能的应用越来越广泛目前提供了多种功能，包括面部跟踪以及手势和身体跟踪、图像分类、视频监控、自动语音识别（ASR）和高级驾驶员辅助系统（ADAS）等。
 
@@ -96,7 +96,7 @@ NPU有如下特性：
 - 提供 AI 开发工具：支持模型快速转换、支持开发板端侧转换 API、支持 TensorFlow / TF Lite / Caffe / ONNX / Darknet 等模型。
 - 提供 AI 应用开发接口：提供 RKNN 跨平台 API、Linux 支持 TensorFlow 开发。
 
-### 1.3 NPU 开发工具
+### NPU 开发工具
 
 RK3399Pro NPU 开发工具如下：
 
@@ -126,16 +126,16 @@ RKNN DRIVER 开发内容在工程目录 external/rknpu 下。
 **RKNPUTools**：
 RKNN API的开发使用在工程目录 external/RKNPUTools 下。
 
-### 1.4 NPU 上电启动流程介绍
+### NPU 上电启动流程介绍
 
-#### 1.4.1 NPU 和 CPU 硬件框架
+#### NPU 和 CPU 硬件框架
 
 ![npu-disgram](resources/npu-disgram.png)
 
 图中 host 为系统端 CPU（Android/Linux OS），device 为 NPU 端 (Linux OS)，host 控制 NPU 的上电
 及固件升级，通过 USB2.0 升级固件(升级固件到 DDR，所以每次开机都要重新升级)，通过 USB3.0/PCIE传输模型数据。
 
-#### 1.4.2 Debian 中 NPU 上电启动流程
+#### Debian 中 NPU 上电启动流程
 
 Debian 的 NPU 启动流程主要如下：
 
@@ -190,7 +190,7 @@ linaro-alip rockchip.sh[718]: update npu image ok\n
 
 其中 npu_upgrade 是 USB3.0方式的 NPU 固件升级批处理可执行文件，npu_upgrade_pcie和npu_upgrade_pcie_combine 是 PCIE 方式的 NPU 固件升级可执行文件。
 
-#### 1.4.2 Buildroot 中 NPU 上电启动流程
+#### Buildroot 中 NPU 上电启动流程
 
 Buildroot 的 NPU 启动流程主要如下：
 
@@ -271,7 +271,7 @@ write boot ok
 ...
 ```
 
-#### 1.4.3 NPU 上电部分 npu_powerctrl 的介绍
+#### NPU 上电部分 npu_powerctrl 的介绍
 
 ```
 /usr/bin/npu_powerctrl -i
@@ -296,7 +296,7 @@ Usage:npu_powerctrl [-s] [-r] [-o] [-i] [-d]
 -d      power down
 ```
 
-#### 1.4.4 NPU 启动正常判断
+#### NPU 启动正常判断
 
 如果是NPU和CPU之间是 USB 3.0 传输模型数据，启动如下 Log 可判断：
 
@@ -312,7 +312,7 @@ or
 [ 14.024987] usb 1-1: New USB device found, idVendor=2207, idProduct=1005
 ```
 
-#### 1.4.5 NPU 休眠唤醒
+#### NPU 休眠唤醒
 
 **NPU 休眠**
 
@@ -416,16 +416,16 @@ fi
 
 ```
 
-#### 1.4.6 NPU 和 CPU 之间的数据传输
+#### NPU 和 CPU 之间的数据传输
 
 目前可以通过两种方式 ADB 和 TTY。
 
 - ADB 访问 NPU，目前只支持 NPU USB 3.0 的版本。
 - TTY 访问 NPU，用串口的 rz、sz 进行数据的拷贝。
 
-### 1.5 NPU 启动失败的分析
+### NPU 启动失败的分析
 
-#### 1.5.1 确认 NPU 是否正常进入烧写模式
+#### 确认 NPU 是否正常进入烧写模式
 
 - 以下电源没有供会导致无法识别 180a
 
@@ -478,7 +478,7 @@ root@linaro-alip:~# cat /sys/kernel/debug/clk/clk_wifi_pmu/clk_enable_count
 1
 ```
 
-#### 1.5.2 待机唤醒死机问题
+#### 待机唤醒死机问题
 
 休眠错误 log: 没有正常唤醒导致上层无法访问 USB 设备节点
 
@@ -509,7 +509,7 @@ RK3399Pro EVB V14 不需要连接外部 32k 时钟。
 
 - vdd_npu 电源控制是连接到 NPU 端控制的，默认使用的是 tcs452x，不支持修改该电源初始化错误会导致休眠死机。
 
-#### 1.5.3 DDR 初始化失败
+#### DDR 初始化失败
 
 ```
 DDR Version V1.02 20190404_no_atag_soc_info_dbg
@@ -521,7 +521,7 @@ Returning to boot ROM...
 
  ![npu-ddr](resources/npu-ddr.png)
 
-### 1.6 相关调试命令
+### 相关调试命令
 
  **手动更新 NPU 固件**：
 

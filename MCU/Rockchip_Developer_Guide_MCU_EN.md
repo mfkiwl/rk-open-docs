@@ -34,7 +34,7 @@ Software Engineer
 
 [TOC]
 
-## 1 Rockchip MCU Overview
+## Rockchip MCU Overview
 
 ARM® Cortex®-M processor family provide some benefits to developers, including: simple, easy-to-use, highly efficient, ultra-low power operation.
 
@@ -47,13 +47,13 @@ Based on the above advantages of ARM® Cortex®-M, the MCUs currently integrated
 
 - The RK3399 integrates two Cortex-M0s, "PMU M0" is used by ATF and the other "Perilp M0" are open to customers developed by themselves.
 
-## 2 Primary Development
+## Primary Development
 
-### 2.1 Configuration Preparing
+### Configuration Preparing
 
 This chapter mainly introduces the basic method of Rockchip MCU development based on RK3399 Perilp M0.
 
-#### 2.1.1 Boot Address
+#### Boot Address
 
 Take genetic boot way "miniloader + ATF + u-boot" as an example.
 
@@ -75,7 +75,7 @@ Of course, if you use U-Boot or other loader as the first-level boot loader, you
 
 For the MCU bin compiling, refer to chapter[3.2.2 Compilation](#3.2.2 Compilation).
 
-#### 2.1.2 Address mapping
+#### Address mapping
 
 The Cortex-M0/Cortex-M3 has a fixed Memory Map, which facilitates easy porting of software between different systems. The address space is divided into many different segments, you can refer to Chapter 2.2 chapter Memory model in  [Cortex-M0 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0497a/index.html) and Chapter 7.4.2 in Rockchip RK3399 TRM. Commonly, we only need configuring the MCU's 0x00000000-0x1FFFFFFF address mapping.
 
@@ -96,7 +96,7 @@ The Rockchip MCU has configured the map address of the peripheral (0x40000000-0x
 
 The peripherals here are those listed in the Rockchip RK3399 TRM Chapter 2 System Overview.
 
-#### 2.1.3 Clock Configuration
+#### Clock Configuration
 
 The Rockchip MCU clock source can be selected from CPLL or GPLL. Refer to the RK3399 TRM Chapter 3 CRU. In that chapter it is point out that the CLK configuration register is "CRU_CLKSEL_CON24 (0x0160)", where:
 
@@ -119,7 +119,7 @@ arch/arm/cpu/armv8/rk33xx/clock-rk3399.c
 #endif
 ```
 
-#### 2.1.4 Reset Cancellation
+#### Reset Cancellation
 
 The final step in the MCU's implement is to perform a reset cancellation. Read the register information in the  Chapter 3 CRU Rockchip RK3399 TRM . The reset cancel register of the RK3399 Perilp M0 is:
 
@@ -138,9 +138,9 @@ arch/arm/cpu/armv8/rk33xx/clock-rk3399.c
 
 Tip: The configuration of the clock and reset can be placed where the MCU expected to run. The Rockchip SDK is currently placed in U-Boot.
 
-### 2.2 Other Configuration
+### Other Configuration
 
-#### 2.2.1 Enable JTAG Configuration
+#### Enable JTAG Configuration
 
 In MCU development, it is often necessary to use JTAG to track, debug and solve problems. The Rockchip MCU JTAG interface implements SWD (2-wire) mode and requires configuration of  JTAG iomux to connect.
 
@@ -151,9 +151,9 @@ GRF_GPIO4B_IOMUX[9:8] = 2’b10
 GRF_GPIO4B_IOMUX[9:8] = 2’b10
 ```
 
-### 2.3 MCU Communicated with SoC
+### MCU Communicated with SoC
 
-#### 2.3.1 Mailbox
+#### Mailbox
 
 The integrated mailbox on the Rockchip SoC has 4 channels triggered by interrupts. And data is passed through shared memory. Rockchip MCU can communicate with SoC via the mailbox peripheral. RK3399 Mailbox programming can be found in  Chapter 21 Mailbox Rockchip RK3399 TRM ; RK3368 Mailbox refer to  Chapter 11 Mailbox chapter in  Rockchip RK3368 TRM.
 
@@ -184,15 +184,15 @@ mailbox_scpi: mailbox-scpi {
 };
 ```
 
-#### 2.3.2 Share Memory
+#### Share Memory
 
 The Rockchip MCU can also communicate with SoC via sharing memory. For example, partitioning a space in INTMEM (SRAM) and configuring it to be accessible to both the master SoC and the MCU, which implements share memory communication.
 
 The Rockchip MCU can also communicate with the master SoC via UART or other methods.
 
-## 3 Demo Code
+## Demo Code
 
-### 3.1 Fetch the Code
+### Fetch the Code
 
 Git repository path:
 
@@ -200,9 +200,9 @@ Git repository path:
 - The code  at "10.10.10.29" can refer to the rk3399-pmu-m0 branch
 - the github code can refer to the rk3399-box-m0 branch.
 
-### 3.2 Code Intruduction
+### Code Intruduction
 
-#### 3.2.1 Directory
+#### Directory
 
 ```c
 rk-mcu>ls -R
@@ -237,7 +237,7 @@ main.c  main.c.bk  remotectl_pwm.c  startup.c
   The "startup.c " is the M0 entry program, which mainly includes the M0 interrupt vector table and the interrupt execution function.
   The "main.c"  is the main functions of the M0 program.
 
-#### 3.2.2 compiling
+#### compiling
 
 The cross-compilation tool chain implements gcc-arm-none-eabi-v4.8 or newer.
 The compilation method as follows:
@@ -260,7 +260,7 @@ example: build the targets for the RK3399M0 project:
 
 After compiling, "build/RK3399M0/bin/RK3399M0.bin"  will be generated, Then copy "RK3399M0.bin" to the directory "tools/rk_tools/bin/rk33/ " in the U-Boot  and rename it to "rk3399bl30_v1.00.bin", After that, follow [2.1.1 Boot Address](#2.1.1 Boot Address) instruction, recompile U-Boot, and packing M0 bin into trust.img .
 
-#### 3.2.3 Interrupt Development
+#### Interrupt Development
 
 M0 interrupt vector table can be seen at [Cortex-M0 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0497a/index.html)
 Chapter 2.3 Exception model.
@@ -306,21 +306,21 @@ M0_INT_ARB_GET_FLAG() // Get interrupt bit
 
 About the external interrupt supported by RK3399 Perilp M0 , please refer to Chapter 2.4 System Interrupt Connection for Cortex-M0 in Rockchip RK3399 TRM.
 
-## 4 MCU Debug
+## MCU Debug
 
-### 4.1 JTAG Debug
+### JTAG Debug
 
 - Set iomux, tck, tms about JTAG in GRF, please refer to [2.2.1 Enabling JTAG configuration](#2.2.1 Enabling JTAG configuration).
 - Development board JTAG switch or "tck/tms" switch to the MCU;
 - DS-5, ICE or Jlink connect to m3/m0 for debugging.
 
-### 4.2 Console Printing
+### Console Printing
 
 - M0 can access the UART register directly for printing and debugging.
 
 - MCU implements the same UART as the  SoC master, it is recommend to turn off M0 printing during normal operation to prevent the system being abnormal due to irregular UART access.
 
-### 4.3 Read and Write Register
+### Read and Write Register
 
 - The system can be stay to the U-Boot or Kernel command line and the MCU status register can be read via io to view the MCU status.
 

@@ -78,7 +78,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 标题
+## 标题
 
-### 1.1 二级标题
+### 二级标题
 

@@ -45,9 +45,9 @@ Software Development Engineer
 
 ---
 
-## 1 PWM Voltage Regulator
+## PWM Voltage Regulator
 
-### 1.1 The driver files and DTS node
+### The driver files and DTS node
 
 The driver files location:
 
@@ -130,9 +130,9 @@ regulator-boot-on;
 
 Used in U-Boot if need to set the power on in U-Boot stage.
 
-## 2  SYR8XX Voltage Regulating
+## SYR8XX Voltage Regulating
 
-### 2.1 The driver files and DTS node
+### The driver files and DTS node
 
 The driver files location:
 
@@ -264,9 +264,9 @@ regulator-ramp-delay = <1000>;
 
 It is to control the ascending speed of voltage regulating. Normally no need to change as it is already the optimal value.
 
-## 3   XZ321X Voltage Regulating
+## XZ321X Voltage Regulating
 
-### 3.1 The driver files and DTS node
+### The driver files and DTS node
 
 The driver files location:
 
@@ -374,15 +374,15 @@ If it is used for GPU, also need to modify:
 
 The configuration depends on the actual power supply situation of XZ3126.(configured according to the released hardware circuit by default)
 
-## 4  DEBUG Interface
+## DEBUG Interface
 
-### 4.1 Read out the Power Tree
+### Read out the Power Tree
 
 ```c
 cat sys/kernel/debug/regulator/regulator_summary
 ```
 
-### 4.2 Set the voltage manually
+### Set the voltage manually
 
 Enable the macro:
 

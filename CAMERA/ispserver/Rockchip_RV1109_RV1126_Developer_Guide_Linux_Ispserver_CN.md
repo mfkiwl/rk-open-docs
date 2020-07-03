@@ -82,13 +82,13 @@ ISP模块软件开发工程师
 
 ---
 
-## 1 框架概述
+## 框架概述
 
-### 1.1 概述
+### 概述
 
 该模块功能主要实现ispclient应用与服务端ispserver进程间通讯的协议规范，进程间通讯的接口的规范。客户通过我们提供的接口文件，实现客户端应用与ispserver进程间交互。ispserver主要依赖于rkaiq库，通过rkaiq库跟isp交互.ispclient不直接跟rkaiq库交互。
 
-### 1.2 软件架构图
+### 软件架构图
 
 ![isp20_ipc_framework](resources/isp2-ipc-framework.png)
 
@@ -104,13 +104,13 @@ ISP20 IPC模块框架图如图1-1所示。该模块设计按照层次模型进�
 
 ---
 
-## 2 接口规范
+## 接口规范
 
-### 2.1 接口层规范
+### 接口层规范
 
 提供给服务端和客户端的接口。
 
-#### 2.1.1  服务端：
+#### 服务端：
 
 ##### **【接口规范】**
 
@@ -127,11 +127,11 @@ void* args:共享内存结构体指针。args是接口的参数的结构体，�
 
 由于接口的功能和rkaiq库的uAPI接口是对应关系的，因此各个接口的具体功能可以参见《Rockchip_Developer_Guide_ISP20_RkAiq_CN.md》功能描述部分。==注意： 服务端编译的时候要注意链接的库是librkaiq.so。==
 
-#### 2.1.2 客户端：
+#### 客户端：
 
 uAPI的.h文件接口的实现，客户端可以不依赖rkaiq库。通过dbus接口调用到服务端接口 （`uAPI接口名+_ipc+(void *args)`）, 然后通过服务端接口调用aiq库实现 头文件的路径目录`$sysroot/usr/include/rkaiq/uApi`目录。==注意：编译客户端的时候要注意链接ispclient.so。==
 
-### 2.2 协议层的规范
+### 协议层的规范
 
 由于IPC层通讯机制基于共享内存和DBUS的机制，共享内存的主要作用是传输接口的参数数据。dbus的主要作用是同步共享内存,用于客户端通知服务端同步共享内存。
 
@@ -165,11 +165,11 @@ uAPI的.h文件接口的实现，客户端可以不依赖rkaiq库。通过dbus�
 
 ---
 
-## 3 DBSERVER的模式适配
+## DBSERVER的模式适配
 
 dbserver模式主要采用数据库的方式进行进程间通讯, 客户端将isp配置的数据写入数据库，然后通过dbus广播一个消息到ispserver，ispserver收到消息后调用aiq的接口,更新配置。该功能要开启，需要在buildroot/config/xxx.config.h的BR2_PACKAGE_DBSERVER配置打开。
 
-## 4 源码的构成
+## 源码的构成
 
 ```
 isp2-ipc

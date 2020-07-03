@@ -71,9 +71,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ------
 
-## 1  HAL WATCHDOG 配置
+## HAL WATCHDOG 配置
 
-### 1.1  HAL CONFIG
+### HAL CONFIG
 
 依赖driver开启：
 
@@ -83,7 +83,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 #endif
 ```
 
-### 1.2  HAL 差异部分
+### HAL 差异部分
 
 不同芯片差异主要在CLK ID，CLK频率，可以在rk2206.h或者soc.h中查找
 
@@ -91,7 +91,7 @@ PCLK_WDT0_GATE：PCLK GATE ID，用于CLK开关；
 
 PCLK_MCU_BUS：PCLK_WDT0的父时钟，用于频率设置和获取，用于将时间转换成counter值
 
-### 1.3  HAL 常用 API
+### HAL 常用 API
 
 ```c
 HAL_Status HAL_WDT_Init(uint32_t freq, struct WDT_REG *wdt)；
@@ -101,9 +101,9 @@ HAL_Status HAL_WDT_Start(enum WDT_RESP_MODE mode)；
 uint32_t HAL_WDT_ClearInterrupt(void)；
 ```
 
-## 2 RKOS WATCHDOG配置
+## RKOS WATCHDOG配置
 
-### 2.1  RKOS WATCHDOG CONFIG
+### RKOS WATCHDOG CONFIG
 
 ```c
 make menuconfig
@@ -112,7 +112,7 @@ make menuconfig
 	-*- Enable WatchDog
 ```
 
-### 2.2  RKOS 常用API
+### RKOS 常用API
 
 ```
 INIT FUN rk_err_t WDTDevInit(WDT_DEVICE_CLASS *pstWDTDev)；
@@ -120,7 +120,7 @@ COMMON API rk_err_t WDTDevSetTimeout(HDC dev, uint32 timeout)；
 
 ```
 
-### 2.3  RKOS 使用示例
+### RKOS 使用示例
 
 使用示例：
 
@@ -132,9 +132,9 @@ HAL_WDT_SetTimeout(10)；/* 设置超时时间10秒 */
 HAL_WDT_Start(INDIRECT_SYSTEM_RESET)；/* 设置超时直接重启，并开启WATCHDOG */
 ```
 
-## 3 TEST
+## TEST
 
-### 3.1  CONFIG配置
+### CONFIG配置
 
 ```c
 Components Config  --->
@@ -142,7 +142,7 @@ Components Config  --->
         [*]     Enable WDT shell cmd
 ```
 
-### 3.2  USAGE
+### USAGE
 
 使用示例：
 

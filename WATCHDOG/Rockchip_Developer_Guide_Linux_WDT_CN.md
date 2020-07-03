@@ -137,11 +137,11 @@ Prompt: Watchdog Timer Support
 
 ## 常见问题
 
-### 1. WDT无法停止
+### WDT无法停止
 
 旧版本WDT没有相应的寄存器可以配置停止功能，只能通过disable clock或者软复位来停止WDT，有些芯片的clock或者复位操作只能在安全环境执行，未来新版本的WDT添加了停止功能。
 
-### 2. WDT精度
+### WDT精度
 
 WDT精度只有16档，相邻档位计数相差比较大，因此无法精细计数。
 

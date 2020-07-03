@@ -71,7 +71,7 @@ Software development engineers
 
 -----------
 
-## 1. Overview
+## Overview
 
 Rockchip Linux platform supports two upgrade modes: recovery mode and Linux A/B mode:
 
@@ -80,9 +80,9 @@ Rockchip Linux platform supports two upgrade modes: recovery mode and Linux A/B 
 
 Users can choose one according to their requirements for both the modes with their advantages and disadvantages.
 
-## 2. Recovery  Mode
+## Recovery  Mode
 
-### 2.1. Overview
+### Overview
 
 There will be a recovery partition on the device, which is consists of kernel+resource+ramdisk and mainly used for upgrade operations on the machine in recovery mode. U-boot will determine whether the system to be booted is a normal system or a recovery system based on the fields stored in the misc partition (see the misc partition section for details). Due to system independence, the recovery mode can guarantee the integrity of upgrade even when upgrade process is interrupted. If the power is abnormally powered down, the upgrade can still continue.
 
@@ -111,7 +111,7 @@ There will be a recovery partition on the device, which is consists of kernel+re
 
 <div style="page-break-after: always;"></div>
 
-### 2.2. Configure and Compile
+### Configure and Compile
 
 Buildroot: the recovery configuration files are selected as follows: (make menuconfig):
 
@@ -164,7 +164,7 @@ Step4: flashing the firmware again.
 
 <div style="page-break-after: always;"></div>
 
-### 2.3. OTA Upgrade
+### OTA Upgrade
 
 The upgrade supports network upgrade and local upgrade, and you can specify the partition to be upgraded. Run the following command on the normal system.
 
@@ -197,7 +197,7 @@ Optional parameters:
 3. --partition: set the partition to be upgraded. It is recommended to set it to 0x3F00. **It is not supported to upgrade the parameter and loader partitions**. See the [Chapter 5.1 Parameters Introduction](### 5.1. Parameters ) for details.
 4. --reboot: after upgrading the recovery partition, reboot into the recovery mode.
 
-### 2.4. Create an Upgrade Disk
+### Create an Upgrade Disk
 
 Creating an upgrade disk refers to inserting the SD card created by the SDDiskTool card-making tool to
 the machine to upgrade, this section will introduce how to create a upgrade disk and some upgrade issues
@@ -219,7 +219,7 @@ update.img will be named sdupdate.img.
 
 After all the preparations are completed, insert the SD card into the device and power on.
 
-### 2.5. Log Checking
+### Log Checking
 
 1. Check log by serial port
 
@@ -239,9 +239,9 @@ After upgrading, check the log file under "userdata/recovery" directory  in the 
 cat userdata/recovery/Log
 ```
 
-## 3. Linux A/B  Mode
+## Linux A/B  Mode
 
-### 3.1. Overview
+### Overview
 
 You have to prepare two separate system firmwares which are respectively stored in the flash in Linux A/B mode . The system can be booted from one of the slots. If the current slot fails to boot, it can be started from another slot, and the system can be directly upgraded in the normal state, without entering the system upgrade mode, and just restart the system to enter the upgraded system.
 
@@ -273,9 +273,9 @@ Since there are already multiple backups of miniloader, trust, and uboot on the 
 
 <div style="page-break-after: always;"></div>
 
-### 3.2. Boot Process
+### Boot Process
 
-#### 3.2.1. Data Format and Storage
+#### Data Format and Storage
 
 The storage position is 2K offset from the misc partition, and AvbABSlotData and AvbABData data
 structures are as follows
@@ -304,7 +304,7 @@ AvbABData: slot_a and slot_b  boot information
 
 <div style="page-break-after: always;"></div>
 
-#### 3.2.2. Boot Process
+#### Boot Process
 
 According to the configuration method of the upper bootcontrol program, there are two boot modes: successful_boot and reset retry. The difference of the two modes is as follows:
 
@@ -315,13 +315,13 @@ According to the configuration method of the upper bootcontrol program, there ar
 
 <div style="page-break-after: always;"></div>
 
-#### 3.2.3. Boot Process
+#### Boot Process
 
 ![](Resources/upgrade process.png)
 
-### 3.3. Compilation Configuration
+### Compilation Configuration
 
-#### 3.3.1. uboot
+#### uboot
 
 Add the following configurations to defconfig, take rk3308 64bit for example:
 "u-boot/configs/rk3308_defconfig":
@@ -337,7 +337,7 @@ CONFIG_ANDROID_AB=y
 
 <div style="page-break-after: always;"></div>
 
-#### 3.3.2. Buildroot
+#### Buildroot
 
 ```shell
 BR2_PACKAGE_RECOVERY=y	#enable recovery function
@@ -357,7 +357,7 @@ make recovery
 ./build.sh
 ```
 
-#### 3.3.3. Partition Table
+#### Partition Table
 
 Set parameter partition table of corresponding BoardConfig.mk as follows：
 
@@ -371,7 +371,7 @@ export RK_PARAMETER=parameter-ab-64bit.txt
 
 32bit: please refer to /device/rockchip/rk3308/parameter-ab-32bit.txt
 
-#### 3.3.4. Firmware output
+#### Firmware output
 
 Enable Linux A / B automatic compilation system of corresponding  BoardConfig.mk as follows:
 
@@ -423,7 +423,7 @@ The update_ab.img is generated in both rockdev and IMAGE directories, which is u
 
 ![](Resources/1560409929891.png)
 
-### 3.4. OTA Upgrade
+### OTA Upgrade
 
 Upgrade online：
 
@@ -455,9 +455,9 @@ Optional parameters:
 3. --savepath: firmware save path. It is "/tmp/update.img" by default. and it is recommended to use the default value.
 4. --reboot: reboot after upgrade
 
-### 3.5. Partition Boot Settings
+### Partition Boot Settings
 
-#### 3.5.1. Bootable Settings
+#### Bootable Settings
 
 Set the current partition to be bootable by the misc and then execute after the system successfully boots, mark the system to start successfully. Please refer to the following script.
 
@@ -478,7 +478,7 @@ esac
 exit 0
 ```
 
-#### 3.5.2. Upgrade Partition Settings
+#### Upgrade Partition Settings
 
 ```shell
 updateEngine --misc=other --reboot
@@ -495,7 +495,7 @@ Optional parameter：
 
 **Note:** the updateEngine program is automatically set after OTA upgrade is completed, no need to repeat the settings.
 
-## 4. Restore the Factory Settings
+## Restore the Factory Settings
 
 The configuration files that can be read and written were stored in the userdata partition. The factory firmware will set some configuration parameters by default. After using a period of time, the configuration file will be generated or modified. Sometimes users need to clear the data, at this time, they need to restore the factory configuration.
 
@@ -522,9 +522,9 @@ Optional parameter:
 
 1. --reboot: if this parameter was not set, the factory settings will be restored after the next reboot of the machine.
 
-## 5. Details of the Upgrade Program
+## Details of the Upgrade Program
 
-### 5.1. Parameters
+### Parameters
 
 The updateEngine mainly includes upgrading partition and writing the Misc configuration function, command parameters are as follows:
 
@@ -599,7 +599,7 @@ Set the path of the upgrade firmware, which can be remote or local path.
 
 Set the path where the firmware is saved. If  it is not set and the upgraded firmware path is a remote address, the default value is /tmp/update.img.
 
-### 5.2. Upgrade Customize Partition
+### Upgrade Customize Partition
 
 ```c
 typedef struct {
@@ -636,23 +636,23 @@ UPDATE_CMD update_cmd[] = {
 };
 ```
 
-## 6. Appendix
+## Appendix
 
-### 6.1. Firmware Package Tools
+### Firmware Package Tools
 
-#### 6.1.1. Windows Package Tool
+#### Windows Package Tool
 
 The Windows package tool is located in the tools\windows\AndroidTool\rockdev directory. Modify the package-file first to add the image to be upgraded into package. Note that the path here is relative path.
 
 The mkupdate.bat batch program will link the "tools\windows\AndroidTool\rockdev\Image" to the rockdev directory under root directory. So please make sure the corresponding image exists under rockdev. Then execute the mkupdate.bat which will package corresponding image in rockdev under root directory into update.img and stored in rockdev under root directory.
 
-#### 6.1.2. Linux Package Tool
+#### Linux Package Tool
 
 The Linux package tool is available in the "tools/linux/Linux_Pack_Firmware/rockdev" directory. Modify the package-file first to add the image to be upgraded into package. Note that the path here is relative path.
 
 The "tools/linux/Linux_Pack_Firmware/rockdev/Image" will link to the rockdev under root directory. So please make sure the corresponding image under rockdev exists. Then execute the mkupdate.sh which will package the corresponding image in rockdev under root directory into update.img and stored in rockdev under root directory.
 
-### 6.2. Misc Partition
+### Misc Partition
 
 The Misc partition is a partition without a file system. It is used to store some boot configuration parameters. The current structure is as follows. Please see the "external/recovery/bootloader.h" and "external/recovery/update_engine/rkbootloader.cpp" for details.
 

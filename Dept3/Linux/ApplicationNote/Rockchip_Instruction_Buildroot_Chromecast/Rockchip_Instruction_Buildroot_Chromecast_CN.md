@@ -67,17 +67,17 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 相关介绍
+## 相关介绍
 
-### 1.1 相关介绍
+### 相关介绍
 
 Chromecast是Google开发的一种远程内容流投射方式，支持投射音视频到任意Chromecast接收器（如Google Chromecast设备）。
 
 最新Rockchip Buildroot SDK通过pychromecast、mkchromecast等开源python软件包提供Chromecast发送端支持。
 
-## 2 使用方式
+## 使用方式
 
-### 2.1 pychromecast
+### pychromecast
 
 pychromecast是目前最流行的开源Chromecast协议（v2）实现软件包，支持设备发现、播放控制、程序控制等功能。
 
@@ -130,7 +130,7 @@ MediaStatus(current_time=42.458322, content_id='http://commondatastorage.googlea
 
 [^注]: 详细资料请参考官方说明 <https://github.com/balloob/pychromecast>
 
-### 2.2 mkchromecast
+### mkchromecast
 
 mkchromecast是目前最流行的开源Chromecast应用，它基于pychromecast以及pyqt提供带有UI（如控制菜单）的Chromecast投射。
 

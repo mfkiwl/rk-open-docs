@@ -70,9 +70,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 [TOC]
 
-## 1 RT-Thread WATCHDOG配置
+## RT-Thread WATCHDOG配置
 
-### 1.1 RT-Thread WATCHDOG CONFIG
+### RT-Thread WATCHDOG CONFIG
 
 ```c
 scons --menuconfig
@@ -82,7 +82,7 @@ RT-Thread Components  --->
 		[*] Using Watch Dog device drivers
 ```
 
-### 1.2 RT-Thread 常用API
+### RT-Thread 常用API
 
 ```c
 int wdt_dev_init(void)；
@@ -93,7 +93,7 @@ rt_err_t dw_wdt_start(uint32_t type)；
 rt_err_t dw_wdt_stop(void)；
 ```
 
-### 1.3 RT-Thread 使用示例
+### RT-Thread 使用示例
 
 使用示例：
 
@@ -104,9 +104,9 @@ dw_wdt_start(uint32_t type)； /* 设置工作模式，并开启WDT */
 dw_wdt_stop(void)； /* 停止WDT */
 ```
 
-## 2 TEST
+## TEST
 
-### 2.1 CONFIG配置
+### CONFIG配置
 
 ```
 RT-Thread bsp test case  --->
@@ -114,7 +114,7 @@ RT-Thread bsp test case  --->
         [*]     Enable BSP Common WDT TEST
 ```
 
-### 2.2 USAGE
+### USAGE
 
 使用示例：
 
@@ -125,7 +125,7 @@ wdt_test start type /* 设置运行模式并启动且自动喂狗，type = 1:中
 wdt_test reboot /* 停止喂狗 */
 ```
 
-## 3 WDT精度
+## WDT精度
 
 WDT精度只有16档，相邻档位计数相差比较大，因此无法精细计数。
 
@@ -150,6 +150,6 @@ WDT精度只有16档，相邻档位计数相差比较大，因此无法精细计
 
 假设wdt clock为100MHz，最大超时时间 0x7fffffff / 100MHz = 21秒，如果需要更大的超时，需要调整对应的wdt clock。
 
-## 4 开发指南
+## 开发指南
 
 我司 WDT 驱动遵循 RTT 系统标准 WDT 驱动框架，因此可直接参考 RTT 官方[WDT开发指南](https://www.rt-thread.org/document/site/programming-manual/device/watchdog/watchdog/)。

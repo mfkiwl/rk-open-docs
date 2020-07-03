@@ -84,19 +84,19 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1  概述
+## 概述
 
 本 SDK 支持四个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 2.6，Debian9 和 Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3399 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
 本 SDK 支持 VPU 硬解码、GPU 3D、Wayland/X11 显示、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
-## 2 主要支持功能
+## 主要支持功能
 
 | **功能**    | **模块名** |
 | ----------- | :-------------- |
 | 数据通信      | Wi-Fi、以太网卡、USB、SD 卡、PCI-e 接口  |
 | 应用程序      | 多媒体播放、设置、浏览器、文件管理       |
 
-## 3 SDK 获取说明
+## SDK 获取说明
 
 SDK 通过瑞芯微代码服务器对外发布或者从 [Github](https://github.com/rockchip-linux) 开源网站上获取。其编译开发环境，参考第 7 节 [SDK编译说明](#7 SDK 编译说明)。
 
@@ -163,13 +163,13 @@ cd rk3399_linux/
 
 注意: 如果是已立项的项目请优先选择用方法一获取代码，不同于 Github 的是它会经过内部稳定测试和版本控制，方法二更多适用于爱好者和前期项目评估。
 
-## 4 软件开发指南
+## 软件开发指南
 
-### 4.1 开发指南
+### 开发指南
 
 RK3399 Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.02-rc3)、Yocto(Thud 2.6) 和 Debian9/10，为帮助开发工程师更快上手熟悉 SDK的开发调试工作，随 SDK 发布《Rockchip_Developer_Guide_Linux_Software_xx.pdf》。可在 docs/ 目录下获取，并会不断完善更新。
 
-### 4.2 软件更新记录
+### 软件更新记录
 
 软件发布版本升级通过工程 xml 进行查看当前版本，具体方法如下：
 
@@ -189,7 +189,7 @@ RK3399 Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.
 <SDK>/docs/SoC_public/RK3399/RK3399_Linux_SDK_Release_Note.txt
 ```
 
-## 5 硬件开发指南
+## 硬件开发指南
 
 硬件相关开发可以参考用户使用指南，在工程目录：
 
@@ -205,7 +205,7 @@ RK3399 IND 行业板硬件开发指南：
 <SDK>/docs/Soc_public/RK3399/Rockchip_RK3399_User_Manual_Sapphire_EVB_V3.0_CN.pdf
 ```
 
-## 6 SDK 工程目录介绍
+## SDK 工程目录介绍
 
 SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、device、docs、external 等目录。每个目录或其子目录会对应一个 git 工程，提交需要在各自的目录下进行。
 
@@ -226,7 +226,7 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 - u-boot：存放基于 v2017.09 版本进行开发的 U-Boot 代码。
 - yocto：存放基于 YoctoThud 2.6 开发的根文件系统。
 
-## 7 SDK 编译说明
+## SDK 编译说明
 
 Ubuntu 16.04 系统：
 编译 Buildroot 环境搭建所依赖的软件包安装命令如下：
@@ -250,7 +250,7 @@ sudo apt-get install lib32gcc-7-dev g++-7 libstdc++-7-dev
 
 建议使用 Ubuntu18.04 系统或更高版本开发，若编译遇到报错，可以视报错信息，安装对应的软件包。
 
-### 7.1 U-boot 编译
+### U-boot 编译
 
 进入工程 u-boot 目录下执行 make.sh 来获取 rk3399_loader_v1.24.224.bin trust.img
 uboot.img.
@@ -276,7 +276,7 @@ u-boot/
 └── uboot.img
 ```
 
-### 7.2 Kernel 编译步骤
+### Kernel 编译步骤
 
 进入工程目录根目录执行以下命令自动完成 kernel 的编译及打包。
 
@@ -314,7 +314,7 @@ make ARCH=arm64 rk3399-firefly-linux.img -j12
 
 编译后在 kernel目录生成 boot.img，此 boot.img 就是包含 Kernel 的 Image 和 DTB。
 
-### 7.3 Recovery 编译步骤
+### Recovery 编译步骤
 
 进入工程目录根目录执行以下命令自动完成 Recovery 的编译及打包：
 
@@ -331,9 +331,9 @@ SDK$make recovery-rebuild
 SDK$./build.sh recovery
 ```
 
-### 7.4 Buildroot  编译
+### Buildroot  编译
 
-#### 7.4.1 Buildroot 的 Rootfs 编译
+#### Buildroot 的 Rootfs 编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
 
@@ -361,7 +361,7 @@ aarch64-linux-gcc --version
 aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
 ```
 
-#### 7.4.2 Buildroot 中模块编译
+#### Buildroot 中模块编译
 
 比如 qplayer 模块，常用相关编译命令如下：
 
@@ -385,7 +385,7 @@ SDK$make qplayer-dirclean
 SDK$rm -rf /buildroot/output/rockchip_rk3399/build/qlayer-1.0
 ```
 
-### 7.5 Debian 9 编译
+### Debian 9 编译
 
 ```
  ./build.sh debian
@@ -470,7 +470,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 
 此时会生成 linaro-rootfs.img。
 
-### 7.6 Debian 10 编译
+### Debian 10 编译
 
 ```
 ./build.sh distro
@@ -490,7 +490,7 @@ cd distro/ && make ARCH=arm64 rk3399_defconfig && ./make.sh
 <SDK>/docs/Linux/ApplicationNote/Rockchip_Debian10_Developer_Guide_CN.pdf
 ```
 
-### 7.7 Yocto  编译
+### Yocto  编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
 
@@ -519,7 +519,7 @@ export LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8
 或者参考 [setup-locale-python3]( https://webkul.com/blog/setup-locale-python3) 编译后生成的 image 在 yocto/build/lastest/rootfs.img， 默认用户名登录是 root。
 Yocto 更多信息请参考 [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto)。
 
-### 7.8 全自动编译
+### 全自动编译
 
 完成上述 Kernel/U-Boot/Recovery/Rootfs 各个部分的编译后，进入工程目录根目录执行以下命
 令自动完成所有的编译：
@@ -592,7 +592,7 @@ export RK_CFG_BUILDROOT=rockchip_rk3399
 export RK_CFG_RECOVERY=rockchip_rk3399_recovery
 ```
 
-### 7.9 固件的打包
+### 固件的打包
 
 上面 Kernel/U-Boot/Recovery/Rootfs 各个部分的编译后，进入工程目录根目录执行以下命令自
 动完成所有固件打包到 rockdev 目录下：
@@ -603,7 +603,7 @@ export RK_CFG_RECOVERY=rockchip_rk3399_recovery
 ./mkfirmware.sh
 ```
 
-## 8 刷机说明
+## 刷机说明
 
 RK3399 挖掘机接口分布图如下：
 
@@ -613,7 +613,7 @@ RK3399 IND 行业板接口分布图如下：
 
 ![RK3399-IND](resources/RK3399-IND.png)
 
-### 8.1 Windows 刷机说明
+### Windows 刷机说明
 
 SDK 提供 Windows 烧写工具(工具版本需要 V2.55 或以上)，工具位于工程根目录：
 
@@ -634,7 +634,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 <SDK>/tools/windows/DriverAssitant_v4.8.zip
 ```
 
-### 8.2 Linux 刷机说明
+### Linux 刷机说明
 
 Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.33 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
@@ -664,7 +664,7 @@ sudo ./upgrade_tool uf rockdev/update.img
 ./rkflash.sh
 ```
 
-### 8.3 系统分区说明
+### 系统分区说明
 
 默认分区说明 ( 下面是 RK3399 IND 分区参考）
 
@@ -690,7 +690,7 @@ sudo ./upgrade_tool uf rockdev/update.img
 - rootfs 分区：供 buildroot、debian 或 yocto 编出来的 rootfs.img。
 - userdata 分区：供 APP 临时生成文件或给最终用户使用，挂载在 /userdata 目录下。
 
-## 9 RK3399 SDK 固件
+## RK3399 SDK 固件
 
 RK3399_LINUX_SDK_V2.4.0_20200430 固件下载链接如下
 （包含 Buildroot/Debian 9/Debian 10/Yocto 的固件）
@@ -716,12 +716,12 @@ RK3399_LINUX_SDK_V2.4.0_20200430 固件下载链接如下
 [Debian9](https://eyun.baidu.com/s/3jKkicsu)
 [Debian10](https://eyun.baidu.com/s/3kWCpXB5)
 
-## 10 SSH 公钥操作说明
+## SSH 公钥操作说明
 
 请根据《Rockchip SDK 申请及同步指南》文档说明操作，生成 SSH 公钥，发邮件至fae@rock-chips.com，申请开通 SDK 代码下载权限。
 该文档会在申请开通权限流程中，释放给客户使用。
 
-### 10.1 多台机器使用相同 SSH 公钥
+### 多台机器使用相同 SSH 公钥
 
 在不同机器使用，可以将你的 SSH 私钥文件 id_rsa 拷贝到要使用的机器的 “~/.ssh/id_rsa” 即
 可。
@@ -745,7 +745,7 @@ Agent admitted failture to sign using the key
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 10.2 一台机器切换不同 SSH 公钥
+### 一台机器切换不同 SSH 公钥
 
 可以参考 ssh_config 文档配置 SSH。
 
@@ -767,13 +767,13 @@ ssh-add ~/.ssh/id_rsa
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 10.3 密钥权限管理
+### 密钥权限管理
 
 服务器可以实时监控某个 key 的下载次数、IP  等信息，如果发现异常将禁用相应的 key 的下
 载权限。
 请妥善保管私钥文件。并不要二次授权与第三方使用。
 
-### 10.4 参考文档
+### 参考文档
 
 更多详细说明，可参考文档 sdk/docs/RKTools manuals/Rockchip SDK Kit 申请指南 V1.6-
 201905.pdf。

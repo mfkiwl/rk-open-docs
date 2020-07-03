@@ -38,7 +38,7 @@ Linux A/B System 介绍。
 [TOC]
 
 ------
-## 1 引用参考
+## 引用参考
 
 《Rockchip-Secure-Boot2.0.md》
 
@@ -46,13 +46,13 @@ Linux A/B System 介绍。
 
 《Android Verified Boot 2.0》
 
-## 2 术语
+## 术语
 
-## 3 简介
+## 简介
 
 所谓的 A/B System 即把系统固件分为两份，系统可以从其中的一个 slot 上启动。当一份启动失败后可以从另一份启动，同时升级时可以直接将固件拷贝到另一个 slot 上而无需进入系统升级模式。
 
-## 4 AB 数据格式及存储
+## AB 数据格式及存储
 
 存储位置为 misc 分区偏移 2KB 位置。
 
@@ -197,13 +197,13 @@ AvbABSlotData：
 | last_boot     | 上一次成功启动的 slot，0：slot A 上次成功启动，1：slot B 上次成功启动 |
 | crc32         | 数据校验                                                     |
 
-## 5 启用配置
+## 启用配置
 
-### 5.1 pre-loader 说明
+### pre-loader 说明
 
 目前 pre-loader 支持 A/B slot 分区和单 slot 分区。
 
-### 5.2 uboot 配置
+### uboot 配置
 
 ```
 CONFIG_AVB_LIBAVB=y
@@ -214,11 +214,11 @@ CONFIG_RK_AVB_LIBAVB_USER=y
 CONFIG_ANDROID_AB=y
 ```
 
-### 5.2 system bootctrl 参考
+### system bootctrl 参考
 
 目前 system bootctrl 设计两套控制逻辑，bootloader 全支持这两种逻辑启动。
 
-#### 5.2.1 successful_boot 模式
+#### successful_boot 模式
 
 正常进入系统后，boot_ctrl 依据 androidboot.slot_suffix，设置当前 slot 的变量：
 
@@ -266,7 +266,7 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-#### 5.2.2 reset retry 模式
+#### reset retry 模式
 
 正常进入系统后，boot_ctrl 依据 androidboot.slot_suffix，设置当前 slot 的变量：
 
@@ -314,7 +314,7 @@ is_update = 0;
 last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 ```
 
-#### 5.2.3 两种模式的优缺点
+#### 两种模式的优缺点
 
 1. successful_boot 模式
 
@@ -328,7 +328,7 @@ last_boot = 0 or 1;     :refer to androidboot.slot_suffix
 
 缺点：会回退到旧版本固件
 
-## 6 流程
+## 流程
 
 启动流程：
 
@@ -342,17 +342,17 @@ AB reset retry 模式数据流程：
 
 ![reset-retry](Rockchip_Developer_Guide_Linux_AB_System\reset-retry.png)
 
-## 7 升级及升级异常处理参考
+## 升级及升级异常处理参考
 
-### 7.1 从系统升级
+### 从系统升级
 
 参考《Rockchip Linux 升级方案开发指南》。
 
-### 7.2 从 recovery 升级
+### 从 recovery 升级
 
 AB system 不考虑支持 recovery 升级。
 
-## 8 分区参考
+## 分区参考
 
 ```
 FIRMWARE_VER:8.1
@@ -368,18 +368,18 @@ TYPE: GPT
 CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00002000@0x00008000(trust_a),0x00002000@0x0000a000(trust_b),0x00001000@0x0000c000(misc),0x00001000@0x0000d000(vbmeta_a),0x00001000@0x0000e000(vbmeta_b),0x00020000@0x0000e000(boot_a),0x00020000@0x0002e000(boot_b),0x00100000@0x0004e000(system_a),0x00300000@0x0032e000(system_b),0x00100000@0x0062e000(vendor_a),0x00100000@0x0072e000(vendor_b),0x00002000@0x0082e000(oem_a),0x00002000@0x00830000(oem_b),0x0010000@0x00832000(factory),0x00008000@0x842000(factory_bootloader),0x00080000@0x008ca000(oem),-@0x0094a000(userdata)
 ```
 
-## 9 测试
+## 测试
 
 准备一套可测试 AB 的固件。
 
-### 9.1 successful_boot 模式
+### successful_boot 模式
 
 1. 只烧写 slot A，系统从 slot A 启动。设置从 slot B 启动，系统从 slot A 启动。测试完成，清空 misc 分区
 2. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。测试完成，清空 misc 分区
 3. 烧写 slot A 与 slot B，迅速 reset 系统 14 次后，retry counter 用完，还能从 last_boot 指定的系统启动，即能正常从 slot A 启动。测试完成，清空 misc 分区
 4. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。设置系统从 slot A 启动，reboot 系统，当前系统为 slot A。测试完成，清空 misc 分区
 
-### 9.2 reset retry 模式
+### reset retry 模式
 
 1. 只烧写 slot A，系统从 slot A 启动。设置从 slot B 启动，系统从 slot A 启动。测试完成，清空 misc 分区
 2. 烧写 slot A 与 slot B，启动系统，当前系统为 slot A。设置系统从 slot B 启动，reboot 系统，当前系统为 slot B。测试完成，清空 misc 分区

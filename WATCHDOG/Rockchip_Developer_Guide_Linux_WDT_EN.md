@@ -137,11 +137,11 @@ Prompt: Watchdog Timer Support
 
 ## FAQ
 
-### 1. WDT Can't Stop
+### WDT Can't Stop
 
 The legacy version of WDT does not have a matched register to configure the stop function, which can only be stopped by disable clock or soft reset. The clock or reset operation of some Rockchip' s  product can only be performed in a safe environment. The new version of WDT adds a stop function in the future.
 
-### 2. WDT Accuracy
+### WDT Accuracy
 
 The accuracy of WDT is only 16 levels, and the counting of adjacent level is quite different, so it cannot be counted finely.
 

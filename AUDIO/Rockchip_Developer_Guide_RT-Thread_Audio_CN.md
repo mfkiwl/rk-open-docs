@@ -75,15 +75,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 文档及音频模块简介
+## 文档及音频模块简介
 
 RK2108上的音频相关模块有Analog MIC， PDM Digital MIC，VAD，AudioPWM和ES8388 CODEC，ES8311 CODEC等。其中ES8388 CODEC同时具备录音、播放、回采功能。Analog MIC和PDM Digital MIC可以配合VAD使用。本文档主要介绍RK2108上音频模块的配置及简单测试命令的使用。
 
-## 2 开发基础
+## 开发基础
 
-### 2.1 音频配置
+### 音频配置
 
-#### 2.1.1 Analog MIC配置
+#### Analog MIC配置
 
 在menuconfig中开启RT_USING_AUDIO_CARD和RT_USING_AUDIO_CARD_ACDCDIG，随之出现的`iface type (I2STDM1)  --->`项可选择ADC的DAI（Digital Audio Interface）。
 
@@ -104,7 +104,7 @@ RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Cards
 
 使用时对应声卡名为`adcc`，如使用rt_device_read接口主动获取Analog MIC数据，需关闭RT_USING_VAD选项，否则无法正常获取数据。
 
-#### 2.1.2 PDM Digital MIC配置
+#### PDM Digital MIC配置
 
 在menuconfig中开启RT_USING_AUDIO_CARD和RT_USING_AUDIO_CARD_PDM_MIC。
 
@@ -124,7 +124,7 @@ RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Cards
 
 使用时对应声卡名为`pdmc`。
 
-#### 2.1.3 ES8388 CODEC配置
+#### ES8388 CODEC配置
 
 在menuconfig中开启RT_USING_AUDIO_CARD和RT_USING_AUDIO_CARD_ES8388，如需使用录音功能则需使能RT_USING_AUDIO_CARD_I2S_MIC。
 
@@ -145,7 +145,7 @@ RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Cards
 
 使用时对应声卡名为`es8388c`和`es8388p`，分别对应录音和播放。
 
-#### 2.1.4 ES8311 CODEC配置
+#### ES8311 CODEC配置
 
 在menuconfig中开启RT_USING_AUDIO_CARD和RT_USING_AUDIO_CARD_ES8311，如需使用录音功能则需使能RT_USING_AUDIO_CARD_I2S_MIC。
 
@@ -168,7 +168,7 @@ RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Cards
 
 注：ES8311或ES8388只在指定板型上可用，使用前请先配置正确的`RT_BOARD_NAME`。
 
-#### 2.1.5 Audio PWM配置
+#### Audio PWM配置
 
 在menuconfig中开启RT_USING_AUDIO_CARD和RT_USING_AUDIO_CARD_AUDIOPWM。
 
@@ -194,7 +194,7 @@ RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Cards
 
 使用时对应声卡名为`audpwmp`。
 
-#### 2.1.6 声卡拼接配置
+#### 声卡拼接配置
 
 以Analog MIC与ES8311拼接为例，在menuconfig中开启RT_USING_AUDIO_CARD并按如下配置。
 
@@ -215,7 +215,7 @@ RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Cards
 
 使用时对应声卡名为`echoc`和`echop`，支持回采功能。
 
-### 2.2 测试用例
+### 测试用例
 
 需要在menuconfig中开启RT_USING_AUDIO_SERVER。目前Audio Server以库的形式提供，有如下三个库：
 
@@ -228,7 +228,7 @@ libAudio_server_gcc_dsp.a   支持本地mp3、wav、opus播放，支持wav、opu
 
 编辑third_party/audio/audio_server/SConscript中的`libs = ['libAudio_server_gcc']`指定所使用的库。
 
-#### 2.2.1 播放
+#### 播放
 
 需要在menuconfig中开启AUDIO_ENABLE_PLAYER_TEST。
 
@@ -250,7 +250,7 @@ delete_player
 
 注：如需使用某一声卡播放，请确认相关宏已配置，并使用list_device查看是否存在对应设备，录音设备以`c`结尾，放音设备以`p`结尾。
 
-#### 2.2.2 录音
+#### 录音
 
 需要在menuconfig中开启AUDIO_ENABLE_RECORDER_TEST。
 
@@ -268,7 +268,7 @@ record_start test.wav -D pdmc -r 16000 -c 2 -l 10
 record_stop
 ```
 
-### 2.3 Tinycap和Tinyplay
+### Tinycap和Tinyplay
 
 需要在menuconfig中开启RT_USING_COMMON_TEST_AUDIO。
 

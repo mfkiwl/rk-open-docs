@@ -72,13 +72,13 @@ Software development engineers
 
 ---
 
-## 1. System Suspend
+## System Suspend
 
 For all SoC platforms with trust, the work of system suspend is completed in trust. Each platform has different implementation for the system suspend in trust, **so the suspend configuration options  between different platforms have no relevance and reference, and this document only applies to the RK3308 platform**.
 
 The system suspend process generally has the following operations: turn off the power domain, module IP, clock, PLL, ddr enter self-refresh, switch the system bus to the low-speed clock (24M or 32K), power off the vdd_arm, configure the wake-up source, etc. In order to meet the needs of different products in suspend  mode, the relevant configuration is currently passed to the trust through the DTS node during the kernel startup.
 
-### 1.1 Driver File
+### Driver File
 
 ```
 ./drivers/soc/rockchip/rockchip_pm_config.c
@@ -86,7 +86,7 @@ The system suspend process generally has the following operations: turn off the 
 ./include/dt-bindings/suspend/rockchip-rk3308.h
 ```
 
-### 1.2 DTS Node
+### DTS Node
 
 ```c
 rockchip_suspend: rockchip-suspend {
@@ -120,7 +120,7 @@ rockchip_suspend: rockchip-suspend {
 };
 ```
 
-## 2. DTS Configuration
+## DTS Configuration
 
 The currently supported configuration options are defined in:
 
@@ -128,7 +128,7 @@ The currently supported configuration options are defined in:
 ./include/dt-bindings/suspend/rockchip-rk3308.h
 ```
 
-### 2.1 Common Configuration
+### Common Configuration
 
 Configure Item:
 
@@ -166,7 +166,7 @@ The suspend mode currently supported by RK3308 can be divided into 2 categories:
 - VAD products: It needs supporting VAD wake-up source during suspend mode, keeping clock of the related modules such as VAD / ACODEC / PDM and the 24M crystal and related PLL work normally. At present, trust will first detect whether the VAD related mode has been turned off during the kernel stage. If it is enabled, that means it is VAD products, so trust will switch to the low power mode that supports VAD wakeup.
 - Non-VAD products: There is no module that needs to be maintained during suspend, and almost all modules and clocks can be turned off, it is an extremely low power mode. In this mode, the system clock can be switched to 32K or 24M.
 
-### 2.2 Power Configuration
+### Power Configuration
 
 Configure Item:
 
@@ -185,7 +185,7 @@ NOTE about Power:
 
 - Please check if there is pwm-regulator on the board.
 
-### 2.3 Wake-up Configuration
+### Wake-up Configuration
 
 Configure Item:
 
@@ -229,7 +229,7 @@ Points to note for wakeup sources:
 
    The timer inside the PMU wakes up. Generating an timeout interrupt every 5s, which is generally only used for sleep wakeup test.
 
-### 2.4 Debug Configuration
+### Debug Configuration
 
 Configure Item:
 
@@ -265,7 +265,7 @@ Debug Note：
 - RKPM_DBG_REG：If it is suspected that some register value is changed by trust during suspend, this configuration can be enabled.
 - RKPM_DBG_FSM_SOUT：After this configuration is enabled, the PMU state machine will always output a specific waveform signal through GPIO4_D5 during suspend to feedback the current internal state of the PMU state machine. This function is only helpful when the PMU state machine crashes during system suspend.
 
-### 2.5 Reboot /Reset Configuration
+### Reboot /Reset Configuration
 
 Configure Item:
 
@@ -293,7 +293,7 @@ Examples of requirements for GPIO not reset:
 
 Some hardware circuit designs will provide "power hold" power control pins, which need to be pulled high / low by the software in the early stage of system power to ensure that the system power supply works normally. The "power hold" pin cannot be reset during the reboot. Otherwise, the system will power off.
 
-## 3. Printed Log
+## Printed Log
 
 The following briefly introduces the meaning of the trust print information during system suspend and wake-up. For convenience of annotation, some print contents are branched as follows. Different suspend modes will bring different prints.
 

@@ -75,13 +75,13 @@ Software development engineers
 
 ## PWM Driver
 
-### 1. Driver File
+### Driver File
 
 The driver file is in: `drivers/pwm/pwm-rockchip.c`
 
 The names of the driver files in the 3.10 and 4.4 kernels are the same. `Pwm-rockchip.c` only supports Continuous mode, but the code inside is slightly different. The 4.4 kernel version wraps `pwm_config()`, `pwm_enable()` and `pwm_disable()` in the `pwm_apply_state()` function. The advantage is that several PWM parameters can be changed at a time and the kernel 3.10 PWM driver still keep the original interface.
 
-### 2. DTS Node Configuration
+### DTS Node Configuration
 
 The different  of Kernel 3.10 and 4.4 DTS nodes is the number of parameters, parameter number in kernel 3.10 is 2, while in kernel 4.4 is 3. The number of parameters is the same as that of the PWM node `pwm-cells`, if the `pwm-cells` configuration is 3, you need to configure the optional polarity; if it is 2, you do not need to configure the polarity.
 DTS configuration reference document `Documentation/devicetree/bindings/pwm/pwm.txt`, the main parameters are explained below:
@@ -130,7 +130,7 @@ echo 1 > enable
 
 PWM has the most continuous mode use and more frequent backlighting use.
 
-### 1. Backlight DTS
+### Backlight DTS
 
 The following are common backlight configuration nodes in DTS files:
 
@@ -184,14 +184,14 @@ backlight: backlight {
 
 - The  "enable-gpios" indicates the backlight enable pin, which can be configured according to the circuit schematic; some hardware does not have backlight enable pins, you should delete this configuration, and the back-light driver will configure the backlight by the 0th element of the  array"brightness-levels" to shut down.
 
-### 2. PWM Backlight Min and Max brightness Level
+### PWM Backlight Min and Max brightness Level
 
 How to determine the brightness-level value of back-light off, which can be regulated by modifying back-light brightness through the command line, `echo xxx > /sys/class/backlight/backlight/brightness`
 When the PWM polarity is set to positive, you can use the command ` echo xxx > /sys/class/backlight/backlight/brightness` to fetch the back-light node. The range of "xxx" here is 0 ~ 255. At this time, observe the change situation of brightness. For example, let "x" is to be the point where the back-light brightness is 0. Let "y" to be the brightest point of the back-light accepted by the customer. At this time, regulate the brightness-level table again, the first value of the array can be changed to "x" and the maximum value can be changed to "y". The middle value needs to be evenly changed to 256 elements, and one element of them has to be value of 255. When the PWM is negative polarity, the opposite is also to be converted.
 
 ## FAQ
 
-### 1. Connection of PWM Between U-Boot and Kernel
+### Connection of PWM Between U-Boot and Kernel
 
 - If U-Boot has the function of PWM voltage regulation, the PWM is still working at the kernel stage, the PWM clock gating count needs to be adjusted to be consistent with the current PWM state according to the current hardware status of the PWM. Otherwise, the clock driver may find that the unused PWM clock,  turn off it, which causing the PWM failed to work. The above patch has been modified to ensure the PWM driver: `drivers/pwm/pwm-rockchip.c`, updated to the following submission points:
 
@@ -202,7 +202,7 @@ When the PWM polarity is set to positive, you can use the command ` echo xxx > /
 
 - Inconsistencies in the polarity and cycle configured by U-Boot and kernel can also lead to middle-state switching, which can lmake the changes for PWM duty cycle, and dead-machine problems such as a lack of PWM voltage control, so keep the U-Boot consistent with kernel's polarity and cycle.
 
-### 2. PWM Pin PULL State As  PWM Regulator
+### PWM Pin PULL State As  PWM Regulator
 
 When the device rebooting, the registers in the GRF may not reset(second global reset), but the PWM controller  reset, which make the PWM pin to be a input state. This  will change the default voltage of the PWM Regulator after rebooting by reseting the PWM pin pull state . Therefore, the PWM pin must be configured the same as the default state(pull-up or pull-down) in the kernel, which cannot be configured as "none". This configuration only needs to be modified when the PWM is used as a voltage regulator, as the other functions can be ignored.
 
@@ -229,7 +229,7 @@ When the device rebooting, the registers in the GRF may not reset(second global 
 };
 ```
 
-### 3. Oscilloscope Cannot Detect PWM Waveform
+### Oscilloscope Cannot Detect PWM Waveform
 
 If the oscilloscope cannot get the waveform, confirm the following method:
 

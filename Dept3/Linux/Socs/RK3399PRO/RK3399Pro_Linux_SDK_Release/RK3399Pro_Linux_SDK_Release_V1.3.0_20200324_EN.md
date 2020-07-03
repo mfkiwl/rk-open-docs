@@ -73,19 +73,19 @@ Software development engineers
 [TOC]
 ---
 
-## 1 Overview
+## Overview
 
 This SDK is based on 3 Linux systems: Buildroot 2018.02-rc3, Yocto Thud 2.6, Debian 9, with Kernel 4.4 and U-boot v2017.09. It is suitable to the development of RK3399Pro EVB and all other Linux products developed based on it.
 This SDK supports NPU TensorFlow/Caffe model, VPU hardware decoding, GPU 3D, Wayland display, QT and other functions. For detailed function debugging and interface introduction, please refer to related documents under the docs/ directory in the project.
 
-## 2 Main Functions
+## Main Functions
 
 | **Functions**    | **Module Names** |
 | ----------- | :-------------- |
 | Data Communication      | Wi-Fi, Ethernet Card, USB, SDCARD, PCI-e |
 | Application      | Multimedia playback, settings, browser, file management |
 
-## 3 How to Get the SDK
+## How to Get the SDK
 
 SDK is released by Rockchip server or got from [Github](https://github.com/rockchip-linux)  open source website. Please refer to Chapter 7 [SDK Compilation Introduciton](#7 SDK Compilation Introduciton) to build a development environment.
 
@@ -153,13 +153,13 @@ Synchronize the whole project:
 
 Note: If your project has already started, please choose the first Method to get the code first. Unlike Github, it has passed by internal stress testing and version control. The second method is more suitable for enthusiasts and project evaluation.
 
-## 4 Software Development Guide
+## Software Development Guide
 
-### 4.1 Development Guide
+### Development Guide
 
 RK3399Pro Linux SDK Kernel version is Kernel 4.4, Rootfs is Buidlroot (2018.02-rc3), Yocto(thud 2.6) and Debian9 respectively. To help engineers quick start of SDK development and debugging, “Rockchip_Developer_Guide_Linux_Software_EN” is released with the SDK. It can be obtained in the docs/ directory and will be continuously updated.
 
-### 4.2 NPU Development Tool
+### NPU Development Tool
 
 The SDK NPU development tool includes following items:
 
@@ -191,7 +191,7 @@ RKNN API development materials are in the project directory “external/NRKNPUTo
 **NPU software startup instructions:**
 Please refer to the document in the project directory  “docs/Soc_public/RK3399PRO/ Rockchip_RK3399Pro_Instruction_Linux_NPU_CN.pdf” for RK3399Pro NPU software setup instructions.
 
-### 4.3 Software Update History
+### Software Update History
 
 Software release version upgrade can be checked through project xml file by the following command:
 
@@ -211,7 +211,7 @@ Or refer to the project directory:
 <SDK>/docs/SoC_public/RK3399PRO/RK3399PRO_Linux_SDK_Release_Note.pdf
 ```
 
-## 5 Hardware Development Guide
+## Hardware Development Guide
 
 Please refer to user guides in the project directory for hardware development :
 
@@ -219,7 +219,7 @@ Please refer to user guides in the project directory for hardware development :
 <SDK>/docs/Soc_public/RK3399PRO/Rockchip_RK3399Pro_User_Guide_Hardware_xx.pdf
 ```
 
-## 6 SDK Project Directory Introduction
+## SDK Project Directory Introduction
 
 There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, external and other directories in the project directory. Each directory or its sub-directories will correspond to a git project, and the commit should be done in the respective directory.
 
@@ -240,7 +240,7 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 - u-boot: store U-Boot code developed based on v2017.09 version.
 - yocto: stores the root file system developed based on YoctoThud 2.6.
 
-## 7 SDK Compilation Instroduction
+## SDK Compilation Instroduction
 
 **Ubuntu 16.04 system:**
 Please install software packages with below commands to setup Buildroot compiling environment:
@@ -273,9 +273,9 @@ NPU firmware will be uploaded when RK3399Pro power on. The default NPU firmware 
 
 It is going to introduce NPU and RK3399Pro firmware compiling methods below.
 
-### 7.1 NPU Compilation Introduction
+### NPU Compilation Introduction
 
-#### 7.1.1 Uboot Compilation
+#### Uboot Compilation
 
 Enter project npu/u-boot directory and run `make.sh` to get rknpu_lion_loader_v1.03.103.bin trust.img uboot.img:
 
@@ -294,7 +294,7 @@ u-boot/
 └── uboot.img
 ```
 
-#### 7.1.2 Kernel Compilation Steps
+#### Kernel Compilation Steps
 
 Enter project root directory and run the following command to automatically compile and package kernel:
 
@@ -315,7 +315,7 @@ make ARCH=arm64 rk3399pro_npu_pcie_defconfig
 make ARCH=arm64 rk3399pro-npu-evb-v10-multi-cam.img -j12
 ```
 
-#### 7.1.3  Boot.img and NPU Firmware Generation Steps
+#### Boot.img and NPU Firmware Generation Steps
 
 Enter project npu directory and run the following command to automatically compile and package boot.img:
 
@@ -337,7 +337,7 @@ cd - && cd npu
 ./mkfirmware.sh rockchip_rk3399pro-npu-multi-cam
 ```
 
-#### 7.1.4 Full Automatic Compilation
+#### Full Automatic Compilation
 
 After compiling various parts of Kernel/U-Boot/Rootfs above, enter root directory of project directory and execute the following commands to automatically complete all compilation:
 
@@ -369,9 +369,9 @@ After compiling, boot.img, uboot.img, trust.img, MiniLoaderAll.bin are generated
 
 **Note:** the generated npu firmware under rockdev should be placed in the specified directory of rootfs “/usr/share/npu_fw”.
 
-### 7.2 RK3399Pro Compilation Instroduction
+### RK3399Pro Compilation Instroduction
 
-#### 7.2.1 U-boot  Compilation
+#### U-boot  Compilation
 
 Enter project u-boot directory and execute `make.sh` to get rk3399pro_loader_v1.23.115.bin trust.img uboot.img:
 RK3399Pro EVB boards：
@@ -389,7 +389,7 @@ u-boot/
 └── uboot.img
 ```
 
-#### 7.2.2 Kernel  Compilation Steps
+#### Kernel  Compilation Steps
 
 Enter project root directory and run the following command to automatically compile and package kernel:
 
@@ -427,7 +427,7 @@ make ARCH=arm64 rk3399pro-evb-v14-linux.img -j12
 
 After compiling, boot.img which contains image and DTB of kernel will be generated in kernel directory.
 
-#### 7.2.3 Recovery  Compilation Steps
+#### Recovery  Compilation Steps
 
 Enter project root directory and run the following command to automatically complete compilation and packaging of Recovery.
 
@@ -439,7 +439,7 @@ RK3399Pro EVB  boards：
 
 The recovery.img is generated in Buildroot directory “output/rockchip_rk3399pro_recovery/images” after compiling.
 
-#### 7.2.4 Buildroot rootfs and APP  Compilation
+#### Buildroot rootfs and APP  Compilation
 
 Enter project root directory and run the following commands to automatically complete compiling and packaging of Rootfs.
 
@@ -486,7 +486,7 @@ When the following logs are printed, configuration is successful:
 aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
 ```
 
-#### 7.2.5 Debian rootfs  Compilation
+#### Debian rootfs  Compilation
 
 ```
  ./build.sh debian
@@ -571,7 +571,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 
 Will generate linaro-rootfs.img.
 
-#### 7.2.6 Yocto rootfs  Compilation
+#### Yocto rootfs  Compilation
 
 Enter project root directory and execute the following commands to automatically complete compiling and packaging Rootfs.
 
@@ -604,7 +604,7 @@ Or refer to[setup-locale-python3]( https://webkul.com/blog/setup-locale-python3)
 
 Please refer to  [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto) for more detailed information of Yocto.
 
-#### 7.2.7 Full Automatic Compilation
+#### Full Automatic Compilation
 
 After compiling various parts of Kernel/U-Boot/Recovery/Rootfs above, enter root directory of project directory and execute the following commands to automatically complete all compilation:
 
@@ -676,7 +676,7 @@ export RK_CFG_BUILDROOT=rockchip_rk3399pro_combine
 export RK_CFG_RECOVERY=rockchip_rk3399pro_recovery
 ```
 
-#### 7.2.8  Firmware Package
+#### Firmware Package
 
 After compiling various parts of Kernel/U-Boot/Recovery/Rootfs above, enter root directory of project directory and run the following command to automatically complete all firmware packaged into rockdev directory:
 
@@ -686,13 +686,13 @@ Firmware generation:
 ./mkfirmware.sh
 ```
 
-## 8 Upgrade Introduction
+## Upgrade Introduction
 
 There are V10/V11/V12/V13/V14 Five versions of current RK3399Pro EVB, V10 version board is green, and V10/V11/V12/V13/V14 version board is black. Board function positions are the same. The following is the introduction of RK3399Pro EVB V12 board, as shown in the following figure
 
 ![RK3399Pro-V14](resources/RK3399Pro-V14.png)
 
-### 8.1 Windows  Upgrade Introduction
+### Windows  Upgrade Introduction
 
 SDK provides windows upgrade tool (this tool should be V2.55 or later version) which is located in project root directory:
 
@@ -711,7 +711,7 @@ Note：Before upgrade, please install the latest USB driver, which is in the bel
 <SDK>/tools/windows/DriverAssitant_v4.8.zip
 ```
 
-### 8.2 Linux Upgrade Instruction
+### Linux Upgrade Instruction
 
 The Linux upgrade tool (Linux_Upgrade_Tool should be v1.33 or later versions) is located in “tools/linux” directory. Please make sure your board is connected to MASKROM/loader rockusb, if the compiled firmware is in rockdev directory, upgrade commands are as below:
 
@@ -741,7 +741,7 @@ Or in root directory, run the following command on the machine to upgrade in MAS
 ./rkflash.sh
 ```
 
-### 8.3 System Partition Introduction
+### System Partition Introduction
 
 Default partition (below is RK3399Pro EVB reference partition) is showed as follows:
 
@@ -767,9 +767,9 @@ Default partition (below is RK3399Pro EVB reference partition) is showed as foll
 - rootfs partition: store rootfs.img compiled by Buildroot , Yocto or Debian.
 - userdata partition: store files temporarily generated by app or for users. Read and write, mounted in /userdata directory.
 
-## 9 RK3399Pro SDK Firmware and Simple Demo Test
+## RK3399Pro SDK Firmware and Simple Demo Test
 
-### 9.1 RK3399Pro SDK  Firmware
+### RK3399Pro SDK  Firmware
 
 RK3399PRO_LINUX_SDK_V1.3.0_20200324 firmware download links are as follows:
 (Including Buildroot,Debian and Yocto firmware)
@@ -786,7 +786,7 @@ Debian 9:
 Yocto:
 [Suitable for all development boards](https://eyun.baidu.com/s/3hte6jjA)
 
-### 9.2 RKNN_DEMO Test
+### RKNN_DEMO Test
 
 Firstly, insert usb camera, run  rknn_demo in Buildroot system or run test_rknn_demo.sh in Debian system.
 Please refer to the project document: docs/Soc_public/RK3399PRO/Rockchip_Developer_Guide_Linux_RKNN_DEMO_CN.pdf for details, the results of running in Buildroot are as follows:
@@ -814,19 +814,19 @@ It will display as follows：
 
 ![rknn-demo](resources/rknn-demo.png)
 
-### 9.3 N4 Camera Test
+### N4 Camera Test
 
 First connect the N4 camera module (need a 12V power supply), then directly open the camera application in the Buildroot system or run test_camera-rkisp1.sh in the Debian system.
 The running results in Buildroot are as follows: (when no camera sensor is connected)
 
 ![n4](resources/n4.png)
 
-## 10 SSH Public Key Operation Introduction
+## SSH Public Key Operation Introduction
 
 Please follow the introduction in the “Rockchip SDK Application and Synchronization Guide” to generate an SSH public key and send the email to fae@rock-chips.com, to get the SDK code.
 This document will be released to customers during the process of applying for permission.
 
-### 10.1 Multiple Machines Use the Same SSH Public Key
+### Multiple Machines Use the Same SSH Public Key
 
 If the same SSH public key should be used in different machines, you can copy the SSH private key file id_rsa to “~/.ssh/id_rsa” of the machine you want to use.
 
@@ -850,7 +850,7 @@ Enter the following command in console to solve:
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 10.2 One Machine Switches Different SSH Public Keys
+### One Machine Switches Different SSH Public Keys
 
 You can configure SSH by referring to ssh_config documentation.
 
@@ -871,12 +871,12 @@ As shown in the figure, SSH uses the file “~/.ssh1/id_rsa” of another direct
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 10.3 Key Authority Management
+### Key Authority Management
 
 Server can monitor download times and IP information of a key in real time. If an abnormality is found, download permission of the corresponding key will be disabled.
 
 Keep the private key file properly. Do not grant second authorization to third parties.
 
-### 10.4  Reference Documents
+### Reference Documents
 
 For more details, please refer to document “sdk/docs/RKTools manuals/Rockchip SDK Kit Application GuideV1.6-201905.pdf”.

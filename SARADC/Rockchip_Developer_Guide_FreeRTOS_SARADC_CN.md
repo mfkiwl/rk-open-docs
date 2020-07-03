@@ -71,9 +71,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ------
 
-## 1  HAL SARADC 配置
+## HAL SARADC 配置
 
-### 1.1  HAL CONFIG
+### HAL CONFIG
 
 依赖driver开启：
 
@@ -83,7 +83,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 #endif
 ```
 
-### 1.2  HAL 差异部分
+### HAL 差异部分
 
 不同芯片差异主要在CLK ID，CLK频率，可以在rk2206.h或者soc.h中查找
 
@@ -91,7 +91,7 @@ CLK_SARADC_GATE：SCLK GATE ID，用于CLK开关；
 
 PCLK_SARADC_CONTROL_GATE：PCLK GATE ID，用于CLK开关；
 
-### 1.3  HAL 常用 API
+### HAL 常用 API
 
 ```c
 HAL_Status HAL_SARADC_Start(struct SARADC_REG *reg, eSARADC_mode mode, uint32_t chn)；
@@ -101,9 +101,9 @@ void HAL_SARADC_ClearIrq(struct SARADC_REG *reg)；
 uint32_t HAL_SARADC_GetRaw(struct SARADC_REG *reg)；
 ```
 
-## 2 RKOS SARADC配置
+## RKOS SARADC配置
 
-### 2.1  RKOS SARADC CONFIG
+### RKOS SARADC CONFIG
 
 ```c
 make menuconfig
@@ -112,7 +112,7 @@ make menuconfig
 	-*- Enable ADC
 ```
 
-### 2.2  RKOS 常用API
+### RKOS 常用API
 
 ```c
 COMMON FUN rk_err_t ADCDev_Start(ADC_DEVICE_CLASS *ADCDevHandler)；
@@ -121,7 +121,7 @@ COMMON API rk_err_t ADCDev_Read(HDC dev, uint16 channel, uint16 size, uint16 clk
 COMMON API rk_err_t ADCDev_GetAdcBufData(HDC dev, uint16 *buf, uint16 size, uint16 clk, uint16 channel)；
 ```
 
-### 2.3  RKOS 使用示例
+### RKOS 使用示例
 
 使用示例：
 
@@ -133,9 +133,9 @@ HAL_SARADC_GetRaw(SARADC)；/* 获取采样值 */
 HAL_SARADC_Stop(SARADC)；/* 清除中断，关闭SARADC */
 ```
 
-## 3 TEST
+## TEST
 
-### 3.1  CONFIG配置
+### CONFIG配置
 
 ```c
 Components Config  --->
@@ -143,7 +143,7 @@ Components Config  --->
         [*]     Enable SARADC shell cmd
 ```
 
-### 3.2  USAGE
+### USAGE
 
 使用示例：
 

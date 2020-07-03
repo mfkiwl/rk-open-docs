@@ -40,7 +40,7 @@
 [TOC]
 
 ------
-## 1 引用参考
+## 引用参考
 
 《Rockchip-Secure-Boot-Application-Note.md》
 
@@ -48,7 +48,7 @@
 
 《Rockchip_Developer_Guide_Linux4.4_SecureBoot_CN.pdf》
 
-## 2 术语
+## 术语
 
 AVB : Android Verified Boot
 
@@ -64,11 +64,11 @@ ProductUnlock Key (PUK)：用于解锁设备
 
 **各种key分离，职责明确，可以降低key被泄露的风险。**
 
-## 3 简介
+## 简介
 
 本文介绍 Rockchip 安全验证引导流程。所谓的安全验证引导流程分为安全性校验与完整性校验。安全性校验是加密公钥的校验，流程为从安全存储（OTP & efuse）中读取公钥 hash，与计算的公钥 hash 对比，是否一致，然后公钥用于解密固件 hash。完整性校验为校验固件的完整性，流程为从存储里加载固件，计算固件的 hash 与解密出来的 hash 对比是否一致。
 
-## 4 通信加密例子
+## 通信加密例子
 
 设备的安全验证启动流程与通信中的数据加密校验流程类似，通过该例子可以加速对 avb 校验流程的理解。假如现在 Alice 向 Bob 传送数字信息，为了保证信息传送的保密性、真实性、完整性和不可否认性，需要对传送的信息进行数字加密和签名，其传送过程为：
 
@@ -96,11 +96,11 @@ ProductUnlock Key (PUK)：用于解锁设备
 
 ![secure-communicate](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/secure-communicate.png)
 
-## 5 AVB
+## AVB
 
 AVB 为 Android Verified Boot，谷歌设计的一套固件校验流程，主要用于校验 boot system 等固件。Rockchip Secure Boot 参考通信中的校验方式及 AVB，实现一套完整的 Secure Boot 校验方案。
 
-### 5.1 AVB 支持特性
+### AVB 支持特性
 
 - 安全校验
 
@@ -112,7 +112,7 @@ AVB 为 Android Verified Boot，谷歌设计的一套固件校验流程，主要
 
 - chained partitions 支持，可以与 boot，system 签名私钥一致，也可以由 oem 自己保存私钥，但必须由 PRK 签名
 
-### 5.2 key，固件签名及证书生成
+### key，固件签名及证书生成
 
 ```shell
 #!/bin/sh
@@ -203,7 +203,7 @@ fastboot oem fuse at-perm-attr
 
 ![general_key_cer](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/general_key_cer.png)
 
-### 5.3 AVB lock
+### AVB lock
 
 ```
 fastboot oem at-lock-vboot
@@ -211,7 +211,7 @@ fastboot oem at-lock-vboot
 
 如何进入 fastboot 见 fastboot 命令支持章节。
 
-### 5.4 AVB unlock
+### AVB unlock
 
 目前 Rockchip 采用严格安全校验，需要在对应的defconfig内添加
 
@@ -344,7 +344,7 @@ if __name__ == '__main__':
 	challenge_verify()
 ```
 
-### 5.5 U-boot 使能
+### U-boot 使能
 
 开启 avb 需要 trust 支持，需要 U-Boot 在 defconfig 文件中配置：
 
@@ -381,7 +381,7 @@ CONFIG_ROCKCHIP_EFUSE=y
 CONFIG_ROCKCHIP_OTP=y
 ```
 
-### 5.6 kernel 修改
+### kernel 修改
 
 system，vendor，oem 等分区的校验由 kernel 的 dm-verify 模块加载校验，所以需要使能该模块。
 
@@ -435,7 +435,7 @@ firmware {
 };
 ```
 
-### 5.7 Android SDK 一些配置说明
+### Android SDK 一些配置说明
 
 #### AVB Enable
 
@@ -465,7 +465,7 @@ BOARD_AVB_KEY_PATH := path/to/testkey_psk.pem
   - `BOARD_CACHEIMAGE_PARTITION_SIZE`
   - `BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE`
 
-### 5.8 CMDLINE 新内容
+### CMDLINE 新内容
 
 ```
 Kernel command line: androidboot.verifiedbootstate=green androidboot.slot_suffix=_a dm="1 vroot none ro 1,0 1031864 verity 1 PARTUUID=b2110000-0000-455a-8000-44780000706f PARTUUID=b2110000-0000-455a-8000-44780000706f 4096 4096 128983 128983 sha1 90d1d406caac04b7e3fbf48b9a4dcd6992cc628e 4172683f0d6b6085c09f6ce165cf152fe3523c89 10 restart_on_corruption ignore_zero_blocks use_fec_from_device PARTUUID=b2110000-0000-455a-8000-44780000706f fec_roots 2 fec_blocks 130000 fec_start 130000" root=/dev/dm-0 androidboot.vbmeta.device=PARTUUID=f24f0000-0000-4e1b-8000-791700006a98 androidboot.vbmeta.avb_version=1.1 androidboot.vbmeta.device_state=unlocked androidboot.vbmeta.hash_alg=sha512 androidboot.vbmeta.size=6528 androidboot.vbmeta.digest=41991c02c82ea1191545c645e2ac9cc7ca08b3da0a2e3115aff479d2df61feaccdd35b6360cfa936f6f4381e4557ef18e381f4b236000e6ecc9ada401eda4cae androidboot.vbmeta.invalidate_on_error=yes androidboot.veritymode=enforcing
@@ -499,7 +499,7 @@ avbtool 生成 vbmeta 时，对 system 固件加--generate_dm_verity_cmdline_fro
 
 Android SDK 开启 BOARD_AVB_ENABLE 会把这些信息加到 vbmeta 内。
 
-## 6 分区参考
+## 分区参考
 
 新增加 vbmeta 分区与 security 分区，vbmeta 分区存储固件校验信息，security 分区存储加密过的安全数据。
 
@@ -534,7 +534,7 @@ TYPE: GPT
 CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00002000@0x00008000(trust_a),0x00002000@0x0000a000(trust_b),0x00001000@0x0000c000(misc),0x00001000@0x0000d000(vbmeta_a),0x00001000@0x0000e000(vbmeta_b),0x00020000@0x0000e000(boot_a),0x00020000@0x0002e000(boot_b),0x00100000@0x0004e000(system_a),0x00300000@0x0032e000(system_b),0x00100000@0x0062e000(vendor_a),0x00100000@0x0072e000(vendor_b),0x00002000@0x0082e000(oem_a),0x00002000@0x00830000(oem_b),0x0010000@0x00832000(factory),0x00008000@0x842000(factory_bootloader),0x00080000@0x008ca000(oem),-@0x0094a000(userdata)
 ```
 
-## 7 fastboot 命令支持
+## fastboot 命令支持
 
 U-Boot 下可以通过输入命令进入 fastboot：
 
@@ -542,7 +542,7 @@ U-Boot 下可以通过输入命令进入 fastboot：
 fastboot usb 0
 ```
 
-### 7.1 fastboot 支持命令速览
+### fastboot 支持命令速览
 
 ```
 fastboot flash < partition > [ < filename > ]
@@ -569,7 +569,7 @@ fastboot oem at-get-vboot-unlock-challenge
 fastboot oem at-reset-rollback-index
 ```
 
-### 7.2 fastboot 具体使用
+### fastboot 具体使用
 
 1. fastboot flash < partition > [ < filename > ]
 
@@ -816,7 +816,7 @@ fastboot oem fuse at-bootloader-vboot-key
 
 举例：fastboot oem at-disable-unlock-vboot
 
-## 8 固件烧写（windows）
+## 固件烧写（windows）
 
 ![firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/firmware-download.png)
 
@@ -824,13 +824,13 @@ A/B System 烧写
 
 ![AB-firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/AB-firmware-download.png)
 
-## 9 pre loader verified
+## pre loader verified
 
 参见《Rockchip-Secure-Boot-Application-Note.md》
 
 ![1-3MaskRom-to-loader-sequence](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/1-3MaskRom-to-loader-sequence.png)
 
-## 10 U-boot verified
+## U-boot verified
 
 OTP 设备校验流程：
 
@@ -840,7 +840,7 @@ efuse设备校验流程：
 
 ![uboot-verify](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/uboot-verify-efuse.png)
 
-## 11 系统校验启动
+## 系统校验启动
 
 ![system-verify-boot](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/system-verify-boot.png)
 
@@ -850,9 +850,9 @@ avb：使用 avb 的方式加载校验分区
 
 slotselect：该分区分 A/B，加载时会使用到 cmdline 的"androidboot.slot_suffix=_a"这个参数。
 
-## 12 基于 linux 环境的 AVB 操作及验证流程
+## 基于 linux 环境的 AVB 操作及验证流程
 
-### 12.1 操作流程
+### 操作流程
 
 1. 生成整套固件
 2. 使用 SecureBootConsole 生成 PrivateKey.pem 与 PublicKey.pem，工具为 rk_sign_tool，命令如下：
@@ -942,6 +942,6 @@ fastboot oem fuse at-rsa-perm-attr
 
 参考《Rockchip-Secure-Boot-Application-Note.md》
 
-### 12.2 验证流程
+### 验证流程
 
 to-do.

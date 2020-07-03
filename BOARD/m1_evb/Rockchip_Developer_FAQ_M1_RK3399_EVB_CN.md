@@ -40,7 +40,7 @@
 
 ***
 
-## 1 板子介绍
+## 板子介绍
 
    M1_RK3399_EVB板本身不具有从Flash启动的功能，如果想脱离Jtag工作，需要配合一个RK3399 EVB板：RK_IND_EVB_RK3399_LP4D200P232SD8_V10_20190528YWQ
 
@@ -59,14 +59,14 @@ RK3399反面照
 两个板子的反面通过100pin的连接器组合在一起：
 ![M1_RK3399组合](./Rockchip_Developer_FAQ_M1_RK3399_EVB_CN/m1_3399组合.jpg)
 
-## 2 接口介绍
+## 接口介绍
 
    M1的电源可由RK3399 EVB提供，M1 EVB可以不用接电源。RK3399上电后，M1板上debug口边上的红色小灯会亮起。
    如果M1 EVB要脱离RK3399 EVB板独立工作，则需要接入USB 5v供电。这个DC口仅仅提供电源，不具有USB升级固件功能。
 
-## 3 固件下载
+## 固件下载
 
-### 3.1 通过RK3399下载固件
+### 通过RK3399下载固件
 
 RK3399的kernel需要打开olpc模块，使用spi2apb下载固件到M1的sram中，这个kernel可以从这里下载到：
 
@@ -115,7 +115,7 @@ RK3399的kernel需要打开olpc模块，使用spi2apb下载固件到M1的sram中
 	PS. 本目录下rtthread_ap.bin是默认使能RK3399显示的版本，/data/flash.sh执行完后，敲reboot重启RK3399，可以进入到android界面
 	注意：如果重启了M1却没有执行/data/flash.sh下载固件，mipi屏默认是不输出的。
 
-### 3.2 通过RK3399开机自动下载固件
+### 通过RK3399开机自动下载固件
 
 下面这个android 7.1固件可以实现开机自动下载M1固件，它的boot.img中有带一个/lib/firmware/rtthread.bin，另外在init.rockchip.rc中调用了gpio72 reset和echo "raw rtthread.bin" > /dev/rk_olpc.
 
@@ -158,7 +158,7 @@ RK3399的kernel需要打开olpc模块，使用spi2apb下载固件到M1的sram中
 	...
 	    write /dev/rk_olpc "raw rtthread.bin"
 
-## 4 JTag调试
+## JTag调试
 
 如果想让M1 EVB脱离RK3399独立工作，你可能需要JTag
 硬件上需要拨2个开关：

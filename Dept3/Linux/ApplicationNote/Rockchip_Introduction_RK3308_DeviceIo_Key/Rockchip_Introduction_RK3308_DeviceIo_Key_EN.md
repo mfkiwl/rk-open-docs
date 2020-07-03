@@ -71,11 +71,11 @@ Software Development Engineer
 
 ---
 
-## 1. Overview
+## Overview
 
 This code module is integrated in the libDeviceIo.so dynamic library, based on the input_event input subsystem, including short press, long press, and combination key common requirements which are packaged to facilitate development.
 
-## 2. Interface Introduction
+## Interface Introduction
 
 - `Callback function definition`
 
@@ -169,7 +169,7 @@ Key module exits and releases related resources:
 int RK_input_exit(void)`
 ```
 
-## 3. Application Example
+## Application Example
 
 ```c
 #include <stdio.h>

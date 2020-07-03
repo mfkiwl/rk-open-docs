@@ -76,17 +76,17 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 Qt 介绍
+## Qt 介绍
 
 Qt 是1991 年奇趣科技开发的一个跨平台的C++图形用户界面应用程序框架。它提供给应用程序开发者建立艺术级的图形用户界面所需的所有功能，同时良好的可扩展性也决定了Qt 程序的可发展性。目前Qt 支持的操作系统有:Windows、嵌入式Linux、MS/Windows - 95、98、NT4.0、ME、2000、XP、Vista 等，这意味着使用Qt 您只需一次性开发应用程序，无须重新编写源代码，便可跨不同桌面和嵌入式操作系统部署这些应用程序。
 
-## 2 使用工具Qt Creator搭建Qt工程
+## 使用工具Qt Creator搭建Qt工程
 
 Qt Creator 是一个用于Qt 开发的轻量级跨平台集成开发环境。与Qt 语言相辅相成，Qt Creator 能够跨平台运行，目前支持的系统包括Linux(32 位及64 位)，Mac OS X 和Windows。Qt Creator 的设计使得开发人员能够利用Qt 这个应用程序框架更加快速和轻易的开发任务。
 
 另外，目前比较主流的Qt 开发方式除了Qt Creator IDE，还能利用Visual Studio+Qt 进行便携的开发，在Visual Studio 中下载安装Qt 插件，能很容易的部署起Qt 的开发环境。本套Demo 程序开发环境为Qt Creator。
 
-### 2.1 新建工程
+### 新建工程
 
 下面使用的是win7的32位Qt Creator作为例子来介绍Qt Creator的使用方法。
 
@@ -106,7 +106,7 @@ Qt Creator 是一个用于Qt 开发的轻量级跨平台集成开发环境。与
 
 ![](resources/init.png)
 
-### 2.2 使用图形化界面设计布局
+### 使用图形化界面设计布局
 
 Qt界面库的一大优点就是跨平台，您可以使用Qt Creator设计出好看的UI，然后移植进ARM的目标板上。下面介绍怎么使用Qt Creator来设计布局。Qt Creator的布局文件名为*.ui，一个项目必须要有ui文件,才可以使用图形化设计布局。新建一个ui文件;(文件->新建文件或项目)
 
@@ -122,7 +122,7 @@ Qt界面库的一大优点就是跨平台，您可以使用Qt Creator设计出�
 
 在这个界面上，您可以拖拽左边的控件来添加您窗体的控件，具体操作方法可以详见Qt Creatot官网<https://doc.qt.io>有丰富的教程。
 
-### 2.3 工程源码结构介绍
+### 工程源码结构介绍
 
 在默认新建的项目中，会包含以下这4类文件：pro文件，cpp文件，h头文件，UI界面设计文件。
 
@@ -130,9 +130,9 @@ Qt界面库的一大优点就是跨平台，您可以使用Qt Creator设计出�
 
 pro工程文件是qmake编译所需要的，具体编写方法见下文。cpp文件和h文件是c++的资源文件，ui文件是设计师设计界面文件，使用html语言来编写。
 
-## 3 交叉编译Qt工程
+## 交叉编译Qt工程
 
-### 3.1  Buildroot下构建QT工程
+### Buildroot下构建QT工程
 
  在Buildroot中添加自己编写的Qt工程 ，下面介绍添加进Buildroot的方法。
 
@@ -181,7 +181,7 @@ endef
 $(eval $(generic-package))
 ```
 
-### 3.2 移植源码
+### 移植源码
 
 在添加Buildroot后，您需要把您的工程资源文件夹添加到SDK中去编译，下面介绍添加源码的方法。
 
@@ -283,7 +283,7 @@ Debug:LIBS += -L folderPath // Debug 版引入的lib 文件路径
 DEFINES += XX_XX_XXX //定义编译选项，在.h 文件中就可以使用：#ifdefine xx_xx_xxx
 RC_FILE = xxx.icns
 
-### 3.3 编译工程
+### 编译工程
 
 回到目录SDK/下，编译项目模块
 
@@ -291,9 +291,9 @@ RC_FILE = xxx.icns
 make 项目名称-rebuild
 ```
 
-## 4 Qt Demo 程序说明
+## Qt Demo 程序说明
 
-### 4.1 网络管理
+### 网络管理
 
 在Demo 应用程序中，无线网络管理的书写基础Wpa_supplicant 书写。Wpa_supplicant是Linux 下无线连接的管理工具，我们可以用之来进行无线网络的配置。Linux 系统中已经自动集成了该软件。
 在Qt Demo 应用程序的./Setting/ wpa_supplicant 目录下为Wpa_supplicant 的开源代码，目前已经集成在Qt Demo 程序中，因此可以这么说，Qt Demo 应用只是提供一个友好的用户界面，交互的操作由Qt5 完成，而底下实际的功能是由wpa_supplicant 完成。
@@ -337,7 +337,7 @@ wpa_ctrl_pending 接口是用来检测是否有即将到来的事件消息。
 
 wpa_ctrl_get_fd 接口则是来获得控制接口的文件描述符号。
 
-### 4.2 音视频播放器
+### 音视频播放器
 
 在Qt5 中，废止了原本的多媒体框架phonon，转而引入QMediaPlayer，因此在Demo 程序中用QMediaPlayer 进行音视频播放器的开发。
 

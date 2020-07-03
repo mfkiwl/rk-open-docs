@@ -40,7 +40,7 @@
 
 ***
 
-## 1. 板子介绍
+## 板子介绍
 
  RK2108B_EVB_V10 板正面照
    ![rk2108b](./Rockchip_Developer_FAQ_RK2108_EVB_CN/front.jpg)
@@ -55,7 +55,7 @@
 
 4） 在 OTG 口连接着电脑，按住 MaskRom 键的同时，短按一下 Reset 键，板子会进入到升级状态，松开MaskRom 键，即可开始下载固件。
 
-## 2. SDK下载
+## SDK下载
 
 ```
 repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.10.29:29418/rtos/rt-thread/manifests -b master
@@ -63,7 +63,7 @@ repo init --repo-url ssh://10.10.10.29:29418/android/tools/repo -u ssh://10.10.1
 
 需要确保您的公钥在29服务器上有开通权限。
 
-## 3. 编译SDK
+## 编译SDK
 
 编译系统的搭建：
 
@@ -103,9 +103,9 @@ mkimage.sh
 
 *更多说明请参考《Rockchip_Developer_Guide_RT-Thread_CN》*
 
-## 4. 升级固件
+## 升级固件
 
-### 4.1 Linux版升级工具
+### Linux版升级工具
 
 下载Linux板升级工具,链接：
 
@@ -123,7 +123,7 @@ sudo ./upgrade_tool wl 0 Image/Firmware.img
 sudo ./upgrade rd
 ```
 
-### 4.2 Windows版升级工具
+### Windows版升级工具
 
 下载 Windows 升级工具，链接：
 
@@ -149,7 +149,7 @@ sudo ./upgrade rd
 	testing sleep 1s:
 	msh />actual tick is:1000
 
-## 5. JTAG调试
+## JTAG调试
 
 调试方法参考《Rockchip_User_Guide_J-Link_CN》
 
@@ -170,7 +170,7 @@ RT_USING_UART2 [=y]
 
 另外，RK2108 的固件是默认编译成XIP模式的，需要烧录到 Flash 才可运行，JTAG 无法直接下载此类型固件到 SRAM。如果需要使用 JTAG 上位机（Ozone，JLinkExe）下载固件 rtthread.elf，需要关闭 XIP 开关（参考下文）。
 
-## 6. 文件系统
+## 文件系统
 
 RK2108 默认支持 FAT 文件系统，在 bsp/rockchip/rk2108/board/rk2108b_evb/mnt.c 可以找到分区表：
 
@@ -256,7 +256,7 @@ $sudo upgrade_tool 选择1，进入操作模式
 Rockusb>RL 0x1100 0x6f00 root_out.img
 ```
 
-## 7.其他问题
+## 其他问题
 
 1. ### 如何提交补丁
 

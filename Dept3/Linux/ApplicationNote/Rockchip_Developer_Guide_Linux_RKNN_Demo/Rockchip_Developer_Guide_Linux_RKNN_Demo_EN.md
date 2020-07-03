@@ -74,17 +74,17 @@ Software Development Engineer
 [TOC]
 ---
 
-## 1 Run RKNN_DEMO
+## Run RKNN_DEMO
 
-### 1.1 Overview
+### Overview
 
 The rknn_demo module configuration directory is "<SDK>/ buildroot/ package/ rockchip/ rknn_demo" and the code directory is "<SDK>/external/rknn_demo". It is mainly used to collect images through USB camera and then send them to NPU for processing and display the results through MiniGUI. The currently supported model is “mobilenet_ssd”.
 
-### 1.2 Configure in buildroot
+### Configure in buildroot
 
 The required configurations are enabled in SDK by default, the mainly dependences are RGA and USB camera. If they are not enabled, please go to kernel to check the historical changes of related config. Because RKNN interfaces and model of rk1808 and rk3399pro are different, you can configure according to chip type in the configuration file, mainly basing on BR2_PACKAGE_RK1808 and BR2_PACKAGE_RK3399PRO. When it is rk1808, the value of the macro "NEED_RKNNAPI" used in the code is 0 and the value is 1 when it is rk3399pro.
 
-### 1.3 NPU Related
+### NPU Related
 
 The model files have been compiled into the board by default in the SDK. The corresponding file macro and directory are as follows:
 
@@ -96,7 +96,7 @@ The model files have been compiled into the board by default in the SDK. The cor
 
 Before the model runs, make sure the related files exist.
 
-### 1.4 Compile and Run
+### Compile and Run
 
 You can compile modules in the SDK directory with the command “make rknn_demo” and generate the rknn_demo executable file. Before copy to the board, make sure USB camera is plugged in, and run “rknn_demo” command directly.
 Note: should not be coexist with other UIs. Please delete the related UI startup commands before starting. The board’s default UI is QT, you can run the command:
@@ -109,9 +109,9 @@ The normal running frame rate is around 25~30fps. If the frame rate is not enoug
 
 ![rknn demo](resources/rknn_demo.png)
 
-## 2 RKNN_DEMO Development
+## RKNN_DEMO Development
 
-### 2.1 File Directory Introduction
+### File Directory Introduction
 
 The config.in is a configuration file, the rknn_demo.mk is the basic compilation file in which copy of resource is done.
 Detailed commands please refer to RKNN_DEMO_INSTALL_TARGET_CMDS.
@@ -120,9 +120,9 @@ The rknn_camera.c is the main file which is used to start MiniGUI main window an
 The “src/rknn/ssd” is SSD related processing file. In the ssd.c, the ssd_run function loads the model and obtains the buf of USB camera through the cameraRun function, and outputs to the registration function ssd_camera_callback. In the ssd_camera_callback function, yuv_draw function sends video data to MiniGUI layer for RGA synthesis of video data and UI data. YUV420toRGB24_RGA convert video data from 640*480 nv12 format to 300*300 rgb888 format which will be sent to the ssd_rknn_process function for processing.
 The src/ui/ssd is UI display file for SSD. The caption_create function paints title bar and displays it in caption_wnd_proc; the fps_create function paints frame rate bar and displays it in fps_wnd_proc; the ssd_paint_object paints region of detected object and the processing result of SSD is sent here for display. Detailed MiniGUI development and processing, please refer to related open source materials.
 
-## 3 RKNN_DEMO FAQ
+## RKNN_DEMO FAQ
 
-### 3.1 How to Switch Display 720p Resolution on HDMI
+### How to Switch Display 720p Resolution on HDMI
 
 ```shell
 [root@rk3399pro:/]# rknn_demo

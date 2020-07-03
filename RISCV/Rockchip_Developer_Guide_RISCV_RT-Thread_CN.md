@@ -38,7 +38,7 @@
 
 ------
 
-## 1 引用参考
+## 引用参考
 
 [1]. 《RISC-V 架构与嵌入式开发快速入门》
 
@@ -48,7 +48,7 @@
 
 [4]. 《Rockchip-Developer-Guide-Riscv-FreedomStudio-CN.md》
 
-## 2 术语
+## 术语
 
 RISC-V：是一个基于精简指令集（RISC）原则的开源指令集架构（ISA）
 
@@ -58,7 +58,7 @@ Hifive1：一款基于 RISC-V 指令集芯片的开发板
 
 SCR1：SCR1 is an open-source RISC-V compatible MCU core, designed by Syntacore
 
-## 3 测试平台
+## 测试平台
 
 Hifive1 开发板
 
@@ -66,13 +66,13 @@ Hifive1 开发板
 
 RT-Thread
 
-## 4 简介
+## 简介
 
 本文介绍如何在 Hifive1 开发板和 SCR1 核的 FPGA 测试板上运行 RT-Thread 的过程。
 
-## 5 Hifive1 移植流程
+## Hifive1 移植流程
 
-### 5.1 环境搭建
+### 环境搭建
 
 编译链工具下载：
 
@@ -97,7 +97,7 @@ sudo apt-get install scons
 git clone https://github.com/RT-Thread/rt-thread.git
 ```
 
-### 5.2 编译
+### 编译
 
 修改 bsp/hifive1/rtconfig.py：
 
@@ -134,9 +134,9 @@ scons
 
 最后编译出 rtthread.bin，rtthread.elf，可用于下载调试。
 
-### 5.3 程序下载
+### 程序下载
 
-#### 5.3.1 Linux 环境
+#### Linux 环境
 
 新建文件 99-openocd.rules，写入如下内容：
 
@@ -159,7 +159,7 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="15ba",ATTR{idProduct}=="002a", MODE="664", GR
 
 ![result](./Rockchip-Developer-Guide-RISCV-RT-Thread/result.png)
 
-#### 5.3.2 Windows 环境
+#### Windows 环境
 
 运行 FreedomStudio，在工程下右击，点击 Debug As，如下配置：
 
@@ -169,13 +169,13 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="15ba",ATTR{idProduct}=="002a", MODE="664", GR
 
 ![result](./Rockchip-Developer-Guide-RISCV-RT-Thread/result.png)
 
-## 6 SCR1 移植流程
+## SCR1 移植流程
 
-### 6.1 环境搭建
+### 环境搭建
 
 参考 5.1 章节。
 
-### 6.2 代码编译
+### 代码编译
 
 从服务器下载代码：
 
@@ -195,6 +195,6 @@ git checkout develop
 scons
 ```
 
-### 6.3 调试
+### 调试
 
 参考 5.3.2 章节。

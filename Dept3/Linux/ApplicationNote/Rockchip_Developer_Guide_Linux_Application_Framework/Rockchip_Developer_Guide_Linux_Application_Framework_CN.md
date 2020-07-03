@@ -76,9 +76,9 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 简介：
+## 简介：
 
-### 1.1 应用
+### 应用
 
 主要应用路径位于SDK工程的app路径下，对应功能如下：
 
@@ -94,7 +94,7 @@ Rockchip Electronics Co., Ltd.
 | ispserver       | 图像信号处理服务端     |
 | onvif_server    | onvif协议服务端        |
 
-### 1.2 库
+### 库
 
 主要库路径位于SDK工程的app路径下，采用dbus的进程间通信机制。主要开发libIPCProtocol即可。
 
@@ -104,7 +104,7 @@ Rockchip Electronics Co., Ltd.
 | librkdb        | 基于sql，提供对数据库操作的接口。                  |
 | libgdbus       | 提供dbus支持。                                     |
 
-### 1.3 应用框架
+### 应用框架
 
 应用框架如下：
 
@@ -120,11 +120,11 @@ Rockchip Electronics Co., Ltd.
 
 除了以上两种方式外，还可新增GB28181协议等其他方式。此框架可以兼容不同应用，可以不耦合。
 
-## 2 数据流
+## 数据流
 
 数据流主要为web前后端之间的http协议和dbus总线上的通信数据。统一使用JSON格式。
 
-### 2.1 GET
+### GET
 
 以获取当前网卡信息为例，首先web端在进入配置-网络-基础设置时，会自动刷新，并向web后端发送一条请求，摘要如下：
 
@@ -168,7 +168,7 @@ response:
 }
 ```
 
-### 2.2 PUT
+### PUT
 
 以设置IP地址为例，web前端发送如下请求：
 
@@ -204,9 +204,9 @@ method call time=1588054078.249193 sender=:1.447 -> destination=rockchip.dbserve
 
 web后端的部分接口会再获取一次最新值，返还给前端。
 
-## 3 ipcweb-ng
+## ipcweb-ng
 
-### 3.1 开发基础
+### 开发基础
 
 web前端，采用Angular 8框架。
 
@@ -231,7 +231,7 @@ make rk_oem-dirclean && make rk_oem target-finalize #重新编译oem
 ./mkfirmware.sh #打包oem.img,再进行烧写
 ```
 
-### 3.2 开发环境
+### 开发环境
 
 ```shell
 sudo apt update
@@ -243,7 +243,7 @@ npm npm --version # 确认 npm 版本
 sudo npm install -g @angular/cli # 安装 Angular 命令行工具
 ```
 
-### 3.3 在线调试
+### 在线调试
 
 启动webpack开发服务
 
@@ -261,7 +261,7 @@ ng serve
 
 也可使用`ng build --prod`命令编译，将生成在dist目录下的文件，推送到板端，替换/oem/www下的文件。如果浏览器访问页面未更新，需要清理浏览器图片和文件的缓存。
 
-### 3.4 代码框架
+### 代码框架
 
 ```shell
 src/
@@ -356,9 +356,9 @@ $ tree -L 2 src/app/config
     └── wifi
 ```
 
-## 4 ipcweb-backend
+## ipcweb-backend
 
-### 4.1 开发基础
+### 开发基础
 
 web后端，采用ngingx+fastcgi，调试可以使用curl、postman或者直接与web前端联调。
 
@@ -411,7 +411,7 @@ location /cgi-bin/ {
 }
 ```
 
-### 4.2 编译环境
+### 编译环境
 
 可以在SDK根目录下使用make ipcweb-backend编译，也可以使用以下命令编译。
 
@@ -426,7 +426,7 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=<path_of_sdk_root>/buildroot/output/rockchip_pum
 make
 ```
 
-### 4.3 调试环境
+### 调试环境
 
 1. 将编译出的entry.cgi文件推送到设备端的/oem/www/cgi-bin/路径下，确保entry.cgi文件的权限和用户组如下：
 
@@ -461,9 +461,9 @@ $ cat /var/log/nginx/access.log
 # 网页服务器访问log
 ```
 
-## 5 ipc-daemon
+## ipc-daemon
 
-### 5.1 开发基础
+### 开发基础
 
 系统守护服务，提供系统维护相关服务，初始化和确保dbserver/netserver/storage_manager/mediaserver的运行。
 
@@ -473,7 +473,7 @@ $ cat /var/log/nginx/access.log
 
 **编译命令：** 在SDK根目录下，`make ipc-daemon-dirclean && make ipc-daemon`
 
-### 5.2 对外接口
+### 对外接口
 
 以下接口位于app/libIPCProtocol/system_manager.h中。
 
@@ -486,9 +486,9 @@ $ cat /var/log/nginx/access.log
 | system_export_log    | 导出调试日志 |
 | system_upgrade       | OTA固件升级  |
 
-## 6 storage_manager
+## storage_manager
 
-### 6.1 开发基础
+### 开发基础
 
 存储管理服务，提供文件查询、硬盘管理、录像抓图配额等功能。
 
@@ -498,7 +498,7 @@ $ cat /var/log/nginx/access.log
 
 **编译命令：** 在SDK根目录下，`make storage_manager-dirclean && make storage_manager`
 
-### 6.2 对外接口
+### 对外接口
 
 以下接口位于app/libIPCProtocol/storage_manager.h中。
 
@@ -510,9 +510,9 @@ $ cat /var/log/nginx/access.log
 | storage_manager_get_media_path    | 获取媒体文件路径信息 |
 | storage_manager_diskformat        | 硬盘格式化           |
 
-## 7 netserver
+## netserver
 
-### 7.1 开发基础
+### 开发基础
 
 网络服务，提供获取网络信息，扫描Wi-Fi，配网等功能。
 
@@ -522,7 +522,7 @@ $ cat /var/log/nginx/access.log
 
 **编译命令：** 在SDK根目录下，`make netserver-dirclean && make netserver`
 
-### 7.2 对外接口
+### 对外接口
 
 以下接口位于app/libIPCProtocol/netserver.h中。
 
@@ -533,9 +533,9 @@ $ cat /var/log/nginx/access.log
 | netserver_get_config    | 获取service对应的配置信息     |
 | netserver_get_networkip | 获取eth0或wlan0的网卡信息     |
 
-## 8 dbserver
+## dbserver
 
-### 8.1 开发基础
+### 开发基础
 
 数据库服务，对数据库进行初始化，提供对数据库相关操作接口。
 
@@ -545,11 +545,11 @@ $ cat /var/log/nginx/access.log
 
 **编译命令：** 在SDK根目录下，`make dbserver-dirclean && make dbserver`
 
-### 8.2 对外接口
+### 对外接口
 
 接口位于app/libIPCProtocol/dbserver.h中，主要对数据库不同table进行select、update、delete等操作。
 
-### 8.3 调试环境
+### 调试环境
 
 修改完代码，重新编译后，设备端需要执行以下操作：
 
@@ -570,9 +570,9 @@ method return time=1588123823.096268 sender=:1.5 -> destination=:1.6 serial=7 re
    string "{ "iReturn": 0, "sErrMsg": "", "jData": [ { "id": 0, "sNtpServers": "122.224.9.29 94.130.49.186", "sTimeZone": "posix\/Etc\/GMT-8", "iAutoMode": 1, "iRefreshTime": 60 } ] }"
 ```
 
-## 9 mediaserver
+## mediaserver
 
-### 9.1 开发基础
+### 开发基础
 
 提供多媒体服务的主应用，具体开发请参考《MediaServer开发基础》
 
@@ -582,9 +582,9 @@ method return time=1588123823.096268 sender=:1.5 -> destination=:1.6 serial=7 re
 
 **编译命令：** 在SDK根目录下，`make mediaserver-dirclean && make mediaserver`
 
-## 10 libIPCProtocol
+## libIPCProtocol
 
-### 10.1 开发基础
+### 开发基础
 
 基于dbus，提供进程间通信的函数接口。
 
@@ -594,7 +594,7 @@ method return time=1588123823.096268 sender=:1.5 -> destination=:1.6 serial=7 re
 
 **编译命令：** 在SDK根目录下，`make libIPCProtocol-dirclean && make libIPCProtocol`
 
-### 10.2 对外接口
+### 对外接口
 
 其中接口为对dbus通信的封装，各个服务的对外接口均在此库中提供。
 核心都是通过dbus调用其他应用的method，但交互方式主要有两种：
@@ -666,15 +666,15 @@ dbus_method_call(userdata->connection,
                      populate_get, userdata, NULL, NULL);
 ```
 
-### 10.3 注意事项
+### 注意事项
 
 1. 由于返回字符串的长度不固定，所以某些函数中动态申请了内存，要注意内存释放问题。
 
 2. mediaserver目前没有监听参数变化，所以音视频相关参数除了写入数据库外，还需要再调用mediaserver.h提供的接口进行配置。
 
-## 11 ispserver
+## ispserver
 
-### 11.1 开发基础
+### 开发基础
 
 图像信号处理服务端，具体开发请参考《ISP IPC模块框架说明及接口规范》
 
@@ -684,9 +684,9 @@ dbus_method_call(userdata->connection,
 
 **编译命令：** 在SDK根目录下，`make isp2-ipc-dirclean && make isp2-ipc`
 
-## 12 onvif_server
+## onvif_server
 
-### 12.1 开发基础
+### 开发基础
 
 onvif协议服务端。
 
@@ -706,7 +706,7 @@ onvif协议服务端。
 
 **编译命令：** 在SDK根目录下，`make onvif_server-dirclean && make onvif_server`
 
-### 12.2 开发环境
+### 开发环境
 
 1. 下载gSOAP工具包，并编译安装。
 
@@ -741,7 +741,7 @@ soapcpp2 -s -2 onvif.h -x -I ../gsoap/import/ -I ../gsoap/
 
 5. 根据具体需求，实现server_operation.c中的函数。输入参数和输出参数的结构体已经有详细定义在soapStub.h中，按规范填充实现即可。
 
-### 12.3 调试环境
+### 调试环境
 
 1. 确保运行onvif_server的设备，和需要对接的NVR或个人电脑，位于同一局域网内。
 
@@ -825,13 +825,13 @@ Connection: close
 </SOAP-ENV:Envelope>
 ```
 
-### 12.4 注意事项
+### 注意事项
 
 1. 所有指针都需要先直接或间接地调用soap_malloc进行申请内存。
 
 2. 结构体在申请内存后，还需要调用soap_default_tt__开头的函数赋默认值，或手动给每一个成员赋值或NULL。注意不要遗漏，否则虽然编译能过，函数内部也不会报错，但是检查response结构体时的时候会直接退出，且难以排查。
 
-## 13 应用框架开发流程
+## 应用框架开发流程
 
 **从数据库到web应用的开发，自底向上的开发流程如下：**
 

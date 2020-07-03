@@ -2,14 +2,14 @@
 
 # SPL
 
-## 1 固件引导
+## 固件引导
 
 SPL 的作用是代替miniloader完成 trust.img 和 uboot.img的加载和引导工作。SPL 目前支持引导两种固件：
 
 - FIT 固件：默认使能；
 - RKFW  固件：默认关闭，需要用户单独配置和使能；
 
-### 1.1 FIT 固件
+### FIT 固件
 
 FIT（flattened image tree）格式是 SPL 支持的一种比较新颖的固件格式，支持多个 image 打包和校验。FIT 使用 DTS 的语法对打包的 image 进行描述，描述文件为 u-boot.its，最终生成的 FIT 固件为 u-boot.itb。
 
@@ -170,7 +170,7 @@ cjh@ubuntu:~/uboot-nextdev/u-boot$ fdtdump u-boot.itb | less
 ./doc/uImage.FIT/
 ```
 
-### 1.2 RKFW 固件
+### RKFW 固件
 
 为了能更直接替换掉 miniloader 且不用修改后级固件的分区、打包格式。因此RK平台增加了RKFW 格式（即独立分区的固件：trust.img 和 uboot.img）的引导。
 
@@ -189,7 +189,7 @@ CONFIG_RKFW_U_BOOT_SECTOR      // uboot.img分区地址，需要和分区表的�
 ./common/spl/spl_rkfw.c
 ```
 
-### 1.3 存储优先级
+### 存储优先级
 
 U-Boot dts 中通过`u-boot,spl-boot-order` 指定存储设备的启动优先级。
 
@@ -208,9 +208,9 @@ U-Boot dts 中通过`u-boot,spl-boot-order` 指定存储设备的启动优先级
 };
 ```
 
-## 2 编译打包
+## 编译打包
 
-### 2.1 代码编译
+### 代码编译
 
 U-Boot 根据**不同的编译路径** 对同一份U-Boot代码编译获得SPL固件，当编译 SPL 时会自动生成`CONFIG_SPL_BUILD` 宏。U-Boot会在编译完 u-boot.bin 之后继续编译 SPL，并创建独立的输出目录`./spl/`。
 
@@ -249,11 +249,11 @@ make[2]: `arch/arm/dts/rk3328-evb.dtb' is up to date.
 ./spl/u-boot-spl.bin
 ```
 
-### 2.3 固件打包
+### 固件打包
 
-## 3 系统模块
+## 系统模块
 
-### 3.1 GPT
+### GPT
 
 SPL 使用GPT分区表。
 
@@ -280,7 +280,7 @@ int part_get_info_by_name(struct blk_desc *dev_desc,
                           const char *name, disk_partition_t *info);
 ```
 
-### 3.2 A/B system
+### A/B system
 
 SPL 支持A/B 系统启动。
 
@@ -303,7 +303,7 @@ int spl_get_current_slot(struct blk_desc *dev_desc, char *partition, char *slot)
 int spl_get_partitions_sector(struct blk_desc *dev_desc, char *partition,u32 *sectors);
 ```
 
-### 3.3 启动优先级
+### 启动优先级
 
 - SPL 使用 `u-boot,spl-boot-order` 定义的启动顺序，位于rkxxxx-u-boot.dtsi：
 
@@ -328,7 +328,7 @@ int spl_get_partitions_sector(struct blk_desc *dev_desc, char *partition,u32 *se
 
   把 sd 卡的优先级提到最高可以方便系统从 sd 卡启动。
 
-### 3.4 ATAGS
+### ATAGS
 
 SPL 与 U-Boo 通过 ATAGS 机制实现传参。传递的信息有：启动的存储设备、打印串口等。
 
@@ -352,7 +352,7 @@ int atags_set_tag(u32 magic, void *tagdata);
 struct tag *atags_get_tag(u32 magic);
 ```
 
-### 3.5 kernel boot
+### kernel boot
 
 通常kernel是由U-Boot加载和引导，SPL 也可以支持加载 kernel。目前支持加载 android head version 2 的 boot.img，支持 RK格式固件。
 
@@ -362,7 +362,7 @@ struct tag *atags_get_tag(u32 magic);
 Maskrom -> ddr -> SPL -> Trust -> Kernel
 ```
 
-### 3.6 pinctrl
+### pinctrl
 
 配置：
 
@@ -425,13 +425,13 @@ DTS 配置：
 
 SPL 启用pinctrl时要修改 defconfig 里的 `CONFIG_OF_SPL_REMOVE_PROPS` 定义，删除其中的`pinctrl-0 pinctrl-names` 字段。
 
-### 3.7 secure boot
+### secure boot
 
 [TODO]
 
-## 4 驱动模块
+## 驱动模块
 
-### 4.1 MMC
+### MMC
 
 配置：
 
@@ -452,7 +452,7 @@ int spl_mmc_load_image(struct spl_image_info *spl_image,
                        struct spl_boot_device *bootdev);
 ```
 
-### 4.2 MTD block
+### MTD block
 
 SPL 统一 nand、spi nand、spi nor 接口到 block 层。
 
@@ -510,7 +510,7 @@ int spl_mtd_load_image(struct spl_image_info *spl_image,
                        struct spl_boot_device *bootdev);
 ```
 
-### 4.3 OTP
+### OTP
 
 用于存储不可更改数据，secure boot 中用到。
 
@@ -535,7 +535,7 @@ int misc_read(struct udevice *dev, int offset, void *buf, int size);
 int misc_write(struct udevice *dev, int offset, void *buf, int size);
 ```
 
-### 4.4 Crypto
+### Crypto
 
 Secure-boot 会使用crypto完成hash、ras的计算。
 
@@ -574,7 +574,7 @@ int crypto_sha_csum(struct udevice *dev, sha_context *ctx,
 int crypto_rsa_verify(struct udevice *dev, rsa_key *ctx, u8 *sign, u8 *output);
 ```
 
-### 4.5 Uart
+### Uart
 
 SPL 串口通过 `rkxxxx-u-boot.dtsi` 的 chosen 节点指定。以 rk3308 为例：
 

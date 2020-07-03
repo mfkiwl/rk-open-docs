@@ -40,7 +40,7 @@
 
 ---
 
-## 1. 介绍
+## 介绍
 
 ​    Systrace 是目前 Android 上最主要的性能调试手段，有以下优点：
 
@@ -53,7 +53,7 @@
 - 基于 tracepoint，所以只会收集你加过 trace 的函数信息，Android 在大部分模块的重要函数里都加了 trace 了，所以大部分情况下还是够用，同时 Android 也提供了几个函数方便添加自己的 trace。
 - 看不到 pmu 计数器的信息，也看不到 gpu 和 memory 的信息（理论上内核驱动如果定时收集这些信息并加到 trace 里，systrace 应该也能看到）
 
-## 2. 用法
+## 用法
 
 ​    为了更方便介绍 Systrace，我这里举一个实际的性能分析例子：fishtank 在 1000 只鱼的情况下帧率很低
 
@@ -199,7 +199,7 @@ python ./systrace.py -t 10 -o fishtank.html gfx webview sched freq load workq di
 
 这个 fishtank.html 即我们抓到的数据。为了方便和本文对照，我上传到[网盘](https://pan.baidu.com/s/1slJUibN "fishtank.html")了。
 
-## 3. 分析
+## 分析
 
 ​    分析数据需要 chrome 浏览器，版本最好要新一些，太旧可能会有兼容问题，因为这个 html 并不符合 w3c 的标准。
 

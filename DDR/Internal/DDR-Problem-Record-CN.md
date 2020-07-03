@@ -44,9 +44,9 @@
 
 ---
 
-## 1. RK3228B
+## RK3228B
 
-### 1.1 问题：无法恢复出厂设置
+### 问题：无法恢复出厂设置
 
 **关键词：无法恢复出厂设置，OS_REG 被清，GRF_OS_REG 被清，LPDDR3 板子无法恢复出厂设置**
 
@@ -137,9 +137,9 @@ REBOOT 测试时 VCCIO 会塌陷到 2.5V,而 RESET 检测 VCCIO 的阀值为 2.6
 
 ---
 
-## 2. PX3
+## PX3
 
-### 2.1 问题：贴 2GB DDR3L，只识别到 1GB 容量
+### 问题：贴 2GB DDR3L，只识别到 1GB 容量
 
 **关键词：容量识别错，容量不对，少了一个 CS，少了一个片选**
 
@@ -173,7 +173,7 @@ DDR3L 是 2 个 CS 的颗粒，而客户原理图只连了一个 CS0 到颗粒�
 
 无法解决，除非客户改版
 
-### 2.2 问题：免拆机 loader 无法进入测试模式
+### 问题：免拆机 loader 无法进入测试模式
 
 **关键词：无法进入测试模式，无法进入 maskrom，免拆机 loader，DDR 工具测试失败**
 
@@ -251,9 +251,9 @@ graph TD
 
 ---
 
-## 3. RK3126/RK3128
+## RK3126/RK3128
 
-### 3.1 问题：reboot 测试失败
+### 问题：reboot 测试失败
 
 **关键词：reboot 失败，概率性**
 
@@ -279,7 +279,7 @@ graph TD
 
 所以相应的 uboot， kernel 中的 reboot 代码都需要做相应的改动，reboot 前让 dram 进入 self-refresh mode。
 
-### 3.2 问题：x4 颗粒初始化失败
+### 问题：x4 颗粒初始化失败
 
 **关键词：x4 颗粒，初始化失败，Col error！， W FF！=R，必现， 白牌颗粒**
 
@@ -313,7 +313,7 @@ graph TD
 1. 针对 x4 颗粒两个颗粒连接到同一个 DQS 上的情况，通过 enable DLL 来尽量减少颗粒的不一致性带来的 DQS 之间的相位差的问题。
 2. 针对部分违反 jedec 需要手动清 DLL Reset bit 的颗粒手动清该 bit 解决问题。
 
-### 3.3 问题：x4 颗粒 reboot 死机问题
+### 问题：x4 颗粒 reboot 死机问题
 
 **关键词：x4 颗粒，reboot， 必现， 白牌颗粒**
 
@@ -338,7 +338,7 @@ reboot 后必现的在 training 处卡住，由于 3126 没有 ddr reset pin，�
 
 在 reboot 前调用 ddr 变频命令将 ddr 频率变到与 loader 初始化相同的 300Mhz。这样初始化时的 cl 就正常了。
 
-### 3.4 问题：概率性开机初始化出错，报 Col error
+### 问题：概率性开机初始化出错，报 Col error
 
 **关键词：初始化出错， Col error， 白牌颗粒**
 
@@ -360,7 +360,7 @@ redmine 号 112646，开机概率性会卡在 ddr 初始化处报 Col error， �
 
 出现异常的颗粒直接更换。
 
-### 3.5 问题：系统中报错，死机
+### 问题：系统中报错，死机
 
 **关键词：panic，白牌颗粒**
 
@@ -404,7 +404,7 @@ ddr 测试工具 march 专项，以及系统中的 memtester 在较低频率下�
 
 对于存储单元异常的白牌颗粒只能通过更换颗粒来解决。
 
-### 3.6 问题：rk3126c ddr2 系统中不稳定容易 panic
+### 问题：rk3126c ddr2 系统中不稳定容易 panic
 
 **关键词：panic**
 
@@ -429,9 +429,9 @@ ddr 测试工具 march 专项，以及系统中的 memtester 在较低频率下�
 
 ---
 
-## 4. RK3229
+## RK3229
 
-### 4.1 问题：4bit ddr3 大于 600M 时死机
+### 问题：4bit ddr3 大于 600M 时死机
 
 **关键词：屏幕绿屏，无法运行高频**
 
@@ -453,7 +453,7 @@ ddr 测试工具 march 专项，以及系统中的 memtester 在较低频率下�
 
 将电容移到颗粒端。
 
-### 4.2 问题：DDR2 支持
+### 问题：DDR2 支持
 
 **关键词：ddr2，ddr 控制器 1:2 mode**
 
@@ -479,7 +479,7 @@ ddr 测试工具 march 专项，以及系统中的 memtester 在较低频率下�
 
 将最小的 cl,cwl 现在在 6 和 5 解决该问题。
 
-### 4.3 问题：压力测试报错
+### 问题：压力测试报错
 
 **关键词：stressapptest，memtester 报错**
 
@@ -503,7 +503,7 @@ ddr 测试工具 march 专项，以及系统中的 memtester 在较低频率下�
 
 3. 后续 trust 更新 rx DLL 设置小于 400MHz 时 DLL 设置为 67.5°，400MHz 到 680MHz 之间 DLL 设置为 45°，大于 680MHz 时 DLL 设置为 22.5°
 
-### 4.4 问题：压力测试报错
+### 问题：压力测试报错
 
 **关键词：stressapptest，memtester 报错**
 
@@ -527,9 +527,9 @@ memtester 和 stressapptest 均会报错，stressapptest 报错的概率更大�
 
 ---
 
-## 5. RK3128/RK322X/RK3368/RK322XH
+## RK3128/RK322X/RK3368/RK322XH
 
-### 5.1 问题：概率性出现颗粒类型，颗粒位宽探测出错
+### 问题：概率性出现颗粒类型，颗粒位宽探测出错
 
 **关键词：概率性，颗粒类型出错，颗粒位宽出错，W FF != R**
 
@@ -560,9 +560,9 @@ memtester 和 stressapptest 均会报错，stressapptest 报错的概率更大�
 
 ---
 
-## 6. RK322xH/RK3328
+## RK322xH/RK3328
 
-### 6.1 问题：颗粒验证时，烧写失败
+### 问题：颗粒验证时，烧写失败
 
 **关键词：烧写失败，不能启动**
 
@@ -594,7 +594,7 @@ memtester 和 stressapptest 均会报错，stressapptest 报错的概率更大�
 
 根据芯片型号，选对 loader 和其他文件，就能解决
 
-### 6.2 问题：1Gbx4  8 颗组成 4GB 下载异常
+### 问题：1Gbx4  8 颗组成 4GB 下载异常
 
 **关键词：下载失败，ddr 初始化报错， 4GB**
 
@@ -614,7 +614,7 @@ memtester 和 stressapptest 均会报错，stressapptest 报错的概率更大�
 
 更新 loader 到 v1.09 20171011 后解决该 4GB 下载失败问题。
 
-### 6.3 问题：更新到 v1.08 的 loader 后出现死机
+### 问题：更新到 v1.08 的 loader 后出现死机
 
 **关键词：hynix 2cs lpddr3，odt，rd_gap**
 
@@ -643,7 +643,7 @@ hynix 该批次的 lpddr3 odt 设计逻辑上有问题。enable 后 cs0 会误�
 1. disable write odt。
 2. 或者将主控端的 rd_gap 加大。但是这样会影响 ddr 的访问效率。
 
-### 6.4 问题：视频加 ddr 变频，死机
+### 问题：视频加 ddr 变频，死机
 
 **关键词：死机，视频，变频**
 
@@ -665,7 +665,7 @@ DDR 变频都走完了，起 CPU 多核时，不知道为什么就挂了。而�
 
 注释掉 CPU 1.3GHz 这档拷机
 
-### 6.5 问题：大唐 ddr3 2 层板 800MHz 死机
+### 问题：大唐 ddr3 2 层板 800MHz 死机
 
 **关键词：跑不了高频，2 层板，panic**
 
@@ -689,9 +689,9 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 ---
 
-## 7. RK3288
+## RK3288
 
-### 7.1 问题：ddr 变频中函数改为 no_inline 死机
+### 问题：ddr 变频中函数改为 no_inline 死机
 
 **关键词：no inline，ddr 变频**
 
@@ -713,7 +713,7 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 传递给 ddr_sre_2_srx 的参数最好设置成全局变量直接引用，而不通过参数传递。
 
-### 7.2 问题：每个通道贴 2 颗 512Mbx8bit DDR3，烧写失败
+### 问题：每个通道贴 2 颗 512Mbx8bit DDR3，烧写失败
 
 **关键词：烧写失败，烧写报错，2 颗 8bit，row=16**
 
@@ -755,7 +755,7 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 当然代码中对 row=16 的 test()，以及 CS1 的探测等都必须特殊处理。
 
-### 7.3 问题：RK3288 Power domain 驱动 idle port 失败
+### 问题：RK3288 Power domain 驱动 idle port 失败
 
 **关键词：RK3288, idle port 失败，单通道**
 
@@ -781,9 +781,9 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 ---
 
-## 8. RK3188/RK3026
+## RK3188/RK3026
 
-### 8.1 问题：系统死机花屏
+### 问题：系统死机花屏
 
 **关键词：重影花屏**
 
@@ -816,9 +816,9 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 ---
 
-## 9. RK3188
+## RK3188
 
-### 9.1 问题：系统死机
+### 问题：系统死机
 
 **关键词：三星 LPDDR3 pop， RZQ，驱动强度**
 
@@ -844,9 +844,9 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 ---
 
-## 10. RK3399
+## RK3399
 
-### 10.1 问题：LPDDR4 reboot 报错
+### 问题：LPDDR4 reboot 报错
 
 **关键词：LPDDR4， reboot，DDR 报错**
 
@@ -936,7 +936,7 @@ kingstom 颗粒 2 层板 ddr 800MHz 时容易出现死机 painc 现象
 
 - 代码修改要不影响 DDR3，因为 DDR3 也用这个 RESET 信号。
 
-### 10.2 问题：LP4 待机唤醒死机
+### 问题：LP4 待机唤醒死机
 
 **关键词：LP4，LPDDR4，待机死机、唤醒死机，PS019，Z91M**
 
@@ -990,7 +990,7 @@ Z91M: EOL at 2016 Q3
 
 ![VCC_DDRC_Not_Power_Off](DDR-Problem-Record/VCC_DDRC_Not_Power_Off.jpg)
 
-### 10.3 问题：灵优智学 kingston LP4 颗粒 stress 报错
+### 问题：灵优智学 kingston LP4 颗粒 stress 报错
 
 **关键词：Q5116PH1MDGPAR，Kingston，LP4 报错，LPDDR4 报错，stress 报错**
 
@@ -1030,7 +1030,7 @@ Z91M: EOL at 2016 Q3
 
 原来纹波 35mV，加完电容后，纹波 20mV。所以从外面测，看不出纹波太大影响。实际效果很明显。
 
-### 10.4 问题：shmoo 结果跟 sw_training 结果不一致
+### 问题：shmoo 结果跟 sw_training 结果不一致
 
 **关键词：S5RG2G20CMS-MGCJ、Netsol、开机异常、RISK、no find pass-eye、Channel 1 异常**
 
@@ -1107,9 +1107,9 @@ shmoo 测试的 buffer 小，只用到 1KB。而 sw_training 用的 buffer 有 6
 
 ---
 
-## 11. RK3326/PX30
+## RK3326/PX30
 
-### 11.1 问题：RK3326/PX30 DDR测试工具Loader设备下测试失败
+### 问题：RK3326/PX30 DDR测试工具Loader设备下测试失败
 
 **关键词：DDR测试工具 Loader设备 A35 ICACHE**
 

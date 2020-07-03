@@ -75,7 +75,7 @@ Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 名词说明
+## 名词说明
 
 - **颗粒**：指各种 DDR memory，DDR3 memory、DDR4 memory、LPDDR3 memory、LPDDR4 memory、LPDDR2 memory
 
@@ -96,7 +96,7 @@ Rockchip Electronics Co., Ltd.
   ![AXI_SPLIT](DDR-PCB-Layout-Attention-Internal\AXI_SPLIT.png)
 
 ---
-## 2 总的要求
+## 总的要求
 总的要求适用于所有平台，各款主控的特殊要求，后面单独列出
 
 **1、DQ 的交换，不能超出该组 byte，只能在 byte 内部进行交换。有些主控有特殊要求，byte 内部都不能交换，见具体主控的特殊要求**
@@ -166,7 +166,7 @@ LPDDR4 有大于 2 个 CS 的颗粒，如果使用，只能用到 2 个 CS
   ![DRAM_3GB](DDR-PCB-Layout-Attention-Internal\1x_channel_DRAM_3GB.png)
 
 ---
-##  3 RK3399 特殊要求
+## RK3399 特殊要求
 **1、 CS2 是 CS0 的复制信号，CS3 是 CS1 的复制信号，其行为与被复制信号完全一样**
 
 因此对于 DDR3，LPDDR3，实际只能使用 2 个 CS。CS2，CS3 主要是给 LPDDR4 使用的，因为 LPDDR4 颗粒一个 channel 是 16bit，当要让主控达到 32bit、2CS 时，就需要用到 4 根 CS 信号。
@@ -216,7 +216,7 @@ LPDDR4 有大于 2 个 CS 的颗粒，如果使用，只能用到 2 个 CS
  因此对于单通道使用场景（channel 0 有接 DRAM，channel 1 没有接 DRAM），也需要对 channel 1 进行供电（DDR1_AVDD_0V9,DDR1_CLK_VDD,DDR1_VDD），否则 channel 1 上的 controller 和 PHY 无法完成初始化，影响 DDR 变频功能。
 
 ---
-## 4 RK3326、PX30 特殊要求
+## RK3326、PX30 特殊要求
 **1、支持的位宽组合方式**
 
 1. 32bit 最大位宽（大容量 16bit+小容量 16bit），举例：256x16+128x16=768MB。
@@ -249,7 +249,7 @@ AXI SPLIT 模式下，要求所有颗粒的 column,bank 是相同的。
 
 ---
 
-## 5 RV1126/RV1109需求
+## RV1126/RV1109需求
 
 **1、DQ对调**
 

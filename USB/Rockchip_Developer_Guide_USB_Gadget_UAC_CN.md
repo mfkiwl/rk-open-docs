@@ -80,9 +80,9 @@ Kernel/Documentation/ABI/testing/configfs-usb-gadget-hid
 [TOC]
 ------
 
-## 1 Kernel UAC CONFIG
+## Kernel UAC CONFIG
 
-### 1.1 Related Kernel Commits
+### Related Kernel Commits
 
 如果要正常使用 Kernel-4.4 的 UAC1/UAC2 的功能，需要先确认所使用的内核已经包含如下的系列补丁，如果未找到补丁，请提交问题到 Rockchip Redmine 平台，或者发邮件给本文档的作者。
 
@@ -134,7 +134,7 @@ cafb671 UPSTREAM: usb: dwc2: gadget: Disable enabled HW endpoint in dwc2_hsotg_e
 9b54359 UPSTREAM: usb: dwc2: gadget: Correct dwc2_hsotg_ep_stop_xfr() function
 ```
 
-### 1.2 Related CONFIGs
+### Related CONFIGs
 
 CONFIG_USB_CONFIGFS_F_UAC1 (enable UAC1 Function )
 
@@ -146,7 +146,7 @@ CONFIG_USB_CONFIGFS_F_ACC （Audio Source depends on it）
 
 CONFIG_USB_CONFIGFS_F_AUDIO_SRC (enable Audio Source Function)
 
-### 1.3 Related Documents
+### Related Documents
 
 - Documentation/usb/gadget_configfs.txt
 - Documentation/usb/gadget-testing.txt
@@ -154,9 +154,9 @@ CONFIG_USB_CONFIGFS_F_AUDIO_SRC (enable Audio Source Function)
 - Documentation/ABI/testing/configfs-usb-gadget-uac1_legacy
 - Documentation/ABI/testing/configfs-usb-gadget-uac2
 
-## 2 UAC1 Usage and Test
+## UAC1 Usage and Test
 
-### 2.1 UAC1 Usage
+### UAC1 Usage
 
 **USB Audio Class 1 standard (1998)**
 
@@ -322,9 +322,9 @@ controlC1  pcmC0D0c   pcmC1D0p   pcmC7D0c   pcmC7D1p
 controlC2  pcmC0D0p   pcmC2D0c   pcmC7D0p   timer
 ```
 
-### 2.2 UAC1 Test
+### UAC1 Test
 
-#### 2.2.1 UAC1 Test on Windows
+#### UAC1 Test on Windows
 
 打开 Windows 声音设置，如下图 2-4 Windows-Audio-Setting，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
 
@@ -380,7 +380,7 @@ aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 
 图 2-7 Windows-Capture-Listen-2
 
-#### 2.2.2 UAC1 Test on Ubuntu
+#### UAC1 Test on Ubuntu
 
 打开 Ubuntu 声音设置，如下图 2-8 Ubuntu-Audio-Setting-Output 和图 2-9 Ubuntu-Audio-Setting-Input，分别选择 USB-Audio 作为声音输出设备和声音输入设备（麦克风）。
 
@@ -434,9 +434,9 @@ audacity 录音界面如下图 2-10 所示。
 
 图 2-10 Ubuntu-audacity
 
-## 3 UAC2 Usage and Test
+## UAC2 Usage and Test
 
-### 3.1 UAC2 Usage
+### UAC2 Usage
 
 **USB Audio Class 2 standard (2009)**
 
@@ -606,9 +606,9 @@ controlC1  pcmC0D0c   pcmC1D0p   pcmC7D0c   pcmC7D1p
 controlC2  pcmC0D0p   pcmC2D0c   pcmC7D0p   timer
 ```
 
-### 3.2 UAC2 Test
+### UAC2 Test
 
-#### 3.2.1 UAC2 Test on Windows
+#### UAC2 Test on Windows
 
 Windows PC 端的设置请参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
 
@@ -650,15 +650,15 @@ aplay /tmp/test.wav -c 2 -r 48000 -D hw:2,0
 
 执行完上述命令后，PC 端可以使用 Windows 自带的 “Voice Recorder”软件保存录音文件，使用方法参考[2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
 
-#### 3.2.2 UAC2 Test on Ubuntu
+#### UAC2 Test on Ubuntu
 
 Ubuntu PC 端的设置请参考[2.2.2 UAC1 Test on Ubuntu](#2.2.2 UAC1 Test on Ubuntu)
 
 Ubuntu PC 环境下， 3308 端的 UAC2 录音和放音测试命令，请直接参考[3.2.1 UAC2 Test on Windows](#3.2.1 UAC2 Test on Windows)
 
-## 4 UAC1 Legacy Usage and Test
+## UAC1 Legacy Usage and Test
 
-### 4.1 UAC1 Legacy Usage
+### UAC1 Legacy Usage
 
 Rockchip 平台 UAC1 Legacy 驱动兼容 USB Audio Class specification 1.0，但只支持放音功能，并且**需要实际的声卡支持（默认使用 /dev/snd/pcmC0D0p）**。
 
@@ -764,7 +764,7 @@ req_count - ISO OUT endpoint request count 默认设置为 256
 
 UAC1 Legacy 不会在 3308 端创建对应的声卡设备节点。
 
-### 4.2 UAC1 Legacy Test
+### UAC1 Legacy Test
 
 Windows PC 端的放音设置请参考 [2.2.1 UAC1 Test on Windows](#2.2.1 UAC1 Test on Windows)
 
@@ -772,9 +772,9 @@ Ubuntu PC 端的放音设置请参考 [2.2.2 UAC1 Test on Ubuntu](#2.2.2 UAC1 Te
 
 3308 端不需要执行任何命令，连接 USB 到 PC 后，UAC1 Legacy 驱动默认会打开 3308 本地 Card0 声卡播放声音。
 
-## 5 Audio Source Usage and Test
+## Audio Source Usage and Test
 
-### 5.1  Audio Source Usage
+### Audio Source Usage
 
 Rockchip 平台 Audio Source 驱动兼容 USB Audio Class specification 1.0，但只支持录音功能。
 
@@ -892,7 +892,7 @@ controlC0  controlC2  pcmC0D0c   pcmC1D0c   pcmC2D0p   pcmC7D0p   pcmC7D1p
 controlC1  controlC7  pcmC0D0p   pcmC1D0p   pcmC7D0c   pcmC7D1c   timer
 ```
 
-### 5.2  Audio Source Test
+### Audio Source Test
 
 **测试 Audio Source 录音功能：**
 
@@ -920,9 +920,9 @@ aplay /tmp/test.wav -r 44100 -c 2 -D hw:2,0
 
 图 5-3 Windows-USB-Audio-Source-Setting
 
-## 6 UAC1 Legacy and Audio Source Composite Usage and Test
+## UAC1 Legacy and Audio Source Composite Usage and Test
 
-### 6.1 UAC1 Legacy and Audio Source Composite Usage
+### UAC1 Legacy and Audio Source Composite Usage
 
 **UAC1 Legacy +  Audio Source 使用方法如下：**
 
@@ -963,11 +963,11 @@ echo ff400000.usb > /sys/kernel/config/usb_gadget/rockchip/UDC
 
 其他配置和调试方法，请参考 [4.1 UAC1 Legacy Usage](#4.1 UAC1 Legacy Usage) 和 [5.1  Audio Source Usage](#5.1  Audio Source Usage)
 
-### 6.2 UAC1 Legacy and Audio Source Composite Test
+### UAC1 Legacy and Audio Source Composite Test
 
 请参考 [4.2 UAC1 Legacy Test](#4.2 UAC1 Legacy Test) 和 [5.2  Audio Source Test](#5.2  Audio Source Test)
 
-## 7 Composite with ADB
+## Composite with ADB
 
 当 UAC1 和 ADB 一起使用时，UAC1 必须放在前面。否则，可能会导致在 Windows 系统上，UAC 设备驱动无法识别的问题。
 
@@ -979,7 +979,7 @@ ln -s /sys/kernel/config/usb_gadget/rockchip/functions/uac1.gs0 /sys/kernel/conf
 ln -s /sys/kernel/config/usb_gadget/rockchip/functions/ffs.adb /sys/kernel/config/usb_gadget/rockchip/configs/b.1/ffs.adb
 ```
 
-## 8 Reference Documentation
+## Reference Documentation
 
 **USB Protocol (from USB Implementers Forum)**
 
@@ -1002,7 +1002,7 @@ ln -s /sys/kernel/config/usb_gadget/rockchip/functions/ffs.adb /sys/kernel/confi
 - [The Well-Tempered Computer (An introduction to computer audio) - USB](http://www.thewelltemperedcomputer.com/KB/USB.html)
 - [Windows USB Audio 2.0 Drivers](https://docs.microsoft.com/en-us/windows-hardware/drivers/audio/usb-2-0-audio-drivers)
 
-## 9 Appendix A UAC1 Device Descriptor
+## Appendix A UAC1 Device Descriptor
 
 ```
 Device Descriptor:
@@ -1220,7 +1220,7 @@ Device Status:     0x0000
   (Bus Powered)
 ```
 
-## 10 Appendix B UAC2 Device Descriptor
+## Appendix B UAC2 Device Descriptor
 
 ```
 Device Descriptor:

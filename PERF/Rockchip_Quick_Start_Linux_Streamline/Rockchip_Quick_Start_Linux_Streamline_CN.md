@@ -40,11 +40,11 @@
 
 ***
 
-## 1. 介绍
+## 介绍
 
    Streamline 是 DS5 提供的一个性能分析工具，通过抓取 cpu 和 gpu 的内部硬件计数器和 Kernel 的一些软件 tracepoint 来实现性能分析，功能比较强大。
 
-## 2. 抓取数据
+## 抓取数据
 
 - 准备工具
 
@@ -83,7 +83,7 @@
 
   计数器选好以后，可以点击<img src="./button_start.jpg"></img>开启抓取，结束时点击<img src="./button_stop.jpg"></img>按钮，这时候会自动跳转到分析界面。
 
-## 3. 分析结果
+## 分析结果
 
 Streamline 相对于传统的 profile 工具的优势在于：丰富的硬件计数器支持，可以很方便的看到 cache，bus 和 gpu 内部状态。
 

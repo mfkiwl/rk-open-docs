@@ -80,7 +80,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 Wi-Fi配置说明
+## Wi-Fi配置说明
 
 ``` c
 Components Config  --->
@@ -93,7 +93,7 @@ Components Config  --->
 
 以上配置3者只能选其一
 
-## 2 Wi-Fi相关命令
+## Wi-Fi相关命令
 
 | 命令               | 命令格式                             | 描述                                                         |
 | ------------------ | ------------------------------------ | ------------------------------------------------------------ |
@@ -110,15 +110,15 @@ Components Config  --->
 | 查看网络信息       | ip.config                            |                                                              |
 | ping 命令          | ip.ping -n 5 192.168.1.1             | -n 次数，默认4次   ip地址默认，192.168.1.1                   |
 
-## 3 API使用说明
+## API使用说明
 
 在使用WiFi相关的API时，需要包含wifithread.h 和 wifi_api_internal.h，该文件在src\components\wireless\rk2206\api中。
 
 WICE相关的头文件在 src\components\wireless\wice中。
 
-### 3.1 启动Wi-Fi
+### 启动Wi-Fi
 
-#### 3.1.1 RKTaskCreate
+#### RKTaskCreate
 
 功能：创建静态任务
 
@@ -146,9 +146,9 @@ RKTaskCreate(TASK_ID_WIFI_APPLICATION, 0, (void *)WLAN_MODE_AP, SYNC_MODE);
 
 RKTaskCreate(TASK_ID_WIFI_APPLICATION, 0, (void *)WLAN_MODE_MP, SYNC_MODE);
 
-### 3.2 删除Wi-Fi
+### 删除Wi-Fi
 
-#### 3.2.1 RKTaskDelete
+#### RKTaskDelete
 
 **功能：删除静态任务**
 
@@ -161,7 +161,7 @@ RKTaskCreate(TASK_ID_WIFI_APPLICATION, 0, (void *)WLAN_MODE_MP, SYNC_MODE);
 | Mode          | uint32   | typedef  unsigned long  uint32   删除模式：   SYNC_MODE 同步托管模式   ASYNC_MODE 异步托管模式   DIRECT_MODE 非托管模式 |
 | return        | rk_err_t | RK_SUCCESS:删除成功，RK_ERROR：删除失败                      |
 
-#### 3.2.2 rk_wifi_deinit
+#### rk_wifi_deinit
 
 **功能：反初始化Wi-Fi模块**
 
@@ -177,9 +177,9 @@ rk_wifi_deinit();
 
 RKTaskDelete(TASK_ID_WIFI_APPLICATION,0,SYNC_MODE);
 
-### 3.3 启动AirKiss
+### 启动AirKiss
 
-#### 3.3.1 rk_wifi_smartconfig
+#### rk_wifi_smartconfig
 
 **功能：启动AirKiss配网**
 
@@ -189,9 +189,9 @@ RKTaskDelete(TASK_ID_WIFI_APPLICATION,0,SYNC_MODE);
 | ------------- | -------- | --------------------------------------- |
 | return        | rk_err_t | RK_SUCCESS 启动成功，RK_ERROR：启动失败 |
 
-### 3.4 停止AirKiss
+### 停止AirKiss
 
-#### 3.4.1 rk_easy_smartconfig_stop
+#### rk_easy_smartconfig_stop
 
 **功能：停止AirKiss配网**
 
@@ -201,9 +201,9 @@ RKTaskDelete(TASK_ID_WIFI_APPLICATION,0,SYNC_MODE);
 | ------------- | -------- | --------------------------------------- |
 | return        | rk_err_t | RK_SUCCESS 停止成功，RK_ERROR: 停止失败 |
 
-### 3.5 检测AirKiss是否配置成功
+### 检测AirKiss是否配置成功
 
-#### 3.5.1 wifi_easy_setup_flag
+#### wifi_easy_setup_flag
 
 **功能：检查AirKiss是否配置成功**
 
@@ -213,9 +213,9 @@ RKTaskDelete(TASK_ID_WIFI_APPLICATION,0,SYNC_MODE);
 | ------------- | -------- | ------------------------------------------------------------ |
 | return        | int      | WIFI_TRUE：配置成功 ，WIFI_WAIT: 等待配置，WIFI_WAIT：配置失败 |
 
-### 3.6 设置路由器
+### 设置路由器
 
-#### 3.6.1 rk_wifi_usartconfig
+#### rk_wifi_usartconfig
 
 **功能：设置路由器信息**
 
@@ -235,9 +235,9 @@ Wi-Fi连接不成功，1分钟之后才可以重新连接。
 
 shell命令对特殊字符串的支持不好，测试此函数，请使用AirKiss。
 
-### 3.7 扫描路由器
+### 扫描路由器
 
-#### 3.7.1 wifi_start_scan_internal
+#### wifi_start_scan_internal
 
 **功能：设置路由器信息**
 
@@ -253,7 +253,7 @@ shell命令对特殊字符串的支持不好，测试此函数，请使用AirKis
 
 调用这个函数需要先调用 wifi_switch_overlay_status(WIFI_OVERLAY_SCAN);来加载SCAN驱动。
 
-#### 3.7.2 扫描结果相关结构体
+#### 扫描结果相关结构体
 
 ```c
 typedef struct rkwifi_scan_result
@@ -286,9 +286,9 @@ rkwifi_scan_result_t结构体说明
 | on_channel      | rkwifi_bool_t              | 保留， 应用不关注        |
 | next            | struct rkwifi_scan_result* | 保留， 应用不关注        |
 
-### 3.8 检查路由器是否连上
+### 检查路由器是否连上
 
-#### 3.8.1 MainTask_GetStatus
+#### MainTask_GetStatus
 
 **功能：获取某个状态信息**
 

@@ -75,7 +75,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 Rockchip UART功能特点
+## Rockchip UART功能特点
 
 UART（Universal Asynchronous Receiver/Transmitter）
 
@@ -85,9 +85,9 @@ UART（Universal Asynchronous Receiver/Transmitter）
 * 支持中断传输模式和DMA传输模式。
 * 最高支持4M波特率。
 
-## 2 软件开发
+## 软件开发
 
-### 2.1 代码路径
+### 代码路径
 
 串口驱动：
 
@@ -104,7 +104,7 @@ src/bsp/hal/lib/hal/inc/hal_uart.h
 src/subsys/shell/shell_uart.c
 ```
 
-### 2.2 串口配置
+### 串口配置
 
 在板级配置iomux.c中，可以查看所有UART设备的iomux配置。在板级配置board.c中，可以通过`UartDevHwInit(uint32 DevID, uint32 Channel)`函数配置UART设备，可以通过`DebugInit(void)`函数配置UART Console设备。
 
@@ -120,7 +120,7 @@ BSP Driver --->
 
 可以使用command shell命令`dev.list`可以查看已经生成的UART设备。
 
-### 2.3 串口测试
+### 串口测试
 
 使能串口测试程序：
 
@@ -148,11 +148,11 @@ Example: uart_test r uart1 115200 1 0
 
 可以使用command shell命令`io`读写UART设备寄存器值，检查是否符合预期。UART设备寄存器相关内容请参考数据手册。
 
-### 2.4 波特率支持
+### 波特率支持
 
 1.5M以下的波特率都可以支持，1.5M以上的波特率需要实际测试是否支持，因为这跟CLK时钟树有关。RK2206能稳定支持的最高波特率为4M。
 
-### 2.5 console配置
+### console配置
 
 在menuconfig下，可以配置需要使用作为console的uart设备。
 

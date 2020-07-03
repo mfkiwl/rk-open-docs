@@ -74,14 +74,14 @@ Fuzhou Rockchip Electronics Co., Ltd.
 ---
 [TOC]
 ---
-## 1 PWM 总线接口用途
+## PWM 总线接口用途
 
 脉宽调制（PWM，Pulse Width Modulation）功能在嵌入式系统中是非常常见的，它是利用微处理器的数字输出来对模拟电路进行控制的一种非常有效的技术，广泛应用在从测量、通信到功率控制与变换的许多领域中。
 Rockchip PWM 支持三种模式: Continuous mode、One-shot mode 和 Capture mode,另外一个 PWM 控制器有 4 通道 built-in。
 
-## 2 PWM 配置
+## PWM 配置
 
-### 2.1 munuconfig 配置
+### munuconfig 配置
 
 在 menuconfig 里面将控制器的驱动勾选 DRIVER_PWM，并同时根据当前的硬件情况，勾选所使用的 PWM 控制器, 可多选。
 
@@ -106,7 +106,7 @@ Rockchip PWM 支持三种模式: Continuous mode、One-shot mode 和 Capture mod
             [*] Enable PWM Shell
 ```
 
-### 2.2 板级文件配置
+### 板级文件配置
 
 板级配置，请修改对应工程的 board.c 文件里的 PwmDevHwInit() 函数，主要就是 iomux 配置配置，需要注意的是一个 PWM channel 可能有几种 iomux 选择(m0, m1...)， 根据实际硬件原理图选择正确的配置。
 
@@ -130,15 +130,15 @@ void PwmDevHwInit(uint32 DevID)
 
 这里我们用 pwm0~pwm3 pin 对应着第一个 PWM 控制器的四个通道的四个 pin 脚，pwm4~pwm7 表示第二个，以此类推。
 
-## 3 代码和 API 使用
+## 代码和 API 使用
 
-### 3.1 代码位置
+### 代码位置
 
 - 控制器驱动层代码 ./src/driver/pwm/PwmDevice.c
 - 控制器 HAL 层代码 ./src/bsp/hal/lib/hal/src/hal_pwm.c
 - PWM shell 测试代码 ./src/subsys/shell/shell_pwm.c
 
-### 3.2 PWM API 接口
+### PWM API 接口
 
 ```c
 extern rk_err_t PwmDev_Control(HDC dev, RK_PWM_CMD cmd, void *arg);
@@ -150,9 +150,9 @@ extern void PwmDevHwInit(uint32 DevID);
 extern void PwmDevHwDeInit(uint32 DevID);
 ```
 
-### 3.3  API 接口使用
+### API 接口使用
 
-#### 3.3.1 创建 PWM 实例
+#### 创建 PWM 实例
 
 使用 PwmDev_Create() 创建，rkdev_open()得到 PWM device，在这个动作之前可以先 find，如果已经创建了，可以直接使用，例如:
 
@@ -170,7 +170,7 @@ extern void PwmDevHwDeInit(uint32 DevID);
     }
 ```
 
-#### 3.3.2 PWM Configurate
+#### PWM Configurate
 
 调用 PwmDev_Control() 配置 PWM 的占空比，周期和极性。
 Continous mode 配置
@@ -209,7 +209,7 @@ PwmDev_Control(g_pwm_dev, RK_PWM_CMD_SET_ONESHOT, &oneshot_config);
 
 原则上先配置 PWM，再使能。
 
-#### 3.3.3 PWM 开关
+#### PWM 开关
 
 Enable:
 
@@ -227,9 +227,9 @@ Disable:
 PwmDev_Control(g_pwm_dev, RK_PWM_CMD_DISABLE, channel);
 ```
 
-## 4 SHELL 测试与输出
+## SHELL 测试与输出
 
-### 4 .1 PWM continous mode 测试
+### PWM continous mode 测试
 
 配置命令依次输入 pwm 设备号，pwm  channel number，period ns，duty ns, 极限(1 为负极性，0为正极性)。以下例子为测试pwm1控制器第3通道，频率10K，占空比 50%，极性负极性。
 先配置
@@ -244,7 +244,7 @@ RK2206>pwm_test set pwm1 3 100000 50000 1
 RK2206>pwm_test enable pwm1 3 0
 ```
 
-### 4 .2 PWM oneshot mode 测试
+### PWM oneshot mode 测试
 
 配置命令依次输入 pwm 设备号，pwm  channel number，period ns，duty ns，极限(1 为负极性，0为正极性)，count。以下例子为测试 pwm0 控制器第0通道，频率100K，占空比 20%，极性正极性，count 为10(输出10+1个波形)。
 先配置

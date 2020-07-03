@@ -72,15 +72,15 @@ ROCKCHIP I2C 在不同芯片，不同内核版本上的驱动不一样，I2C 可
 
 I2C 的流程在两个驱动上大致是一样，写是单纯的 TX 模式 (I2C_CON[1:0]=2’b00)，而读一般使用 TRX 模式(I2C_CON[1:0]=2’b01)。下面的 I2C 控制器操作流程图是描述软件如何通过这个 I2C 控制器寄存器来配置和执行 I2C 任务。描述分为 3 部分,传输模式，混合模式和接收模式。
 
-### 1. Trasmint only mode(I2C_CON[1:0]=2’b00)
+### Trasmint only mode(I2C_CON[1:0]=2’b00)
 
 ![3](Rockchip_Developer_Guide_Linux_I2C/3.Trasmint only mode.png)
 
-### 2. Mix mode (I2C_CON[1:0]=2’b01 or I2C_CON[1:0]=2’b11)
+### Mix mode (I2C_CON[1:0]=2’b01 or I2C_CON[1:0]=2’b11)
 
 ![4](Rockchip_Developer_Guide_Linux_I2C/4.Mix mode.png)
 
-### 3. Receive only mode (I2C_CON[1:0]=2’b10)
+### Receive only mode (I2C_CON[1:0]=2’b10)
 
 ![5](Rockchip_Developer_Guide_Linux_I2C/5.Receive only mode.png)
 
@@ -98,7 +98,7 @@ I2C 的参数配置最主要就是 I2C 频率的配置，可配 I2C frequency �
 
 I2C 的驱动 i2c-rk3x.c 与 i2c-rockchip.c 两个配置方式是不一样的，区别如下：
 
-### 1. i2c-rk3x.c 配置
+### i2c-rk3x.c 配置
 
 i2c-rk3x.c 驱动的配置都在 DTS，参考文件 Documentation/devicetree/bindings/i2c/i2c-rk3x.txt。重点说明其中配置项，i2c-scl-rising-time-ns，i2c-scl-falling-time-ns：
 
@@ -125,7 +125,7 @@ i2c-rk3x.c 驱动的配置都在 DTS，参考文件 Documentation/devicetree/bin
 };
 ```
 
-### 2. i2c-rockchip.c 配置
+### i2c-rockchip.c 配置
 
 i2c-rockchip.c 驱动仍然遵循 I2C frequency 与 SCL 上升沿的约束关系，能否用更高的频率取决于 i2c-scl-rising-time-ns；I2C 频率在代码上面配置，直接配置 i2c_msg 结构体上的 scl_rate 成员， 默认 frequency 仍为 100k，例如下面的 200K 配置配置：
 
@@ -143,11 +143,11 @@ i2c-rockchip.c 驱动仍然遵循 I2C frequency 与 SCL 上升沿的约束关系
 
 对于 I2C 的使用说明在 Documentation/i2c/ 有比较详细的，查阅，下面重点提下读写部分：
 
-### 1. Kernel space
+### Kernel space
 
 Rockchip I2C 的读写通信都是使用的是 linux 的标准接口，请参考 kernel 下面的 Documentation/i2c/writing-clients 文档说明，里面的 Sending and receiving 部分有系统的介绍。
 
-### 2. User space
+### User space
 
 通常, I2C 设备由内核驱动程序控制。但也可以从用户态访问总线上的所有设备，通过 “/dev/i2c-%d” 接口来访问，kernel 下面的 Documentation/i2c/dev-interface 文档有详细说明与示例。
 
@@ -206,7 +206,7 @@ Documentation/devicetree/bindings/i2c/i2c-gpio.txt
 
 因为我们有两个 i2c 驱动，所以仍然分两部分：
 
-### 1. i2c-rk3x.c 驱动
+### i2c-rk3x.c 驱动
 
 如果调用 I2C 传输接口返回值为 -6(-ENXIO)时候，表示为 NACK 错误，即对方设备无应答响应，这种情况一般为外设的问题，常见的有以下几种情况：
 
@@ -232,7 +232,7 @@ Documentation/devicetree/bindings/i2c/i2c-gpio.txt
 
 常见的情况是 sda 被拉低，证明是谁拉低的，同样参考上面 “SCL 被拉低" 的方法两种。
 
-### 2. i2c-rockchip.c 驱动
+### i2c-rockchip.c 驱动
 
 如果调用 I2C 传输接口返回值为 -11(-EAGAIN )时候，表示为 NACK 错误，即对方设备无应答响应，这种情况一般为外设的问题，常见的有以下几种情况：
 
@@ -264,6 +264,6 @@ Documentation/devicetree/bindings/i2c/i2c-gpio.txt
 - “state=2” 表示 SCL 为低；
 - “state=3” 表示 SCL 和 SDA 都为低。
 
-### 3. Debug 之 I2C 波形
+### Debug 之 I2C 波形
 
 如果遇到的 I2C 问题以上情况都不是，最好的办法是抓取 I2C  出错时候的波形，通过波形来分析 I2C 问题，I2C 的波形非常有用，大部分的问题都能分析出来；可以在出错的地方让 cpu 卡住（比如 while(1) 等），不发起新的 I2C 任务，最后抓到的波形应该就是出错的波形，如果需要过滤还可以加入设备 I2C 地址的判断条件等。

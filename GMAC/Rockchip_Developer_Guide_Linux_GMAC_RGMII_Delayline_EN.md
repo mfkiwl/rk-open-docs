@@ -71,11 +71,11 @@ Software development engineers
 
 ---
 
-## 1 How To Get RGMII Delayline
+## How To Get RGMII Delayline
 
 If your project features a Gigabit Ethernet and uses the RGMII interface, as long as there is a hardware difference, you need to reset the delayline configuration. Because if the configured delayline value does not match the hardware of your project, it will affect your Gigabit Ethernet performance and even normal network functions.
 
-### 1.1 Checking Code
+### Checking Code
 
 The implementation code is all in the file `drivers/net/ethernet/stmicro/stmmac/dwmac-rk-tool.c`, so it is also more convenient to transplant. If your project does not have this part of the code, please request a patch on Redmine, which has kernel-4.4 and kernel-3.10 versions, the others after kernel-4.4 should have supported it.
 
@@ -84,17 +84,17 @@ The implementation code is all in the file `drivers/net/ethernet/stmicro/stmmac/
 
 - Kernel-3.10 patch: Rockchip_RGMII_Delayline_Kernel3.10.tar.gz
 
-### 1.2 Checking Node
+### Checking Node
 
 After the code in the previous step is confirmed and compiled, it will generate several sysfs nodes. If it is not generated, it means there is a problem with the patch. Taking RK3399 as an example, you can see these nodes in the directory `/sys/devices/platform/fe300000.ethernet` :
 
 ![1](Rockchip_Developer_Guide_Linux_GMAC_RGMII_Delayline/1.Ethernet RGMII Delayline Node.png)
 
-### 1.3 Usage
+### Usage
 
 Note that if you are using `RTL8211E phy`, you need to remove the network cable before testing.
 
-#### 1.3.1 Scanning Delayline Window
+#### Scanning Delayline Window
 
 Scanning through the `phy_lb_scan` node will get an window, then get the coordinates in the center of this window, which needs to be scanned with a Gigabit speed of 1000.
 
@@ -112,7 +112,7 @@ And the center point of coordinate will be printed after the scanning window:
 
 The hardware signal of the RK3399 board tested in this picture is not very good, so the window is not very large. Similarly, RGMII 100M can also get a window. `Echo 100 > phy_lb_scan` can see that the 100M window is very large, occupying almost all the coordinates, because 100M is not as demanding as Gigabit on the signal.
 
-#### 1.3.2 Testing Scanned Result
+#### Testing Scanned Result
 
 Secondly, configure the scanned value to the `rgmii_delayline` node through the command, and then test whether the TX/RX data transmission under this configuration is normal through the `phy_lb` node test, at least this test needs pass first.
 
@@ -144,7 +144,7 @@ After testing pass, fill the delayline into dts respectively: `tx_delay = <0x2e>
 };
 ```
 
-#### 1.3.3 Auto Scanning
+#### Auto Scanning
 
 If a set of delayline values cannot be adapted to all hardware, the reason may be poor hardware and a small window with poor redundancy; you can turn on the automatic  function scanning and open `CONFIG_DWMAC_RK_AUTO_DELAYLINE` on menuconfig. It should be noted here that if the problem of the small window is not resolved, opening this macro will not completely solve the problem. Generally speaking, it is not necessary to open this macro.
 
@@ -169,9 +169,9 @@ Log printing for subsequent boot:
 [   23.092358] damac rk read rgmii dl from vendor tx: 0x2f, rx: 0x10
 ```
 
-## 2 Hareware Checking
+## Hareware Checking
 
-### 2.1 Check reference draw
+### Check reference draw
 
 Please check the hardware on Redmine window with Rockchip FAE whether you are using the latest released reference drawings; for example, our reference drawings have changed the default RTL8211E PHY to RTL8211F, because RTL8211E has the following problems:
 
@@ -182,7 +182,7 @@ Please check the hardware on Redmine window with Rockchip FAE whether you are us
 The latest reference drawings also include modifications if 3.3V IO is used, IO needs to be divided and etc.
 If TX_CLK bypass from MAC_CLK, the voltage divider is to reserve the ground resistance at MAC_CLK where closed to the main control direction to avoid the long wiring, which leads to the duty cycle of the receiving end of the Rockchip platform of 125M sent by the PHY has exceeded the specification or the edge is too slow and the TX_CLK signal output by the bypass is not good enough. And after leaving the ground resistance, regulating the amplitude of MAC_CLK through voltage division can change the signal quality of TX_CLK.
 
-### 2.2 Test RGMII Timing Specifics
+### Test RGMII Timing Specifics
 
 According to the latest RGMII protocol, you need to meet the following timing requirements. Please test your board for compliance. If you know nothing about test or do not have an oscilloscope to test, please make a request on Redmine.
 
@@ -190,21 +190,21 @@ According to the latest RGMII protocol, you need to meet the following timing re
 
 For example, to confirm the signal quality of CLK at Gigabit, you should measure the waveforms of the signals at where close to the receiving end (do not measure at the sending end, the signal reflection at the sending end is serious, and the waveform cannot reflect the actual signal quality). Measuring the signal MAC_CLK, TX_CLK, RX_CLK, you should focus on duty cycle, amplitude, and rise and fall time, the bandwidth of the measuring oscilloscope and probe must be more than 5 times of 125M. For single-ended probes, the ground loop should be as short as possible. It is best to use a differential probe to control the duty cycle at 45 % ~ 55%. When the test environment is normal, the signal measured should be a square wave instead of a sine wave. Generally, the customer self-test is a positive sine wave with a 50% duty cycle, which is basically incorrect.
 
-#### 2.2.1 RX_CLK/MAC_CLK
+#### RX_CLK/MAC_CLK
 
 MAC_CLK or RXCLK is provided by PHY. If the integrity of the received CLK measurement signal have defects, there is generally no register to regulate on the PHY side, it may only be adjusted by hardware. You can string high-frequency inductance at the transmitting end to improve the edge too slow （the bandwidth is only available if it meets the requirement so here cannot use ordinary inductance), and regulate the duty ratio and reduce the amplitude by modify voltage by resistance at the transmitting end.
 
-#### 2.2.2 TX_CLK
+#### TX_CLK
 
 If there is a problem with TX_CLK, the edge is too slow, you can read the corresponding register through IO to check if the IO drive strength has been adjusted to the maximum, you can connect it with an oscilloscope; at the same time, directly regulate the drive strength through the IO command to observe the waveform change. If the improvement is not obvious by regulating driver, you can try for the string high-frequency inductance, or change and increase the series 22ohm resistor; if the duty cycle is not within the specification and TX_CLK bypass from MAC_CLK, you can adjust the TX_CLK duty cycle by dividing the MAC_CLK amplitude, the divided value is 100 ohm, the ground resistance value varies with the layout, different board have different value, you can regulate up from 100, until the oscilloscope observes that the duty cycle meets the requirements. If the above methods are not significant, and the IO currently used is 3.3V, in the case that both the PHY and RK platform support 1.8V IO, you can change the IO power to 1.8V and then observe the signal integrity because 1.8V IO signal indicator stronger than 3.3V, 1.8V IO is recommended.
 
-## 3 FAQ
+## FAQ
 
-### 3.1 Scanning Window size
+### Scanning Window size
 
 We hope that the larger the window, the better, indicating that the hardware signal is good and the redundancy is large. If the window cannot be scanned or the window scanned is too small, there are generally hardware problems, please refer to the hardware section.
 
-### 3.2 PHY Selection
+### PHY Selection
 
 There are no special requirements for the selection of PHY, as long as it conforms to RGMII. However, there are two points to note:
 

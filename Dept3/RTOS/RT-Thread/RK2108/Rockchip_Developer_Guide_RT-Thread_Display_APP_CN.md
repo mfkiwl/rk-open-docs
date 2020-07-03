@@ -76,11 +76,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 clock_demo显示用例
+## clock_demo显示用例
 
 clock_demo显示用例是在RK2108B_EVB + ST7703_DS(720x1280) Pannel硬件环境下，运行一个时钟界面的显示参考用例。
 
-### 1.1 代码路径
+### 代码路径
 
 ```shell
 .
@@ -88,7 +88,7 @@ clock_demo显示用例是在RK2108B_EVB + ST7703_DS(720x1280) Pannel硬件环境
     └── clock_demo
 ```
 
-### 1.2 编译配置
+### 编译配置
 
 进入工程目录，执行menuconfig命令，开始进行该用例的编译配置：
 
@@ -192,11 +192,11 @@ Location:
 
 ![1-2-10-720_1280_clock_demo_app_config.png](Rockchip_Developer_Guide_RT-Thread_Display_APP/1-2-10-720_1280_clock_demo_app_config.png)
 
-## 2 RK_IoT_Display显示用例
+## RK_IoT_Display显示用例
 
 rk_iot_display显示用例是在RK2108_EVB + CTC_2.8'(240x320) Pannel硬件环境下，针对iot应用场景，运行一个AI对讲显示界面。
 
-### 2.1 代码路径
+### 代码路径
 
 ```shell
 .
@@ -283,9 +283,9 @@ Location:
 
 ![2-2-7-240_320_iot_diaplay_app_config.png](Rockchip_Developer_Guide_RT-Thread_Display_APP/2-2-7-240_320_iot_diaplay_app_config.png)
 
-## 3 固件编译与下载
+## 固件编译与下载
 
-### 3.1 编译
+### 编译
 
 配置完成之后，在工程目录下执行以下命令，完成编译与打包过程：
 
@@ -301,13 +301,13 @@ usr@host:~/rt-thread/bsp/rockchip/rk2108$ ./build.sh
     └── rk2108_db_loader.bin
 ```
 
-### 3.2 固件下载
+### 固件下载
 
 1）Windows下固件下载
 
 Windows下使用Rockchip AndroidTool_Release_vx.xx固件下载工具进行下载：
 ![1-2-11-720_1280_clock_demo_firmware_upgrade.png](Rockchip_Developer_Guide_RT-Thread_Display_APP/1-2-11-720_1280_clock_demo_firmware_upgrade.png)
 
-## 4 参考文档
+## 参考文档
 
 1. [LittlevGL GUI 参考文献](https://littlevgl.com/)

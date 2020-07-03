@@ -64,9 +64,9 @@ Software development engineers
 [TOC]
 ---
 
-## 1. Introduction to RMSL Module Interface
+## Introduction to RMSL Module Interface
 
-### 1.1 Overview
+### Overview
 
 Rockchip RMSL module is an USB plug and play device, there are three outputs at the same time: Depth, RGB and IR. Depth outputs YUYV data, RGB and IR output MJPG data.
 
@@ -76,7 +76,7 @@ Rockchip RMSL module is an USB plug and play device, there are three outputs at 
 | RGB       | 1920x1080        | MJPG      | 30fps    | Output RGB image, which can be decoded to NV12 format |
 | IR        | 640x480          | MJPG      | 15fps    | Output Infrared image, which can be decoded to NV12 format |
 
-### 1.2 RMSL Module
+### RMSL Module
 
 The model number of RK RMSL can be obtained from SN number. The currently supported RK structured light models are as follows:
 
@@ -84,7 +84,7 @@ The model number of RK RMSL can be obtained from SN number. The currently suppor
 | :----------: | :---------------: | :-----------: |
 | RMSL201-1301 | R2011301xxxxxxxxx |      USB      |
 
-### 1.3 Configurations in Buildroot
+### Configurations in Buildroot
 
 In the Buildroot Linux SDK, the development interfaces and reference demos are located in the app/demo/rmsl directory. The default SDK release version will not build the program. You have to enable the Buildroot configuration BR2_PACKAGE_APP_DEMO_RMSL to enable building. The following application packages that this program depends on should be enabled too:
 
@@ -98,7 +98,7 @@ In the Buildroot Linux SDK, the development interfaces and reference demos are l
 - If there is no macro switch or rmsl demo code, please update to the latest SDK or obtain it from the [github repository](https://github.com/rockchip-linux/demo).
 - external/camera_engine_rkisp/ should be updated to `86dc5bf1 apps: rkisp_api: add usb camera supports`. If the SDK is not updated to the latest version, it can be obtained through the [github repository](https://github.com/rockchip-linux/camera_engine_rkisp).
 
-### 1.4 Build and Run
+### Build and Run
 
 Enter the SDK directory, build the modules with the following command:
 
@@ -241,7 +241,7 @@ In the above three examples, the data stream size is 640 * 480 by default, but t
     -rawvideo w=640:h=480:size=$((640*480*2)):format=rgb16
 ```
 
-## 2 Demo Code Introduction
+## Demo Code Introduction
 
 The source code is located in the app/demo/rmsl/ directory, which contains RMSL settings, querying interface, getting data stream and decoding and display functions.
 
@@ -260,7 +260,7 @@ app/demo/rmsl/
 └── vpu_decode.h
 ```
 
-### 2.1 RMSL Control Interface
+### RMSL Control Interface
 
 **Get the version:**
 
@@ -369,13 +369,13 @@ Return values:
 - A negative means error
 - A positive 0 means that the original frame data of the module is already a depth image and no calculation is required. (No such case currently)
 
-### 2.2 Get Data Stream
+### Get Data Stream
 
 The rkisp_api.so is used to get data stream in the rmsl_linux_demo. Compared with the common USB Camera module, one more initialization operation is required.
 
 For more details about rkisp_api.so interface, please refer to "Rockchip_Developer_Guide_Linux_Camera_EN.pdf".
 
-### 2.3 Decoding
+### Decoding
 
 The Rockchip MPP library is used to decode MJPG in this demo. Which will send the data stream got from rkisp_api to MPP for decoding. Because the decoded buffer may be resized/copied by RGA and then display on screen, this demo allocate buffer from RGA as decoded buffer.
 
@@ -395,7 +395,7 @@ Note:
 - rga_bo_fd, is RGA buffer handle
 - rga_bo.ptr, is virtual address of RGA buffer
 
-### 2.4 Display
+### Display
 
 In order to process the data stream as efficiently as possible and take the characteristics of different Rockchip chips into account, the display of rmsl_linux_demo directly uses the libdrm  interface, and the three images are copied to the specific offset of the target buffer through RGA, and finally sent to the overlay Plane of Rockchip VOP.
 
@@ -426,7 +426,7 @@ Although there is an additional step of RGA transcoding and copying, the RGA har
 - If multiple overlay layers are available, NV12 format can be displayed in a separate plane directly. A total of three overlay layers are required, two for RGB and infrared NV12 frame display, and the other for depth image display. In this way, RGA transcoding and/or copying steps can be skipped. RGB Camera can also reach a frame rate of 30fps.
 - Multithreading can improve concurrency, especially when needing to process point cloud images, which involving floating-point operations.
 
-#### 2.4.1 Integration with QT application
+#### Integration with QT application
 
 If you need QT applications to draw UI components such as menus and buttons, a video area can be reserved on main UI for video overlay plane.
 
@@ -434,8 +434,8 @@ If you need QT applications to draw UI components such as menus and buttons, a v
 
 The above is just to provide a kind of idea, please make your own design as need.
 
-## 3 FAQs
+## FAQs
 
-### 3.1 Device Disconnected after Opening Camera
+### Device Disconnected after Opening Camera
 
 The reason is that the power supply is insufficient. Please connect to the USB hub of an external power supply.

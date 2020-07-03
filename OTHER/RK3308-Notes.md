@@ -127,7 +127,7 @@ RK3308B-EVB-V10要通过板子右边预留过孔飞线，使用的时候要请�
 
 ## 开发过程中遇到的问题
 
-### 1、CPU Qos 优先级过高导致EMMC 读写超时
+### 、CPU Qos 优先级过高导致EMMC 读写超时
 
 **现象**：
 
@@ -208,7 +208,7 @@ while true; do stressapptest -f /data/1 -f /data/2 -f /data/3 -f /data/4; done
 
 查阅TRM发现，RK3308 默认CPU Qos优先级位2，一般普通外设优先级位1、比CPU低。在DDR初始化阶段把CPU Qos优先级设置为1，其他外设Qos 优先级设置为2、问题解决。
 
-### 2、eMMC/SDIO控制器状态机信号采样点不同导致Tuning异常
+### 、eMMC/SDIO控制器状态机信号采样点不同导致Tuning异常
 
 **现象：**
 
@@ -372,7 +372,7 @@ drivers/mmc/host/dw_mmc.c
 include/linux/mmc/dw_mmc.h
 ```
 
-### 3、Soft Reset方案选择
+### 、Soft Reset方案选择
 
 Glb_srstn_1 resets almost all logic
 
@@ -382,13 +382,13 @@ Glb_srstn_2 resets almost all logic except GRF and GPIOs
 
 RK3308B做了改进，在Glb_srstn_1的情况下，提供了GRF_SOC_CON14可以独立控制在reset的时候不reset GPIO和PWM。所以RK3308B使用Glb_srstn_1.
 
-### 4、VCCIO3 电源域控制
+### 、VCCIO3 电源域控制
 
 电源域VCCIO3控制着eMMC/NAND FLASH/SFC的工作电压、根据外部颗粒的不同，有的工作电压为3.3V、有的为1.8V。系统上电，默认情况下，这几个控制器通过采集GPIO0_A4的电压来判断供电模式，GPIO0_A4这时候处于输入模式，高电平标示该电源域位1.8V供电，低电平标示该电源域位3.3V供电。
 
 系统启动，软件可以介入控制后，可以通过配置GRF_SOC_CON0的io_vsel3位来控制VCCIO3的电源域，将GPIO0_A4解放出来，用作其他用途。再配置io_vsel3之前，不能切GPIO0_A4, 否则存储模块工作会异常。
 
-### 5、PWM regulator pin脚在Glb_srstn_2 模式下的下拉设置
+### 、PWM regulator pin脚在Glb_srstn_2 模式下的下拉设置
 
 在低温reboot拷机的过程中，部分机器表现不稳定，在内核随机崩溃。最后发现把调制ARM core电压的pwm pin脚设置为下拉状态，问题解决。
 
@@ -423,7 +423,7 @@ index 5882595bb7dd..c86ac1ce8b37 100644
 
 主要原因是：在硬件设计上，该pwm regulator是负极性的（既低电平时间越长，调制出的电压越高）。在系统采用Second soft reset的时候，pwm控制器会被复位，而且pwm管脚会被复位到输入状态，但是Second soft reset不会复位控制IOMUX的GRF寄存器，即这时候管脚还保持在pwm输入状态，如果不设置为下拉模式，得到的电压会偏低。
 
-### 6、可靠性数据
+### 、可靠性数据
 
 根据其中一个批次的 1000 小时 HTOL 报告， life time 受工作电压和温度影响。 下表是根据公式推算在 Arm core 1.125V 供电下，不同工作温度(芯片节温)的 life time. 指的是24小时不停工作的寿命。
 

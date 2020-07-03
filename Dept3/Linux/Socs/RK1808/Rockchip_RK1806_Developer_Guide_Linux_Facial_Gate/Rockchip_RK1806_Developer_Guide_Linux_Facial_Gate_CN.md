@@ -78,7 +78,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 **SDK** 获取
+## **SDK** 获取
 
 SDK 下载命令如下：
 
@@ -90,7 +90,7 @@ RK1806编译烧写环境的搭建请参考：
 
 docs/SoC platform related/RK1808/Rockchip_RK1808_Linux_SDK_Release_V1.1.0_20190808_CN.pdf
 
-## 2 **配置环境变量**
+## **配置环境变量**
 
 执行./build.sh device/rockchip/rk1806/BoardConfig_ficial_gate.mk
 
@@ -100,9 +100,9 @@ processing option: device/rockchip/rk1806/BoardConfig_ficial_gate.mk
 switching to board: /home/ljh/1806/release_sdk/device/rockchip/rk1806/BoardConfig_ficial_gate.mk
 ```
 
-## 3 **编译固件**
+## **编译固件**
 
-### 3.1 **自动编译所有固件**
+### **自动编译所有固件**
 
 执行./build.sh 编译固件
 
@@ -110,7 +110,7 @@ switching to board: /home/ljh/1806/release_sdk/device/rockchip/rk1806/BoardConfi
 1806/release_sdk$ ./build.sh
 ```
 
-### 3.2 **编译uboot**
+### **编译uboot**
 
 进入工程 uboot 目录下执行 make.sh
 
@@ -118,7 +118,7 @@ switching to board: /home/ljh/1806/release_sdk/device/rockchip/rk1806/BoardConfi
 1806/release_sdk/u-boot$ ./make.sh rk1806
 ```
 
-### 3.3 **编译kernel**
+### **编译kernel**
 
 进入kernel目录执行以下命令自动完成 kernel 的编译及打包：
 
@@ -127,13 +127,13 @@ switching to board: /home/ljh/1806/release_sdk/device/rockchip/rk1806/BoardConfi
 1806/release_sdk/kernel$ make rk1806-ficial-gate-v10.img
 ```
 
-### 3.4 **编译rootfs**
+### **编译rootfs**
 
 ```shell
 ljh@SYS3:~/1806/release_sdk$ ./build.sh rootfs
 ```
 
-## 4  **QFacialGate 应用**
+## **QFacialGate 应用**
 
 SDK中包含了QFacialGate 闸机应用，该应用用QT做UI，通过Rkfacial库调用RK自有算法rockface，实现人脸检测，人脸特征点提取，人脸识别，活体检测。
 
@@ -161,7 +161,7 @@ sdk/external/rkfacial/doc/Rockchip_Instruction_Rkfacial_CN.pdf
 
 注： SDK中包含了RK自研算法rockface，但需要获取授权使用。具体获取授权流程请 联系业务并参考sdk/external/rockface/auth/README.md文档。
 
-## 5 **其它说明**
+## **其它说明**
 
 1:产品化的时候可以修改/etc/fstab文件，以只读模式挂载userdata分区提高开机速度。
 

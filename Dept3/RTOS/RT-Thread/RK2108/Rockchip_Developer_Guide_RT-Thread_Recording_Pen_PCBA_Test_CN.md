@@ -75,9 +75,9 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 基于LITTLEVGL2RTT的录音笔PCBA测试
+## 基于LITTLEVGL2RTT的录音笔PCBA测试
 
-### 1.1 代码路径
+### 代码路径
 
 基于LITTLEVGL2RTT的录音笔 PCBA 测试示例的代码路径为applications/pcba_test。
 
@@ -127,7 +127,7 @@ pcba_test/
 └── wifi_test_page.h
 ```
 
-### 1.2 工程配置
+### 工程配置
 
 使用board/recording_pen_v10/recording_pen_pcba_defconfig作为 PCBA 测试的默认配置。
 
@@ -139,7 +139,7 @@ cp ./board/recording_pen_v10/recording_pen_pcba_defconfig .config
 
 进入 menuconfig 可看到 PCBA 测试相关的具体配置。
 
-#### 1.2.1 LITTLEVGL2RTT配置
+#### LITTLEVGL2RTT配置
 
 开启RT_USING_LITTLEVGL2RTT，并参考如下配置：
 
@@ -154,7 +154,7 @@ cp ./board/recording_pen_v10/recording_pen_pcba_defconfig .config
 
 其中出现的数值请根据实际硬件情况进行设置。
 
-#### 1.2.2 音频配置
+#### 音频配置
 
 开启RT_USING_AUDIO_CARD，关闭RT_USING_VAD，并参考如下配置：
 
@@ -175,11 +175,11 @@ cp ./board/recording_pen_v10/recording_pen_pcba_defconfig .config
 
 或参考Rockchip_Developer_Guide_RT-Thread_Audio_CN.md进行配置。
 
-#### 1.2.3 按键配置
+#### 按键配置
 
 开启RT_USING_KEYCTRL。
 
-#### 1.2.4 屏幕配置
+#### 屏幕配置
 
 开启RT_USING_DISPLAY，并参考如下配置：
 
@@ -194,7 +194,7 @@ cp ./board/recording_pen_v10/recording_pen_pcba_defconfig .config
 
 panel 根据具体硬件设置配置。
 
-#### 1.2.5 WIFI 、BT配置
+#### WIFI 、BT配置
 
 开启cypress 模块的WIFI、 BT配置：
 
@@ -214,7 +214,7 @@ panel 根据具体硬件设置配置。
 	[*]     choose one desired DEMO  --->
 ```
 
-#### 1.2.6 PCBA 应用配置
+#### PCBA 应用配置
 
 ```bash
 > RT-Thread application  --->
@@ -227,9 +227,9 @@ panel 根据具体硬件设置配置。
     [ ] Enable dual-tracking
 ```
 
-## 2 PCBA 测试
+## PCBA 测试
 
-### 2.1 整体框架
+### 整体框架
 
 - 测试入口
 
@@ -290,9 +290,9 @@ panel 根据具体硬件设置配置。
 
   ![result page](Rockchip_Developer_Guide_RT-Thread_Recording_Pen_PCBA_Test_CN/result_page.png)
 
-### 2.2 测试项说明
+### 测试项说明
 
-#### 2.2.1 测试项接口
+#### 测试项接口
 
 在`applications/pcba_test/pcba_display.c`中记录了各个页面的相关函数，其中为空即代表当前页面没有相关函数。
 
@@ -316,49 +316,49 @@ struct lvgl_page_func pcba_page_func[MENU_MAX_PAGE] =
 };
 ```
 
-#### 2.2.2 显示屏测试
+#### 显示屏测试
 
 进入显示屏测试页面后，循环刷新屏的窗体背景色为红、绿、蓝、黑、白、黄，观察是否正常显示，无异常噪点、黑点。
 
-#### 2.2.3 按键测试
+#### 按键测试
 
 进入按键测试页面后，窗体中根据硬件设置按键个数，显示6个按键按钮，按下对应功能按键后，窗体中对应按键按钮显示绿色背景。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.4 录音测试
+#### 录音测试
 
 进入录音测试页面，按下 FUN_1 按键开始录音，录音文件保存在/sdcard/pcba_test/目录下。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.5 放音测试
+#### 放音测试
 
 进入放音测试页面，按下播放按键 FUN_5 开始播放/sdcard/pcba_test/中保存的录音文件。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.6 eMMC测试
+#### eMMC测试
 
 进入eMMC测试页面，将自动计算并显示出当前 eMMC Flash 的总容量。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.7 电池测试
+#### 电池测试
 
 进入电池测试页面，将显示出当前设备电池充电状态（百分比）、电池总容量、当前充电电流、电池电压。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.8 电池温度测试
+#### 电池温度测试
 
 进入电池温度测试页面，将显示出当前设备电池温度。电池温度需要根据电池规格书，提供电池的NTC table。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
 电池NTC Table请参考Rockchip_Developer_Guide_RT-Thread_RK816_CN.md。
 
-#### 2.2.9 RTC 测试
+#### RTC 测试
 
 进入 RTC 测试页面，将显示出当前设备中RTC的时间与日期。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.10 WIFI 测试
+#### WIFI 测试
 
 进入 WIFI 测试页面，将启动 WIFI，自动扫描并显示扫描到的SSID，目前最大显示6个SSID。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.11 BT 测试
+#### BT 测试
 
 进入 BT 测试页面，将启动 BT ，扫描设备周边设备，实时显示扫描到的设备个数。测试成功后按下 FUN_2 按键，结束测试，表示测试成功；按下 FUN_3 按键，结束测试，表示测试失败。
 
-#### 2.2.12 测试结果
+#### 测试结果
 
 进入测试结果页面，显示所有测试项的测试结果。按下 FUN_1 按键，返回主测试页面。
 

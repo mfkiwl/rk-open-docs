@@ -79,15 +79,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 RT-Thread Power Manager 功能支持
+## RT-Thread Power Manager 功能支持
 
 * 支持Clock Gating
 * 支持Power Gating
 * 支持DVFS 动态调频调压
 
-## 2 功耗管理方法
+## 功耗管理方法
 
-### 2.1 基本概念
+### 基本概念
 
 **Clock Gating：** 控制CLOCK开关
 
@@ -99,7 +99,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **静态功耗：** 静态功耗和电压、温度相关，控制方法为Power Gating
 
-### 2.2 Clock Gating
+### Clock Gating
 
 一个模块不需要工作时，需要关闭对应的CLOCK；接口如下：
 
@@ -109,7 +109,7 @@ rt_err_t clk_enable(struct clk_gate *gate, int on)
 
 涉及参考文档为：CLK/Rockchip_Developer_Guide_RTOS_Clock_CN.md
 
-### 2.3 Power Gating
+### Power Gating
 
 一个模块不需要工作时，第一步需要先关闭对应的CLOCK，然后再关闭对应的Power Domain；由于关闭Power Gating的耗时比Clock Gating的耗时长，所以一般在长时间不使用的情况下才进行Power Gating操作；接口如下：
 
@@ -119,15 +119,15 @@ rt_err_t pd_power(struct pd *power, int on)
 
 涉及参考文档为：CLK/Rockchip_Developer_Guide_RTOS_Clock_CN.md
 
-### 2.4 DVFS 控制
+### DVFS 控制
 
 涉及参考文档为：Rockchip_Developer_Guide_RT-Thread_DVFS_CN.md
 
-### 2.5 RT-Thread PM MODE控制
+### RT-Thread PM MODE控制
 
 RT Thread基于PM MODE机制控制不同场景下的功耗需求,具体实现参数RT-Thread官方文档。实现上面通过和DVFS机制协同实现。
 
-#### 2.5.1  基本概念
+#### 基本概念
 
 系统在pm_cfg.h 中定义了run modes、sleep modes 两类模式，用户也可以根据需求进行扩展。
 
@@ -146,7 +146,7 @@ enum
 };
 ```
 
-#### 2.5.2 RT-Thread PM MODE 使用
+#### RT-Thread PM MODE 使用
 
 1. 通过下面两个函数申请和释放一个模式：
 
@@ -178,7 +178,7 @@ pm current mode: Running Normal Mode
 
 通过命令：msh >pm_release 1释放1的模式（PM_RUN_MODE_NORMAL）。
 
-#### 2.5.3 初始化配置-Power Management Mode 对应的 DVFS
+#### 初始化配置-Power Management Mode 对应的 DVFS
 
 ```c
 const static struct dvfs_table dvfs_core_table[] =
@@ -226,7 +226,7 @@ struct rk_dvfs_desc dvfs_data[] =
 
 该代码段为配置DVFS table，参考：Rockchip_Developer_Guide_RT-Thread_DVFS_CN.md
 
-#### 2.5.4 初始化配置-Power Management Mode
+#### 初始化配置-Power Management Mode
 
 ```c
 static struct pm_mode_dvfs pm_mode_data[] =
@@ -262,7 +262,7 @@ void rkpm_register_dvfs_info(struct pm_mode_dvfs *dvfs, int cnt, void (*pm_func)
 
 参数pm_func： 用于不同芯片对于功耗的个性控制，暂时没有使用。
 
-### 2.6 Runtime Power 控制
+### Runtime Power 控制
 
 对于在运行状态的系统，系统会根据各个模块的状态进行相关功耗控制，所以各个模块的驱动中需要通过下面两个函数申请、释放自己的运行状态。
 
@@ -272,9 +272,9 @@ void pm_runtime_request(ePM_RUNTIME_ID runTimeId)
 void pm_runtime_release(ePM_RUNTIME_ID runTimeId)
 ```
 
-### 2.7 低功耗（Sleep Mode）设计及实现
+### 低功耗（Sleep Mode）设计及实现
 
-#### 2.7.1 主要操作
+#### 主要操作
 
 低功耗的主要操作如下：
 
@@ -282,7 +282,7 @@ void pm_runtime_release(ePM_RUNTIME_ID runTimeId)
 2. 判断是否需要将系统休眠时钟切换到32K
 3. 可选择配置GPIO, TIMER, TIMEOUT中断作为休眠时唤醒系统的信号源
 
-#### 2.7.2 具体实现
+#### 具体实现
 
 1. 配置休眠模式，根据进入休眠时PD_DSP, PD_AUDIO的状态，决定休眠时，是否关闭对应的PD,VD及系统休眠时钟是否切换到32k，在下面的函数中实现对应的操作。
 

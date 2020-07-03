@@ -79,9 +79,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 简介
+## 简介
 
-### 1.1 支持器件
+### 支持器件
 
 RK MCU 产品使用的 SPI flash 仅为 SPI Nor，不支持 SPI Nand。
 
@@ -89,7 +89,7 @@ SPI Nor 具有封装小、读速率相较其他小容量非易失存储更快、
 
 RK RTOS SPI flash 框架提供通用的 SPI Nor 接口和自动化的 XIP 方案。
 
-### 1.2 主控控制器
+### 主控控制器
 
 RK 平台 SPI Flash 可选用的控制器包括 FSPI 和 SPI 两种方案。
 
@@ -102,13 +102,13 @@ FSPI   (Flexible Serial Peripheral Interface)  是一个灵活的串行传输控
 
 SPI （ Serial Peripheral Interface ）为通用的 串行传输控制器，可以支持外挂 SPI Nor、SPI Nand，RK RTOS 平台目前仅支持 SPI Nor 的实现。
 
-### 1.3 XIP 技术
+### XIP 技术
 
 XIP（eXecute In Place），即芯片内执行，指 CPU 直接通过映射地址的 memory 空间取指运行，即应用程序可以直接在 flash 闪存内运行，不必再把代码读到系统 RAM 中，所以片内执行代码的运行地址为相应的映射地址。由于 SPI Nor XIP 仅支持读，所以只能将代码段和只读信息置于 SPI Nor 中。
 
 FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相近方式获取 flash 数据，如同访问一片“只读的 sram”空间，详细 FSPI 信息参考 TRM 中 FSPI 章节。
 
-### 1.4 驱动框架
+### 驱动框架
 
 考虑到要适配 FSPI 和 SPI 两种控制器，所以抽象出控制器层，从而将整个驱动框架分为三个层次 ：
 
@@ -144,7 +144,7 @@ FSPI 除支持 CPU XIP 访问 SPI flash，还支持如DSP 等其他模块以相�
 1. 以上实现一一对应附图，可结合阅读
 2. 由于 RK SPI DMA 传输相关代码在 OS Driver 层，且 SPI 控制器除了应用在 SPI Nor 上，还支持较多其他器件，存在硬件资源边界保护，所以在 SPI Flash 框架中的 SPI 控制器不应直接套接 HAL 层 hal_spi.c 驱动，而应使用 OS Driver 中的 SPI 接口。
 
-## 2 配置
+## 配置
 
 SPI Flash 驱动框架所有配置都能通过 Kconfig 进行灵活调整，如 1.4 章节所讲，SPI flash 完整的驱动框架由三个抽象层构成，相应的配置也分为三个层次：
 
@@ -192,14 +192,14 @@ SPI 控制器配置：
 
 请参考《Rockchip_Developer_Guide_Linux_SPI_CN.md》文档。
 
-### 3 代码和接口
+### 代码和接口
 
-#### 3.1 代码
+#### 代码
 
 "src/driver/spiflash/SpiFlashDev.c"
 "include/driver/SpiFlashDev.h"
 
-#### 3.2 函数接口
+#### 函数接口
 
 **创建设备接口**
 
@@ -259,15 +259,15 @@ rk_size_t SpiFlashDev_Read(HDC dev, rk_size_t off, uint8_t *data, rk_size_t len)
 rk_err_t SpiFlashDev_Erase(HDC dev, rk_size_t off, rk_size_t len);
 ```
 
-## 4 XIP 实现方案须知
+## XIP 实现方案须知
 
 前面已经介绍 SPI Nor 支持 XIP 功能，如果选用 FSPI 主控实现的 SPI Nor 方案，会自动开启 XIP 功能，以下介绍产品应用中涉及到 XIP 的一些须知。
 
-### 4.1 添加 XIP 支持
+### 添加 XIP 支持
 
 当选用 FSPI 实现的 SPI Flash 方案，并按照 1.2 章节中关于 FSPI 配置方法去配置，SPI Flash 将默认配置使用 XIP 功能，如要关闭该功能，应则关闭配置 “Enable FSPI XIP”
 
-### 4.2 XIP 使用过程的开关
+### XIP 使用过程的开关
 
 RK SPI Flash 框架会在需求的场景自动开关 XIP 功能，客户无需调用开关接口，详细如下:
 
@@ -302,11 +302,11 @@ static void SpiFlashDev_xipResume(void)
 - SPI Nor 主控 FSPI 开关 XIP 过程，需通知相应设备停止/恢复 XIP 访问，具体按照上文 “XIP 关” 所述操作
 - XIP 关，同时会关闭全局中断
 
-## 5 函数接口调用范例
+## 函数接口调用范例
 
 参考 shell_spiflash.c。
 
-## 6 shell使用范例
+## shell使用范例
 
 **创建设备**
 
@@ -326,7 +326,7 @@ spiflash.create <spi devid>   /*例如： spi.create 0 */
     "erase",     SpiFlashDevShellErase,    "erase spiflash device by sector size", "spiflash.erase <devID> <from> <size>",
 ```
 
-## 7 常见问题
+## 常见问题
 
 - **如何判断 SPI flash 已经挂载成功？**
 

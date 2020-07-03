@@ -71,9 +71,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ------
 
-## 1  HAL KEYCTRL 配置
+## HAL KEYCTRL 配置
 
-### 1.1  HAL CONFIG
+### HAL CONFIG
 
 依赖driver开启：
 
@@ -83,7 +83,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 #endif
 ```
 
-### 1.2  HAL 差异部分
+### HAL 差异部分
 
 不同芯片差异主要在CLK ID，可以在rk2108.h或者soc.h中查找
 
@@ -91,7 +91,7 @@ CLK_KEY_GATE：SCLK GATE ID，用于CLK开关；
 
 PCLK_KEY_GATE：PCLK GATE ID，用于CLK开关；
 
-### 1.3  HAL 常用 API
+### HAL 常用 API
 
 ```c
 HAL_Status HAL_KeyCtrl_Init(struct KEY_CTRL_REG *reg, uint32_t keyDetectionTh, uint32_t keyCalculatePeriodTh, uint32_t keyFilterIrqTh)；
@@ -99,9 +99,9 @@ uint32_t HAL_KeyCtrl_GetValue(struct KEY_CTRL_REG *reg)；
 void HAL_KeyCtrl_ClearInt(struct KEY_CTRL_REG *reg);
 ```
 
-## 2 RT-Thread KEYCTRL配置
+## RT-Thread KEYCTRL配置
 
-### 2.1  RT-Thtread CONFIG
+### RT-Thtread CONFIG
 
 ```c
 scons --menuconfig
@@ -110,7 +110,7 @@ scons --menuconfig
 	-*- Enable KEYCTRL
 ```
 
-### 2.2  RT-Thread 常用API
+### RT-Thread 常用API
 
 ```
 static rt_bool_t rt_keyctrl_check_range(rt_uint32_t key_value, rt_uint32_t target)；
@@ -126,7 +126,7 @@ static rt_err_t rt_keyctrl_control(rt_device_t dev, int cmd, void *args)；
 static int rt_keyctrl_dev_init(void)；
 ```
 
-### 2.3  RT-Thread 使用示例
+### RT-Thread 使用示例
 
 使用示例：
 
@@ -138,9 +138,9 @@ rt_keyctrl_save_key_code(char key_code)； /* 保存按键 */
 rt_keyctrl_ind_callback(void)； /* 主动上传按键 */
 ```
 
-## 3 TEST
+## TEST
 
-### 3.1  CONFIG配置
+### CONFIG配置
 
 ```c
 RT-Thread bsp test case  --->
@@ -148,7 +148,7 @@ RT-Thread bsp test case  --->
         [*]     Enable BSP Common KEYCTRL TEST
 ```
 
-### 3.2  USAGE
+### USAGE
 
 使用示例：
 

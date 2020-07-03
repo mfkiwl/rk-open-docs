@@ -85,7 +85,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 说明
+## 说明
 
 调试结构：Eclipse CDT+GNU MCU Eclipse OpenOCD+Eclipse+GDB+OpenOCD+ftdi/jlink+SOC
 
@@ -101,11 +101,11 @@ Rockchip Electronics Co., Ltd.
 
 * ftdi  采用ft2232h，USB转JTAG/SWD芯片，可以作为JTAG/SWD适配器，速度快，稳定性高
 
-## 2 操作系统环境
+## 操作系统环境
 
-### 2.1 Ubuntu 64位
+### Ubuntu 64位
 
-#### 2.1.1 eclipse软件包gnu_mcu_openocd_eclipse.tar.gz
+#### eclipse软件包gnu_mcu_openocd_eclipse.tar.gz
 
 解压gnu_mcu_openocd_eclipse.tar.gz：
 
@@ -124,7 +124,7 @@ tar -xzvf gnu_mcu_openocd_eclipse.tar.gz
     * tools   开源相关的工具，如GDB
     * doc 使用文档
 
-#### 2.1.2 安装软件
+#### 安装软件
 
 * 运行eclipse，需要安装JRE。
 
@@ -151,9 +151,9 @@ sudo apt-get install gcc-arm-embedded
 
 说明：在Ubuntu 16.04和Ubuntu 18.04测试正常
 
-### 2.2 Windows
+### Windows
 
-#### 2.2.1 eclipse软件包gnu_mcu_openocd_eclipse.zip
+#### eclipse软件包gnu_mcu_openocd_eclipse.zip
 
 解压，进入主目录：
 
@@ -167,21 +167,21 @@ sudo apt-get install gcc-arm-embedded
     * doc 使用文档
     * FTDI 修改FT232H配置信息的软件
 
-#### 2.2.2 运行eclipse，需要安装JRE
+#### 运行eclipse，需要安装JRE
 
 RK\tools\jdk_8.0.1310.11_64.exe
 
-#### 2.2.3 使能Windows telnet功能
+#### 使能Windows telnet功能
 
 不同的Windows版本，使能telnet的入口可能不一样，请自行百度。
 
 telnet用来进入openocd的命令行模式。
 
-## 3 调试功能
+## 调试功能
 
 不管是Ubuntu还是Windows，UI界面基本一致，本文介绍以Ubuntu为主。
 
-### 3.1 启动eclipse软件
+### 启动eclipse软件
 
 ```
 ./eclipse &
@@ -195,7 +195,7 @@ telnet用来进入openocd的命令行模式。
 
 ![img](Rockchip_Developer_Guide_GNU_MCU_Eclipse_OpenOCD/2.png)
 
-### 3.2 GNU MCU Eclipse OpenOCD
+### GNU MCU Eclipse OpenOCD
 
 * 点击下图绿色瓢虫右边的三角按钮，点击Debug Configurations。
 
@@ -280,7 +280,7 @@ telnet用来进入openocd的命令行模式。
 
 ![img](Rockchip_Developer_Guide_GNU_MCU_Eclipse_OpenOCD/15.png)
 
-### 3.3 Eclipse CDT (C/C++ Development Tooling)
+### Eclipse CDT (C/C++ Development Tooling)
 
 ![img](Rockchip_Developer_Guide_GNU_MCU_Eclipse_OpenOCD/2.png)
 
@@ -364,7 +364,7 @@ mww phys 物理地址 数值 数据量（单位是4个字节）
 
 小结：以上介绍的窗口，每个窗口顶部有很多功能按钮，细心的读者可以自行根据提示操作，这里不再详细介绍。
 
-### 3.4 OpenOCD使用说明
+### OpenOCD使用说明
 
 请参考：OpenOCD User’s Guide：
 
@@ -374,7 +374,7 @@ mww phys 物理地址 数值 数据量（单位是4个字节）
 
 请参考：《Rockchip_Developer_Guide_OpenOCD_CN.md》。
 
-## 4 FPGA芯片验证
+## FPGA芯片验证
 
 建议命令行操作。
 

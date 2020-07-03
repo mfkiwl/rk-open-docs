@@ -48,13 +48,13 @@ Software Development Engineers
 
 ---
 
-## 1 Solution Overview
+## Solution Overview
 
-### 1.1 Overview
+### Overview
 
 This chapter mainly describes clock sub system related important concept, clock solution, overall process and code structure.
 
-### 1.2 Important Concept
+### Important Concept
 
 **Clock sub system**
 
@@ -68,7 +68,7 @@ All the mainstream processor platform running Linux have very complex clock tree
 
 Clock related components contain: oscillator used to generate clock(active oscillator, also called harmonic oscillator) or crystal(passive oscillator, also called crystal oscillator); PLL used for frequency doubling(Phase Locked Loop); divider used for frequency dividing; Mux used for multi-choice; And GATE used to control clock enable; hardware module using clock(also called consumer); and so on.
 
-### 1.3 Clock Solution
+### Clock Solution
 
 Every SOC has its own clock allocation solution, mainly including PLL setting, parent attribute, DIV, MUX etc.. The clock solution is different for different chipset.
 
@@ -80,7 +80,7 @@ Diagram 1‑1 clk Clk clock tree sample graph
 
 Diagram 1‑2 Clock allocation sample graph
 
-### 1.4 Over process
+### Over process
 
 ![1-3-clk-configuration-flow](Rockchip_Developer_Guide_Linux3.10_Clock/1-3-clk-configuration-flow.png)
 
@@ -94,7 +94,7 @@ The main content includes(no need to support all clk)
 
 3. Select clk parent
 
-### 1.5 Code structure
+### Code structure
 
 CLOCK software framework consists of CLK Device Tree(clk register description, the tree relationship among clk, etc.), Device driver CLK configuration and CLK API. The three parts functions and CLK code route are shown as Table 1-1.
 
@@ -106,15 +106,15 @@ CLOCK software framework consists of CLK Device Tree(clk register description, t
 
 Table 1‑1 CLK code structure
 
-## 2 CLOCK Development Guide
+## CLOCK Development Guide
 
-### 2.1 Overview
+### Overview
 
 This chapter describes how to modify clock setting, use API interface and debug CLK program.
 
-### 2.2 Clock Related Concept
+### Clock Related Concept
 
-#### 2.2.1 PLL
+#### PLL
 
 Phase locked loop input through 24M crystal and then lock out corresponding frequency through internal phase locked loop. This is the clock source of all SOC CLOCK. All SOC bus and device clock frequencies are divided from PLL. RK platforms PLL mainly include:
 
@@ -142,7 +142,7 @@ The devices bus clock structure is shown as below picture:
 
 Diagram 2‑1 bus clock structure
 
-#### 2.2.2 GATING
+#### GATING
 
 CLOCK framework has many GATING, mainly used to lower power consumption. When some device is off and no need to maintain CLOCK, you can enbale GATING to save the power.
 
@@ -154,9 +154,9 @@ RK CLOCK framework GATING is using tree structure with parent-child attribute. G
 
 Diagram 2‑2 GATING sample graph
 
-### 2.3 Clock Configuration
+### Clock Configuration
 
-#### 2.3.1 Clock Initial Configuration
+#### Clock Initial Configuration
 
 ```c
 arch/arm64/dts/rockchip/rk33xx.dtsi
@@ -232,7 +232,7 @@ Note: For the clock not enabled by default and no device reference to enable, it
 }
 ```
 
-#### 2.3.2 Driver Clock Configuration
+#### Driver Clock Configuration
 
 1. Get CLK Pointer
 
@@ -257,9 +257,9 @@ Driver code：
 	dev->clk = devm_clk_get(NULL, "clk_saradc");
 ```
 
-### 2.4  CLOCK API Interface
+### CLOCK API Interface
 
-#### 2.4.1 Main CLK API
+#### Main CLK API
 
 1. **Header file**
 
@@ -317,7 +317,7 @@ At last, why is there clk_prepare_enable/clk_disable_unprepare integrated interf
 
 (if return value is less than 0, set CLK failed)
 
-#### 2.4.2 Example
+#### Example
 
 DTS
 
@@ -373,7 +373,7 @@ Driver code
 	}
 ```
 
-### 2.5 CLOCK Debugging
+### CLOCK Debugging
 
 1. **CLOCK DEBUGS:**
 
@@ -446,11 +446,11 @@ Address: Operational Base + offset (0x00d0)
 
 ![clk-gaiting](Rockchip_Developer_Guide_Linux3.10_Clock/clk-gaiting.png)
 
-## 3 FAQ
+## FAQ
 
-### 3.1 PLL Setting
+### PLL Setting
 
-#### 3.1.1 PLL Type Search
+#### PLL Type Search
 
 PLL related registers, PLL computing formula etc. will have some differences for different chipsets. Use PLL type to distinguish the chipsets and to compute and set PLL parameters.
 
@@ -472,7 +472,7 @@ According PLL type to look up PLL frequency support table in clk-pll.c.
 	return &clk_pll_ops_312xplus;
 ```
 
-#### 3.1.2 PLL Recall Function Definition
+#### PLL Recall Function Definition
 
 ```c
 	static const struct clk_ops clk_pll_ops_312xplus = {
@@ -482,7 +482,7 @@ According PLL type to look up PLL frequency support table in clk-pll.c.
 	};
 ```
 
-#### 3.1.3 PLL frequency table definition
+#### PLL frequency table definition
 
 ```c
 	struct pll_clk_set *clk_set = (struct pll_clk_set *)(rk312xplus_pll_com_table);
@@ -496,7 +496,7 @@ According PLL type to look up PLL frequency support table in clk-pll.c.
 	};
 ```
 
-#### 3.1.4 PLL computing formula
+#### PLL computing formula
 
 ```c
 	VCO = 24M * FBDIV / REFDIV (450M ~ 2200M);
@@ -521,9 +521,9 @@ There is one special PLL type which can not be found in the table. It will autom
 
 (Note: But when using automatic computing, VCO is not guaranteed to be as big as possible, not recommend if you have requirement for PLL jitter)
 
-### 3.2 Some special clock setting
+### Some special clock setting
 
-#### 3.2.1 LCDC display related clock
+#### LCDC display related clock
 
 LCDC DCLK is determined by current panel resolution, so the difference is huge among different products. So in RK platforms LCDC DCLK usually monopolize one PLL. The PLL frequency can change according to the panel requirement. So, normally it requires this PLL can compute PLL parameter automatically and try not to hang some other clocks with requirement for clock under this PLL. Refer to below table:
 
@@ -565,7 +565,7 @@ drivers/clk/rockchip/clk-ops.c
 	};
 ```
 
-#### 3.2.2 EMMC/SDIO/SDMMC
+#### EMMC/SDIO/SDMMC
 
 These clocks require frequency division by even and should have default two divided-frequency within the controller. That means, if EMMC needs 50M, the CLOCK needs to provide 100M clock for EMMC and the 100M should be obtained from PLL frequency division by even.
 
@@ -600,7 +600,7 @@ Check if it is able to obtain the required frequency according to the above doub
 
 You can change frequency through clk_set_rate interface in EMMC driver.
 
-#### 3.2.3 Fractional frequency division
+#### Fractional frequency division
 
 I2S, UART etc. are fractional frequency division. There is one requirement for fractional frequency division setting, that is the frequency and the parent of the fractional frequency division should have a 20-time relationship, if not, the CLK output will have a large jitter and frequency deviation.
 
@@ -608,6 +608,6 @@ I2S, UART etc. are fractional frequency division. There is one requirement for f
 
 Diagram 3‑1 fractional frequency division clock sample graph
 
-#### 3.2.4 Ethernet Clock
+#### Ethernet Clock
 
 The ethernet clock requires to be precise. 100M ethernet requires precise frequency of 50M and gigabit ethernet requires 125M. Normally if there is ethernet requirement, PLL output clock should also be precise. If current clock solution is not able to provide precise clock due to other reason, ethernet needs to use external clock crystal. It is determined by the project requirement and the actual product solution.

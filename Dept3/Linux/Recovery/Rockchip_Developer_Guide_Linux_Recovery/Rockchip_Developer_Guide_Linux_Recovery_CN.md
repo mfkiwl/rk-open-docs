@@ -84,15 +84,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 OTA升级
+## OTA升级
 
-### 1.1 概述
+### 概述
 
 OTA（Over-the-Air）即空间下载技术。 OTA 升级是 Android 系统提供的标准软件升级方式。它功能强大，可以无损失升级系统，主要通过网络，例如 WIFI、3G/4G 自动下载 OTA 升级包、自动升级，也支持通过下载 OTA 升级包到 SD 卡/U 盘升级，OTA 的升级包非常的小，一般几 MB 到十几 MB。
 
 本文主要介绍了使用 OTA 技术升级时，本地升级程序 recovery 执行升级的流程及技术细节，以便用户在开发过程中了解升级的过程及注意事项。
 
-### 1.2 编译
+### 编译
 
 - **rootfs 主系统**
 
@@ -148,9 +148,9 @@ OTA（Over-the-Air）即空间下载技术。 OTA 升级是 Android 系统提供
   6. `./mkfirmware.sh`
   7. 烧写 recovery.img
 
-### 1.3 升级流程
+### 升级流程
 
-#### 1.3.1 升级固件准备
+#### 升级固件准备
 
 修改 `tools/linux/Linux_Pack_Firmware/rockdev/package-file`，根据需要升级的分区配置，修改该文件。
 
@@ -166,7 +166,7 @@ OTA（Over-the-Air）即空间下载技术。 OTA 升级是 Android 系统提供
 
 ![image error head](resource/image-err-head.png "Image have wrong head")
 
-#### 1.3.2 升级过程
+#### 升级过程
 
 - 将升级固件 update.img 放在 SD 卡或 U 盘根目录或者设备的/userdata 目录下。
 
@@ -186,12 +186,12 @@ OTA（Over-the-Air）即空间下载技术。 OTA 升级是 Android 系统提供
 
 ![the detialed flow chart of recovery](resource/recovery-flow.png "recpvery flow")
 
-### 1.4 恢复出厂模式
+### 恢复出厂模式
 
 我们把可以读写的配置文件保存在 userdata 分区，出厂固件会默认一些配置参数，用户使用一
 段时间后会生成或修改配置文件，有时用户需要清除这些数据，我们就需要恢复到出厂配置。直接运行`update`后面不加任何参数或者加 `factory/reset` 参数均可进入 recovery 后恢复出厂配置。
 
-### 1.5 注意事项
+### 注意事项
 
 - 打包 update.img 固件时需要注意，升级固件不一定要全分区升级，可修改 package-file 文件，将不要升级的分区去掉，这样可以减少升级包（update.img ）的大小。
 
@@ -201,9 +201,9 @@ OTA（Over-the-Air）即空间下载技术。 OTA 升级是 Android 系统提供
 
 - 如果将 update.img 升级包放置在 flash 中的 userdata 分区，则需要保证 package-file 中括 不包括 userdata.img 被打包进去，原因是可能会导致文件系统的损坏，升级成功后可能使 oem或 userdata 分区mount不成功。若从SD卡或 U 盘升级时，可以打包 userdata.img，从而对userdata 分区进行升级。升级完成后会对 userdata 分区重新resize 操作。
 
-## 2 运行调试
+## 运行调试
 
-### 2.1 Recovery 模式中log的查看
+### Recovery 模式中log的查看
 
 `buildroot/output/rockchip_rkxxxx_recovery/target` 目录下创建一个隐藏文件，
 
@@ -223,7 +223,7 @@ touch .rkdebug
 cat userdata/recovery/log
 ```
 
-### 2.2 带屏设备与不带屏设备
+### 带屏设备与不带屏设备
 
 Recovery 执行过程中如果失败，且提示如下 log 信息：
 
@@ -268,7 +268,7 @@ endif
 5. `./mkimage.sh`
 6. 烧录 rockdev/recovery.img
 
-#### 2.2.1. 带屏设备的旋转与显示
+#### 带屏设备的旋转与显示
 
 - 若需要将 Recovery 升级过程中显示的界面根据显示设备的方向做一些旋转操作，可按如下说明操作。
   1. 更新Recovery 代码到最新。
@@ -284,7 +284,7 @@ endif
 
 - 更换 Recovery 中 UI 显示的背景图片。可自行更换 external/recovery/res/images 目录下的图片文件，保持文件名不变。
 
-### 2.3 Debian 与 Ubuntu 系统的升级
+### Debian 与 Ubuntu 系统的升级
 
 与 Buildroot recovery 升级一样，该Recovery OTA升级方案也支持 Debian 或 Ubuntu 系统下的升级。由于Recovery 模式下升级需要通过设备各个分区节点来识别并写入不同设备分区节点的固件数据，Buildroot 系统是通过 udev 中的别名方式（by-name）来对设备分区节点做了通用的易识别的处理。Debian 或 Ubuntu 系统中因为缺少这样的方式，导致了实际中不 Recovery 不能正常运行的情况，所以只需要将 Debian 或 Ubuntu 系统中设备分区的节点也跟Buildroot 系统下可通过 by-name 别名方式标识出来，Recovery 即可正常工作。
 
@@ -297,7 +297,7 @@ endif
 芯片平台（RK3308、RK3328、RK3399、RK3326 等）。修改的目的就是开机启动后可以将 Debian 系统或 Ubuntu 系统中各个分区节点形如`/dev/mmcblk0p0` 、`/dev/mmcblk0p1`、`/dev/mmcblk0p2`、`/dev/mmcblk0p3` ... 修改为
 `/dev/block/by-name/uboot`、`/dev/block/by-name/misc`、`/dev/block/by-name/boot`、`/dev/block/by-name/rootfs`...等。
 
-## 3 SD 卡制作启动盘升级
+## SD 卡制作启动盘升级
 
 本章节主要为了解决使用 SD 卡启动，进行裸片升级的需求，详细描述 SD 卡启动盘的制作及相关升级的问题。
 
@@ -363,9 +363,9 @@ sdboot update will update from /mnt/sdcard/sdupdate.img
 start with main.
 ```
 
-## 4 附录
+## 附录
 
-### 4.1. misc 分区说明
+### misc 分区说明
 
 misc 其实是英文 miscellaneous 的前四个字母，杂项、混合体、大杂烩的意思。
 
@@ -393,7 +393,7 @@ misc 分区的结构组成详见下图。
 
 Recovery 中支持的命令部分，可参考 external/recovery/recovery.c 中 OPTIONS 结构中内容。
 
-#### 4.1.1 misc.img 选择
+#### misc.img 选择
 
 SDK 根目录 `device/rockchip/rockimg` 目录下是经常使用的 misc.img 文件。生成固件的时候根据配置选择拷贝哪一个 misc.img 的文件。
 
@@ -418,9 +418,9 @@ vim BoardConfig.mk
 
 从上图中可看到，默认使用 `wipe_all-misc.img` 作为 misc 分区的固件，使用该 misc固件，烧写后会格式化用户（/userdata 或/data ）分区与客制（/oem）分区的数据。若希望开机不进入 recovery 模式，而进入正常系统，可以修改 `BoardConfig.mk` 这里 misc image 的具体文件为 `blank-misc.img`。然后重新编译，生成新的固件。
 
-### 4.2 Recovery 不同场景下的使用
+### Recovery 不同场景下的使用
 
-#### 4.2.1 第一次开机
+#### 第一次开机
 
 烧写过 misc.img、recovery.img 的设备会进入第一次开机流程。
 
@@ -461,7 +461,7 @@ executed '/usr/sbin/resize2fs' done
 executed '/usr/sbin/resize2fs' return 0
 ```
 
-#### 4.2.2 恢复出厂设置
+#### 恢复出厂设置
 
 命令行运行`update`程序，设备会进入 recovery，并进行格式化，格式化完成之后会自动进入 normal 系统。
 
@@ -483,7 +483,7 @@ USB_SDP_CHARGER
 [ 10.891460] random: nonblocking pool is initialized
 ```
 
-#### 4.2.3 升级
+#### 升级
 
 执行`update ota /xxx/update.img`，设备会进入 recovery，并进行升级。
 
@@ -503,9 +503,9 @@ librkupdate_ui_print = parameter writing....
 librkupdate_###### Download trust ... #######
 ```
 
-### 4.3 常见问题汇总
+### 常见问题汇总
 
-#### 4.3.1  “cannot find/open a drm device ”
+#### “cannot find/open a drm device ”
 
 常见在非 RK3308 平台，进入 recovery 模式后串口打印如下 log：
 
@@ -563,7 +563,7 @@ make recovery-dirclean && make recovery
 ./mkfirmware.sh
 ```
 
-#### 4.3.2 misc 分区固件修改默认命令
+#### misc 分区固件修改默认命令
 
 如果想修改 misc 固件中打包不同的 recovery 命令，或者使用空白的 misc 分区固件。可按如下方式修改：
 
@@ -571,7 +571,7 @@ make recovery-dirclean && make recovery
 
 ![misc chose in mkfirmware.sh](resource/misc-chose.png "misc chose in mkfirmware.sh")
 
-#### 4.3.3 userdata 分区设置为 vfat 文件系统
+#### userdata 分区设置为 vfat 文件系统
 
 SDK 中默认 userdata 分区为 ext2/ext4 文件系统，若想修改为 vfat32 文件系统，可按如下修改：
 
@@ -662,7 +662,7 @@ SDK 中默认 userdata 分区为 ext2/ext4 文件系统，若想修改为 vfat32
    export RK_USERDATA_FS_TYPE=vfat
    ```
 
-#### 4.3.4 userdata （或/data ）分区不格式化
+#### userdata （或/data ）分区不格式化
 
 BoardConfig.mk 中配置了 `wipe_all-misc.img`，却不希望格式化用户或客制（userdata 或 oem）分区，此时需要修改 recovery 的代码。修改 `external/recovery/reocvery.c`： main 函数中如下图的代码，将下图红框中的代码注释掉后，重新编译 recovery 分区固件，烧写 recovery 分区固件即可。
 

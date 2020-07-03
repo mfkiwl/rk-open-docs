@@ -74,13 +74,13 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 说明
+## 说明
 
 FT232H 是“Future Technology Devices International Ltd”的一款芯片，USB 转各种接口，这里主要使用 USB 转 JTAG/SWD 功能。
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/1.png)
 
-## 2 Rockchip FT232H 小板
+## Rockchip FT232H 小板
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/2.png)
 
@@ -95,9 +95,9 @@ FT232H 小板：
 * 排针，VCC、TCS、TCK、GND，可以和板子飞线连接
 * 按键，按下会拉低 TMS
 
-## 3 Windows 环境下配置 FT232H EEPROM 信息
+## Windows 环境下配置 FT232H EEPROM 信息
 
-### 3.1 安装 EEPROM 编程工具 FT_Prog_v3.8.128.448 Installer.exe
+### 安装 EEPROM 编程工具 FT_Prog_v3.8.128.448 Installer.exe
 
 解压 gnumcueclipse_v1.0.zip，安装 RK\FTDI\FT_Prog_v3.8.128.448 Installer.exe
 
@@ -107,7 +107,7 @@ FT232H 小板：
 https://www.ftdichip.com/Support/Utilities.htm#FT_PROG
 ```
 
-### 3.2 运行 FT_Prog.exe
+### 运行 FT_Prog.exe
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/6.png)
 
@@ -115,7 +115,7 @@ https://www.ftdichip.com/Support/Utilities.htm#FT_PROG
 * 2 扫描设备
 * 3 扫描结果
 
-### 3.3 配置驱动属性
+### 配置驱动属性
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/7.png)
 
@@ -124,7 +124,7 @@ https://www.ftdichip.com/Support/Utilities.htm#FT_PROG
 * 3 选中 Driver
 * 4 选择 D2XX Direct
 
-### 3.4 配置 JTAG/SWD 驱动强度
+### 配置 JTAG/SWD 驱动强度
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/8.png)
 
@@ -132,17 +132,17 @@ https://www.ftdichip.com/Support/Utilities.htm#FT_PROG
 * 2 选中 Group AD
 * 3 Drive 选择 8mA，这可以改善 TCK 30MHz 波形
 
-## 4 驱动安装
+## 驱动安装
 
-### 4.1 Ubuntu 16.04 以上驱动配置
+### Ubuntu 16.04 以上驱动配置
 
-#### 4.1.1 安装驱动
+#### 安装驱动
 
 ```
 sudo apt-get install libftdi-dev
 ```
 
-#### 4.1.1 添加 USB 信息
+#### 添加 USB 信息
 
 打开或创建/etc/udev/rules.d/60-openocd.rules：
 
@@ -159,21 +159,21 @@ ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", MODE="660", GROUP="plugdev", 
 
 说明：4.1.1 这步是 OpenOCD 使用 FT232H 时需要的。
 
-### 4.2 Windows 驱动配置
+### Windows 驱动配置
 
 不同的软件在使用 FT232H 时，驱动是不一样的，那么就需要根据需求来修改 FT232H 的 USB 驱动。
 
 以下以 OpenOCD 使用 FT232H 为例：
 
-#### 4.2.1 运行 RK\OpenOCD\drivers\UsbDriverTool.exe
+#### 运行 RK\OpenOCD\drivers\UsbDriverTool.exe
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/3.png)
 
-#### 4.2.2 将 FT232H 默认驱动改为 WinUSB 驱动
+#### 将 FT232H 默认驱动改为 WinUSB 驱动
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/4.png)
 
-#### 4.2.3 安装成功
+#### 安装成功
 
 ![img](Rockchip_Developer_Guide_FT232H_USB2JTAG/5.png)
 

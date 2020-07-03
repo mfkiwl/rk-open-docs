@@ -74,11 +74,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 简介
+## 简介
 
 目前，RKOS的Link Script就要针对GCC编译器设计，支持预编译，宏定义，多内存分布等。
 
-## 2 原理
+## 原理
 
 RKOS Link Script以.S为扩展名的脚本组织GCC LD规则，同时可包含多个宏定义的H文件，这些H文件里主要将多种公用的LD规则抽象为宏定义，同时在Makefile中加入了预编译处理。其原理同Linux内核链接脚本。
 
@@ -109,7 +109,7 @@ RKOS Link Script整体框架在与GCC LD脚本保持一致的基础上，引入�
 - STACK_SECTION
 - HEAP_SECTION
 
-## 3 配置
+## 配置
 
 进入RKOS工程编译目录，执行make menuconfig命令打开Link Script的配置项，以选择当前工程采用哪种存储做为主memory，以RK2206 SoC为例，支持SRAM，PSRAM和XIP三种方案。
 
@@ -122,7 +122,7 @@ RKOS Link Script整体框架在与GCC LD脚本保持一致的基础上，引入�
                 ( ) XIP
 ```
 
-## 4 代码实现
+## 代码实现
 
 如[第2章节](#2 原理)所述，Linker Script的代码实现分为.S脚本和.H文件两部分，如下分别介绍其实现：
 

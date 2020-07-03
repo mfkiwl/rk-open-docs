@@ -51,7 +51,7 @@
 
 ​	目前用于 ARM TrustZone 技术的开源项目中，使用比较广泛的有 ARM Trusted Firmware 和 OP-TEE OS[2]，它们都是针对 ARM 芯片给出的底层固件开源项目，二者之间可以配合使用或单独使用。
 
-### 1. 系统架构
+### 系统架构
 
 ​	从系统架构角度看，如下是启用了 ARM TrustZone 技术后的 64 位平台系统架构图。整个系统被分成了两个世界：左边是非安全世界，右边是安全世界。安全世界可以访问两个世界的所有资源，非安全世界只能访问非安全世界的资源，如果非安全世界访问安全世界的资源，则将产生系统硬件总线报错等异常，是无法获取到资源的。
 
@@ -63,7 +63,7 @@
 
 ![Relationship-2](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_2.png)
 
-### 2. CPU 特权等级
+### CPU 特权等级
 
 ​	从 CPU 的视角看，如下是一个标准的启用了 ARM TrustZone 技术后的 CPU 特权模式等级架构图。如果是 64 位 CPU，它的特权等级分为 EL0、EL1、EL2、EL3，其中根据 CPU 所处的世界又分为安全 EL0、安全 EL1 或者非安全 EL0、非安全 EL1。如果是 32 位 CPU，它的特权等级分为 Mon、Hyp、SVC、ABT、IRQ、FIQ、UND、SYS、USER 模式，其中 SVC、ABT、IRQ、FIQ、UND、SYS、USER 也如 64 位一样有安全和非安全模式之分。
 
@@ -75,11 +75,11 @@
 
 ## Rockchip 平台的 Trust
 
-### 1. 实现机制
+### 实现机制
 
 ​	目前 Rockchip 平台上的 64 位 SoC 平台上使用的是 ARM Trusted Firmware + OP-TEE OS 的组合；32 位 SoC 平台上使用的是 OP-TEE OS。
 
-### 2. 启动流程
+### 启动流程
 
 ​	ARM Trusted Firmware 的体系架构里将整个系统分成四种安全等级，分别为：EL0、EL1、EL2、EL3。将整个安全启动的流程阶段定义为：BL1、BL2、BL31、BL32、BL33，其中 ARM Trusted Firmware 自身的源代码里提供了 BL1、BL2、BL31 的功能。Rockchip 平台仅使用了其中的 BL31 的功能，BL1 和 BL2 我们有自己的一套实现方案。所以在 Rockchip 平台上我们一般也可以“ 默认” ARM Trusted Firmware 指的就是 BL31，而 BL32 使用的则是 OP-TEE OS。
 
@@ -93,7 +93,7 @@ Maskrom -> Loader -> Trust -> U-Boot -> kernel -> Android
 
 ![Boot-flow](Rockchip_Developer_Guide_Trust/ARM_Trusted_firmware_boot_flow.png)
 
-### 3. 固件获取
+### 固件获取
 
 目前只提供 binary 文件，不提供源代码。Trust 的 binary 文件提交在 U-Boot 工程里：
 
@@ -112,11 +112,11 @@ tools/rk_tools/RKTRUST/
 
 说明：开发者也可以下载单独的rkbin仓库，里面存放了所有平台的bin文件。
 
-### 4. DTS 使能
+### DTS 使能
 
-#### 4.1 内核 3.10
+#### 内核 3.10
 
-##### 4.1.1 32 位平台
+##### 位平台
 
 （1）增加 psci 节点
 
@@ -139,7 +139,7 @@ chosen {
 };
 ```
 
-##### 4.1.2 64 位平台
+##### 位平台
 
 （1）增加 psci 节点：
 
@@ -190,9 +190,9 @@ cpus {
 };
 ```
 
-#### 4.2 内核 4.4+
+#### 内核 4.4+
 
-##### 4.2.1 32 位平台
+##### 位平台
 
 增加 psci 节点即可：
 
@@ -203,7 +203,7 @@ psci {
 };
 ```
 
-##### 4.2.2 64 位平台
+##### 位平台
 
 （1）增加 psci 节点：
 
@@ -254,7 +254,7 @@ cpus {
 };
 ```
 
-#### 4.3 内核 Document
+#### 内核 Document
 
 内核 Document 里提供了关于 psci 的相关说明：
 
@@ -262,25 +262,25 @@ cpus {
 ./Documentation/devicetree/bindings/arm/psci.txt
 ```
 
-### 5. 运行内存和生命周期
+### 运行内存和生命周期
 
-#### 5.1 运行内存
+#### 运行内存
 
 ARM Trusted Firmware  运行在 DRAM 起始偏移 0M~2M 的空间，以 0x10000（64KB）作为程序入口地址。
 
 OP-TEE OS 运行在 DRAM 起始偏移 132M~148M 之间（结束地址依各平台需求而定）以 0x08400000（132M）作为入口地址。
 
-#### 5.2 生命周期
+#### 生命周期
 
 Trust 自上电初始化之后就始终常驻于内存之中，完成着自己的使命。
 
-### 6. Security
+### Security
 
 在第一章节里我们介绍了启用 ARM TrustZone 后系统被分为了安全世界和非安全世界。那么在 Rockchip 平台上 CPU 运行在哪些固件时属于安全世界，哪些固件又属于非安全世界呢？具体区分如下：Loader、Trust 运行在安全世界；U-Boot、kernel、Android 运行在非安全世界里（安全的 driver、APP 除外）。
 
-### 7. 功能
+### 功能
 
-#### 7.1 PSCI（Power State Coordination Interface）
+#### PSCI（Power State Coordination Interface）
 
 ​	通常各家 SoC 厂商的芯片在 IC 设计上具有明显差异，尤其是 CPU 的电源状态管理部分。各家 SoC 厂商有自己的一套软件流程来管理 CPU 电源状态，所以内核里的这部分代码碎片化比较明显，很难进行高度统一，显然内核很不愿意这方面一直维持碎片化的现状。而且普通开发者一般也不是很关心这部分实现，因为这部分软件实现跟 CPU 体系架构、IC 设计紧密相关，要完全理解或者自己实现都存在一定难度。
 
@@ -320,7 +320,7 @@ SYSTEM_RESET
 ./arch/arm/mach-rockchip/psci.c
 ```
 
-#### 7.2 Secure Monitor
+#### Secure Monitor
 
 ​	Secure Monitor 是 CPU 往来安全世界和非安全世界进行状态转换的桥梁。Secure Monitor 的代码是在 Trust 中实现的。如果没有这部分代码，CPU 将无法进行安全/非安全状态的切换，ARM TrustZone 技术也就失去了它的意义和作用。
 
@@ -328,11 +328,11 @@ SYSTEM_RESET
 
 > The Secure Monitor Call exception is implemented only as part of the Security Extensions. The Secure Monitor Call instruction, SMC, requests a Secure Monitor function, causing the processor to enter Monitor mode.
 
-#### 7.3 安全信息的配置
+#### 安全信息的配置
 
 ​	ARM TrustZone 技术除了本身 Cortex-A 处理器紧密集成，还需要通过 AMBA AXI 总线和特定的 TrustZone 系统 IP 块在系统中进行扩展，因此有一系列相关 IP 模块的安全信息需要进行配置，这部分配置一般都在 Trust 里完成。
 
-#### 7.4 安全数据的保护
+#### 安全数据的保护
 
 ​	安全数据保护。例如：安全支付、数字版权管理 (DRM)、企业服务和基于 Web 的服务等相关安全信息的存储保护。
 
@@ -340,7 +340,7 @@ SYSTEM_RESET
 
 ​	目前对外发布的固件只提供 Trust 的 binary 文件，不提供源代码。目前对于 Trust 的调试方式比较少，更多需要借助专门的 jtag 工具来进行分析，当 Trust 出问题的时候普通使用者一般并不具备自行调试和解决问题的能力，所以出现问题时请尽量保护好现场、收集足够多的信息反馈给负责 Trust 的 maintainer。因此通常使用者应当知道哪些是 Trust 的打印信息、Trust 对应的版本号、哪些是 Trust 的 PANIC 信息等。
 
-### 1. 开机 log 示例
+### 开机 log 示例
 
 ```c
 NOTICE:  BL31: v1.3(debug):4c793da
@@ -360,7 +360,7 @@ INFO:    Entry point address = 0x200000
 INFO:    SPSR = 0x3c9
 ```
 
-### 2. 打印信息识别
+### 打印信息识别
 
 除去开机阶段的打印信息，通常在运行过程中：
 
@@ -376,7 +376,7 @@ OP-TEE OS 打印格式（不带有时间戳）：
 INF [0x0] TEE-CORE: *********
 ```
 
-### 3. 固件版本号识别
+### 固件版本号识别
 
 ARM Trusted Firmware 的版本号：4c793da。
 
@@ -390,9 +390,9 @@ OP-TEE OS 的版本号：27532f4（忽略最前面的 g）。
 INF [0x0] TEE-CORE:init_primary_helper:337: Initializing (1.1.0-127-g27532f4 #54 Mon Dec 18 02:01:14 UTC 2017 aarch64)
 ```
 
-### 4. PANIC 信息识别
+### PANIC 信息识别
 
-#### 4.1 ARM Trusted Firmware 发生 panic
+#### ARM Trusted Firmware 发生 panic
 
 ```c
 Unhandled Exception in EL3.
@@ -444,7 +444,7 @@ spsr_abt =      0x0000000000000000
 ......
 ```
 
-#### 4.2 OP-TEE OS 发生 panic
+#### OP-TEE OS 发生 panic
 
 ```c
 core data-abort at address 0xc121b16c

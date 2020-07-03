@@ -40,7 +40,7 @@ SDK维护工程师
 
 # 一 Chameleon项目简介
 
-## 1.1 CI自动化测试系统简介
+## CI自动化测试系统简介
 
 Rockchip的开发模式, 是采用common的BSP, 大部分通用芯片共用kernel, U-Boot, Trust等模块, 一般由同一组人维护, 硬件芯片端会支持十几款芯片和更多的板子, 软件OS端需要支持不同版本的Linux, Android OS,  对于系统可用性, 兼容性, 稳定性, 性能等各方面都是比较大的挑战. Chameleon项目是利用LAVA, Jenkins, Gerrit对系统持续集成进行自动化测试的一个系统, 系统能保证BSP的各个模块, 在日常开发过程中, 做尽量多的验证, 提高整体代码质量. 整体框图如下：
 
@@ -57,7 +57,7 @@ Rockchip的开发模式, 是采用common的BSP, 大部分通用芯片共用kerne
 - lava-dev server: 172.16.12.245
 - lava-dev worker: 172.16.12.244
 
-## 1.2 Jenkins简介
+## Jenkins简介
 
 Jenkins 是始于Hudson的一个持续集成工具, 下图是一个通用的开发流程.
 ![jenkins-gerrit](chameleon/jenkins-gerrit.png)
@@ -74,7 +74,7 @@ Jenkins 是始于Hudson的一个持续集成工具, 下图是一个通用的开�
 下图是Gerrit/Jenkins/LAVA在RK系统的实际部署情况, 其中在Jenkins builder进行验证的时候,会发送job给Lava在实际的硬件板上进行测试.
 ![jenkins-rk](chameleon/jenkins-rk.png)
 
-## 1.3 LAVA简述
+## LAVA简述
 
 Linaro Automation and Validation Architecture(LAVA)是由Linaro开发的一个自动验证系统, 结合Gerrit, Jenkins可以形成一个完整的持续集成(CI)自动测试系统.
 
@@ -94,9 +94,9 @@ Slave端在LAVA里面也叫Worker, 主要是:
 LAVA运行的HOST推荐的系统是Debian, 参考<http://172.16.10.254/static/docs/v2/installing_on_debian.html>.
 Dispatcher的流程可参考<http://172.16.10.254/static/docs/v2/dispatcher-design.html>
 
-## 1.4 Chameleon项目内容
+## Chameleon项目内容
 
-### 1.4.1 主要目标
+### 主要目标
 
 - 硬件开发板需要连接所有正在维护的SDK对应的SDK板和市场上流行的开发板, 形成一个云验证平台, 顺便解决工程师硬件环境搭建难的问题；
 - 日常内部SDK/patch维护(gerrit review), 系统能解决RK发布的SDK所用的主线代码, 处于持续可用状态, 顺便解决工程师在解决非当前开发SDK的软件环境搭建难的问题；
@@ -104,7 +104,7 @@ Dispatcher的流程可参考<http://172.16.10.254/static/docs/v2/dispatcher-desi
 - upstream u-boot/kernel mainline可用性维护
 - 品质批量测试可自动化部分
 
-### 1.4.2 主要测试项
+### 主要测试项
 
 - Boot测试,(u-boot, kernel, trust, system), 用于gerrit代码patch review
   - 能启动到shell, android为adb连接
@@ -160,7 +160,7 @@ Dispatcher的流程可参考<http://172.16.10.254/static/docs/v2/dispatcher-desi
 
 参考<https://validation.linaro.org/static/docs/v2/installing_on_debian.html>
 
-## 2.1 LAVA版本介绍
+## LAVA版本介绍
 
 目前LAVA的版本比较多，官方网站主要有四个版本，具体区别如下：
 
@@ -196,9 +196,9 @@ deb https://images.validation.linaro.org/production-repo stretch-backports main
 sudo apt update
 ```
 
-## 2.2 LAVA Server建立与配置
+## LAVA Server建立与配置
 
-### 2.2.1 Debian安装LAVA Server
+### Debian安装LAVA Server
 
 ```shell
 sudo apt install postgresql
@@ -212,7 +212,7 @@ sudo service apache2 restart
 
 ==注意：升级lava-server并不会覆盖其配置文件/etc/apache2/sites-available/lava-server.conf==
 
-### 2.2.2 卸载lava-server
+### 卸载lava-server
 
 ```shell
 sudo apt autoremove postgresql lava-server
@@ -226,7 +226,7 @@ sudo a2dismod proxy
 sudo apt --purge autoremove postgresql lava-server
 ```
 
-### 2.2.3 lava-server配置
+### lava-server配置
 
 #### 修改时间域
 
@@ -275,7 +275,7 @@ cd /var/lib/lava-server/default/
 sudo ln -s /home/lava/workspace/lava-server/media/ .
 ```
 
-### 2.2.4 检查部署
+### 检查部署
 
 要检查前面的安装部署是否成功，可以运行如下命令：
 
@@ -297,7 +297,7 @@ System check identified 2 issues (2 silenced).
 
 可以看到有一个安全警告，这是我们之前启用http访问导致的，暂时可以不用管，如果没有其他错误，则代表部署成功。
 
-### 2.2.5 添加superuser
+### 添加superuser
 
 部署成功后，首先要添加一个超级用户来管理这个LAVA服务，命令如下：
 
@@ -307,7 +307,7 @@ sudo lava-server manage createsuperuser --username cliff
 
 这个命令会提示你输入email（用于密码重置）和passwd，之后你就可以通过访问<http://ip_of_lava_server>用这个账号登陆来实现大部分的管理功能。
 
-### 2.2.6 添加base device_type
+### 添加base device_type
 
 首先把我们自定义的device_type添加到server对应位置
 
@@ -321,7 +321,7 @@ cp rkdroid.jinja2 /etc/lava-server/dispatcher-config/device-types/rkdroid.jinja2
 sudo lava-server manage device-types add rkdroid
 ```
 
-### 2.2.7 LAVA Server Log
+### LAVA Server Log
 
 LAVA Server是由几个模块组成的，有各自的log
 与lava-slave交互，并接收http请求的是master daemon, log是：
@@ -331,7 +331,7 @@ scheduler模块的log是：
 另外每个任务有自己独立的文件夹，目录是
 /var/lib/lava-server/default/media/job-output/job-11424/
 
-## 2.3 LAVA Worker建立与配置
+## LAVA Worker建立与配置
 
 为了进行完整的测试，需要LAVA Worker能够保证以下模块/组件能够正常工作：
 独立账户，source code访问权限
@@ -343,7 +343,7 @@ DUT串口
 DUT ADB
 RK下载工具
 
-### 2.3.1 新增PC账户
+### 新增PC账户
 
 Debian安装完成后，有一个默认用户，我们需要新建一个'lava'的用户，(Debian9默认不支持sudo)．
 通过su命令登录到root；
@@ -358,7 +358,7 @@ passwd lava
 vim /etc/group #添加lava到sudo组
 ```
 
-### 2.3.2 设置静态IP
+### 设置静态IP
 
 Worker需要使用静态IP, 以便重启后能够通过同一个地址远程访问．修改/etc/network/interfaces文件，修改IP为静态IP
 
@@ -373,7 +373,7 @@ iface enp3s0 inet static
 
 FIXME: 以上修改可以实现静态IP，但是无法产生正确的DNS server(查询/etc/resolv.conf)，最终通过UI按以上配置来设置network可以正常工作．
 
-### 2.3.3 建立代码环境
+### 建立代码环境
 
 安装各种需要用到的基础包
 
@@ -400,7 +400,7 @@ user lava
 
 加入以上设置后，git clone代码时不需要带username，系统会默认使用以上user和对应的rsa key来认证．
 
-### 2.3.4 安装dispatcher
+### 安装dispatcher
 
 由于Debian９默认的dispatcher包版本较旧，我们需要安装back-port版本获取最新的安装包．
 /etc/apt/sources.list添加：
@@ -477,7 +477,7 @@ vim /var/log/lava-dispatcher/lava-slave.log
 
 LAVA Master发送过来的LAVA job以及Job的完成情况，都可以通过这个log来查询．
 
-### 2.3.5 安装LXC
+### 安装LXC
 
 #### Debian中安装LXC
 
@@ -519,7 +519,7 @@ sudo lxc-create -t debian -n lxc-test-10894 -- --release sid --arch amd64 --mirr
 
 LXC的log目录：/var/log/lxc/
 
-### 2.3.6 辅助控制接口
+### 辅助控制接口
 
 Linaro的设计是使用一个pduclient来对DUT进行一些物理信号控制，如power　on/off, reset等．我们这边直接使用python脚本来给硬件发送信号．
 运行dispatcher之前需要先测试辅助的控制命令都可以工作．
@@ -550,7 +550,7 @@ sudo service udev restart
 
 介绍测试方法请参考第四章．
 
-### 2.3.7 DUT串口支持
+### DUT串口支持
 
 rockchip的DUT均有一个debug uart，用于系统全过程的debug信息输出，lava-dispatcher对DUT串口的支持，是首先将串口转换成一个网络端口设备，然后通过telnet进行访问．
 
@@ -609,7 +609,7 @@ LAVA支持多个串口同时连接的模式，配置格式参考LAVA文档．
 telnet 172.16.12.249 7001
 ```
 
-### 2.3.8 DUT ADB支持
+### DUT ADB支持
 
 #### 安装ADB
 
@@ -645,7 +645,7 @@ adb devices
 adb reboot loader
 ```
 
-### 2.3.9 upgrade_tool
+### upgrade_tool
 
 我们使用Linux下的命令行工具upgrade_tool来作为LAVA测试系统的DUT固件下载工具，测试时先手动让设备进入maskrom模式或者loader模式，然后用命令测试是否可以正常烧写设备．
 
@@ -671,7 +671,7 @@ Found 1 rockusb,Select input DevNo,Rescan press <R>,Quit press <Q>:
 
 # 三 Jenkins服务器搭建
 
-## 3.1 Jenkins job配置
+## Jenkins job配置
 
 ### Jenkins任务管理
 
@@ -739,18 +739,18 @@ https://git.linaro.org/ci/job/configs.git
 https://lkft.validation.linaro.org
 ```
 
-## 3.2 Jenkins builder配置
+## Jenkins builder配置
 
-### 3.2.1 新增PC账户
+### 新增PC账户
 
 PC添加jenkins用户，把jenkins的私钥放入~/.ssh/目录；
 修改~/.ssh/config把访问10.10.10.29的user默认设置为jenkins；
 
-### 3.2.2 Jenkins服务器新增builder结点
+### Jenkins服务器新增builder结点
 
 在Jenkins服务器添加builder，把用户根目录作为builder的$ROOT_DIR．
 
-### 3.2.3 Jenkins builder环境
+### Jenkins builder环境
 
 Jenkins　builder的环境就是保证所有需要在此builder上运行的程序，脚本均可以正常工作．
 
@@ -828,7 +828,7 @@ sudo apt-get install openjdk-8-jdk git-core gnupg flex bison gperf build-essenti
 sudo pip install pycryptodome
 ```
 
-## 3.3 Apache2 HTTP 服务配置
+## Apache2 HTTP 服务配置
 
 Jenkins编译生成的固件, 统一通过一个HTTP服务器存放, 方便LAVA job获取使用.
 
@@ -868,7 +868,7 @@ DocumentRoot /home/lava/http/
 sudo service apache2 restart
 ```
 
-## 3.4 NFS配置
+## NFS配置
 
 为了方便Jenkins的Artifact Deployer插件在编译完成后把固件放到固件服务器, 同时也可以用于U-Boot NFS root测试, 需要搭建NFS服务器.
 
@@ -935,7 +935,7 @@ sudo vim /etc/fstab
 
 Chameleon硬件辅助板为自动化测试不可缺少的一环,它连接测试板与lava slave上位机,提供对控制测试板的上电,复位,以及通信等功能.
 
-## 4.1 硬件资源
+## 硬件资源
 
 - 4个USB2.0接口: 作为测试板串口输出接口
 - 4个USB3.0接口: 作为测试板OTG接口
@@ -976,7 +976,7 @@ INA226的电压测量值如下，其中U2 - 1 代表USB2.0的第一个设备，U
 
 ![hardware-link2](./chameleon/hardware-link2.png)
 
-## 4.2 软件系统
+## 软件系统
 
 chameleon硬件辅助板的软件系统包括RK3308固件编译, 辅助板app 和上位机的控制脚本
 
@@ -992,11 +992,11 @@ chameleon硬件辅助板的软件系统包括RK3308固件编译, 辅助板app �
 | 串口文件传输 				| 待完善 | 上位机发送/接受文件的速度大约为100/10 KB/s，接收文件的速度太慢，还没找到原因 |
 | USB文件传输 				| 未完成 | |
 
-### 4.2.1 整体框架
+### 整体框架
 
 ![chameleon software system](./chameleon/chameleon-software-system.png)
 
-### 4.2.2 固件编译
+### 固件编译
 
 chameleon硬件辅助板的固件包括MiniLoaderAll.bin, parameter.txt, trust.img, uboot.img, boot.img 和 rootfs.img, 接下来介绍固件的编译流程
 
@@ -1117,9 +1117,9 @@ cd chameleon-app && make && cp chameleon ../$FIRMWARE/rootfs/app/. && make clean
 mksquashfs $ROOTFS_PATH/rootfs/ $FIRMWARE/rootfs.squashfs -noappend -processors 24 -comp gzip
 ```
 
-## 4.3 通讯协议
+## 通讯协议
 
-### 4.3.1 dispatcher控制命令
+### dispatcher控制命令
 
 usage: chameleon.py [-h] [--device DEVICE] [--uart UART] [--ops OPS]
                     [--get_var GET_VAR] [--set_var SET_VAR]
@@ -1234,7 +1234,7 @@ sudo python chameleon.py --uart /dev/ttyUSB0 --get_file /tmp/record.wav --path .
 sudo python chameleon.py --uart /dev/ttyUSB0 --mode 2 --device 1 --ops reset-device
 ```
 
-### 4.3.2 chameleon串口通信协议
+### chameleon串口通信协议
 
 #### 控制命令
 
@@ -1315,7 +1315,7 @@ GPIO命令字段定义
 | FAILimplement error	| 执行错误	| chameleon硬件板执行命令时发生错误，可能是打开文件错误(无权限，路径不对），也有可能是内存申请失败，需要配合debug串口定位错误 |
 | FAILunknown operation	| 操作错误	| 下发的命令字段出错，可能是命令输入错误，或者传输乱码 |
 
-### 4.3.2 chameleon app
+### chameleon app
 
 chameleon app代码tree如下
 
@@ -1446,7 +1446,7 @@ lava@lava-slave06:/etc/lava-server/dispatcher-config$ tree
     └── rv1108-evb.yaml
 ```
 
-## 5.1 Server Dashboard添加设备
+## Server Dashboard添加设备
 
 打开Server Dashboard网页并登录，进入administration并打开Add device页，按需要填写信息，没有对应可选项可以直接添加, 添加新的项时注意按照实际情况填写架构，CPU核数量等信息，最重要的是命名请参考本节命名规范．
 
@@ -1484,9 +1484,9 @@ lava-slave03-mid
 lava-slave04
 ```
 
-## 5.2 更新device dictionary
+## 更新device dictionary
 
-### 5.2.1 生成device jinja2
+### 生成device jinja2
 
 #### 获取代码
 
@@ -1548,7 +1548,7 @@ sudo ./add_device.py
 
 其中开头部分表示这是基于'rkdroid.jinja2'的扩展，需要LAVA Server端的base device_type有对应文件和每个项的定义，参考2.2.6节.
 
-### 5.2.2 更新device dictionary到server
+### 更新device dictionary到server
 
 通过lava-tool命令行工具(已被cli工具替换)把配置好的设备配置更新到服务器
 
@@ -1559,9 +1559,9 @@ sudo lava-tool device-dictionary http://rktest:iws035h8esh11jlajsfz47sif96t0ciah
 命令执行成功后，在server　dashboard的device页面确认dictionary信息
 ![update device dictionary](chameleon/add_device03.png)
 
-## 5.3 DUT序列号
+## DUT序列号
 
-### 5.3.1 RK序列号
+### RK序列号
 
 Rockchip的SDK提供一个vendor storage区域，用于存放设备的SN，可直接用于U-Boot　rockusb, Kernel的adb等，Android中使用vendor storage的SN作为USB的SN，是在Android 8.1才合并，早期的版本需要手动加补丁．Rockchip早期使用过IDB区域来存放SN数据，这个方法已被替换，后续不推荐使用．
 Rockchip的序列号生成方法是：
@@ -1570,19 +1570,19 @@ Rockchip的序列号生成方法是：
 －从efuse读取cpuid(长度不对)，然后通过一次转换得到SN;
 －以上接口都没有，则使用随机产生的SN；
 
-### 5.3.2 序列号的使用
+### 序列号的使用
 
 Linux升级工具upgrade_tool的'-s'参数支持指定序列号对特定设备进行操作，这个参数同时支持把usb location  id作为参数，可以根据实际情况使用，如maskrom的rockusb没有提供SN．
 
 adb工具同样使用'-s'选项指定序列号对特定设备进行操作．
 
-### 5.3.3 RK写号工具
+### RK写号工具
 
 烧写设备SN可以使用Windows下的写号工具或UpgradeDllTool，目前没有Linux版本．根据文档烧写序列号，工具默认会同时烧写vendor storage区域和IDB区域．
 <img src="chameleon/tool_upgradedll.png" style="zoom:80%"/>
 <img src="chameleon/tool_sn.png" style="zoom:70%"/>
 
-### 5.3.4 确认序列号可用
+### 确认序列号可用
 
 把烧写序列号后的设备通过USB连接到PC，可以在pc上通过命令查询
 
@@ -1614,7 +1614,7 @@ adb devices
 
 # 六 LAVA JOB
 
-## 6.1 JOB实现流程
+## JOB实现流程
 
 - 任务提交到LAVA Master,
 - Master 解析调度任务
@@ -1640,9 +1640,9 @@ LAVA dispatcher中的daemon收到master的任务后，会开始解析任务，�
 
 测试输出需要格式化为特定格式的数据，输出由LAVA Server解析的信息。如果有需要，可以在web interface里面使用图表形式进行长期追踪。
 
-## 6.2 JOB提交
+## JOB提交
 
-### 6.2.1 通过命令提交
+### 通过命令提交
 
 为了方便提交任务，我们提供了一个仓库，包含了提交脚本和job模板
 
@@ -1686,7 +1686,7 @@ boot_url = http://172.16.10.254:8000/images/rk3288_P1/boot.img
 
 需要注意的是JOB_VAR中的"device_tag"是用于指定某个特定的设备，不是必须的，如果未指定，LAVA Server会从设备列表中找一个device_type符合的可用设备来执行任务．
 
-### 6.2.2 通过网页提交
+### 通过网页提交
 
 有效账户登录网页后，可以通过网页接口直接提交job，首先在Scheduler选项下面点击submit, 如下图
 ![submit job](chameleon/submit_job.jpg)
@@ -1694,19 +1694,19 @@ boot_url = http://172.16.10.254:8000/images/rk3288_P1/boot.img
 出来的界面如下，把job的详细内容粘贴到中间的文本框中，点击左下放的'Validate', 成功后点击Submit提交。
 ![submit job2](chameleon/submit_job2.jpg)
 
-### 6.2.3 网页查看任务内容
+### 网页查看任务内容
 
 job提交后，可以通过job的详细信息页面查询当前执行的任务内容，点击下图中的'Definition'查看。
 ![job detail](chameleon/job_detail.jpg)
 
-## 6.3 LAVA job定义
+## LAVA job定义
 
 提交给LAVA Server的job是YAML格式的描述，提交的任务格式包含：
 
 - parameters for the job
 - list of actions.
 
-### 6.3.1 parameter部分
+### parameter部分
 
 必需包含的内容有：
 device_type, 用于指定测试目标的设备类型
@@ -1736,7 +1736,7 @@ action_timeout:
 priority: medium
 ```
 
-### 6.3.2 actions部分
+### actions部分
 
 Actions部分定义了测试任务该使用什么方法，部署什么固件，如何进入测试环境，并测试什么内容。
 一般分为3个阶段：
@@ -1807,7 +1807,7 @@ Action详细的选项参考如下内容：
 <http://172.16.12.246/static/docs/v2/dispatcher-format.html>
 <http://172.16.12.246/static/docs/v2/dispatcher-actions.html>
 
-### 6.3.3 job示例
+### job示例
 
 以下几个示例列出了rockchip平台实际使用的job内容。
 
@@ -1956,9 +1956,9 @@ visibility: public
         name: get-adb-serial
 ```
 
-## 6.4 LAVA Server详细实现
+## LAVA Server详细实现
 
-### 6.4.1 Server状态机
+### Server状态机
 
 LAVA Master通过Worker, Device, Job这几个状态机来描述和管理各自的状态和健康情况。
 
@@ -2015,7 +2015,7 @@ LAVA Master通过Worker, Device, Job这几个状态机来描述和管理各自�
   - Incomplete
   - Canceled: the test job was canceled.
 
-### 6.4.2 Scheduler
+### Scheduler
 
 调度器一般由lava-master每20S发起一次，首先调度health-check任务，然后在查询数据库中的其他job情况调度到对应的device.
 
@@ -2598,9 +2598,9 @@ def start_job(self, job, options):
 [^1]: 代码可以看/etc/init.d/lava-slave
 [^2]: 代码可以看/etc/init.d/lava-master
 
-## 6.5 LAVA dispatcher
+## LAVA dispatcher
 
-### 6.5.1 Dispatcher流程
+### Dispatcher流程
 
 LAVA的dispatcher由slave daemon(lava-run)收到master发过来的job后启动，主要分为job的parser和runner。
 parser解析server发过来的action_data，形成一份可执行的pipeline作为job执行内容。
@@ -2650,7 +2650,7 @@ Deploy (1)
    \_ 2.2
 ```
 
-### 6.5.2 Pipeline示例
+### Pipeline示例
 
 下面通过几个在rockchip平台实际使用的测试用例，来了解测试过程。
 
@@ -2783,7 +2783,7 @@ Android的测试在Linux测试的基础上加入了LXC的deploy和boot, 需要�
 可以通过如下地址了解详细信息:
 <http://172.16.12.246/static/docs/v2/dispatcher-design.html>
 
-### 6.5.3 Deploy action -- rk_upgrade
+### Deploy action -- rk_upgrade
 
 为了适配rk的固件类型和烧写工具，开发了一个新的'deploy'方法，名为'rk_upgrade',　使用'upgrade_tool'升级，支持三种类型:
 
@@ -2809,7 +2809,7 @@ Android的测试在Linux测试的基础上加入了LXC的deploy和boot, 需要�
         apply-overlay: true
 ```
 
-### 6.5.4 Test action -- lava-test-shell
+### Test action -- lava-test-shell
 
 dispatcher在'lava_dispatcher/lava_test_shell/'目录提供了一系列的黑盒工具，用于运行test-definition脚本，在deploy阶段需要进行预编译到可直接执行的状态，然后打包到rootfs中，然后运行测试时由test　action　’lava-test-shell‘(lava_dispatcher/actions/test/shell.py)启用。
 
@@ -2882,9 +2882,9 @@ if __name__ == '__main__':
 网页中test-case结果解析如下：
 ![test case result](chameleon/test_case_result.jpg)
 
-## 6.6 Test-definition
+## Test-definition
 
-### 6.6.1 代码仓库
+### 代码仓库
 
 前面6.3.2提到LAVA JOB中的'Test'测试项，一般是一个独立的git仓库存放测试代码。我们在linaro代码的基础上，加入了一些自己测试内容，形成自己的仓库，地址如下：
 
@@ -2896,7 +2896,7 @@ ssh://10.10.10.29:29418/rk/test-definitions
 https://git.linaro.org/qa/test-definitions.git
 ```
 
-### 6.6.2 test-definition格式
+### test-definition格式
 
 LAVA Test-definition包含３部分:
 
@@ -2954,7 +2954,7 @@ parse:
 
 如果使用独立脚本进行测试，可以调用一些预定义的库函数以减少代码重复，对于测试结果，建议测试脚本按要求格式生成output/result.txt，然后调用utils/send-to-lava.sh ./output/result.txt把信息传给lava, lava解析后得到6.5节的输出效果。
 
-### 6.6.3 库函数
+### 库函数
 
 test-definition仓库automated/lib/下面提供了给测试脚本使用的库函数:
 
@@ -2974,7 +2974,7 @@ error_msg "Unsupported architecture!"
 warn_msg "Unsupported architecture"
 ```
 
-### 6.6.4 Linux测试case示例
+### Linux测试case示例
 
 Linux系统测试中，'linux-test-shell'和测试项'test-definition'都是打包在DUT的rootfs中，所有程序直接在DUT的系统里面运行。
 
@@ -3177,7 +3177,7 @@ dd_read
 parse_output "dd-read"
 ```
 
-### 6.6.5 Android系统测试项
+### Android系统测试项
 
 Android测试项与Linux测试不一样，'lava-test-shell'和'test-definition'都是部署在LXC的rootfs，而不是部署到DUT，所有与DUT的交互都是通过ADB完成。测试需要用到的资源和文件，都是通过adb　push推送，命令通过adb shell运行，如果要运行的命令较复杂，则可以把脚本push到DUT后运行，最后结果通过adb pull获取。通过如下示例，可以比较清晰的看出一个测试的完整流程。
 
@@ -3393,7 +3393,7 @@ for i in $(seq "${ITERATION}"); do
 done
 ```
 
-### 6.6.6 一些建议
+### 一些建议
 
 - 脚本中所有命令必须是可执行的，如果是跟os有关，需要加以区分，这是为什么yaml中有'os'属性；
 - 所有测试必须在特定的目录内完成，如果有测试仓库下载，也需要checkout到同一个目录下面；
@@ -3410,7 +3410,7 @@ done
 <http://172.16.12.246/static/docs/v2/lava_test_shell.html>
 <http://172.16.12.246/static/docs/v2/writing-tests.html>
 
-### 6.6.7 LTP
+### LTP
 
 The Linux Test Project is a joint project started by SGI, developed and maintained by IBM, Cisco, Fujitsu, SUSE, Red Hat and others, that has a goal to deliver test suites to the open source community that validate the reliability, robustness, and stability of Linux. The LTP testsuite contains a collection of tools for testing the Linux kernel and related features.
 代码:
@@ -3422,7 +3422,7 @@ git clone https://github.com/linux-test-project/ltp.git
 维护者主要是Linux操作系统厂商和一些产品品牌商，所以侧重与系统层面的测试，如syscall, fs, io, mm, net等，不做benchmark。
 一年发布3次，文档请查看<https://github.com/linux-test-project/ltp/wiki/Developers>
 
-### 6.6.8 LTP-DDT
+### LTP-DDT
 
 LTP-DDT(Device Driver Tests)是TI基于LTP项目扩展用于测试Linux驱动的项目，基础架构和使用方式完全使用LTP内容，测试用例/场景代码位于'runtest/ddt/'，需要用到的测试代码/脚本位于'testcases/ddt/'.
 项目页面<http://processors.wiki.ti.com/index.php/LTP-DDT>, 代码：
@@ -3480,7 +3480,7 @@ git clone git://arago-project.org/git/projects/test-automation/ltp-ddt.git
 - dwt
 - wlan
 
-## 6.7 使用测试结果
+## 使用测试结果
 
 测试结果通过格式化输出后，可以在LAVA的任务页面看到测试输出，而实际上单个测试的结果数据，通常意义不大，后续的数据处理才更有用处。LAVA对于测试结果的使用提供了：
 
@@ -3490,7 +3490,7 @@ git clone git://arago-project.org/git/projects/test-automation/ltp-ddt.git
 - 定制结果处理规则；
 - LAVA的数据过滤和列表
 
-### 6.7.1 LAVA Queries
+### LAVA Queries
 
 单一的query可以基于如下其中一个对象进行条件过滤:
 
@@ -3553,7 +3553,7 @@ git clone git://arago-project.org/git/projects/test-automation/ltp-ddt.git
 添加完成后的'dd-wr-speed'　query示例
 ![query dd wr](chameleon/query-dd-wr.png)
 
-### 6.7.2 LAVA Charts
+### LAVA Charts
 
 按要求建立好query后，就可以建立chart来显示query，在Result->Chart页面，点击'Create'输入名字和描述后，就得到如下图的页面：
 

@@ -75,15 +75,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 MiniGUI Desktop
+## MiniGUI Desktop
 
-### 1.1 概述
+### 概述
 
 MiniGUI是一款面向嵌入式系统的高级窗口系统和图形用户界面支持系统，目前我们在MiniGUI的基础上编写了MiniGUI Desktop，用以实现音频播放、视频播放、图片浏览等功能，支持按键或触屏控制，便于二次开发。
 
-### 1.2  功能描述
+### 功能描述
 
-#### 1.2.1 文件浏览
+#### 文件浏览
 
 表 1‑1支持的文件类型
 
@@ -99,7 +99,7 @@ MiniGUI是一款面向嵌入式系统的高级窗口系统和图形用户界面�
 
 在图片预览窗体中，支持上一张/下一张以及双击屏幕退出。
 
-#### 1.2.2   系统设置
+#### 系统设置
 
 图 1‑1系统设置层级关系
 
@@ -117,7 +117,7 @@ MiniGUI是一款面向嵌入式系统的高级窗口系统和图形用户界面�
 
 **系统信息：**显示模组型号；显示固件版本号；点击系统升级会判断是否有固件可更新。
 
-### 1.3 编译配置
+### 编译配置
 
 板级配置：
 
@@ -152,13 +152,13 @@ ENABLE_WIFI=1
 ENABLE_BATT=1
 ```
 
-### 1.4 开发指引
+### 开发指引
 
-#### 1.4.1 创建窗体
+#### 创建窗体
 
 函数DialogBoxIndirectParam用于创建窗体并设置对应的事件处理函数，一般情况下，每个窗体都有单独的dialog文件，例如audioplay_dialog.c，每个窗体都有自己的创建函数和事件处理函数，以audioplay_dialog为例，其创建窗体的函数为creat_audioplay_dialog，主要工作为指定窗体的位置以及一些参数的传递和初始化，最后调用DialogBoxIndirectParam创建窗体。
 
-#### 1.4.2 窗体事件处理
+#### 窗体事件处理
 
 在创建一个窗体时，会绑定对应事件处理函数，以audioplay_dialog.c为例，其处理函数为audioplay_dialog_proc，系统触发某一事件后，就会上发至该函数进行处理。常用事件如下：
 
@@ -178,12 +178,12 @@ ENABLE_BATT=1
 
 注：更多事件的触发和处理可参考MiniGUI官方文档说明。
 
-#### 1.4.3 控件的绘制和按下判断
+#### 控件的绘制和按下判断
 
 按钮等控件的绘制本质上是绘制图片，使用FillBox、FillBoxWithBitmap、DrawText等函数实现，按下判断则是在触发MSG_LBUTTONDOWN、MSG_LBUTTONUP事件后记录对应的坐标，调用各个窗体的check_button函数去判断是哪个控件被触发，从而执行对应的操作。
 
 绘制时的坐标等参数由ui_1024x600.h、ui_480x272.h、ui_480_320.h分别指定对应分辨率下的数值，目前ui_1024x600.h中的支持较完善，另外两种分辨率，或其他分辨率的头文件还需要进行适配。在common.h中通过#include的方式指定使用哪个分辨率的头文件。
 
-### 1.5 常见问题
+### 常见问题
 
 请参考常见问题FAQs:[https://github.com/VincentWei/minigui/wiki/FAQs-in-Chinese](https://github.com/VincentWei/minigui/wiki/FAQs-in-Chinese)

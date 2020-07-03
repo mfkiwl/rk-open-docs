@@ -80,11 +80,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1.1 概述
+## 概述
 
 ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb带宽允许的情况下可以支持24台设备同时升级。
 
-## 1.2 目录结构
+## 目录结构
 
 - Language目录:语言文件
 
@@ -92,7 +92,7 @@ ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb�
 
 - ProductionTool.exe 烧录程序
 
-## 1.3 常用设置
+## 常用设置
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\common_settings.png)
 
@@ -106,13 +106,13 @@ ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb�
 
 5. “不烧录未使用的分区空间”,勾选上,工具烧录固件时,只写入固件中各分区的有效数据,未使用的填充数据不进行烧写.
 
-## 1.4 固件升级
+## 固件升级
 
-### 1.4.1 点击”固件”,选择固件和Loader
+### 点击”固件”,选择固件和Loader
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\firmware_upgrade_step1.png)
 
-### 1.4.2 点击”启动”,开始等待升级设备接入
+### 点击”启动”,开始等待升级设备接入
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\firmware_upgrade_step2.png)
 
@@ -123,19 +123,19 @@ ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb�
 点击”停止”后,用一台升级设备依次接入所有使用的usb端口,每接入一个usb端口,记录下工具给它分配的ID,然后用标签纸写上ID,贴在usb线上,以后工具都是用ID来表示设备.
 ![](.\Rockchip-User-Guide-ProductionTool-CN\firmware_upgrade_step3.png)
 
-## 1.5 常见升级问题
+## 常见升级问题
 
-### 1.5.1 下载Boot失败
+### 下载Boot失败
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\boot_download_fail.png)
 下载Boot操作分两步,一是下载ddr初始化代码到sram中运行,二是下载升级代码到ddr中运行,所以这个步骤失败:1查主控;2查ddr
 
-### 1.5.2 测试设备失败
+### 测试设备失败
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\test_device_fail.png)
 测试设备操作在下载Boot之后,如果测试设备失败,多数是DDR有问题,导致下载到ddr中的升级通讯代码运行不正常.
 
-### 1.5.3 下载Firmware失败
+### 下载Firmware失败
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\down_firmware_fail.png)
 
@@ -144,7 +144,7 @@ ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb�
 1. usb通讯不稳定,更换usb端口或者usb连接线,检查设备端usb硬件
 2. 设备端写操作出错,连接串口,提供串口日志,排除flash硬件
 
-### 1.5.4 校验Firmware失败
+### 校验Firmware失败
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\check_firmware_fail.png)
 “校验Firmware失败”,校验过程主要是回读数据进行比较,失败的原因:
@@ -152,7 +152,7 @@ ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb�
 1. usb通讯不稳定,更换usb端口或者usb连接线,检查设备端usb硬件
 2. 设备端读操作出错,连接串口,提供串口日志,排除flash硬件
 
-### 1.5.5 校验Firmware失败,数据比较出错
+### 校验Firmware失败,数据比较出错
 
 ![](.\Rockchip-User-Guide-ProductionTool-CN\check_firmware_data_compare_err.png)
 
@@ -161,6 +161,6 @@ ProductionTool是应用在小系统解决方案上的厂线烧录工具,在usb�
 1. 如果不同数据,是非常有规律的个别bit出错,检查ddr
 2. 如果数据出现大块不同,检查flash
 
-### 1.5.6 权限问题
+### 权限问题
 
 当出现”下载Boot”失败情况,请先确认rockusb驱动是不是使用v4.6之前版本,如果是,需要右击程序以管理员权限打开工具.

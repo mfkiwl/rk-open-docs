@@ -76,7 +76,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 RK2206_EVB_V11_20191204
+## RK2206_EVB_V11_20191204
 
 RK2206_EVB_V11_20191204 平面图如下:
 
@@ -86,7 +86,7 @@ RK2206_EVB_V11_20191204 平面图如下:
 
 <img src="./resources/BATTERY.jpg" style="zoom: %;" />
 
-## 2 工厂模式编译设置
+## 工厂模式编译设置
 
 工厂测试模式需在编译前配置开启。
 
@@ -123,7 +123,7 @@ make menuconfig                                                #选择单板 RK2
 make build -j32                                                 #编译
 ```
 
-## 3 按键与测试项
+## 按键与测试项
 
 - 按键丝印与下表一致
 

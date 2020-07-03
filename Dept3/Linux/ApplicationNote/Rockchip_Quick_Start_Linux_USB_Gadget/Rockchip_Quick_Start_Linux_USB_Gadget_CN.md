@@ -176,7 +176,7 @@ usb_uvc_en
 
 /tmp/.usb_config 是/etc/init.d/.usb_config的复制文件，开机后，S50usbdevice会将/etc/init.d/.usb_config复制一份到/tmp下，/tmp目录为ram空间，可以随时修改。在运行状态下，需要临时修改USB功能，可以修改该文件，并用/etc/init.d/S50usbdevice restart重置USB功能。
 
-#### 2.2.1 ADB (Android Debug Bridge)
+#### ADB (Android Debug Bridge)
 
 ADB是一种功能多样的命令行调试工具，可以实现文件传输，Unix Shell登录等功能。
 
@@ -204,7 +204,7 @@ sudo adb devices
 
 Windows 需要安装ADB驱动，必要时，需要使用管理员权限运行ADB
 
-#### 2.2.2 UAC （USB Audio Class）
+#### UAC （USB Audio Class）
 
 UAC通过USB虚拟标准PCM接口给Host设备，实现Device和Host之间音频互传功能。
 
@@ -276,7 +276,7 @@ Windows:
 
 这样就可以在PC的扬声器上听到测试音频。
 
-#### 2.2.3 RNDIS（Remote Network Driver Interface Specification）
+#### RNDIS（Remote Network Driver Interface Specification）
 
 RNDIS提供基于USB的网络接口规范，可以使用网络命令（SSH等）实现Device和Host的数据交互。
 
@@ -324,7 +324,7 @@ ifconfig enp0s20u3u4u4 up
 
 **Note:**Windows上识别成功自动分配ipv4地址，无需手动分配。
 
-#### 2.2.4 MTP （Media Transfer Protocol）
+#### MTP （Media Transfer Protocol）
 
 MTP是由Microsoft提出的一套媒体文件传输协议，可以方便的在Device和Host之间共享媒体文件。
 
@@ -345,7 +345,7 @@ echo usb_mtp_en > /tmp/.usb_config
 
 **Note:**MTP属性名称可以在buildroot/package/rockchip/mtp中，参考补丁修改。默认共享/userdata目录。
 
-#### 2.2.5 UMS （USB Mass Storage）
+#### UMS （USB Mass Storage）
 
 UMS 给Host设备提供大容量外挂存储。
 
@@ -388,7 +388,7 @@ echo "ums_block_auto_mount=on" >> /tmp/.usb_config
 
 ![UMS Config](resources/UMS_Config.png)
 
-#### 2.2.6 ACM （CDC - ACM: Communication Device Class - Abstract Control Model）
+#### ACM （CDC - ACM: Communication Device Class - Abstract Control Model）
 
 可以理解为USB虚拟串口，在Device/Host两端生成TTY设备。
 
@@ -408,7 +408,7 @@ echo test > /dev/ttyACM0
 cat /dev/ttyGS0 #得到 test 输出
 ~~~
 
-#### 2.2.7 UVC (USB Video Class)
+#### UVC (USB Video Class)
 
 UVC 功能需要上层UVC应用才能正常启动，Buildroot中提供了一个测试Demo (uvc_app)，Buildroot中需要打开对应编译开关。
 

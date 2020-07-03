@@ -177,7 +177,7 @@ rk_err_t TimerDev_Start(HDC dev);
 rk_err_t TimerDev_Stop(HDC dev);
 ```
 
-### 1.4 函数接口调用范例
+### 函数接口调用范例
 
 参考 shell_timer.c。
 

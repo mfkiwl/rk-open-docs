@@ -68,9 +68,9 @@ Hardware development engineers
 ---
 [TOC]
 
-## 1 Overview
+## Overview
 
-### 1.1 RK USB Controllers Solution
+### RK USB Controllers Solution
 
 Rockchip SoC usually has several USB controllers built in, and different controllers are independent of each other. Please get detailed information in the chip TRM. Because some USB controllers have limitations on usage, it is important to clarify the requirements of the scheme and the limitations of the controller before determining the design scheme of USB. The built-in USB controllers of each chip are shown in Table 1-1.
 
@@ -100,7 +100,7 @@ Table 1‑1 USB Controllers List
 2. In the table, "EHCI/OHCI" indicates that the USB controller integrates the EHCI controller and OHCI controller. "DWC3/xHCI" indicates that the USB controller integrates the DWC3 controller and xHCI controller.
 3. RK3288 supports two independent DWC2 controllers. One DWC2 supports OTG function and the other DWC2 only supports Host function.
 
-### 1.2 USB 2.0 Host
+### USB 2.0 Host
 
 Compatible Specification
 
@@ -118,7 +118,7 @@ Features
 
 Figure 1-1 USB 2.0 Host Controller Block Diagram
 
-### 1.3 USB 2.0 OTG
+### USB 2.0 OTG
 
 Compatible Specification
 
@@ -154,7 +154,7 @@ Features
 
 Figure 1‑2 USB 2.0 OTG Block Diagram
 
-### 1.4 USB 3.0 OTG
+### USB 3.0 OTG
 
 Compatible Specification
 
@@ -220,7 +220,7 @@ USB 3.0 xHCI Host Features
 
 Figure 1‑3 USB 3.0 OTG Block Diagram
 
-### 1.5 USB 2.0 PHY
+### USB 2.0 PHY
 
 The USB 2.0 PHY supports two designs, one port and two ports. Figure 1-4 below is a block diagram that supports two ports.
 
@@ -232,7 +232,7 @@ Figure 1‑4 USB 2.0 PHY Block Diagram
 
 - OTG Port: connect to USB 3.0 OTG controller or USB 2.0 logic module of USB 2.0 OTG controller via UTMI+
 
-### 1.6 Type-C USB 3.0 PHY
+### Type-C USB 3.0 PHY
 
 - Support USB 3.0 (SuperSpeed only)
 
@@ -252,13 +252,13 @@ Figure 1‑5 TypeC PHY Block Diagram
 
 ---
 
-## 2 Hardware Circuits and Signals
+## Hardware Circuits and Signals
 
-### 2.1 USB 2.0 Host Hardware Circuits
+### USB 2.0 Host Hardware Circuits
 
 This chapter introduces the hardware circuit design and signal of USB 2.0 HOST. According to the type of USB 2.0 PHY used, it can be divided into common USB 2.0 HOST hardware circuit and USB 2.0 HSIC hardware circuit.
 
-#### 2.1.1 Common USB 2.0 Host Hardware Circuit
+#### Common USB 2.0 Host Hardware Circuit
 
 USB 2.0 works at 480MHz clock, it is suggested that the width of USB 2.0 DP/DM lines should be 7-8 MIL and 90 Ω impedance differential. It is better to layout on the surface layer and cover the ground, and no interference source on the edge and no other signal line on the right upper and lower layers.
 
@@ -280,7 +280,7 @@ Figure 2-2 USB 2.0 Host VBUS control circuit and interface circuit
 
 Figure 2‑3 USB 2.0 Host VBUS GPIO controller pin
 
-#### 2.1.2 USB 2.0 HSIC Hardware Circuit
+#### USB 2.0 HSIC Hardware Circuit
 
 HSIC (High Speed Inter Chip) uses 240 MHz DDR signal, so the transmission rate is 480 Mbps, the same as USB 2.0, and the typical line impedance is 50 Ω. It is suggested that the maximum length of the line should not exceed 10 cm on the PCB.
 
@@ -292,9 +292,9 @@ Example (USB 2.0 HSIC hardware circuit design of RK3399 SoC)
 
 Figure 2‑4 USB 2.0 HSIC pin in SoC
 
-### 2.2 USB OTG Hardware Circuits
+### USB OTG Hardware Circuits
 
-#### 2.2.1 USB 2.0 OTG Hardware Circuit
+#### USB 2.0 OTG Hardware Circuit
 
 USB 2.0 OTG related hardware signals:
 
@@ -325,7 +325,7 @@ Figure 2-7 USB 2.0 OTG_DET circuit
 
 Figure 2-8 USB 2.0 OTG_DRV circuit
 
-#### 2.2.2 USB 3.0 OTG Hardware Circuit
+#### USB 3.0 OTG Hardware Circuit
 
 The maximum transmission rate of USB 3.0 OTG is 5Gbps, which is downward compatible with USB 2.0 OTG function. The physical interface is Type-C or Type-A. The USB 3.0 OTG supports 4-wire differential signal lines up to 3 meters and 11-inch PCB. In order to avoid interference and reduce electromagnetic interference, the 5Gbps signal is transmitted by differential signal on long cable.
 
@@ -362,7 +362,7 @@ Figure 2‑13 USB 3.0 VBUS Control Circuit-1（Control by GPIO）
 Figure 2‑14 USB 3.0 VBUS Control-2（Control by RK818）
 
 ---
-## 3 Kernel USB CONFIG
+## Kernel USB CONFIG
 
 The configuration and saving of the USB module is the same as the other kernel modules.
 
@@ -386,7 +386,7 @@ make ARCH=arm64 savedefconfig
 
 Use the defconfig instead of the rockchip_defconfig
 
-### 3.1 USB PHY CONFIG
+### USB PHY CONFIG
 
 ```makefile
 
@@ -407,7 +407,7 @@ Device Drivers  --->
 
 "Rockchip INNO USB 3.0 PHY Driver" is used for USB 3.0 PHY with Innosilicon IP block, e.g. RK3328；
 
-### 3.2 USB Host CONFIG
+### USB Host CONFIG
 
 The configuration of the USB Host module is located at
 
@@ -443,7 +443,7 @@ Select the xHCI configurations to support USB 3.0 HOST.
 
 Note: In order to cut the Kernel core, the rk3308_linux_defconfig used for RK3308 doesn't support USB HOST. But actually, RK3308 SoC integrates one USB 2.0 Host controller (EHCI&OHCI). Select the OHCI/EHCI configurations and the related device class drivers if you want to use USB 2.0 HOST interface on RK3308 Board.
 
-### 3.3 USB OTG CONFIG
+### USB OTG CONFIG
 
 Select the “DesignWare USB2 DRD Core Support” and the mode for USB 2.0 OTG controller driver.
 
@@ -463,7 +463,7 @@ Device Drivers  --->
 
 ```
 
-### 3.4 USB Gadget CONFIG
+### USB Gadget CONFIG
 
 Rockchip platforms support the USB Gadget ACM、RNDIS、MSC、MTP、PTP、Accessory、ADB、MIDI、Audio function by default. Developers can enable more USB Gadget functions according to actual product requirements, but at the same time, init files in Android system need to be modified.（init.rk30board.usb.rc and init.usb.configfs.rc）。
 
@@ -499,9 +499,9 @@ DeviceDrivers  --->
 
 ```
 
-### 3.5 USB Device Class Driver CONFIG
+### USB Device Class Driver CONFIG
 
-#### 3.5.1 Mass Storage Class CONFIG
+#### Mass Storage Class CONFIG
 
 The U disk belongs to SCSI device, so the SCSI options need to be configured before enable the USB Mass Storage configuration.
 
@@ -539,7 +539,7 @@ Device Driver --->
 
 ```
 
-#### 3.5.2 USB Serial Converter CONFIG
+#### USB Serial Converter CONFIG
 
 - Support USB 3G Modem
 
@@ -594,7 +594,7 @@ Device Drivers	--->
 
  ```
 
-#### 3.5.3 USB HID CONFIG
+#### USB HID CONFIG
 
 Select the following HID configuration to support generic USB Mouse and Keyboard.
 
@@ -608,7 +608,7 @@ Device Drivers	--->
 
 ```
 
-#### 3.5.4 USB Net CONFIG
+#### USB Net CONFIG
 
 - USB Bluetooth CONFIG
 
@@ -681,7 +681,7 @@ Device Driver --->
 
 ```
 
-#### 3.5.5 USB Camera CONFIG
+#### USB Camera CONFIG
 
 ```makefile
 
@@ -694,7 +694,7 @@ Device Driver --->
 
 ```
 
-#### 3.5.6 USB Audio CONFIG
+#### USB Audio CONFIG
 
 ```makefile
 
@@ -707,7 +707,7 @@ Device Driver --->
 
 ```
 
-#### 3.5.7 USB HUB CONFIG
+#### USB HUB CONFIG
 
 Disable the configuration “Disable external HUBs” to support the external USB HUB.
 
@@ -724,9 +724,9 @@ Device Drivers --->
 There are many other USB devices that may be used, such as GPS, Printer, etc. It may need Vendor customized driver or standard Class driver. If you need to support these USB devices, you can search methods via internet to support them. Rockchip platforms have no special requirements, you can directly refer to those methods.
 
 ---
-## 4 USB DTS Configuration
+## USB DTS Configuration
 
-### 4.1 USB 2.0/3.0 PHY DTS
+### USB 2.0/3.0 PHY DTS
 
 USB PHY is divided into USB 2.0 PHY and USB 3.0 PHY. These two PHYs are independent of each other, and their characteristics are quite different, so you need to configure DTS separately.
 
@@ -734,7 +734,7 @@ USB PHY is divided into USB 2.0 PHY and USB 3.0 PHY. These two PHYs are independ
 
 `Rockchip_RK3399_Developer_Guide_USB_DTS_CN`
 
-#### 4.1.1 USB 2.0 PHY DTS
+#### USB 2.0 PHY DTS
 
 Rockchip series SoCs mainly use two USB 2.0 PHY IPs: Innosilicon IP and Synopsis IP. The hardware design of these two IPs is different, so the corresponding PHY DTS configuration is also different. Most of the Rockchip series USB 2.0 PHYs use Innosilicon IP.
 
@@ -832,7 +832,7 @@ u2phy0_host: host-port {
 };
 ```
 
-#### 4.1.2 USB 3.0 PHY DTS
+#### USB 3.0 PHY DTS
 
 Rockchip series SoCs mainly use three types of USB 3.0 PHY IP: Type-C PHY IP, Innosilicon USB 3.0 PHY IP and Innosilicon USB 3.0 CombPhy IP. These three IPs have different hardware designs, so their corresponding PHY DTS configurations are also different.
 
@@ -915,7 +915,7 @@ tcphy0: phy@ff7c0000 {
 
 `Rockchip_RK3399_Developer_Guide_USB_DTS_CN`
 
-### 4.2 USB 2.0 Controller DTS
+### USB 2.0 Controller DTS
 
 There are two different architectures controllers:
 
@@ -924,7 +924,7 @@ There are two different architectures controllers:
 
 The following describes the two different architectures of the USB 2.0 controller DTS.
 
-#### 4.2.1 USB 2.0 Host Controller DTS
+#### USB 2.0 Host Controller DTS
 
 1. **USB 2.0 Host Controller DTS configuration document**
 
@@ -970,7 +970,7 @@ usb_host0_ohci: usb@fe3a0000 {
 
 ```
 
-#### 4.2.2 USB 2.0 OTG Controller DTS
+#### USB 2.0 OTG Controller DTS
 
 1. **USB 2.0 OTG Controller DTS configuration document**
 
@@ -1033,13 +1033,13 @@ usb20_otg: usb@ff580000 {
 
 ```
 
-### 4.3 USB 3.0 Controller DTS
+### USB 3.0 Controller DTS
 
-#### 4.3.1 USB 3.0 Host Controller DTS
+#### USB 3.0 Host Controller DTS
 
 USB 3.0 Host controller is xHCI, integrated in DWC3 OTG IP, so it is not necessary to configure DTS separately for xHCI. We only need to configure DWC3 DTS, and set the "dr_mode" attribute of DWC3 to "otg" or "host".
 
-#### 4.3.2 USB 3.0 OTG Controller DTS
+#### USB 3.0 OTG Controller DTS
 
 1. **USB 3.0 OTG Controller DTS Configuration Document**
 
@@ -1105,9 +1105,9 @@ usbdrd3_0: usb0 {
     };
 ```
 
-## 5 USB Driver Development
+## USB Driver Development
 
-### 5.1 Linux USB Driver Framework
+### Linux USB Driver Framework
 
 The Linux USB protocol stack is a layered architecture, as shown in Figure 5-1 below. The left is the USB device driver, the right is the USB host driver, and the bottom layer is the driver for the different USB controllers and PHYs of the Rockchip SoCs.
 
@@ -1115,13 +1115,13 @@ The Linux USB protocol stack is a layered architecture, as shown in Figure 5-1 b
 
 Figure 5-1 Linux USB driver framework
 
-### 5.2 USB PHY Drivers
+### USB PHY Drivers
 
 This chapter mainly introduces the driver code of PHY briefly. If you want to know more about the hardware framework, register description, signal adjustment of PHY, please refer to the document
 
 `Rockchip_Developer_Guide_Linux_USB_PHY_CN`
 
-#### 5.2.1 USB 2.0 PHY Driver
+#### USB 2.0 PHY Driver
 
 Rockchip SoCs mainly use two USB 2.0 PHY IPs: Innosilicon IP and Synopsis IP. The hardware design of these two IPs is different, so a separate USB PHY driver is required. At the same time, SoCs with the same USB 2.0 PHY IP use the same driver, instead of each SoC having a dedicated driver.
 
@@ -1336,7 +1336,7 @@ At the same time, the node is still compatible with the old order of Linux-3.10 
 
   `echo 0 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
-#### 5.2.2 USB 3.0 PHY Drivers
+#### USB 3.0 PHY Drivers
 
 Rockchip SoCs mainly use three types of USB 3.0 PHY IP: Type-C PHY IP, Innosilicon USB 3.0 PHY IP and Innosilicon USB 3.0 CombPhy IP. These three IPs have different hardware designs, so they need separate USB PHY drivers.
 
@@ -1507,11 +1507,11 @@ Note：
 - [u3phy dev name] and [u2phy dev name] need to be modified to the specific PHY node names corresponding to the SoC;
 - USB's default mode, which is determined by the attribute "dr_mode" in the DTS of the DWC3 controller;
 
-### 5.3 USB Controller Drivers
+### USB Controller Drivers
 
-#### 5.3.1 USB 2.0 OTG Driver
+#### USB 2.0 OTG Driver
 
-##### 5.3.1.1 USB 2.0 OTG Driver Framework
+##### USB 2.0 OTG Driver Framework
 
 The USB 2.0 OTG uses a DWC2 controller. The system-level block diagram is shown in Figure 5-2 below. The DWC2 controller has both AHB master interface and AHB slave interface. This is because that the DWC2 controller has internal DMA to move data between USB FIFO and Memory via the AHB bus.
 At the same time, please note that the green box in the figure is hardware IP optional function. The DWC2 controller of the Rockchip SoC does not support external DMA function and endp_multi_proc_interrupt. The interface protocol for communication with the USB PHY is UTMI +.
@@ -1526,7 +1526,7 @@ Figure 5-3 below illustrates the interrupt handling hierarchy of the DWC2 contro
 
 Figure 5-3 Interrupt level of DWC2 controller
 
-##### 5.3.1.2 USB 2.0 OTG Driver Overview
+##### USB 2.0 OTG Driver Overview
 
 1. **USB 2.0 OTG Controller driver code**
 
@@ -1570,7 +1570,7 @@ The structure of the dwc2 driver code is as follows:
 └── platform.c (implement dwc2 probe, initialize dwc2 lowlevel hw resources according to core_params configuration of different chips)
 ```
 
-##### 5.3.1.3 USB 2.0 OTG Debug Interface
+##### USB 2.0 OTG Debug Interface
 
 - DWC2 Driver Debug Interface
 
@@ -1679,9 +1679,9 @@ debuglevel ff580000.usb    op_state       unbind versio
 
 **version:** Gets the Driver Version.
 
-#### 5.3.2 USB 2.0 Host Driver
+#### USB 2.0 Host Driver
 
-##### 5.3.2.1 USB 2.0 Host Controller framework
+##### USB 2.0 Host Controller framework
 
 The USB 2.0 Host controller is composed of a USB 2.0 EHCI controller and a USB 1.1 OHCI controller. The green box in Figure 5-4 is the hardware IP optional function. The USB 2.0 Host controller of the Rockchip SoC is configured as an EHCI controller and an OHCI controller, and communicate with the USB PHY by UTMI + interface. Both EHCI and OHCI use internal DMA to access system memory via the AHB bus. EHCI is responsible for handling HighSpeed transmission transactions, and OHCI is responsible for handling FullSpeed and LowSpeed transmission transactions.
 
@@ -1689,7 +1689,7 @@ The USB 2.0 Host controller is composed of a USB 2.0 EHCI controller and a USB 1
 
 Figure 5-4 EHCI & OHCI controller system-level block diagram
 
-##### 5.3.2.2 USB 2.0 Host Driver Overview
+##### USB 2.0 Host Driver Overview
 
 1. **USB 2.0 Host driver code**
 
@@ -1825,7 +1825,7 @@ static const struct hc_driver ohci_hc_driver = {
 
 ```
 
-##### 5.3.2.3 USB 2.0 Host Debug Interface
+##### USB 2.0 Host Debug Interface
 
 Example (RK3399 USB 2.0 EHCI/OHCI)
 
@@ -1872,9 +1872,9 @@ async periodic registers
 
 **registers:** Dump driver info, then registers in Spec order and other registers mostly affect Frame Timings
 
-#### 5.3.3 USB 3.0 OTG Driver
+#### USB 3.0 OTG Driver
 
-##### 5.3.3.1 USB 3.0 OTG Controller Framework
+##### USB 3.0 OTG Controller Framework
 
 USB 3.0 OTG Controller is DWC3 Controller, as shown in Figure 5-5 below.
 
@@ -1902,7 +1902,7 @@ The characteristics of the USB3.0 controller are as follows:
 
 - xHCI is a standard USB3.0 Host controller, with the PC USB 3.0 interface. And, it can support Force USB2.0 only mode.
 
-##### 5.3.3.2 USB 3.0 OTG  Driver Overview
+##### USB 3.0 OTG  Driver Overview
 
 1. **USB 3.0 OTG driver code**
    ​`drivers/usb/dwc3/*` （USB 3.0 OTG Global  core and Peripheral driver）
@@ -2037,7 +2037,7 @@ static const struct hc_driver xhci_hc_driver = {
 
 ```
 
-##### 5.3.3.3 USB 3.0 OTG Debug Interface
+##### USB 3.0 OTG Debug Interface
 
 Example (Linux-4.19 RK3399 USB 3.0 OTG0)
 
@@ -2152,9 +2152,9 @@ For other SoCs, the method is similar, just search for the otg_mode node under t
 ```
 
 ---
-## 6 Android USB Gadget Configuration
+## Android USB Gadget Configuration
 
-### 6.1 USB Gadget Configfs Framework
+### USB Gadget Configfs Framework
 
 Since Linux-3.11, USB Gadgets have been configured in the framework of Configfs, and the android.c file in the Gadget directory has been deleted from the kernel. Device class drivers that support the Configfs framework are moved to the directory  `drivers/usb/gadget/function` .
 
@@ -2173,7 +2173,7 @@ Documentation/usb/gadget-testing.txt
 
 [https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets](https://wiki.linaro.org/LMG/Kernel/AndroidConfigFSGadgets)
 
-### 6.2 USB Gadget Configuration File
+### USB Gadget Configuration File
 
 USB-related scripts in Android include:
 
@@ -2279,7 +2279,7 @@ The Kernel USB Gadget Framework only supports one USB Gadget at the same time. A
    };
    ```
 
-### 6.3 USB VID And PID Configuration
+### USB VID And PID Configuration
 
 USB VID and PID configuration need to follow the following principles:
 
@@ -2309,7 +2309,7 @@ VID and PID commonly used in the Andorid platform are defined as follows:
 |   ACCESSORY   | 0x18d1 | 0x18d1 |
 | ACCESSORY,ADB | 0x18d1 | 0x2d01 |
 
-### 6.4 USB Gadget Debug Interface
+### USB Gadget Debug Interface
 
 - **Configfs Configure Interface**
 
@@ -2365,9 +2365,9 @@ f_audio_source f_midi power state subsystem uevent
 
 ---
 
-## 7 USB Common Debug Methods And Commands
+## USB Common Debug Methods And Commands
 
-### 7.1 USB Common Debug Methods
+### USB Common Debug Methods
 
 1. **Common USB Debug Instruments And Software Tools**
 
@@ -2417,7 +2417,7 @@ For more information, please refer to the documentation:
 
 - Print usb devio driver log: `echo 1>/sys/module/usbcore/parameters/usbfs_snoop`
 
-### 7.2 USB Common Commands
+### USB Common Commands
 
 This chapter mainly describes the specific commands for Rockchip USB driver USB, including 2.0 OTG switch command, USB 3.0 OTG switch command, USB 3.0 force USB 2.0 only command and USB eye diagram test command.
 
@@ -2449,11 +2449,11 @@ This chapter mainly describes the specific commands for Rockchip USB driver USB,
 
 ---
 
-## 8 Analysis of Common USB Questions
+## Analysis of Common USB Questions
 
-### 8.1 Device Enumeration Log
+### Device Enumeration Log
 
-#### 8.1.1 USB 2.0 OTG Normal Boot Log
+#### USB 2.0 OTG Normal Boot Log
 
 Default mode is device when booting without USB cable.
 
@@ -2469,7 +2469,7 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.2 USB 2.0 Device Normal Connection Log
+#### USB 2.0 Device Normal Connection Log
 
 ```c
 
@@ -2489,7 +2489,7 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.3 USB 2.0 Device Disconnect Log
+#### USB 2.0 Device Disconnect Log
 
 ```c
 
@@ -2499,7 +2499,7 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.4 USB 2.0 Host Enumerate LS Device Log
+#### USB 2.0 Host Enumerate LS Device Log
 
 ```c
 
@@ -2511,7 +2511,7 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.5 USB 2.0 Host Enumerate FS Device Log
+#### USB 2.0 Host Enumerate FS Device Log
 
 ```c
 
@@ -2524,7 +2524,7 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.6 USB 2.0 Host Enumerate HS Device Log
+#### USB 2.0 Host Enumerate HS Device Log
 
 ```c
 
@@ -2547,13 +2547,13 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.7 USB 2.0 Host-LS/FS/HS Device Disconnect Log
+#### USB 2.0 Host-LS/FS/HS Device Disconnect Log
 
 ```c
 [  443.151067] usb 1-1: USB disconnect, devicenumber 3
 ```
 
-#### 7.1.8 USB 3.0 Device Normal Connection Log
+#### USB 3.0 Device Normal Connection Log
 
 ```c
 
@@ -2564,7 +2564,7 @@ Default mode is device when booting without USB cable.
 
 ```
 
-#### 8.1.9 USB 3.0 Host Enumerate SS Device Log
+#### USB 3.0 Host Enumerate SS Device Log
 
 ```c
 
@@ -2586,15 +2586,15 @@ Default mode is device when booting without USB cable.
 
 ```
 
-### 8.2 Analysis of Common Questions
+### Analysis of Common Questions
 
-#### 8.2.1 USB Hardware Circuit Problem
+#### USB Hardware Circuit Problem
 
 1. Use multimeter to measure the voltage of PHY power supply, VCC5V0_OTG, USB_DET, USB_ID.
 2. Measuring voltage ripple of PHY power supply with oscilloscope.
 3. Test USB eye diagram with oscilloscope.
 
-#### 8.2.2 USB Device Problem
+#### USB Device Problem
 
 The phenomenon that the USB Device is normally connected to the PC mainly includes:
 
@@ -2637,7 +2637,7 @@ Without the following log:
 
 This issue is always caused by USB_DET voltage abnormality. Use multimeter to measure the voltage of USB_DET. Normally, the voltage is low (0V) when USB cable is unplugged. If the voltage is still high (~3V) after USB cable is unplugged, it will cause the disconnection issue.
 
-#### 8.2.3 USB Host Problem
+#### USB Host Problem
 
 **Issue-1：**No USB enumeration log when USB device plug into the USB Host port.
 
@@ -2658,7 +2658,7 @@ DWC_OTG:dwc_otg_hcd_urb_enqueue urb->transfer_buffer address not align to 4-byte
 
 The dwc2 otg driver requires the transfer buffer address of urb must be 4 bytes aligned. Generally, the buffer address of urb is allocated in USB class drivers, so try to fix this issue in corresponding USB class driver.
 
-#### 8.2.4 USB Camera Problem
+#### USB Camera Problem
 
 1. USB camera cannot be turned on
 
@@ -2668,7 +2668,7 @@ The dwc2 otg driver requires the transfer buffer address of urb must be 4 bytes 
 
    It may be caused by frame loss of USB driver. You need to use USB analyzer to analyze the actual USB communication data.
 
-#### 8.2.5 USB Charge Detection
+#### USB Charge Detection
 
 USB 2.0 PHY supports charging detection of BC1.2 standard. It can detect four charging types: SDP/CDP/standard DCP (D+/D-short connection) and non-standard DCP (D+/D-not short connection).
 
@@ -2712,7 +2712,7 @@ Try to fix it step by step:
 2. If the log shows that the charge type is SDP, then an error detection has occurred. First, try to change an USB cable, and test again, if this issue still exits, please use oscilloscope to capture D+/D- signals when USB cable plug in, and send both the error kernel log and  D+/D- signals to us.
 3. If the connection is a USB charger and the logs show it's DCP, it indicates that the software detects normally, but if the charging is still slow, it may be a problem of charging IC or battery.
 
-#### 8.2.6 USB Transfer Rate Problem
+#### USB Transfer Rate Problem
 
 The main factors affecting the transmission rate:
 
@@ -2732,17 +2732,17 @@ Reference:
 
 `Rockchip_Developer_Guide_Linux_USB_Performance_Analysis_CN`
 
-#### 8.2.7 USB Enumeration Rate
+#### USB Enumeration Rate
 
 Pay attention to the printed log of the USB enumeration. "high-speed" means recognized as USB 2.0, and "super-speed" means recognized as USB 3.0.
 
-#### 8.2.8 USB3.0 Recognized Problem
+#### USB3.0 Recognized Problem
 
 After the USB3.0 device is plugged in, nothing happens, how to troubleshoot?
 
 According to the definition of USB3.0 enumeration process, it is generally stuck at the Link Training process of USB 3.0 PHY, that is, the problem of USB PHY signal. You can use the USB3.0 analyzer to capture the Link Training process and combine it with the LTSSM state machine described in the USB 3.0 Spec for analysis.
 
-#### 8.2.9 USB 3.0 Disk Copy Problem
+#### USB 3.0 Disk Copy Problem
 
 - Confirm whether the VBUS supply current meets the requirements
 
@@ -2752,7 +2752,7 @@ According to the definition of USB3.0 enumeration process, it is generally stuck
 
 - Reduce the size of the data block transmitted once, update the xHCI driver, and open the xHCI debug log
 
-#### 8.2.10 USB3.0 Camera Transmission Problem
+#### USB3.0 Camera Transmission Problem
 
 It is generally related to the efficiency of USB access to the DDR bus.
 
@@ -2768,7 +2768,7 @@ Optimization means:
 
 - If the RK platform is for UVC Gadget, you can dynamically allocate TxFIFO to increase the size of TxFIFO;
 
-### 8.3 About PC USB Driver
+### About PC USB Driver
 
 The developers often use USB download mode (rockusb) and USB debug mode (ADB) on Rockchip platforms during development stage.
 
@@ -2782,7 +2782,7 @@ The developers often use USB download mode (rockusb) and USB debug mode (ADB) on
 
 ---
 
-## 9 USB Signal Quality Test
+## USB Signal Quality Test
 
 Refer to the document《Rockchip_Developer_Guide_USB_SQ_Test_CN》.
 

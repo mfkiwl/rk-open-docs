@@ -77,15 +77,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 RT-Thread REGULATOR 功能特点
+## RT-Thread REGULATOR 功能特点
 
 * 支持 I2C 接口的 PMIC 调压、使能输出（如：RK808、RK818、RK809、RK817...）
 * 支持 I2C 接口的独立 DCDC 调压、使能输出（如：SYR82X、TCS452X...）
 * 支持针对 SOC 集成的 LDO 等电源模块的调压、使能输出（如：RK2108、PISCES...）
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 **REGULATOR 接口：**
 
@@ -132,9 +132,9 @@ HAL_Check HAL_PWR_CheckDescByPwrId(struct PWR_INTREG_DESC *pdesc,
                                    ePWR_ID pwrId);
 ```
 
-### 2.2 配置
+### 配置
 
-#### 2.2.1 打开 REGULATOR 配置
+#### 打开 REGULATOR 配置
 
 hal_conf.h
 
@@ -142,7 +142,7 @@ hal_conf.h
 #define HAL_PWR_MODULE_ENABLED
 ```
 
-#### 2.2.2 打开 PMIC 配置
+#### 打开 PMIC 配置
 
 ```c
 RT-Thread bsp drivers  --->
@@ -176,7 +176,7 @@ hal_conf.h
 #endif
 ```
 
-#### 2.2.3 打开内部 SOC 调压功能
+#### 打开内部 SOC 调压功能
 
 hal_conf.h
 
@@ -187,7 +187,7 @@ hal_conf.h
 备注：
 根据产品实际硬件进行配置，如果是单外部 PMIC 调压的只要配置本章的 2.2.1 和 2.2.2（如 RK1808 项目），如果芯片内部 SOC 调压的只要配置 2.2.1 和 2.2.3（如 PISCES 项目），如果是外部 PMIC 和内部 SOC 都支持调压就要配置 2.2.1、2.2.2 和 2.2.3。
 
-### 2.3 初始化设置
+### 初始化设置
 
 board.c 中有一个 desc 的结构体需要填充，主要是描述每路电源的硬件信息（是 I2C 还是内部，I2C 地址、寄存器的相关信息）
 
@@ -291,7 +291,7 @@ vdd_npu： 电源 name, 只是为了打印
 PWR_ID_DSP_CORE ： ePWR_ID pwrId，用于 desc 结构的获取
 875000： init 电压，如果设置 0，不会在初始化的时候设置此路电压
 
-### 2.4 示例
+### 示例
 
 vdd_cpu 调压
 
@@ -308,7 +308,7 @@ regulator_enable(desc);
 }
 ```
 
-### 2.5 dump 接口
+### dump 接口
 
 打开 dump config 配置：
 

@@ -72,7 +72,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Linux Storage Stack
+## Linux Storage Stack
 
    下图是一张 Linux 的存储栈的图解，通过它我们可以对 Linux 的存储子系统有个大致的了解：
 
@@ -80,7 +80,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
    我们从用户态发起一个系统调用，一般会进过这样的流程：VFS  -> FS(ext4/f2fs) -> Block Layer -> Physical Devices。
 
-## 2 系统调用与 C 库函数
+## 系统调用与 C 库函数
 
    fopen 和 open，read 和 fread，write 和 fwrite 有什么区别，很多人都会弄混了，而这经常会带来一些问题。所以在这里理清他们的关系是很有必要的。
 
@@ -88,7 +88,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
    ==Note: 绝大部分的 C 库都为文件接口提供一层缓存，所以你调用 fwrite 操作的时候，实际上数据是先放到这一层缓存的，在编程的时候必须注意，在下一节会重点说明。==
 
-## 3 Linux 数据回写
+## Linux 数据回写
 
    这一部分是问的最多的问题，很多对刚接触文件接口（包括前面的系统调用和 C 库函数）的人都会觉得很奇怪：为什么我 fwrite/write 函数已经返回了，此时掉电或重启后数据会丢失？问题的根源在于缓存的存在，由于存储设备属于低速设备，直接操作的话会有严重的延迟，所以通常会在 DRAM 上先缓存一部分数据。而 DRAM 是易失性存储设备，掉电数据就丢了，所以要确保数据固化就要把数据回写到存储设备上。
 
@@ -259,7 +259,7 @@ echo 5 > /sys/fs/f2fs/xxx/cp_interval
 
 [^1]: Page Cache 中被修改过的 Page 会被标记为脏，其中的数据被叫做脏数据
 
-## 4 Linux 数据预读
+## Linux 数据预读
 
    在 Linux 系统中，默认情况下不管是用户态调用 read，还是内核态调用 vfs_read，都会触发数据预读，即都会多读一部分数据到 Page Cache 中，这在顺序读的场景下对性能的提升是非常明显的。而高性能的存储设备可以通过加大预读窗口大小来大幅提升顺序读性能。在 Android 平台有两个方法来修改预读窗口大小：全局控制和文件单独控制。
 
@@ -284,7 +284,7 @@ posix_fadvise(fd, start, len, POSIX_FADV_WILLNEED); // 暗示内核，上层短�
 posix_fadvise(fd, start, len, POSIX_FADV_DONTNEED); // 暗示内核，上层短时间内不会访问某段数据
 ```
 
-## 5 文件掉电保护
+## 文件掉电保护
 
    每个文件系统都有一套自己的掉电保护机制，但是这个机制只保证文件系统本身的完整性，而无法保证文件的完整性。在本节开始前，有必要对这两者做一下解释：
 
@@ -423,7 +423,7 @@ index 9225d34..0785ace 100644
  #/dev/block/platform/fe330000.sdhci/by-name/userdata       /data               f2fs      noatime,nodiratime,nosuid,nodev,discard,inline_xattr,nobarrier   wait,check,notrim,forceencrypt=/metadata/key_file
 ```
 
-## 6 性能测试
+## 性能测试
 
    常见的文件系统测试有很多，这里介绍最简单的两种：dd 和 iozone，前者用于顺序性能测试，后者更全面一些，包括了一些随机性能测试。
 
@@ -535,9 +535,9 @@ rk3399:/ # cd /data/local/
 rk3399:/data/local # ./fio tiobench-example.fio
 ```
 
-## 7 IO 高性能编程
+## IO 高性能编程
 
-### 7.1 direct io
+### direct io
 
    前面说过这个接口适用于应用程序要自己控制缓存和回写的场景，操作和普通的 buffer io 差异不大，在文件打开的时候传 O_DIRECT 标志即可，但是需要注意的是：direct io 模式下要求 write 的 buffer 和 count 都必须 block 对齐，这里的 block 大小可以通过 sys 文件系统查询到，一般为 512。下面是一个 demo：
 
@@ -679,11 +679,11 @@ int main(int argc, char * argv[])
 
 ```
 
-### 7.2 async io
+### async io
 
    async io 即异步 io，后面都简称 aio，实际上对于内核来说，同步 io 的本质实现也是 aio+blocking，即内核阻塞调用者直到 aio 完成通知到来。目前 linux 平台下有两套 aio：glibc 和 linux native，前者更简洁易懂，但在 android 平台上不支持；后者会更通用更节省 cpu，一般还通过 libaio 来辅助。
 
-#### 7.2.1 glibc aio
+#### glibc aio
 
    先来看一下 glibc 的 aio 接口：
 
@@ -904,7 +904,7 @@ int main()
 
   显然从节省 cpu 角度来看，应该后面两种方式更优，所以推荐用后两种方式。想了解更多 glibc 的 aio 例子，可以看[这篇文章](https://www.ibm.com/developerworks/cn/linux/l-async/index.html?mhq=使用异步I%2FO%20大大提高应用程序的性能&mhsrc=ibmsearch_a);
 
-#### 7.2.2 linux native aio
+#### linux native aio
 
    linux native aio 则是内核提供了一套 aio 接口，所以在所有 linux 发行版上都能用，包括 android。先来看一下具体接口：
 
@@ -998,7 +998,7 @@ int main(int args, void *argv[]){
 
    通过阅读 glibc 的源码我们可以知道，glibc 的 aio 实际上是新创建一个线程去做实际的 io 操作，以解放主线程，而 linux native aio 则利用 cpu 和 io 可以并行工作的原理，在 io 处理过程中调用者可以完成其他工作。前者多了线程的创建和同步通信开销，所以对于 cpu 资源非常紧张的场景，后者应该是更好的选择。
 
-### 7.3 通过 ioctl 控制数据回写
+### 通过 ioctl 控制数据回写
 
    文件系统的很多高级功能都是通过 ioctl 来实现，这里介绍 f2fs 的两个新特性：atomic write 和 volatile write。前者实现原子写，可以实现异常掉电下文件的数据一致性；后者则是强制数据缓存在 page cache 中，减少 writeback 对性能的影响，二者都可以应用于数据库的优化。下面是两个具体例子：
 
@@ -1031,9 +1031,9 @@ static int keepFileInMemory(int fd) {
 }
 ```
 
-## 8 开机LOG分析
+## 开机LOG分析
 
-### 8.1 挂载失败
+### 挂载失败
 
    Android 7.0 以后大部分厂商都是默认启用加密，这时候对 DATA 分区来说，整个开机过程会有两次 Mount 动作，第一次的时候直接挂载原始设备（即加密过的分区），如果失败就说明分区加密过了，Vold 会去配置 dm-crypt 设备节点，配置成功后会多一个 dm-x（ x 是从0开始顺序递增，比如你前面已经映射了3个 dm 设备，那这一次映射 x = 3，设备节点名字就是 dm-3 ），配置成功后会进行第二次挂载，这次挂载的就是 dm-x 设备（即解密后的分区）。
 

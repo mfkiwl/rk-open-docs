@@ -70,7 +70,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Rockchip UART 功能特点
+## Rockchip UART 功能特点
 
 UART （Universal Asynchronous Receiver/Transmitter）
 
@@ -79,9 +79,9 @@ UART （Universal Asynchronous Receiver/Transmitter）
 * 支持中断传输模式和DMA传输模式
 * 最高支持4M波特率兼容16550A
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 串口框架：
 
@@ -105,7 +105,7 @@ bsp/rockchip-pisces/drivers/drv_uart.h
 bsp/rockchip-common/tests/termios_test.c
 ```
 
-### 2.2 配置
+### 配置
 
 打开串口配置，同时会生成/dev/uart0..9设备。
 
@@ -141,7 +141,7 @@ uart1  Character Device     0
 uart0  Character Device     0
 ~~~
 
-### 2.3 串口测试
+### 串口测试
 
 使能串口测试程序：
 
@@ -172,11 +172,11 @@ RT-Thread Components  --->
     termtest t /dev/uart4 115200
 ~~~
 
-### 2.4 波特率支持
+### 波特率支持
 
 1.5M以下的波特率都可以支持，1.5M以上的波特率需要实际测试看支不支持，因为这跟CLK 时钟树有关。
 
-### 2.5 console配置
+### console配置
 
 ~~~c
 RT-Thread Kernel  --->

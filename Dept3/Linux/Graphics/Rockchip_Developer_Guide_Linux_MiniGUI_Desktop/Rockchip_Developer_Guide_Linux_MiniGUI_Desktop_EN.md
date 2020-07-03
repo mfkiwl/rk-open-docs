@@ -69,15 +69,15 @@ Software development engineers
 [TOC]
 ---
 
-## 1 MiniGUI Desktop
+## MiniGUI Desktop
 
-### 1.1  Introduction
+### Introduction
 
 MiniGUI is a high-level window system (Windowing System) for embedded systems and the graphical user interface (Graphical User Interface, GUI) support system. At present, we have compiled MiniGUI Desktop on the basis of MiniGUI to implement the functions such as audio playback, video playback, and picture browsing, and support buttons or touch screen control for secondary development more easily.
 
-### 1.2  Functions
+### Functions
 
-#### 1.2.1 File Browsing
+#### File Browsing
 
 Table 1-1 Supported file types:
 
@@ -93,7 +93,7 @@ In the audio and video playback form, play/pause, previous/next song, and fast f
 
 In the picture preview form, support previous/next picture and double-click screen to exit.
 
-#### 1.2.2   System Setting
+#### System Setting
 
 Figure 1-1 Architecture of system settings
 
@@ -111,7 +111,7 @@ Figure 1-1 Architecture of system settings
 
 **System Information**: Display module number and firmware version number; click System Upgrade to check if there is a firmware to update.
 
-### 1.3 Compilation Configuration
+### Compilation Configuration
 
 Board-level configuration
 
@@ -146,13 +146,13 @@ ENABLE_WIFI=1
 ENABLE_BATT=1
 ```
 
-### 1.4 Development Guide
+### Development Guide
 
-#### 1.4.1 Create a Form
+#### Create a Form
 
 The DialogBoxIndirectParam function is used to create a form and set the related event processing function. Generally, each form has a separate dialog file, such as audioplay_dialog.c. Each form has its own creation function and event processing function. Take audioplay_dialog as an example. Its creation function is creat_audioplay_dialog. and its main job is to specify the position of the form and transfer and initialize some parameters. Finally, call the DialogBoxIndirectParam function to create the form.
 
-#### 1.4.2 Form Event Processing
+#### Form Event Processing
 
 When a Form is created, the corresponding event processing function has been fixed. Take audioplay_dialog.c as an example. Its processing function is audioplay_dialog_proc. After the system triggers an event, it will be sent to this function for processing. Commonly used events are as follows:
 
@@ -172,12 +172,12 @@ Table 1-2 Form Events
 
 Note: For more event triggering and processing, please refer to the official documentation of MiniGUI.
 
-#### 1.4.3 Widgets Drawing and Press down Checking
+#### Widgets Drawing and Press down Checking
 
 The essence of drawing buttons or other widgets is to draw pictures, which are implemented by functions such as FillBox, FillBoxWithBitmap, and DrawText. Press down checking is to record the corresponding coordinates after the MSG_LBUTTONDOWN and MSG_LBUTTONUP events are triggered. Call the check_button function of each form to check which widgets is triggered, and then to do the corresponding operation.
 
 Coordinates or other parameters in drawing are specified by ui_1024x600.h, ui_480x272.h, and ui_480_320.h respectively at the corresponding resolution. Currently, the ui_1024x600.h is well supported, and the other two resolutions, or other resolution' header files should be adapted. In common.h,  #include is used to specify which resolution header file to use.
 
-### 1.5 Frequently Ask Questions
+### Frequently Ask Questions
 
 Please refer to the  FAQs:[https://github.com/VincentWei/minigui/wiki/FAQs-in-Chinese](https://github.com/VincentWei/minigui/wiki/FAQs-in-Chinese)

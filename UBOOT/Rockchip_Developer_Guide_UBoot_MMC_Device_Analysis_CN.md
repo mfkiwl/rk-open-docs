@@ -93,7 +93,7 @@ emmc: dwmmc@ff390000 {
 
 MMC 初始化主要分为两个部分：1，MMC 控制器初始化；2，MMC 设备初始化。
 
-### 1. MMC 控制器初始化
+### MMC 控制器初始化
 
 Rockchip 在`uboot/arch/arm/mach-rockchip/board.c`调用 mmc_initialize(gd->bd)。
 mmc_initialize(gd->bd)，为硬件驱动 probe 过程，函数位于`uboot/drivers/mmc/mmc.c`。代码如下：
@@ -145,7 +145,7 @@ CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent assigned-cl
 
 mmc_do_preinit()主要做了 static struct mmc mmc_static 初始化，注册 MMC 设备。
 
-### 2. MMC 设备初始化
+### MMC 设备初始化
 
 MMC 控制器初始化，调用 mmc_init 对 MMC 卡做初始化，运行到相应的模式。函数位于`uboot/drivers/mmc/mmc.c`。
 

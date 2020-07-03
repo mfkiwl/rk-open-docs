@@ -75,13 +75,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 概述
+## 概述
 
    MkDocs 是一个用于创建项目文档的 **快速**, **简单** , **完美华丽** 的静态站点生成器. 文档源码使用 MarkDown 来撰写, 用一个 YAML 文件作为配置文档。截止到本文完成的时间，最新版本是1.0.4，已经基本稳定，当然还是有一些缺点有待完善，例如：默认的Javascript插件不支持中文全文搜索。
 
    需要了解更多信息，可以访问其[官网](https://mkdocs.readthedocs.io/en/stable/)。
 
-## 2 安装
+## 安装
 
    MkDocs 的安装有两种方式：通过包管理器安装（例如：apt-get、yum），手动安装。官方推荐使用包管理器安装，如果你的 Linux 发行版找不到安装包，或者你想在 Windows 平台安装，则需要用到手动安装。但是，我在安装过程中发现，ubuntu 18.04的 mkdocs 版本非常老，所以实际上我最终用的版本是手动安装的最新版。
 
@@ -121,7 +121,7 @@ $ mkdocs --version
 mkdocs, version 1.0.4 from /home/cmc/.local/lib/python2.7/site-packages/mkdocs (Python 2.7)
 ```
 
-## 3 创建文档工程
+## 创建文档工程
 
    创建一个新的文档工程非常简单，可以通过如下命令完成：
 
@@ -163,7 +163,7 @@ site_name: RKDocs
 
 ![my-project-main-page](./Rockchip_Developer_Guide_MkDocs/my-project-modify-main-page.png)
 
-### 3.1 添加页面
+### 添加页面
 
    本节继续上面的例子，给文档工程新增一个页面，这里为了简化流程，直接拉了一个现成的 MarkDown 文档作为页面源码，具体命令如下：
 
@@ -214,7 +214,7 @@ nav:
 
 ![my-project-nav-bar-1](./Rockchip_Developer_Guide_MkDocs/my-project-search.png)
 
-### 3.2 配置主题
+### 配置主题
 
    MkDocs 目前自带两个主题：mkdocs 和 readthedocs，前者是默认主题，后者用的人也非常的多。同时还有一些第三方的主题可用，还可以支持半定制主题和完全定制主题，本节只介绍如何切换主题，更高级的功能请参见官方的[开发指南](https://mkdocs.readthedocs.io/en/stable/user-guide/custom-themes/)。
 
@@ -232,7 +232,7 @@ theme: readthedocs
 
 ![my-project-nav-bar-1](./Rockchip_Developer_Guide_MkDocs/my-project-theme-readthedocs.png)
 
-### 3.3 修改 Favicon Icon
+### 修改 Favicon Icon
 
    默认情况下，MkDocs 会用自己的网站图标，如果你要替换成自己的网站图标，可以把你的图标放到 `docs/img` 目录下，并命名为 `favicon.ico` ，具体命令如下：
 
@@ -241,7 +241,7 @@ mkdir docs/img
 cp /path_to_your_icon/favicon.ico docs/img/
 ```
 
-### 3.4 修改地址格式
+### 修改地址格式
 
    MkDocs 支持两种地址格式：目录和常规，默认是前者。对于搭建网页服务器来说，二者没有差别，都能正常跳转。但是如果没有搭建服务器，而直接通过浏览器本地打开，前者兼容性比较差，在很多浏览器上无法正常跳转。此时就要修改 `mkdocs.yml` ，设置 `use_directory_urls: false` 。
 
@@ -262,9 +262,9 @@ theme: readthedocs
 | api-guide.md     | /api-guide/              | /api-guide.html           |
 | about/license.md | /about/license/          | /about/license.html       |
 
-## 4 撰写MarkDown文档
+## 撰写MarkDown文档
 
-### 4.1 交叉引用
+### 交叉引用
 
    MkDocs 可以很方便的实现文档交叉引用，例如：你可以从文档 A 跳转到文档 B 的指定章节。方法和 MarkDown 的超链接是一样，只要注意 URL 的格式即可，下面是几种跳转的 URL 格式，具体如下：
 
@@ -280,9 +280,9 @@ Please see the [project license](about.md#license) for further details. <!--'#'�
    从上面可以看到，要跳转到指定章节，需要在 URL 后面加上章节地址 `#xxx`  ，其是根据你的章节标题来生成的，只支持英文字符和数字，并且所有空格会被 `-` 替代，所有中文字符都会被忽略，下面是一个章节标题到地址的转换例子：
 
 ```markdown
-## 2 CSR配置                <!--地址：‘#2_CSR’-->
-## 2      CSR配置           <!--地址：‘#2_CSR’-->
-## 2.1 配置                 <!--地址：‘#21’-->
+## CSR配置                <!--地址：‘#2_CSR’-->
+## CSR配置           <!--地址：‘#2_CSR’-->
+## 配置                 <!--地址：‘#21’-->
 ```
 
    有个小技巧可以获取到章节地址，你可以通过浏览器打开生成的页面，通过导航栏跳转到你要的页面，点击左边的章节标题，跳转到指定章节，此时地址栏会显示这个章节的完整地址，例如：
@@ -297,14 +297,14 @@ file:///Volumes/home1/rtos/rtthread/rtt-docs/site/quick-start/Rockchip_Developer
 请参考[板级配置](../path_to_document/Rockchip_Developer_Guide_RT-Thread_CN.md#44) 获取更多细节.
 ```
 
-### 4.2 图片链接
+### 图片链接
 
    插入图片的方法遵循 MarkDown 标准 ，这里就不细述，只要其地址格式有两点需要注意：
 
 - 地址格式不支持中文，即你的路径上不能有中文，不管目录还是文件都请用英文名
 - 请用 posix 风格的路径，即不能有反斜杆 `\` ，而要用正斜杆 `/`
 
-## 5 编译和发布
+## 编译和发布
 
    通过如下命令可以完成编译：
 

@@ -69,11 +69,11 @@ DDR 小组内部工程师
 [TOC]
 ---
 
-## 1 NOC
+## NOC
 
 ​	msch : 如果是2个cs ，选的ddrconf一定要有带D的，这就导致了如果2个cs 的时候容量小于ddrconf的容量时ddr空间会有空洞的行为，而如果D位置在高位的话msch中的rank size也需要按ddrconf配置，如果D位置在Bank和col中间的话rank size则按实际大小配置。
 
-## 2 关于IO对调
+## 关于IO对调
 
 1. PHY支持除LPDDR4外的其他类型CMD线对调。
 2. PHY支持DQ整组对调，并不支持组内DQ对调。
@@ -82,7 +82,7 @@ DDR 小组内部工程师
 5. LPDDR4的DQ8-15实际上可以对调，但是不建议硬件对调。CA training 和read training时可以对DQ8-15的对调顺序做fix。DQ0-7不可对调。
 6. 关于DQ整组的对调，实际上是phy的byte送到DFI上时做了一次对调，如果是16bit mode的话DFI一定要选择低16bit有效，然后再根据DFI的byte选择对应phy byte相应应该enable哪几个byte。如phy reg0x4f设置为0xE4得话，bit[0:1]=3表示DDR PHY接口上的byte0整组映射到DFI接口上的byte3上。bit[2:3]=2表示DDR PHY接口上的byte1整组映射到DFI接口上的byte2上。依次类推DDR PHY接口上的byte2映射到DFI上的byte1，DDR PHY接口上的byte3映射到DFI上的byte0上。如果运行在16bit mode下的话此时为了让DFI的byte0，1enable，实际上对应到DDR PHY上是DDR PHY的byte2，3需要enable，reg0xf[3:0]需要配置为0xc. 如果是8bit mode的话DDR PHY的byte3需要enable，reg0xf[3:0]应该配置为0x8。
 
-## 3 其他DDR PHY问题
+## 其他DDR PHY问题
 
 1. 之前gf22上需要将reg0x8 fix成0xf 解决1x接口上hold time不足的问题, --rv1109上已经fix了该问题
 2. PHY内部RX DQS相对DQ默认delay了80-120ps 约5个de-skew单位。作为对比1808上为7个de-skew单位。
@@ -96,7 +96,7 @@ DDR 小组内部工程师
 11. 控制器要求LPDDR4 mode下dfi_t_rddata_en,dfi_tphy_wrlat这两个timing根据phy提供的公式计算到的结果还需要额外减3才行。这导致了LPDDR4的CWL必须大于等于8。
 12. PHY的vref out输出内阻时25Kohm左右，如果外部挂的电容太大的话会导致vref的建立时间特别长。
 
-## 4 关于CA training
+## 关于CA training
 
 1. CA training的clk 的默认值：以对应fsp中的default值为基准值。在training之前需要先将clk 的default值update到fsp中。clk保持在中间值相对ca training会更准一些。
 2. CA training 2cs下的流程Figure8的流程中有误，实际有4次变频需要等待4次dfi_cat_freq_change_req，也就是Frequency change from x to y和Frequency change from y to x这8步需要再重复一遍。
@@ -106,7 +106,7 @@ DDR 小组内部工程师
 7. reg_train_reg_update_en用于控制ca training中的部分逻辑，当training完成后可以gating掉training逻辑以省功耗。
 7. ca training和write dq training中的vref training时inno实际时找vref的min值和max值取平均，而lp4mode下的vref最大值只到42%，而我们的write信号vref最佳值很可能在40%附件，这导致了vref training出的结果很可能偏离最佳位置比较大。
 
-## 5 关于Read training
+## 关于Read training
 
 1. read training 只有predefine mode 才支持vref training。
 
@@ -120,7 +120,7 @@ DDR 小组内部工程师
 
 4. read training时DQS基于寄存器reg_*_rd_train_dqs_default的设置值不动DQ动扫描，当DQ触发到边界时DQS默认会相反方向移动一个单位，如果DQS移动到边界的话则会报错。 最终training完成后如果reg0x242，reg0x243,reg0x2c2,reg0x2c3表示training的DQS结果。
 
-## 6 关于de-skew：
+## 关于de-skew：
 
 1. 关于cmd perbit de-skew：只有LPDDR4有4组，其他类型的颗粒只有一组，直接register输出。对于LPDDR4 read fsp中的cmd de-skew的话，通过reg_cmd_invdelaysel_sel(reg0x386[5:0])选择 值从reg0x3e0输出。如果要更新fsp中的cmd de-skew配置的话通过reg22[6]将所有cmd de-skew register的值直接更新到对应的FSP中,reg0x10[7:6] 来选择更新到哪个 cs,bit7对应cs1,bit6 对应cs0,0有效。
 2. 关于tx/rx DQ的perbit de-skew register的值没法直接使用，必须更新到对应的FSP中才能生效使用。
@@ -130,11 +130,11 @@ DDR 小组内部工程师
 6. de-skew的延时受电压影响较大，实测vdd_logic提高100mv，每单位de-skew延时加快20%左右，作为对比RK1808上电压提高100mv实际只是加快10%。
 7. 信号线上串入的de-skew越多功耗也越大。所有不管是因为功耗还是因为de-skew受电压温度影响，实际能将de-skew设置多小就尽量设置多小。
 
-## 7 关于wrlvl
+## 关于wrlvl
 
 ​	wrlvl实际上是颗粒用DQS的上升沿去采样CLK，如果DQS和CLK上升沿或者下降沿刚好对上的整个区间采样到的结果可能是不确定的。inno在wrlvl的设计上在对找到0到1变化的点并没有反复确认，如果初始位置刚好是DQS和CLK下降沿对齐的话有概率开始由于采样的电平不确定被误判为找到wrlvl成功的点。针对这个问题建议CLK和DQS之间的相位差尽量控制在半个cycle范围内比较安全。由于CLK和DQS的相位差不受频率影响，可以在低频下（如333MHz)下完成wrlvl。高频下不做wrlvl直接使用333MHz 下wrlvl的结果。
 
-## 8 驱动强度相关配置
+## 驱动强度相关配置
 
 1. cmd和clk的驱动强度最低bit实际是常开的。只有高4bit可调整。
 
@@ -176,7 +176,7 @@ DDR 小组内部工程师
 
    reg0x144[1]  dqs弱上拉，同时dqsb弱下拉，为0时开启 （300 ohm），reg0x144[0]  dqs弱下拉，同时dqsb弱上拉，为1时开启（300 ohm）。
 
-## 9 关于WRITE TRAINING
+## 关于WRITE TRAINING
 
 1. 由于PHY设计问题，Write training必须保证WL大于3。
 2. 没有对DM做training，而DM实际值与各自组内的DQ0使用一样的de-skew值。所以需要保证DM与DQ0等长。

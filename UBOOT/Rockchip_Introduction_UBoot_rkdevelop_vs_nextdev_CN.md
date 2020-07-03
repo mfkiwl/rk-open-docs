@@ -49,7 +49,7 @@
 
 ​	Rockchip 平台的 U-Boot 目前存在两个版本，旧的版本是 rkdevelop 分支，新的版本是 next-dev 分支。
 
-### 1. rkdevelop 概况
+### rkdevelop 概况
 
 ​	rkdevelop 是从 U-boot 官方的 v2014.10 的正式版本中切出来进行开发的版本。目前大部分的芯片（2018 年之前）只要有使用 U-Boot，基本都是使用这个版本。目前这个版本支持的芯片包括：RK3036/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3368/RK3399/部分 PX 系列。
 
@@ -65,25 +65,25 @@
 
 对于上述的功能和使用方式有兴趣的读者，可以具体请参考《Rockchip U-Boot 开发指南 V3.8-20170214》。
 
-### 2. next-dev 概况
+### next-dev 概况
 
 ​	next-dev 是从 U-Boot 官方的 v2017.09 正式版本中切出来进行开发的版本。随着 upstream 的 U-Boot 功能越来越完善，以及我们实际产品上对 U-Boot 的需求更加多样，因此 U-Boot 的版本升级也是势在必行，因此我们进行了 next-dev 开发。next-dev 作为 rkdevelop 的升级版本，目前在该平台上已经支持的芯片包括：RV1108/RK3188/RK3036/RK3066/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3326/RK3368/RK3399/部分 PX 系列。
 
 ​	简而言之，rkdevelop 上支持的芯片在 next-dev 都同样有支持。在 rkdevelop 上支持的软件功能，在 next-dev 上大部分也同样会支持。
 
-### 3. next-dev 和 rkdevelop 的差异
+### next-dev 和 rkdevelop 的差异
 
-#### 3.1 基础版本差异
+#### 基础版本差异
 
 ​	如上述介绍，rkdevelop 分支基于 v2014.10 版本进行开发，不再更新 upstream 的代码；next-dev 分支基于 v2017.09 的版本进行开发，后续还会持续更新 upstream 的代码。
 
-#### 3.2 代码风格
+#### 代码风格
 
 ​	rkdevelop 的整体代码风格偏“定制化”会多一些，coding style 以及功能实现上很多都不够标准化，更多走的是 rockchip 自己的一套流程或者框架。究其原因，主要还是 v2014.10 版本本身的系统框架还不够完善、第一次开发 U-Boot 也存在经验不足、工程师的标准化开发意识不够强、后续的各种产品需求越来越多样。
 
 ​	经过 rkdevelop 的开发经验积累，我们对 next-dev 有了更好的全局规划和认识，因此 next-dev 分支的代码严格遵循 upstream 的规范进行开发，所有驱动实现都尽量走现有的通用框架流程，方便以后持续更新和扩展功能。
 
-#### 3.3 DM(Driver Model)框架
+#### DM(Driver Model)框架
 
 ​	DM 框架是 U-Boot 里现在所有驱动的框架模型统称，它主要包括 uclass、driver、device。U-Boot 的 doc 目录里可以找到官方详细的说明文档：
 
@@ -114,11 +114,11 @@
 ......
 ```
 
-#### 3.4 代码开源
+#### 代码开源
 
 ​	目前各芯片平台的基础代码都已经合并到官方的分支里，可以满足客户自己下载源代码进行编译下载、开源的需求。我们的工程师还会继续开展各芯片平台的 upstream 工作。
 
-#### 3.5 Pre-loader 支持
+#### Pre-loader 支持
 
 ```c
 Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
@@ -131,7 +131,7 @@ Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 其中 TPL 主要功能是 DDR 初始化, SPL 主要功能是加载和引导 trust/U-Boot 两个模块.rkdevelop 仅支持 Rockchip miniloader 作为 pre-loader；
 ​	next-dev 上各芯片平台都支持两种启动方式：SPL/TPL 和 Rockchip miniloader。
 
-#### 3.6. 分区支持
+#### 分区支持
 
 1. rkdevelop 仅支持 rk 格式 parameter.txt 分区, 不支持其他分区；
 	rkdevelop 同时解析 parameter.txt 的 CMDLINE 信息
@@ -139,7 +139,7 @@ Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 2. next-dev 支持 GPT 分区和 rk parameter 分区；
 	为了保持 GPT 与 rkparameter 一致性, next-dev 推荐使用 kernel dts 的 bootargs 来自定义 cmdline, 不使用 parameter 的 CMDLINE.
 
-#### 3.7. 支持的固件类型
+#### 支持的固件类型
 
 **从固件打包格式上看：**
 
@@ -157,12 +157,12 @@ rkdevelop 支持上述 1. 2. 两种命令启动固件，但是两种功能的代
 2. next-dev 支持 linux 的 Distro Boot（Linux Distribution 的 EFI boot）；
 3. next-dev 支持 AOSP 固件(Android AVB 校验和 A/B 分区)；
 
-#### 3.8 文件系统
+#### 文件系统
 
 1. next-dev 文件系统支持，rkdevelop 不支持文件系统；
 2. next-dev 支持 fat、ext2/4 文件系统；
 
-#### 3.9 rkbin 仓库
+#### rkbin 仓库
 
 rkdevelop 的 U-Boot 工程里存放了许多 bin 文件和脚本工具。存放路径如下：
 
@@ -178,19 +178,19 @@ tools/trust_merger.c
 
 在 next-dev 分支上，U-Boot 工程里不再存放这些 bin 文件和脚本工具，这些统一放到“rkbin”仓库里，因此用户需要再单独下载一个 rkbin 仓库配合 next-dev 使用。编译 uboot.img 的时候编译脚本会从 rkbin 仓库里索引对应平台的 bin 文件和工具，然后编译打包它们。最终和 rkdevelop 分支一样，也还是会在 U-Boot 工程下生成相关的 uboot.img、trust.img、loader 等固件。
 
-#### 3.10 Secure Boot
+#### Secure Boot
 
 rkdevelop 分支支持 rk secure boot, next-dev 不支持；
 next-dev 分支支持 AVB(Android), FIT 签名校验, rkdevelop 不支持；
 
-#### 3.11 Rockusb 和烧写
+#### Rockusb 和烧写
 
 rkdevelop 支持所有的 Rockusb 命令, next-dev 支持的 WL 命令和所需的信息交互命令,
 next-dev 不支持 ul, write pba, write vendor storage 等命令；
 之前的固件烧写主要由 usbplug+miniloader 组成, usbplug 负责用 ul 命令烧写 miniloader,然后重启(或直接进入这个步骤)进入 miniloader, 在此环境完成剩余固件烧写；
 新的烧写过程可以一次性在 usbplug 阶段完成, 省去重启步骤, 包括写 vendor storage 在内, 都直接在 usbplug 完成, 不需要 miniloader 辅助.
 
-#### 3.12 存储介质烧写地址
+#### 存储介质烧写地址
 
 旧的方式:
 NAND: IDB 存放在在特别的 boot 分区,系统阶段不可见, 后续的数据按 parameter 定义的地址按实际物理地址存放；

@@ -76,21 +76,21 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Rockchip Linux Graphics介绍
+## Rockchip Linux Graphics介绍
 
-### 1.1 概述
+### 概述
 
 Rockchip Linux平台的Graphics，是应用上DRM和DMA-BUF的ARM Linux平台。优势是，通用的架构，在上面客制化会很容易，可以利用很多现有组件，现有很多基础开源项目的开发，都开始基于Rockchip平台来作为ARM端的适配平台。但缺点是，很多人不是很理解这些内容，实际应用起来需要一个学习过程。更多资料可以参考[Rockchip wiki](http://opensource.rock-chips.com/wiki_Graphics)。
 
-### 1.2 芯片硬件模块介绍
+### 芯片硬件模块介绍
 
-#### 1.2 1 VOP (Video Output Processor)
+#### VOP (Video Output Processor)
 
 VOP是从存储器帧缓冲区到显示设备的显示接口, 是显示单元用来显示图像 （比如输入NV12,RGB的Buffer，显示到屏幕）。
 
 VOP的一些特性：比如RK3399/RK3399PRO有VOP_LIT和VOP_BIG两个VOP，其中VOP_BIG有4个图层，VOP_LIT有2个图层。VOP_BIG最大可支持到4K（4096x2160）分辨率，VOP_LIT最大可支持到2K（2560x1600）分辨率。
 
-#### 1.2.2 GPU (Graphics Process Unit)
+#### GPU (Graphics Process Unit)
 
 GPU提供了一个基于开放标准的完整图形加速平台,支持2D,3D和GPGPU计算，Rockchip Linux的GPU有提供OpenGles，EGL，OpenCl的 API，不支持OPENGL.支持类型如下:
 
@@ -103,16 +103,16 @@ GPU提供了一个基于开放标准的完整图形加速平台,支持2D,3D和GP
 - DirectX 11.1
 - DirectX 9
 
-#### 1.2.3 RGA (Raster Graphic Acceleration)
+#### RGA (Raster Graphic Acceleration)
 
 Rockchip RGA是一个独立的二维光栅图形加速单元。它加速了二维图形操作，
 例如点/线绘制、图像缩放、旋转、位图、图像合成等。
 
-### 1.3 图像软件模块介绍
+### 图像软件模块介绍
 
 主要理解libdrm,wayland和x11(compositor), mesa和libmali,qt和gtk（applcation）的关系。可参[Linux_Graphics_Stack](https://upload.wikimedia.org/wikipedia/commons/c/c2/Linux_Graphics_Stack_2013.svg)。
 
-#### 1.3.1 LIBDRM
+#### LIBDRM
 
 LIBDRM是一个跨驱动的中间件，它允许用户空间应用（例如作为Mesa和2D驱动程序）通过DRI与内核通信协议。参考如下DRM结构图：
 ![DRM结构图](resources/DRM.png)
@@ -173,7 +173,7 @@ atomic的实例
 
 当然最好还是看libdrm的文档和test程序。 如果你是自己写小程序，可以把mpp+libdrm那demo里的rkdrm下的文件抽出来自己用，还是挺方便的。如果只是写给rockchip平台用，就legacy api，如果还有多个平台的需求，就研究下atomic了。
 
-#### 1.3.2 LIBMALI
+#### LIBMALI
 
 前面说了，GPU是提供opengles，egl，opencl API的，所以要这几个工作，就需要把LIBMALI加进rootfs里。
 
@@ -183,11 +183,11 @@ atomic的实例
 要注意编译选项:
 不带后缀。是x11-gbm，注意GBM是配置DRM使用的memory机制，如果不是3.10的kernel，不要用fbdev的。GBM是给QT EGLFS这样的程序用的，不依赖X11,Wayland。Wayland/ Wayland-gbm给Wayland使用。
 
-#### 1.3.3 ZERO-COPY
+#### ZERO-COPY
 
 用mali显示dmabuf的数据，比如说摄像头，视频，其实是可以用dmabuf ZERO-COPY机制优化的。 不然载入texture还要cpu去拷贝。X11/Wayland有ZERO-COPY的配置，可以搜下相关的Wayland dmabuf。
 
-#### 1.3.4 X11
+#### X11
 
 就和一般桌面平台差不多，不过X11有个GPU性能缺陷的问题。
 
@@ -201,7 +201,7 @@ https://www.freedesktop.org/wiki/Software/Glamor/
 https://en.wikipedia.org/wiki/X.Org_Server
 ```
 
-#### 1.3.5 Wayland
+#### Wayland
 
 建议使用Yocto/Buildroot SDK做Wayland的开发。 效率上Wayland要比X11好点，主要是兼容性问题。如果不需要桌面，又要多窗口，可以Wayland试试看。
 
@@ -211,18 +211,18 @@ https://en.wikipedia.org/wiki/X.Org_Server
 https://en.wikipedia.org/wiki/Wayland
 ```
 
-#### 1.3.6 None
+#### None
 
 除了X11和Wayland之外，还有None，这也是嵌入式上接触比较多的。 比如MiniGUI，SDL皆是如此。
 
 若要支持到DRM和opengl的话，就只能选择QT了。
 
-#### 1.3.7 QT EGLFS
+#### QT EGLFS
 
 QT EGLFS是QT自己实现的一个GUI系统，不支持多窗口，但也因此少了window compoiste。
 QT EGLFS和dri2的方式也差不多，区别就在于，QT EGLFS的font buffer在自己用gpu compoiste后，是直接送给DRM去显示，而X里是送Window manager去做compoiste，所以EGLFS在效率上是有优势的。
 
-#### 1.3.7 显示架构的选择
+#### 显示架构的选择
 
 - QT+ Wayland
 - QT + EGLFS
@@ -253,17 +253,17 @@ QT EGLFS和dri2的方式也差不多，区别就在于，QT EGLFS的font buffer�
 - QT+ Wayland
 - Wayland
 
-### 1.4 双屏异显异音功能的介绍
+### 双屏异显异音功能的介绍
 
 Rockchip Linux 在 Debian/Buildroot 平台上对DP/HDMI/MIPI/eDP/LVDS等显示接口可以任意组合,支持双屏同显或异显的功能。当双屏异显时，一个显示接口当主屏，另一个当副屏。同时也支持不同声卡在不同显示上播放， 下面主要介绍双屏异显和双屏异声功能。
 
-#### 1.4.1 Debian双屏显示功能介绍
+#### Debian双屏显示功能介绍
 
 在 Debian 使用X11系统，可以使用 xrandr 去设置双屏同显和异显功能。
 
 "xrandr" 是一款官方的 RandR (Resize and Rotate)Wikipedia:X Window System 扩展配置工具。它可以设置屏幕显示的大小、方向、镜像等。对多显示器的情况请参考 [Multihead](https://wiki.archlinux.org/index.php/Multihead) 页面。
 
-##### 1.4.1.1 系统的显示设备及设备名
+##### 系统的显示设备及设备名
 
 支持命令行和界面下对双屏显示模式进行设置。
 
@@ -304,7 +304,7 @@ DP-1 disconnected (normal left inverted right x axis y axis)
 
 可以看到当前系统有两个显示设备，设备名分别为 HDMI-1 和 eDP-1。
 
-##### 1.4.1.2 双屏显示模式设置
+##### 双屏显示模式设置
 
 双屏支持双屏同显，双屏异显模式。异显模式下支持 On right、Above、On left、Below四种模式。
 菜单界面：
@@ -321,7 +321,7 @@ su linaro -c "DISPLAY=:0 xrandr --output HDMI-1 --above eDP-1"
 其中--above 参数可以设置为 right-of, left-of, below, same-as 切换双屏的显示模式
 Default/same-as 模式下为双屏同显。
 
-#### 1.4.2  Buildroot双屏显示功能介绍
+#### Buildroot双屏显示功能介绍
 
 Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示器屏幕的区分根据drm的name（通过Weston启动log或者/sys/class/drm/card0-\<name\>获取），相关配置通过环境变量设置，如：
 
@@ -352,7 +352,7 @@ Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示�
     # off|current|preferred|<WIDTHxHEIGHT@RATE>
 ```
 
-#### 1.4.3  Debian双屏异音功能介绍
+#### Debian双屏异音功能介绍
 
 (1) 在Debian系统Sound&Video---->PulseAudio Volume Control ，然后对应声卡进行播放，比下图：
 
@@ -383,7 +383,7 @@ SPDIF声卡测试:: aplay -D plughw:2,0 /dev/urandom
 
 ![Audio-Display](resources/Audio-Display.png)
 
-#### 1.4.4  Buildroot双屏异音功能介绍
+#### Buildroot双屏异音功能介绍
 
 Buildroot上应用还没开发对应功能，可以在qfm/oem/piano2-CoolEdit.mp3进行播放，声卡可以通过如下命令进行切换：
 

@@ -80,11 +80,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 功能测试
+## 功能测试
 
-### 1.1 Buildroot
+### Buildroot
 
-#### 1.1.1 图层下移恢复
+#### 图层下移恢复
 
 当设备触屏无效，串口内可以输入时定为图层下移，可以用如下指令恢复：
 
@@ -93,7 +93,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 /etc/init.d/S50launcher start （再开启lanucher）
 ```
 
-#### 1.1.2 后台应用删除
+#### 后台应用删除
 
 例：删除后台音频
 查找在播放的音频
@@ -107,7 +107,7 @@ ps | grep audio
 
 删除后台音频播放 kill 569
 
-#### 1.1.3 录像
+#### 录像
 
 录像：
 
@@ -121,7 +121,7 @@ YUVPlayer.exe 工具播放 YUV 录像文件时的设置如下：
 
 ![camera](resources/camera.png)
 
-#### 1.1.4 录音
+#### 录音
 
 arecord -c 通道 -r 采样频率 –f 采样位数 –d 录音时长 /录音存放路径/录音文件名。
 通道 ch_tbl="2 4 6 8"
@@ -148,7 +148,7 @@ arecord -c 2 -r 44100 -f S16_LE /tmp/record.wav
 aplay /tmp/record.wav
 ```
 
-#### 1.1.5 WI-FI 连接
+#### WI-FI 连接
 
 **方法1**
 
@@ -186,13 +186,13 @@ wpa_cli -iwlan0 set_network 0 psk \""   （无密码）
 ifconfig 以及ping baidu.com    #能获取正常ip地址以及能ping通就代表可以上网
 ```
 
-#### 1.1.6 音频播放
+#### 音频播放
 
 ```shell
 aplay /media/usb0/musicdemo.wmv
 ```
 
-#### 1.1.7 系统时间查看/设置
+#### 系统时间查看/设置
 
 ```shell
 date  （查看系统时间）
@@ -201,7 +201,7 @@ hwclock --show  （查看硬件时间）
 hwclock --systohc  （硬件时间同步显示系统时间）
 ```
 
-#### 1.1.8 RTC 时钟测试
+#### RTC 时钟测试
 
 cat /路径/time 查看当前状态下或重启后时间是否有变化
 如：
@@ -227,7 +227,7 @@ cat /sys/devices/platform/ff3c0000.i2c/i2c-0/0-0020/rk808-rtc/rtc/rtc0/time
 
 ![RTC](resources/RTC.png)
 
-#### 1.1.9 屏幕旋转问题
+#### 屏幕旋转问题
 
 在/etc/xdg/weston/weston.ini 配置文件中写入：
 
@@ -246,7 +246,7 @@ card0 card0-HDMI-A-1  controlD64    version card0-DP-1     card0-eDP-1    render
 
 比如这里用的drm设备是card0-eDP-1， 那么name="eDP-1"。
 
-#### 1.1.10 视频播放
+#### 视频播放
 
 **单窗口视频播放**
 
@@ -268,7 +268,7 @@ etc/init.d/S50launcher stop
 etc/init.d/S50launcher start
 ```
 
-#### 1.1.11 SD 卡升级、启动
+#### SD 卡升级、启动
 
 - SD 卡插入 PC 端，在 PC 端执行SD_Firmware_Tool.exe，选择固件升级/SD启动，选择固件-update.img，开始创建。
 - 将 SDK 进入maskrom擦除flash后，断电。
@@ -276,13 +276,13 @@ etc/init.d/S50launcher start
 
 ![sd_update](resources/sd_update.png)
 
-#### 1.1.12 查找文件
+#### 查找文件
 
 ```shell
 find ./ -name \*.sh
 ```
 
-#### 1.1.13 查内存
+#### 查内存
 
 ```shell
 cat /proc/meminfo或 free –h
@@ -290,18 +290,18 @@ cat /proc/meminfo或 free –h
 
 ![mem](resources/mem.png)
 
-#### 1.1.15 查磁盘空间使用情况
+#### 查磁盘空间使用情况
 
 df -h：
 
 ![df-h](resources/df-h.png)
 
-#### 1.1.16 U盘/SD卡自动挂载默认路径
+#### U盘/SD卡自动挂载默认路径
 
 U盘：/media/usb0/
 SD卡：/sdcard/
 
-#### 1.1.17 文件拷贝
+#### 文件拷贝
 
 从U盘拷贝文件至机器
 
@@ -309,9 +309,9 @@ SD卡：/sdcard/
 cp -r /media/usb0/3399-linux/ /userdata
 ```
 
-### 1.2 Debian
+### Debian
 
-#### 1.2.1 禁止待机
+#### 禁止待机
 
 在Debian终端上输入命令：
 
@@ -324,7 +324,7 @@ xset dpms force off (立即关闭屏幕)
 备注：重启样机后，以上设置就失效
 终端位置：主界面左下角开始-> System Tools -> LXTerminal
 
-#### 1.2.2 连接 WI-FI
+#### 连接 WI-FI
 
 在串口输入如下命令：
 
@@ -335,7 +335,7 @@ xset dpms force off (立即关闭屏幕)
 4. 关闭WI-FI：nmcli r wifi off
 ```
 
-#### 1.2.3 双屏异显
+#### 双屏异显
 
 使用 hdmi-toggle 来确定有几个显示设备，比如下面可以检测到 HDMI-1 和 DP-1 两个设备：
 
@@ -350,7 +350,7 @@ su linaro-c "DISPLAY=:0xrandr--outputHDMI-1--aboveDP-1" 其中--above
 其中 --above 可以代换成 right-of, left-of,below,same-as,preferred,off 等等
 这样就可以完成双屏异显的功能。
 
-#### 1.2.4 双屏异声
+#### 双屏异声
 
 打开左下角的 Sound&Video---->PulseAudio Volume Control，然后选择歌曲播放，使用哪个声卡播放可以参考如下选择：
 
@@ -370,7 +370,7 @@ DPaudio: aplay-Dplughw:2,0/dev/urandom
 
 打开一个音乐歌曲从主屏拖到副屏，然后在主屏中同样方式选择一个声卡来播放，完成双屏异声功能。
 
-#### 1.2.5 显示屏旋转
+#### 显示屏旋转
 
 旋转 normal/left/right
 
@@ -380,19 +380,19 @@ vi /etc/X11/xorg.conf.d/20-modesetting.conf
 
 可以把normal改为left/right/，reboot后生效。
 
-#### 1.2.6 U盘自动挂载默认路径
+#### U盘自动挂载默认路径
 
 /media/linaro/B4EA-8716
 备注：不同U盘名称不同,实际名称为准。
 
-## 2 性能测试
+## 性能测试
 
-### 2.1 磁盘读写测试
+### 磁盘读写测试
 
 测试前先查一下节点：fdisk –l
 查看分区可读写的是mmcblk1p9,这个分区容量最大13.5G,其它P1-8的容量比较小，P8的容量3.5G ,在此盘读写后易造成系统损坏，重启机器发现无法开机,所以选择p9。
 
-#### 2.1.1 e读写
+#### e读写
 
 写磁盘：
 
@@ -406,7 +406,7 @@ dd if=/dev/zero of=/dev/mmcblk1p9 bs=1M count=2000 oflag=direct,nonblock
 dd if=/dev/mmcblk1p9 of=/dev/null bs=1M count=2000 iflag=direct,nonblock
 ```
 
-#### 2.1.2 U盘读写
+#### U盘读写
 
 写磁盘：
 
@@ -421,7 +421,7 @@ dd if=/dev/sda1 of=/dev/null bs=1M count=2000 iflag=direct,nonblock
 
 ```
 
-### 2.2 设置性能模式
+### 设置性能模式
 
 方法1：
 
@@ -438,14 +438,14 @@ echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
 echo performance > /sys/devices/system/cpu/cpufreq/policy4/scaling_governor
 ```
 
-### 2.3 查看当前CPU频率
+### 查看当前CPU频率
 
 ```shell
 cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq
 cat /sys/devices/system/cpu/cpufreq/policy4/scaling_cur_freq
 ```
 
-### 2.4 glmark2 跑分
+### glmark2 跑分
 
 **Buildroot glmark2**
 
@@ -477,13 +477,13 @@ cd /usr/local/bin/
 sh test_glmark2_offscreen.sh
 ```
 
-## 3 压力测试
+## 压力测试
 
 压力测试列表
 
 ![linux_rockchip_test](resources/linux_rockchip_test.png)
 
-### 3.1 glmark2
+### glmark2
 
 **Buildroot**
 
@@ -499,7 +499,7 @@ while true; do /rockchip_test/gpu/test_glmark2_fullscreen.sh sleep 2; done
 while true; do /usr/local/bin/test_glmark2_fullscreen.sh sleep 2; done
 ```
 
-### 3.2 reboot test
+### reboot test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 
@@ -512,7 +512,7 @@ sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 echo off > /data/cfg/rockchip_test/reboot_cnt
 ```
 
-### 3.3 recovery test
+### recovery test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 
@@ -525,7 +525,7 @@ sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 echo off > /oem/rockchip_test/reboot_cnt
 ```
 
-### 3.4 memtester test
+### memtester test
 
 方法1
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
@@ -536,7 +536,7 @@ sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 直接执行 memtester 300M
 注：300MB 是可以根据实际的 DDR 大小设置，例如：100MB、200MB，但是这个值不能大于 DDR 的大小。
 
-### 3.5 stressapptest
+### stressapptest
 
 方法1：
 
@@ -550,23 +550,23 @@ sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 300 （测试24小时自动停止）
 ```
 
-### 3.6 cpufreq test
+### cpufreq test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 压力测试列表内选择测试项对应序号2
 再选择 cpu freq stress test 以及 cpu freq test:(with out stress test) 对应序号。
 
-### 3.7 flash stress test
+### flash stress test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 压力测试列表内选择测试项对应序号3。
 
-### 3.8 bluetooth test
+### bluetooth test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 压力测试列表内选择测试项对应序号4。
 
-### 3.9 suspend_resume test
+### suspend_resume test
 
 **Buildroot**
 
@@ -580,17 +580,17 @@ cd /usr/local/bin/
 sh test_suspend_resume.sh
 再选择auto suspend (resume by rtc) 对应序号3开始测试。
 
-### 3.10 WI-FI test
+### WI-FI test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 压力测试列表内选择测试项对应序号8
 
-### 3.11 ddr freq scaling test
+### ddr freq scaling test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 压力测试列表内选择测试项对应序号11
 
-### 3.12 npu stress test
+### npu stress test
 
 SDK 端串口连接到 NPU 端口：
 
@@ -600,13 +600,13 @@ SDK 端串口连接到 NPU 端口：
 stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 300 （测试24小时自动停止）。
 ```
 
-### 3.13 camera test
+### camera test
 
 sh rockchip_test/rockchip_test.sh（打开压力测试列表）
 压力测试列表内选择测试项对应序号13
 再选择camera stresstest 对应序号3开始测试。
 
-### 3.14 video test
+### video test
 
 播放放器无法设备循环所有视频播放，用脚本执行。
 先把全英文视频文件的视频文件夹及脚本拷入设备内，再执行脚本测试：

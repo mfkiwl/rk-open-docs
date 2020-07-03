@@ -73,13 +73,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 JTAG/SWD 的硬件接口
+## JTAG/SWD 的硬件接口
 
-### 1.1 系统调试架构，支持 JTAG/SWD 和 TRACE_DATA 两种输出接口
+### 系统调试架构，支持 JTAG/SWD 和 TRACE_DATA 两种输出接口
 
 ![img](Rockchip_Developer_Guide_DS5/wpsD1D8.tmpdebug.png)
 
-### 1.2 JTAG/SWD 又分为两种接口，5 线的 JTAG 接口和 2 线的 SWD 接口
+### JTAG/SWD 又分为两种接口，5 线的 JTAG 接口和 2 线的 SWD 接口
 
 JTAG 接口包括 TDO、TDI、TRST_N、TMS、TCK，SWD 接口包括 TMS 和 TCK 两根线。如图 1.2.1，Debug 的脚是和 SDMMC 复用的，硬件设计上可以直接将这些引脚连到 JTAG/SWD 座子上，或者采用 TF 卡转接板来连接。这两种接口是芯片硬件自动识别和控制的，不需要软件干预。即调试软件如 DS-5，若 TDO/TDI/TRST_N/TMS/TCK 全部连接，配置为 JTAG 或 SWD 接口都能识别，如果只连接 TMS 和 TCK，则只能配置为 SWD 接口。本文主要介绍 SWD 接口。
 
@@ -101,19 +101,19 @@ JTAG 接口包括 TDO、TDI、TRST_N、TMS、TCK，SWD 接口包括 TMS 和 TCK 
 
 ​							（图 1.2.4 DSTREAM 和 DEBUG 目标板）
 
-## 2 JTAG/SWD代码软件配置
+## JTAG/SWD代码软件配置
 
-### 2.1 IOMUX 引脚复用功能的切换
+### IOMUX 引脚复用功能的切换
 
 JTAG 各个引脚是和其他功能模块复用的，需要切换到 JTAG 的各个引脚。
 
-#### 2.1.1 配置 IOMUX 寄存器
+#### 配置 IOMUX 寄存器
 
 GRF_GPIO4B_IOMUX (0xFF77_0000 +0x0e024)
 
 ![img](Rockchip_Developer_Guide_DS5/wpsDF45.tmpdebug.png)
 
-#### 2.1.2 当 force jtag 位为 1 时，硬件会自动切换，不需要配置寄存器 IOMUX
+#### 当 force jtag 位为 1 时，硬件会自动切换，不需要配置寄存器 IOMUX
 
 GRF_SOC_CON7(0xFF77_0000+0x0e21c)
 
@@ -123,17 +123,17 @@ GRF_SOC_CON7(0xFF77_0000+0x0e21c)
 
 就是说，使用 JTAG 时不能插着 SD 卡。
 
-### 2.2 Debug 模块和 CPU 相关 CLK
+### Debug 模块和 CPU 相关 CLK
 
 一般无需 CLK 开关配置。
 
-## 3 DS-5 软件工具快速上手
+## DS-5 软件工具快速上手
 
-### 3.1 熟悉 DS-5 软件的主要菜单
+### 熟悉 DS-5 软件的主要菜单
 
 ![Alt text](Rockchip_Developer_Guide_DS5/20181130204001debug.png)
 
-### 3.2 创建新的芯片平台配置
+### 创建新的芯片平台配置
 
 这些配置包含了 DEBUG 系统相关配置信息，主要是告诉 DS-5 该 SOC 包含哪些 DEBUG 模块，及组合方式。SD-5 正是根据这些信息去访问 SOC 的。如果已经有 SOC 的配置，那么这一步可以跳过去，直接看 3.3 章节。
 
@@ -201,7 +201,7 @@ Ctrl+S 保存工程，这时工程会生成如下文件，表示创建配置成�
 
 ![1543840745511](Rockchip_Developer_Guide_DS5/1543840745511debug.png)
 
-### 3.3 创建新的连接配置
+### 创建新的连接配置
 
 打开 Window->Show view->Debug Control
 
@@ -241,9 +241,9 @@ Ctrl+S 保存工程，这时工程会生成如下文件，表示创建配置成�
 
 ![Alt text](Rockchip_Developer_Guide_DS5/496ffff7-0bdd-495e-9c44-363341e0dfd9debug.png)
 
-### 3.4 错误排除
+### 错误排除
 
-#### 3.4.1 如果连接失败呢，应该如何排查
+#### 如果连接失败呢，应该如何排查
 
 ![Alt text](Rockchip_Developer_Guide_DS5/2018113020091701debug.png)
 
@@ -255,7 +255,7 @@ Ctrl+S 保存工程，这时工程会生成如下文件，表示创建配置成�
 
 还有要检查 TMS 和 TCK 这两个脚的硬件连接是否正常。
 
-#### 3.4.2 如果某个 DS-5 设备用起来怪怪的，连接老是异常，那么可能是 DS-5 软件和 DSTREAM 设备固件版本不匹配
+#### 如果某个 DS-5 设备用起来怪怪的，连接老是异常，那么可能是 DS-5 软件和 DSTREAM 设备固件版本不匹配
 
 需要升级 DSTREAM 固件。选择 windows-> show view -> other -> debug hardware firmware installer
 
@@ -263,9 +263,9 @@ Ctrl+S 保存工程，这时工程会生成如下文件，表示创建配置成�
 
 1、选择 DSTREAM 设备，2、连接设备，软件会自动识别出版本，并提示是否需要升级，3、升级固件
 
-### 3.5 调试的基本步骤
+### 调试的基本步骤
 
-#### 3.5.1 可查看信息
+#### 可查看信息
 
 连上目标板
 
@@ -339,7 +339,7 @@ Num Enb Low Addr                High Addr               Attributes              
 
 ![1543829111946](Rockchip_Developer_Guide_DS5/1543829111946debug.png)
 
-#### 3.5.2  常用的命令
+#### 常用的命令
 
 ```c
 dump binary memory "E:\mem_ok.txt" sp:0x62000000 +0x200000    保存某段内存到本地文件

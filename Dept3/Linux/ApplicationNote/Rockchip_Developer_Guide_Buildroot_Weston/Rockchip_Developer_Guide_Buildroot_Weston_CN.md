@@ -67,15 +67,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 相关介绍
+## 相关介绍
 
-### 1.1 相关介绍
+### 相关介绍
 
 Weston是Wayland开源显示协议的官方参考实现，Rockchip Buildroot SDK的显示服务默认使用Weston 3.0 drm后端。
 
 [^注]: Weston及Wayland相关资料可以参考官方网站：<https://wayland.freedesktop.org>
 
-### 1.2 配置方式
+### 配置方式
 
 Buildroot SDK中Weston的配置方式主要有以下几种：
 
@@ -110,9 +110,9 @@ e、udev rules
 
 Weston中输入设备的部分配置需要通过udev rules。
 
-## 2 具体配置
+## 具体配置
 
-### 2.1 状态栏相关配置
+### 状态栏相关配置
 
 Weston支持在weston.ini配置文件的shell段设置状态栏的背景色、位置，以及在launcher段设置快捷启动程序，如：
 
@@ -168,7 +168,7 @@ Weston目前不支持设置状态栏的大小，如要调整，必须进行代�
             }
 ```
 
-### 2.2 背景配置
+### 背景配置
 
 Weston支持在weston.ini配置文件的shell段设置背景图案、颜色，如
 
@@ -186,7 +186,7 @@ Weston支持在weston.ini配置文件的shell段设置背景图案、颜色，�
     # 颜色格式为ARGB8888，未设置背景图案时生效
 ```
 
-### 2.3 待机及锁屏配置
+### 待机及锁屏配置
 
 Weston的超时待机时长可以在启动参数中配置，也可以在weston.ini的core段配置，如：
 
@@ -222,7 +222,7 @@ Weston的锁屏可以在weston.ini的shell段配置，如：
     # 锁屏界面背景
 ```
 
-### 2.4 显示颜色格式配置
+### 显示颜色格式配置
 
 Buildroot SDK内Weston目前默认显示格式为ARGB8888，对于某些低性能平台，可以在weston.ini的core段配置为RGB565，如：
 
@@ -247,7 +247,7 @@ Buildroot SDK内Weston目前默认显示格式为ARGB8888，对于某些低性�
     # xrgb8888|rgb565|xrgb2101010
 ```
 
-### 2.5 屏幕方向配置
+### 屏幕方向配置
 
 Weston的屏幕显示方向可以在weston.ini的output段配置，如
 
@@ -268,7 +268,7 @@ Weston的屏幕显示方向可以在weston.ini的output段配置，如
     echo "output:eDP-1::rotate180" > /tmp/.weston_drm.conf # eDP-1旋转180度
 ```
 
-### 2.6 分辨率及缩放配置
+### 分辨率及缩放配置
 
 Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
 
@@ -306,7 +306,7 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
 
 这种方式缩放时需要依赖RGA加速。
 
-### 2.7 冻结屏幕
+### 冻结屏幕
 
 在启动Weston时，开机logo到UI显示之间存在短暂切换黑屏。如需要防止黑屏，可以通过以下种动态配置文件方式短暂冻结Weston屏幕内容：
 
@@ -334,7 +334,7 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
     					echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # 1秒后解冻
 ```
 
-### 2.8 多屏配置
+### 多屏配置
 
 Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示器屏幕的区分根据drm的name（通过Weston启动log或者/sys/class/drm/card0-\<name\>获取），相关配置通过环境变量设置，如：
 
@@ -363,7 +363,7 @@ Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示�
     # off|current|preferred|<WIDTHxHEIGHT@RATE>
 ```
 
-### 2.9 输入设备相关配置
+### 输入设备相关配置
 
 Weston服务默认需要至少一个输入设备，如无输入设备，则需要在weston.ini中的core段特殊设置：
 
@@ -397,7 +397,7 @@ Weston的输入设备是基于libinput的，所以如果需要校准触屏，可
 
 其中第3、6参数需要分别除以屏幕宽和高，以分辨率1280x800为例，前面的最终校准参数为1.013788 0.0 -0.061495(即-78.713867除以1280) 0.0 1.332709 -0.276154(即-220.923355除以800)。
 
-### 2.10 无GPU平台配置
+### 无GPU平台配置
 
 SDK中的Weston默认使用GPU进行渲染合成加速，对于无GPU的平台，也可以选用RGA替代进行加速。
 

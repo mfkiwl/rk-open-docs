@@ -357,7 +357,7 @@ make clean	    #清除生成的编译文件
 make distclean	#清除生成的编译文件、配置文件、Doxygen文档以及生成的固件
 ```
 
-### 4.3 脚本编译
+### 脚本编译
 
 在SDK根目录下执行./script/build.sh可以进行脚本编译，其参数如下：
 

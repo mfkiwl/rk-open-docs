@@ -117,7 +117,7 @@ io-domains {
 
 下面是 rockchip-io-domain.c 驱动的软件流程图，主要分为两个方面：
 
-### 1. 初始化配置
+### 初始化配置
 
 在驱动的 probe 函数中的 supply name，获取 dts 中对应 supply name 定义的 regulator，再根据 regulator 的电压配置 io-domain 寄存器，如果是 1.8v 那一档，该 bit 配置为 1；如果是 3.3v 那一档，该 bit 配置为 0。
 
@@ -138,7 +138,7 @@ cond0(yes)->op
 cond0(no)->e
 ```
 
-### 2. 动态配置
+### 动态配置
 
 在初始化的过程中，会绑定 regulator，通过注册 notify 的方式，一旦这个 regulator 的电压发生变化，就会通知 io-domain 驱动更新成对应的寄存器，做到动态更新寄存器的效果。
 
@@ -148,7 +148,7 @@ cond0(no)->e
 
 不是每个 IO 电源域都需要配置，有些 IO 的电源域是固定的，不需要配置。下面 3 个步骤描述如何通过软件配置 io-domian：
 
-### 1. 通过 rockchip-io-domain.txt 文档寻找名称
+### 通过 rockchip-io-domain.txt 文档寻找名称
 
 需要在软件上通过 dts 配置的 IO 电源域在 Linux Kernel 的目录下的文件都有描述：Documentation/devicetree/bindings/power/rockchip-io-domain.txt；由于 TRM 文档和硬件原理图上对同一个 io-domain 名称描述可能有差异，在 rockchip-io-domain.txt 文档上统一描述了 TRM 与 硬件原理图上 io-domain 名称的对应关系。
 
@@ -165,7 +165,7 @@ Possible supplies for rk3399 pmu-domains:
 
 - pmu1830-supply:The supply connected to PMUIO2_VDD.
 
-### 2. 通过硬件原理图寻找 io-domain 配置的真实电压
+### 通过硬件原理图寻找 io-domain 配置的真实电压
 
 仍以 RK3399-EVB 原理图 和 bt656 IO 电源域为例，我们在 rockchip-io-domain.txt 中找到了 bt656 对应的硬件原理图上表示为 APIO2_VDD。所以通过逆向搜索 ‘APIO2_VDD’ 得到 RK3399-EVB 硬件原理图上的 APIO2_VDD 电源是由 RK808 下的 VCC1V8_DVP 供给。
 
@@ -173,7 +173,7 @@ Possible supplies for rk3399 pmu-domains:
 
 ![io-domain-2-rk3399-APIO2-supply](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-2-rk3399-APIO2-supply.png)
 
-### 3. 通过 DTS 配置
+### 通过 DTS 配置
 
 以上两步做完后，得到了配置的名称和供电源头，在 DTS 里面找到对应的 regulator:  vcc1v8_dvp，就可以在 rk3399-evb.dtsi 配置上 “bt656-supply = <&vcc1v8_dvp>;”，其他的电源域配置类似。
 
@@ -244,7 +244,7 @@ Possible supplies for rk3399 pmu-domains:
 
 ## 常见问题
 
-### 1. 如何确定某个 Pin 脚所在的电源域寄存器是否配置正确
+### 如何确定某个 Pin 脚所在的电源域寄存器是否配置正确
 
 经常遇到客户报的问题是某 pin 脚的电压与所期望的不符，很有可能就是电源域配置问题。例如，在 RK3399 上，软件上代码已经让 GPIO2_B1 输出高，但是实际通过量测发现电压不对；通过读取寄存器已经确认该 pin 脚已经将 iomux 配置成 gpio，并且也设置成输出高，这就很有可能是 io-domain 没有配置正确。那么这时候就要确认电源域寄存器是否配置正确，方法就是上面介绍的如何配置电源域的相反步骤。
 
@@ -262,7 +262,7 @@ Possible supplies for rk3399 pmu-domains:
 
 ![io-domain-10-bt565-bit-desc](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-10-bt565-bit-desc.png)
 
-### 2. io-domain 的寄存器不正确
+### io-domain 的寄存器不正确
 
 常见的寄存器不对，可能是以下几个问题
 

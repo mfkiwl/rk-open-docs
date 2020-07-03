@@ -72,7 +72,7 @@ Software development engineers
 
 ---
 
-## 1 Feature of Rockchip SPI
+## Feature of Rockchip SPI
 
 The serial peripheral interface is called SPI, the following are some of the features supported by the Linux 4.4 SPI driver:
 
@@ -86,9 +86,9 @@ the following are some of the new features supported by the Linux 4.19 SPI drive
 
 - Support both slave and master mode
 
-## 2 Kernel Software
+## Kernel Software
 
-### 2.1 Code Path
+### Code Path
 
 ```c
 drivers/spi/spi.c				/* SPI Driver framework */
@@ -98,7 +98,7 @@ drivers/spi/spi-rockchip-test.c	/* SPI test driver, it needs to add to Makefile 
 Documentation/spi/spidev_test.c	/* SPI test tool in user state */
 ```
 
-### 2.2 Kernel Configuration
+### Kernel Configuration
 
 ```c
 Device Drivers  --->
@@ -106,7 +106,7 @@ Device Drivers  --->
 		<*>   Rockchip SPI controller driver
 ```
 
-### 2.3 DTS Node Configuration
+### DTS Node Configuration
 
 ```c
 &spi1 {								//Quote SPI controller node
@@ -141,7 +141,7 @@ Configuration instructions for max-freq and spi-max-frequency:
 - max-freq should not be lower than 24M, otherwise there may be problems.
 - If you need to configure spi-cpha, max-freq <= 6M, 1M <= spi-max-frequency >= 3M.
 
-### 2.3 SPI Device  Driver
+### SPI Device  Driver
 
 Register device driver:
 
@@ -205,13 +205,13 @@ static inline int
 spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
 ```
 
-### 2.4 User mode SPI device Configuration
+### User mode SPI device Configuration
 
 User mode SPI device means operating the SPI interface in user space directly, which makes it convenient for many SPI peripheral drivers run in user space.
 
 There is no need to change the kernel to facilitate driver development.
 
-#### 2.4.1 Kernel Configuration
+#### Kernel Configuration
 
 ```c
 Device Drivers  --->
@@ -219,7 +219,7 @@ Device Drivers  --->
 		[*]   User mode SPI device driver support
 ```
 
-#### 2.4.2 DTS Configuration
+#### DTS Configuration
 
 ```c
 &spi0 {
@@ -233,7 +233,7 @@ Device Drivers  --->
 };
 ```
 
-#### 2.4.3 Kernel Patch
+#### Kernel Patch
 
 ```c
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
@@ -252,17 +252,17 @@ MODULE_DEVICE_TABLE(of, spidev_dt_ids);
 
 Note: The legacy kernels may not have 2.4.1 and 2.4.3 and need to be added manually. If there already have both cores, just add 2.4.2.
 
-#### 2.4.4 Using Instruction
+#### Using Instruction
 
 After the driver device is successfully registered, a device like this name will be displayed: /dev/spidev1.1
 
 Please refer to Documentation/spi/spidev_test.c
 
-### 2.5 Independent SPI slave configuration
+### Independent SPI slave configuration
 
 The interfaces "spi_read" and "spi_write" of SPI slave are the same as SPI master.
 
-#### 2.5.1 Linux 4.4 configuration
+#### Linux 4.4 configuration
 
 About kernel patch of the slave, please check if your code contains the following patches, if not, please add the patch:
 
@@ -333,7 +333,7 @@ DTS configuration：
 
 Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
 
-#### 2.5.2 Linux 4.19 configuration
+#### Linux 4.19 configuration
 
 Owning to the developing of Linux 4.19 SPI slave framework，it support SPI slave after adding related code in spi-rockchip.c：
 
@@ -370,9 +370,9 @@ First slave: `echo write 0 1 16 > /dev/spi_misc_test`
 
 Then master: `echo read 0 1 16 > /dev/spi_misc_test`
 
-## 3 SPI Testing Driver in Kernel
+## SPI Testing Driver in Kernel
 
-### 3.1 Kernel Driver
+### Kernel Driver
 
 drivers/spi/spi-rockchip-test.c
 You need to add below：
@@ -382,7 +382,7 @@ drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
 ```
 
-### 3.2 DTS Configuraion
+### DTS Configuraion
 
 ```c
 &spi0 {
@@ -408,7 +408,7 @@ drivers/spi/Makefile
 };
 ```
 
-### 3.3 Driver log
+### Driver log
 
 ```c
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
@@ -420,7 +420,7 @@ drivers/spi/Makefile
 //This is the mark of succesful register.
 ```
 
-### 3.4 Test Command
+### Test Command
 
 ```c
 echo write 0 10 255 > /dev/spi_misc_test
@@ -438,7 +438,7 @@ Echo setspeed id frequency (in Hz) > /dev/spi_misc_test
 
 You can modify the test case by yourself if you want.
 
-## 4 FAQ
+## FAQ
 
 - Confirm that the driver is running before debugging
 - Ensure that the IOMUX configuration of the SPI 4 pins is correct .

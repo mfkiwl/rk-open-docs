@@ -1042,7 +1042,7 @@ mass_storage,adb/accessory/accessory,adb/acm/acm,adb
 
 ```
 
-####  USB 2.0 OTG Device 正常断开日志
+#### USB 2.0 OTG Device 正常断开日志
 ```
 
 [22.817708][0: swapper/0: 0] ********session end ,soft disconnect***********

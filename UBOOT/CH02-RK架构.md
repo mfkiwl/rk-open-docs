@@ -4,7 +4,7 @@
 
 本章主要向用户介绍RK 平台上一些重要的基础情况、feature等。
 
-## 1 平台文件
+## 平台文件
 
 平台目录：
 
@@ -27,7 +27,7 @@ defconfig目录：
 ./arch/arm/mach-rockchip/board.c
 ```
 
-## 2 平台配置
+## 平台配置
 
 **配置文件**
 
@@ -125,7 +125,7 @@ defconfig目录：
 ......
 ```
 
-## 3 启动流程
+## 启动流程
 
 RK平台的U-Boot 启动流程如下，仅列出一些重要步骤：
 
@@ -183,7 +183,7 @@ start.s
 			run_main_loop                      // 【进入命令行模式，或执行启动命令】
 ```
 
-## 4 内存布局
+## 内存布局
 
 U-Boot 由前级 Loader 加载到 `CONFIG_SYS_TEXT_BASE` 地址，初始化时会探明当前系统的总内存容量，32位平台上认为最大4GB可用（但是不影响内核对容量的识别），64位平台上认为所有内存都可用。然后通过一系列reserve_xxx() 接口从内存末尾往前预留需要的内存，最后把自己relocate到某段reserve的空间上。内存整体使用布局如下，以ARM64为例：
 
@@ -215,7 +215,7 @@ U-Boot 由前级 Loader 加载到 `CONFIG_SYS_TEXT_BASE` 地址，初始化时�
 - Fastboot 功能需要的 buffer 地址和大小在 defconfig 中定义；
 - OP-TEE 占据的空间需要根据实际需求而定，最大为 30M；其中 RK1808/RK3308 上 OP-TEE 放在低地址，不在 0x8400000；
 
-## 5 存储布局
+## 存储布局
 
 RK linux方案的存储布局如下，Android方案除了boot/rootfs的定义跟linux平台有差异，其它基本一致，可借鉴参考。
 
@@ -223,7 +223,7 @@ RK linux方案的存储布局如下，Android方案除了boot/rootfs的定义跟
 
 > 图片引用：<http://opensource.rock-chips.com/wiki_Partitions>
 
-## 6 Kernel-DTB
+## Kernel-DTB
 
 原生的U-Boot只支持使用U-Boot自己的DTB，RK平台增加了kernel DTB机制的支持，即使用kernel DTB 去初始化外设。主要目的是为了兼容外设板级差异，如：power、clock、display 等。
 
@@ -254,7 +254,7 @@ fdtdump ./u-boot.dtb | less
 
 > 更多参考：进阶原理章节。
 
-## 7 Aliases
+## Aliases
 
 U-Boot中有些特殊的aliases有别于kernel DTS里的定义。
 
@@ -265,7 +265,7 @@ mmc1：表示sd
 mmc0：表示emmc
 ```
 
-## 8 Stacktrace
+## Stacktrace
 
 原生的U-Boot不支持调用栈回溯机制，RK平台增加了该功能。目前一共有3种方式触发调用栈打印：
 
@@ -346,7 +346,7 @@ Stack:
 
   > 执行该命令时，**当前机器上的固件必须和当前代码环境匹配才有意义！**否则会得到错误的转换。
 
-## 9 ATAGS传参
+## ATAGS传参
 
 RK平台的启动流程：
 
@@ -366,7 +366,7 @@ RK平台的各级固件之间可以通过ATAGS机制传递一些配置信息。
 ./arch/arm/mach-rockchip/rk_atags.c
 ```
 
-## 10 固件格式
+## 固件格式
 
 RK平台的U-Boot支持三种格式的固件引导：
 
@@ -423,7 +423,7 @@ RK平台的U-Boot支持三种格式的固件引导：
       "run distro_bootcmd;"
   ```
 
-## 11 快捷键
+## 快捷键
 
 RK平台提供串口组合键触发一些事件用于调试、烧写（如果无法触发，请多尝试几次；启用secure-boot时无效）。**开机时长按**：
 
@@ -436,7 +436,7 @@ RK平台提供串口组合键触发一些事件用于调试、烧写（如果无
 - ctrl+p：打印 cmdline 信息；
 - ctrl+s："Starting kernel..."之后进入 U-Boot 命令行；
 
-## 12 MMU-Cache
+## MMU-Cache
 
 RK平台默认使能MMU、Dcache、Icache，MMU采用1:1线性映射，Dcache采用write-back策略。相关接口：
 
@@ -459,7 +459,7 @@ void mmu_set_region_dcache_behaviour(phys_addr_t start, size_t size,
                                      enum dcache_option option)
 ```
 
-## 13 内核解压
+## 内核解压
 
 - 64 位平台的机器通常烧写Image，由U-Boot 加载到目标运行地址。但是 RK平台的 U-Boot 还可支持对64位 LZ4格式的压缩内核进行解压。但是用户必须使能：
 
@@ -499,7 +499,7 @@ void mmu_set_region_dcache_behaviour(phys_addr_t start, size_t size,
       "ramdisk_addr_r=0x6a200000\0"
   ```
 
-## 14 bidram/sysmem
+## bidram/sysmem
 
 U-Boot可以使用系统的所有内存，且从高地址往低地址预留系统所需的内存，预留完后通常还剩余较大的内存空间。U-Boot没有机制去管理这块空间，因此RK平台引入bidram、sysmem内存块机制对这块内存进行管理。
 
@@ -608,7 +608,7 @@ Sysmem Error: Failed to alloc "KERNEL" at 0x00100000 - 0x02200000
 Sysmem Error: Failed to double alloc for existence "RAMDISK"
 ```
 
-## 15 分区表
+## 分区表
 
 RK平台的U-Boot支持两种分区表：RK paramter格式（旧）和 标准GPT格式（新），当机器上同时存在两种分区表时，优先使用GPT分区表。无论是 GPT 还是 RK parameter，烧写用的分区表文件都叫 parameter.txt。用户可以通过"TYPE: GPT"属性确认是否为 GPT。
 
@@ -631,13 +631,13 @@ kup),0x00002000@0x0008a000(security),0x00100000@0x0008c000(cache),0x00500000@0x0
 96000(oem),0x00000400@0x00896000(frp),-@0x00896400(userdata:grow)
 ```
 
-## 16 HW-ID DTB
+## HW-ID DTB
 
 RK平台的U-Boot可以根据GPIO或者ADC的硬件状态，从多份DTB文件中筛选与硬件状态匹配的DTB进行加载。
 
 > 更多参考：系统模块章节。
 
-## 17 make.sh
+## make.sh
 
 make.sh既是一个编译脚本，也是一个打包、调试工具。可用于反汇编、打包固件。
 
@@ -667,7 +667,7 @@ make.sh既是一个编译脚本，也是一个打包、调试工具。可用于�
 ./make.sh sym                // 打开u-boot.sym
 ```
 
-## 18 vendor storage
+## vendor storage
 
 RK平台的U-Boot提供了Vendor storage区域给用户保存SN、MAC等信息。存储偏移如下（详见vendor.c）：
 
@@ -687,13 +687,13 @@ int vendor_storage_read(u16 id, void *pbuf, u16 size)
 int vendor_storage_write(u16 id, void *pbuf, u16 size)
 ```
 
-## 19 AMP
+## AMP
 
 RK平台的U-Boot支持AMP(Asymmetric Multi-Processing) 固件引导。
 
 > 更多参考：驱动模块章节。
 
-## 20 SD/U盘
+## SD/U盘
 
 RK平台的U-Boot支持SD/U盘的固件启动或升级。其中：
 
@@ -702,18 +702,18 @@ RK平台的U-Boot支持SD/U盘的固件启动或升级。其中：
 
 > 更多参考：系统模块章节。
 
-## 21 SysReset
+## SysReset
 
 - U-Boot的复位和kernel一样，最终需要陷入trust里完成
 - U-Boot 命令行模式可以支持跟kernel一样的reboot xxx命令（依赖于kernel dts中的定义）
 
-## 22 Interrupt
+## Interrupt
 
 U-Boot的原生代码没有完整支持中断，RK平台完善了该功能，支持GIC-V2、GIC-V3。
 
 > 更多参考：驱动模块章节。
 
-## 23 Timestamp
+## Timestamp
 
 Kernel的打印信息默认带有时间戳，方便用户关注时间。U-Boot的打印信息默认没有带时间戳，用户有需要的话可以使能配置`CONFIG_BOOTSTAGE_PRINTF_TIMESTAMP`。如下：
 
@@ -759,14 +759,14 @@ Kernel的打印信息默认带有时间戳，方便用户关注时间。U-Boot�
 
 > 注意：时间戳打印的是相对时间，而非绝对时间。
 
-## 24 Relocation
+## Relocation
 
 U-Boot会在完成board_f.c的流程后把自己relocate到内存末尾的某个地址上，具体地址视U-Boot内存布局而定。RK的U-Boot默认：
 
 - 32位平台：`CONFIG_SKIP_RELOCATE_UBOOT=y`时不做relocation，否则有做。
 - 64位平台有做relocation。
 
-## 25 总体耗时
+## 总体耗时
 
 U-Boot 初始化结束默认会打印本阶段的总耗时：
 
@@ -786,7 +786,7 @@ Total: 812.613 ms    // U-Boot阶段的总耗时
 Starting kernel ...
 ```
 
-## 26 详细耗时
+## 详细耗时
 
 用户可以打开`lib/initcall.c` 的`debug()` 和 `DEBUG` 获得如下的流程耗时，函数地址可借助./make.sh进行反汇编获得。
 
@@ -821,7 +821,7 @@ initcall: 0020de27
 ......
 ```
 
-## 27 fuse.programmed
+## fuse.programmed
 
 RK平台为了方便调试secure-boot功能，只需要对固件签名就能开启secure-boot模式（可不烧写efuse/otp）。Miniloader 会通过 U-Boot 向 kernel 追加 cmdline 表明当前的 efuse/otp 使能是否被烧写：
 

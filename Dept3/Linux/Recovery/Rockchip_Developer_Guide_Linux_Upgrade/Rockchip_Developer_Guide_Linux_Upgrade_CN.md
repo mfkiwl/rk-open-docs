@@ -75,7 +75,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 -----------
 
-## 1、简介
+## 、简介
 
 Rockchip Linux 平台支持两种升级方案，Recovery 模式和Linux A/B 模式：
 
@@ -84,9 +84,9 @@ Rockchip Linux 平台支持两种升级方案，Recovery 模式和Linux A/B 模�
 
 这两种模式各有优缺点，用户根据需求选择使用。
 
-## 2、Recovery 模式
+## 、Recovery 模式
 
-### 2.1、概述
+### 、概述
 
 Recovery 模式是在设备上多一个Recovery分区，该分区由kernel+resource+ramdisk 组成，主要用于升级操作。u-boot会根据misc分区(详见misc 分区章节)存放的字段来判断将要引导的系统是Normal 系统还是Recovery 系统。由于系统的独立性，所以Recovery模式能保证升级的完整性，即升级过程被中断，如异常掉电，升级仍然能继续执行。
 
@@ -113,7 +113,7 @@ Recovery 模式是在设备上多一个Recovery分区，该分区由kernel+resou
 | oem      | oem.img           | 厂商预制，可读写                    |
 | userdata | userdata.img      | 用于数据，可读写                    |
 
-### 2.2、配置和编译
+### 、配置和编译
 
 Buildroot：recovery 配置文件选择如下（make menuconfig）
 
@@ -155,7 +155,7 @@ SDK默认会开启以上配置，用户无需再次配置。源码目录位于ex
 8. 重新烧写固件
 ```
 
-### 2.3、OTA升级
+### 、OTA升级
 
 升级支持网络下载和本地升级，且可指定要升级的分区，在normal系统运行如下命令：
 
@@ -188,7 +188,7 @@ updateEngine --image_url=/userdata/update.img --misc=update --savepath=/userdata
 3. --partition：设置将要升级的分区，建议使用0x3F00，**不支持升级parameter 和loader分区**。详见 [5.1节 参数说明](### 5.1、参数说明 )。
 4. --reboot：升级recovery 完后，重启进入recovery模式
 
-### 2.4、SD 卡制作启动盘升级
+### 、SD 卡制作启动盘升级
 
 SD卡启动盘升级指将通过SDDiskTool 制卡工具制作的SD卡插入到机器中进行升级，详细描述 SD 卡启动盘的制作及相关升级的问题。
 
@@ -206,7 +206,7 @@ SD卡启动盘升级指将通过SDDiskTool 制卡工具制作的SD卡插入到�
 
 所有准备工作做好后，设备中插入 SD 卡，并重新上电。
 
-### 2.5、日志的查看
+### 、日志的查看
 
 1. 串口日志查看
 
@@ -226,9 +226,9 @@ touch .rkdebug
 cat userdata/recovery/Log
 ```
 
-## 3、Linux A/B 模式
+## 、Linux A/B 模式
 
-### 3.1、概述
+### 、概述
 
 Linux A/B，即准备两份独立的系统固件，分别存放在 flash 上，系统可以从其中一个 slot 启动，如果当前 slot 启动失败，可以从另外一个 slot 启动，在Normal模式下直接升级系统，无需进入系统升级模式，只需重启系统即可进入升级过的系统。
 
@@ -260,9 +260,9 @@ Linux A/B 由于有两个引导 slot，所以具有以下**优点**：
 | system_b | rootfs.img     | 根文件系统                                    |
 | userdata | userdata.img   | 无备份                                      |
 
-### 3.2、引导流程
+### 、引导流程
 
-#### 3.2.1、数据格式及存储
+#### 、数据格式及存储
 
 存储位置为 misc 分区偏移 2K 位置，AvbABSlotData 和 AvbABData 数据结构如下：
 
@@ -288,7 +288,7 @@ AvbABData：slot_a 和 slot_b 的引导信息
 | unsigned char reserved2[11]           | 保留数据                           |
 | unsigned char crc32                   | Crc 数据校验                       |
 
-#### 3.2.2、引导流程
+#### 、引导流程
 
 根据上层 bootcontrol 程序的设置方式，可分为两种引导方式 successful_boot 和 reset retry。 两种模式的对比如下：
 
@@ -297,13 +297,13 @@ AvbABData：slot_a 和 slot_b 的引导信息
 | Successful<br />_boot | 只要正常启动系统，不会回退到旧版本固件      | 设备长时间工作后，如果存储某些颗粒异常，会导致系统一直重启            | tries_remaining=0<br />successful_boot=1<br /><br />last_boot=0 | A:priority=14<br />B:priority=15 |
 | Reset retry           | 始终保持 retry 机制，可以应对存储异常问题 | 1.机器会回到旧的版本上，可能出现版本不可控问题<br />2.如果因为用户误操作，retry尝试次数过了，会误判为当前分区为可启动 | tries_remaining=7<br />last_boot=0       | A:priority=14<br />B:priority=15 |
 
-#### 3.2.3、引导流程图
+#### 、引导流程图
 
 ![](Resources/1560395624561.png)
 
-### 3.3、编译配置
+### 、编译配置
 
-#### 3.3.1、uboot
+#### 、uboot
 
 defconfig 增加如下配置，如 rk3308 64bit：u-boot/configs/rk3308_defconfig
 
@@ -316,7 +316,7 @@ CONFIG_RK_AVB_LIBAVB_USER=y
 CONFIG_ANDROID_AB=y
 ```
 
-#### 3.3.2、Buildroot
+#### 、Buildroot
 
 ```shell
 BR2_PACKAGE_RECOVERY=y	#开启升级功能
@@ -334,7 +334,7 @@ make recovery
 ./build.sh
 ```
 
-#### 3.3.3、分区表
+#### 、分区表
 
 相应的 BoardConfig.mk，设置 parameter 分区表，如下：
 
@@ -348,7 +348,7 @@ export RK_PARAMETER=parameter-ab-64bit.txt
 
 32bit：参考/device/rockchip/rk3308/parameter-ab-32bit.txt
 
-#### 3.3.4、固件输出
+#### 、固件输出
 
 相应的 BoardConfig.mk，设置开启 Linux A/B 自动编译系统，开启方式如下：
 
@@ -400,7 +400,7 @@ rockdev 和 IMAGE 目录下，都会生成 update_ab.img，该固件用于烧写
 
 ![](Resources/1560409929891.png)
 
-### 3.4、OTA升级
+### 、OTA升级
 
 网络升级：
 
@@ -432,9 +432,9 @@ updateEngine --image_url=/userdata/update.img --update --reboot
 3. --savepath：固件保存地址，缺省时为/tmp/update.img，建议使用默认值
 4. --reboot：升级完后重启
 
-### 3.5、分区引导设置
+### 、分区引导设置
 
-#### 3.5.1、可引导设置
+#### 、可引导设置
 
 通过misc设置当前分区为可引导分区，要在 system 成功引导之后执行，标记系统成功启动，参考如下脚本
 
@@ -455,7 +455,7 @@ esac
 exit 0
 ```
 
-#### 3.5.2、升级分区设置
+#### 、升级分区设置
 
 ```shell
 updateEngine --misc=other --reboot
@@ -472,7 +472,7 @@ updateEngine --misc=other --reboot
 
 注意：updateEngine程序在OTA升级结束之后会自动设置，无需重复设置。
 
-## 4、恢复出厂设置
+## 、恢复出厂设置
 
 我们把可以读写的配置文件保存在 userdata 分区， 出厂固件会默认一些配置参数， 用户使用一段时间后会生成或修改配置文件， 有时用户需要清除这些数据， 我们就需要恢复到出厂配置。
 
@@ -499,9 +499,9 @@ updateEngine --misc=wipe_userdata --reboot
 
 1. --reboot 如果没有传入该参数，则在机器下次重启后才会恢复出厂设置。
 
-## 5、升级程序详细说明
+## 、升级程序详细说明
 
-### 5.1、参数说明
+### 、参数说明
 
 updateEngine主要包含升级分区和写Misc配置功能，支持命令参数如下：
 
@@ -576,7 +576,7 @@ updateEngine 运行成功之后，机器重启
 
 设置保存固件的位置，如果没有传入且升级的固件路径为远程地址，则默认值为/tmp/update.img
 
-### 5.2、自定义分区升级
+### 、自定义分区升级
 
 ```c
 typedef struct {
@@ -613,19 +613,19 @@ UPDATE_CMD update_cmd[] = {
 };
 ```
 
-## 6、附录
+## 、附录
 
-### 6.1、固件打包工具
+### 、固件打包工具
 
-#### 6.1.1、windows 工具
+#### 、windows 工具
 
 Windows 打包工具在 tools\windows\AndroidTool\rockdev 目录下。先修改 package-file 文件将需要升级的 image 加入打包。注意路径是这里的路径是相对路径。 mkupdate.bat 批处理程序会把 tools\windows\AndroidTool\rockdev\Image 链接到根目录下的 rockdev 目录。所以请保证 rockdev 下 的相应 image 存在。接着执行 mkupdate.bat。mkupdate.bat 脚本会把根目录下 rockdev 中的相应的 image 打包成 update.img 存放在根目录下 rockdev。
 
-#### 6.1.2、linux工具
+#### 、linux工具
 
 Linux 打包工具在 tools/linux/Linux_Pack_Firmware/rockdev 目录下。先修改 package-file 文件将需要升级的 image 加入打包。注意路径是这里的路径是相对路径。 tools/linux/Linux_Pack_Firmware/rockdev/Image 会链接到根目录下rockdev 目录。所以请保证 rockdev 下的相应 image 存在。 接着执行mkupdate.sh。mkupdate.sh脚本会把根目录下rockdev中的相应的image打包成update.img 存放在根目录下 rockdev。
 
-### 6.2、Misc 分区说明
+### 、Misc 分区说明
 
 Misc分区是一个没有文件系统的分区，用于存放一些引导配置参数，现有结构如下，详见external/recovery/bootloader.h、external/recovery/update_engine/rkbootloader.cpp
 

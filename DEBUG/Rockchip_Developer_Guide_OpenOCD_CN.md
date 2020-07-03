@@ -38,13 +38,13 @@ OpenOCD 使用指南。
 
 ------
 
-## 1 引用参考
+## 引用参考
 
 [1] <https://blog.csdn.net/zhengyangliu123/article/details/54934719>
 
 [2] [《Open On-Chip Debugger: OpenOCD User’s Guide》](http://openocd.org/documentation/)
 
-## 2 术语
+## 术语
 
 OpenOCD：OpenOCD 是一个用于 JTAG 调试的软件，可以用于不同调试器和 CPU，还可以与 GDB 配合，开源。
 
@@ -54,7 +54,7 @@ J-Link：SEGGER 公司为支持仿真 ARM 内核芯片推出的 JTAG 仿真器�
 
 GDB：[The GNU Project Debugger](http://www.gnu.org/software/gdb/)，GNU 开源组织发布的一个强大的 UNIX 下的程序调试工具。
 
-## 3 测试平台
+## 测试平台
 
 STM32F103 开发板
 
@@ -64,13 +64,13 @@ FT2232HL 仿真器
 
 J-Link 仿真器
 
-## 4 简介
+## 简介
 
 本文介绍如何通过 OpenOCD 调试开发板，仿真器包括 FT2232HL 仿真器与 J-Link。
 
-## 5 驱动安装
+## 驱动安装
 
-### 5.1 FT2232HL Windows 驱动安装
+### FT2232HL Windows 驱动安装
 
 1. FT2232HL 调试板与电脑连接，会显示如下两个串口：
 
@@ -94,7 +94,7 @@ J-Link 仿真器
 
 安装 WinUSB 驱动。
 
-### 5.2 FT2232HL Linux 驱动安装
+### FT2232HL Linux 驱动安装
 
 新建文件 99-openocd.rules，写入如下内容：
 
@@ -107,7 +107,7 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="15ba",ATTR{idProduct}=="002a", MODE="664", GR
 
 把该文件拷贝到/etc/udev/rules.d/目录下。
 
-## 6 FT2232HL Windows 调试
+## FT2232HL Windows 调试
 
 在 PowerShell 下输入：
 
@@ -121,9 +121,9 @@ log 如下：
 
 表示能够正常连接设备。
 
-## 7 FT2232HL Linux 调试
+## FT2232HL Linux 调试
 
-### 7.1 程序下载
+### 程序下载
 
 在 shell 输入：
 
@@ -135,7 +135,7 @@ log 如下：
 
 ![linux_openocd_link_log](./Rockchip_Developer_Guide_OpenOCD/linux_openocd_link_log.png)
 
-### 7.2 结合 telnet 调试
+### 结合 telnet 调试
 
 在 shell 内输入：
 
@@ -204,7 +204,7 @@ add_usage_text command_name usage_string
       valid any time)
 ```
 
-### 7.3 结合 gdb 调试程序
+### 结合 gdb 调试程序
 
 在 shell 内输入：
 
@@ -350,7 +350,7 @@ xPSR: 0x61000000 pc: 0x2000003a msp: 0xffffffe4
 
 ![gdb-debug](./Rockchip_Developer_Guide_OpenOCD/gdb-debug.png)
 
-## 8 J-Link 支持
+## J-Link 支持
 
 Linux shell 输入：
 
@@ -364,7 +364,7 @@ log 如下：
 
 其他命令操作同章节 7 FT2232HL Linux 调试。
 
-## 9 OpenOCD 命令
+## OpenOCD 命令
 
 shell 下输入 openocd --help，查看支持的命令，log 如下：
 
@@ -429,10 +429,10 @@ For bug reports, read
 openocd -f jlink.cfg -f stm32f1x.cfg -c init -c "halt"  -c "flash write_image erase u-boot.bin 0x08000000 bin" -c "reset"
 ```
 
-## 10 eclips 支持
+## eclips 支持
 
 to-do
 
-## 11 Rockchip 芯片支持
+## Rockchip 芯片支持
 
 to-do

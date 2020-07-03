@@ -72,9 +72,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 USB 理论传输速率分析
+## USB 理论传输速率分析
 
-### 1.1 USB Communication Flow
+### USB Communication Flow
 
 USB 的通信流模型如图 1-1 所示，采用分层的结构，一台主机与一个 USB 设备间的连接是由许多层上的连接组成 。USB 总线接口层提供了主机和设备之间的物理连接、发送和接收数据。USB 设备层对 USB 系统软件是可见的，系统软件基于它所见的设备层来完成对设备的一般的 USB 操作。USB 应用层可以通过与之相配合的客户软件向主机提供一些额外的功能。USB 设备层和应用层的通信是逻辑上的，对应于这些逻辑通信的实际物理通信由 USB 总线接口层来完成。
 
@@ -82,7 +82,7 @@ USB 的通信流模型如图 1-1 所示，采用分层的结构，一台主机�
 
 图 1-1 USB Communication Flow
 
-### 1.2 USB 物理层传输速率
+### USB 物理层传输速率
 
 USB 物理层的传输速率是指 USB 物理总线的传输速率。USB 总线目前支持 USB1.0、USB1.1、USB2.0、USB3.0（USB3.1 Gen1）、USB 3.1 Gen2 五种标准传输速率，如下表 1-1 所示。
 
@@ -96,7 +96,7 @@ USB 物理层的传输速率是指 USB 物理总线的传输速率。USB 总线�
 | USB 3.0（USB 3.1 Gen1） | 5Gbps   | 超速（Super-Speed）    |
 | USB 3.1 Gen2          | 10Gbps  | 暂未定义（Super-Speed+） |
 
-### 1.3 USB 协议层传输速率
+### USB 协议层传输速率
 
 不同的 USB 设备类型，采用不同的 USB 设备类协议，比如：USB Disk 采用的是 USB Mass Storage Class 规范的子类规范（USB Mass Storage Class Bulk-Only Transport），USB Camera 采用的是 USB Video Class 规范，USB HID 采用的是 USB Human Interface Devices Class 规范，更多的规范，请在[USB-IF 官网](http://www.usb.org/developers/docs/devclass_docs/)查看。
 
@@ -133,7 +133,7 @@ USB 体系支持四种传输类型：
 
 由表格 1-2 可以看出，不同的 USB 传输类型，最大的理论传输速率也是不同的。并且，由于受到 USB 传输类型的最大速率限制以及 USB 设备类协议的交互影响，USB 的实际传输速率远小于 USB 物理总线上的传输速率。
 
-### 1.4 影响 USB 传输速率的主要因素
+### 影响 USB 传输速率的主要因素
 
 USB 的传输速率主要受如下几方面的影响：
 
@@ -162,9 +162,9 @@ USB 的传输速率主要受如下几方面的影响：
    U 盘拷贝速率容易受文件系统的影响，常见的文件系统格式包括：VFAT、EXT4 和 NTFS。对于 VFAT/EXT4 两种文件系统格式的传输机制，kernel 的 block 层会自动将小的数据块 merge 为 120K，再写入磁盘。而 NTFS 的写入磁盘操作是在用户空间，数据块不会由 block 层 merge。所以，如果应用层每次请求的数据块太小（如 4KB），NTFS 文件系统格式的 U 盘，拷贝速率一般会明显慢于 VFAT/EXT4 的文件系统格式。详细的分析，请参考[2.1 USB Disk 传输速率分析](#2.1 USB Disk 传输速率分析)
 
 ---
-## 2 USB Host 传输性能分析
+## USB Host 传输性能分析
 
-### 2.1 USB Disk 传输速率分析
+### USB Disk 传输速率分析
 
 **测试方法：**
 
@@ -593,7 +593,7 @@ USB Disk 常用的文件系统格式包括：VFAT、EXT4 和 NTFS。对于 VFAT/
 
 可以参考本文档提供的方法，先定位传输瓶颈，再进行优化。
 
-### 2.2 USB Ethernet 传输速率分析
+### USB Ethernet 传输速率分析
 
 **测试方法：**
 
@@ -704,7 +704,7 @@ USB3.0 Host：上行和下行均为**750 ～ 800 Mbits/sec**
 
 如果实际产品测试无法达到上述速率，请先使用 ifconfig 和 tcpdump 工具，排查是否误码率太高，如果误码率太高，请测试 USB 眼图，确认 USB 的信号质量是否符合要求。
 
-### 2.3 USB Camera 传输速率分析
+### USB Camera 传输速率分析
 
 **测试方法：**
 
@@ -753,9 +753,9 @@ b). USB Host 驱动的同步传输性能；
 对于因素 a)，可以在 PC 上验证 USB Camera 的性能。对于因素 b)，可以考虑提高 USB QOS 的优先级、提高 USB 中断的响应速度、提高 USB 控制器的 AHB CLK 以及 DMA burst length。
 
 ---
-## 3 USB Device 传输性能分析
+## USB Device 传输性能分析
 
-### 3.1 USB MTP 传输速率分析
+### USB MTP 传输速率分析
 
 **测试方法：**
 
@@ -836,7 +836,7 @@ USB MTP 采用的是批量传输的类型，理论上，Rockchip 平台 USB2.0 �
 
   `/sys/module/usb_f_mtp/parameters/mtp_rx_req_len` （Rx Buffer Length 单位：byte）
 
-### 3.2 USB MSC 传输速率分析
+### USB MSC 传输速率分析
 
 **测试方法：**
 
@@ -925,7 +925,7 @@ echo 1800000 >  /sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed
 
 结论：USB MSC 的传输速率受 CPU 运行的频率影响比较明显，CPU 频率越高，读速率也越高。
 
-### 3.3 USB Gadget Webcam 传输速率分析
+### USB Gadget Webcam 传输速率分析
 
 **测试方法：**
 
@@ -1042,7 +1042,7 @@ index d146ce7..9eb7aad 100644
 | ------- | --------------- | ----------------- | ----------------- |
 | USB 2.0 | 648×480 > 30fps | 1920×1080 > 30fps | 1920×1080 > 30fps |
 
-### 3.4 USB Rndis 传输速率分析
+### USB Rndis 传输速率分析
 
 USB Rndis 实际上就是 TCP/IPover USB，就是在 USB 设备上跑 TCP/IP，让 USB 设备看上去像一块网卡。
 
@@ -1130,7 +1130,7 @@ Linux-4.4 Configfs USB Rndis：**上行和下行均为 100Mbps**
 
 目前，已知的一个问题是 Linux-3.10 Android Gadget USB Rndis 上行和下行速率都偏低，需要进一步优化。
 
-### 3.5 USB Gadget HID 传输速率分析
+### USB Gadget HID 传输速率分析
 
 **测试方法：**
 

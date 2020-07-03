@@ -70,11 +70,11 @@ Software development engineers
 
 ---
 
-## 1. Overview
+## Overview
 
 This code module is integrated in the libDeviceIo.so dynamic library and it is a WIFI operation interface based on WPA package.
 
-## 2. Interface Introduction
+## Interface Introduction
 
 - `RK_WIFI_RUNNING_State_e`
 
@@ -192,7 +192,7 @@ To check whether the network been configured.
 
 To check whether the network is connected  by ping.
 
-## 3. Application Demo
+## Application Demo
 
 ```c
 #include <stdio.h>

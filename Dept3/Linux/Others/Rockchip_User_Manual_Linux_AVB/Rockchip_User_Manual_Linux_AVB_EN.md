@@ -86,15 +86,15 @@ Software development engineers
 
 ---
 
-## 1 Notice before reading
+## Notice before reading
 
 1. When the device is in **unlock state**, AVB will still verify the boot.img. AVB will show the error if boot.img is invalid, but the device **boot normally**. When the device is in lock state, AVB will **stop booting** if boot.img is invalid and show the error as well. Therefore, setting the device to unlock state is convenient for debugging.
 2. AVB does not support compressing kernel images.
 3. Chips used eFuse must enable Base SecureBoot (Rockchip_Developer_Guide_Linux4.4_SecureBoot.pdf **chapter 2 Base SecureBoot**)
 
-## 2 AVB Configuration
+## AVB Configuration
 
-### 2.1 Trust
+### Trust
 
 Make sure the trust.img has enable secure option.
 
@@ -120,7 +120,7 @@ index 0b2839d..51ec627 100644
 
 **Secure option is enabled as default for TOS format, like RK3288TOS.ini**.
 
-### 2.2 U-Boot
+### U-Boot
 
 AVB needs these U-Boot configs:
 
@@ -199,7 +199,7 @@ index 230bf0e..e5c81e6 100644
 
 Now, run ./make.sh xxx to generate uboot.img, trust.img and loader.bin
 
-### 2.3 Parameter
+### Parameter
 
 Partition `vbmeta` and `system` are required, `security` is optional:
 
@@ -221,7 +221,7 @@ uuid:system=614e0000-0000-4b53-8000-1d28000054a9
 
 When downloading, the partition names on the RKDevTool (windows PC）should be modified synchronously. After modification, reload parameter.
 
-## 3 AVB Keys
+## AVB Keys
 
 AVB contains the following four Keys:
 
@@ -248,7 +248,7 @@ The `PrivateKey.pem` which is the key of Base SecureBoot is required. This opera
 
 **Please keep the generated files properly, otherwise you will not be able to unlock after locking, and the machine will not be able to upgrade anymore.**
 
-## 4 Sign the firmware
+## Sign the firmware
 
 AVB can verify the boot.img and recovery.img, sign them with this command:
 
@@ -267,13 +267,13 @@ Now, we get all files of AVB, include:
 
 Pack them together, we can get the `update.img` with AVB. In order to use Base SecureBoot, update.img should be signed with rk_signed_tool (or other signed tools), do not forget to enable **`exclude_boot_sign = True`** in `setting.ini`.
 
-## 5 Download firmware
+## Download firmware
 
 Download firmware with windows tool (RKDevTool), try to add `vbmeta` partition (and `security` partition if necessary) to the tool and blank the address. Then reload parameter.txt, the tool will update new partition address. `security` partition do not need to download any images, it would initialized by U-Boot.
 
 After downloading firmware, the device is unlock state, it can not stop booting invalid image.
 
-## 6 AVB lock and unlock
+## AVB lock and unlock
 
 AVB support Lock and Unlock states:
 
@@ -314,7 +314,7 @@ Unlock the device:
 ./avb_user_tool.sh -u # reboot device after finishing unlock.
 ```
 
-## 7 Verity
+## Verity
 
 If everything goes well, the log below will be shown if the device is LOCKED.
 

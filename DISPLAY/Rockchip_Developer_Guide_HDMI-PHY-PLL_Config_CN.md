@@ -70,15 +70,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 概述
+## 概述
 
 RK322X/RK3328 芯片 HDMI PHY PLL 除了供 HDMI PHY 使用外，还作为显示的时钟源，供 HDMI/CVBS/VOP 使用。在产品开发设计中，当需要增加对某些特殊分辨率的支持时，需要新增 PHY PLL 配置，以便 PHY 能输出该分辨率对应的时钟频率。
 
-## 2 PHY配置计算说明
+## PHY配置计算说明
 
 PLL 计算包括两部分，PRE-PLL 和 POST-PLL 计算。
 
-### 2.1 PRE-PLL计算过程
+### PRE-PLL计算过程
 
 PRE-PLL 计算过程如图所示，其中 $F_{REF}$ 为 24Mhz：
 
@@ -139,7 +139,7 @@ $$
 
 如其中第一点所述，实际使用中，在非 `4K-YUV420` 的场景下，`pin_hd20_pclk` 与 `pin_hd20_prepclk` 始终相等。`4K-YUV420` 的场景下 `pin_hd20_pclk` 是 `pin_hd20_prepclk` 的两倍。
 
-### 2.2 POST-PLL计算过程
+### POST-PLL计算过程
 
 POST-PLL 计算过程如下：
 
@@ -164,7 +164,7 @@ LINUX 3.10 内核需要根据当前需要支持分辨率对应的的 TMDS CLOCK 
 
 需要注意的是，无论是 PRE-PLL 还是 POST-PLL，VCO 的频率都必须在 1.4~3.0Ghz 之间（实际使用中最大可以放宽到 3.2Ghz）。
 
-### 2.3 计算工具的使用
+### 计算工具的使用
 
 实际工作中可以使用计算工具 cal_innophy 进行计算，该计算工具可通过 RK 技术支持窗口获取。
 
@@ -218,11 +218,11 @@ TMDS CLOCK在不同色深的情况下，与PIXLE CLOCK的比率不同，详见2.
 
 LINUX 3.10 内核的 POST-PLL 配置分为 `RK322XH_V1_PLL_TABLE` 和 `EXT_PLL_TABLE` 两个 TABLE。可以根据所需 TMDS CLOCK 以及当前使用芯片的版本，直接选用 `post_pll_cfg_table` 当中对应值，在相应的 TABLE 中添加配置，详见 3.2 节。
 
-## 3 代码中新增PHY配置说明
+## 代码中新增PHY配置说明
 
 LINUX 3.10 内核以及 LINUX 4.4/4.19 内核将 PHY 的配置保存在对应的 TABLE 中，根据当前输出分辨率的 PIXEL CLOCK 和 TMDS CLOCK 选择对应的配置并设置到对应的寄存器中。相同分辨率的不同色深模式的配置不同（TMDS CLOCK 不同），所以如果需要同时支持 8-bit 和 10-bit 的色深，需要在 TABLE 中添加两项配置，详见2.1节。
 
-### 3.1 LINUX 3.10内核
+### LINUX 3.10内核
 
 LINUX 3.10 内核驱动 HDMI 需要在特定的 TABLE 中新增对应的配置项，路径为：
 
@@ -345,7 +345,7 @@ ppll_nd，ppll_nf，ppll_no 对应 LINUX 4.19/4.4 内核 `post_pll_config` 中�
 
 需要注意的是，部分版本的sdk代码较旧不包括 frac。RK322X 系列的芯片 PHY 的版本不支持浮点，所以 frac 只能为 0。
 
-### 3.2 LINUX 4.4/4.19内核
+### LINUX 4.4/4.19内核
 
 LINUX 4.4/4.19 内核需要新增 PHY 配置时，需在 PRE-PLL 的配置 TABLE：`pre_pll_cfg_table` 中新增对应的配置，而 POST-PLL 的配置 TABLE：`post_pll_cfg_table` 目前配置已经涵盖了 PHY 所支持的所有分辨率，无需再新增配置。路径为：
 

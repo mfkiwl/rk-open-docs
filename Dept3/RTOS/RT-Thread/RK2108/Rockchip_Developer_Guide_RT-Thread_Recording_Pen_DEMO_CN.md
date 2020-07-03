@@ -74,9 +74,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 基于LITTLEVGL2RTT的录音笔DEMO示例
+## 基于LITTLEVGL2RTT的录音笔DEMO示例
 
-### 1.1 代码路径
+### 代码路径
 
 基于LITTLEVGL2RTT的录音笔DEMO示例的代码路径为applications/recording_pen。
 
@@ -89,11 +89,11 @@ applications
        └──resource   存放图片、字库文件
 ```
 
-### 1.2 工程配置
+### 工程配置
 
 进入menuconfig，进行如下配置。
 
-#### 1.2.1 LITTLEVGL2RTT配置
+#### LITTLEVGL2RTT配置
 
 开启RT_USING_LITTLEVGL2RTT，并参考如下配置：
 
@@ -108,7 +108,7 @@ applications
 
 其中出现的数值请根据实际硬件情况进行设置。
 
-#### 1.2.2 音频配置
+#### 音频配置
 
 开启RT_USING_AUDIO_SERVER。
 
@@ -142,11 +142,11 @@ applications
 
 或参考Rockchip_Developer_Guide_RT-Thread_Audio_CN.md进行配置。
 
-#### 1.2.3 按键配置
+#### 按键配置
 
 开启RT_USING_KEYCTRL。
 
-#### 1.2.4 屏幕配置
+#### 屏幕配置
 
 开启RT_USING_DISPLAY，并参考如下配置：
 
@@ -161,25 +161,25 @@ applications
 
 具体选项请根据实际硬件情况进行选择。
 
-#### 1.2.5 DEMO配置
+#### DEMO配置
 
 开启RT_USING_RECORDING_PEN_APP。
 
-### 1.3 硬件配置
+### 硬件配置
 
 显示屏的配置，请参考Rockchip_Developer_Guide_RT-Thread_SPI_Screen_CN.md。
 
-## 2 开发基础
+## 开发基础
 
-### 2.1 DEMO整体框架
+### DEMO整体框架
 
 ![recording_pen_demo](Rockchip_Developer_Guide_RT-Thread_Recording_Pen_DEMO/recording_pen_demo.png)
 
-### 2.2 显示相关框架
+### 显示相关框架
 
 显示处理函数为applications/recording_pen/display/recpen_display.c中的`display_task`函数，负责屏幕的初始化，lvgl的初始化，页面的显示、切换，转发刷新、按键事件等。
 
-#### 2.2.1 页面
+#### 页面
 
 在applications/recording_pen/recpen.h中定义了如下页面：
 
@@ -222,7 +222,7 @@ struct lvgl_page_func page_func[MENU_MAX_PAGE] =
 };
 ```
 
-#### 2.2.2 气泡
+#### 气泡
 
 气泡相关函数定义在applications/recording_pen/display/toast.c中：
 
@@ -232,7 +232,7 @@ struct lvgl_page_func page_func[MENU_MAX_PAGE] =
 | void toast_reflash(void);                   | 由display_task调用，用于刷新Toast，判断是否需要删除 |
 | void toast_destory(void);                   | 用于删除Toast对象，一般不主动调用                   |
 
-#### 2.2.3 提示框
+#### 提示框
 
 提示框相关函数定义在applications/recording_pen/display/dialog_box.c中：
 
@@ -289,7 +289,7 @@ dialog_box_key返回值如下：
 168     }
 ```
 
-### 2.3 文件管理
+### 文件管理
 
 文件管理相关函数定义在applications/recording_pen/recpen_file.c中：
 
@@ -305,7 +305,7 @@ dialog_box_key返回值如下：
 | rt_err_t recpen_next_file();                                 | 查找下一文件             |
 | rt_err_t recpen_prev_file();                                 | 查找上一文件             |
 
-### 2.4 按键处理
+### 按键处理
 
 按键相关函数定义在applications/recording_pen/recpen_key.c中。
 
@@ -330,7 +330,7 @@ dialog_box_key返回值如下：
 | KEY_PLAY LONG PRESS   | 删除文件                   | 无       | 无       | 无       |
 | KEY_DOWN              | 下一个文件                 | 无       | 下一选项 | 下一选项 |
 
-### 2.5 录音
+### 录音
 
 录音相关函数定义在applications/recording_pen/recpen_record.c中：
 
@@ -343,7 +343,7 @@ dialog_box_key返回值如下：
 
 录音声卡默认使用`pdmc`，可修改`RECORD_CARD_NAME`进行配置，文件格式默认为`wav`，可修改`ENCODE_TYPE`进行配置。
 
-### 2.6 播放
+### 播放
 
 播放相关函数定义在applications/recording_pen/recpen_player.c中：
 

@@ -41,7 +41,7 @@ Field application engineers
 
 -----
 
-## 1 Overview
+## Overview
 
 Thermal is a framework model defined by kernel developers supporting to control the system temperature according to the specific governor in order to prevent the chipset from overheating. Thermal framework consists of governor, core, cooling device and sensor driver. The software architecture is as below:
 
@@ -62,7 +62,7 @@ Thermal cooling device: heating source or cooling device, such as CPU, GPU, DDR 
 
 -----
 
-## 2 Code Path
+## Code Path
 
 Governor related code:
 
@@ -95,9 +95,9 @@ drivers/thermal/rk3368_thermal.c      /* tsadc driver for RK3368 */
 
 -----
 
-## 3 Configuration Method
+## Configuration Method
 
-### 3.1 Menuconfig Configuration
+### Menuconfig Configuration
 
 ```c
 <*> Generic Thermal sysfs driver  --->
@@ -122,7 +122,7 @@ drivers/thermal/rk3368_thermal.c      /* tsadc driver for RK3368 */
 
 It is able to select thermal governor through "Default Thermal governor" configuration option. Developers can change it according to the actual product requirement.
 
-### 3.2 Tsadc Configuration
+### Tsadc Configuration
 
 Tsadc as thermal sensor in the thermal control is used to acquire temperature. Usually need to do the configuration in both DTSI and DTS.
 
@@ -191,11 +191,11 @@ DTS configuration is mainly used to select CRU reset or GPIO reset, low voltage 
 
 Refer to the document "Documentation/devicetree/bindings/thermal/rockchip-thermal.txt".
 
-### 3.3 Power Allocator Governor Configuration
+### Power Allocator Governor Configuration
 
 Power allocator thermal governor introduces PID (Proportion-Integral-Differential) control to dynamically allocate power for cooling devices according to current temperature. When the temperature is low, the allocatable power is relatively large, that is, the operating frequency is high. As the temperature rises, the allocatable power gradually decreases and the operating frequency also gradually decreases, so as to limit the frequency according to the temperature.
 
-#### 3.3.1 CPU Configuration
+#### CPU Configuration
 
 CPU as cooling device in thermal control needs to include "#cooling-cells", "dynamic-power-coefficient" attributes in the node.
 
@@ -232,7 +232,7 @@ cpu_b0: cpu@100 {
 };
 ```
 
-#### 3.3.2 GPU Configuration
+#### GPU Configuration
 
 GPU as cooling device in thermal control needs to include "#cooling-cells" attribute in the node and power_model subnode.
 
@@ -277,7 +277,7 @@ gpu: gpu@ff9a0000 {
 };
 ```
 
-#### 3.3.3 Thermal Zone Configuration
+#### Thermal Zone Configuration
 
 Thermal zone node is mainly used to configure the related parameters of thermal governor and generate the corresponding user mode interface.
 
@@ -456,7 +456,7 @@ thermal_zones: thermal-zones {
 
 Refer to the document "Documentation/devicetree/bindings/thermal/thermal.txt"、"Documentation/thermal/power_allocator.txt".
 
-#### 3.3.4 Thermal Parameter Adjustment
+#### Thermal Parameter Adjustment
 
 Some parameters are related with the chipset and usually no need to change. Some parameters need to be adjusted according to the actual product requirement. Generally you can do as below steps:
 
@@ -722,7 +722,7 @@ echo 0 > /sys/kernel/debug/tracing/tracing_on  /* pause to capture data */
 echo 0 > /sys/kernel/debug/tracing/trace       /* clean up the previous data */
 ```
 
-## 4 User Interface Introduction
+## User Interface Introduction
 
 User interface is in the directory of /sys/class/thermal/, and the detailed contents correspond to the thermal zone node configuration in DTSI. Some platforms only have one sub node under the thermal zone node, so there is only thermal_zone0 sub directory under the directory of /sys/class/thermal/. Some platforms have two sub nodes, and correspondingly there will be thermal_zone0 and thermal_zone1 sub directories under the directory of /sys/class/thermal/. Through user mode interface it is able to switch thermal control strategy, check current temperature and so on.
 
@@ -775,9 +775,9 @@ Refer to the document “Documentation/thermal/sysfs-api.txt”.
 
 -----
 
-## 5 Common Issues
+## Common Issues
 
-### 5.1 Disable Thermal Control
+### Disable Thermal Control
 
 Method 1: set the default thermal governor as user_space in menuconfig.
 
@@ -815,7 +815,7 @@ echo 0 > /sys/class/thermal/thermal_zone0/cdev1/cur_state
 echo 0 > /sys/class/thermal/thermal_zone0/cdev2/cur_state
 ```
 
-### 5.2 Acquire Current Temperature
+### Acquire Current Temperature
 
 Just look at the temp node in the directory of thermal_zone0 or thermal_zone1.
 

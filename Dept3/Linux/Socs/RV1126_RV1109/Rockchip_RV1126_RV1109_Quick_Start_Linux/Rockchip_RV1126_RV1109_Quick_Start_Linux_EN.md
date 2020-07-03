@@ -75,7 +75,7 @@ This document (this guide) is mainly intended for:
 
 ---
 
-## 1   Set up an Development Environment
+## Set up an Development Environment
 
 **Ubuntu 16.04 system:**
 Please install software packages with below commands to set up a building environment:
@@ -92,9 +92,9 @@ In addition to the above software packages, the following dependencies is needed
 sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 ```
 
-## 2 SDK Configuration Framework Introduction
+## SDK Configuration Framework Introduction
 
-### 2.1 SDK Project Directory Introduction
+### SDK Project Directory Introduction
 
 There are buildroot, app, kernel, u-boot, device, docs, external and other directories in the project directory. Each directory or its sub-directories will correspond to a git project, and the commit should be done in the respective directory.
 
@@ -110,13 +110,13 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 - tools: stores some commonly used tools.
 - u-boot: U-Boot code.
 
-### 2.2 SDK Configuration Framework
+### SDK Configuration Framework
 
 ![](resources/SDK_Configuration_Framework.jpg)
 
-## 3 SDK Building Introduction
+## SDK Building Introduction
 
-### 3.1 To Select Board Configure
+### To Select Board Configure
 
 SDK Download Address:
 
@@ -139,7 +139,7 @@ Command of select board configure:
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
 ```
 
-### 3.2 To View Building Commands
+### To View Building Commands
 
 Execute the following command in the root directory: `./build.sh -h|help`
 
@@ -185,7 +185,7 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 
 [^Note]: The detailed compilation commands are based on the actual SDK version, mainly because the configuration may be different. build.sh compilation command is fixed.
 
-### 3.3 U-Boot Building
+### U-Boot Building
 
 ```shell
 ### U-Boot building command
@@ -195,7 +195,7 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ./build.sh -h uboot
 ```
 
-### 3.4 Kernel Building
+### Kernel Building
 
 ```shell
 ### Kernel building command
@@ -205,7 +205,7 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ./build.sh -h kernel
 ```
 
-### 3.5 Recovery Building
+### Recovery Building
 
 ```shell
 ### Recovery building command
@@ -215,23 +215,23 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ./build.sh -h recovery
 ```
 
-### 3.6 Rootfs Building
+### Rootfs Building
 
 ```shell
 ### Rootfs building command
 ./build.sh rootfs
 
-###  to view detailed Rootfs build command
+### to view detailed Rootfs build command
 ./build.sh -h rootfs
 ```
 
-### 3.7 Firmware Package
+### Firmware Package
 
 Firmware packaging command: `./mkfirmware.sh`
 
 Firmware directory: rockdev
 
-### 3.8 Full Automatic Building
+### Full Automatic Building
 
 Enter the project root directory and execute the following command to automatically complete all buildings:
 
@@ -239,21 +239,21 @@ Enter the project root directory and execute the following command to automatica
 ./build.sh all
 ```
 
-## 4 Upgrade Introduction
+## Upgrade Introduction
 
-### 4.1 TOP Surface of the EVB
+### TOP Surface of the EVB
 
 ![](resources/EVB-front-view.jpg)
 
-### 4.2 Bottom Surface of the EVB
+### Bottom Surface of the EVB
 
 ![](resources/EVB-back-view.jpg)
 
-### 4.3 EVB Function Table
+### EVB Function Table
 
 ![](resources/EVB-function-interfaceEN.png)
 
-### 4.4 Windows Upgrade Introduction
+### Windows Upgrade Introduction
 
 The SDK provides a windows flash tool (this tool should be V2.71 or later version) which is located in project root directory:
 
@@ -276,7 +276,7 @@ Note:
 <SDK>/tools/windows/DriverAssitant_v4.91.zip
 ```
 
-### 4.5 Linux Upgrade Introduction
+### Linux Upgrade Introduction
 
 The Linux upgrade tool (Linux_Upgrade_Tool should be v1.49 or later versions) is located in "tools/linux" directory. Please make sure your board is connected to MASKROM/loader rockusb, if the generated firmware is in rockdev directory, upgrade commands are as below:
 
@@ -306,7 +306,7 @@ Or in root directory, run the following command on your device to upgrade in MAS
 ./rkflash.sh
 ```
 
-## 5 EVB Function Introduction
+## EVB Function Introduction
 
 The EVB supports the following functions:
 
@@ -316,11 +316,11 @@ The EVB supports the following functions:
 - Support access device from web
 - Support face recognition
 
-### 5.1 How to Access 3 RTSP and 1 RTMP Network Stream
+### How to Access 3 RTSP and 1 RTMP Network Stream
 
 Connect a network cable to the network port of the EVB, power on and start. It will obtain the IP address automatically by default.
 
-#### 5.1.1 Get Device IP Address by Serial Port or ADB of the EVB
+#### Get Device IP Address by Serial Port or ADB of the EVB
 
 ```shell
 ifconfig eth0
@@ -344,7 +344,7 @@ Parity: none
 Flow control: none
 ```
 
-#### 5.1.2 Get Device IP Address by RK IPCamera Tool
+#### Get Device IP Address by RK IPCamera Tool
 
 Install the tool in the SDK directory `tools/windows/RK_IPCamera_Tool-V1.1.zip`. Open the tool and connect the EVB board to the computer through the network port. In the local area network, check the RK IPCamera Tool device list to obtain the device IP address.
 
@@ -359,7 +359,7 @@ Install the tool in the SDK directory `tools/windows/RK_IPCamera_Tool-V1.1.zip`.
 - Step 5: set the IP to device
 - Step 6: open to preview
 
-#### 5.1.3 Access Network Stream
+#### Access Network Stream
 
 Use a player that supports RTSP or RTMP to access, for example (VLC player).
 
@@ -375,7 +375,7 @@ RTMP access address:
 
 - rtmp://**IP address of the device**:1935/live/substream
 
-### 5.2 How to Access Device Information via Web
+### How to Access Device Information via Web
 
 Open a web browser (Chrome browser is recommended ) to access the address:
 
@@ -385,15 +385,15 @@ http://IP address of the device
 
 For detailed operation instructions on the web, please refer to the documents under the SDK docs directory.
 
-### 5.3 How to Test Face Recognition Function
+### How to Test Face Recognition Function
 
 Use a player to access RTSP main stream: rtsp://**IP address of the device**/live/mainstream.
 
 The default authorization test time of the SDK's face recognition function is 30 ~ 60 minutes. When the authorization is invalid, the main stream preview will prompt "gace algorithm software is not authorized", and you have to restart to test again.
 
-### 5.4 How to Debug With EVB via Network
+### How to Debug With EVB via Network
 
-#### 5.4.1 Debug With SSH
+#### Debug With SSH
 
 Connect EVB with network, get EVB board's IP address with the Chapter 5.1.2 [Get Device IP Address by RK IPCamera Tool](#### 5.1.2 Get Device IP Address by RK IPCamera Tool). Ensure that the PC can ping the EVB board.
 
@@ -405,7 +405,7 @@ ssh root@192.168.1.159
 ### input the default passwd：rockchip
 ```
 
-#### 5.4.2 Debug With SCP
+#### Debug With SCP
 
 ```shell
 ### Upload the test-file from PC to EVB board dirctory /userdata
@@ -419,7 +419,7 @@ root@192.168.1.159's password:
 ### input the default passwd：rockchip
 ```
 
-## 6 Smart USB Camera Product
+## Smart USB Camera Product
 
 The smart USB camera product supports the following functions:
 
@@ -430,11 +430,11 @@ The smart USB camera product supports the following functions:
 - Support preview of multiple terminal devices such as smart TV or PC
 - Support for eptz function
 
-### 6.1 Product Building Introduction
+### Product Building Introduction
 
 The compilation and configuration of the smart USB camera product is based on the public SDK and adopts the separate rv1126_rv1109_linux_Ai_camera_release.xml Code list management update.
 
-#### 6.1.1 To Select Board Configure
+#### To Select Board Configure
 
 SDK download address ：
 
@@ -454,11 +454,11 @@ Command of selecting board configure :
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk
 ```
 
-#### 6.1.2 Building
+#### Building
 
 The building command of the intelligent USB camera product is the same as that of the SDK. Please refer to the SDK Building Introduction in Section 3.
 
-### 6.2 Product Software Framework
+### Product Software Framework
 
 The overall structure is as follows：
 
@@ -472,7 +472,7 @@ The corresponding relationship between rv1109 / rv1126 end application and sourc
 >
 > **3.uvc app:source code patch:  <SDK>/external/uvc_app: Responsible for the implementation and control of the complete functions of UVC camera.**
 
-#### 6.2.1 uvc_app
+#### uvc_app
 
 Please refer to：
 
@@ -480,7 +480,7 @@ Please refer to：
 <SDK>/external/uvc_app/doc/zh-cn/uvc_app.md
 ```
 
-#### 6.2.2 mediaserver
+#### mediaserver
 
 Please refer to：
 
@@ -488,7 +488,7 @@ Please refer to：
 <SDK>/docs/Linux/AppcationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
 ```
 
-#### 6.2.3 Other
+#### Other
 
 For other Linux application framework or module materials, please refer to the corresponding documents in the following directory：
 
@@ -496,9 +496,9 @@ For other Linux application framework or module materials, please refer to the c
 <SDK>/docs/Linux/
 ```
 
-### 6.3  Function Introduction
+### Function Introduction
 
-#### 6.3.1 How To Preview For USB Camera
+#### How To Preview For USB Camera
 
 Use USB cable to connect the USB OTG port of EVB with the host computer, such as the USB host port of TV or PC, and power on. By default, the UVC camera application and rndis service will be started automatically. Use serial port to connect EVB board and run ifconfig usb0 to obtain the pre configured IP address of rndis virtual network port.
 
@@ -527,7 +527,7 @@ Android smart TV uses RKAICameraTest application or other standard camera applic
 
 ![](/resources/uvcc/uvc_camera_open.jpg)
 
-#### 6.3.2 How To Test AI Model Post-processing
+#### How To Test AI Model Post-processing
 
 Open the RKAICameraTest application on the TV terminal, click the rndis button to connect with rndis after seeing the preview, click the settings button to select the "model algorithm switching" option after success, select the model algorithm to be used, which is the face detection algorithm by default, and then click the "Ai post-processing switch", when the face appears in front of the camera, you can see the AI processing effect:
 
@@ -535,7 +535,7 @@ Open the RKAICameraTest application on the TV terminal, click the rndis button t
 
 ![](resources/uvcc/uvc_camera_setting.jpg)
 
-#### 6.3.3 How To Test EPTZ
+#### How To Test EPTZ
 
 Open the RKAICameraTest application at the TV end, click the rndis button to connect to rndis after seeing the preview, click the settings button to select the "eptz mode switch" option after the countdown is completed, and then open the application, at this time, the top left corner of the interface will display whether it is the eptz model or the general intelligent preview mode:
 

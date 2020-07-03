@@ -79,11 +79,11 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 CLK 配置
+## CLK 配置
 
-### 1.1  HAL CLK 配置
+### HAL CLK 配置
 
-#### 1.1.1  HAL 层 CLK 头文件
+#### HAL 层 CLK 头文件
 
 cru 的工具会自动生成头文件，里面包含 GATE_ID、SOFTRST_ID、DIV_ID、MUX_ID、CLK_ID。
 GATE_ID： 包含 CON 和 SHIFT，CON = GATE_ID / 16, SHIFT = GATE_ID % 16
@@ -101,7 +101,7 @@ Con = 10;Shift = 6;Width = 2;
 Con = 10;Shift = 0;Width = 5;
 ```
 
-#### 1.1.2  常用 API
+#### 常用 API
 
 ```c
 uint32_t HAL_CRU_GetPllFreq(struct PLL_SETUP *pSetup);
@@ -125,7 +125,7 @@ HAL_Status HAL_CRU_ClkNp5BestDiv(eCLOCK_Name clockName, uint32_t rate, uint32_t 
 
 ```
 
-#### 1.1.3  CLK 开关
+#### CLK 开关
 
 ```c
 HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clk);
@@ -141,7 +141,7 @@ HAL_Status HAL_CRU_ClkDisable(uint32_t clk);
 
 （2）没有引用计数的概念，写开就会开，写关就会关，对于很多模块共用的 CLK，关闭需谨慎。
 
-#### 1.1.4  CLK 频率设置
+#### CLK 频率设置
 
 ```c
 uint32_t HAL_CRU_ClkGetFreq(eCLOCK_Name clockName);
@@ -159,7 +159,7 @@ HAL_Status HAL_CRU_ClkSetMux(uint32_t muxName, uint32_t muxValue);
 uint32_t HAL_CRU_ClkGetMux(uint32_t muxName);
 ```
 
-#### 1.1.5  CLK SOFTRESET
+#### CLK SOFTRESET
 
 ```c
 HAL_Check HAL_CRU_ClkIsReset(uint32_t clk);
@@ -169,9 +169,9 @@ HAL_Status HAL_CRU_ClkResetDeassert(uint32_t clk);
 
 参数是 SFRST_ID(在 soc.h 中，详细解释见本文 1.1.1)。
 
-### 1.2  RT-THREAD CLK 配置
+### RT-THREAD CLK 配置
 
-#### 1.2.1  RT-THREAD CLK 接口
+#### RT-THREAD CLK 接口
 
 ```c
 rt_err_t clk_enable_by_id(int gate_id)；
@@ -189,7 +189,7 @@ rt_err_t clk_set_rate(eCLOCK_Name clk_id, uint32_t rate);
 1、增加互斥锁机制，对于公共 CLK，两个模块都在使用的，最好能有锁，这样更安全。
 2、增加引用计数，对于公共 CLK，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 1.2.2  RT-THREAD 开关 CLK
+#### RT-THREAD 开关 CLK
 
 使用示例：
 
@@ -214,7 +214,7 @@ clk_enable_by_id(ACLK_DSP_GATE);/* clk enable */
 clk_disable_by_id(ACLK_DSP_GATE);/* clk disable */
 ```
 
-### 1.2.3  RT-THREAD 设置频率
+### RT-THREAD 设置频率
 
 使用示例：
 
@@ -223,7 +223,7 @@ clk_set_rate(clk_id, init_rate_hz);
 rt_kprintf("%s: rate = %d\n", __func__, clk_get_rate(clk_id));
 ```
 
-#### 1.2.4  RT-THREAD 设置初始化频率及 CLK DUMP
+#### RT-THREAD 设置初始化频率及 CLK DUMP
 
 (1)在 board.c 中初始化时钟使用示例如下：
 
@@ -255,9 +255,9 @@ CLK DUMP 只能 DUMP 部分在 clk_inits[]结构中的时钟和所有的寄存�
 
 CLK DUMP使用是用FINSH_FUNCTION_EXPORT，直接敲clk_dump()就可以。
 
-### 1.3  FreeRTOS CLK 配置
+### FreeRTOS CLK 配置
 
-#### 1.3.1  FreeRTOS CLK 接口
+#### FreeRTOS CLK 接口
 
 ```c
 rk_err_t ClkEnableById(int gateId);
@@ -281,7 +281,7 @@ void ClkDump(void);
 1、增加互斥锁机制，对于公共 CLK，两个模块都在使用的，最好能有锁，这样更安全。
 2、增加引用计数，对于公共 CLK，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 1.3.2  FreeRTOS 开关 CLK
+#### FreeRTOS 开关 CLK
 
 使用示例：
 
@@ -306,7 +306,7 @@ ClkEnableById(ACLK_DSP_GATE);/* clk enable */
 ClkDisableById(ACLK_DSP_GATE);/* clk disable */
 ```
 
-### 1.3.3  FreeRTOS 设置频率
+### FreeRTOS 设置频率
 
 使用示例：
 
@@ -315,7 +315,7 @@ ClkSetRate(clkId, rate);
 rk_printfA("%s: rate = %d\n", __func__, ClkGetRate(clk_id));
 ```
 
-#### 1.3.4  FreeRTOS 设置初始化频率及 CLK DUMP
+#### FreeRTOS 设置初始化频率及 CLK DUMP
 
 (1)在 board_config.c 中初始化时钟使用示例如下：
 
@@ -354,11 +354,11 @@ CLK DUMP 只能 DUMP 部分在 clkInits[]结构中的时钟和所有的寄存器
 
 CLK DUMP有支持test命令。详细见第3章TEST。
 
-## 2 PD 配置
+## PD 配置
 
-### 2.1  HAL PD 配置
+### HAL PD 配置
 
-#### 2.1.1  HAL 层 PD 头文件
+#### HAL 层 PD 头文件
 
 PD 的 ID 需要手动填写一下，如下：
 
@@ -398,13 +398,13 @@ typedef enum PD_Id {
 #define PD_GET_ACK_SHIFT(x) (((uint32_t)(x)&PD_ACK_MASK) >> PD_ACK_SHIFT)
 ```
 
-#### 2.1.2  常用 API
+#### 常用 API
 
 ```c
 HAL_Status HAL_PD_On(ePD_Id pd);
 ```
 
-#### 2.1.3  PD 开关
+#### PD 开关
 
 ```c
 HAL_Status HAL_PD_Off(ePD_Id pd);
@@ -418,9 +418,9 @@ HAL_Status HAL_PD_Off(ePD_Id pd);
 
 （2）没有引用计数的概念，写开就会开，写关就会关，对于很多模块共用的 PD，关闭需谨慎。
 
-### 2.2  RT-THREAD PD 配置
+### RT-THREAD PD 配置
 
-#### 2.2.1  RT-THREAD 接口
+#### RT-THREAD 接口
 
 ```c
 struct pd *get_pd_from_id(ePD_Id pd_id);
@@ -433,7 +433,7 @@ rt_err_t pd_off(struct pd *power);
 1、增加互斥锁机制，对于公共 PD，两个模块都在使用的，最好能有锁，这样更安全。
 2、增加引用计数，对于公共 PD，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 2.2.2  RT-THREAD 开关 PD
+#### RT-THREAD 开关 PD
 
 使用示例：
 
@@ -458,9 +458,9 @@ HAL_PD_On(PD_DSP);/* power on */
 HAL_PD_Off(PD_DSP);/* power off */
 ```
 
-### 2.3  FreeRTOS PD配置
+### FreeRTOS PD配置
 
-#### 2.3.1  FreeRTOS 接口
+#### FreeRTOS 接口
 
 ```c
 rk_err_t PdPowerOn(PD *power);
@@ -473,7 +473,7 @@ void PutPd(PD *power);
 1、增加互斥锁机制，对于公共 PD，两个模块都在使用的，最好能有锁，这样更安全。
 2、增加引用计数，对于公共 PD，两个模块都在使用的，同时开关的时候有引用计数，这样更安全。
 
-#### 2.3.2  FreeRTOS 开关 PD
+#### FreeRTOS 开关 PD
 
 使用示例：
 
@@ -498,11 +498,11 @@ HAL_PD_On(PD_DSP);/* power on */
 HAL_PD_Off(PD_DSP);/* power off */
 ```
 
-## 3 TEST
+## TEST
 
-### 3.1  RT-THREAD
+### RT-THREAD
 
-#### 3.1.1  CONFIG配置
+#### CONFIG配置
 
 ```c
 RT-Thread bsp test case  --->
@@ -511,7 +511,7 @@ RT-Thread bsp test case  --->
             [*]   Enable BSP Common PM TEST
 ```
 
-#### 3.1.2  USAGE
+#### USAGE
 
 ```c
 clk -w <id|name> <rate_hz>    set clk rate;
@@ -532,9 +532,9 @@ clk -r 0
 clk_dump
 ```
 
-### 3.2  FreeRTOS
+### FreeRTOS
 
-#### 3.2.1  CONFIG配置
+#### CONFIG配置
 
 ```c
 Components Config  --->
@@ -542,7 +542,7 @@ Components Config  --->
         [*]     Enable PM_TEST Shell
 ```
 
-#### 3.2.2  USAGE
+#### USAGE
 
 ```c
 "    clk -w <id> <rate_hz>    set clk rate\r\n"

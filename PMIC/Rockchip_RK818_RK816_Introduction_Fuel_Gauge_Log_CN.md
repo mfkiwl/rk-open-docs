@@ -40,9 +40,9 @@
 
 ---
 
-## 1 充电器/OTG 检测
+## 充电器/OTG 检测
 
-### 1.1 驱动文件
+### 驱动文件
 
 ```c
 drivers/power/rk818_charger.c
@@ -50,7 +50,7 @@ drivers/power/rk818_charger.c
 
 本驱动主要实现了充电器/OTG 拔插事件的检测和充电电流的配置。打印信息都以 "rk818-charger: " 作为前缀方便识别，打印中出现的 "ac"、"usb"、"dc"、"otg" 分别代表了不同的设备，1 表示当前处于连接状态，0 表示断开连接。需要注意的是：PMIC 本身没有能力检测充电器/OTG 拔插事件，所以对于充电类型的检测实际上都是依赖 USB 的通知链消息。
 
-### 1.2 probe 阶段
+### probe 阶段
 
 DC 充电器注册情况：
 
@@ -83,7 +83,7 @@ rk818-charger: ac=1, usb=0, dc=0, otg=0
 rk818-charger: driver version: 2.0
 ```
 
-### 1.3 running 阶段
+### running 阶段
 
 来自于 USB 通知链的充电器/OTG 设备插拔消息：
 
@@ -119,7 +119,7 @@ rk818-charger: enable otg5v
 rk818-charger: ac=1 usb=0 dc=0 otg=0 v=4200 chrg=1000 input=1800 virt=0
 ```
 
-### 1.4 suspend 阶段
+### suspend 阶段
 
 suspend 时 OTG 设备的 5V 供电变化情况：
 
@@ -128,7 +128,7 @@ rk818-charger: suspend: otg 5v on
 rk818-charger: suspend: otg 5v off
 ```
 
-### 1.5 shutdown 阶段
+### shutdown 阶段
 
 shutdown 时当前各设备的连接情况：
 
@@ -136,9 +136,9 @@ shutdown 时当前各设备的连接情况：
 rk818-charger: shutdown: ac=1 usb=0 dc=0 otg=0
 ```
 
-## 2 电池电量检测
+## 电池电量检测
 
-### 2.1 驱动文件
+### 驱动文件
 
 ```c
 drivers/power/rk818_battery.c
@@ -147,7 +147,7 @@ drivers/power/rk818_battery.h
 
 本驱动主要实现了 fuel gauge 的功能，提供了一套用于统计电池电量信息的驱动程序。打印信息都以 "rk818-bat: " 作为前缀方便识别。
 
-### 2.2 probe 阶段
+### probe 阶段
 
 当接电池后第一次上电开机，会有 "first on" 的提示：
 
@@ -179,7 +179,7 @@ rk818-bat: dsoc=32 cap=1000 v=3780 ov=3900 rv=3890 min=25 psoc=32 pcap=1000
 rk818-bat: driver version 7.1
 ```
 
-### 2.3 running 阶段
+### running 阶段
 
 每次电量变化的时候驱动向框架上报电量时都有如下打印，第一句话表示各参数的实时状态；第二句话表示开机初始化时的参数状态量，主要用于 debug
 
@@ -188,7 +188,7 @@ rk818-bat: changed: dsoc=22, rsoc=24, v=3820, ov=3770 c=1018, cap=960, f=4000, s
 rk818-bat: dl=10, rl=12, v=3670, halt=0, halt_n=0, max=0, init=0, sw=0, calib=0, below0=0, force=0
 ```
 
-### 2.4 suspend 阶段
+### suspend 阶段
 
 系统进入深度休眠后，如果待机过长时间后导致电池低电至关机电压以下，则会产生一个 PMIC 唤醒的中断，然后关机：
 
@@ -196,7 +196,7 @@ rk818-bat: dl=10, rl=12, v=3670, halt=0, halt_n=0, max=0, init=0, sw=0, calib=0,
 rk818-bat: lower power yet, power off system! v=3350, c=-125, dsoc=0
 ```
 
-### 2.5 shutdown 阶段
+### shutdown 阶段
 
 shutdown 的时候显示相关重要信息：
 
@@ -205,7 +205,7 @@ rk818-bat: shutdown: dl=0 rl=2 c=-1220 v=3460 cap=88 f=4000 ch=1 n=0 mode=1 rest
 打印含义：<显示soc> <真实soc> <电流> <电压> <剩余容量> <满充容量> <是否有charger> <其余忽略....>
 ```
 
-## 3 关于 RK816 电量计
+## 关于 RK816 电量计
 
 RK816 电量计的功能实现基本和 RK818 差别不大，把充电器识别和电量计改动都统一在：
 

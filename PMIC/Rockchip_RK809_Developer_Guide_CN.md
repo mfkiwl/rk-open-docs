@@ -73,9 +73,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 基础
+## 基础
 
-### 1.1 概述
+### 概述
 
 RK809 是一款高性能 PMIC，RK809 集成 5 个大电流 DCDC、9 个 LDO、2 个 开关SWITCH、 1个 RTC、1个 高性能CODEC、可调上电时序等功能。
 
@@ -84,7 +84,7 @@ RK809 是一款高性能 PMIC，RK809 集成 5 个大电流 DCDC、9 个 LDO、2
 1. DCDC：输入输出压差大时，效率高，但是存在纹波比较大的问题，成本高，所以大压差，大电流负载时使用。一般有两种工作模式。PWM 模式：纹波瞬态响应好，效率低；PFM 模式：效率高，但是负载能力差。
 2. LDO：输入输出压差大时，效率低，成本低，为了提高 LDO 的转换效率，系统上会进行相关优化如：LDO 输出电压为 1.1V，为了提高效率，其输入电压可以从 VCCIO_3.3V 的 DCDC 给出。所以电路上如果允许尽量将 LDO 接到 DCDC 输出回路，但是要注意上电时序。
 
-### 1.2 功能
+### 功能
 
 从使用者的角度看，RK809 的功能概况起来可以分为 4 个部分：
 
@@ -95,7 +95,7 @@ RK809 是一款高性能 PMIC，RK809 集成 5 个大电流 DCDC、9 个 LDO、2
 5. clk 功能：有两个32.768KHZ时钟输出，一个不可以控常开，一个是软件可控；
 6. codec 功能：采样率最高支持到192KHZ，支持16bit和32bit，支持DAC、ADC PDM等(此功能暂不在本文档中介绍，后面会有专有文档补充说明)。
 
-### 1.3 芯片引脚功能
+### 芯片引脚功能
 
 ![RK809-pins-list](Rockchip_RK809_Developer_Guide/RK809_pins_list.png)
 
@@ -107,7 +107,7 @@ RK809 是一款高性能 PMIC，RK809 集成 5 个大电流 DCDC、9 个 LDO、2
 
 ![RK809-pins-function-3](Rockchip_RK809_Developer_Guide/RK809_pins_function_3.png)
 
-### 1.4 重要概念
+### 重要概念
 
 - I2C 地址
 
@@ -167,7 +167,7 @@ RK809 是一款高性能 PMIC，RK809 集成 5 个大电流 DCDC、9 个 LDO、2
        | ------------- | ---------- | ----------------------------------|
        | 0.6 ~ 3.4     | 25         | 0.6、0.625、0.65、0.675、…… 、3.4 |
 
-### 1.5 上电条件和时序
+### 上电条件和时序
 
 1. 上电条件
 
@@ -186,9 +186,9 @@ RK809 是一款高性能 PMIC，RK809 集成 5 个大电流 DCDC、9 个 LDO、2
 
 ![RK809-power-start-seq2](Rockchip_RK809_Developer_Guide/RK809_power_start_seq2.png)
 
-## 2 配置
+## 配置
 
-### 2.1 驱动和 menuconfig
+### 驱动和 menuconfig
 
 **4.4 内核配置**
 
@@ -250,7 +250,7 @@ CONFIG_INPUT_RK805_PWRKEY
 CONFIG_COMMON_CLK_RK808
 ```
 
-### 2.2 DTS 配置
+### DTS 配置
 
 **4.4 内核 DTS 配置**
 
@@ -498,7 +498,7 @@ static int rk817_shutdown_prepare(struct rk808 *rk808)
 
 请参考4.4内核DTS配置。差异点：4.19内核的DTS配置不再需要gpio子节点，但其他模块依然使用`gpios = <&rk809 0 GPIO_ACTIVE_LOW>;`的方式引用和使用rk809的pin脚。
 
-### 2.3 函数接口
+### 函数接口
 
 如下几个接口基本可以满足日常使用，包括 regulator 开、关、电压设置、电压获取等：
 
@@ -542,14 +542,14 @@ regulator_put(rdev_logic);				// 释放vdd_logic
 
 说明：4.4或者4.19内核还提供了`devm_`开头的regulator接口帮开发者管理要申请的资源。
 
-## 3 Debug
+## Debug
 
-### 4.4 内核
+### 内核
 
 命令格式同 3.10 内核一样，只是节点路径不同，4.4 内核上的 debug 节点路径是：
 
 `/sys/rk8xx/rk8xx_dbg`
 
-### 4.19 内核
+### 内核
 
 请参考4.4内核命令。

@@ -205,7 +205,7 @@ rk_err_t SpiDev_SendThenSend(HDC dev, uint8_t ch, const void *sendBuf0, rk_size_
 rk_err_t SpiDev_SendThenRecv(HDC dev, uint8_t ch, const void *sendBuf, rk_size_t len0, void *recvBuf, rk_size_t len1);
 ```
 
-### 1.4 函数接口调用范例
+### 函数接口调用范例
 
 参考 shell_spi.c。
 

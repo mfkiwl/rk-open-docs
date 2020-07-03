@@ -42,13 +42,13 @@ Software development engineers
 
 ---
 
-## 1. Basic concept
+## Basic concept
 
-### 1.1 Frequency (clk) and voltage
+### Frequency (clk) and voltage
 
 Generally there are many modules inside SoC, such as ARM, GPU, DDR, I2C, SPI, USB and so on. When each module is working, the digital logic part requires an appropriate frequency and corresponding voltage. The higher the module frequency is, the higher the voltage is required. The frequency and voltage are two important parameters of power consumption.
 
-### 1.2 Voltage domain(VD) and power domain(PD)
+### Voltage domain(VD) and power domain(PD)
 
 Generally all modules inside SoC have digital logic part and IO part. The digital logic part is mainly responsible for computing and status control, and IO part is mainly responsible for the transmission of the interface signal (some modules don't have IO, such as ARM, GPU, etc.). Generally the power supplies of the digital logic and IO are separated. The power consumption of IO part is generally fixed, while the power consumption of digital logic part changes a lot due to the influence of frequency and voltage. In order to optimize the power consumption, the digital logic part inside the chip is divided into voltage domain and power domain according to the module.
 
@@ -74,7 +74,7 @@ The block diagram is as below:
 
 ![rk3399_vd_pd.png](./Rockchip_Developer_Guide_Power_Analysis/rk3399_vd_pd.png)
 
-### 1.3 DCDC (Direct Current) and LDO (Low dropout regulator)
+### DCDC (Direct Current) and LDO (Low dropout regulator)
 
 The external power supply of SoC mainly includes DCDC and LDO:
 
@@ -92,7 +92,7 @@ The block diagram of the power supply is as below:
 
 ![rk3126_rk816.png](./Rockchip_Developer_Guide_Power_Analysis/rk3126_rk816.png)
 
-### 1.4 Static power consumption and dynamic power consumption
+### Static power consumption and dynamic power consumption
 
 - The static power consumption is the power consumption consumed by the leakage of transistor when the internal modules of SoC are not working. The static power consumption will increase with the increase of the temperature and voltage.
 
@@ -104,7 +104,7 @@ The format of dynamic power consumption:
     P(d)= C * V^2 * F
 ```
 
-### 1.5 DVFS(Dynamic Voltage and Frequency Scaling), CPUFREQ and DEVFREQ
+### DVFS(Dynamic Voltage and Frequency Scaling), CPUFREQ and DEVFREQ
 
 The higher the module working frequency and the voltage are, the higher the power consumption is. So need dynamically adjust the frequency and voltage to optimize the power consumption. When the system is idle, reduce the frequency and voltage, when the system is busy, increase the frequency and voltage.
 
@@ -113,7 +113,7 @@ The higher the module working frequency and the voltage are, the higher the powe
 - CPUFREQ is the software framework of dynamic CPU frequency scaling, including several different frequency scaling strategies. For more details, please refer to the document 《Rockchip-Developer-Guide-Linux4.4-CPUFreq-CN》.
 - DEVFREQ is the software framework of dynamic peripheral(not including CPU) frequency scaling, including several different frequency scaling strategies. For more details, please refer to 《Rockchip-Developer-Guide-Linux4.4-Devfreq》.
 
-## 2. Power consumption measurement
+## Power consumption measurement
 
 Before optimizing the power consumption, need to measure the voltage and current of each power supply, analyze the data and then optimize accordingly.
 
@@ -123,7 +123,7 @@ Before optimizing the power consumption, need to measure the voltage and current
 cat /sys/class/thermal/thermal_zone0/temp
 ```
 
-### 2.1 Measurement method
+### Measurement method
 
 Series connect a resistor R in the circuit to measure the voltage difference U between two sides of the resistor, then the current I=U/R. Generally here we use the resistor with 0.01 ohm,but you need to adjust the resistance according to the current.
 
@@ -131,7 +131,7 @@ Take RK3399 EVB board as example, by this method, series connect 0.01 ohm resist
 
 ![rk3399_rk808.png](./Rockchip_Developer_Guide_Power_Analysis/rk3399_rk808.png)
 
-### 2.2 Measurement tool
+### Measurement tool
 
 As there are many channels of power required to be measured, use multi-channel voltage/current collector can effectively improve the testing efficiency. PowerMeterage is the voltage/current collection tool developed by RockChip and it can measure 20 channels of power consumption data at the same time. The interface is as below:
 
@@ -141,9 +141,9 @@ The hardware connection of PowerMeterage is as below:
 
 ![powerme1.png](./Rockchip_Developer_Guide_Power_Analysis/powerme1.png)
 
-## 3. Power consumption data analysis
+## Power consumption data analysis
 
-### 3.1 Calculate theoretical power consumption
+### Calculate theoretical power consumption
 
 Use PowerMeterage tool to break down the power consumption of each path, convert DCDC to the battery with ~80%~90% efficiency, the output current of LDO is equal to the input current, convert DCDC, LDO and other powers to the battery, and then add them up to estimate the total power consumption. If it is very different from the power consumption actually measured on the battery, maybe there is leakage. Need to analyze further.
 
@@ -162,7 +162,7 @@ Take RK3326 EVB board as example, the static desktop power consumption is as bel
 | LDO      | VCC3V0_PMU | 3.01 | 1.20        | 1.20                 |      |
 | battery  | VBAT    | 3.81    | 94.60       | 92.67                | Theoretical value is similar to actually measured value |
 
-### 3.2 Compare with EVB data
+### Compare with EVB data
 
 Break down the power consumption data of each path, compare with the data of EVB in the same scenario, and check if there is problem. For example, the following is the comparison of the static desktop power consumption between RK3326 EVB board and customer device, it can be seen that customer board's power consumption of ARM and LOG are abnormal, and need to analyze further.
 
@@ -178,9 +178,9 @@ Break down the power consumption data of each path, compare with the data of EVB
 | LDO      | VCC3V0_PMU | 3.01     | 1.20     | 3.01     | 1.40    |
 | battery    | VBAT     | 3.81     | 94.60    | 3.81     | 191.6   |
 
-### 3.3 Data analysis for each path
+### Data analysis for each path
 
-#### 3.3.1 VDD_CORE/VDD_CPU/VDD_ARM
+#### VDD_CORE/VDD_CPU/VDD_ARM
 
 These three names are the same power, that is, ARM core power. This power consumption can be analyzed mainly from the following aspects:
 
@@ -303,7 +303,7 @@ cat /proc/interrupts
 ...
 ```
 
-#### 3.3.2 VDD_GPU
+#### VDD_GPU
 
 The power consumption of VDD_GPU mainly confirms if the the frequency voltage table is normal or not, if the measured voltage is consistent with the set voltage or not, using devfreq node.
 
@@ -353,7 +353,7 @@ cat /sys/class/devfreq/ff400000.gpu/load
 0@200000000Hz
 ```
 
-#### 3.3.3 VDD_LOGIC
+#### VDD_LOGIC
 
 Generally VDD_LOGIC will contain many modules, in order to manage the power consumption conveniently, it will be divided into many PD internally. The power consumption can be analyzed mainly from the following aspects:
 
@@ -432,11 +432,11 @@ dmc_ondemand
 Other commands to set the frequency and voltage are the same as GPU devfreq.
 ```
 
-#### 3.3.4 VCC_DDR
+#### VCC_DDR
 
 VCC_DDR supplies power mainly for DDR component and DDR-IO part of SoC. The parameters affecting the power consumption of VCC_DDR include: DDR frequency, DDR loading, DDR low power consumption configuration, DDR component type and so on. Under the same condition, the power consumption of DDR components from different vendors may have big difference.
 
-#### 3.3.5 VCC_IO
+#### VCC_IO
 
 VCC_IO supplies power mainly for IO Pad of SoC and some peripherals. The power consumption can be analyzed from the following aspects:
 
@@ -444,27 +444,27 @@ VCC_IO supplies power mainly for IO Pad of SoC and some peripherals. The power c
 
 - Check if IO pin status of SoC matches with the peripheral or not, for example, IO output is high, but the connected peripheral pin is low level.
 
-### 3.4 Common scenario analysis
+### Common scenario analysis
 
-#### 3.4.1 Static desktop
+#### Static desktop
 
 It is mainly the display module which is working, CPU, GPU, DDR should be reduced to the lowest frequency, and enter low power consumption mode. Adjust VDD_CPU,VDD_GPU,VDD_LOGIC to the lowest voltage of opp-table, confirm the status of clk_summary and pm_genpd_summary, confirm the peripheral modules (WIFI, BT, etc.) are all closed. The static desktop generally is used as the basic power consumption of other scenarios, so need to firstly optimize its power consumption to the best.
 
-#### 3.4.2 Video playback
+#### Video playback
 
 It is mainly the video decoder (VPU/RKVDEC) which is working, GPU generally is closed. Especially confirm if the running frequency of DDR and voltage of VDD_LOGIC are normal or not.
 
-#### 3.4.3 Game
+#### Game
 
 It is mainly CPU and GPU which are working. Especially analyze the loading of CPU and GPU, frequency change, the voltages of VDD_CPU and VDD_GPU are normal or not.
 
-#### 3.4.4 Deepsleep
+#### Deepsleep
 
 Generally VDD_CPU and VDD_GPU will turn off the power supply, VDD_LOG only reserves the power supply for some resume module, so need to focus on the power consumption analysis of IO, DDR components and some peripherals.
 
-## 4. Power consumption optimization strategy
+## Power consumption optimization strategy
 
-### 4.1 CPU optimization
+### CPU optimization
 
 - Adjust cpufreq parameter.
 
@@ -543,7 +543,7 @@ echo 1112 > /dev/cpuctl/mygroup/tasks
 /dev/cpuctl/mygroup/cpu.shares
 ```
 
-### 4.2 DDR optimization
+### DDR optimization
 
 - Frequency scaling with scenario: configure different DDR frequencies for different scenarios, such as 4K video, video recording, dual display and so on.
 
@@ -607,7 +607,7 @@ cat /sys/class/devfreq/dmc/load                                       <
 
 - For more detailed configuration and optimization of DDR DEVFREQ, please refer to the document 《Rockchip-Developer-Guide-Linux4.4-Devfreq》.
 
-### 4.3 Thermal control optimization
+### Thermal control optimization
 
 When the temperature is increasing to certain degree, the power consumption will increase dramatically, especially in the case with high voltage.
 
@@ -626,7 +626,7 @@ When the temperature is increasing to certain degree, the power consumption will
 };
 ```
 
-### 4.4 Power optimization
+### Power optimization
 
 - In voltage conversion circuit, when the voltage reduction and current are relatively large, it is recommended to use DCDC to improve the efficiency and reduce the power consumption.
 

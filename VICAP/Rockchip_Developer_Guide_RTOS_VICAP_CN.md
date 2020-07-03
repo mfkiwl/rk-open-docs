@@ -83,19 +83,19 @@ VICAP（video capture unit）用于对并口数据进行接收，主要支持以
 
 [TOC]
 
-## 1 HAL的使用
+## HAL的使用
 
-### 1.1 HAL的说明
+### HAL的说明
 
 HAL层主要是将VICAP控制器的各个具体功能，在寄存器层面封装成单独的函数接口，以供上层的os进行调用。
 OS层直接调用HAL层的函数接口以实现目标功能，同时负责HAL层相应寄存器的竟态管理，而HAL不负责，比如进行锁操作。
 VICAP各项功能设置详见相对应的芯片手册。
 
-### 1.2 HAL的主要函数接口
+### HAL的主要函数接口
 
 HAL各函数接口按照VICAP的寄存器功能进行展开。
 
-#### 1.2.1 Register: VICAP_DVP_CTRL
+#### Register: VICAP_DVP_CTRL
 
 ```c
 HAL_Status HAL_VICAP_SetAxiBurstType(struct VICAP_REG *pReg, eVICAP_axiBurstType type);
@@ -103,7 +103,7 @@ HAL_Status HAL_VICAP_SetCaptureEnable(struct VICAP_REG *pReg, bool enable);
 HAL_Status HAL_VICAP_SetWorkmode(struct VICAP_REG *pReg, eVICAP_workMode workMode);
 ```
 
-#### 1.2.2 Register: VICAP_DVP_INTEN/VICAP_DVP_INTSTAT
+#### Register: VICAP_DVP_INTEN/VICAP_DVP_INTSTAT
 
 中断使能/禁能函数：
 
@@ -119,7 +119,7 @@ uint32_t HAL_VICAP_GetIrqStatus(struct VICAP_REG *pReg);
 HAL_Status HAL_VICAP_ClearIrqStatus(struct VICAP_REG *pReg, uint32_t mask);
 ```
 
-#### 1.2.3 Register: VICAP_DVP_FOR
+#### Register: VICAP_DVP_FOR
 
 VICAP_DVP_FOR寄存器是VICAP控制器重要的寄存器涉及了数据输入输出格式的相关配置，需要仔细确认。
 
@@ -137,7 +137,7 @@ HAL_Status HAL_VICAP_SetInputMode(struct VICAP_REG *pReg, eVICAP_inputMode mode)
 HAL_Status HAL_VICAP_SetHrefVsynPol(struct VICAP_REG *pReg, eVICAP_hrefPol hpol,  eVICAP_vsyncPol vpol);
 ```
 
-#### 1.2.4 Register: VICAP_DVP_FRM0_ADDR_Y/VICAP_DVP_FRM0_ADDR_UV
+#### Register: VICAP_DVP_FRM0_ADDR_Y/VICAP_DVP_FRM0_ADDR_UV
 
 VICAP使用oneframe mode或者frame pingpong mode时需要设置。
 
@@ -146,7 +146,7 @@ HAL_Status HAL_VICAP_SetFrm0YAddr(struct VICAP_REG *pReg, uint32_t yAddr);
 HAL_Status HAL_VICAP_SetFrm0UvAddr(struct VICAP_REG *pReg, uint32_t uvAddr);
 ```
 
-#### 1.2.5 Register: VICAP_DVP_FRM1_ADDR_Y/VICAP_DVP_FRM1_ADDR_UV
+#### Register: VICAP_DVP_FRM1_ADDR_Y/VICAP_DVP_FRM1_ADDR_UV
 
 VICAP使用oneframe mode或frame pingpong mode时需要设置。
 
@@ -155,7 +155,7 @@ HAL_Status HAL_VICAP_SetFrm1YAddr(struct VICAP_REG *pReg, uint32_t yAddr);
 HAL_Status HAL_VICAP_SetFrm1UvAddr(struct VICAP_REG *pReg, uint32_t uvAddr);
 ```
 
-#### 1.2.6 Register: VICAP_DVP_VIR_LINE_WIDTH
+#### Register: VICAP_DVP_VIR_LINE_WIDTH
 
 虚宽的定义是存储图像数据时，相邻两行行数据存储首地址的差值，该寄存器可读可写。
 
@@ -164,7 +164,7 @@ HAL_Status HAL_VICAP_SetVirtualLineWidth(struct VICAP_REG *pReg, uint32_t width)
 uint32_t HAL_VICAP_GetVirtualLineWidth(struct VICAP_REG *pReg);
 ```
 
-#### 1.2.7 Register: VICAP_DVP_SET_SIZE
+#### Register: VICAP_DVP_SET_SIZE
 
 VICAP_DVP_SET_SIZE寄存器用于设置上层application需要VICAP输出的width和height。
 
@@ -172,7 +172,7 @@ VICAP_DVP_SET_SIZE寄存器用于设置上层application需要VICAP输出的widt
 HAL_Status HAL_VICAP_SetReceivedSize(struct VICAP_REG *pReg, uint32_t height, uint32_t width);
 ```
 
-#### 1.2.8 Register: VICAP_DVP_BLOCK_LINE_NUM
+#### Register: VICAP_DVP_BLOCK_LINE_NUM
 
 VICAP使用block pingpong mode时，必须对该寄存器进行设置。
 计算公式：
@@ -185,7 +185,7 @@ blocknum是指VICAP实际输出的完整图像被分割的总block数。
 HAL_Status HAL_VICAP_SetBlockLineNum(struct VICAP_REG *pReg, uint32_t num);
 ```
 
-#### 1.2.9 Register: VICAP_DVP_BLOCK0_ADDR_Y/VICAP_DVP_BLOCK0_ADDR_UV
+#### Register: VICAP_DVP_BLOCK0_ADDR_Y/VICAP_DVP_BLOCK0_ADDR_UV
 
 VICAP使用block pingpong mode时需要设置。
 
@@ -194,7 +194,7 @@ HAL_Status HAL_VICAP_SetBlock0YAddr(struct VICAP_REG *pReg, uint32_t yAddr);
 HAL_Status HAL_VICAP_SetBlock0UvAddr(struct VICAP_REG *pReg, uint32_t uvAddr);
 ```
 
-#### 1.2.10 Register: VICAP_DVP_BLOCK1_ADDR_Y/VICAP_DVP_BLOCK1_ADDR_UV
+#### Register: VICAP_DVP_BLOCK1_ADDR_Y/VICAP_DVP_BLOCK1_ADDR_UV
 
 VICAP使用block pingpong mode时需要设置。
 
@@ -203,7 +203,7 @@ HAL_Status HAL_VICAP_SetBlock1YAddr(struct VICAP_REG *pReg, uint32_t yAddr);
 HAL_Status HAL_VICAP_SetBlock1UvAddr(struct VICAP_REG *pReg, uint32_t uvAddr);
 ```
 
-#### 1.2.11 Register: VICAP_DVP_BLOCK_STATUS
+#### Register: VICAP_DVP_BLOCK_STATUS
 
 VICAP_DVP_BLOCK_STATUS寄存器用于指示block pingpong mode模式下，VICAP的block状态，需要在每个block采样完成后相应清零。
 
@@ -212,7 +212,7 @@ uint32_t HAL_VICAP_GetBlockStatus(struct VICAP_REG *pReg);
 uint32_t HAL_VICAP_ClearBlockStatus(struct VICAP_REG *pReg, uint32_t mask);
 ```
 
-#### 1.2.12 Register: VICAP_DVP_CROP
+#### Register: VICAP_DVP_CROP
 
 VICAP_DVP_CROP寄存器用于对输出图像进行裁剪时进行设置。
 
@@ -220,7 +220,7 @@ VICAP_DVP_CROP寄存器用于对输出图像进行裁剪时进行设置。
 HAL_Status HAL_VICAP_SetCropOrdinate(struct VICAP_REG *pReg, uint32_t startY, uint32_t startX);
 ```
 
-#### 1.2.13 Register: VICAP_DVP_FRAME_STATUS
+#### Register: VICAP_DVP_FRAME_STATUS
 
 VICAP_DVP_FRAME_STATUS寄存器用于指示frame oneframe mode或者frame pingpong mode模式下VICAP的采样状态。frame pingpong mode 不需要对此寄存器清零，frame oneframe mode则需要。
 
@@ -229,7 +229,7 @@ uint32_t HAL_VICAP_GetFrameStatus(struct VICAP_REG *pReg);
 uint32_t HAL_VICAP_ClearFrameStatus(struct VICAP_REG *pReg, uint32_t mask);
 ```
 
-## 2 RTOS VICAP Framework
+## RTOS VICAP Framework
 
 VICAP framework 是基于RT-Thread/RKOS的设备对象将其抽象为struct rt_VICAP_device来实现的。
 为实现通过VICAP采集所连接的camera的图像数据，需要完成以下三部分的工作：
@@ -240,7 +240,7 @@ VICAP framework 是基于RT-Thread/RKOS的设备对象将其抽象为struct rt_V
 
 具体说明如下所述。
 
-### 2.1 Adapter layer
+### Adapter layer
 
 Adapter layer做为适配层，将RT-Thread和RKOS的相关的系统变量和接口做桥接，为vicap驱动在这两套系统的实现提供了统一的接口和变量，具体实现用户可以不用关心。其主要包含以下三个文件：
 
@@ -250,7 +250,7 @@ Adapter layer做为适配层，将RT-Thread和RKOS的相关的系统变量和接
 |adapter.h | 实现了系统对象变量的桥接|
 |adapter_type.h| 实现系统整形变量的桥接|
 
-### 2.2 Camera Device Driver
+### Camera Device Driver
 
 Camera device driver的整体框架是基于RT-Thread/RKOS的设备对象而实现。该框架基于内核对象struct rk_device/struct _DEVICE_CLASS封装了struct rt_camera_device对象，该camera对象为VICAP驱动实现camera类型的设备驱动提供了统一的实现方式。主要包含以下几个文件：
 
@@ -260,7 +260,7 @@ Camera device driver的整体框架是基于RT-Thread/RKOS的设备对象而实�
 | camera.h| 声明了camera device的相关对象 |
 | camera_mediabus.h | 声明了media-bus相关参数及对象 |
 
-#### 2.2.1 创建和注册camera设备
+#### 创建和注册camera设备
 
 camera对象struct rt_camera_device具体说明如下。
 
@@ -349,7 +349,7 @@ struct gc2145_dev
 ret_err_t rk_camera_register(struct rk_camera_device *camera, const char *name, void *data);
 ```
 
-#### 2.2.2 访问Camera设备
+#### 访问Camera设备
 
 对于camera而言，上层应用通过调用RT-Thread的系统I/O设备管理接口进行访问，进而回调struct rk_camera_ops *ops相应的控制函数，实现对具体camera的硬件操作。上层应用操作camera设备流程如下:
 
@@ -383,15 +383,15 @@ rk_device_control(dev, cmd, &arg)
 rk_device_close(dev);
 ```
 
-### 2.3 VICAP Driver Framework
+### VICAP Driver Framework
 
-#### 2.3.1 VICAP Driver Framework的说明
+#### VICAP Driver Framework的说明
 
 VICAP driver framework是基于RTOS的设备对象封装了struct rk_VICAP_device对象，进而实现了VICAP驱动框架以实现具体的VICAP device driver。
 
 目前的VICAP设备驱动已实现其大部分主要功能，用户可以不用关心VICAP controller的具体使用用法而去实现VICAP驱动。用户只要关心application端对VICAP的控制就可以了。
 
-#### 2.3.2 VICAP Application
+#### VICAP Application
 
 应用层使用VICAP功能需要按照以下流程进行操作：
 其中必须注意的是：
@@ -487,15 +487,15 @@ ret = rk_device_control(vicapdev, RK_DEVICE_CTRL_VICAP_STREAM_OFF, RK_NULL);
 ret = rk_device_close(vicapdev);
 ```
 
-### 2.4 VICAP 测试
+### VICAP 测试
 
 vicap在系统中实现了vicap_test命令，用于提供vicap的功能展示。
 通过在窗口输出vicap_test help 可获得相应的用法提示。
 目前测试demo app只支持采集nv12。
 
-#### 2.4.1 RT-Thread 的测试
+#### RT-Thread 的测试
 
-##### 2.4.1.1 config 的配置
+##### config 的配置
 
 - step1：打开vicap test
 
@@ -551,7 +551,7 @@ vicap在系统中实现了vicap_test命令，用于提供vicap的功能展示。
 |   Depends on: RT_USING_FINSH [=y]
 ```
 
-##### 2.4.1.2 打开vicap
+##### 打开vicap
 
 - step1: 设置vicap格式
 
@@ -570,9 +570,9 @@ vicap_test dev_streamon
 
 在photo模式下，正常结束会打印log：release buf;在preview模式下，正常执行会连续打印log：fps:帧率，提示帧率。
 
-#### 2.4.2 RKOS的测试
+#### RKOS的测试
 
-##### 2.4.2.1 config的配置
+##### config的配置
 
 打开vicap shell选项
 
@@ -580,7 +580,7 @@ vicap_test dev_streamon
 COMPONENTS_SHELL_VICAP(=y) "Enable VICAP shell command"
 ```
 
-##### 2.4.2.2 打开vicap
+##### 打开vicap
 
 - step1: 创建文件存储目录
 

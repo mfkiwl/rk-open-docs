@@ -69,7 +69,7 @@ Software development engineers
 [TOC]
 ---
 
-## 1 Introduction
+## Introduction
 
 Devfreq is a framework model defined by kernel developer to dynamically change frequency and voltage according to specified governor. It can be effective to lower power consumption with taking into account the performance. Devfreq is similar to CPUFreq, but CPUFreq is only used for CPU, and Devfreq is used for modules that require changing frequency dynamically in addition to the CPU. The Devfreq framework consists of governor, core, driver and event. The software framework is as follows:
 
@@ -93,7 +93,7 @@ Devfreq is a framework model defined by kernel developer to dynamically change f
 
    Devfreq event：It is used to monitor load information of device.
 
-## 2 Code Path
+## Code Path
 
 Governor related code:
 
@@ -131,7 +131,7 @@ drivers/devfreq/rockchip_bus.c                                     /* bus driver
 drivers/soc/rockchip/rockchip_opp_select.c                      /* interface for opp */
 ```
 
-## 3 Menuconfig Configuration
+## Menuconfig Configuration
 
 ```c
 Device Drivers  --->
@@ -153,11 +153,11 @@ Device Drivers  --->
 
 Please modify the configuration for different platforms  according to the actual situation.
 
-## 4 Device Tree Configuration
+## Device Tree Configuration
 
-### 4.1 GPU DVFS Configuration
+### GPU DVFS Configuration
 
-#### 4.1.1 Clock Configuration
+#### Clock Configuration
 
 According to the actual situation of the platform, add "clock" and "clock-names" properties to GPU node, which is generally in the DTSI file. If you need more detail about configuration description of clock, please refer to the related Rockchip clock development documentation. Take RK3399 as an example:
 
@@ -174,7 +174,7 @@ gpu: gpu@ff9a0000 {
 };
 ```
 
-#### 4.1.2 Regulator Configuration
+#### Regulator Configuration
 
 According to the power solution of product hardware, add “mali-supply” property to the GPU node, which is generally board-level DTS file. For detailed configuration instructions for Regulator, please refer to the development documentation related to Regulator and PMIC. Take RK3399 as an example:
 
@@ -208,7 +208,7 @@ According to the power solution of product hardware, add “mali-supply” prope
 };
 ```
 
-#### 4.1.3 OPP Table Configuration
+#### OPP Table Configuration
 
 The kernel puts the related configuration of frequency and voltage in the devicetree. These nodes make up by configuration information is called OPP Table. The OPP Table node contains  the frequency and voltage of OPP nodes, leakage configuration properties, and PVTM configuration properties.
 
@@ -219,7 +219,7 @@ Documentation/devicetree/bindings/opp/opp.txt
 Documentation/power/opp.txt
 ```
 
-##### 4.1.3.1 Add OPP Table
+##### Add OPP Table
 
 According to the actual situation of the platform, add an OPP Table node and add "operating-points-v2" property to the GPU node, generally in the DTSI file. Take RK3399 as an example:
 
@@ -243,7 +243,7 @@ gpu_opp_table: opp-table2 {
 }
 ```
 
-##### 4.1.3.2 Delete OPP
+##### Delete OPP
 
 If the developer needs to delete some frequency points, the following method can be used.
 
@@ -276,11 +276,11 @@ Method 2: Re-quote the OPP Table node in the board-level DTS and add "status = "
 };
 ```
 
-#### 4.1.4 Modify OPP Table According to Leakage
+#### Modify OPP Table According to Leakage
 
 IDDQ (Integrated Circuit Quiescent Current) , we also call it leakage. The GPU's leakage means the quiescent current of GPU when provide a specific voltage.  If the GPU is in VD logic, the GPU's leakage is equivalent to the logic leakage, which means providing a specific voltage to the VD logic, and get the quiescent current value. At chip producing, the leakage value will be written to eFuse or OTP.
 
-##### 4.1.4.1 Modify Voltage According to Leakage
+##### Modify Voltage According to Leakage
 
 Background: we find that the Vmin of small leakage chips is larger than big leakage chips from test, so we can reduce the voltage for big leakage chips to reduce power consumption and improve performance.
 
@@ -330,11 +330,11 @@ gpu_opp_table: gpu-opp-table {
 
 To turn off this feature, you can delete the property"rockchip, leak-voltage-sel" , then OPP will use the voltage specified by "opp-microvolt".
 
-#### 4.1.5 Modify OPP Table According to PVTM
+#### Modify OPP Table According to PVTM
 
 GPU PVTM (Process-Voltage-Temperature Monitor) is a module located near GPU, which can reflect the difference in performance between chips. It is affected by process, voltage and temperature.
 
-##### 4.1.5.1 Modify Voltage According to PVTM
+##### Modify Voltage According to PVTM
 
 Background: we find that the Vmin of small PVTM chips is larger than big PVTM chips from test, so we can reduce the voltage for big PVTM chips to reduce power consumption and improve performance.
 
@@ -404,7 +404,7 @@ gpu_opp_table: opp-table2 {
 
 To turn off this feature,  you can delete the property "rockchip, pvtm-voltage-sel" , OPP will use the voltage specified by "opp-microvolt".
 
-#### 4.1.6 Modify OPP Table According to IR-Drop
+#### Modify OPP Table According to IR-Drop
 
 IR-Drop is a phenomenon that a voltage drop or rise in power and ground networks in integrated circuits. Here we consider it as the ripple voltage case by power ripple and board layout.
 
@@ -447,7 +447,7 @@ The board-level DTS is configured as follows:
 
 To turn off this feature, delete property “rockchip,board-irdrop”.
 
-#### 4.1.7 Wide Temperature Configuration
+#### Wide Temperature Configuration
 
 Wide temperature usually means ambient temperature is from − 40℃ to + 85℃.
 
@@ -482,7 +482,7 @@ gpu_opp_table: opp-table2 {
 }
 ```
 
-#### 4.1.8 Upthreshold and Downdifferential Configuration
+#### Upthreshold and Downdifferential Configuration
 
 Background: The simple ondemand governor has two parameters, upthreshold and downdifferential, the default values are 90 and 5. When the load exceeds 90%, the frequency is adjusted to the highest frequency. When the load is less than 90% and greater than 90%-5%, don't change the current frequency. When the load is less than 90%-5%, frequency will be adjusted to the appropriate value, so that the load is almost 90%-5%/2. With the default configuration, in some scenarios, the GPU will not raise the frequency timely, which will result in frame loss. Therefore, need modify the configuration.
 
@@ -504,11 +504,11 @@ gpu: gpu@ffa30000 {
 }
 ```
 
-### 4.2 DMC DVFS Configuration
+### DMC DVFS Configuration
 
 DMC（Dynamic Memory Controller）DVFS means scaling DDR voltage and frequency dynamically.
 
-#### 4.2.1 Clock Configuration
+#### Clock Configuration
 
 According to the actual situation of platform, add the "clock" property to the DMC node, which is generally the DTSI file. If you need more detail about configuration description of clock, please refer to the related Rockchip clock development documentation. Take RK3399 as an example:
 
@@ -522,7 +522,7 @@ dmc: dmc {
 };
 ```
 
-#### 4.2.2 Regulator Configuration
+#### Regulator Configuration
 
 According to the actual product hardware power solution, add the “center-supply” property to the DMC node, which is generally in board-level DTS file. For detailed configuration instructions of Regulator, please refer to the development documentation related to Regulator and PMIC. Take RK3399 as an example:
 
@@ -553,7 +553,7 @@ According to the actual product hardware power solution, add the “center-suppl
 };
 ```
 
-#### 4.2.3 OPP Table Configuration
+#### OPP Table Configuration
 
 The kernel puts the related configuration of frequency and voltage in the devicetree. These nodes make up by configuration information is called OPP Table. The OPP Table node contains  the frequency and voltage of OPP nodes, leakage configuration properties, and PVTM configuration properties.
 
@@ -564,7 +564,7 @@ Documentation/devicetree/bindings/opp/opp.txt
 Documentation/power/opp.txt
 ```
 
-##### 4.2.3.1 Add OPP Table
+##### Add OPP Table
 
 According to the actual situation of the platform, add an OPP Table node and add the "operating-points-v2" property to DMC node, generally in the DTSI file. Take RK3399 as an example:
 
@@ -588,7 +588,7 @@ dmc_opp_table: opp-table3 {
 };
 ```
 
-##### 4.2.3.2 Delete OPP
+##### Delete OPP
 
 If the developer needs to delete some frequency points, the following method can be used.
 
@@ -621,11 +621,11 @@ Method 2: Re-quote the "OPP Table" node in the board-level DTS and add "status =
 };
 ```
 
-#### 4.2.4 Modify OPP Table According to Leakage
+#### Modify OPP Table According to Leakage
 
 IDDQ (Integrated Circuit Quiescent Current) , we also call it leakage. The DDR's leakage means the quiescent current of DDR when provide a specific voltage. At chip producing, the leakage value will be written to eFuse or OTP.
 
-##### 4.2.4.1 Modify Voltage According to Leakage
+##### Modify Voltage According to Leakage
 
 Background: we find that the Vmin of small leakage chips is larger than big leakage chips from test, so we can reduce the voltage for big leakage chips to reduce power consumption and improve performance.
 
@@ -675,9 +675,9 @@ dmc_opp_table: dmc-opp-table {
 
 To turn off this feature, you can delete property "rockchip, leakage-voltage-sel" , then OPP will use the voltage specified by "opp-microvolt".
 
-#### 4.2.5 Modify OPP According to PVTM
+#### Modify OPP According to PVTM
 
-##### 4.2.5.1 Modify Voltage According to PVTM
+##### Modify Voltage According to PVTM
 
 Background: we find that the Vmin of small PVTM chips is larger than big PVTM chips from test, so we can reduce the voltage for big PVTM chips to reduce power consumption and improve performance.
 
@@ -734,7 +734,7 @@ dmc_opp_table: dmc-opp-table {
 
 To turn off this feature,  you can delete the property "rockchip, pvtm-voltage-sel" , OPP will use the voltage specified by "opp-microvolt".
 
-#### 4.2.6 Modify OPP Table According to IR-Drop
+#### Modify OPP Table According to IR-Drop
 
 IR-Drop is a phenomenon that a voltage drop or rise in power and ground networks in integrated circuits. Here we consider it as the ripple voltage case by power ripple and board layout.
 
@@ -775,7 +775,7 @@ The board-level DTS is configured as follows:
 
 To turn off this feature, delete property “rockchip,board-irdrop”.
 
-#### 4.2.7 Change Frequency According to scenario
+#### Change Frequency According to scenario
 
 Background: If fixed DDR frequency, the higher frequency, the higher power consumption, and the lower frequency, the poor performance, it is difficult to meet product requirements. For certain scenarios where DDR bandwith are relatively clear, such as benchmark, video, standby, etc., dynamically increasing or decreasing the DDR frequency to meet their different needs for performance or power consumption.
 
@@ -809,7 +809,7 @@ Configuration method: Add the “system-status-freq” property to the DMC node,
 }
 ```
 
-#### 4.2.8 Change Frequency According to Load
+#### Change Frequency According to Load
 
 Background: There are few scenarios can be covered, the others need to dynamically change the DDR frequency according to the DDR utilization to optimize performance and power consumption.
 
@@ -859,7 +859,7 @@ Configuration method: add the properties "devfreq-events", "upthreshold", "downd
 };
 ```
 
-#### 4.2.9 Change Frequency According to  VOP Bandwidth
+#### Change Frequency According to  VOP Bandwidth
 
 Background: After enable the auto-freq , the property "auto-min-freq" needs to be added to limit the minimum frequency to prevent splash screen. So there is still space for power optimization in these scenarios, we can modify the DDR frequency based on the VOP bandwidth.
 
@@ -890,11 +890,11 @@ Configuration method: Add the property "vop-bw-dmc-freq" to the DMC node, taking
 };
 ```
 
-### 4.3 BUS DVFS Configuration
+### BUS DVFS Configuration
 
 In addition to GPU and DMC, there are some modules that also need to change frequency and voltage dynamically, such as PLL, CCI, etc., we will classify them into BUS DVFS.
 
-#### 4.3.1 PLL DVFS Configuration
+#### PLL DVFS Configuration
 
 Background: It is found that when the frequency of the PLL exceed a certain value on some platforms, the voltage domain in which the PLL is located needs to raise voltage, so the voltage needs to be modified according to the frequency of the PLL.
 
@@ -973,7 +973,7 @@ The board configuration is as follows:
 };
 ```
 
-## 5 User Interface Introduction
+## User Interface Introduction
 
 After the device successfully registers devfreq, it will generate a subdirectory containing the user mode interface in the directory"/sys/class/devfreq/" , such as "ff9a0000.gpu", you can switch the governor through the user mode interface, check the current frequency, modify the frequency, etc., as follows:
 
@@ -990,9 +990,9 @@ target_freq                  /* the last frequency set by software*/
 trans_stat                   /* scaling times and running time at each frequency */
 ```
 
-## 6 FAQ
+## FAQ
 
-### 6.1 How to Check OPP Table
+### How to Check OPP Table
 
 Input command below:
 
@@ -1021,7 +1021,7 @@ Take PX30 as an example:
                      1512000000      1000000     1000000     1000000
 ```
 
-### 6.2 How to Fix Frequency
+### How to Fix Frequency
 
 Method 1: Disable OPPs you don't need at OPP table, leave what you need alone. Take PX30 as an example, fix GPU frequency to 400MHz.
 
@@ -1078,7 +1078,7 @@ echo 400000000 > /sys/class/devfreq/ff400000.gpu/userspace/set_freq
 cat /sys/class/devfreq/ff400000.gpu/cur_freq
 ```
 
-### 6.3 How to Check the Current Frequency
+### How to Check the Current Frequency
 
 The user interface of devfreq and debugfs interface of clock allow to check frequency.
 
@@ -1092,7 +1092,7 @@ cat /sys/class/devfreq/ff400000.gpu/cur_freq
 cat /sys/kernel/debug/clk/aclk_gpu/clk_rate
 ```
 
-### 6.4 How to Check the Current Voltage
+### How to Check the Current Voltage
 
 You can check the voltage through the debug interface of the regulator. Take PX30 as an example, check the voltage of GPU, the command is as follows:
 
@@ -1101,7 +1101,7 @@ You can check the voltage through the debug interface of the regulator. Take PX3
 cat /sys/kernel/debug/regulator/vdd_logic/voltage
 ```
 
-### 6.5 How to Set Voltage and Frequency Separately
+### How to Set Voltage and Frequency Separately
 
 Take the PX30 GPU as an example, set the frequency to 400MHz and the voltage to 1000mV.
 
@@ -1120,7 +1120,7 @@ cat /sys/kernel/debug/regulator/vdd_logic/voltage
 
 Note: When raising the frequency, first raise voltage and then increase frequency, when frequency is going down, first reduce the frequency and then getting down the voltage.
 
-### 6.6 How to Check the Voltage of the OPP
+### How to Check the Voltage of the OPP
 
 If support modifying voltage according to PVTM, input command below:
 
@@ -1147,7 +1147,7 @@ Similarly, if support modifying voltage according to leakage, input the followin
 dmesg | grep leakage
 ```
 
-### 6.7 How to Check Current Leakage
+### How to Check Current Leakage
 
  Input command below
 
@@ -1165,7 +1165,7 @@ Take RK3399 CPU as example, it will print as below:
 [    3.341084] mali ff9a0000.gpu: leakage=15
 ```
 
-### 6.8 How to Change Voltage of OPP
+### How to Change Voltage of OPP
 
 Method 1: modify each voltage of OPP directly.
 

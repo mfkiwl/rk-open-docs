@@ -71,15 +71,15 @@ Software development engineers
 [TOC]
 ---
 
-## 1 Qt WebEngine
+## Qt WebEngine
 
-### 1.1 Overview
+### Overview
 
 The Qt WebEngine module provides a web browser engine built for embedding web content into applications without using a local browser. The engine features QML types and C++ classes for rendering HTML, XHTML, and SVG documents using CSS and programmed with JavaScript.
 
 This document mainly introduces the embedded usage of Qt WebEngine in Buildroot and Debian systems, and how to call the multivideo hard decode process from ffmpeg/mpp/vpu.
 
-### 1.2 Architecture
+### Architecture
 
 The functions of Qt WebEngine can be divided into the following modules:
 
@@ -92,9 +92,9 @@ Please refer to the following figure for details:
 
 For more details, please refer to [Qt official documents](https://doc-snapshots.qt.io/qt5-dev/qtwebengine-overview.html).
 
-## 2 Different Systems Support
+## Different Systems Support
 
-### 2.1 Buildroot
+### Buildroot
 
 Buildroot supported by Rockchip Linux is developed based on 2018.02-rc3, and the Qt WebEngine is developed based on version 5.12.2.
 If the Qt WebEngine should be supported in Buildroot, the config (BR2_PACKAGE_QT5WEBENGINE) and related configurations should be enabled. Currently the latest released SDKs all support this function, but the related configuration is disabled. So you need to open the following configuration:
@@ -146,7 +146,7 @@ cd /usr/lib/qt/examples/webenginewidgets/simplebrowser
 
 The Opengles has been specified during Buildroot compilation, so you only need to fix the previous context issues, add the parameter --disable-es3-gl-context to allow chromium to use es2 during booting. Because the hard video decode function of chromium needs to access some device nodes, --no-sandbox parameter is needed when starting simplebrowser .
 
-### 2.2 Debian
+### Debian
 
 The official Qt of Rockchip Linux Debian 9 (stretch) is 5.7 which does not support WebEngine. The Qt packages used in the SDK are updated based on the buster source with the version of 5.11, so you need to modify the source during manual installation.
 

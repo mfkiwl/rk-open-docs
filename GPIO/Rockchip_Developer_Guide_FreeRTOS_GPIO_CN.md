@@ -75,15 +75,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 [TOC]
 
-## 1 概述
+## 概述
 
 Rockchip FreeRTOS 的 GPIO 模块，提供用户层接口，控制 IO PAD 的方向以及电平，即配置输入模式，输出高电平模式，输出低电平模式。
 
 有关 IO PAD 上下拉配置，在 PINCTRL 模块实现并说明。
 
-## 2 软件框架
+## 软件框架
 
-### 2.1 Driver 层驱动文件
+### Driver 层驱动文件
 
 驱动层的文件位于`src/driver/gpio/drv_gpio.c`，头文件位于`include/driver/drv_gpio.h`，提供如下接口
 
@@ -108,7 +108,7 @@ pin 是 GPIO 端口序号，硬件原理图通常标识为 GPIO0_A1_u，u 是端
 
 `BANK_PIN(1, 10)`是 GPIO1_B2
 
-### 2.2 HAL 层驱动文件
+### HAL 层驱动文件
 
 HAL 层文件位于`src/bsp/hal`，HAL 层的 GPIO 驱动位于 lib/hal/src/hal_gpio.c，头文件位于`lib/hal/inc/hal_gpio.h`
 
@@ -134,19 +134,19 @@ HAL 驱动中`lib/CMSIS/Device/RK2206/Include/rk2206.h`有定义芯片支持的 
 
 HAL 层的 API，第一个参数就是 GPIO0 或者 GPIO1，其他参数见函数参数说明
 
-### 2.3 Driver 层测试用例
+### Driver 层测试用例
 
 在驱动层`src/subsys/shell/shell_gpio.c`，有 GPIO 相关测试用例，这个主要是提供给硬件自动化测试 GPIO 使用。
 
-## 3 常用接口说明
+## 常用接口说明
 
 由于 GPIO 模块相对简单，使用者有两种方式调用 API
 
-### 3.1 HAL 层 API
+### HAL 层 API
 
 如上 2.2 部分介绍的 API，HAL 的接口是直接操作寄存器。
 
-### 3.2 Driver 层 API
+### Driver 层 API
 
 如上 2.1 部分介绍的 API，Driver 层的 API 比较规范，便于拓展支持。
 

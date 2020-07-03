@@ -72,13 +72,13 @@ Software development engineers
 
 ---
 
-## 1 Set up the Development Environment
+## Set up the Development Environment
 
-### 1.1 System Environment
+### System Environment
 
 It is recommended to take 64-bit Ubuntu 16.04 or Ubuntu 18.04 system to build this SDK.
 
-### 1.2 Toolchain for Building
+### Toolchain for Building
 
 The building tool SCons + GCC are officially recommended by RT-Thread. SCons is an open source building system written in Python language. And GCC cross building tool is officially provided by ARM. You can directly install all the required tools by the following commands:
 
@@ -96,7 +96,7 @@ tar xvf gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
 export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 ```
 
-## 2 Project Directory
+## Project Directory
 
 The standard directory structure of RT-Thread is as follows:
 
@@ -137,11 +137,11 @@ The standard directory structure of RT-Thread is as follows:
 |-- tools                   # RT-Thread official tool directory, including menuconfig and building scripts
 ```
 
-## 3 Project Building Configuration
+## Project Building Configuration
 
 RT-Thread controls building by SCons which is an open source building system written in Python similar to GNU Make. It takes SConstruct and SConscript files instead of common Makefile. They are also Python scripts and can be written in standard Python syntax, so Python standard libraries can be called for various complex processing in SConstruct and SConscript files.
 
-### 3.1 Project Configuration
+### Project Configuration
 
 Enter the project directory, like bsp/rockchip/rk2108, and run the project configuration tool menuconfig:
 
@@ -171,7 +171,7 @@ The frequently operations of menuconfig tool are as follows:
 
 There is a default configuration file defconfig in each board level directory, which contains the general configuration of the board, and you can modify based on this configuration.
 
-### 3.2 Save the Configurations
+### Save the Configurations
 
 There is a default configuration defconfig in each board-level configuration directory. If you didn't execute scons menuconfig, the default rtconfig.h will be included in building. You have to overwrite the .config with its defconfig file at first to modify the defconfig of the board, and then use the new .config to update the defconfig file after modifying through menuconfig. The following is the an detailed example:
 
@@ -181,9 +181,9 @@ scons menuconfig                           ; Modify configuration items
 cp .config board/xxx/defconfig             ; Save the configuration as the default configuration of the board
 ```
 
-## 4 Project Build
+## Project Build
 
-### 4.1 Build Command
+### Build Command
 
 Build command:
 
@@ -227,18 +227,18 @@ Please refer to help or documents for other SCons commands:
 scons -h
 ```
 
-### 4.2 Firmware Package
+### Firmware Package
 
 The purpose of firmware packaging is to package various firmwares required by the system, such as partition table, loader, OS and root file system. The firmware packaging script of RK2108 is: bsp/rockchip/rk2108/mkimage.sh. The current building script will automatically trigger the firmware packaging after building is completed, so you only need to execute the `./build.sh` command once to complete the building and packaging.
 
-## 5 Firmware Flash
+## Firmware Flash
 
 Before flashing the firmware, the board should be in upgrade mode. RK2108 supports two upgrade modes: Loader mode and MaskRom mode. The following are the ways to enter these 2 modes:
 
 1. When the USB port is connected to the computer, hold down RECOVERY key and do not release it. Short press RESET key to let the board enter the Loader mode and then release RECOVERY key;
 2. When the USB port is connected to the computer, hold down MASROM key and do not release it. Short press RESET key to let the board enter MaskRom mode and then release MASROM key. Devices without flashing firmware will automatically enter MaskRom mode after power on.
 
-### 5.1 Windows USB Driver Installation
+### Windows USB Driver Installation
 
 In the development and debugging process, you need to switch the device to Loader mode or MaskRom mode, and install the Rockusb driver correctly to recognize the device normally.
 
@@ -258,7 +258,7 @@ Please refer to the following steps to install:
 
 Note: some versions of Windows system need to bypass the digital signature during installing the driver, restart the computer and press F8, select **force to disable the driver signature **, and then install the driver.
 
-### 5.2 Windows Upgrade Tool
+### Windows Upgrade Tool
 
 Open the Rockchip_Develop_Tool_v2.63 in the bsp/rockchip/tools directory. If it is the first time for you to use this tool, you need to install the driver DriverAssitant_v4.91 in its directory. Open the upgrade tool:
 
@@ -268,7 +268,7 @@ The first item“LoaderToDDR” select  bsp/rockchip/rk2108/Image/rk2108_db_load
 
 The second item “Firmware” select  bsp/rockchip/rk2108/Image/Firmware.img.
 
-### 5.3 Linux Upgrade Tool and Command
+### Linux Upgrade Tool and Command
 
 The following script can be used to complete the firmware flashing under the Linux system:
 
@@ -285,9 +285,9 @@ Actually, it called the following command to complete the flashing:
 ../tools/upgrade_tool rd
 ```
 
-## 6 Run and Debug
+## Run and Debug
 
-### 6.1  System Start
+### System Start
 
 There are several ways to start the system:
 
@@ -297,7 +297,7 @@ There are several ways to start the system:
 
 [^Note]: There are differences in the way of power-on and start between different hardware designs .
 
-### 6.2 System Debug
+### System Debug
 
 RK2108 supports serial port debugging. Different hardware devices have different serial port configurations.
 

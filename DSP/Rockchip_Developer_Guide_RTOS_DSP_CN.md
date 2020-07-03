@@ -83,7 +83,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 Rockchip DSP 简介
+## Rockchip DSP 简介
 
 DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号转换成数字信号，用于专用处理器的高速实时处理。 它具有高速，灵活，可编程，低功耗的界面功能，在图形图像处理，语音处理，信号处理等通信领域起到越来越重要的作用。如下为 Cadence® Tensilica® HiFi3 DSP 的简介。
 
@@ -95,9 +95,9 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 - RK2108、RK2206 和 PISCES集成 HIFI3 DSP。
 
-## 2 HIFI3 软件环境搭建
+## HIFI3 软件环境搭建
 
-### 2.1 License 安装
+### License 安装
 
 License是和MAC地址绑定的。如果需要多台机器使用，那么需要搭建License服务器，但是同时只能一台机器访问License服务器。服务器搭建步骤参考2.2章的内容。
 
@@ -105,7 +105,7 @@ License是和MAC地址绑定的。如果需要多台机器使用，那么需要�
 
 ![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_File_Config.png)
 
-### 2.2 Floating License Server 搭建
+### Floating License Server 搭建
 
 - 将相关文件放置到服务器
 
@@ -245,9 +245,9 @@ sudo update-rc.d flexlm enable
 
 ![Xplorer_License_Config](Rockchip_Developer_Guide_RTOS_DSP/Success_Install_Key_1.png)
 
-### 2.3 Xplorer 工具安装
+### Xplorer 工具安装
 
-#### 2.3.1 Windows环境
+#### Windows环境
 
 Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到  [Cadence 官方网站申请](https://ip.cadence.com/support/sdk-evaluation-request)，License 需要联系 Cadence 获取，我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“。
 
@@ -273,7 +273,7 @@ Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到  [C
 
 ![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304_Detail.png)
 
-#### 2.3.2 Ubuntu环境
+#### Ubuntu环境
 
 由于开发工具在Ubuntu环境下有未知的UI适配问题和使用问题，所以我们建议尽量在windows下开发。
 
@@ -300,7 +300,7 @@ sudo apt-get install ncurses-libs.i686 -y
 sudo apt-get install redhat-lsb.i686 -y
 ```
 
-### 2.4 DSP 代码下载及编译
+### DSP 代码下载及编译
 
 工程目录在根目录的 Projects 下，存放不同工程的配置文件和工程文件。
 
@@ -308,7 +308,7 @@ sudo apt-get install redhat-lsb.i686 -y
 
 在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
-### 2.5 DSP 固件生成
+### DSP 固件生成
 
 工具生成的执行文件只能用于工具仿真，不能直接跑在设备上。运行 CMD 控制台，找到固件生成脚本 generate_dsp_fw.bat 文件，进入到该文件所在目录执行该脚本，使用方式如下：
 
@@ -332,7 +332,7 @@ generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 、Bin2Array.
 
 不同文件的加载方式请参考3.2节的说明。
 
-### 2.6 固件打包配置文件
+### 固件打包配置文件
 
 在每个工程目录下，均有一个 FwConfig.xml 文件，该文件采用 Xml 定义一些固件配置。当运行 HifiFirmwareGenerator.exe 时，会解析当前目录的 FwConfig.xml，这里列出几个关键字段的含义：
 
@@ -378,7 +378,7 @@ generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 、Bin2Array.
 </Image>
 ```
 
-### 2.7 固件转换配置文件
+### 固件转换配置文件
 
 在工程目录下存在Bin2Array.xml文件，用以指定转换模板。文件中字段说明如下：
 
@@ -387,15 +387,15 @@ generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 、Bin2Array.
 - Input：待转换的.bin文件。
 - Output：转换输出文件。
 
-### 2.8 Map 配置信息修改
+### Map 配置信息修改
 
 Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在 ”T:(active build target) ” -->  ”Modify”，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“ <工具安装目录> \XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
 
 段配置文件为“memmap.xmm”，text、data 等会存放在 sram0 中，这是 Share Memory 的地址空间，需要将这些段存放在 TCM 中。可以参考“<工程目录>\rkdsp\projects\PISCES\map\min-rt\memmap.xmm”中的相关修改。修改完后，需要使用命令”<工具安装目录>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b  <map目录> --xtensa-core=HiFi3Dev181203”。这时候可以在 Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成“.map”文件，里面记录了具体函数分配到的地址空间，以验证上述修改是否生效。
 
-## 3 RT-THREAD 代码解析
+## RT-THREAD 代码解析
 
-### 3.1 代码路径
+### 代码路径
 
 DSP 框架：
 
@@ -417,7 +417,7 @@ DSP 驱动调用流程可以参考以下测试用例：
 bsp/rockchip/common/tests/dsp_test.c
 ```
 
-### 3.2 配置
+### 配置
 
 打开 DSP driver 配置如下，下面以RK2108工程为例：
 
@@ -446,7 +446,7 @@ RT-Thread bsp drivers  --->
 
 注[^1]:实际目标文件由menuconfig中RT_DSPFW_FILE_NAME指定。
 
-### 3.3 驱动调用
+### 驱动调用
 
 驱动调用方式可以参考“bsp/rockchip-common/tests/dsp_test.c”。
 
@@ -462,7 +462,7 @@ rt_device_close(dsp_dev);
 
 调用“rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work)”的时候，传入 work 指针，驱动会通过 mailbox 将 work 发送给 DSP，DSP 解析 work，并进行相应的算法操作，将 work 处理结果传回来。调用“rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work)”可以取回 DSP 的算法处理结果，如果 DSP 仍在处理中，那么该函数会阻塞，直到 DSP 处理完成。
 
-### 3.4 测试case
+### 测试case
 
 打开 DSP TEST 和 AUDIO TEST 配置如下：
 
@@ -498,9 +498,9 @@ Hifi3: process return value = 1
 work result:0x00000001
 ```
 
-## 4 RKOS 代码解析
+## RKOS 代码解析
 
-### 4.1 代码路径
+### 代码路径
 
 DSP 驱动层：
 
@@ -515,7 +515,7 @@ DSP 驱动调用流程可以参考以下测试用例：
 src/subsys/shell/Shell_DspDevice.c
 ```
 
-### 4.2 配置
+### 配置
 
 打开 DSP Driver 配置如下：
 
@@ -537,7 +537,7 @@ menuconfig选项和3.2基本一致，这里说下两个不同的地方：
 
 2. 添加了“Enable dsp jtag”选项，表示使能DSP JTAG。
 
-### 4.3 驱动调用
+### 驱动调用
 
 驱动调用方式可以参考“src/subsys/shell/Shell_DspDevice.c”。
 
@@ -554,7 +554,7 @@ rkdev_delete(DEV_CLASS_DSP, 0, NULL);
 
 调用说明可以参考3.3节中的介绍，只是函数名有些不同，执行方式是一样的。
 
-### 4.4 测试case
+### 测试case
 
 打开 DSP Test配置如下：
 
@@ -577,9 +577,9 @@ config end
 [A.DspTe][000024.61]work result:0x00000000
 ```
 
-## 5 通信协议
+## 通信协议
 
-### 5.1 通信协议分析
+### 通信协议分析
 
 MCU 和 DSP 通过 Mailbox 进行通信，Mailbox 包含 4 个通道，一个通道传输 32bit 的 CMD 和 Data 数据。每次发送消息，CMD 通道传输命令码，表示这次消息进行哪些操作；Data 通道传输数据，一般为 work 或者 config 的 buffer 指针。命令码存于在 drv_dsp.h 中，DSP_CMD_WORK、DSP_CMD_READY、DSP_CMD_CONFIG 等。
 

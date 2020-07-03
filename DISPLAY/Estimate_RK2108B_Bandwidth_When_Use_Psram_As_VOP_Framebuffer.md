@@ -57,13 +57,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 概述
+## 概述
 
 Pisces 项目中 M1 SRAM 大小 1M，系统软件需要占用部分存储空间，导致一些大一点的分辨率或者位宽大的显示效果无法实现，所以需要评估在 M1 上外挂 PSRAM 做显存的方案，主要风险点是 PSRAM 的带宽对显示效果的影响。
 
 由于 M1 无法外接 PSRAM，所以本次测试中使用 RK2108B 外接 PSRAM 硬件平台测试。
 
-## 2 硬件环境
+## 硬件环境
 
 - 主板： RK2108B EVB 板
 - 屏：720x1280 video mode mipi 屏
@@ -72,7 +72,7 @@ Pisces 项目中 M1 SRAM 大小 1M，系统软件需要占用部分存储空间�
 - SCLK_SFC1_SRC 实际工作频率： 132Mhz
 - 4 线QPI接口，理论最大带宽为：132 * 4 / 8 = 66 MBps
 
-## 3 CPU 单独访问 PSRAM 带宽
+## CPU 单独访问 PSRAM 带宽
 
 执行测试命令：qpi_psram，CPU 连续向 0x1c000000 地址空间读、写 4M 大小的随机数，测试结果：
 
@@ -82,7 +82,7 @@ Pisces 项目中 M1 SRAM 大小 1M，系统软件需要占用部分存储空间�
 | 写     | 24 MB/s |
 | 拷贝   | 12 MB/s |
 
-## 4 VOP 单独访问PSRAM带宽
+## VOP 单独访问PSRAM带宽
 
 执行测试命令：display_test color_bar，VOP 根据指定的宽、高、格式、帧率访问 PSRAM 中的数据：
 
@@ -94,7 +94,7 @@ Pisces 项目中 M1 SRAM 大小 1M，系统软件需要占用部分存储空间�
 | 720x1280 | 4bit/pixel  | 45 fps | 19.78 MBps   | ok       |
 | 720x1280 | 4bit/pixel  | 30 fps | 13.18 MBps   | ok       |
 
-## 5 VOP 和 CPU 同时访问 PSRAM 带宽
+## VOP 和 CPU 同时访问 PSRAM 带宽
 
 步骤：
 
@@ -110,7 +110,7 @@ Pisces 项目中 M1 SRAM 大小 1M，系统软件需要占用部分存储空间�
 | 720x1280 | 4bit/pixel | 45 fps | 15 MB/s           | 14 MB/s           | ok       |
 | 720x1280 | 4bit/pixel | 30 fps | 18 MB/s           | 17 MB/s           | ok       |
 
-## 6 结论
+## 结论
 
 1. CPU 单独访问 PSRAM 的带宽约为：23~24MBps；
 2. VOP(DMA) 在分辨率为720x1280@45fps，位宽为8bit的情况下单独访问 PSRAM 的带宽约为：39.55 MBps；

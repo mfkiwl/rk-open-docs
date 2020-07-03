@@ -41,27 +41,27 @@ U-Boot 下 MTD block device 设计介绍。
 
 ------
 
-## 1 引用参考
+## 引用参考
 
 [1].《Rockchip-Developer-Guide-UBoot-nextdev-CN.md》
 
 [2].《Rockchip-Developer-Guide-Uboot-mmc-device-driver-analysis.md》
 
-## 2 术语
+## 术语
 
 MTD：Memory Technology Device 即内存技术设备。
 
-## 3 简介
+## 简介
 
 设计 MTD block 层，兼容目前 block 设备接口。
 
-## 4 设计
+## 设计
 
-### 4.1 MTD block 设计
+### MTD block 设计
 
 设计 mtd bread & bwrite & berase 三个函数，通过 desc->devnum 来区分挂接的不同 MTD 设备，这样上层可以直接调用 blk_dread & blk_dwrite & blk_derase 操作 MTD 设备。代码位于 drivers/mtd/mtd_blk.c。
 
-### 4.2 多设备挂接设计
+### 多设备挂接设计
 
 对于 block 设备，会依据 if_type 与 devnum 来找挂接在 block 设备下的驱动。对于挂接在 block 设备下的 MTD 驱动，定义 if_type 为 IF_TYPE_MTD。devnum 在设备驱动在与 block 层 bind 时传递。例：
 
@@ -129,19 +129,19 @@ ulong mtd_derase(struct udevice *udev, lbaint_t start,
 }
 ```
 
-### 4.3 分区表设计
+### 分区表设计
 
 兼容 GPT 分区表，注意 nand flash 与 spi flash 尾部需要保留 4 个 blocks 用于保存坏块表。
 
-### 4.4 新增 CONFIG
+### 新增 CONFIG
 
 增加 CONFIG_MTD_BLK、CONFIG_CMD_MTD_BLK，支持 mtd block device。
 
-### 4.5 驱动挂接框图
+### 驱动挂接框图
 
 ![mtd-block](.\Rockchip_Developer_Guide_UBoot_MTD_Block_Device_Design\mtd-block.png)
 
-### 4.6 SPL MTD block 设计
+### SPL MTD block 设计
 
 SPL MTD block 层可以统一  SPL 下的 nand & spi nand & spi nor 的驱动调用，上层有统一的接口读写设备，达到精简代码的效果。
 
@@ -206,9 +206,9 @@ unsigned long blk_dread(struct blk_desc *block_dev, lbaint_t start,
                         lbaint_t blkcnt, void *buffer)
 ```
 
-## 5 step by step
+## step by step
 
-### 5.1 U-Boot
+### U-Boot
 
 1. 对应的 defconfig 添加
 
@@ -267,7 +267,7 @@ Starting kernel ...
 ......
 ```
 
-### 5.2 SPL
+### SPL
 
 1.config 配置，参考<https://10.10.10.29/#/c/android/rk/u-boot/+/79335/>
 

@@ -74,7 +74,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 框架
+## 框架
 
 ![](resources/power_manager_struct.png)
 
@@ -86,13 +86,13 @@ PM（Power Management）： 提供了平台可支持的所有功耗场景
 
 自动休眠唤醒： RKOS上的所有线程和设备按照这个休眠框架实现后，可以启动这个自动休眠逻辑，同时不影响APP的功能，自动休眠唤醒逻辑会在不同状态从PM场景中选择一个最省功耗的场景。
 
-## 2 DVFS(Dynamic Voltage and Frequency Scaling)
+## DVFS(Dynamic Voltage and Frequency Scaling)
 
-### 2.1 原理
+### 原理
 
 一般情况下，模块的工作频率越高，功耗也会越大，为了降低功耗，需要在适当的时候降低模块的工作频率。而不同的工作频率下，模块的需求电压也不一样，所以变频时，就需要同时调整电压，这就是动态调频调压技术。
 
-### 2.2 配置
+### 配置
 
 如果一些模块共用一个电源，需要打开DRIVER_REQ_PWR宏，保证调压时，选择所有模块需求的最高电压：
 
@@ -185,7 +185,7 @@ __WEAK void PM_DVFS_Init(void)
 }
 ```
 
-### 2.3 代码和API
+### 代码和API
 
 - src/driver/dvfs/drv_dvfs.c
 - include/driver/drv_dvfs.h
@@ -200,7 +200,7 @@ rk_err_t dvfs_set_rate_by_idx(struct rk_dvfs_desc *dvfs_desc, uint8_t tbl_idx, u
 
 ```
 
-### 2.4 使用范例
+### 使用范例
 
 RK2206 DSP通过DVFS设置频率：
 
@@ -213,13 +213,13 @@ desc_dsp = dvfs_get_by_clk(CLK_HIFI3, NULL);
 dvfs_set_rate(desc_dsp, 0, 192000000); //DSP支持频率：48M/96M/192M/327.68M
 ```
 
-## 3 Power Management
+## Power Management
 
-### 3.1 原理
+### 原理
 
 很多应用对系统性能需求不一样，需要统计不同的应用需求，设置一个合理的系统性能（比如：mcu/mem/bus频率），保证应用能够流畅地运行。PM Mode框架用来汇总应用对系统性能的需求，最终选择一个合理的配置。
 
-### 3.2 配置
+### 配置
 
 打开DRIVE_PM宏：
 
@@ -256,7 +256,7 @@ void PM_DVFS_Init(void)
 }
 ```
 
-### 3.3 代码和API
+### 代码和API
 
 - src/driver/pm/drv_pm.c
 - src/kernel/pm/pm.c
@@ -283,7 +283,7 @@ void rkos_pm_request(uint8 mode);
 void rkos_pm_release(uint8 mode);
 ```
 
-### 3.4 使用范例
+### 使用范例
 
 ```
 #include "kernel/pm.h"
@@ -298,7 +298,7 @@ void main(void)
 }
 ```
 
-### 3.5 shell调试命令
+### shell调试命令
 
 打开COMPONENTS_SHELL_PM_TEST宏：
 
@@ -330,13 +330,13 @@ RK2206>pm dump
 [A.14.00][000042.039804]pm current mode: Running Normal Mode
 ```
 
-## 4 自动休眠与唤醒
+## 自动休眠与唤醒
 
-### 4.1 原理
+### 原理
 
 RKOS 电源管理器根据系统运行状态分别向任务管理器和设备管理器发送休眠时钟信号，任务管理器在休眠时钟信号的节拍下事先设定模式逐个休眠线程，每个时钟节拍休眠1个线程，同理设备管理休眠设备。当系统满足一定的条件时，电源管理器调用PM Mode相关接口，对系统的功耗模式进行设定。
 
-### 4.2 KCONFIG
+### KCONFIG
 
 ```c
 At src/kernel/Kconfig:83
@@ -349,7 +349,7 @@ Menu path: (top menu) -> RKOS
         default "n"
 ```
 
-### 4.3 状态迁移图
+### 状态迁移图
 
 从电源管理的角度对RKOS系统状态划分如下：
 
@@ -386,7 +386,7 @@ typedef enum _SYS_STATUS
 
 ![](resources/system_idle_chat.png)
 
-### 4.4 线程休眠状态
+### 线程休眠状态
 
 ```C
 typedef enum _TASK_STATE
@@ -404,7 +404,7 @@ typedef enum _TASK_STATE
 | TASK_STATE_IDLE1   | 系统在POWER_SAVE,POWER_SAVE_1,POWER_SAVE_2模式下，长时间未清楚休眠计数器 | ENABLE模式：线程会被冻结，FORCE_MODE：线程不被冻结，非冻结的线程随时都可以处于运行态 |
 | TASK_STATE_IDLE2   | 设备在 TASK_STATE_IDLE1模式下长时间未被唤醒                  | 线程在掉电内存中的重要数据压缩搬移到非掉电内存               |
 
-### 4.5 线程休眠模式
+### 线程休眠模式
 
 ```c
 //suspend mode
@@ -424,7 +424,7 @@ typedef enum _TASK_STATE
 | DISABLE_MODE | 禁止休眠，此模式可以防止设备冻结线程，系统中存在拒绝休眠的线程时，无法进入SUSPEND_1 |
 | FORCE_MODE   | 强制休眠，此模式系统在POWER_SAVE,POWER_SAVE_1,POWER_SAVE_2会累加线程休眠COUNTER，累加到设定值时，调用休眠函数但不冻结该线程，需要设计者在线程运行时自行确认线程休眠状态，然后调用唤醒接口进行自唤醒，自唤醒的线程并不影响系统的休眠状态。 |
 
-### 4.6设备休眠状态
+### 设备休眠状态
 
 ```c
 typedef enum _DEV_STATE
@@ -442,7 +442,7 @@ typedef enum _DEV_STATE
 | DEV_STATE_IDLE1   | 系统在POWER_SAVE,POWER_SAVE_1,POWER_SAVE_2模式下，长时间未清楚休眠计数器 | ENABLE模式：设备会被休眠，API不能使用，FORCE_MODE：设备被休眠，API可以使用 |
 | DEV_STATE_IDLE2   | 设备在 DEV_STATE_IDLE1模式下长时间未被唤醒                   | 线程，设备在掉电内存中的重要数据压缩搬移到非掉电内存         |
 
-### 4.7 设备休眠模式
+### 设备休眠模式
 
 ```c
 //suspend mode

@@ -70,7 +70,7 @@ Software development engineers
 
 ---
 
-## 1. Overview
+## Overview
 
 This code module is integrated in the libDeviceIo.so dynamic library based on a single RGB Led driven by PWM and has packaged interfaces such as LED on and off, flashing and breathing light effects. The layered design meets requirement of different application cases, supports the priority setting of lighting effects, and builds complex lighting effect based on current interfaces.
 
@@ -84,7 +84,7 @@ STABLE: including a light effect stack that supports priority setting. The light
 
 In conclusion, if there is an element in TEMP layer, the TEMP layer element is always displayed; otherwise, it will check whether there is an element in REALTIME layer, and if there is an element in REALTIME layer, the top element of the STABLE layer is displayed. It is going to wait if  STABLE layer stack is empty.
 
-## 2. Interface Introduction
+## Interface Introduction
 
 - `RK_Led_Effect_layer_e`
 
@@ -155,7 +155,7 @@ Clear all set effects and turn off  LED light.
 
 Led module de-initialization, release resources.
 
-## 3. Application Example
+## Application Example
 
 ```c
 #include <stdio.h>

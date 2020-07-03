@@ -73,26 +73,26 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 概述
+## 概述
 
 Rockchip RT-Thread 显示驱动基于 RT-Thread IO 设备驱动模型向 OS 注册 LCD 驱动，能支持 LittlevGL 等 GUI 应用，同时为了充分发挥 Rockchip 显示模块的性能，我们拓展了一些接口，加入了多图层合成、颜色效果调整、后级缩放、MIPI switch 等功能的支持。
 
-### 1.1 基本概念
+### 基本概念
 
 CRTC：显示控制器，在 rockchip 平台是 SOC 内部 VOP(部分文档也称为 LCDC)模块的抽象；
 Plane：图层，在 rockchip 平台是 SOC 内部 VOP(LCDC)模块 win 图层的抽象；
 Encoder/Connector：输出转换器的软件抽象，指 RGB、LVDS、DSI、eDP、HDMI 等显示接口；
 Panel：各种 LCD、HDMI 等显示设备的抽象；
 
-### 1.2 显示通路
+### 显示通路
 
 ![1-2_display-path](Rockchip_Developer_Guide_RT-Thread_Display/1-2_display-path.png)
 
-## 2 软件框架
+## 软件框架
 
 ![2-1_display-framework](Rockchip_Developer_Guide_RT-Thread_Display/2-1_display-framework.png)
 
-### 2.1 Driver 层驱动文件
+### Driver 层驱动文件
 
 | **Driver** | **File**                                                     | **description**                                              |
 | ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -101,7 +101,7 @@ Panel：各种 LCD、HDMI 等显示设备的抽象；
 | DSI        | bsp/rockchip-common/drivers/drv_dsi.c<br />bsp/rockchip-common/drivers/drv_dsi.h | DSI/DPHY 显示模块驱动                                         |
 | PANEL      | bsp/rockchip-common/drivers/drv_panel.c <br />bsp/rockchip-common/drivers/drv_panel_cfg.h | panel 驱动，抽象初始化命令，时序，电源管理等屏相关的操作。    |
 
-### 2.2 HAL 层驱动文件
+### HAL 层驱动文件
 
 | **Driver** | **File**                                                     | **Description**            |
 | ---------- | :----------------------------------------------------------- | -------------------------- |
@@ -109,7 +109,7 @@ Panel：各种 LCD、HDMI 等显示设备的抽象；
 | VOP        | bsp/rockchip-common/hal/lib/hal/src/hal_vop.c<br />bsp/rockchip-common/hal/lib/hal/inc/hal_vop.h | VOP 模块硬件基础功能的实现  |
 | DSI        | bsp/rockchip-common/hal/lib/hal/src/hal_dsi.c<br />bsp/rockchip-common/hal/lib/hal/inc/hal_dsi.h | DSI/DPHY 模块硬件功能实现   |
 
-## 3 常用接口说明
+## 常用接口说明
 
 rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交互，目前扩展的 control 主要有以下几个：
 
@@ -126,9 +126,9 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 | RK_DISPLAY_CTRL_SET_POST_CLIP    | 设置 clip 系数                                         |
 | RK_DISPLAY_CTRL_MIPI_SWITCH      | 切换 MIPI   switch 通路                                |
 
-## 4 关键数据结构说明
+## 关键数据结构说明
 
-### 4.1 struct display_state
+### struct display_state
 
 显示驱动最核心的结构体，包括了 RTT 中定义的 device 结构体和 graphic_info 以及 rockchip 平台对硬件设备抽象的结构体。
 
@@ -142,7 +142,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 | struct panel_state panel_state             | 用于描述显示设备初始化命令，电源等相关信息 |
 | struct DISPLAY_MODE_INFO mode              | 用于描述扫描时序等屏相关信息               |
 
-### 4.2 struct crtc_state
+### struct crtc_state
 
 用于描述 Rockchip 处理器 VOP 模块的结构体，主要包括以下信息：
 
@@ -155,7 +155,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 | uint8_t irqno                           | VOP 模块的中断号               |
 | uint8_t power_state                     | 电源状态                      |
 
-### 4.3 struct CRTC_WIN_STATE
+### struct CRTC_WIN_STATE
 
 用于描述 Rockchip 处理器 VOP 模块 WIN 图层的结构体，主要包括以下信息：
 
@@ -184,7 +184,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 | uint8_t globalAlphaValue | 全局 alpha 的值：0~0xff                                      |
 | uint32_t *lut            | bpp 格式查找表，可以参考 display_test.c 中的定义，也可以用户自定义 |
 
-### 4.4 struct VOP_POST_SCALE_INFO
+### struct VOP_POST_SCALE_INFO
 
 用于描述 Rockchip 处理器 VOP 模块后级缩放的结构体，主要包括以下信息：
 
@@ -200,7 +200,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 | eVOP_PostSclMode postSclHmode | 硬件缩放倍数，驱动做计算，应用层无需配置     |
 | eVOP_PostSclMode postSclVmode | 硬件缩放倍数，驱动做计算，应用层无需配置     |
 
-### 4.5 struct VOP_BCSH_INFO
+### struct VOP_BCSH_INFO
 
 用于描述 Rockchip 处理器 VOP 模块后级 BCSH 的结构体，主要包括以下信息：
 
@@ -211,7 +211,7 @@ rt-thread GUI 应用和驱动通过各种 control(类似 linux 下的 IOCTL)交�
 | uint8_t satCon     | 修改饱和度，配置范围 0~100，默认值为 50 |
 | uint8_t hue        | 修改色度，配置范围 0~100，默认值为 50   |
 
-### 4.6 struct VOP_COLOR_MATRIX_INFO
+### struct VOP_COLOR_MATRIX_INFO
 
 用于描述 Rockchip 处理器 VOP 模块后级 color matrix 的结构体，主要包括以下信息：
 
@@ -249,7 +249,7 @@ colorMatrixCoe[3][3] = {
 };
 ```
 
-### 4.7 struct VOP_POST_CLIP_INFO
+### struct VOP_POST_CLIP_INFO
 
 用于描述 Rockchip 处理器 VOP 模块后级 clip 的结构体，主要包括以下信息：
 
@@ -258,13 +258,13 @@ colorMatrixCoe[3][3] = {
 | bool  postClipEn   | 控制开关        |
 | uint8_t postYThres | 需要 clip 的值    |
 
-## 5 对齐要求
+## 对齐要求
 
-### 5.1 数据对齐要求
+### 数据对齐要求
 
 ![5_format-align](Rockchip_Developer_Guide_RT-Thread_Display/5_format-align.png)
 
-### 5.2 屏对齐要求
+### 屏对齐要求
 
 有些屏本身有对齐要求，以 S6E3HC2 屏为例：
 
@@ -272,9 +272,9 @@ colorMatrixCoe[3][3] = {
 
 配置为 720x1560 的时候 DSC 的 slice 大小为 360x52，所以区域刷新时显示的位置需要按 360x52 对齐，显示区域的大小需要按 360x390 对齐。
 
-## 6 屏配置说明
+## 屏配置说明
 
-### 6.1 选择驱动已支持的屏
+### 选择驱动已支持的屏
 
 按以下通路选择对应屏的配置文件：
 
@@ -285,7 +285,7 @@ cd bsp/rockchip-pisces
             Panel Type (R17 SS mipi panel, resolution is 1080x2340)  --->
 ```
 
-### 6.2 增加一块新的屏支持
+### 增加一块新的屏支持
 
 1. 进入屏配置文件目录：cd bsp/rockchip-common/drivers/panel_cfg；
 
@@ -297,11 +297,11 @@ cd bsp/rockchip-pisces
 
 ![6-2_panel](Rockchip_Developer_Guide_RT-Thread_Display/6-2_panel.png)
 
-### 6.3 常见的扫描时序图
+### 常见的扫描时序图
 
 ![6-3_timing](Rockchip_Developer_Guide_RT-Thread_Display/6-3_timing.png)
 
-### 6.4 屏配置参数说明
+### 屏配置参数说明
 
 | **Parameters**                    | **Description**                              |
 | --------------------------------- | -------------------------------------------- |
@@ -330,7 +330,7 @@ cd bsp/rockchip-pisces
 | struct rockchip_cmd cmd_aod_on[]  | 屏进入aod模式初始化命令                      |
 | struct rockchip_cmd cmd_aod_off[] | 屏退出aod模式初始化命令                      |
 
-### 6.5 屏初始化命令说明
+### 屏初始化命令说明
 
 1. 下面以 MIPI DSI CMD 为例说明：
 
@@ -394,9 +394,9 @@ Gerneic Packet 包括 n 个字节的 parameters。
 
 ![6-5-7_Dimming](Rockchip_Developer_Guide_RT-Thread_Display/6-5-7_Dimming.png)
 
-## 7 显示测试 demo
+## 显示测试 demo
 
-### 7.1 display_test 支持的测试 case
+### display_test 支持的测试 case
 
 使用命令:
 
@@ -420,7 +420,7 @@ dsc; winloop; winmove; winalpha; scale; coe;  bcsh; gamma; clip; mipi_switch; eb
 | ebook       | 显示 1bpp 格式图片的电子书 demo              |
 | color_bar   | 显示 color_bar loop 的 demo                  |
 
-### 7.2 demo 说明
+### demo 说明
 
 1. LCD 设备
 
@@ -541,7 +541,7 @@ RT_ASSERT(ret == RT_EOK);
 
 显示一帧的流程可以参考以上步骤 1 到步骤 9 执行，如果是刷新多帧，可以在修改 win_config 和 post_scale 配置 后重复执行步骤 7、8、9。
 
-### 7.3 区域刷新坐标配置说明
+### 区域刷新坐标配置说明
 
 1. 同时支持 X 和 Y 方向区域刷新屏的配置 demo
 
@@ -664,7 +664,7 @@ ret = rt_device_control(g_display_dev, RK_DISPLAY_CTRL_COMMIT, NULL);
 RT_ASSERT(ret == RT_EOK);
 ```
 
-## 8 Color Key 使用说明
+## Color Key 使用说明
 
 VOP 支持关键色全透的效果即指定图层中某一种颜色实现透视到下一图层或者背景层的效果，驱动提供win_config 中的 colorKey 参数用来配置 color key 功能，其中 bit[23, 0] 分别表示 RGB 三个分量的关键色数据，bit24 用来表示打开或者关闭 color key 功能。
 
@@ -674,7 +674,7 @@ VOP 支持关键色全透的效果即指定图层中某一种颜色实现透视�
 #define COLOR_KEY_EN	BIT(24)
 ```
 
-### 8.1 RGB888 格式配置 Color Key 的方法
+### RGB888 格式配置 Color Key 的方法
 
 1. 实现红色全透，配置:
 
@@ -700,7 +700,7 @@ win_config->colorKey = 0x0000FF | COLOR_KEY_EN;
 win_config->colorKey = (R_VAL << 16) | (G_VAL << 8) | (B_VAL) | COLOR_KEY_EN;
 ```
 
-### 8.2 RGB565 格式配置 Color Key 的方法
+### RGB565 格式配置 Color Key 的方法
 
 1. 实现红色全透，配置：
 
@@ -732,13 +732,13 @@ B_VAL_CONFIG = B_VAL << 3;  //B[4,0] -> B[7,0]
 win_config->colorKey = (R_VAL_CONFIG  << 16) | (G_VAL_CONFIG << 8) | B_VAL_CONFIG  | COLOR_KEY_EN;
 ```
 
-### 8.3 关闭 Color Key 的方法
+### 关闭 Color Key 的方法
 
 ```c
 win_config->colorKey = 0;
 ```
 
-## 9 更新 lut 的方法
+## 更新 lut 的方法
 
 图层的 lut 在使用时需要打开 lut_en，打开 lut_en 后 lut 会被保护起来，即此时无法读写 lut 的寄存器，如果在不同的场景切换需要更新 lut 的配置，而 lut_en 的开关需要帧生效，所以更新 lut 需要按如下步骤操作:
 
@@ -764,7 +764,7 @@ win_config->colorKey = 0;
 
    将 win 中的格式设置为对应的 bpp 格式刷一帧，此时新的 lut 生效。
 
-## 10 参考文档
+## 参考文档
 
 (1) Rockchip DRM Display Driver Development Guide
 (2) Rockchip_DRM_Panel_Porting_Guide.pdf

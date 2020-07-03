@@ -75,9 +75,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Sensor点亮相关
+## Sensor点亮相关
 
-### 1.1 Sensor ID识别不到, I2C通讯失败
+### Sensor ID识别不到, I2C通讯失败
 
 Sensor ID如果未识别到，这与RKISP或RKCIF没有任何关系，仅仅是Sensor上电时序未满足要求。
 
@@ -87,23 +87,23 @@ Sensor ID如果未识别到，这与RKISP或RKCIF没有任何关系，仅仅是S
 2. 24M mclk是否有输出, 电压幅度是否正确。
 3. Sensor的上电时序是否满足要求，主要包括avdd, dovdd, dvdd, power down, reset等
 
-#### 1.1.1 什么是**7-bits**地址
+#### 什么是**7-bits**地址
 
 8bits中的最低位(LSB)表示R/W，高7bits即是我们需要的i2c slave id。
 
-#### 1.1.2 开机后，测量不到24M mclk 和 vdd电源
+#### 开机后，测量不到24M mclk 和 vdd电源
 
 在Sensor 驱动的实现中，一般是只有在需要时才开启mclk及电源，因此开机后mclk及电源默认是关闭的。
 调试时，可以将驱动中的`power_off()` 函数的实现注释掉，这样不会下电，方便测量。
 
-#### 1.1.3 仍然测量不到24M mclk
+#### 仍然测量不到24M mclk
 
 使用示波器时，检查下示波器的带宽是否足够，建议至少48M以上的带宽。
 
 1. Sensor没有正确打开mclk，请参考如`drivers/media/i2c/ov5695.c`中对mclk的操作。
 2. 该gpio被其它模块占用了，这种情况时，一般kernel log会有相应的提示。还可以通过io命令去查看pin-ctrl寄存器设置是否正确。
 
-#### 1.1.4 有mclk，但电压幅度不对，与实际的电源域不同
+#### 有mclk，但电压幅度不对，与实际的电源域不同
 
 这是由于io-domains配置错误，一般io-domains的电压是1.8v或3.3v, 根据您的原理图的设计来决定。
 通过查看原理图，并根据实际情况修改io-domains，比如:
@@ -140,12 +140,12 @@ index e0c608f..7842812 100644
 
 如果Sensor初始化时，io_domains还未初始化，那么io_domains会使用默认值，如果默认值与实际的硬件电源域不同时，mclk的电压也会不符合预期。此时返回`-EPROBE_DEFER`会让Sensor在稍后的启动过程中再尝试probe。
 
-#### 1.1.5 检查Sensor的上电时序是否满足要求
+#### 检查Sensor的上电时序是否满足要求
 
 Sensor 的Datasheet中一般会详细描述每路电源的上电顺序及间隔要求，请通过示波器检查是否满足。
 有一些Sensor的电源vdd在上电时是**没有时间先后要求**的，如`ov5695`，它的驱动中可能是用`regulator_bulk`来管理电源；但有一些是**有先后要求**的，如`ov2685.c`，它在驱动中是用多个regulator去分别控制，具体如`avdd_regulator`, `dovdd_regulator`。请根据实际情况选择。
 
-### 1.2 Sensor驱动中的`exp_def`、`hts_def`、`vts_def`默认值是多少
+### Sensor驱动中的`exp_def`、`hts_def`、`vts_def`默认值是多少
 
 如果有Sensor原厂的联系方式，请联系原厂获取。否则，请从datasheet中查找到对应的寄存器，并从寄存器列表中找到初始化时配置的值即可。以`ov2685.c`为例：
 
@@ -166,7 +166,7 @@ Sensor 的Datasheet中一般会详细描述每路电源的上电顺序及间隔�
 
 **如果不期望应用程序去调节曝光、帧率时，可以不必要用到exp, hts, vts。**一般RAW格式的Sensor需要这三个参数。
 
-### 1.3 `link_freq`与`pixel_rate`值应该是多少
+### `link_freq`与`pixel_rate`值应该是多少
 
 `link_freq`指的是MIPI clk的实际频率。**注意不是24M的mclk，而是MIPI dn/dp clk。**
 优先通过原厂窗口查问，或查找datasheet是否有相关的参数。
@@ -185,12 +185,12 @@ width * height * fps * bits_per_pixel / lanes / 2
 link_freq * 2 * lanes / bits_per_pixel
 ```
 
-### 1.4 怎么才算点亮Sensor
+### 怎么才算点亮Sensor
 
 首先需要能认到Sensor id，即i2c的读写不能有异常。这时用`media-ctl -p -d /dev/media0`应该能够看到Sensor的具体信息如名称、分辨率等。
 其次，上层抓图时，MIPI要能输出数据，且不报MIPI/ISP相关错误，应用层能接收到帧。
 
-### 1.5 Sensor AVL列表
+### Sensor AVL列表
 
 RGB Sensor AVL 位于[https://redmine.rockchip.com.cn/projects/rockchip_camera_module_support_list/camera](https://redmine.rockchip.com.cn/projects/rockchip_camera_module_support_list/camera)。支持列表中显示了sensor模组的详细信息。
 
@@ -198,7 +198,7 @@ RGB Sensor AVL 位于[https://redmine.rockchip.com.cn/projects/rockchip_camera_m
 
 ---
 
-## 2 MIPI/ISP异常相关
+## MIPI/ISP异常相关
 
 Sensor调试初期，比较经常碰到的几类问题是：
 
@@ -208,7 +208,7 @@ Sensor调试初期，比较经常碰到的几类问题是：
 4. 偶现MIPI错误
 5. MIPI不停报错，直至死机
 
-### 2.1 MIPI需要设置哪些参数
+### MIPI需要设置哪些参数
 
 在Sensor与ISP之间MIPI通讯需要设置4个参数，请<font color=red>**务必**</font>确认4个MIPI参数的正确性。
 
@@ -217,7 +217,7 @@ Sensor调试初期，比较经常碰到的几类问题是：
 - <u>Sensor的MIPI实际输出`link_freq`</u>
 - <u>Sensor使用了几个MIPI lane，这需要在dts中2个位置都配置正确</u>
 
-### 2.2 没有收到帧数据，也没有看到ISP/MIPI有报错
+### 没有收到帧数据，也没有看到ISP/MIPI有报错
 
 1. 确认kernel log中有没有关于MIPI的报错，比如用`dmesg | grep MIPI`看看有没有出错信息。
 2. 确认kernel log中有没有出现Sensor 的i2c读写失败，如果Sensor 在配置寄存器时失败了，Sensor也可能没有正确初始化并使能输出。
@@ -228,9 +228,9 @@ Sensor调试初期，比较经常碰到的几类问题是：
   - 在Sensor驱动中，最后使能MIPI输出的是`s_stream()`，请确认在这个函数前，特别是`s_power()`，不要让MIPI信号输出。这是因为在s_stream()前，MIPI控制器还未实际准备好接收数据，如果在`s_stream()`前输出数据，可能导致MIPI协议头SOT信号丢失，
   - 也可以将 Camera Sensor 端 clock lane 由 continue 模式切换到 no continues。
 
-### 2.3 MIPI报错
+### MIPI报错
 
-#### 2.3.1 MIPI错误信息详细表
+#### MIPI错误信息详细表
 
 **针对RK3288/RK3399/RK3368，错误信息表如下：**
 
@@ -270,7 +270,7 @@ Sensor调试初期，比较经常碰到的几类问题是：
 
 常见的错误分析如下小章节。
 
-#### 2.3.2 如何处理SOT/SOT_SYNC错误
+#### 如何处理SOT/SOT_SYNC错误
 
 SOT信号需要符合 **MIPI_D-PHY_Specification**。如果需要深入分析，请直接从网上搜索该pdf文档，并建议重要参考：
 
@@ -286,18 +286,18 @@ SOT信号需要符合 **MIPI_D-PHY_Specification**。如果需要深入分析，
 - **再次确认link_freq是否正确**。因为SOT时序中的Ths-settle需要在MIPI接收端配置正确，所以link_freq很关键，
 - 如果使用了多lane，看Sensor原厂有没有办法修改成1 lane传输。
 
-#### 2.3.3 如何处理CRC/CheckSum(CS) 、ECC/ECC1/ECC2错误
+#### 如何处理CRC/CheckSum(CS) 、ECC/ECC1/ECC2错误
 
 出现了ECC错误，CS检验错误，说明数据在传输时不完整。建议:
 
 - **优先排查硬件信号**，
 - 如果使用了多lane，看Sensor原厂有没有办法修改成1 lane传输。因为多lane之间没有同步好，也有可能出现ECC错误。
 
-#### 2.3.4 如何处理ERR_PROTOCOL/ERR_F_BNDRY错误
+#### 如何处理ERR_PROTOCOL/ERR_F_BNDRY错误
 
 该错误说明没有收到预期的EOT/SOT。SOT,EOT应该成对匹配出现。建议实测波形检查。
 
-#### 2.3.5 能正常收帧，但偶现MIPI错误
+#### 能正常收帧，但偶现MIPI错误
 
 如果是MIPI错误，参考前面的错误描述。与信号相关建议从硬件信号上分析。
 
@@ -309,14 +309,14 @@ SOT信号需要符合 **MIPI_D-PHY_Specification**。如果需要深入分析，
 - 在`s_power()`函数的最后，关闭sensor的输出，即相当于调用了`stop_stream()`
 - 在`start_stream()`与`stop_stream()`中，仅打开或关闭MIPI的输出。
 
-#### 2.3.6 报很多MIPI错误甚至死机
+#### 报很多MIPI错误甚至死机
 
 这可能是[2.3.5 能正常收帧，但偶现MIPI错误](#2.3.5 能正常收帧，但偶现MIPI错误)的更坏的情况。
 碰到过这样的现象，其原因是MIPI信号不符合要求，而且MIPI接收端某些错误是电平中断，导致中断风暴并最终死机。
 
 可以尝试按[2.3.5 能正常收帧，但偶现MIPI错误](#2.3.5 能正常收帧，但偶现MIPI错误)的方法看是否有效。
 
-#### 2.4 如何处理ISP PIC_SIZE_ERROR
+#### 如何处理ISP PIC_SIZE_ERROR
 
 Picture size error是ISP级的错误，它提示未接收到预期的行数，列数。因此从各级的分辨率大小检查。
 
@@ -346,11 +346,11 @@ Picture size error是ISP级的错误，它提示未接收到预期的行数，�
                   .height = 240,
   ```
 
-## 3 获取图像相关
+## 获取图像相关
 
 这部分主要涉及与抓图相关的常见问题。
 
-### 3.1 有哪些方式可以抓图
+### 有哪些方式可以抓图
 
 RKISP及RKCIF驱动支持v4l2接口，获取图像可以使用：
 
@@ -374,7 +374,7 @@ RKISP及RKCIF驱动支持v4l2接口，获取图像可以使用：
 
   注意，需要video用户组的权限，或者root超级用户权限。
 
-### 3.2 抓到的图颜色不对，亮度也明显偏暗或偏亮
+### 抓到的图颜色不对，亮度也明显偏暗或偏亮
 
 需要根据Sensor分情况：
 
@@ -384,15 +384,15 @@ RKISP及RKCIF驱动支持v4l2接口，获取图像可以使用：
   - 如果颜色不对，请确认sensor的输出格式有没有配置错误，uv分量有没有弄反。确认无误时，建议联系Sensor原厂
   - 如果亮度明显不对，请联系Sensor原厂
 
-### 3.3 什么是ISP的拓扑结构(topology, 链路结构)，如何使用media-ctl命令
+### 什么是ISP的拓扑结构(topology, 链路结构)，如何使用media-ctl命令
 
 RKISP或RKCIF可以接多个的Sensor，分时复用；同时RKISP还有多级的裁剪功能。因此用链接的方式将各个节点连接，并可通过media-ctl分别配置参数。关于media-ctl的使用，在《Rockchip_Developer_Guide_Linux_Camera_CN.pdf》文档中有较完整的描述。
 
-#### 3.3.1 一个ISP怎样接多个Sensor
+#### 一个ISP怎样接多个Sensor
 
 可以接多个Sensor，但只能分时复用。通过配置dts，将多个Sensor链接到MIPI DPHY后，可通过media-ctl切换Sensor。
 
-### 3.4 抓取RAW图是否与原图完全一致
+### 抓取RAW图是否与原图完全一致
 
 当ISP以bypass模式获取Sensor RAW图（如RGGB, BGGR）时，需要8bit对齐，不足8bit会低位填充0，即
 
@@ -401,38 +401,38 @@ RKISP或RKCIF可以接多个的Sensor，分时复用；同时RKISP还有多级�
 
 只有MP对应的video设备可以出RAW图，SP是不能支持RAW图输出的。
 
-### 3.5 ISP怎样双路(MP, SP)同时输出
+### ISP怎样双路(MP, SP)同时输出
 
 RKISP有SP, MP两路输出，即Sensor出来一张图像，SP，MP可以分别对该图像做裁剪、格式转换，并可同时输出。
 SP, MP具体不同的视频处理能力，详细请参考《Rockchip_Developer_Guide_Linux_Camera_CN.pdf》。
 
 只有当SP, MP都输出RGB或YUV时才可以同时输出。如果MP输出RAW图，那么SP不可以出图。
 
-### 3.6 ISP是否具有放大功能
+### ISP是否具有放大功能
 
 硬件上有该功能，但不建议使用，驱动中也是默认关闭该功能。
 
-### 3.7 ISP是否具有旋转功能
+### ISP是否具有旋转功能
 
 没有。如果需要使用旋转功能，建议：
 
 - 如果是flip, mirror，首先查看Sensor是不是有该功能，如果有，直接使用。这样效率最高
 - 如果无法使用Sensor flip, mirror，考虑使用RGA模块，它的代码及demo位于external/linux-rga/目录，且有相关文档位于docs/目录下
 
-### 3.8 怎样抓灰度(GREY)图
+### 怎样抓灰度(GREY)图
 
 只要ISP可以输出YUV、或者Sensor输出是Y8灰度图时，应用程序总是可以使用V4L2_PIX_FMT_GREY(FourCC为GREY)格式直接获取图像。
 
-### 3.9 RGB图支持哪些格式
+### RGB图支持哪些格式
 
 首先，只有SP这一路可以支持RGB输出，格式为：V4L2_PIX_FMT_XBGR32, V4L2_PIX_FMT_RGB565。其中XBGR32（对应的FourCC为XR24）是包含R、G、B、X四个分量，其中X分量总是为0。
 不支持RGB888，即24bit的格式输出。
 
-### 3.10 无屏板卡如何快速预览
+### 无屏板卡如何快速预览
 
 SDK中external/uvc_app/目录提供了将板卡模拟成uvc camera的功能，请参考该目录中的说明文件及代码，将板卡连接到PC机后可识别出usb camera，并可预览图像。
 
-### 3.11 如何区分SP与MP
+### 如何区分SP与MP
 
 可通过`media-ctl -p -d /dev/media0`(如有多个media设备，也尝试下/dev/media1, /dev/media2) 去查看拓扑结构，如下截取部分输出：
 
@@ -466,7 +466,7 @@ SDK中external/uvc_app/目录提供了将板卡模拟成uvc camera的功能，�
 /sys/class/video4linux/video6/name:rkisp1-input-params
 ```
 
-## 4 3A相关
+## A相关
 
 如果Sensor需要3A tunning，如Sensor输出格式RGGB, BGGR等这样的RAW BAYER RGB格式，那么需要RKISP提供图像处理。
 根据camera_engine_rkisp版本的不同，3A处理方式有差别。建议尽量将camera_engine_rkisp升级到最新的版本。
@@ -476,7 +476,7 @@ SDK中external/uvc_app/目录提供了将板卡模拟成uvc camera的功能，�
 - 已经在支持列表中的，在external/camera_engine_rkisp/iqfiles/目录下会有一份对应的xml文件
 - 否则**请向业务窗口发起模组调试申请**
 
-### 4.1 如何确认camera_engine_rkisp的版本
+### 如何确认camera_engine_rkisp的版本
 
 - 从源码中查看
 
@@ -495,7 +495,7 @@ SDK中external/uvc_app/目录提供了将板卡模拟成uvc camera的功能，�
 
 **如果版本号低于v2.2.0，请考虑升级到v2.2.0甚至更新的版本**
 
-#### 4.1.1 如何确认camera_engine_rkisp所需要的rkisp kernel驱动的版本号
+#### 如何确认camera_engine_rkisp所需要的rkisp kernel驱动的版本号
 
 camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足够新。
 
@@ -514,7 +514,7 @@ camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足�
 
   ```
 
-### 4.2 如何升级camera_engine_rkisp
+### 如何升级camera_engine_rkisp
 
 包含有三部分
 
@@ -552,7 +552,7 @@ camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足�
 
 位于buildroot/package/rockchip/camera_engine_rkisp目录下，如果不方便更新整个buildroot，可以只单独更新这个目录。
 
-### 4.3 如何确认3A是否正常在工作
+### 如何确认3A是否正常在工作
 
 在确认camera_engine_rkisp已经是v2.2.0版本或以上之后。通过抓取图像，查看图像的色彩及曝光是否正常。
 同时，通过查看后台是否有rkisp_3A_server进程在执行，如下：
@@ -567,18 +567,18 @@ camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足�
 
 可以看到进程号706即是rkisp_3A_server。
 
-#### 4.3.1 没有看到rkisp_3A_server进程
+#### 没有看到rkisp_3A_server进程
 
 - 首先先确认/usr/bin/rkisp_3A_server可执行文件是否存在，如不存在，请检查camera_engine_rkisp版本及编译。
 - 查看/var/log/syslog中是否有rkisp_3A相关的错误，如有看具体错误是什么，是否Sensor模组对应的xml没有找到，或不匹配。
 - 在shell中执行`rkisp_3A_server --mmedia=/dev/media0`（如有多个/dev/media设备，选择/dev/video对应的那一个），从另一个shell中抓图。获取rkisp_3A_server对应的错误信息
 
-#### 4.3.2 rkisp_3A_server是如何启动的
+#### rkisp_3A_server是如何启动的
 
 Linux SDK中，rkisp_3A_server由脚本/etc/init.d/S40rkisp_3A 启动并在后台执行。
 如果/etc/init.d/S40rkisp_3A文件未找到，检查camera_engine_rkisp的版本及buildroot package编译脚本。
 
-#### 4.3.3 如何确定Sensor iq配置文件(xml)文件名及路径
+#### 如何确定Sensor iq配置文件(xml)文件名及路径
 
 Sensor iq文件由三部分组成，
 
@@ -590,11 +590,11 @@ Sensor iq文件由三部分组成，
 
 那么上例中的iq文件名为：ov5695_TongJu_CHT842-MD.xml, 存放在/etc/iqfiles/目录下。注意大小写有区分。
 
-### 4.4 怎样手动曝光
+### 怎样手动曝光
 
 需要手动曝光的情况下，rkisp_3A_server进程必须先退出。然后可参考rkisp_demo.cpp程序或librkisp_api.so的源码。
 
-### 4.5 如何打开librkisp的log
+### 如何打开librkisp的log
 
 通过设置环境变量persist_camera_engine_log，其对应的位表示如下：
 
@@ -617,9 +617,9 @@ Sensor iq文件由三部分组成，
    # /usr/bin/rkisp_3A_server --mmedia=/dev/media0
 ```
 
-## 5 应用开发相关
+## 应用开发相关
 
-### 5.1 C语言参考demo
+### C语言参考demo
 
 - RK提供的Linux SDK中包含rkisp_demo工具及源码
   rkisp_demo是一个简单的工具，可以用于获取图像。类似于v4l2-ctl工具，rkisp_demo也不能显示图像，它主要是提供源码供参考。
@@ -627,7 +627,7 @@ Sensor iq文件由三部分组成，
 - RK提供的Linux SDK中包含rkisp_api.so动态链接库及源码，可以基于此做修改或直接使用C语言开发程序
   源码位于external/camera_engine_rkisp/apps目录下。如果您的代码较旧找不到该目录，请更新。
 
-### 5.2 什么是DMA buffer，有什么好处
+### 什么是DMA buffer，有什么好处
 
 DMA buffer 是一片由驱动分配的内存，该buffer 可以在多个内核模块之间共享，从而减少内存拷贝。特别是对图像处理时能优化性能，减小DDR负载。
 

@@ -76,7 +76,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1. 浮点打印
+## 浮点打印
 
    官方的 RT-Thread （后面简称 RTT ）不支持浮点打印，毕竟相当一部分 MCU 甚至连浮点指令都不支持，如果在调试过程中需要用到浮点打印，可以通过如下步骤实现：
 
@@ -102,7 +102,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
     rtprintf("memory bandwidth: %s\n", buf);
 ```
 
-## 2. 64位长整型打印
+## 位长整型打印
 
    官方的 RTT 支持64位的长整型打印，不过这个功能默认没有打开，可以通过如下方式启用：
 
@@ -111,7 +111,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 #define RT_PRINTF_LONGLONG
 ```
 
-## 3. 配置界面无法启动
+## 配置界面无法启动
 
    正常执行 `scons --menuconfig` 会弹出配置界面，如果无法弹出，可能是下面三个原因：
 

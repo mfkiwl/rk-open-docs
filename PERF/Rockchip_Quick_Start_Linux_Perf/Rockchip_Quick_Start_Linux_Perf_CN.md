@@ -40,11 +40,11 @@
 
 ***
 
-## 1 介绍
+## 介绍
 
    Perf 是从 Linux 2.6 开始引入的一个 profiling 工具，通过访问包括 pmu 在内的软硬件性能计数器来分析性能，支持多架构，是目前 Kernel 的主要性能检测手段，和 Kernel 代码一起发布，所以兼容性良好。
 
-## 2 功能
+## 功能
 
    性能瓶颈如果要分类的话，大致可以分为几个大类：cpu／gpu／mem／storage，其中 gpu 用 Perf 没法探测（这个目前比较好用的工具就只有 DS5），storage 只能用 tracepoint 来统计。总的说来，Perf 还是侧重于分析 cpu 的性能，其他功能都不是很好用。
 
@@ -85,9 +85,9 @@ $ perf
 * stat：打印性能计数统计值
 * top：cpu 占有率实时统计
 
-## 3 在 Android 平台使用
+## 在 Android 平台使用
 
-### 3.1 准备工作
+### 准备工作
 
 1. 首先按 Google 或芯片厂商的指导，构建一个完整的 Android 和 Kernel 的编译环境（如果不关心 Kernel 可以忽略）, 这样分析的时候符号表才能匹配上。
 
@@ -145,7 +145,7 @@ CONFIG_PERF_EVENTS=y
 CONFIG_HW_PERF_EVENTS=y
 ```
 
-### 3.2 获取当前平台支持的事件
+### 获取当前平台支持的事件
 
 ```shell
 rk3399:/data/local # ./perf list
@@ -187,7 +187,7 @@ List of pre-defined events (to be used in -e):
 
 [^1]: 后面也会简单介绍一些Simpleperf
 
-### 3.3 获取系统热点进程
+### 获取系统热点进程
 
 Perf 中的 top 工具可以列出当前 cpu 的热点，还可以附加 Kernel 的符号表让信息可方便分析。命令如下：
 
@@ -212,7 +212,7 @@ perf top 还和系统的 top 一样可以指定刷新间隔[^2], 以上命令中
 
 [^2]: 这个是指top统计信息的刷新间隔而不是采样间隔
 
-### 3.4 获取进程的统计信息
+### 获取进程的统计信息
 
 perf stat 用于获取进程某个时间段内的 pmu 统计信息，命令如下：
 
@@ -226,7 +226,7 @@ ctrl+c 退出，或发信号让 Perf 进程退出都可以看到统计结果，�
 
 一些明显的异常值会被标注为红色，例如上图是浏览器跑 fishtank 时候抓的统计信息，可以看到分支预测的失败率非常高，结合 Perf 的热点分析工具可以进一步缩小范围找到分支预测失败的原因。
 
-### 3.5 收集进程的 profile 数据
+### 收集进程的 profile 数据
 
 perf record 用于记录详细的 profile 数据，可以指定记录某个进程，还可以记录调用栈，命令如下：
 
@@ -240,7 +240,7 @@ perf record 用于记录详细的 profile 数据，可以指定记录某个进�
 # ./perf record -e cache-misses -p 1415
 ```
 
-### 3.6 分析 profile 数据
+### 分析 profile 数据
 
 perf report 用户分析抓到的 profile 数据，一般会先把数据发到 pc 上再分析，命令如下：
 
@@ -255,7 +255,7 @@ perf report --objdump=aarch64-linux-android-objdump --vmlinux=/path/to/vmlinux -
 
  上图有‘+’的地方可以用‘enter’键来遍历其调用关系。
 
-### 3.7 FlameGraph
+### FlameGraph
 
 还可以通过一些脚本来方便分析调用关系，Flame Graph 就是一个比较好用的可视化分析工具。
 
@@ -271,7 +271,7 @@ git clone https://github.com/brendangregg/FlameGraph.git
 perf script --vmlinux=<kernel_folder>/vmlinux --symfs $ANDROID_PRODUCT_OUT/symbols -i perf.data | FlameGraph/stackcollapse-perf.pl | FlameGraph/flamegraph.pl > flamegraph.html
 ```
 
-## 4 在 Linux 平台使用
+## 在 Linux 平台使用
 
 arm 版本的 linux 发行版很多都没有提供 Perf 的包，所以需要自己手动编译一个 Perf，由于 Perf 依赖的 elfutils/binutils/zlib，所以实际上需要交叉编译四个东西。
 
@@ -337,7 +337,7 @@ make -f Makefile.perf perf ARCH=arm64 CROSS_COMPILE=/home/cmc/workspace/linaro/t
 
 理论上在 arm 的 linux 发行版上直接编译 Perf 应该也是可以的，但是我没有试过。用法的话和 Android 是一样的，这里就不叙说了。
 
-## 5 Simpleperf 使用
+## Simpleperf 使用
 
 Android 7.0 开始提供了一个更完整的 Perf 版本 Simpleperf：
 

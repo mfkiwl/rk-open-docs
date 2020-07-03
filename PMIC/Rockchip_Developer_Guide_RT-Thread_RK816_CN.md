@@ -84,16 +84,16 @@ RK816 是一款高性能 PMIC，RK816 集成 4 个大电流 DCDC、1个升压BOO
 - fuel gauge：电池电量统计
 - NTC sensor：电池温度检测
 
-## 1 PMIC
+## PMIC
 
-### 1.1 驱动文件
+### 驱动文件
 
 ```
 ./bsp/rockchip/common/drivers/drv_pmic.h
 ./bsp/rockchip/common/drivers/drv_pmic.c
 ```
 
-### 1.2 配置使能
+### 配置使能
 
 ```
 CONFIG_RT_USING_PMIC
@@ -103,7 +103,7 @@ HAL_PWR_MODULE_ENABLED
 HAL_PWR_I2C8_MODULE_ENABLED
 ```
 
-### 1.3 板级定义
+### 板级定义
 
 用户需要在 board.c 中定义PMIC的I2C硬件信息。例如：
 
@@ -115,7 +115,7 @@ struct pwr_i2c_desc pmic_pwr_i2c_desc =
 };
 ```
 
-### 1.4 用户接口
+### 用户接口
 
 ```c
 rt_uint32_t pmic_get_voltage(struct pwr_i2cbus_desc *desc);
@@ -145,20 +145,20 @@ rt_err_t pmic_update_bits(struct rt_i2c_bus_device *pmic_i2c_bus,
 struct pwr_i2c_desc *pmic_get_i2c_desc(void);
 ```
 
-## 2 Regulator
+## Regulator
 
-### 2.1 驱动文件
+### 驱动文件
 
 ```
 ./bsp/rockchip/common/drivers/drv_regulator.c
 ./bsp/rockchip/common/drivers/drv_regulator.h
 ```
 
-### 2.2 配置使能
+### 配置使能
 
 没有额外配置项，把PMIC的配置使能即可。
 
-### 2.3 定义接口
+### 定义接口
 
 定义时请用专门的宏：
 
@@ -190,7 +190,7 @@ REGULATOR_INIT(NAME, ID, VOLTUV, EN, SSPDVOL, SSPDEN)
 REGULATOR_INIT(NAME, ID, VOLTUV, EN, SSPDVOL, SSPDEN)
 ```
 
-### 2.4 板级定义
+### 板级定义
 
 用户需要在board.c 定义regulators[]。例如：
 
@@ -243,7 +243,7 @@ const struct regulator_init regulator_inits[] =
 }
 ```
 
-### 2.5 用户接口
+### 用户接口
 
 ```c
 struct regulator_desc *regulator_get_desc_by_pwrid(ePWR_ID pwrId);
@@ -257,11 +257,11 @@ rt_err_t regulator_disable(struct regulator_desc *desc);
 void regulator_desc_init(struct regulator_desc *descs, uint32_t cnt);
 ```
 
-## 3 RTC
+## RTC
 
 目前的RTC驱动仅实现了时间配置、获取的功能，闹钟功能没有实现。
 
-### 3.1 驱动文件
+### 驱动文件
 
 ```c
 ./bsp/rockchip/common/drivers/rk816_rtc.c
@@ -271,7 +271,7 @@ void regulator_desc_init(struct regulator_desc *descs, uint32_t cnt);
 ./components/drivers/include/drivers/rtc.h
 ```
 
-### 3.2 配置使能
+### 配置使能
 
 ```
 CONFIG_RT_USING_PMIC
@@ -279,7 +279,7 @@ CONFIG_RT_USING_RTC
 CONFIG_RT_USING_RTC_RK816
 ```
 
-### 3.3 用户接口
+### 用户接口
 
 设置时间和日期
 
@@ -294,7 +294,7 @@ rt_err_t set_date(rt_uint32_t year, rt_uint32_t month, rt_uint32_t day);
 struct tm* localtime(const time_t* t)
 ```
 
-### 3.4 测试命令
+### 测试命令
 
 RTC框架提供了`date`命令用于读写rtc时间。实现代码：
 
@@ -309,9 +309,9 @@ RTC框架提供了`date`命令用于读写rtc时间。实现代码：
 => date 2019 12 10 8 10 30  // 设置时间：2019-12-10 8:10:30
 ```
 
-## 4 Charger
+## Charger
 
-### 4.1 驱动文件
+### 驱动文件
 
 ```c
 bsp/rockchip/common/drivers/pmic/rk816_charger.c
@@ -336,14 +336,14 @@ rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg)
 #define RT_DEVICE_CTRL_CHAGER_SRCCUR_SET    (6) // 设置来自适配器端的输入电流，单位：mA
 ```
 
-### 4.2 配置使能
+### 配置使能
 
 ```
 CONFIG_RT_USING_CHARGER
 CONFIG_RT_USING_CHARGER_RK816
 ```
 
-### 4.3 基础概念
+### 基础概念
 
 - 最大充电电流
 
@@ -373,7 +373,7 @@ CONFIG_RT_USING_CHARGER_RK816
 
   板子上电池端正负极端之间的采样电阻，PMIC通过采样电阻完成电压、电流的采集。通过改变采样电阻的阻值，用户可以扩展充电电流和充电截止电流的档位（放大或缩小）。硬件设计上，通常采用20mR采样电阻。该参数需要在板级配置中进行指定（见后续章节）。
 
-### 4.4 硬件档位
+### 硬件档位
 
 根据采样电阻的阻值不同，用户可以扩展充电电流和充电截止电流的档位（放大或缩小），但是最大充电电压、最大输入电流不受影响。如下是根据寄存器定义顺序列举的硬件档位：
 
@@ -413,7 +413,7 @@ CONFIG_RT_USING_CHARGER_RK816
 - 用户只能通过`rt_device_control()`的方式访问设备，并且只能传递上述列出的具体档位值。例如：100mR采样电阻情况下配置最大充电电流，只有8个档位值可以被传递：200,   240,  280,  320,  360,  400,  450,  480；40mR下也是8个档位值可以被传递：500,   600,  700,  800,  900, 1000, 1125, 1200。
 - 用户不需要通过`rt_device_control()`接口传递采样电阻的阻值。这个阻值需要通过板级配置定义(见后续章节)，rk816_charger.c驱动初始化时会自动去获取该配置。
 
-### 4.5 板级定义
+### 板级定义
 
 用户只需要根据板子的实际硬件设计，在board.c 定义采样电阻的阻值（单位：毫欧）。比如：
 
@@ -424,7 +424,7 @@ struct rk816_charger_platform_data rk816_charger_pdata =
 };
 ```
 
-### 4.6 用户接口
+### 用户接口
 
 上述章节已提到用户需要通过`rt_device_control()`接口访问charger设备，如下给出更详细使用说明：
 
@@ -501,9 +501,9 @@ ret = rt_device_control(device, RT_DEVICE_CTRL_CHAGER_BATCUR_SET, &bat_cur);
 ...
 ```
 
-## 5 Fuel Gauge
+## Fuel Gauge
 
-### 5.1 驱动文件
+### 驱动文件
 
 ```c
 bsp/rockchip/common/drivers/pmic/rk816_fg.c
@@ -514,14 +514,14 @@ components/drivers/pm/fuel_gauge.c
 components/drivers/include/drivers/fuel_gauge.h
 ```
 
-### 5.2 配置使能
+### 配置使能
 
 ```
 RT_USING_PM_FG
 RT_USING_FG_RK816
 ```
 
-### 5.3 板级定义
+### 板级定义
 
 用户需要在board.c 定义电量计相配置信息。比如：
 
@@ -590,11 +590,11 @@ struct rk816_fg_platform_data rk816_fg_pdata =
 
   轮询时间（秒）。电量计驱动需要不停轮询才能正常工作，目前建议 5~10s 比较合适，设置为 5s 最佳。
 
-### 5.4 自初始化
+### 自初始化
 
 开机时电量计驱动会通过`INIT_DEVICE_EXPORT()` 完成自初始化并且创建一个电量计的线程，每隔`monitor_sec` 跑一次电量计算法，更新内部状态。所以用户只要做好板级配置、正常使能驱动即可。
 
-### 5.5 用户接口
+### 用户接口
 
 ```c
 rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg)
@@ -622,7 +622,7 @@ if (device == RT_NULL)
 rt_device_control(device, RT_DEVICE_CTRL_FG_GET, &status);
 ```
 
-### 5.6 调试开关
+### 调试开关
 
 用户如果对电量计功能进行拷机，或者在使用过程发现电量异常等问题，都需要打开电量计的调试开关抓取调试信息。打开调试开关后，电量计驱动每隔`monitor_sec` 就会打印一次电量计的调试信息。
 
@@ -644,9 +644,9 @@ rt_device_control(device, RT_DEVICE_CTRL_FG_GET, &status);
   fg_rk816 1 // 1：使能调试信息  0：关闭
   ```
 
-## 6. NTC Sensor
+## NTC Sensor
 
-### 6.1 驱动文件
+### 驱动文件
 
 ```c
 bsp/rockchip/common/drivers/pmic/rk816_sensor.c
@@ -657,20 +657,20 @@ components/drivers/sensors/sensor.c
 components/drivers/include/drivers/sensor.h
 ```
 
-### 6.2 配置使能
+### 配置使能
 
 ```c
 CONFIG_RT_USING_SENSOR
 CONFIG_RT_USING_SENSOR_RK816
 ```
 
-### 6.3 基础概念
+### 基础概念
 
 电池温度检测原理：电池在不同的温度下有不同的内阻，用户通过某种方式获取到电池阻值后，根据电池规格书上的"温度-阻值"表获即可取对应的电池温度。一般情况下，温度和阻值成反比关系。
 
 RK816内部会提供一个类似恒流源的模块，通过TS脚对电池输出大小固定的电流脉冲，这样在电池端就会产生一定压降。RK816通过TS脚采集电池NTC脚上内阻压降反推出当前电池的阻值，然后根据"温度-阻值"表获取当前电池温度。
 
-### 6.4 板级定义
+### 板级定义
 
 用户需要在board.c 定义电池的NTC配置信息。比如：
 
@@ -693,7 +693,7 @@ struct rk816_sensor_platform_data rk816_sensor_pdata =
 
 上面的`rk816_ntc_table`数据需要从电池规格书中获取，规格书上通常会有电阻温度和内阻的表格数据。
 
-### 6.5 用户接口
+### 用户接口
 
 ```c
 rt_size_t rt_device_read (rt_device_t dev, rt_off_t pos, void *buffer,rt_size_t size);
@@ -718,7 +718,7 @@ res = rt_device_read(dev, 0, &sensor_data, 1);
 ...
 ```
 
-### 6.6 测试命令
+### 测试命令
 
 框架提供了cmd实现：
 
@@ -750,7 +750,7 @@ sensor info              // sensor信息（意义不大）
 sensor read              // 读取温度
 ```
 
-## 7 其他文档
+## 其他文档
 
 《Rockchip_Developer_Guide_RT-Thread_Power_CN.md》
 

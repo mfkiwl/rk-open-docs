@@ -49,7 +49,7 @@ ARM TrustZone technology is a system-wide security approach, for a wide range of
 
  ARM Trusted Firmware and OP-TEE OS [2] are currently used in ARM open source projects of ARM TrustZone technology, they are the underlying firmware open source projects for ARM chips, which can be used together or use alone.
 
-### 1. System architecture
+### System architecture
 
 From system architecture perspective, the following is a 64-bit platform system architecture diagram with ARM TrustZone technology enabled. The system is divided into two worlds: the non- secure world on the left and the secure world on the right. The secure world can access all the resources of the two worlds. The non- secure world can only access the resources of the non- secure world. If the non-secure world accesses the resources of the secure world, an exception such as system hardware bus error will occur, and resources cannot be obtained.
 
@@ -61,7 +61,7 @@ Rockchip Trust can be understood as a collection of features of ARM Trusted Firm
 
 ![Relationship-2](Rockchip_Developer_Guide_Trust/Secure_and_Non_secure_relationship_2.png)
 
-### 2. CPU privilege level
+### CPU privilege level
 
 From the CPU perspective, the following is a standard CPU privilege mode level architecture diagram with ARM TrustZone enabled. If it is a 64-bit CPU, its privilege level is divided into EL0, EL1, EL2, EL3, which is divided into secure EL0, secure EL1 or non-secure EL0, non-secure EL1 according to the world in which the CPU is located. If it is a 32-bit CPU, its privilege level is divided into Mon, Hyp, SVC, ABT, IRQ, FIQ, UND, SYS, USER mode, of which SVC, ABT, IRQ, FIQ, UND, SYS, USER are also like 64 bits, there are security and non-security modes difference.
 
@@ -73,11 +73,11 @@ Rockchip Trust can be understood as features collection of EL3 + Secure EL1.
 
 ## Trust on Rockchip platform
 
-### 1. Implementation Mechanism
+### Implementation Mechanism
 
 Currently, the combination of ARM Trusted Firmware + OP-TEE OS is used on 64-bit SoC platform of Rockchip platform; the OP-TEE OS is used on 32-bit SoC platform.
 
-### 2. Boot-up process
+### Boot-up process
 
 The ARM Trusted Firmware architecture divides the whole system into four secure levels: EL0, EL1, EL2, and EL3. The process phase of the entire secure boot is defined as: BL1, BL2, BL31, BL32, BL33, and the functions of BL1, BL2, and BL31 are provided in the source code of ARM Trusted Firmware itself. The Rockchip platform only uses the functions of BL31. BL1 and BL2 have their own implementations method. So on the Rockchip platform we can also generally "default" ARM Trusted Firmware refers to BL31, while BL32 uses OP-TEE OS.
 
@@ -91,7 +91,7 @@ Maskrom -> Loader -> Trust -> U-Boot -> kernel -> Android
 
 ![Boot-flow](Rockchip_Developer_Guide_Trust/ARM_Trusted_firmware_boot_flow.png)
 
-### 3.Firmware obtain
+### Firmware obtain
 
 Currently only binary files are provided, and source code is not provided. Binary files of Trust are submitted in the U-Boot project.
 
@@ -110,11 +110,11 @@ tools/rk_tools/RKTRUST/
 
 Note: Developers can download the individual rkbin repository which contains the binaries of all platforms.
 
-### 4. Enable DTS
+### Enable DTS
 
-#### 4.1 Kernel 3.10
+#### Kernel 3.10
 
-##### 4.1.1 32 bit platform
+##### bit platform
 
 （1）Add psci node
 
@@ -137,7 +137,7 @@ chosen {
 };
 ```
 
-##### 4.1.2 64 bit platform
+##### bit platform
 
 （1）Add psci node：
 
@@ -188,9 +188,9 @@ cpus {
 };
 ```
 
-#### 4.2 Kernel 4.4+
+#### Kernel 4.4+
 
-##### 4.2.1 32 bit platform
+##### bit platform
 
 Just need to add psci node：
 
@@ -201,7 +201,7 @@ psci {
 };
 ```
 
-##### 4.2.2 64 bit platform
+##### bit platform
 
 （1）Add psci node：
 
@@ -252,7 +252,7 @@ cpus {
 };
 ```
 
-#### 4.3 Kernel Document
+#### Kernel Document
 
 The kernel document provides instructions on psci:
 
@@ -260,25 +260,25 @@ The kernel document provides instructions on psci:
 ./Documentation/devicetree/bindings/arm/psci.txt
 ```
 
-### 5. Running memory and life cycle
+### Running memory and life cycle
 
-#### 5.1 Running memory
+#### Running memory
 
 The ARM Trusted Firmware runs in the space where DRAM start offset is 0M~2M, and 0x10000 (64KB) is used as the program entry address.
 
 The OP-TEE OS runs between 132M and 148M of DRAM start offset (the end address depends on the platform requirements) with 0x08400000 (132M) as the entry address.
 
-#### 5.2 Life cycle
+#### Life cycle
 
 Trust has been resident in memory since it was initialized to complete its mission.
 
-### 6. Security
+### Security
 
 In the first chapter we introduced that after ARM TrustZone is enabled, the system is divided into a secure world and a non-secure world. So on Rockchip platform, how do you distinguish between which firmware the CPU running is in the secure world or the non-secure world? The method is as follows: Loader and Trust run in the secure world; U-Boot, kernel, and Android run in the non-secure world (except for security drivers and APPs).
 
-### 7. Functions
+### Functions
 
-#### 7.1 PSCI（Power State Coordination Interface）
+#### PSCI（Power State Coordination Interface）
 
 Usually, the chips of various SoC vendors have significant differences in IC design, especially the power state management part of CPU. Each SoC vendor has its own set of software processes to manage CPU power state, so this part of code in kernel is fragmented and it is difficult to achieve a high degree of uniformity. Obviously, kernel is very reluctant to maintain the fragmentation status in this respect. Moreover, developers usually are not very concerned about this part of implementation, because this part of the software implementation is closely related to CPU architecture and IC design, it is difficult to fully understand or implement.
 
@@ -318,7 +318,7 @@ SYSTEM_RESET
 ./arch/arm/mach-rockchip/psci.c
 ```
 
-#### 7.2 Secure Monitor
+#### Secure Monitor
 
 Secure Monitor is the bridge between CPU for state transition between the secure world and the non-secure world. The Secure Monitor code is implemented in Trust. Without this part of the code, CPU will not be able to switch between the secure and non-secure state, and ARM TrustZone technology will lose its importance and function.
 
@@ -326,11 +326,11 @@ So how to enter Secure Monitor mode? Need to be implemented by SMC instructions,
 
 > The Secure Monitor Call exception is implemented only as part of the Security Extensions. The Secure Monitor Call instruction, SMC, requests a Secure Monitor function, causing the processor to enter Monitor mode.
 
-#### 7.3 Secure information configuration
+#### Secure information configuration
 
 In addition to the tight integration of Cortex-A processor itself, ARM TrustZone technology needs to be extended in the system through the AMBA AXI bus and the specific TrustZone system IP block. Therefore, a series of related IP module security information needs to be configured, and they are completed in Trust.
 
-#### 7.4 Security data protection
+#### Security data protection
 
 Security data protection. For example: storage protection for related security information such as secure payments, digital rights management (DRM), enterprise services, and web-based services.
 
@@ -338,7 +338,7 @@ Security data protection. For example: storage protection for related security i
 
 At present, the released firmware is only provided with Trust binary files, and the source code is not provided. Currently, there are few debugging methods for Trust. it usually need to use the special jtag tools for analysis. When have Trust issues, customers generally do not have the ability to debug and solve problems by themselves, so please try to protect the scene when issues occur, collect enough information to feed back to the maintainer responsible for Trust. Therefore, users should generally know which is the print information of Trust, the version number corresponding to Trust, and which is PANIC information of Trust.
 
-### 1. Boot log example
+### Boot log example
 
 ```c
 NOTICE:  BL31: v1.3(debug):4c793da
@@ -358,7 +358,7 @@ INFO:    Entry point address = 0x200000
 INFO:    SPSR = 0x3c9
 ```
 
-### 2. Print information identification
+### Print information identification
 
 Except from the printing information during the boot phase, they are usually during running.
 
@@ -374,7 +374,7 @@ OP-TEE OS print format (without time stamp):
 INF [0x0] TEE-CORE: *********
 ```
 
-### 3.Firmware version identification
+### Firmware version identification
 
 ARM Trusted Firmware version: 4c793da。
 
@@ -388,9 +388,9 @@ OP-TEE OS version: 27532f4 (ignoring the front g)
 INF [0x0] TEE-CORE:init_primary_helper:337: Initializing (1.1.0-127-g27532f4 #54 Mon Dec 18 02:01:14 UTC 2017 aarch64)
 ```
 
-### 4. PANIC information identification
+### PANIC information identification
 
-#### 4.1 ARM Trusted Firmware panic
+#### ARM Trusted Firmware panic
 
 ```c
 Unhandled Exception in EL3.
@@ -442,7 +442,7 @@ spsr_abt =      0x0000000000000000
 ......
 ```
 
-#### 4.2 OP-TEE OS panic
+#### OP-TEE OS panic
 
 ```c
 core data-abort at address 0xc121b16c

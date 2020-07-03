@@ -81,19 +81,19 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1  概述
+## 概述
 
 本 SDK支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 2.6，和 Debian 9 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3399Pro EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
 本 SDK 支持 NPU TensorFlow/Caffe 模型、VPU 硬解码、GPU 3D、Wayland 显示、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
-## 2 主要支持功能
+## 主要支持功能
 
 | **功能**    | **模块名** |
 | ----------- | :-------------- |
 | 数据通信      | Wi-Fi、以太网卡、USB、SD 卡、PCI-e 接口  |
 | 应用程序      | 多媒体播放、设置、浏览器、文件管理       |
 
-## 3 SDK 获取说明
+## SDK 获取说明
 
 SDK 通过瑞芯微代码服务器对外发布或者从 [Github](https://github.com/rockchip-linux) 开源网站上获取。其编译开发环境，参考第 7 节 [SDK编译说明](#7 SDK 编译说明)。
 
@@ -160,13 +160,13 @@ cd rk3399pro_linux/
 
 注意: 如果是已立项的项目请优先选择用方法一获取代码，不同于 Github 的是它会经过内部稳定测试和版本控制，方法二更多适用于爱好者和前期项目评估。
 
-## 4 软件开发指南
+## 软件开发指南
 
-### 4.1 开发指南
+### 开发指南
 
 RK3399Pro Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.02-rc3)、Yocto(Thud 2.6) 和 Debian9，为帮助开发工程师更快上手熟悉 SDK的开发调试工作，随 SDK 发布《Rockchip_Developer_Guide_Linux_Software_xx.pdf》。可在 docs/ 目录下获取，并会不断完善更新。
 
-### 4.2 NPU 开发工具
+### NPU 开发工具
 
 本 SDK NPU 开发工具如下：
 
@@ -200,7 +200,7 @@ RKNN API的开发使用在工程目录 external/RKNPUTools 下。
 RK3399Pro的 NPU 软件启动说明，请参考工程目录 docs/Soc_public/RK3399PRO/
 Rockchip_RK3399Pro_Instruction_Linux_NPU_CN.pdf。
 
-### 4.3 软件更新记录
+### 软件更新记录
 
 软件发布版本升级通过工程 xml 进行查看，具体方法如下：
 
@@ -220,7 +220,7 @@ Rockchip_RK3399Pro_Instruction_Linux_NPU_CN.pdf。
 <SDK>/docs/SoC_public/RK3399PRO/RK3399PRO_Linux_SDK_Release_Note.pdf
 ```
 
-## 5 硬件开发指南
+## 硬件开发指南
 
 硬件相关开发可以参考用户使用指南，在工程目录：
 
@@ -228,7 +228,7 @@ Rockchip_RK3399Pro_Instruction_Linux_NPU_CN.pdf。
 <SDK>/docs/Soc_public/RK3399PRO/Rockchip_RK3399Pro_User_Guide_Hardware_xx.pdf
 ```
 
-## 6 SDK 工程目录介绍
+## SDK 工程目录介绍
 
 SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、device、docs、external 等目录。每个目录或其子目录会对应一个 git 工程，提交需要在各自的目录下进行。
 
@@ -249,7 +249,7 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 - u-boot：存放基于 v2017.09 版本进行开发的 U-Boot 代码。
 - yocto：存放基于 YoctoThud 2.6 开发的根文件系统。
 
-## 7 SDK 编译说明
+## SDK 编译说明
 
 Ubuntu 16.04 系统:
 编译 Buildroot 环境搭建所依赖的软件包安装命令如下：
@@ -283,9 +283,9 @@ Rootfs 的 /usr/share/npu_fw 目录下, NPU 固件烧写以及启动方式请参
 
 下面分别对 NPU 和 RK3399Pro 固件编译方法进行介绍：
 
-### 7.1 NPU 编译说明
+### NPU 编译说明
 
-#### 7.1.1 U-boot 编译
+#### U-boot 编译
 
 进入工程 npu/u-boot 目录下执行 make.sh 来获取 rknpu_lion_loader_v1.03.103.bin trust.img uboot.img：
 
@@ -304,7 +304,7 @@ u-boot/
 └── uboot.img
 ```
 
-#### 7.1.2 Kernel 编译步骤
+#### Kernel 编译步骤
 
 进入工程目录根目录执行以下命令自动完成 kernel 的编译及打包：
 
@@ -326,7 +326,7 @@ make ARCH=arm64 rk3399pro_npu_pcie_defconfig
 make ARCH=arm64 rk3399pro-npu-evb-v10-multi-cam.img -j12
 ```
 
-#### 7.1.3 Boot.img 以及 NPU 固件生成步骤
+#### Boot.img 以及 NPU 固件生成步骤
 
 进入工程 npu 目录执行以下命令自动完成 boot.img 的打包：
 RK3399Pro EVB V10/V11/V12 板：
@@ -347,7 +347,7 @@ cd - && cd npu
 ./mkfirmware.sh rockchip_rk3399pro-npu-multi-cam
 ```
 
-#### 7.1.4 全自动编译
+#### 全自动编译
 
 上述 Kernel/U-Boot/Rootfs 各个部分的编译，进入工程目录根目录执行以下命令自动完成所有
 的编译：
@@ -378,9 +378,9 @@ cd ../../
 在 rockdev 目录下生成 boot.img，uboot.img，trust.img，MiniLoaderAll.bin
 注意：rockdev下生成 NPU 固件需要存放在 Rootfs 指定位置/usr/share/npu_fw。
 
-### 7.2 RK3399Pro 编译说明
+### RK3399Pro 编译说明
 
-#### 7.2.1 U-boot 编译
+#### U-boot 编译
 
 进入工程 u-boot 目录下执行 make.sh 来获取 rk3399pro_loader_v1.24.119.bin trust.img
 uboot.img：
@@ -399,7 +399,7 @@ u-boot/
 └── uboot.img
 ```
 
-#### 7.2.2 Kernel 编译步骤
+#### Kernel 编译步骤
 
 进入工程目录根目录执行以下命令自动完成 kernel 的编译及打包：
 RK3399Pro EVB V10 开发板：
@@ -436,7 +436,7 @@ make ARCH=arm64 rk3399pro-evb-v14-linux.img -j12
 
 编译后在 kernel目录生成 boot.img，此 boot.img 就是包含 Kernel 的 Image 和 DTB。
 
-#### 7.2.3 Recovery 编译步骤
+#### Recovery 编译步骤
 
 进入工程目录根目录执行以下命令自动完成 Recovery 的编译及打包：
 RK3399Pro EVB 开发板：
@@ -447,7 +447,7 @@ RK3399Pro EVB 开发板：
 
 编译后在 Buildroot 目录 output/rockchip_rk3399pro_recovery/images 生成 recovery.img。
 
-#### 7.2.4 Buildroot rootfs 及 APP 编译
+#### Buildroot rootfs 及 APP 编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
 RK3399Pro EVB V10/V11/V12 开发板：
@@ -492,7 +492,7 @@ aarch64-linux-gcc --version
 aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
 ```
 
-#### 7.2.5 Debian rootfs 编译
+#### Debian rootfs 编译
 
 ```
  ./build.sh debian
@@ -577,7 +577,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 
 此时会生成 linaro-rootfs.img。
 
-#### 7.2.6 Yocto rootfs 编译
+#### Yocto rootfs 编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
 RK3399Pro EVB 开发板：
@@ -607,7 +607,7 @@ export LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8
 或者参考 [setup-locale-python3]( https://webkul.com/blog/setup-locale-python3) 编译后生成的 image 在 yocto/build/lastest/rootfs.img， 默认用户名登录是 root。
 Yocto 更多信息请参考 [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto)。
 
-#### 7.2.7 全自动编译
+#### 全自动编译
 
 完成上述 Kernel/U-Boot/Recovery/Rootfs 各个部分的编译后，进入工程目录根目录执行以下命
 令自动完成所有的编译：
@@ -680,7 +680,7 @@ export RK_CFG_BUILDROOT=rockchip_rk3399pro_combine
 export RK_CFG_RECOVERY=rockchip_rk3399pro_recovery
 ```
 
-#### 7.2.8 固件的打包
+#### 固件的打包
 
 上面 Kernel/U-Boot/Recovery/Rootfs 各个部分的编译后，进入工程目录根目录执行以下命令自
 动完成所有固件打包到 rockdev 目录下：
@@ -691,7 +691,7 @@ export RK_CFG_RECOVERY=rockchip_rk3399pro_recovery
 ./mkfirmware.sh
 ```
 
-## 8 刷机说明
+## 刷机说明
 
 目前 RK3399Pro EVB 有 V10/V11/V12/V13/V14，5个版本，绿色板子是 V10 版本，黑色板子
 是 V11/V12/V13/V14 版本。板子功能位置是一样，下面以 RK3399Pro EVB V14 板子做介绍，如下
@@ -699,7 +699,7 @@ export RK_CFG_RECOVERY=rockchip_rk3399pro_recovery
 
 ![RK3399Pro-V14](resources/RK3399Pro-V14.png)
 
-### 8.1 Windows 刷机说明
+### Windows 刷机说明
 
 SDK 提供 Windows 烧写工具(工具版本需要 V2.55 或以上)，工具位于工程根目录：
 
@@ -720,7 +720,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 <SDK>/tools/windows/DriverAssitant_v4.8.zip
 ```
 
-### 8.2 Linux 刷机说明
+### Linux 刷机说明
 
 Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.33 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
@@ -750,7 +750,7 @@ sudo ./upgrade_tool uf rockdev/update.img
 ./rkflash.sh
 ```
 
-### 8.3 系统分区说明
+### 系统分区说明
 
 默认分区说明 ( 下面是 RK3399Pro EVB 分区参考）
 
@@ -776,9 +776,9 @@ sudo ./upgrade_tool uf rockdev/update.img
 - rootfs 分区：供 buildroot、debian 或 yocto 编出来的 rootfs.img。
 - userdata 分区：供 APP 临时生成文件或给最终用户使用，挂载在 /userdata 目录下。
 
-## 9 RK3399Pro SDK 固件及简单 Demo 测试
+## RK3399Pro SDK 固件及简单 Demo 测试
 
-### 9.1 RK3399Pro SDK 固件
+### RK3399Pro SDK 固件
 
 RK3399PRO_LINUX_SDK_V1.3.0_20200324 固件下载链接如下
 （包含 Buildroot/Debian 9/Yocto 的固件）
@@ -795,7 +795,7 @@ Debian 9:
 Yocto:
 [适配所有板子](https://eyun.baidu.com/s/3hte6jjA)
 
-### 9.2 RKNN_DEMO 测试
+### RKNN_DEMO 测试
 
 首先插入 usb camera，
 然后在 Buildroot 系统中运行 rknn_demo 或 Debian 系统中运行 test_rknn_demo.sh。
@@ -824,19 +824,19 @@ D RKNNAPI: ==============================================
 
 ![rknn-demo](resources/rknn-demo.png)
 
-### 9.3 N4 Camera 测试
+### N4 Camera 测试
 
 首先接入 N4 Camera 模块（需要接入 12V 电源）， 然后在 Buildroot 系统中直接打开 Camera 应用或在 Debian 系统中运行 test_camera-rkisp1.sh。
 在 Buildroot中运行结果如下：(没有接入具体Camera Sensor)
 
 ![n4](resources/n4.png)
 
-## 10 SSH 公钥操作说明
+## SSH 公钥操作说明
 
 请根据《Rockchip SDK 申请及同步指南》文档说明操作，生成 SSH 公钥，发邮件至fae@rock-chips.com，申请开通 SDK 代码。
 该文档会在申请开通权限流程中，释放给客户使用。
 
-### 10.1 多台机器使用相同 SSH 公钥
+### 多台机器使用相同 SSH 公钥
 
 在不同机器使用，可以将你的 SSH 私钥文件 id_rsa 拷贝到要使用的机器的 “~/.ssh/id_rsa” 即
 可。
@@ -860,7 +860,7 @@ Agent admitted failture to sign using the key
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 10.2 一台机器切换不同 SSH 公钥
+### 一台机器切换不同 SSH 公钥
 
 可以参考 ssh_config 文档配置 SSH。
 
@@ -882,13 +882,13 @@ ssh-add ~/.ssh/id_rsa
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 10.3 密钥权限管理
+### 密钥权限管理
 
 服务器可以实时监控某个 key 的下载次数、IP  等信息，如果发现异常将禁用相应的 key 的下
 载权限。
 请妥善保管私钥文件。并不要二次授权与第三方使用。
 
-### 10.4 参考文档
+### 参考文档
 
 更多详细说明，可参考文档 sdk/docs/RKTools manuals/Rockchip SDK Kit 申请指南 V1.6-
 201905.pdf。

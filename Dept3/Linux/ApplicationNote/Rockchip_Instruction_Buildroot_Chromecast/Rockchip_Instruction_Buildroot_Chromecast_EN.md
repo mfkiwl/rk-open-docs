@@ -61,15 +61,15 @@ Software development engineers
 [TOC]
 ---
 
-## 1 Introduction
+## Introduction
 
 Chromecast is a line of digital media players developed by Google. The devices enable users to cast streamed audio-visual content to any Chromecast receiver that support Google Cast technology (such as Google Chromecast devices).
 
 The latest Rockchip Buildroot SDK provides Chromecast sender support through open source python packages such as pychromecast and mkchromecast.
 
-## 2 Usage
+## Usage
 
-### 2.1 pychromecast
+### pychromecast
 
 Currently, pychromecast is the most popular open source Chromecast protocol (v2) implementation software package, supporting device discovery, playback control, program control and other functions.
 
@@ -122,7 +122,7 @@ MediaStatus(current_time=42.458322, content_id='http://commondatastorage.googlea
 
 [^Note]: Please refer to official introduction for details <https://github.com/balloob/pychromecast>
 
-### 2.2 mkchromecast
+### mkchromecast
 
 mkchromecast is the most popular open source Chromecast application currently. It provides Chromecast casting with UI (such as control menu) based on pychromecast and pyqt.
 

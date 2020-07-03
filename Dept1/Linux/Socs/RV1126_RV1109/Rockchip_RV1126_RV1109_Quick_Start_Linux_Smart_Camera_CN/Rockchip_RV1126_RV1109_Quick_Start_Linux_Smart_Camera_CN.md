@@ -77,7 +77,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1  开发环境搭建
+## 开发环境搭建
 
 ### 命令提示约定
 
@@ -110,7 +110,7 @@ Ubuntu 17.04系统：
 Server $ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 ```
 
-## 2 SDK目录结构说明
+## SDK目录结构说明
 
 进入工程目录下有buildroot、app、kernel、u-boot、device、docs、external等目录。每个目录或其子目录会对应一个git工程，提交需要在各自的目录下进行。
 
@@ -126,9 +126,9 @@ Server $ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 - tools：存放一些常用工具。
 - u-boot：U-Boot代码。
 
-## 3 SDK编译说明
+## SDK编译说明
 
-### 3.1 切换CAMERA产品配置
+### 切换CAMERA产品配置
 
 在根目录执行命令：./build.sh BoardConfig-uvcc.mk
 
@@ -138,7 +138,7 @@ processing option: BoardConfig-uvcc.mk
 switching to board: /disk3/huangjc/SDK_Linux/rv1109/device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk
 ```
 
-### 3.2 查看编译命令
+### 查看编译命令
 
 在根目录执行命令：./build.sh -h|help
 
@@ -182,7 +182,7 @@ Server $ make ARCH=arm rv1126_defconfig
 Server $ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
-### 3.3 U-Boot编译
+### U-Boot编译
 
 U-Boot编译命令：`./build.sh uboot`
 
@@ -194,7 +194,7 @@ Server $ cd u-boot
 Server $ ./make.sh rv1126
 ```
 
-### 3.4 Kernel编译
+### Kernel编译
 
 Kernel编译命令：`./build.sh kernel`
 
@@ -207,7 +207,7 @@ Server $ make ARCH=arm rv1126_defconfig
 Server $ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ```
 
-### 3.5 Recovery编译
+### Recovery编译
 
 Recovery编译命令：`./build.sh recovery`
 
@@ -219,7 +219,7 @@ Server $ source envsetup.sh rockchip_rv1126_rv1109_recovery
 Server $ /home/user/sdk/device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
 ```
 
-### 3.6 Rootfs编译
+### Rootfs编译
 
 Rootfs编译命令：`./build.sh rootfs`
 
@@ -231,13 +231,13 @@ Server $ source envsetup.sh rockchip_rv1126_rv1109_uvcc
 Server $ make
 ```
 
-### 3.7 固件打包
+### 固件打包
 
 固件打包命令：`./mkfirmware.sh`
 
 固件目录：rockdev
 
-### 3.8全自动编译
+### 全自动编译
 
 进入工程根目录执行以下命令自动完成所有的编译：
 
@@ -245,21 +245,21 @@ Server $ make
 ./build.sh all
 ```
 
-## 4 刷机说明
+## 刷机说明
 
-### 4.1 EVB板正面示意图
+### EVB板正面示意图
 
 ![](resources/EVB-front-view.jpg)
 
-### 4.2 EVB板背面示意图
+### EVB板背面示意图
 
 ![](resources/EVB-back-view.jpg)
 
-### 4.3 硬件接口功能表
+### 硬件接口功能表
 
 ![](resources/EVB-function-interface.png)
 
-### 4.4 Windows 刷机说明
+### Windows 刷机说明
 
 SDK 提供 Windows 烧写工具(工具版本需要 V2.71 或以上)，工具位于工程根目录：
 
@@ -280,7 +280,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 <SDK>/tools/windows/DriverAssitant_v4.91.zip
 ```
 
-### 4.5 Linux 刷机说明
+### Linux 刷机说明
 
 Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.49 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
@@ -309,7 +309,7 @@ Server $ sudo ./upgrade_tool uf rockdev/update.img
 Server $ ./rkflash.sh
 ```
 
-## 5 EVB板功能说明
+## EVB板功能说明
 
 EVB板TV Camera固件支持如下功能：
 
@@ -320,7 +320,7 @@ EVB板TV Camera固件支持如下功能：
 - 支持智能电视或PC等多种终端设备预览
 - 支持EPTZ
 
-### 5.1 如何显示主camera预览
+### 如何显示主camera预览
 
 使用usb线连接evb的usb otg口与上位机，如TV端或PC端usb host 口，上电开机。默认会自动启动uvc camera应用及rndis服务。使用串口连上EVB板子运行**ifconfig usb0**可获取**预配置的RNDIS 虚拟网口IP地址**。
 
@@ -349,7 +349,7 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 
 ![](resources/uvc_camera_open.jpg)
 
-### 5.2 如何测试AI模型后处理
+### 如何测试AI模型后处理
 
 在电视端打开RKAICameraTest应用，看到预览后点击RNDIS按钮连接RNDIS，成功后点击SETTINGS按钮选择“模型算法切换”选项，选择要使用的模型算法，默认为人脸检测算法，然后点击“AI后处理开关”，当人脸在镜头前出现即可看到AI处理效果：
 
@@ -357,13 +357,13 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 
 ![](resources/uvc_camera_setting.jpg)
 
-### 5.3 如何测试EPTZ功能
+### 如何测试EPTZ功能
 
 在电视端打开RKAICameraTest应用，看到预览后点击RNDIS按钮连接RNDIS，成功后点击SETTINGS按钮选择“EPTZ模式切换”选项，在倒计时完成后，再打开应用即可，此时在界面左上角会显示是EPTZ模型还是普通智能预览模式：
 
 ![](resources/uvc_camera_eptz.jpg)
 
-## 6 应用软件框架
+## 应用软件框架
 
 总体结构如下：
 
@@ -377,7 +377,7 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 >
 > **3.uvc app 对应<SDK>/external/uvc_app:：负责uvc camera完整功能的实现和控制。**
 
-### 6.1 uvc_app
+### uvc_app
 
 请参考：
 
@@ -385,7 +385,7 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 <SDK>/external/uvc_app/doc/zh-cn/uvc_app.md
 ```
 
-### 6.2 mediaserver
+### mediaserver
 
 请参考：
 
@@ -393,7 +393,7 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 <SDK>/docs/Linux/AppcationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
 ```
 
-### 6.3 其它
+### 其它
 
 其它linux应用框架或模块资料，请参考下列目录对应文档：
 
@@ -401,9 +401,9 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 <SDK>/docs/Linux/
 ```
 
-## 7  FAQ
+## FAQ
 
-### 7.1 如何重编一个模块
+### 如何重编一个模块
 
 以mpp模块为例，重编可以使用：
 
@@ -411,7 +411,7 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 make mpp-rebuild
 ```
 
-### 7.2 使用gdb调试
+### 使用gdb调试
 
 打开buildroot的gdb配置，然后重新编译打包文件系统
 

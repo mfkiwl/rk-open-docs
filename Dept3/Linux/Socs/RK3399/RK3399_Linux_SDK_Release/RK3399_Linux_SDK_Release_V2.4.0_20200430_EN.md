@@ -77,18 +77,18 @@ Software development engineers
 [TOC]
 ---
 
-## 1  Overview
+## Overview
 
 This SDK is based on Buildroot 2018.02-rc3, Yocto Thud 2.6, Debian 9 and Debian 10 or later version with kernel 4.4 and U-boot v2017.09. It is suitable for RK3399 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, Qt and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
 
-## 2 Main Functions
+## Main Functions
 
 | **Functions** | **Module Name** |
 | ----------- | :-------------- |
 | Data Communication | Wi-Fi, Ethernet Card, USB, SDCARD, PCI-e |
 | Applications | Multimedia playback, settings, browser, file management |
 
-## 3 How to Get the SDK
+## How to Get the SDK
 
 SDK is released by Rockchip server or got from [Github](https://github.com/rockchip-linux)  open source website. Please refer to Chapter 7 [SDK Building Introduciton](## 7 SDK Building Introduction) to build a development environment.
 
@@ -155,13 +155,13 @@ Synchronize the whole project:
 
 Note: If your project has already started, please choose the first method to get the code first. Unlike Github, it has passed by internal stress testing and version control. The second method is more suitable for enthusiasts and project evaluation.
 
-## 4 Software Development Guide
+## Software Development Guide
 
-### 4.1 Development Guide
+### Development Guide
 
 The Kernel version of RK3399 Linux SDK Kernel is Linux4.4, Rootfs is  Buidlroot(2018.02-rc3), Yocto(Thud 2.6) or Debian9/10 respectively. To help engineers quick start of SDK development and debugging, “Rockchip_Developer_Guide_Linux_Software_EN” is released with the SDK. It can be obtained in the docs/ directory and will be continuously updated.
 
-### 4.2 Software Update History
+### Software Update History
 
 Software release version upgrade can be checked through project xml file by the following command:
 
@@ -181,7 +181,7 @@ Or refer to the project directory:
 <SDK>/docs/SoC_public/RK3399/RK3399_Linux_SDK_Release_Note.txt
 ```
 
-## 5 Hardware Development Guide
+## Hardware Development Guide
 
 Please refer to user guides in the project directory for hardware development:
 
@@ -197,7 +197,7 @@ RK3399 IND industry board hardware development guide:
 <SDK>/docs/Soc_public/RK3399/Rockchip_RK3399_User_Manual_Sapphire_EVB_V3.0_CN.pdf
 ```
 
-## 6 SDK Project Directory Introduction
+## SDK Project Directory Introduction
 
 There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, external and other directories in the project directory. Each directory or its sub-directories will correspond to a git project, and the commit should be done in the respective directory.
 
@@ -218,7 +218,7 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 - u-boot: store U-Boot code developed based on v2017.09 version.
 - yocto: stores the root file system developed based on YoctoThud 2.6.
 
-## 7 SDK Building Introduction
+## SDK Building Introduction
 
 **Ubuntu 16.04 system:**
 Please install software packages with below commands to setup Buildroot building environment:
@@ -241,7 +241,7 @@ sudo apt-get install lib32gcc-7-dev g++-7 libstdc++-7-dev
 
 It is recommended to use Ubuntu 18.04 system or higher version for development. If you encounter an error during building, you can install the corresponding software packages according to the error message.
 
-### 7.1 U-boot Building
+### U-boot Building
 
 Enter project u-boot directory and run `make.sh` to get rk3399_loader_v1.24.224.bin trust.img and
 uboot.img.
@@ -267,7 +267,7 @@ u-boot/
 └── uboot.img
 ```
 
-### 7.2 Kernel Building Steps
+### Kernel Building Steps
 
 Enter project root directory and run the following command to automatically build and package kernel:
 
@@ -305,7 +305,7 @@ make ARCH=arm64 rk3399-firefly-linux.img -j12
 
 The boot.img includes image and DTB of kernel will be generated after building in the kernel directory.
 
-### 7.3 Recovery Building Steps
+### Recovery Building Steps
 
 Enter project root directory and execute the following command to automatically complete building and packaging of Recovery
 
@@ -323,9 +323,9 @@ SDK$make recovery-rebuild
 SDK$./build.sh recovery
 ```
 
-### 7.4 Buildroot Building
+### Buildroot Building
 
-#### 7.4.1 Buildroot Rootfs Building
+#### Buildroot Rootfs Building
 
 Enter project root directory and execute the following commands to automatically complete building and packaging of Rootfs.
 
@@ -353,7 +353,7 @@ When the following log is printed, configuration is successful:
 aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
 ```
 
-#### 7.4.2 Build Modules in Buildroot
+#### Build Modules in Buildroot
 
 Take the frequently used building commands for qplayer module for example:
 
@@ -383,7 +383,7 @@ or
 SDK$rm -rf /buildroot/output/rockchip_rk3399/build/qlayer-1.0
 ```
 
-### 7.5 Debian 9 Building
+### Debian 9 Building
 
 ```
  ./build.sh debian
@@ -468,7 +468,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 
 The linaro-rootfs.img will be generated.
 
-### 7.6 Debian 10 Building
+### Debian 10 Building
 
 ```
 ./build.sh distro
@@ -490,7 +490,7 @@ Please refer to the following document for more introductions about Debian10.
 <SDK>/docs/Linux/ApplicationNote/Rockchip_Debian10_Developer_Guide_CN.pdf
 ```
 
-### 7.7 Yocto  Building
+### Yocto  Building
 
 Enter project root directory and execute the following commands to automatically complete building and packaging Rootfs.
 
@@ -518,7 +518,7 @@ export LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8
 
 Or refer to [setup-locale-python3]( https://webkul.com/blog/setup-locale-python3).The image generated after building is located in “yocto/build/lastest/rootfs.img”.The default login user name is root, please refer to [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto) for more detailed information of Yocto.
 
-### 7.8 Full Automatic Building
+### Full Automatic Building
 
 After building various parts of Kernel/U-Boot/Rootfs above, enter root directory of project directory and execute the following commands to automatically complete all building:
 
@@ -590,7 +590,7 @@ export RK_CFG_BUILDROOT=rockchip_rk3399
 export RK_CFG_RECOVERY=rockchip_rk3399_recovery
 ```
 
-### 7.9  Firmware Package
+### Firmware Package
 
 After building various parts of Kernel/Uboot/Recovery/Rootfs above, enter root directory of project directory and execute the following command to automatically complete all firmware packaged into rockdev directory:
 
@@ -600,7 +600,7 @@ Firmware Generation:
 ./mkfirmware.sh
 ```
 
-## 8 Upgrade Introduciton
+## Upgrade Introduciton
 
  Interfaces layout of RK3399 excavator are showed as follows:
 
@@ -610,7 +610,7 @@ Interfaces layout of RK3399 IND industry board are showed as follows:
 
 ![RK3399-INDEN](resources/RK3399-INDEN.png)
 
-### 8.1 Windows Upgrade Introduction
+### Windows Upgrade Introduction
 
 SDK provides windows upgrade tool (this tool should be V2.55 or later version) which is located in project root directory:
 
@@ -629,7 +629,7 @@ Note: before upgrade, please install the latest USB driver, which is in the belo
 <SDK>/tools/windows/DriverAssitant_v4.8.zip
 ```
 
-### 8.2 Linux Upgrade Introduction
+### Linux Upgrade Introduction
 
 The Linux upgrade tool (Linux_Upgrade_Tool should be v1.33 or later versions) is located in “tools/linux” directory. Please make sure your board is connected to MASKROM/loader rockusb, if the generated firmware is in rockdev directory, upgrade commands are as below:
 
@@ -659,7 +659,7 @@ Or in root directory, run the following command on your device to upgrade in MAS
 ./rkflash.sh
 ```
 
-### 8.3 System Partition Introduction
+### System Partition Introduction
 
 Default partition introduction (below is RK3399 IND reference partition):
 
@@ -685,7 +685,7 @@ Default partition introduction (below is RK3399 IND reference partition):
 - rootfs partition: store rootfs.img built from buildroot or debian.
 - userdata partition: store files temporarily generated by APP or for users, mounted in /userdata directory
 
-## 9 RK3399 SDK Firmware
+## RK3399 SDK Firmware
 
 RK3399_LINUX_SDK_V2.4.0_20200430 firmware download address is as follows (including  Buildroot/Debian 9/Debian 10/Yocto firmwares):
 
@@ -710,12 +710,12 @@ RK3399_LINUX_SDK_V2.4.0_20200430 firmware download address is as follows (includ
 [Debian9](https://eyun.baidu.com/s/3jKkicsu)
 [Debian10](https://eyun.baidu.com/s/3kWCpXB5)
 
-## 10 SSH Public Key Operation Introduction
+## SSH Public Key Operation Introduction
 
 Please follow the introduction in the “Rockchip SDK Application and Synchronization Guide” to generate an SSH public key and send the email to fae@rock-chips.com, applying for permission to download SDK code.
 This document will be released to customers during the process of applying for permission.
 
-### 10.1 Multi-device Use the Same SSH Public Key
+### Multi-device Use the Same SSH Public Key
 
 If the same SSH public key should be used in different devices, you can copy the SSH private key file id_rsa to “~/.ssh/id_rsa” of the device you want to use.
 
@@ -739,7 +739,7 @@ Enter the following command in console to solve:
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 10.2 Switch Different SSH Public Keys on the Same Device
+### Switch Different SSH Public Keys on the Same Device
 
 You can configure SSH according to the ssh_config documentation.
 
@@ -760,13 +760,13 @@ As shown in the figure, SSH uses the file “~/.ssh1/id_rsa” of another direct
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 10.3 Key Authority Management
+### Key Authority Management
 
 Server can monitor download times and IP information of a key in real time. If an abnormality is found, download permission of the corresponding key will be disabled.
 
 Keep the private key file properly. Do not grant second authorization to third parties.
 
-### 10.4 Reference Documents
+### Reference Documents
 
 For more details, please refer to document “sdk/docs/RKTools manuals/Rockchip SDK Kit Application GuideV1.6-201905.pdf”.
 

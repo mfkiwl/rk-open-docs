@@ -79,7 +79,7 @@ Software development engineers
 
 ---
 
-## 1. Parameter Preview
+## Parameter Preview
 
 The parameter file is mainly used to define partition table. It can support two partition formats: GPT partition and legacy CMDLINE partition. There will be some differences in the contents of parameter files for different projects and different platforms.
 
@@ -124,9 +124,9 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 - Define UUID for system or rootfs, For example: **"uuid:system=af01642c-9b84-11e8-9b2a-234eb5e198a0"**
 - Parameter files will not be burned into NVM (EMMC, NAND, etc.), and only mtdparts partition definitions and UUIDs will be used. Other informations are only defined for compatibility with upgrade tools.
 
-## 2. Details Information
+## Details Information
 
-### 2.1 FIRMWARE_VER:9.0
+### FIRMWARE_VER:9.0
 
 | Item        | FIRMWARE_VER                                                 |
 | ----------- | ------------------------------------------------------------ |
@@ -134,7 +134,7 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 | value       | 0 - 255                                                      |
 | description | The firmware version will be used as packaging updata.img, and the upgrade tool will identify the firmware version based on this code. |
 
-### 2.2 MACHINE_MODEL:RK3326
+### MACHINE_MODEL:RK3326
 
 | Item        | MACHINE_MODEL                                                |
 | ----------- | ------------------------------------------------------------ |
@@ -142,7 +142,7 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 | Length(max) | 255                                                          |
 | description | Machine model, use for package updata.img, you can modify it for display  in upgrade tool according to different projects, which also determine whether the firmware matches correctly device as upgrading firmware in recovery. |
 
-### 2.3 MACHINE_ID:007
+### MACHINE_ID:007
 
 | Item        | MACHINE_ID                                                   |
 | ----------- | ------------------------------------------------------------ |
@@ -150,7 +150,7 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 | Length(max) | 255                                                          |
 | description | The Product development ID, which consists of characters and numbers, use for package updata.img. There are different IDs in different projects,  which can be used to identify machine models. Also, determine if the firmware matches correctly  device as upgrading firmware in recovery. |
 
-### 2.4 MANUFACTURER:rk3326
+### MANUFACTURER:rk3326
 
 | Item        | MANUFACTURER                                                 |
 | ----------- | ------------------------------------------------------------ |
@@ -158,7 +158,7 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 | Length(max) | 255                                                          |
 | description | Vendor information, which use to package updata.img, can be modified by yourself for the upgrade tool display. |
 
-### 2.5 MAGIC:0x5041524B
+### MAGIC:0x5041524B
 
 | Item        | MAGIC                                                        |
 | ----------- | ------------------------------------------------------------ |
@@ -166,7 +166,7 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 | Value       | 0x5041524B(fix)                                              |
 | description | Magic number can not be modified. Some new APs use DTS instead of magic number. But for compatibility, please do not delete or modify. |
 
-### 2.6 ATAG:0x60000800
+### ATAG:0x60000800
 
 | Item        | ATAG                                                         |
 | ----------- | ------------------------------------------------------------ |
@@ -174,7 +174,7 @@ The main differences between GPT partition and legacy CMDLINE partition are：
 | value       | 32 bits ddr address                                          |
 | description | ATAG data stroage address. Some new APs use DTS instead of this. But for compatibility, please do not delete or modify. |
 
-### 2.7 MACHINE:3226
+### MACHINE:3226
 
 | Item        | MACHINE                                                      |
 | ----------- | ------------------------------------------------------------ |
@@ -194,7 +194,7 @@ The following table lists the values for several Chipset:
 | RK3399  | 3399    |
 | RK3308  | 3308    |
 
-### 2.8 CHECK_MASK:0x80
+### CHECK_MASK:0x80
 
 | Item        | MACHINE_MODEL                      |
 | ----------- | ---------------------------------- |
@@ -202,11 +202,11 @@ The following table lists the values for several Chipset:
 | Length(max) | 0x80(fix)                          |
 | description | Reserved, please do not modify it. |
 
-### 2.9 TYPE:GPT
+### TYPE:GPT
 
 This code specify the partition defined in the file CMDLINE for the upgrade Tool to create GPT and write to NVM（NAND，EMMC，etc.） storage devices instead of the parameter file.
 
-### 2.10 CMDLINE：
+### CMDLINE：
 
 "console=ttyFIQ0 androidboot.console=ttyFIQ0"，which is serial port definition。
 
@@ -259,7 +259,7 @@ The last partition needs to specify parameter "grow" , the tool will allocate th
 
 Note:  Using NAND FLASH, The address 0x40 may write with the loader image，its share 0-4MB space with the parameter, and the valid data will not be overwritten.
 
-## 3. Partition Definition Specification
+## Partition Definition Specification
 
 1. All partitions which are written by bootrom, pre-loader, uboot and trust must be palced before recovery partition.
 2. Any new partitions added by the customer,  which are written by the pre-loader, uboot and trust, should be placed before the recovery partition;

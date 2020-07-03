@@ -169,7 +169,7 @@ usb_uvc_en
 
 `/tmp/.usb_config` is a copy file of `/etc/init.d/.usb_config`. After booting, S50usbdevice will copy the `/etc/init.d/.usb_config` to `/tmp` which is a ram space and could be modified at any time. When you need to modify USB function in the running state, you can modify this file and reset USB function by `/etc/init.d/S50usbdevice restart`.
 
-#### 2.2.1 ADB (Android Debug Bridge)
+#### ADB (Android Debug Bridge)
 
 ADB is a versatile command line debugging tool that can be used for file transfer, Unix Shell login and other functions.
 
@@ -197,7 +197,7 @@ sudo adb devices
 
 In Windows system, ADB driver need to be installed, `adb devices` need to run as an administrator if necessary.
 
-#### 2.2.2 UAC (USB Audio Class)
+#### UAC (USB Audio Class)
 
 UAC implements the function of audio transmission between Device and Host for Host devices through USB virtual standard PCM interface.
 
@@ -270,7 +270,7 @@ Click on `Device properties->Additional device properties`, select item `Listen`
 
 In this way you will hear the test audio from the speaker of your PC.
 
-#### 2.2.3 RNDIS (Remote Network Driver Interface Specification)
+#### RNDIS (Remote Network Driver Interface Specification)
 
 RNDIS provides network interface specifications based on USB. Data interaction between Device and Host can be done by network commands (like SSH, etc.).
 
@@ -318,7 +318,7 @@ Now, you can use ping command on Device or Host to communicate with each other.
 
 **Note**: IPV4 address is assigned automatically and successfully without manual assignment under Windows.
 
-#### 2.2.4 MTP (Media Transfer Protocol)
+#### MTP (Media Transfer Protocol)
 
 MTP is a media file transfer protocol proposed by Microsoft, which can conveniently share media files between Device and Host.
 
@@ -339,7 +339,7 @@ Then you will see the "--- MODEL ---" device on the PC, which is the same in Lin
 
 **Note**: The MTP attribute name can be modified in buildroot/package/rockchip/mtp, please refer to the patch. The /userdata directory is shared by default.
 
-#### 2.2.5 UMS (USB Mass Storage)
+#### UMS (USB Mass Storage)
 
 UMS provides large-capacity external storage for Host devices.
 
@@ -383,7 +383,7 @@ All above operations can be configured in Buildroot in this path: Target package
 
 ![UMS Config](resources/UMS_Config.png)
 
-#### 2.2.6 ACM (CDC - ACM: Communication Device Class - Abstract Control Model)
+#### ACM (CDC - ACM: Communication Device Class - Abstract Control Model)
 
 It can be understood as a USB virtual serial port, and generates TTY devices both in Device and Host.
 
@@ -403,7 +403,7 @@ echo test > /dev/ttyACM0
 cat /dev/ttyGS0 #to get test output
 ~~~
 
-#### 2.2.7 UVC (USB Video Class)
+#### UVC (USB Video Class)
 
 UVC function requires UVC application to start normally. A test demo (`uvc_app`) is provided in Buildroot, and the corresponding compilation switch needs to be turned on in Buildroot.
 

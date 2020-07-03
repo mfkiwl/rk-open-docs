@@ -70,12 +70,12 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1  概述
+## 概述
 
 本SDK基于 Buildroot 2018.02-rc3开发，内核基于 Kernel 4.19，引导基于 U-boot v2017.09，适配 RV1126/RV1109 EVB 开发板及基于此开发板进行二次开发的版型。
 开发包适用但不限于电视AI camera产品，提供灵活的数据通路组合接口，满足客户自由组合的客制化需求。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
-## 2 SDK 获取说明
+## SDK 获取说明
 
 SDK通过瑞芯微代码服务器对外发布获取。其编译开发环境，参考第 3节 [软件开发指南](## 3 软件开发指南)。
 
@@ -109,7 +109,7 @@ cd rv1109
 
 后续开发者可根据 FAE 窗口定期发布的更新说明，通过 “.repo/repo/repo sync -c”命令同步更新。
 
-## 3 软件开发指南
+## 软件开发指南
 
 软件相关开发可以参考工程目录下的快速入门文档：
 
@@ -117,7 +117,7 @@ cd rv1109
 <SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_Smart_Camera_CN.pdf
 ```
 
-## 4 硬件开发指南
+## 硬件开发指南
 
 硬件相关开发可以参考工程目录下的用户使用指南文档：
 
@@ -125,12 +125,12 @@ cd rv1109
 <SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
 ```
 
-## 5 SSH 公钥操作说明
+## SSH 公钥操作说明
 
 请根据《Rockchip SDK 申请及同步指南》文档说明操作，生成 SSH 公钥，发邮件至fae@rock-chips.com，申请开通 SDK 代码。
 该文档会在申请开通权限流程中，释放给客户使用。
 
-### 5.1 多台机器使用相同 SSH 公钥
+### 多台机器使用相同 SSH 公钥
 
 在不同机器使用，可以将你的 SSH 私钥文件 id_rsa 拷贝到要使用的机器的 “~/.ssh/id_rsa” 即
 可。
@@ -154,7 +154,7 @@ Agent admitted failture to sign using the key
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 5.2 一台机器切换不同 SSH 公钥
+### 一台机器切换不同 SSH 公钥
 
 可以参考 ssh_config 文档配置 SSH。
 
@@ -176,12 +176,12 @@ ssh-add ~/.ssh/id_rsa
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 5.3 密钥权限管理
+### 密钥权限管理
 
 服务器可以实时监控某个 key 的下载次数、IP  等信息，如果发现异常将禁用相应的 key 的下
 载权限。
 请妥善保管私钥文件。并不要二次授权与第三方使用。
 
-### 5.4 参考文档
+### 参考文档
 
 更多详细说明，可参考文档 <SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf。

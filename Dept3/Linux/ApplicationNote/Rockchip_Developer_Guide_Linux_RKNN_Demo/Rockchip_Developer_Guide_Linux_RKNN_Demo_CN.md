@@ -80,17 +80,17 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 RKNN Demo 运行
+## RKNN Demo 运行
 
-### 1.1 概述
+### 概述
 
 RKNN Demo模块配置目录位于“<SDK>/buildroot/package/rockchip/rknn_demo”，代码位于“<SDK>/external/rknn_demo”。主要实现通过usb camera采集图像，送到NPU进行处理，并通过minigui显示相关结果。当前支持的模型为mobilenet_ssd。
 
-### 1.2 Buildroot中配置
+### Buildroot中配置
 
 SDK中默认已将需要配置使能，主要依赖的有rga和usbcamera。如果未开启，请到Buildroot中查看相关config的历史修改。因为rk1808和rk3399pro的rknn的接口和使用的模型不同，所以在配置文件中，会根据芯片型号进行配置，主要依据的为：BR2_PACKAGE_RK1808和BR2_PACKAGE_RK3399PRO。代码中会使用到宏“NEED_RKNNAPI”，如果是rk1808，则值为0，rk3399pro值为1。
 
-### 1.3 NPU相关
+### NPU相关
 
 SDK中，相关模型文件已经默认编译到板子中。对应的文件宏和目录为：
 
@@ -102,7 +102,7 @@ SDK中，相关模型文件已经默认编译到板子中。对应的文件宏�
 
 模型运行起来前，请确保相关文件存在。
 
-### 1.4 编译和运行
+### 编译和运行
 
 可以在SDK目录中，通过命令make rknn_demo进行模块编译，会生成rknn_demo执行文件。
 拷贝到板子上，确保USB Camera已经插入，直接运行rknn_demo命令即可。
@@ -112,9 +112,9 @@ SDK中，相关模型文件已经默认编译到板子中。对应的文件宏�
 
 ![rknn demo](resources/rknn_demo.png)
 
-## 2 RKNN Demo开发
+## RKNN Demo开发
 
-### 2.1 文件目录介绍
+### 文件目录介绍
 
 Config.in为配置文件，rknn_demo.mk为基本编译文件，资源的拷贝就是在这做的。具体命令可以查看RKNN_DEMO_INSTALL_TARGET_CMDS。
 src/为代码目录，在src目录下，CMakeLists.txt为编译文件。可以在RKNN_DEMO_SRC中添加自己的文件进行编译。
@@ -123,9 +123,9 @@ src/rknn/ssd为ssd相关处理文件。ssd.c中，ssd_run函数进行模型加�
 然后送到函数ssd_rknn_process进行处理。
 src/ui/ssd为ssd的ui显示文件。函数caption_create绘制标题栏，并在caption_wnd_proc中进行显示；函数fps_create绘制帧率栏，并在fps_wnd_proc中进行显示；ssd_paint_object为物体框绘制栏，ssd的处理结果会送到这里进行显示。详细minigui的开发处理，可以参考相关开源资料。
 
-## 3 RKNN Demo FAQ
+## RKNN Demo FAQ
 
-### 3.1 在HDMI的720p上Demo异常退出
+### 在HDMI的720p上Demo异常退出
 
 ```shell
 [root@rk3399pro:/]# rknn_demo

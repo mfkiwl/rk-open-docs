@@ -77,7 +77,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 [TOC]
 ---
 
-## 1 Rockchip USB 功能特点
+## Rockchip USB 功能特点
 
 USB （Universal Serial Bus）
 
@@ -85,9 +85,9 @@ USB （Universal Serial Bus）
 * 支持 DMA 传输模式
 * 支持 Device mode，但不一定支持 OTG mode 和 Host mode ，具体请参考芯片数据手册
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 RT-Thread USB 组件位于`/rt-thread/components/drivers/usb`，是 RT-Thread 依据 USB2.0 协议规范将 USB 协议栈逻辑高度抽象，支持 Host (主机) 模式和 Device (从机) 模式。 该组件在驱动移植方面提供了友好的移植接口，开发者可将厂商 BSP 中的 HCD (Host Controller Driver) 和 PCD (Peripheral Controller Driver) 驱动代码直接接入到 RT-Thread。
 
@@ -119,9 +119,9 @@ bsp/rockchip/common/drivers/drv_usbd.c /* Note3; RT-Thread 与 HAL USB Device控
 
 *Note3*. RT-Thread 与 HAL USB Host控制器驱动之间的适配层尚未支持，后续将支持。
 
-### 2.2 配置
+### 配置
 
-#### 2.2.1 USB Device 配置
+#### USB Device 配置
 
 USB Device 可以支持一个 interface 或者多个 interface 组合的复合设备（Composite Device）。USB组件允许开发者通过宏 RT_USB_DEVICE_COMPOSITE 开启复合功能。下面是 USB Device HID 功能的配置，其中：
 
@@ -146,7 +146,7 @@ RT-Thread Components  --->
             [ ]   Use to HID device as media keyboard
 ~~~
 
-#### 2.2.2 USB Host 配置
+#### USB Host 配置
 
 USB Host 目前只能配置 Mass Storage 功能。
 
@@ -161,7 +161,7 @@ RT-Thread Components  --->
             (4096) usb thread stack size
 ~~~
 
-### 2.3 USB 框架介绍
+### USB 框架介绍
 
 USB 框架是基于 RT-Thread 提供的 [I/O 设备模型框架](https://www.rt-thread.org/document/site/programming-manual/device/device/)实现的，如下图1所示，从上到下分别是 I/O 设备管理层、RTT USB 组件、RTT 与 HAL 的适配层、HAL 层 USB 控制器驱动。
 
@@ -183,7 +183,7 @@ HAL 层 USB 控制器驱动实现了对 USB 控制器进行读写操作的底层
 
 [USB组件之USB device框架简单概览](https://www.rt-thread.org/qa/forum.php?mod=viewthread&tid=5651&highlight=usb)
 
-### 2.4 USB Device 的创建和注册
+### USB Device 的创建和注册
 
 USB Device 通过 `rt_device_register()` 接口注册到 RT-Thread I/O 设备管理器中。
 
@@ -204,11 +204,11 @@ device           type         ref count
 usbd     USB Slave Device     0
 ~~~
 
-### 2.5 USB Host 的创建和注册
+### USB Host 的创建和注册
 
 [TODO]
 
-### 2.6 USB Device 使用示例
+### USB Device 使用示例
 
 USB 应用程序通过 RT-Thread 提供的 I/O 设备管理接口来访问USB硬件，相关接口如下所示：
 
@@ -220,7 +220,7 @@ USB 应用程序通过 RT-Thread 提供的 I/O 设备管理接口来访问USB硬
 | rt_device_write()   | 写入 USB 数据 |
 | rt_device_control() | 控制 USB 设备 |
 
-#### 2.6.1 USB Device HID 使用示例
+#### USB Device HID 使用示例
 
 RT-Thread USB 组件支持常见的 USB Device HID 功能，包括：Keyboard, Mouse, General HID, media keyboard。用户可以根据实际的需求配置对应的 HID 功能。下面以 RK2108 USB HID Keyboard 为例，说明 HID 的配置和使用方法。
 
@@ -247,7 +247,7 @@ RT-Thread USB 组件支持常见的 USB Device HID 功能，包括：Keyboard, M
 
    USB Device HID 应用程序的编写，可以参考 [RT-Thread/IoT_Board 的 USB 鼠标例程](https://github.com/RT-Thread/IoT_Board/tree/master/examples/10_component_usb_mouse)
 
-#### 2.6.2 USB ADB 使用示例
+#### USB ADB 使用示例
 
 RT-Thread 官方提供了 ADB 软件包，可以支持通过 USB 与 PC之间进行 ADB 通信 (文件 pull/push)。
 
@@ -261,7 +261,7 @@ ADB软件包的下载地址如下：
 
 <https://github.com/heyuanjie87/adbd>
 
-#### 2.6.3 USB MSC 使用示例
+#### USB MSC 使用示例
 
 USB MSC (Mass Storage Class) 的功能，可以将设备作为U盘使用。当设备通过 USB 连接 PC 后，PC 可以识别到一个可移动的存储设备，方便设备和 PC 进行文件的拷贝。
 
@@ -320,7 +320,7 @@ USB MSC (Mass Storage Class) 的功能，可以将设备作为U盘使用。当�
 
    当设备通过 USB 连接到 PC 后，USB 驱动会将`root`分区从设备端的文件系统上umount掉。此时，设备端无法对`root`分区进行读写，而PC端可以自动识别到U盘，并可以对U盘进行读写。
 
-#### 2.6.4 USB UAC 使用示例
+#### USB UAC 使用示例
 
 USB UAC (USB Audio Class)功能，可以将设备做为 PC 或其他上位机的扩展声卡使用，RK2108 RT-Thread SDK 支持 UAC V1.0。开启 UAC 功能需要打开或关闭以下 config：
 
@@ -357,7 +357,7 @@ uart0   Character Device     2
 
 注意：UAC 功能开启时，CONFIG_RT_USING_VAD 必须关闭。
 
-### 2.7 USB Host 使用示例
+### USB Host 使用示例
 
 [TODO]
 

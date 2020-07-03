@@ -397,7 +397,7 @@ void
 
 void
 
-### 1.4 rkcif_control
+### rkcif_control
 
 #### int rkcif_control_init(void)
 

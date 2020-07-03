@@ -37,7 +37,7 @@
 
 [TOC]
 
-## 1. SD 卡简介
+## SD 卡简介
 
 Rockchip 现将 SD 卡划分为常规 SD 卡，SD 升级卡，SD 启动卡，SD 修复卡。可以通过瑞芯微创建升级磁盘工具将 update.img 下载到 SD 卡内，制作不同的卡类型。
 
@@ -48,7 +48,7 @@ Rockchip 现将 SD 卡划分为常规 SD 卡，SD 升级卡，SD 启动卡，SD 
 | SD 启动卡   | 设备直接从 SD 卡启动                               |
 | SD 修复卡   | 从 pre-loader 开始拷贝 SD 卡内的固件到设备存储              |
 
-## 2. update.img 制作
+## update.img 制作
 
 update.img 为 Rockchip 提供整套固件的一个合集，它不仅包含了完整固件，还包括固件完整性校验等一些数据。update.img 可以使得用户非常方便地更新整套固件。
 
@@ -89,13 +89,13 @@ recover-script  recover-script
 添加文件时，写入文件名及固件地址。如果是不需要打包某个固件，则在固件名前面加“#”屏蔽掉即可。
 点击运行 mkupdate.bat 即可生成 update.img。
 
-## 3. SD 卡使用及工具打包说明
+## SD 卡使用及工具打包说明
 
-### 3.1 常规 SD 卡
+### 常规 SD 卡
 
 普通 SD 卡与 PC 使用完全一样，可以在 U-Boot 和 Kernel 系统中作为普通的存储空间使用，无需工具对 SD 卡做任何操作。
 
-### 3.2 SD 升级卡
+### SD 升级卡
 
 SD 卡升级卡是通过 RK 的工具制作，实现通过 SD 卡对本地存储(如 eMMC，nand flash)内系统的升级。SD 卡升级是可以脱离 PC 机或网络的一种固件升级方法。具体是将 SD 卡启动代码写到 SD 卡的保留区，然后将固件拷贝到 SD 卡可见分区上，主控从 SD 卡启动时，SD 卡启动代码和升级代码将固件烧写到本地主存储中。同时 SD 升级卡支持 PCBA 测试和 Demo 文件的拷贝。SD 升级卡的这些功能可以使固件升级做到脱离 PC 机进行，提高生产效率。
 
@@ -152,7 +152,7 @@ SD 引导升级卡格式(GPT)
 |  ……   |      recovery       |
 | 剩下空间  | Fat32 存放 update.img |
 
-### 3.3 SD 启动卡
+### SD 启动卡
 
 SD 启动卡是通过 RK 的工具制作，实现设备系统直接从 SD 卡启动，极大的方便用户更新启动新编译的固件而不用非常麻烦地烧写固件到设备存储内。其具体实现是将固件烧写到 SD 卡中，把 SD 卡当作主存储使用。主控从 SD 卡启动时，固件以及临时文件都存放在 SD 卡上，有没有本地主存储都可以正常工作。目前主要用于设备系统从 SD 卡启动，或用于 PCBA 测试。**注意**：PCBA 测试只是 recovery 下面的一个功能项，可用于升级卡与启动卡。
 制作启动卡流程如下：
@@ -205,7 +205,7 @@ SD 引导启动卡格式(GPT)
 |   ……   |         user         |
 | 最后 33 扇区 |       备份 GPT        |
 
-### 3.4 SD 修复卡
+### SD 修复卡
 
 SD 卡运行功能，类似于 SD 卡升级功能，但固件升级发生 pre-loader（miniloader）的 SD 卡升级代码。首先工具会将启动代码写到 SD 卡的保留区，然后将固件拷贝到 SD 卡可见分区上，主控从 SD 卡启动时，SD 卡升级代码将固件升级到本地主存储中。主要用于设备固件损坏，SD 卡可以修复设备。
 制作修复卡流程如下：
@@ -257,7 +257,7 @@ SD 修复卡格式(GPT)
 |   ……   |         user         |
 | 最后 33 扇区 |       备份 GPT        |
 
-## 4. 固件内的标志说明
+## 固件内的标志说明
 
 SD 卡作为各种不同功能的卡，会在 sd 卡内做一些标志。
 
@@ -269,19 +269,19 @@ SD 卡作为各种不同功能的卡，会在 sd 卡内做一些标志。
 | 1      | 启动卡         |
 | 2      | 修复卡         |
 
-## 5. 整体流程分析
+## 整体流程分析
 
 SD 卡的 boot 流程可分为 pre-loader 启动流程与 uboot 启动流程，这两个流程都需要加载检测 SD 卡及 SD 卡内 IDB Block 内 Startup Flag 标志，并且会依据这些标志执行不同的功能。流程如下：
 
 ![sd-system-bringup-frame](./Rockchip_Developer_Guide_SD_Boot/sd-system-bringup-frame.jpg)
 
-### 5.1 pre-loader 启动流程
+### pre-loader 启动流程
 
 ![loader-flow](./Rockchip_Developer_Guide_SD_Boot/loader-flow.jpg)
 
 maskrom 首先先找到一份可用的 miniloader 固件（可以从 TRM 确定 Maskrom 支持的启动存储介质和优先顺序，maskrom 会依次扫描可用存储里的固件），然后跳转到 miniloader。miniloader 重新查找存储设备，如果检测到 SD 卡，检测 SD 卡是否包含 IDB 格式固件。如果是，再判断卡标志。如果 SD 卡可用且标志位为 '0' 或 ‘1’，则从 SD 卡内读取 U-Boot 固件，加载启动 U-Boot。如果标志为‘2’，则进入修复卡流程，在 loader 下更新固件。正常启动流程为扫描其他存储，加载启动下级 loader。
 
-### 5.2 U-Boot 升级卡及启动卡流程
+### U-Boot 升级卡及启动卡流程
 
 ```flow
 st=>start: Start
@@ -333,11 +333,11 @@ op9->op10->e
 升级卡：U-Boot 重新查找存储设备，如果检测到 SD 卡，检测 SD 卡是否包含 IDB 格式固件。如果是，再判断偏卡标志是否为 0，传递给 kernel 的 cmdline 添加'sdfwupdate'。最后读取 SD 卡的 misc 分区，读取卡启动模式，若为 recovery 模式，加载启动 recovery。
 启动卡：U-Boot 重新查找存储设备，如果检测到 SD 卡， 检测 SD 卡是否包含 IDB 格式固件。如果是，再判断卡标志是否为 1。最后读取 SD 卡的 misc 分区，读取卡启动模式，如果为 recovery，加载启动 recovery。如果是 normal 模式，则加载启动 kernel。
 
-### 5.3 recovery 及 PCBA 说明
+### recovery 及 PCBA 说明
 
 具体可参考《Rockchip Recovery 用户操作指南 V1.03.pdf》。
 
-## 6. 注意事项
+## 注意事项
 
 1. 非 GPT 格式，U-Boot 需要配置 CONFIG_RKPARM_PARTITION。
 

@@ -42,9 +42,9 @@
 
 ---
 
-## 1 基础
+## 基础
 
-### 1.1 概述
+### 概述
 
 RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1 个 RTC、可调上电时序等功能。
 
@@ -53,7 +53,7 @@ RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1
 1. DCDC：输入输出压差大时，效率高，但是存在纹波比较大的问题，成本高，所以大压差，大电流负载时使用。一般有两种工作模式。PWM 模式：纹波瞬态响应好，效率低；PFM 模式：效率高，但是负载能力差。
 2. LDO：输入输出压差大时，效率低，成本低，为了提高 LDO 的转换效率，系统上会进行相关优化如：LDO 输出电压为 1.1V，为了提高效率，其输入电压可以从 VCCIO_3.3V 的 DCDC 给出。所以电路上如果允许尽量将 LDO 接到 DCDC 输出回路，但是要注意上电时序。
 
-### 1.2 功能
+### 功能
 
 从使用者的角度看，RK805 的功能概况起来可以分为 4 个部分：
 
@@ -62,7 +62,7 @@ RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1
 3. gpio 功能：out1 和 out2 两个推挽输出引脚（只能 output），可当普通 gpio 使用；
 4. pwrkey 功能：检测 power 按键的按下/释放，可以为 AP 节省一个 gpio。
 
-### 1.3 芯片引脚功能
+### 芯片引脚功能
 
 ![RK805-pins-list](Rockchip_RK805_Developer_Guide\RK805_pins_list.png)
 
@@ -72,7 +72,7 @@ RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1
 
 ![RK805-pins-function-2](Rockchip_RK805_Developer_Guide\RK805_pins_function_2.png)
 
-### 1.4 重要概念
+### 重要概念
 
 - I2C 地址
 
@@ -132,7 +132,7 @@ RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1
      | --------- | ------- | -------------------------------- |
      | 0.8 ~ 3.4 | 100     | 0.8、 0.9、1.0、1.1、 1.2、 …… 3.4 |
 
-### 1.5 上电条件和时序
+### 上电条件和时序
 
 1. 上电条件
 
@@ -148,9 +148,9 @@ RK805 是一款高性能 PMIC，RK805 集成 4 个大电流 DCDC、3 个 LDO、1
 
 ![RK805-power-start-seq](Rockchip_RK805_Developer_Guide\RK805_power_start_seq.png)
 
-## 2 配置
+## 配置
 
-### 2.1 驱动和 menuconfig
+### 驱动和 menuconfig
 
 **3.10 内核配置**
 
@@ -222,7 +222,7 @@ CONFIG_INPUT_RK805_PWRKEY
 CONFIG_COMMON_CLK_RK808
 ```
 
-### 2.2 DTS 配置
+### DTS 配置
 
 **3.10 内核配置**
 
@@ -453,7 +453,7 @@ pinctrl-0：引用 pinctrl 里定义好的 pmic_int 引脚；
 
 请参考4.4内核DTS配置。差异点：4.19内核的DTS配置不再需要gpio子节点，但其他模块依然使用`gpios = <&rk805 0 GPIO_ACTIVE_LOW>;`的方式引用和使用rk805的pin脚。
 
-### 2.3 函数接口
+### 函数接口
 
 如下几个接口基本可以满足日常使用，包括 regulator 开、关、电压设置、电压获取等：
 
@@ -497,9 +497,9 @@ regulator_put(rdev_logic);								// 释放vdd_logic
 
 说明：4.4或者4.19内核还提供了`devm_`开头的regulator接口帮开发者管理要申请的资源。
 
-## 3 Debug
+## Debug
 
-### 3.10 内核
+### 内核
 
 因为 PMIC 涉及的驱动在使用逻辑上都不复杂，重点都体现在最后的寄存器设置上。所以目前常用的 debug 方式就是直接查看 rk805 的寄存器，通过如下节点：
 
@@ -525,12 +525,12 @@ regulator_put(rdev_logic);								// 释放vdd_logic
 
 ![RK805-debug-write-cmd-kernel3.10](Rockchip_RK805_Developer_Guide/RK805_debug_read_cmd_kernel3.10.png)
 
-### 4.4 内核
+### 内核
 
 命令格式同 3.10 内核一样，只是节点路径不同，4.4 内核上的 debug 节点路径是：
 
 `/sys/rk8xx/rk8xx_dbg`
 
-### 4.19 内核
+### 内核
 
 请参考4.4内核命令。

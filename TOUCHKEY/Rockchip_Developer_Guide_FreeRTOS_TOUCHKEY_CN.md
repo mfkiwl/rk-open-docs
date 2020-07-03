@@ -71,9 +71,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ------
 
-## 1  HAL TOUCHKEY 配置
+## HAL TOUCHKEY 配置
 
-### 1.1  HAL CONFIG
+### HAL CONFIG
 
 依赖driver开启：
 
@@ -83,7 +83,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 #endif
 ```
 
-### 1.2  HAL 差异部分
+### HAL 差异部分
 
 不同芯片差异主要在CLK ID，CLK频率，可以在rk2206.h或者soc.h中查找
 
@@ -91,7 +91,7 @@ CLK_TOUCH_DETECT_GATE：SCLK GATE ID，用于CLK开关；
 
 PCLK_TOUCH_DETECT_GATE：PCLK GATE ID，用于CLK开关；
 
-### 1.3  HAL 常用 API
+### HAL 常用 API
 
 ```c
 HAL_Status HAL_TouchKey_Init(uint32_t chn_num, struct TOUCH_SENSOR_REG *touchkey)；
@@ -102,9 +102,9 @@ void HAL_TouchKey_ClearIntPos(uint32_t irq, struct TOUCH_SENSOR_REG *touchkey)�
 uint32_t HAL_TouchKey_GetIntRaw(struct TOUCH_SENSOR_REG *touchkey)；
 ```
 
-## 2 RKOS TOUCHKEY配置
+## RKOS TOUCHKEY配置
 
-### 2.1  RKOS TOUCHKEY CONFIG
+### RKOS TOUCHKEY CONFIG
 
 ```c
 make menuconfig
@@ -114,7 +114,7 @@ make menuconfig
 		-*- Enable Touch Key
 ```
 
-### 2.2  RKOS 常用API
+### RKOS 常用API
 
 ```
 rk_err_t TouchKeyDevInit(void)；
@@ -127,7 +127,7 @@ uint32_t TouchKeyChannelToKey(uint32_t raw_status)；
 void TouchKeySaveKeyCode(uint32_t key_code)；
 ```
 
-### 2.3  RKOS 使用示例
+### RKOS 使用示例
 
 使用示例：
 
@@ -135,9 +135,9 @@ void TouchKeySaveKeyCode(uint32_t key_code)；
 rk_err_t TouchKeyDevInit(void)； /* 初始化TOUCHKEY，打开TOUCHKEY */
 ```
 
-## 3 TEST
+## TEST
 
-### 3.1  CONFIG配置
+### CONFIG配置
 
 ```c
 Components Config  --->
@@ -145,7 +145,7 @@ Components Config  --->
         [*]     Enable key shell cmd
 ```
 
-### 3.2  USAGE
+### USAGE
 
 使用示例：
 

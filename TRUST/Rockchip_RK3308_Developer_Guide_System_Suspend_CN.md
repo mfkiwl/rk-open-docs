@@ -43,13 +43,13 @@
 
 ---
 
-## 1. 系统待机
+## 系统待机
 
 凡是带有 trust 的 SoC 平台，系统待机（system suspend）的工作都在 trust 中完成。因为各个平台的 trust 对于系统待机实现各不相同，所以**不同平台之间的待机配置选项/方法没有任何关联性和参考性，本文档仅适用于 RK3308 平台**。
 
 系统待机流程一般会有如下操作：关闭 power domain、模块 IP、时钟、PLL、ddr 进入自刷新、系统总线切到低速时钟（24M 或 32K）、vdd_arm 断电、配置唤醒源等。为了满足不同产品对待机模式的需求，目前都是通过 DTS 节点把相关配置在开机阶段传递给 trust。
 
-### 1.1 驱动文件
+### 驱动文件
 
 ```
 ./drivers/soc/rockchip/rockchip_pm_config.c
@@ -57,7 +57,7 @@
 ./include/dt-bindings/suspend/rockchip-rk3308.h
 ```
 
-### 1.2 DTS 节点
+### DTS 节点
 
 ```c
 rockchip_suspend: rockchip-suspend {
@@ -91,7 +91,7 @@ rockchip_suspend: rockchip-suspend {
 };
 ```
 
-## 2. DTS 配置
+## DTS 配置
 
 目前已支持的配置选项都定义在：
 
@@ -99,7 +99,7 @@ rockchip_suspend: rockchip-suspend {
 ./include/dt-bindings/suspend/rockchip-rk3308.h
 ```
 
-### 2.1 常规配置
+### 常规配置
 
 配置项：
 
@@ -137,7 +137,7 @@ rockchip,sleep-mode-config = <...>;
 - VAD 类产品：待机时需要支持 VAD 唤醒源，不会关闭 VAD/ACODEC/PDM 等相关模块 IP 和时钟，需保持 24M 晶振和相关 PLL 正常工作。目前待机时 trust 会先检测 VAD 相关模式是否在 kernel 阶段已经关闭，如果没有关闭则默认是 VAD 类产品，待机时切到支持 VAD 唤醒的低功耗模式。
 - 非 VAD 类产品：待机时没有需要维持工作的模块 IP，所有的模块和时钟几乎都可以关闭，是一种最低功耗的模式。这种模式下，系统时钟可以切到 32K 或者 24M。
 
-### 2.2 电源配置
+### 电源配置
 
 配置项：
 
@@ -156,7 +156,7 @@ rockchip,pwm-regulator-config = <...>;
 
 - 根据外部硬件电路设计确定是否使用了 pwm-regulator。
 
-### 2.3 唤醒配置
+### 唤醒配置
 
 配置项：
 
@@ -200,7 +200,7 @@ rockchip,wakeup-config = <...>;
 
   PMU 内部的 timer 唤醒，默认 5s 超时产生中断，一般仅用于开发阶段测试休眠唤醒使用。
 
-### 2.4 debug 配置
+### debug 配置
 
 配置项：
 
@@ -236,7 +236,7 @@ debug 注意点：
 - RKPM_DBG_REG：如果怀疑待机阶段某些寄存器值被 trust 修改，可使能该配置。
 - RKPM_DBG_FSM_SOUT：使能该配置后，待机时 PMU 状态机会通过 GPIO4_D5 一直输出特定波形信号，用于反馈当前 PMU 状态机内部状态，该功能仅在发生系统待机时 PMU 状态机本身死机的情况下有用处。
 
-### 2.5 reboot 复位配置
+### reboot 复位配置
 
 配置项：
 
@@ -264,7 +264,7 @@ GPIO 不复位的需求示例：
 
 某些硬件电路设计上会提供“power hold”电源控制引脚，需要在系统上电早期阶段由软件拉高/低保证系统电源工作正常，在 reboot 过程中“power hold”引脚也不能被复位，否则会出现系统下电的情况。
 
-## 3. 打印信息
+## 打印信息
 
 如下简要介绍系统待机和唤醒时的 trust 打印信息含义。为注释方便，如下对一些打印内容进行分行，不同的待机功耗模式同样也会带来不同的打印，所有打印信息内容以实际显示为主。
 

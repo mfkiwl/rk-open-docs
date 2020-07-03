@@ -78,13 +78,13 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 开发环境搭建
+## 开发环境搭建
 
-### 1.1 开发环境选择
+### 开发环境选择
 
 本 SDK 推荐的编译环境是64位的 Ubuntu16.04 或 Ubuntu18.04。
 
-### 1.2 编译工具链选择
+### 编译工具链选择
 
 编译工具选用的是 RT-Thread 官方推荐的 SCons + GCC，SCons 是一套由 Python 语言编写的开源构建系统， GCC 交叉编译器由 ARM 官方提供，可直接使用以下命令安装所需的所有工具：
 
@@ -102,7 +102,7 @@ tar xvf gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
 export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 ```
 
-## 2 目录结构
+## 目录结构
 
 以下是SDK主要目录对应的说明：
 
@@ -143,11 +143,11 @@ export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 └── tools                 # RT-Thread官方工具目录，包括menuconfig和编译脚本
 ```
 
-## 3 工程编译配置
+## 工程编译配置
 
    RT-Thread 用 SCons 来实现编译控制，SCons 是一套由 Python 语言编写的开源构建系统，类似于 GNU Make。它采用不同于通常 Makefile 文件的方式，而使用 SConstruct 和 SConscript 文件来替代。这些文件也是 Python 脚本，能够使用标准的 Python 语法来编写，所以在 SConstruct、SConscript 文件中可以调用 Python 标准库进行各类复杂的处理。
 
-### 3.1 工程配置
+### 工程配置
 
    进入到对应的工程目录，如 bsp/rockchip/rk2108 目录下，并运行工程配置工具 menuconfig。
 
@@ -177,7 +177,7 @@ menuconfig 工具的常见操作如下：
 
   每个板级目录下都有一个默认的配置文件 defconfig，里面包含了这个板子的常规配置，可以基于这个配置去修改。
 
-### 3.2 保存配置
+### 保存配置
 
 在每一个板级配置目录下都有一个默认配置 defconfig，如果没有执行 scons menuconfig，会用默认的 rtconfig.h 参与编译。要修改板子的 defconfig，可以先用它的 defconfig 文件覆盖 .config，通过 menuconfig 修改后再使用新的 .config 更新 defconfig 文件，下面是具体例子：
 
@@ -187,9 +187,9 @@ scons menuconfig                           ; 修改配置项
 cp .config board/xxx/defconfig             ; 保存配置为板子的默认配置
 ```
 
-## 4 工程编译
+## 工程编译
 
-### 4.1 编译命令
+### 编译命令
 
    编译命令如下：
 
@@ -233,18 +233,18 @@ rm -rf build
 scons -h
 ```
 
-### 4.2 固件打包
+### 固件打包
 
    固件打包是为了把系统需要的各种固件打包在一起，如分区表、loader、OS和根文件系统，RK2108 的固件打包脚本是：bsp/rockchip/rk2108/mkimage.sh 。目前的编译脚本在编译完成后会自动触发固件打包，因此只需执行一次 ./build.sh 命令即可完成编译和打包。
 
-## 5 固件烧录
+## 固件烧录
 
    在烧录固件前，需要让板子进入到升级模式，RK2108 支持两种升级模式：Loader 模式和 MaskRom 模式。下面是进入到2种模式的方法：
 
 1. 在 USB 口连着电脑的前提下，按住 RECOVERY 键不松开，短按 RESET 键，让板子进入到 Loader 模式后松开 RECOVERY 键；
 2. 在 USB 口连着电脑的前提下，按住 MASROM 键不松开，短按 RESET 键，让板子进入到 MaskRom 模式后松开 MASROM 键。未烧录过的固件的设备，上电后会自动进入到 MaskRom 模式。
 
-### 5.1 Windows USB驱动安装
+### Windows USB驱动安装
 
 开发调试阶段，需要将设备切换至 Loader 模式或是 MaskRom 模式，并且正确安装 Rockusb 驱动才能正常识别设备。
 
@@ -264,7 +264,7 @@ scons -h
 
  注意：在安装驱动的时候，部分 windows 系统的版本，需要绕过数字签名，重启电脑按F8，选择**强制禁用驱动程序签名强制**，再安装驱动。
 
-### 5.2 Windows版升级工具
+### Windows版升级工具
 
    打开 bsp/rockchip/tools 目录下的 Rockchip_Develop_Tool_v2.63，如首次使用此工具，需要安装它目录下的驱动：DriverAssitant_v4.91。打开升级工具：
 
@@ -274,7 +274,7 @@ scons -h
 
 第2项“Firmware”选择 bsp/rockchip/rk2108/Image/Firmware.img。
 
-### 5.3 Linux版烧录工具及命令
+### Linux版烧录工具及命令
 
    Linux 系统下可以使用如下脚本完成固件烧录：
 
@@ -291,9 +291,9 @@ bsp/rockchip/rk2108/update_fimeware.sh
 ../tools/upgrade_tool rd
 ```
 
-## 6 运行调试
+## 运行调试
 
-### 6.1 系统启动
+### 系统启动
 
 系统启动方式有以下几种：
 
@@ -303,7 +303,7 @@ bsp/rockchip/rk2108/update_fimeware.sh
 
 [^注]: 不同的硬件设计，其上电启动方式也会有不同的区别。
 
-### 6.2 系统调试
+### 系统调试
 
 RK2108 支持串口调试。不同的硬件设备，其串口配置也会有所不同。
 

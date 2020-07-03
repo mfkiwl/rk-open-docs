@@ -102,25 +102,25 @@ Software Engineer
 [TOC]
 ---
 
-## 1 I2C flow
+## I2C flow
 
 The flow of I2C is roughly the same on both drivers about kernel 4.4 and kernel 3.10 . The write is a simple TX mode (I2C_CON[1:0] = 2'b00), while the read generally uses the TRX mode (I2C_CON[1:0] = 2'b01). The following I2C controller operational flow diagram describes how the software configures and performs I2C tasks by this I2C controller register. The description consists 3 parts, transfer mode, mixed mode and receive mode.
 
-### 1.1 Trasmint only mode(I2C_CON[1:0]=2’b00)
+### Trasmint only mode(I2C_CON[1:0]=2’b00)
 
 ![3](Rockchip_Developer_Guide_Linux_I2C/3.Trasmint only mode.png)
 
-### 1.2 Mix mode (I2C_CON[1:0]=2’b01 or I2C_CON[1:0]=2’b11)
+### Mix mode (I2C_CON[1:0]=2’b01 or I2C_CON[1:0]=2’b11)
 
 ![4](Rockchip_Developer_Guide_Linux_I2C/4.Mix mode.png)
 
-### 1.3 Receive only mode (I2C_CON[1:0]=2’b10)
+### Receive only mode (I2C_CON[1:0]=2’b10)
 
 ![5](Rockchip_Developer_Guide_Linux_I2C/5.Receive only mode.png)
 
 The above is the main flow of I2C, and please refer to driver code to get the further implement.
 
-## 2 I2C Driver Parameter Configuration
+## I2C Driver Parameter Configuration
 
 The mainly part of parameter configuration I2C is the configuration of I2C frequency. The I2C frequency can be matched not only related to the chip but also I2C SCL and SDA rise time, because the I2C standard protocol has requirements for rising  and falling edge time, especially rising time. If the maximum value specified by the protocol is exceeded, the I2C communication may fail. The following is the maximum and minimum value specified in the protocol and figure shows the relationship between them:
 
@@ -132,7 +132,7 @@ The rising edge Tr and the falling edge Tf need to be measured with an oscillosc
 
 The I2C driver `i2c-rk3x.c` and `i2c-rockchip.c` are not the same. The differences are as follows:
 
-### 2.1 Configuration for drive i2c-rk3x.c
+### Configuration for drive i2c-rk3x.c
 
 The configuration of the `i2c-rk3x.c` driver is in DTS, reference file is `Documentation/devicetree/bindings/i2c/i2c-rk3x.txt`. Here highlight the configuration items, `i2c-scl-rising-time-ns`, `i2c-scl-falling-time-ns`:
 
@@ -159,7 +159,7 @@ The configuration of the `i2c-rk3x.c` driver is in DTS, reference file is `Docum
 };
 ```
 
-### 2.2 Configuration for driver i2c-rockchip.c
+### Configuration for driver i2c-rockchip.c
 
 The i2c-rockchip.c driver still follows the constraint relationship between the I2C frequency and the rise edge of SCL. Whether the higher frequency can be used depends on i2c-scl-rising-time-ns; the I2C frequency is configured on the code scl_rate member at the i2c_msg structure directly. The default frequency is still 100k, such as the following 200K configuration:
 
@@ -173,19 +173,19 @@ The i2c-rockchip.c driver still follows the constraint relationship between the 
         xfer_msg[0].scl_rate = 200 * 1000; /* 200K i2c clock frequency */
 ```
 
-## 3 I2C  usage
+## I2C  usage
 
 The further instructions for using I2C are in `Documentation/i2c/*`. The following sections focus on the read and write sections:
 
-### 3.1 Kernel space
+### Kernel space
 
 Rockchip I2C sending and receiving communication uses the standard interface of Linux. Please refer to the `Documentation/i2c/writing-clients` under kernel for a description of the sending and receiving section.
 
-### 3.2 User space
+### User space
 
 Typically, I2C devices are controlled by the kernel driver. However, all devices on the bus can also be accessed from the user mode through the `/dev/i2c-%d` interface.  `Documentation/i2c/dev-interface` under the kernel has further descriptions and examples.
 
-## 3 I2C tools
+## I2C tools
 
 I2C tool is an open source tool, you can download it and cross-compile. The code download address is:
 	<https://www.kernel.org/pub/software/utils/i2c-tools/>
@@ -195,7 +195,7 @@ OR
 After compiling, it will generate tools such as i2cdetect, i2cdump, i2cset, i2cget, i2ctransfer, which can be used directly on the command line.
 The I2C tool are all open source. Please refer to the README and help instructions for compilation and using.
 
-## 4 GPIO simulation as I2C
+## GPIO simulation as I2C
 
 I2C is simulated with GPIO and the kernel has been implemented. Please refer to the documentation:
 `Documentation/devicetree/bindings/i2c/i2c-gpio.txt`
@@ -230,13 +230,13 @@ The following is an example of using I2C nodes at dts.
 
 GPIO method is generally not recommended due to low efficient.
 
-## 4 I2C FAQ
+## I2C FAQ
 
 Because we have two i2c drivers, so this chapter still have two parts:
 
-### 4.1 i2c-rk3x.c Driver
+### i2c-rk3x.c Driver
 
-#### 4.1.1 NACK Error
+#### NACK Error
 
 If the return value of the I2C transport interface is `-6 (-ENXIO)`, it is indicated as a NACK error, that is, the slave device does not respond, this problem usually is located at peripheral. The following are common cases:
 
@@ -245,9 +245,9 @@ If the return value of the I2C transport interface is `-6 (-ENXIO)`, it is indic
 - The I2C timing does not meet the requirements of the slave device , which also generates a NACK signal. For example, the slave device needs the stop signal while receives the repeat start signal, NACK signal will occur.
 - The I2C bus bug caused by external signal can be seen  when measured with an oscilloscope.
 
-#### 4.1.2 Timeout Error
+#### Timeout Error
 
-##### 4.1.2.1 Case 1
+##### Case 1
 
 When I2C log is `timeout, ipd: 0x00, state: 1` occurs, the I2C controller is working irregularly and it cannot generate an interrupt status, the start timing cannot be sent. There are several possibilities:
 
@@ -257,11 +257,11 @@ When I2C log is `timeout, ipd: 0x00, state: 1` occurs, the I2C controller is wor
 - The I2C clock is not enabled, or the clock source is too small;
 - I2C is configured with both the CON_START and CON_STOP bits.
 
-##### 4.1.2.2 Case 2
+##### Case 2
 
 When the I2C log is `timeout, ipd: 0x10, state: 1` occurs, the I2C controller is working properly, but the CPU cannot respond to the I2C interrupt. At this time, cpu0 may be blocked (generally the I2C interrupt is on cpu0, It can be viewed by command `cat /proc/interrups`), or the I2C interrupt source may be turned off make the irq can not trigger cpu to handle it.
 
-##### 4.1.2.3 Case 3
+##### Case 3
 
 When the I2C log is `timeout, ipd: 0x80, state: 1` occurs, the ipd is 0x80, which means that the current SCL is held by the slave, you need to find it was held by which slave for more slave case:
 
@@ -270,9 +270,9 @@ When the I2C log is `timeout, ipd: 0x80, state: 1` occurs, the ipd is 0x80, whic
 
 The common situation is that SDA is pulled down. To prove who is pulling down, also refer to the above method of "SCL is pulled down".
 
-### 4.2 i2c-rockchip.c Driver
+### i2c-rockchip.c Driver
 
-#### 4.2.1 NACK Error
+#### NACK Error
 
 If the return value of the I2C transport interface is `-11(-EAGAIN)`, it is indicated as a NACK error, that is, the other device does not respond. This problem usually is located at slave devices. The following are common cases:
 
@@ -281,9 +281,9 @@ If the return value of the I2C transport interface is `-11(-EAGAIN)`, it is indi
 - The I2C timing does not meet the requirements of the slave device, which also generates a NACK signal. For example, the slave device needs the stop signal while receives the repeat start signal, NACK signal will occur.
 - The I2C bus bug caused by external signal can be seen when measured with an oscilloscope.
 
-#### 4.2.2 Timeout Error
+#### Timeout Error
 
-##### 4.2.2.1 Case 1
+##### Case 1
 
 When I2C log is `timeout, ipd: 0x00, state: 1` occurs, the I2C controller is working irregularly and it cannot generate an interrupt status, the start timing cannot be sent. There are several possibilities:
 
@@ -293,11 +293,11 @@ When I2C log is `timeout, ipd: 0x00, state: 1` occurs, the I2C controller is wor
 - The I2C clock is not enabled, or the clock source is too small;
 - I2C is configured with both the CON_START and CON_STOP bits.
 
-##### 4.2.2.2 Case 2
+##### Case 2
 
 When the I2C log is `timeout, ipd: 0x10, state: 1` occurs,  the I2C controller is working properly, but the CPU cannot respond to the I2C interrupt. At this time, cpu0 may be blocked (generally the I2C interrupt is on cpu0, It can be viewed by command cat /proc/interrups), or the I2C interrupt source may be turned off make the irq can not trigger cpu to handle it.
 
-##### 4.2.2.3 Case 3
+##### Case 3
 
 When the I2C log `timeout, ipd: 0x80, state: 1` occurs, here ipd is 0x80, or the printed `scl was hold by slave`, which means that the current SCL is held by the slave, you need to find it was held by which slave for more slave case:
 
@@ -312,6 +312,6 @@ When the log is `i2c is not in idle (state =x)` occurs, it indicates that at lea
 - "state=2" means SCL is low;
 - "state=3" means SCL and SDA are both low.
 
-### 4.2 I2C waveform
+### I2C waveform
 
 If the I2C problem you meet is not mentioned here, the best way is to grab the waveform when the I2C error occurs and analyze the I2C problem through the waveform. The waveform of I2C is very useful, which can figure out most of the problems; You can operate to stuck the current i2c task(sch as while(1), etc.) while error occurring, the finally captured in oscilloscope is the waveform for the error. If you need to filter, you can also add the condition such as the device I2C address, etc.

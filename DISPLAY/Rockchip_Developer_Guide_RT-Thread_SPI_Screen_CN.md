@@ -73,15 +73,15 @@ SPI屏是指仅通过SPI线传输显示数据和配置参数的屏幕，这种�
 
 ------
 
-## 1 Rockchip SPI 屏接口特点
+## Rockchip SPI 屏接口特点
 
 SPI屏幕通常分为两种类型：3线9bit 和 4线8bit。3线9bit屏的第一个bit代表数据（DATA）或者命令（CMD），而4线8bit屏，需要多使用一个D/CX脚来确定发送的是数据还是命令。
 
 Rockchip SPI的不支持发送9bit数据，因此仅支持4线8bit屏。对于320x240 16bit屏来说，一帧数据量是320x240x16=1228800， 因此50Mhz的SPI屏对应的最高帧率40fps。
 
-## 2 软件
+## 软件
 
-### 2.1 代码路径
+### 代码路径
 
 驱动代码：
 
@@ -102,7 +102,7 @@ SPI屏测试代码：
 bsp/rockchip/common/tests/spi_screen_test.c
 ```
 
-### 2.2 编译配置
+### 编译配置
 
 打开SPI屏的开关RT_USING_SPI_SCREEN：
 
@@ -119,7 +119,7 @@ RT-Thread rockchip common drivers --->
      SPI Panel Type (KGM281G44PVAA SPI panel, resolution is 80x160)  --->
 ```
 
-### 2.3 SPI 屏测试
+### SPI 屏测试
 
 使能SPI 屏测试程序：
 
@@ -138,9 +138,9 @@ spi_screen_test
 
 屏上会显示一张color bar测试图像。
 
-## 3 配置
+## 配置
 
-### 3.1  SPI 屏使用配置
+### SPI 屏使用配置
 
 RK2108支持SPI1_M0，SPI1_M1，SPI2_M0，SPI2_M1，另外SPI2还支持CS0和CS1，共计有6种接法。实际产品中，需要先确认自己的板子是哪个SPI口连接到屏上。在板级的iomux.c中调整SPI的配置函数，如连接的是SPI2_M0，可在board/rk2108_evb/iomux.c 中调用spi2_m0_iomux_config：
 
@@ -194,7 +194,7 @@ RT_UNUSED static void spi2_m0_iomux_config(void)
 #endif
 ```
 
-### 3.2 如何新增 SPI 屏配置文件
+### 如何新增 SPI 屏配置文件
 
 以 bsp/rockchip/common/drivers/panel_cfg/kgm281g44pvaa_panel_cfg.h 为例
 

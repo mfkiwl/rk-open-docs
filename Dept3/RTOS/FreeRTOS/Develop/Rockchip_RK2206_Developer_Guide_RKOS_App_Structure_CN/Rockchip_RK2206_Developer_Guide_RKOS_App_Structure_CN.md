@@ -75,13 +75,13 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 1 APP启动流程
+## APP启动流程
 
 下图展示了APP启动顺序，黑色部分和APP无关，黄色部分为APP框架，代码位于app/common目录下，主要是__WEAK修饰的函数，每个APP可以在自己目录中重新定义这些APP，白色部分是具体APP的功能。
 
 ![](resources/app_start.png)
 
-### 1.1 system init
+### system init
 
 在每个APP的src 目录下有个system_init.c文件，里面包含4个重要的函数， RKOS不同于其他系统的一个特点是，驱动，组件的加载是各个APP按需加载, 在app/common 目录下面有个system_init_base.c里面定义4个__WEAK修饰的同名的函数，如果没有新增功能，可以删除system_init.c所有的函数，如：wlan_demo, story_robot
 
@@ -112,7 +112,7 @@ INIT API void system_deinit(void)
 }
 ```
 
-### 1.2 main sever
+### main sever
 
 main sever相当于RKOS APP管理器， 所有的系统事件都汇聚到这里，比如低电，TF卡插入，拔出， 关机，重启等等。main sever还提供了一个标记设置框架，很好的解决了多线程之间的通信和ICON状态的刷新, 在app/common目录下有个main_sever_base.c, 里面定义了通用函数，使用__WEAK修饰，用户可以在每个APP目录下面的MainSever.c重新定义相应的函数，比如story_robot的MianSever_Start函数。
 
@@ -155,15 +155,15 @@ __WEAK void MainTask_DeleteTopIcon(uint32 StatusID) {/*清除标记时状态显�
 __WEAK void MianSever_Start(MAIN_SEVER_DATA_BLOCK *pstMainData) {/*启动 main sever服务*/}
 ```
 
-### 1.3 scatter loader
+### scatter loader
 
 scatter loader是RKOS的引导程序，由于每个APP的对内存的需求不同，RKOS上没有动态内存管理，这样不同APP就有不同的内存空间，为了更好的对内存进行管理，RKOS将内存相关的初始化代码抽出，放到APP框架中，这样RKOS内核就不用关心内存问题， app/common目录下的scatter_base.c 和 module_info_base.h定义了内存和固件相关的信息，PowerOn_Reset是RKOS的引导程序入口。
 
-## 2 APP事件流
+## APP事件流
 
 RKOS APP事件流分2种，一个是有GUI的事件流，另一个是无GUI的事件流，所有的事件单发单接，可以流转，分可丢失事件和不可丢失事件2种。
 
-### 2.1按键事件流
+### 按键事件流
 
 按键事件是一种可丢失（长按松开事件除外），单发单接，可以流转的事件，其流从按键驱动发出，途径MainSever（非GUI，有GUI，按键驱动直接流向GUI模块，GUI模块流向APP）,  最终流转到APP的事件接收队列中，APP调用以下函数注册按键事件接收函数：
 
@@ -179,7 +179,7 @@ COMMON API rk_err_t GuiTask_AppUnReciveMsg(P_APP_RECIVE_MSG pApp)
 
 关于GUI和main sever中的按键事件结构，请参考其他文档, 在编写按键事件接收函数，注意不要锁死按键驱动，按键驱动由Tmr Svc线程调用，Tmr Svc线程是FreeRTOS的timer线程，意义重大。
 
-### 2.2 系统事件流
+### 系统事件流
 
 系统事件需要发送到main sever中统一处理，比如开关，复位，TF卡插入，USB插入等，这类独立于APP的事件需要调用如下函数发送给MainSever
 
@@ -187,7 +187,7 @@ COMMON API rk_err_t GuiTask_AppUnReciveMsg(P_APP_RECIVE_MSG pApp)
 COMMON API rk_err_t MainTask_SysEventCallBack(uint32 event, void *arg)
 ```
 
-### 2.3 状态事件流
+### 状态事件流
 
 RKOS的所有状态，包括系统状态，模块状态，APP状态等需要调用Main Sever提供的2个API：
 
@@ -204,7 +204,7 @@ __WEAK void MainTask_SetTopIcon(uint32 StatusID) {/*设置标记状态显示*/}
 __WEAK void MainTask_DeleteTopIcon(uint32 StatusID) {/*清除标记时状态显示*/}
 ```
 
-## 3 APP说明
+## APP说明
 
 | APP名称     | 功能                                                         | 位置            | 主要用途                                                     |
 | ----------- | ------------------------------------------------------------ | --------------- | ------------------------------------------------------------ |
@@ -212,7 +212,7 @@ __WEAK void MainTask_DeleteTopIcon(uint32 StatusID) {/*清除标记时状态显�
 | wlan_demo   | shell、 mainsever、故事机所需要的组件                        | app/wlan_demo   | wlan demo APP 提供了故事机的所有运行组件和驱动，方便于命令来测试客户的板子，如果用户自己有APP的，可以以WLAN_DEMO为模板，结合APP启动流程和事件流的要求，对接自己的APP. |
 | story_robot | shell、mainsever、故事机所需要的组件，故事机，工厂测试、充电模式 | app/story_robot | story_robot APP提供了完整的故事机框架和流程，客户只需要修改一些按键和显示，配置各个OEM的授权，就可以实现自己故事机，如果客户没有APP，可以以story_robot为模板来实现自己的APP. |
 
-## 4 多APP同时运行
+## 多APP同时运行
 
 新版RKOS引入了进程（process)概念，尽管物理上无法隔绝2个进程互访空间，导致类似fork 函数无法实现，但从软件工程上来说，引入进程概念可以有以下好处：
 
@@ -222,7 +222,7 @@ __WEAK void MainTask_DeleteTopIcon(uint32 StatusID) {/*清除标记时状态显�
 
 3，进程资源是独享的，内存泄漏资源可以随进程的结束同时被清理。
 
-### 4.1 配置
+### 配置
 
 ```c
 (top menu) → Application config
@@ -233,11 +233,11 @@ __WEAK void MainTask_DeleteTopIcon(uint32 StatusID) {/*清除标记时状态显�
 
 打开这个宏，下面会列出已经注册在系统上的APP，关闭这个宏，RKOS一个固件只能有一个APP，兼容早期开发的APP.
 
-### 4.2 注册APP
+### 注册APP
 
 由于RKOS目前不支持虚拟地址运行APP，APP以库的形式注册到系统上，APP的地址空间可以相同或者不同，相同的APP地址空间以OVERLAY的方式运行，不同的APP地址空间可以同时运行。
 
-#### 4.2.1 做库
+#### 做库
 
 参考app/wlan_demo/gcc/makefile 编写app的makefile
 
@@ -275,7 +275,7 @@ LIBS: 是APP库名
 
 使用make app_lib创建库文件。
 
-#### 4.2.2 注册
+#### 注册
 
 在app/Kconfig 中参考wlan_demo增加一个配置项：
 
@@ -298,9 +298,9 @@ endif
 
 APP 库一定要处于 -Wl,--whole-archive 和 -Wl,--no-whole-archive之间，否则系统会优化掉整个库。
 
-### 4.3 启动
+### 启动
 
-#### 4.3.1 入口编写
+#### 入口编写
 
 早期APP是重定义main_sever_base.c中的相关函数启动APP, 启动方式灵活，当打开MULT_APP_RUN运行是，main_sever_base.c中的代码将不能被重定义，因此重定义了main_sever_base.c， system_init_base.c，scatter_base.c的APP在MULT_APP_RUN环境下编译不过。
 
@@ -364,7 +364,7 @@ pMain:  入口
 
 StartMode:  开机是否自动启动。
 
-#### 4.3.2 启动方式
+#### 启动方式
 
 APP可以通过以下3种方式启动：
 
@@ -374,11 +374,11 @@ APP可以通过以下3种方式启动：
 
 3， app command 启动：app  name [parameter] [&] 启动APP
 
-### 4.4 通信
+### 通信
 
 2个APP可以通过main_sever_base.c提供的FIFO进行通信，FIFO使用前需要创建（只需要一个APP创建即可）、打开操作。
 
-#### 4.4.1 FIFO创建
+#### FIFO创建
 
 通过以下API创建一个FIFO
 
@@ -388,7 +388,7 @@ int MainTask_CreateFIFO(const char *name, int fifo_id);
 
 创建FIFO需要指定一个fifo_id, 大小在0  到 FIFO_DEV_NUM - 1 之间，name 可以为空，也可以是一个文件路径。当name不为空时，建议指定H:盘，H盘是虚拟文件系统，读写速度很快。可以通过USB挂载H盘的方式在PC上查看FIFO中的内容。
 
-#### 4.4.2 FIFO打开
+#### FIFO打开
 
 通过以下API打开一个FIFO
 
@@ -398,7 +398,7 @@ HDC MainTask_OpenFIFO(int fifo_id);
 
 HDC是根据ID生成的FIFO句柄，读写函数需要这个参数。
 
-#### 4.4.3 FIFO读写
+#### FIFO读写
 
 通过以下API对FIFO进行读写
 
@@ -409,7 +409,7 @@ int MainTask_WriteFIFO(HDC dev, char *buf, int size)；
 
 FIFO大小为64K, 写满会挂住写APP，读空会挂住读APP
 
-#### 4.4.4 FIFO关闭删除
+#### FIFO关闭删除
 
 通过以下API对FIFO进行关闭和删除
 
