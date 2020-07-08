@@ -32,12 +32,16 @@ do
 	id=`echo $file | cut -b 3,4`
 	id=`echo $id | awk '{print int($0)}'`
 	if [ $id -gt 0 ]; then
-		sed -i "s/^# /# Chapter-${id} /g" $TMP_DIR/$file
-		sed -i "s/## /## ${id}./g"   $TMP_DIR/$file
+		sed -i \
+		    -e 's/^######[[:blank:]]\+/####### /' \
+		    -e 's/^#####[[:blank:]]\+/###### /' \
+		    -e 's/^####[[:blank:]]\+/##### /' \
+		    -e 's/^###[[:blank:]]\+/#### /' \
+		    -e 's/^##[[:blank:]]\+/### /' \
+		    -e "s/^#[[:blank:]]\+/## Chapter-${id} /" $TMP_DIR/$file
 
 		# Page break for PDF export
-		echo >> $BOOK_NAME
-		echo '<div style="page-break-after: always;"></div>' >> $BOOK_NAME
+		echo -e "\n---\n" >> $BOOK_NAME
 	fi
 
 	# Append Chapter content
