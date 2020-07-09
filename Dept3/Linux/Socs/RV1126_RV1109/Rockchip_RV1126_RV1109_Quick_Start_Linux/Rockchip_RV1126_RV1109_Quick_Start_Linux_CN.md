@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.2.1
+发布版本：V1.3.0
 
-日期：2020-06-29
+日期：2020-07-09
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -71,6 +71,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.1.0 | CWW | 2020-06-08 | 1. 更新公司名称<br>2. 更新文档排版<br>3. 更新第2节|
 | V1.2.0 | HJC | 2020-06-22 | 增加智能USB Camera产品章节 |
 | V1.2.1 | CWW | 2020-06-29 | 1. 更新4.4章节<br>2. 增加编译环境安装fakeroot工具 |
+| V1.3.0 | CWW | 2020-07-09 | 1. 增加模块目录以及文档说明<br>2. 增加编译不同板级配置 |
 
 ---
 
@@ -114,6 +115,82 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 - tools：存放一些常用工具。
 - u-boot：U-Boot代码。
 
+### RV1109/RV1126 模块代码目录说明
+
+| 部分模块代码目录路径         | 模块功能描述                       |
+| ---------------------------- | ---------------------------------- |
+| external/recovery            | recovery                           |
+| external/rkwifibt            | Wi-Fi和BT                          |
+| external/libdrm              | DRM接口                            |
+| external/rk_pcba_test        | PCBA测试代码                       |
+| external/isp2-ipc            | 图像信号处理服务端                 |
+| external/mpp                 | 编解码代码                         |
+| external/rkmedia             | Rockchip 多媒体封装接口            |
+| external/rkupdate            | Rockchip升级代码                   |
+| external/camera_engine_rkaiq | 图像处理算法模块                   |
+| external/rknpu               | NPU驱动                            |
+| external/rockface            | 人脸识别代码                       |
+| external/CallFunIpc          | 应用进程间通信代码                 |
+| external/common_algorithm    | 音视频通用算法库                   |
+| external/rknn-toolkit        | 模型转换、推理和性能评估的开发套件 |
+| app/libIPCProtocol           | 基于dbus，提供进程间通信的函数接口 |
+| app/mediaserver              | 提供多媒体服务的主应用             |
+| app/ipc-daemon               | 系统守护服务                       |
+| app/dbserver                 | 数据库服务                         |
+| app/netserver                | 网络服务                           |
+| app/storage_manager          | 存储管理服务                       |
+| app/ipcweb-backend           | web后端                            |
+| app/librkdb                  | 数据库接口                         |
+| app/ipcweb-ng                | web前端，采用Angular 8框架         |
+
+### RV1109/RV1126 开发相关文档
+
+
+```shell
+├── docs
+│   ├── Linux
+│   │   ├── ApplicationNote (Rockchip应用开发框架介绍、网页端开发指南)
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+│   │   │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
+│   │   │   └── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
+│   │   └── Multimedia (ISP开发指南、编解码以及接口封装开发指南)
+│   │       ├── camera
+│   │       │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
+│   │       │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
+│   │       │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
+│   │       │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_MPP_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_MPP_EN.pdf
+│   │       └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf
+│   └── RV1126_RV1109 (快速开发指南、硬件开发指南、发布说明、编解码说明)
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_EN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
+│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
+│       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
+└── external
+    ├── rknn-toolkit (模型转换、推理和性能评估的开发套件文档)
+    │   └── doc
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
+    │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+    └── rknpu
+        └── rknn (Rockchip NPU 开发文档)
+            └── doc
+                ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
+                └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
+```
+
 ### SDK 配置框架图
 
 ![](resources/SDK_Configuration_Framework.jpg)
@@ -128,10 +205,14 @@ SDK下载地址：
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
 ```
 
-| 支持的板级配置                                  | 备注                   |
-| ----------------------------------------------- | ---------------------- |
-| device/rockchip/rv1126_rv1109/BoardConfig.mk    | 通用版本的板级配置     |
-| device/rockchip/rv1126_rv1109/BoardConfig-tb.mk | 支持快速开机的板级配置 |
+| 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                               | 支持快速开机 |
+| ------ | -------------------------------------------- | -------- | --------------------------------------------------- | ------------ |
+| RV1109 | BoardConfig-38x38-spi-nand-rv1109.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO           |
+| RV1109 | BoardConfig-rv1109.mk                        | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
+| RV1109 | BoardConfig-tb-rv1109.mk                     | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
+| RV1126 | BoardConfig-spi-nand.mk                      | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
+| RV1126 | BoardConfig.mk                               | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
+| RV1126 | BoardConfig-tb.mk                            | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
 
 切换板级配置命令：
 
@@ -388,7 +469,7 @@ RTMP访问地址：
 http://设备IP地址
 ```
 
-网页端详细的操作说明请参考SDK目录docs下的文档。
+网页端详细的操作说明请参考SDK目录docs下的文档Rockchip_Instructions_Linux_Web_Configuration_CN.pdf。
 
 ### 如何测试人脸识别功能
 
@@ -447,10 +528,10 @@ SDK下载地址：
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
 ```
 
-| 支持的板级配置                                    | 备注                         |
-| ------------------------------------------------- | ---------------------------- |
-| device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk | 智能USB Camera产品的板级配置 |
-|                                                   |                              |
+| 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                                |
+| ------ | -------------------------------------------- | -------- | --------------------------------------------------- |
+| RV1109 | BoardConfig-rv1109-uvcc.mk                   | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| RV1126 | BoardConfig-uvcc.mk                          | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 
 切换板级配置命令：
 

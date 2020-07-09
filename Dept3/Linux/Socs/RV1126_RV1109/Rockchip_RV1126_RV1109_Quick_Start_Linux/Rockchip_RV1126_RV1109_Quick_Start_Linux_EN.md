@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.2.1
+Release Version: V1.3.0
 
-Release Date: 2020-06-29
+Release Date: 2020-07-09
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -66,6 +66,7 @@ This document (this guide) is mainly intended for:
 | V1.1.1 | CWW | 2020-06-16 | fix company name |
 | V1.2.0 | HJC | 2020-06-22 | Add smart usb camera product section |
 | V1.2.1 | CWW | 2020-06-29 | 1. update chapter 4.4<br>2. Add install fakeroot for building environment |
+| V1.3.0 | CWW | 2020-07-09 | 1. Add module path and document introduction<br>2. Add Build different Boards |
 
 ---
 
@@ -110,6 +111,81 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 - tools: stores some commonly used tools.
 - u-boot: U-Boot code.
 
+### RV1109/RV1126 Modules Dirctory Introduction
+
+| some of modules directory path | modules introduction                                                           |
+| ------------------------------ | --------------------------------------------------------                       |
+| external/recovery              | recovery                                                                       |
+| external/rkwifibt              | Wi-Fi and BT                                                                   |
+| external/libdrm                | DRM interface                                                                  |
+| external/rk_pcba_test          | PCBA test code                                                                 |
+| external/isp2-ipc              | Image signal processing server                                                 |
+| external/mpp                   | encoding and decoding                                                          |
+| external/rkmedia               | Rockchip Multimedia interface                                                  |
+| external/rkupdate              | Rockchip upgrade code                                                          |
+| external/camera_engine_rkaiq   | Image processing algorithm module                                              |
+| external/rknpu                 | NPU driver                                                                     |
+| external/rockface              | Face recognition code                                                          |
+| external/CallFunIpc            | Application interprocess communication code                                    |
+| external/common_algorithm      | Audio and video general algorithm library                                      |
+| external/rknn-toolkit          | Development kit for model transformation, reasoning and performance evaluation |
+| app/libIPCProtocol             | Based on dbus, provides a functional interface for inter-process communication |
+| app/mediaserver                | Main application providing multimedia services                                 |
+| app/ipc-daemon                 | System guard service                                                           |
+| app/dbserver                   | Database service                                                               |
+| app/netserver                  | Network services                                                               |
+| app/storage_manager            | Storage management service                                                     |
+| app/ipcweb-backend             | web backend                                                                    |
+| app/librkdb                    | Database interface                                                             |
+| app/ipcweb-ng                  | Web front end, using Angular 8 framework                                       |
+
+### RV1109/RV1126 Develop Document
+
+```shell
+├── docs
+│   ├── Linux
+│   │   ├── ApplicationNote (Rockchip Application Framework Develop Introduction and Web Develop Guide)
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+│   │   │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
+│   │   │   └── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
+│   │   └── Multimedia (1. ISP Develop Guide 2. Multimedia Encoding and Decoding Interface Develop Guide)
+│   │       ├── camera
+│   │       │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
+│   │       │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
+│   │       │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
+│   │       │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_MPP_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_MPP_EN.pdf
+│   │       └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf
+│   └── RV1126_RV1109 (1. Quick Start Guide 2. Hardware Develop Guide 3. SDK Release Note 4. Encoding&Decoding Introduction)
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_EN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
+│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
+│       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
+└── external
+    ├── rknn-toolkit (Development kit for model transformation, reasoning and performance evaluation)
+    │   └── doc
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
+    │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+    └── rknpu
+        └── rknn (Rockchip NPU Develop Guide)
+            └── doc
+                ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
+                └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
+```
+
 ### SDK Configuration Framework
 
 ![](resources/SDK_Configuration_Framework.jpg)
@@ -128,6 +204,15 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 | ----------------------------------------------- | ---------------------- |
 | device/rockchip/rv1126_rv1109/BoardConfig.mk    | General Version        |
 | device/rockchip/rv1126_rv1109/BoardConfig-tb.mk | Support Fast Boot      |
+
+| Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      | Support Thunder Boot |
+| ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- | -------------------- |
+| RV1109    | BoardConfig-38x38-spi-nand-rv1109.mk                      | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO                   |
+| RV1109    | BoardConfig-rv1109.mk                                     | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
+| RV1109    | BoardConfig-tb-rv1109.mk                                  | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
+| RV1126    | BoardConfig-spi-nand.mk                                   | SPI NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
+| RV1126    | BoardConfig.mk                                            | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
+| RV1126    | BoardConfig-tb.mk                                         | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
 
 Command of select board configure:
 
@@ -383,7 +468,7 @@ Open a web browser (Chrome browser is recommended ) to access the address:
 http://IP address of the device
 ```
 
-For detailed operation instructions on the web, please refer to the documents under the SDK docs directory.
+For detailed operation instructions on the web, please refer to the documents under the SDK docs directory which named Rockchip_Instructions_Linux_Web_Configuration_CN.pdf.
 
 ### How to Test Face Recognition Function
 
@@ -446,6 +531,11 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 | ------------------------------------------------- | ----------------------------- |
 | device/rockchip/rv1126_rv1109/BoardConfig-uvcc.mk | Smart USB Camera board config |
 |                                                   |                               |
+
+| Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      |
+| ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- |
+| RV1109    | BoardConfig-rv1109-uvcc.mk                                | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| RV1126    | BoardConfig-uvcc.mk                                       | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 
 Command of selecting board configure :
 
