@@ -157,7 +157,7 @@ Note: If your project has already started, please choose the first way to get th
 
 ### Development Guide
 
-The Kernel version of  RK3288 Linux SDK Kernel is Kernel 4.4, Rootfs is Buidlroot(2018.02-rc3) and Debian9/10 respectively. To help engineers quick start of SDK development and debugging, “Rockchip_RK3288_Quick_Start_Linux_SDK_EN.pdf” is released with the SDK. It can be obtained in the docs/RK3288 directory and will be continuously updated.
+The Kernel version of  RK3288 Linux SDK Kernel is Kernel 4.4, Rootfs is Buidlroot(2018.02-rc3) and Debian9/10 respectively. To help engineers quick start of SDK development and debugging, “RK3288_Linux_SDK_Release_xxx.pdf” is released with the SDK. It can be obtained in the docs/RK3288 directory and will be continuously updated.
 
 ### Software Update History
 
@@ -633,9 +633,9 @@ RK3288_Linux_SDK_V2.2.0_20200708 firmware download address is as follows (includ
 
 - RK3288 EVB development boards:
 
-[Buildroot](https://eyun.baidu.com/s/3ggylanh)
-[Debian9](https://eyun.baidu.com/s/3eTiEbQE)
-[Debian10](https://eyun.baidu.com/s/3pMw8R5T)
+[Buildroot](https://eyun.baidu.com/s/3jJFFLpO)
+[Debian9](https://eyun.baidu.com/s/3o9Gn84U)
+[Debian10](https://eyun.baidu.com/s/3pMeXNlh)
 
 ## SSH Public Key Operation Introduction
 

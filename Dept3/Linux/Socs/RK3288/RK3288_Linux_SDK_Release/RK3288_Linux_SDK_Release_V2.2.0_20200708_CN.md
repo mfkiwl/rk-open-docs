@@ -162,7 +162,7 @@ cd rk3288_linux/
 
 ### 开发指南
 
-RK3288 Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.02-rc3) 和 Debian9/10，为帮助开发工程师更快上手熟悉 SDK的开发调试工作，随 SDK 发布《Rockchip_RK3288_Quick_Start_Linux_SDK_CN.pdf》。可在 docs/RK3288 目录下获取，并会不断完善更新。
+RK3288 Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.02-rc3) 和 Debian9/10，为帮助开发工程师更快上手熟悉 SDK的开发调试工作，随 SDK 发布《RK3288_Linux_SDK_Release_xxx.pdf》。可在 docs/RK3288 目录下获取，并会不断完善更新。
 
 ### 软件更新记录
 
@@ -640,9 +640,9 @@ RK3288_Linux_SDK_V2.2.0_20200708 固件下载链接如下
 
 - RK3288 EVB 开发板
 
-[Buildroot](https://eyun.baidu.com/s/3ggylanh)
-[Debian9](https://eyun.baidu.com/s/3eTiEbQE)
-[Debian10](https://eyun.baidu.com/s/3pMw8R5T)
+[Buildroot](https://eyun.baidu.com/s/3jJFFLpO)
+[Debian9](https://eyun.baidu.com/s/3o9Gn84U)
+[Debian10](https://eyun.baidu.com/s/3pMeXNlh)
 
 ## SSH 公钥操作说明
 
