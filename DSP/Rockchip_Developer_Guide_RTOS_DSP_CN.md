@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-302
 
-发布版本：V1.7.0
+发布版本：V1.8.0
 
-日期：2020-06-18
+日期：2020-08-06
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -74,6 +74,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-03-10 | V1.5.0 | 廖华平 | 增加配置文件安装描述图 |
 | 2020-05-22 | V1.6.0 | 钟勇汪 | 修改编译工具源码路径 |
 | 2020-06-18 | V1.7.0 | 吴佳健 | 更新打包工具说明 |
+| 2020-08-06 | V1.8.0 | 吴佳健 | 新增Vendor Key校验说明 |
 
 ---
 
@@ -497,6 +498,32 @@ msh />Hifi3: xiaodu_wakeup--------xiaoduxiaodu-------
 Hifi3: process return value = 1
 work result:0x00000001
 ```
+
+### Vendor Key校验测试
+
+以flash uuid为例，校验测试基本流程如下：
+
+1. 使用FlashKeyTool读取flash uuid
+2. 使用上一步得到的flash uuid计算出校验时使用的key
+3. 使用FlashKeyTool工具将key写入到flash的vendor分区
+4. CPU测试时从vendor分区读取key，发送至DSP
+5. DSP读取flash uuid，经过算法计算后和CPU发送的key进行比对
+6. DSP将比对结果发送回CPU
+7. CPU和DSP根据校验结果做相应处理
+
+注：步骤1~3为烧录时步骤，也可使用相关源码定制工具，在一个工具内完成读取-计算-烧录工作。
+
+**CPU端**
+
+测试代码路径为bsp/rockchip/common/tests/dsp_test.c。
+
+控制台输入测试命令dsp_vendor_test，即可开始测试，测试需DSP固件内开启校验支持。
+
+**DSP端**
+
+代码路径为rkdsp/application/RK2108/key_verify.cpp。
+
+编译前需在Target内定义`DSP_VENDOR_VERIFY = 1`，并将校验算法接口对接至rkdsp/application/RK2108/key_verify.cpp文件内的snor_key_verify函数。该函数将传入CPU发送的key，并将校验函数的返回值返回给CPU。
 
 ## RKOS 代码解析
 
