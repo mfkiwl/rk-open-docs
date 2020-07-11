@@ -2,9 +2,9 @@
 
 文件标识： RK-SM-YF-340
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-06-28
+日期：2020-07-11
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0 | CJS | 2017-01-16 | 初始版本 |
 | V1.1.0 | Nickey Yang | 2018-04-28 | 修订格式和内容 |
 | V1.2.0   | Zack.Huang | 2020-06-28 | 整理内容和添加Qt creator章节 |
+| V1.3.0 | Zack.Huang | 2020-07-11 | 添加部分Qt编译选项的说明 |
 
 ---
 
@@ -285,10 +286,40 @@ RC_FILE = xxx.icns
 
 ### 编译工程
 
-回到目录SDK/下，编译项目模块
+回到目录SDK/下，编译项目模块：
 
 ```
 make 项目名称-rebuild
+```
+
+### Buildroot QT相关编译选项说明
+
+| 编译选项                            | 说明                                                     | 支持包大小（字节） |
+| ----------------------------------- | -------------------------------------------------------- | ------------------ |
+| BR2_PACKAGE_QTBASE5                 | 是否支持QT，添加qtbase（必选)                            | 21128724           |
+| BR2_PACKAGE_QT5CONNECTIVITY         | 是否添加设备连接类，如蓝牙                               |                    |
+| BR2_PACKAGE_QT5MULTIMEDIA           | 是否添加多媒体类                                         | 1719090            |
+| BR2_PACKAGE_QT5QUICKCONTROLS        | 是否引入Qt Quick Controls 服务组件                       | 4854537            |
+| BR2_PACKAGE_QT5WAYLAND              | 是否添加wayland显示服务组件                              | 817872             |
+| BR2_PACKAGE_QT5BASE_JPEG            | 是否支持JPEG图片格式                                     |                    |
+| BR2_PACKAGE_QT5BASE_PNG             | 是否支持PNG图片格式                                      |                    |
+| BR2_PACKAGE_QT5SVG                  | 是否支持位图格式图片格式                                 | 355584             |
+| BR2_PACKAGE_QT5TOOLS                | 是否添加QT工具，Qt工具提供了方便开发和设计应用程序的工具 |                    |
+| BR2_PACKAGE_QT5TOOLS_LINGUIST_TOOLS | 是否支持linguist主机工具lconvert、lrelease和lupdate      |                    |
+| BR2_PACKAGE_QT5VIRTUALKEYBOARD      | 是否支持虚拟键盘                                         |                    |
+| BR2_PACKAGE_QT5_VERSION_5_12        | 版本控制                                                 |                    |
+
+下面是一些字体选项的说明：
+
+```makefile
+BR2_PACKAGE_BITSTREAM_VERA                是否支持BITSTREAM_VERA字体
+BR2_PACKAGE_CANTARELL                     是否支持CANTARELL字体
+BR2_PACKAGE_DEJAVU                        是否支持DEJAVU字体
+BR2_PACKAGE_FONT_AWESOME                  是否支持FONTAWESOME图标字体库
+BR2_PACKAGE_GHOSTSCRIPT_FONTS             是否支持GHOSTSCRIPT字体
+BR2_PACKAGE_INCONSOLATA                   是否支持INCONSOLATA字体
+BR2_PACKAGE_LIBERATION                    是否支持ERATION字体
+BR2_PACKAGE_QT5BASE_FONTCONFIG            是否添加QT5字体库支持
 ```
 
 ## Qt Demo 程序说明
