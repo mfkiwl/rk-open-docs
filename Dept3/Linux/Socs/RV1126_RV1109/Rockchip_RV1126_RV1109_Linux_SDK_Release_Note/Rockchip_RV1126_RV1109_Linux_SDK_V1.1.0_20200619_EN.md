@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-359
 
-Release Version: V1.1.0
+Release Version: V1.1.1
 
-Release Date: 2020-06-19
+Release Date: 2020-07-11
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -55,6 +55,7 @@ This document (this guide) is mainly intended for:
 | 2020-05-15 | V0.2 | CWW | Update docs path |
 | 2020-06-16 | V1.0.0 | CWW | Update official version |
 | 2020-06-19 | V1.1.0 | CW | Update for Smart USB Camera SDK |
+| 2020-07-11 | V1.1.1 | CWW | Update 2.1 chapter |
 
 ---
 
@@ -97,7 +98,7 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Getting from local package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 as an example. After getting an initialization package, you can get the source code by running the following command:
+Take rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 (Please refer to the actual basic package) as an example. After getting an initialization package, you can get the source code by running the following command:
 
 ```shell
 mkdir rv1126_rv1109

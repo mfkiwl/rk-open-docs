@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-359
 
-发布版本：V1.1.0
+发布版本：V1.1.1
 
-日期：2020-06-19
+日期：2020-07-11
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -62,6 +62,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-05-15 | V0.2 | CWW | 更新文档路径 |
 | 2020-06-16 | V1.0.0 | CWW | 更新正式版本 |
 | 2020-06-19 | V1.1.0 | CW | 增加智能USB Camera下载说明 |
+| 2020-07-11 | V1.1.1 | CWW | 更新2.1节 |
 
 ---
 
@@ -87,7 +88,7 @@ SDK通过瑞芯微代码服务器对外发布获取。其编译开发环境，�
 
 获取 RV1126/RV1109 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请SDK，同步提供SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 5 节  [SSH 公钥操作说明](## 5 SSH 公钥操作说明)。
 
-RV1109_Linux_SDK 下载命令如下：
+RV1126_RV1109_Linux_SDK 下载命令如下：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
@@ -102,7 +103,7 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 rv1126_rv1109_linux_sdk_v1.0.0_20200616.tar.bz2 （请以实际获取的基础包为准）为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rv1126_rv1109
