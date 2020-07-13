@@ -77,11 +77,11 @@ RK3308
 
 ---
 
-## 、概述
+## 概述
 
 该代码模块集成在libDeviceIo.so动态库里面，基于wpa封装的WIFI操作接口。
 
-## 、接口说明
+## 接口说明
 
 - `RK_WIFI_RUNNING_State_e`
 
@@ -199,7 +199,7 @@ bssid / frequency / signal level / flags / ssid
 
 以ping的方式判断网络是否连接
 
-## 、使用示例
+## 使用示例
 
 ```c
 #include <stdio.h>

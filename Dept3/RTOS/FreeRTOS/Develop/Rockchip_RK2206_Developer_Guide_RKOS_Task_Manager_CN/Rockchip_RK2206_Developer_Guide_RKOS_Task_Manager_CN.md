@@ -842,7 +842,7 @@ void \* para);
 | hTask         | HTC      | typedef void * HTC；任务句柄                                 |
 | return        | uint32   | typedef unsigned long uint32 0：Runing --- 运行态 1：Ready --- 就绪态 2：Blocked --- 阻塞态 3: Suspend --- 挂起态 4: Deleted --- 删除态 |
 
-### 种任务创建API对比说明
+### 3种任务创建API对比说明
 
 本文所指的任务统称为线程，但是每个API创建出来任务性质不同，使用场景不同。
 

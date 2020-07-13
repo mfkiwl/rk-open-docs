@@ -102,7 +102,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
     rtprintf("memory bandwidth: %s\n", buf);
 ```
 
-## 位长整型打印
+## 64位长整型打印
 
    官方的 RTT 支持64位的长整型打印，不过这个功能默认没有打开，可以通过如下方式启用：
 

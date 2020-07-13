@@ -77,11 +77,11 @@ RK3308
 
 ---
 
-## 、概述
+## 概述
 
 该代码模块集成在libDeviceIo.so动态库里面，基于input_event输入子系统，对按键的常用需求，包括短按、长按、组合按键等需求做了封装处理，方便开发。
 
-## 、接口说明
+## 接口说明
 
 - `Callback函数定义`
 
@@ -175,7 +175,7 @@ int RK_input_register_transaction_press_callback(RK_input_transaction_press_call
 int RK_input_exit(void)
 ```
 
-## 、使用示例
+## 使用示例
 
 ```c
 #include <stdio.h>

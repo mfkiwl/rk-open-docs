@@ -114,7 +114,7 @@ Note: Developers can download the individual rkbin repository which contains the
 
 #### Kernel 3.10
 
-##### bit platform
+##### 32 bit platform
 
 （1）Add psci node
 
@@ -137,7 +137,7 @@ chosen {
 };
 ```
 
-##### bit platform
+##### 64 bit platform
 
 （1）Add psci node：
 
@@ -190,7 +190,7 @@ cpus {
 
 #### Kernel 4.4+
 
-##### bit platform
+##### 32 bit platform
 
 Just need to add psci node：
 
@@ -201,7 +201,7 @@ psci {
 };
 ```
 
-##### bit platform
+##### 64 bit platform
 
 （1）Add psci node：
 

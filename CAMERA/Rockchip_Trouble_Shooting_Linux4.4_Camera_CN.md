@@ -466,7 +466,7 @@ SDK中external/uvc_app/目录提供了将板卡模拟成uvc camera的功能，�
 /sys/class/video4linux/video6/name:rkisp1-input-params
 ```
 
-## A相关
+## 3A相关
 
 如果Sensor需要3A tunning，如Sensor输出格式RGGB, BGGR等这样的RAW BAYER RGB格式，那么需要RKISP提供图像处理。
 根据camera_engine_rkisp版本的不同，3A处理方式有差别。建议尽量将camera_engine_rkisp升级到最新的版本。
