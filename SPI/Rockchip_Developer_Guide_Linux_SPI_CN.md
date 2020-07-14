@@ -2,17 +2,15 @@
 
 文件标识：RK-KF-YF-020
 
-发布版本：V2.1.0
+发布版本：V2.2.0
 
-日期：2020-02-12
+日期：2020-07-14
 
-文件密级：公开资料
-
----
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2019福州瑞芯微电子股份有限公司**
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -60,9 +58,8 @@ Fuzhou Rockchip Electronics Co., Ltd.
 本文档（本指南）主要适用于以下工程师：
 
 技术支持工程师
-软件开发工程师
 
----
+软件开发工程师
 
 **修订记录**
 
@@ -71,11 +68,14 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | V1.0.0 | 洪慧斌 | 2016-06-29 | 初始版本 |
 | V2.0.0 | 林鼎强 | 2019-12-03 | 新增 linux4.19 支持 |
 | V2.1.0 | 林鼎强 | 2020-02-13 | 修改 SPI slave 配置 |
+| V2.2.0 | 林鼎强 | 2020-07-14 | 修订 Linux 4.19 DTS 相关配置，优化文档排版结构 |
+
+---
 
 **目录**
 
----
 [TOC]
+
 ---
 
 ## Rockchip SPI 功能特点
@@ -96,15 +96,17 @@ SPI （serial peripheral interface），以下是 linux 4.4 spi 驱动支持的�
 
 ### 代码路径
 
-```c
-drivers/spi/spi.c    		 spi驱动框架
-drivers/spi/spi-rockchip.c   rk spi各接口实现
-drivers/spi/spidev.c   		 创建spi设备节点，用户态使用。
+```
+drivers/spi/spi.c                spi驱动框架
+drivers/spi/spi-rockchip.c       rk spi各接口实现
+drivers/spi/spidev.c             创建spi设备节点，用户态使用。
 drivers/spi/spi-rockchip-test.c  spi测试驱动，需要自己手动添加到Makefile编译
 Documentation/spi/spidev_test.c  用户态spi测试工具
 ```
 
-### 内核配置
+### SPI 设备配置 —— RK 芯片做 Master 端
+
+**内核配置**
 
 ```c
 Device Drivers  --->
@@ -112,165 +114,72 @@ Device Drivers  --->
 		<*>   Rockchip SPI controller driver
 ```
 
-### DTS 节点配置
+**DTS 节点配置**
+
+Linux 4.4 配置：
 
 ```c
-&spi1 {     						//引用spi 控制器节点
-status = "okay";
-max-freq = <48000000>; 				//spi内部工作时钟
-dma-names = "tx","rx";   			//使能DMA模式，一般通讯字节少于32字节的不建议用
-	spi_test@10 {
-		compatible ="rockchip,spi_test_bus1_cs0";  //与驱动对应的名字
-		reg = <0>;   			 //片选0或者1
-		spi-max-frequency = <24000000>;   //spi clk输出的时钟频率，不超过50M
-		status = "okay";		 //使能设备节点
-	};
+&spi1 {                                             //引用spi 控制器节点
+    status = "okay";
+    max-freq = <48000000>;                          //spi内部工作时钟
+    dma-names = "tx","rx";                          //使能DMA模式，一般通讯字节少于32字节的不建议用;
+    spi_test@10 {
+        compatible ="rockchip,spi_test_bus1_cs0";   //与驱动对应的名字
+        reg = <0>;                                  //片选0或者1
+        spi-cpha;                                   //设置 CPHA = 1，不配置则为 0
+        spi-cpol;                                   //设置 CPOL = 1，不配置则为 0
+        spi-max-frequency = <24000000>;             //spi clk输出的时钟频率，不超过50M
+        status = "okay";                            //使能设备节点
+    };
 };
-```
-
-一般只需配置以下几个属性就能工作了。
-
-```
-		spi_test@11 {
-				compatible ="rockchip,spi_test_bus1_cs1";
-				reg = <1>;
-				spi-max-frequency = <24000000>;
-				status = "okay";
-		};
 ```
 
 max-freq 和 spi-max-frequency 的配置说明：
 
-* spi-max-frequency 是 SPI 的输出时钟，是 max-freq 分频后输出的，关系是 max-freq >= 2*spi-max-frequency。
-* max-freq 不要低于 24M，否则可能有问题。
-* 如果需要配置 spi-cpha 的话， max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
+* spi-max-frequency 是 SPI 的输出时钟，由 SPI 工作时钟 max-freq 内部分频后输出，由于内部至少 2 分频，所以关系是 max-freq >= 2*spi-max-frequency；
 
-### SPI 设备驱动
+* 假定需要 50MHz 的 SPI IO 速率，可以考虑配置（记住内部分频为偶数分频），max-freq = <100000000>，spi-max-frequency = <50000000>，即工作时钟 100 MHz（PLL 分频到一个不大于 100MHz 但最接近的值），然后内部二分频最终 IO 接近 50 MHz；
+* max-freq 不要低于 24M，否则可能有问题；
+* 如果需要配置 spi-cpha 的话， 要求 max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
 
-设备驱动注册:
-
-```c
-static int spi_test_probe(struct spi_device *spi)
-{
-		int ret;
-		int id = 0;
-		if(!spi)
-			return -ENOMEM;
-		spi->bits_per_word= 8;
-		ret= spi_setup(spi);
-		if(ret < 0) {
-			dev_err(&spi->dev,"ERR: fail to setup spi\n");
-			return-1;
-		}
-		return ret;
-}
-static int spi_test_remove(struct spi_device *spi)
-{
-		printk("%s\n",__func__);
-		return 0;
-}
-static const struct of_device_id spi_test_dt_match[]= {
-		{.compatible = "rockchip,spi_test_bus1_cs0", },
-		{.compatible = "rockchip,spi_test_bus1_cs1", },
-		{},
-};
-MODULE_DEVICE_TABLE(of,spi_test_dt_match);
-static struct spi_driver spi_test_driver = {
-		.driver = {
-			.name  = "spi_test",
-			.owner = THIS_MODULE,
-			.of_match_table = of_match_ptr(spi_test_dt_match),
-		},
-		.probe = spi_test_probe,
-		.remove = spi_test_remove,
-};
-static int __init spi_test_init(void)
-{
-		int ret = 0;
-		ret = spi_register_driver(&spi_test_driver);
-		return ret;
-}
-device_initcall(spi_test_init);
-static void __exit spi_test_exit(void)
-{
-		return spi_unregister_driver(&spi_test_driver);
-}
-module_exit(spi_test_exit);
-```
-
-对 spi 读写操作请参考 include/linux/spi/spi.h，以下简单列出几个
+Linux 4.19 配置：
 
 ```c
-static inline int
-spi_write(struct spi_device *spi,const void *buf, size_t len)
-static inline int
-spi_read(struct spi_device *spi,void *buf, size_t len)
-static inline int
-spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
-```
-
-### User mode SPI device 配置说明
-
-User mode SPI device 指的是用户空间直接操作 SPI 接口，这样方便众多的 SPI 外设驱动跑在用户空间，
-
-不需要改到内核，方便驱动移植开发。
-
-#### 内核配置
-
-```c
-Device Drivers  --->
-	[*] SPI support  --->
-		[*]   User mode SPI device driver support
-```
-
-#### DTS 配置
-
-```c
-&spi0 {
-	status = "okay";
-	max-freq = <50000000>;
-	spi_test@00 {
-		compatible = "rockchip,spidev";
-		reg = <0>;
-		spi-max-frequency = <5000000>;
-	};
+&spi1 {                                             //引用spi 控制器节点
+    status = "okay";
+    assigned-clocks = <&pmucru CLK_SPI0>;           //指定 SPI sclk，可以通过查看 dtsi 中命名为 spiclk 的时钟
+    assigned-clock-rates = <200000000>;             //相应 clock 在解析 dts 时完成赋值
+    dma-names = "tx","rx";                          //使能DMA模式，一般通讯字节少于32字节的不建议用，dtsi 中默认设定，可通过置空赋值去掉使能;
+    spi_test@10 {
+        compatible ="rockchip,spi_test_bus1_cs0";   //与驱动对应的名字
+        reg = <0>;                                  //片选0或者1
+        spi-cpha;                                   //设置 CPHA = 1，不配置则为 0
+        spi-cpol;                                   //设置 CPOL = 1，不配置则为 0
+        spi-lsb-first;                              //IO 先传输 lsb
+        spi-max-frequency = <24000000>;             //spi clk输出的时钟频率，不超过50M
+        status = "okay";                            //使能设备节点
+    };
 };
 ```
 
-#### 内核补丁
+spiclk assigned-clock-rates 和 spi-max-frequency 的配置说明：
 
-```c
-diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
-index d0e7dfc..b388c32 100644
---- a/drivers/spi/spidev.c
-+++ b/drivers/spi/spidev.c
-@@ -695,6 +695,7 @@ static struct class *spidev_class;
-static const struct of_device_id spidev_dt_ids[] = {
-        { .compatible = "rohm,dh2228fv" },
-        { .compatible = "lineartechnology,ltc2488" },
-+       { .compatible = "rockchip,spidev" },
-        {},
-};
-MODULE_DEVICE_TABLE(of, spidev_dt_ids);
-```
+* spi-max-frequency 是 SPI 的输出时钟，由 SPI 工作时钟 spiclk  assigned-clock-rates 内部分频后输出，由于内部至少 2 分频，所以关系是 spiclk  assigned-clock-rates >= 2*spi-max-frequency；
+* 假定需要 50MHz 的 SPI IO 速率，可以考虑配置（记住内部分频为偶数分频）spi_clk assigned-clock-rates = <100000000>，spi-max-frequency = <50000000>，即工作时钟 100 MHz（PLL 分频到一个不大于 100MHz 但最接近的值），然后内部二分频最终 IO 接近 50 MHz；
+* spiclk  assigned-clock-rates 不要低于 24M，否则可能有问题；
+* 如果需要配置 spi-cpha 的话， 要求 spiclk  assigned-clock-rates <= 6M,  1M <= spi-max-frequency  >= 3M。
 
-说明：较旧的内核可能没有 2.4.1 和 2.4.3 ，需要手动添加，如果已经包含这两个的内核，只要添加 2.4.2 即可。
-
-#### 使用说明
-
-驱动设备加载注册成功后，会出现类似这个名字的设备：/dev/spidev1.1
-
-请参照 Documentation/spi/spidev_test.c
-
-### SPI 做 slave
+### SPI  设备配置 ——  RK 芯片做 Slave 端
 
 SPI 做 slave 使用的接口和 master 模式一样，都是 spi_read 和 spi_write。
 
 #### Linux 4.4 配置
 
-内核补丁，请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
+**内核补丁**
 
-```c
+请先检查下自己的代码是否包含以下补丁，如果没有，请手动打上补丁：
+
+```diff
 diff --git a/drivers/spi/spi-rockchip.c b/drivers/spi/spi-rockchip.c
 index 060806e..38eecdc 100644
 --- a/drivers/spi/spi-rockchip.c
@@ -320,49 +229,54 @@ index cce80e6..ce2cec6 100644
         void                    *controller_data;
 ```
 
-dts 配置：
+**DTS 节点配置**
 
 ```c
-    &spi0 {
-        max-freq = <48000000>;   //spi internal clk, don't modify
-        spi_test@01 {
-                compatible = "rockchip,spi_test_bus0_cs1";
-                id = <1>;
-                reg = <1>;
-                //spi-max-frequency = <24000000>;  这不需要配
-                spi-slave-mode; //使能slave 模式， 只需改这里就行。
-        };
+&spi0 {
+    max-freq = <48000000>;   //spi internal clk, don't modify
+    spi_test@01 {
+        compatible = "rockchip,spi_test_bus0_cs1";
+        id = <1>;
+        reg = <1>;
+        //spi-max-frequency = <24000000>;  这不需要配
+        spi-slave-mode; //使能slave 模式， 只需改这里就行。
     };
+};
 ```
 
 注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
 
 #### Linux 4.19 配置
 
-Linux 4.19 引入 SPI slave 框架，因此主控代码 spi-rockchip.c 添加了探测 SPI slave 模式的支持：
+**内核配置**
 
-```c
-of_property_read_bool(pdev->dev.of_node, "spi-slave")
+```
+Device Drivers  --->
+	[*] SPI support  --->
+		[*]   SPI slave protocol handlers
 ```
 
-所以仅需配置 dts ：
+ **DTS 节点配置**
 
 ```c
-&spi0 {
-	status = "okay";
-	max-freq = <48000000>; //spi internal clk, don't modify
-	spi-slave; //使能 slave 模式
-	slave { //按照框架要求，SPI slave 子节点的命名需以 "slave" 开始
-		compatible = "rockchip,spi_test_bus0_cs0";
-		id = <0>;
-		spi-max-frequency = <24000000>;
-	};
+&spi1 {
+    status = "okay";
+    assigned-clocks = <&pmucru CLK_SPI0>;
+    assigned-clock-rates = <200000000>;
+    dma-names = "tx","rx";
+    spi-slave;                                            //使能 slave 模式
+    slave {                                               //按照框架要求，SPI slave 子节点的命名需以 "slave" 开始
+        compatible ="rockchip,spi_test_bus1_cs0";
+        reg = <0>;
+        id = <0>;
+        //spi-max-frequency = <24000000>;  这不需要配
+    };
 };
 ```
 
-注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
+注意：spi_clk assigned-clock-rates 必须是 master spi-max-frequency clk 的 6 倍以上，比如 spi_clk assigned-clock-rates  = <48000000>，master 给过来的时钟必须小于 8M。
 
-#### 测试
+#### SPI Slave 测试须知
 
 spi 做 slave，要先启动 slave read，再启动 master write，不然会导致 slave 还没读完，master 已经写完了。
 
@@ -374,51 +288,151 @@ slave write，master read 也是需要先启动 slave write，因为只有 maste
 
 再 master:  `echo read 0 1 16 > /dev/spi_misc_test`
 
-## SPI 内核测试驱动
+### SPI 设备驱动介绍
 
-### 内核驱动
+设备驱动注册:
+
+```c
+static int spi_test_probe(struct spi_device *spi)
+{
+    int ret;
+    int id = 0;
+    if(!spi)
+        return -ENOMEM;
+    spi->bits_per_word= 8;
+    ret= spi_setup(spi);
+    if(ret < 0) {
+        dev_err(&spi->dev,"ERR: fail to setup spi\n");
+        return-1;
+    }
+    return ret;
+}
+static int spi_test_remove(struct spi_device *spi)
+{
+    printk("%s\n",__func__);
+    return 0;
+}
+static const struct of_device_id spi_test_dt_match[]= {
+    {.compatible = "rockchip,spi_test_bus1_cs0", },
+    {.compatible = "rockchip,spi_test_bus1_cs1", },
+    {},
+};
+MODULE_DEVICE_TABLE(of,spi_test_dt_match);
+static struct spi_driver spi_test_driver = {
+    .driver = {
+        .name  = "spi_test",
+        .owner = THIS_MODULE,
+        .of_match_table = of_match_ptr(spi_test_dt_match),
+    },
+    .probe = spi_test_probe,
+    .remove = spi_test_remove,
+};
+static int __init spi_test_init(void)
+{
+    int ret = 0;
+    ret = spi_register_driver(&spi_test_driver);
+    return ret;
+}
+device_initcall(spi_test_init);
+static void __exit spi_test_exit(void)
+{
+    return spi_unregister_driver(&spi_test_driver);
+}
+module_exit(spi_test_exit);
+```
+
+对 spi 读写操作请参考 include/linux/spi/spi.h，以下简单列出几个
+
+```c
+static inline int
+spi_write(struct spi_device *spi,const void *buf, size_t len)
+static inline int
+spi_read(struct spi_device *spi,void *buf, size_t len)
+static inline int
+spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
+```
+
+### User mode SPI device 配置
+
+User mode SPI device 指的是用户空间直接操作 SPI 接口，这样方便众多的 SPI 外设驱动跑在用户空间，
+
+不需要改到内核，方便驱动移植开发。
+
+**内核配置**
+
+```c
+Device Drivers  --->
+	[*] SPI support  --->
+		[*]   User mode SPI device driver support
+```
+
+**DTS 配置**
+
+```c
+&spi0 {
+	status = "okay";
+	max-freq = <50000000>;
+	spi_test@00 {
+		compatible = "rockchip,spidev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+	};
+};
+```
+
+**使用说明**
+
+驱动设备加载注册成功后，会出现类似这个名字的设备：/dev/spidev1.1
+
+请参照 Documentation/spi/spidev_test.c
+
+## 内核测试软件
+
+### 代码路径
 
 ```c
 drivers/spi/spi-rockchip-test.c
+```
+
+### SPI 测试设备配置
+
+**内核补丁**
+
+```c
 需要手动添加编译：
 drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
 ```
 
-### DTS 配置
+**DTS 配置**
 
 ```c
 &spi0 {
-        status = "okay";
-        max-freq = <48000000>;   //spi internal clk, don't modify
-        //dma-names = "tx", "rx";   //enable dma
-        pinctrl-names = "default";  //pinctrl according to you board
-        pinctrl-0 = <&spi0_clk &spi0_tx &spi0_rx &spi0_cs0 &spi0_cs1>;
-        spi_test@00 {
-                compatible = "rockchip,spi_test_bus0_cs0";
-                id = <0>;		//这个属性spi-rockchip-test.c用来区分不同的spi从设备的
-                reg = <0>;   //chip select  0:cs0  1:cs1
-                spi-max-frequency = <24000000>;   //spi output clock
-        };
-
-        spi_test@01 {
-                compatible = "rockchip,spi_test_bus0_cs1";
-                id = <1>;
-                reg = <1>;
-                spi-max-frequency = <24000000>;
-                spi-slave-mode; 使能slave 模式， 只需改这里就行。
-        };
+    status = "okay";
+    spi_test@00 {
+        compatible = "rockchip,spi_test_bus0_cs0";
+        id = <0>;                                       //这个属性spi-rockchip-test.c用来区分不同的spi从设备的
+        reg = <0>;                                      //chip select  0:cs0  1:cs1
+        spi-max-frequency = <24000000>;                 //spi output clock
+    };
+    spi_test@01 {
+        compatible = "rockchip,spi_test_bus0_cs1";
+        id = <1>;
+        reg = <1>;
+        spi-max-frequency = <24000000>;
+        spi-slave-mode; 使能slave 模式， 只需改这里就行。
+    };
 };
 ```
 
-### 驱动 log
+**驱动 log**
 
 ```c
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
 [    0.530774] spi_test spi32766.0: fail to get type, default set 0
 [    0.531342] spi_test spi32766.0: fail to get enable_dma, default set 0
 以上这几个没配的话，不用管
-[	 0.531929]   rockchip_spi_test_probe:name=spi_test_bus1_cs0,bus_num=32766,cs=0,mode=0,speed=5000000
+[    0.531929]   rockchip_spi_test_probe:name=spi_test_bus1_cs0,bus_num=32766,cs=0,mode=0,speed=5000000
 [    0.532711] rockchip_spi_test_probe:poll_mode=0, type=0, enable_dma=0
 这是驱动注册成功的标志
 ```

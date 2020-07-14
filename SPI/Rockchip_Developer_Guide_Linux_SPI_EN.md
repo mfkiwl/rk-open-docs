@@ -2,37 +2,35 @@
 
 ID: RK-KF-YF-075
 
-Release Version: V2.1.0
+Release Version: V2.2.0
 
-Release Date: 2020-02-13
+Release Date: 2020-07-114
 
-Security Level: Non-confidential
-
----
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
-“Rockchip”, “瑞芯微”, “瑞芯” shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
-Website：     [www.rock-chips.com](http://www.rock-chips.com)
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
 
-Customer service Tel： +86-4007-700-590
+Customer service Tel:  +86-4007-700-590
 
-Customer service Fax： +86-591-83951833
+Customer service Fax:  +86-591-83951833
 
-Customer service e-Mail： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -56,17 +54,20 @@ This document (this guide) is mainly intended for:
 Technical support engineers
 Software development engineers
 
+---
+
 **Revision History**
 
-| **Version** | **Author**    | **Date**   | **Change Description**         |
-| ----------- | ------------- | :--------- | ------------------------------ |
-| V1.0.0      | Huibin Hong   | 2016-06-29 | Initial version                |
-| V2.0.0      | Dingqiang Lin | 2019-12-09 | Support Linux 4.19             |
-| V2.1.0      | Dingqiang Lin | 2020-02-13 | Adjust SPI slave configuration |
-
-**Content**
+| **Version** | **Author**    | **Date**   | **Change Description**                                       |
+| ----------- | ------------- | :--------- | ------------------------------------------------------------ |
+| V1.0.0      | Huibin Hong   | 2016-06-29 | Initial version                                              |
+| V2.0.0      | Dingqiang Lin | 2019-12-09 | Support Linux 4.19                                           |
+| V2.1.0      | Dingqiang Lin | 2020-02-13 | Adjust SPI slave configuration                               |
+| V2.2.0      | Dingqiang Lin | 2020-07-14 | Linux 4.19 DTS configuration change, Optimize document layout |
 
 ---
+
+**Contents**
 
 [TOC]
 
@@ -91,14 +92,16 @@ the following are some of the new features supported by the Linux 4.19 SPI drive
 ### Code Path
 
 ```c
-drivers/spi/spi.c				/* SPI Driver framework */
-drivers/spi/spi-rockchip.c		/* RK SPI  implement of interface */
-drivers/spi/spidev.c			/* Create  SPI  device node for using */
-drivers/spi/spi-rockchip-test.c	/* SPI test driver, it needs to add to Makefile compiler manually. */
-Documentation/spi/spidev_test.c	/* SPI test tool in user state */
+drivers/spi/spi.c               /* SPI Driver framework */
+drivers/spi/spi-rockchip.c      /* RK SPI  implement of interface */
+drivers/spi/spidev.c            /* Create  SPI  device node for using */
+drivers/spi/spi-rockchip-test.c /* SPI test driver, it needs to add to Makefile compiler manually. */
+Documentation/spi/spidev_test.c /* SPI test tool in user state */
 ```
 
-### Kernel Configuration
+### SPI Device Configuration: RK SPI As  Master Port
+
+**Kernel Configuration**
 
 ```c
 Device Drivers  --->
@@ -106,167 +109,70 @@ Device Drivers  --->
 		<*>   Rockchip SPI controller driver
 ```
 
-### DTS Node Configuration
+**DTS Node Configuration**
+
+Linux 4.4 Configuration:
 
 ```c
-&spi1 {								//Quote SPI controller node
-status = "okay";
-max-freq = <48000000>;				//SPI internal clock
-dma-names = "tx","rx";				//Enable DMA mode, it is not recommended if the general communication byte is less than 32 bytes
-	spi_test@10 {
-		compatible ="rockchip,spi_test_bus1_cs0";	//The name corresponding to the driver
-		reg = <0>;					//Chip select 0 or 1
-		spi-max-frequency = <24000000>;	//This is clock frequency of spi clk output,witch does not exceed 50M.
-		spi-cpha;					//If configure it, cpha is 1
-		spi-cpo;					//If configure it,cpol is 1, the clk pin remains high level.
-		status = "okay";			//Enable device node
-	};
+&spi1 {                                  //Quote SPI controller node
+    status = "okay";
+    max-freq = <48000000>;               //SPI internal clock
+    dma-names = "tx","rx";               //Enable DMA mode, it is not recommended if the general communication byte is less than 32 bytes
+    spi_test@10 {
+        compatible ="rockchip,spi_test_bus1_cs0"; //The name corresponding to the driver
+        reg = <0>;                       //Chip select 0 or 1
+        spi-max-frequency = <24000000>;  //This is clock frequency of spi clk output,witch does not exceed 50M.
+        spi-cpha;                        //If configure it, cpha is 1
+        spi-cpol;                        //If configure it,cpol is 1, the clk pin remains high level.
+        status = "okay";                 //Enable device node
+    };
 };
-```
-
-Typically, SPI can work by only configuring the following properties.
-
-```c
-		spi_test@11 {
-				compatible ="rockchip,spi_test_bus1_cs1";
-				reg = <1>;
-				spi-max-frequency = <24000000>;
-				status = "okay";
-		};
 ```
 
 Configuration instructions for max-freq and spi-max-frequency:
 
 - spi-max-frequency is the output clock of the SPI, which is output after max-freq was divided, and the relationship between them is max-freq >= 2*spi-max-frequency.
+- Assume that  we want 50MHz SPI IO rate，the configuration can be set as: max-freq = <100000000>，spi-max-frequency = <50000000>.
 - max-freq should not be lower than 24M, otherwise there may be problems.
 - If you need to configure spi-cpha, max-freq <= 6M, 1M <= spi-max-frequency >= 3M.
 
-### SPI Device  Driver
-
-Register device driver:
+Linux 4.19 Configuration:
 
 ```c
-static int spi_test_probe(struct spi_device *spi)
-{
-		int ret;
-		int id = 0;
-		if(!spi)
-			return -ENOMEM;
-		spi->bits_per_word= 8;
-		ret= spi_setup(spi);
-		if(ret < 0) {
-			dev_err(&spi->dev,"ERR: fail to setup spi\n");
-			return-1;
-		}
-		return ret;
-}
-static int spi_test_remove(struct spi_device *spi)
-{
-		printk("%s\n",__func__);
-		return 0;
-}
-static const struct of_device_id spi_test_dt_match[]= {
-		{.compatible = "rockchip,spi_test_bus1_cs0", },
-		{.compatible = "rockchip,spi_test_bus1_cs1", },
-		{},
-};
-MODULE_DEVICE_TABLE(of,spi_test_dt_match);
-static struct spi_driver spi_test_driver = {
-		.driver = {
-			.name  = "spi_test",
-			.owner = THIS_MODULE,
-			.of_match_table = of_match_ptr(spi_test_dt_match),
-		},
-		.probe = spi_test_probe,
-		.remove = spi_test_remove,
-};
-static int __init spi_test_init(void)
-{
-		int ret = 0;
-		ret = spi_register_driver(&spi_test_driver);
-		return ret;
-}
-device_initcall(spi_test_init);
-static void __exit spi_test_exit(void)
-{
-		return spi_unregister_driver(&spi_test_driver);
-}
-module_exit(spi_test_exit);
-```
-
-For SPI read and write operations, please refer to `include/linux/spi/spi.h`.
-
-```c
-static inline int
-spi_write(struct spi_device *spi,const void *buf, size_t len)
-static inline int
-spi_read(struct spi_device *spi,void *buf, size_t len)
-static inline int
-spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
-```
-
-### User mode SPI device Configuration
-
-User mode SPI device means operating the SPI interface in user space directly, which makes it convenient for many SPI peripheral drivers run in user space.
-
-There is no need to change the kernel to facilitate driver development.
-
-#### Kernel Configuration
-
-```c
-Device Drivers  --->
-	[*] SPI support  --->
-		[*]   User mode SPI device driver support
-```
-
-#### DTS Configuration
-
-```c
-&spi0 {
-	status = "okay";
-	max-freq = <50000000>;
-	spi_test@00 {
-		compatible = "rockchip,spidev";
-		reg = <0>;
-		spi-max-frequency = <5000000>;
-	};
+&spi1 {                                  //Quote SPI controller node
+    status = "okay";
+    max-freq = <48000000>;               //SPI internal clock, find the clock witch is named spiclk in dtsi
+    dma-names = "tx","rx";               //Enable DMA mode, it is not recommended if the general communication byte is less than 32 bytes
+    spi_test@10 {
+        compatible ="rockchip,spi_test_bus1_cs0";	//The name corresponding to the driver
+        reg = <0>;                       //Chip select 0 or 1
+        spi-cpha;                        //If configure it, cpha is 1
+        spi-cpol;                        //If configure it,cpol is 1, the clk pin remains high level.
+        spi-lsb-first;                   //IO firstly transfer lsb
+        status = "okay";                 //Enable device node
+        spi-max-frequency = <24000000>;  //This is clock frequency of spi clk output,witch does not exceed 50M.
+    };
 };
 ```
 
-#### Kernel Patch
+Configuration instructions for spiclk assigned-clock-rates and spi-max-frequency:
 
-```c
-diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
-index d0e7dfc..b388c32 100644
---- a/drivers/spi/spidev.c
-+++ b/drivers/spi/spidev.c
-@@ -695,6 +695,7 @@ static struct class *spidev_class;
-static const struct of_device_id spidev_dt_ids[] = {
-        { .compatible = "rohm,dh2228fv" },
-        { .compatible = "lineartechnology,ltc2488" },
-+       { .compatible = "rockchip,spidev" },
-        {},
-};
-MODULE_DEVICE_TABLE(of, spidev_dt_ids);
-```
+- spi-max-frequency is the output clock of the SPI, which is output after spiclk assigned-clock-rates was divided, and the relationship between them is spiclk assigned-clock-rates >= 2*spi-max-frequency.
+- Assume that  we want 50MHz SPI IO rate，the configuration can be set as: spiclk assigned-clock-rates = <100000000>，spi-max-frequency = <50000000>.
+- spiclk assigned-clock-rates should not be lower than 24M, otherwise there may be problems.
+- If you need to configure spi-cpha, spiclk assigned-clock-rates <= 6M, 1M <= spi-max-frequency >= 3M.
 
-Note: The legacy kernels may not have 2.4.1 and 2.4.3 and need to be added manually. If there already have both cores, just add 2.4.2.
-
-#### Using Instruction
-
-After the driver device is successfully registered, a device like this name will be displayed: /dev/spidev1.1
-
-Please refer to Documentation/spi/spidev_test.c
-
-### Independent SPI slave configuration
+### SPI Device Configuration: RK SPI As  Slave Port
 
 The interfaces "spi_read" and "spi_write" of SPI slave are the same as SPI master.
 
 #### Linux 4.4 configuration
 
-About kernel patch of the slave, please check if your code contains the following patches, if not, please add the patch:
+**Kernel Patch**
 
-```c
+please check if your code contains the following patches, if not, please add the patch:
+
+```diff
 diff --git a/drivers/spi/spi-rockchip.c b/drivers/spi/spi-rockchip.c
 index 060806e..38eecdc 100644
 --- a/drivers/spi/spi-rockchip.c
@@ -319,46 +225,51 @@ index cce80e6..ce2cec6 100644
 DTS configuration：
 
 ```c
-    &spi0 {
-        max-freq = <48000000>;   //spi internal clk, don't modify
-        spi_test@01 {
-                compatible = "rockchip,spi_test_bus0_cs1";
-                id = <1>;
-                reg = <1>;
-                //"spi-max-frequency = <24000000>; " is no need
-                spi-slave-mode; //if enble slave mode,just modify here
-        };
+&spi0 {
+    max-freq = <48000000>;   //spi internal clk, don't modify
+    spi_test@01 {
+        compatible = "rockchip,spi_test_bus0_cs1";
+        id = <1>;
+        reg = <1>;
+        //spi-max-frequency = <24000000>; is no need
+        spi-slave-mode;      //if enble slave mode,just modify here
     };
+};
 ```
 
 Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
 
 #### Linux 4.19 configuration
 
-Owning to the developing of Linux 4.19 SPI slave framework，it support SPI slave after adding related code in spi-rockchip.c：
+**Kernel Configuration**
 
-```c
-of_property_read_bool(pdev->dev.of_node, "spi-slave")
+```
+Device Drivers  --->
+	[*] SPI support  --->
+		[*]   SPI slave protocol handlers
 ```
 
-DTS configuration：
+**DTS configuration**
 
 ```c
-&spi0 {
-	status = "okay";
-	max-freq = <48000000>; //spi internal clk, don't modify
-	spi-slave; //enable slave mode
-	slave { //As spi-bus requied, SPI slave sub-node should name start with "slave"
-		compatible = "rockchip,spi_test_bus0_cs0";
-		id = <0>;
-		spi-max-frequency = <24000000>;
-	};
+&spi1 {
+    status = "okay";
+    assigned-clocks = <&pmucru CLK_SPI0>;
+    assigned-clock-rates = <200000000>;
+    dma-names = "tx","rx";
+    spi-slave;                                            //enable slave mode
+    slave {                                               //As spi-bus requied, SPI slave sub-node should name start with "slave"
+        compatible ="rockchip,spi_test_bus1_cs0";
+        reg = <0>;
+        id = <0>;
+        //spi-max-frequency = <24000000>; is no need
+    };
 };
 ```
 
 Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
 
-#### Testing
+#### Tips for SPI slave test
 
 If SPI working as slave, you must start" slave read" and then start "master write". Otherwise, the slave will not finish reading and the master has finished writing.
 
@@ -370,52 +281,147 @@ First slave: `echo write 0 1 16 > /dev/spi_misc_test`
 
 Then master: `echo read 0 1 16 > /dev/spi_misc_test`
 
+### SPI Device  Driver
+
+Register device driver:
+
+```c
+static int spi_test_probe(struct spi_device *spi)
+{
+    int ret;
+    int id = 0;
+    if(!spi)
+        return -ENOMEM;
+    spi->bits_per_word= 8;
+    ret= spi_setup(spi);
+    if(ret < 0) {
+        dev_err(&spi->dev,"ERR: fail to setup spi\n");
+        return-1;
+    }
+    return ret;
+}
+static int spi_test_remove(struct spi_device *spi)
+{
+    printk("%s\n",__func__);
+    return 0;
+}
+static const struct of_device_id spi_test_dt_match[]= {
+    {.compatible = "rockchip,spi_test_bus1_cs0", },
+    {.compatible = "rockchip,spi_test_bus1_cs1", },
+    {},
+};
+MODULE_DEVICE_TABLE(of,spi_test_dt_match);
+static struct spi_driver spi_test_driver = {
+    .driver = {
+        .name  = "spi_test",
+        .owner = THIS_MODULE,
+        .of_match_table = of_match_ptr(spi_test_dt_match),
+    },
+    .probe = spi_test_probe,
+    .remove = spi_test_remove,
+};
+static int __init spi_test_init(void)
+{
+    int ret = 0;
+    ret = spi_register_driver(&spi_test_driver);
+    return ret;
+}
+device_initcall(spi_test_init);
+static void __exit spi_test_exit(void)
+{
+    return spi_unregister_driver(&spi_test_driver);
+}
+module_exit(spi_test_exit);
+```
+
+For SPI read and write operations, please refer to `include/linux/spi/spi.h`.
+
+```c
+static inline int
+spi_write(struct spi_device *spi,const void *buf, size_t len)
+static inline int
+spi_read(struct spi_device *spi,void *buf, size_t len)
+static inline int
+spi_write_and_read(structspi_device *spi, const void *tx_buf, void *rx_buf, size_t len)
+```
+
+### User mode SPI device Configuration
+
+User mode SPI device means operating the SPI interface in user space directly, which makes it convenient for many SPI peripheral drivers run in user space.
+
+There is no need to change the kernel to facilitate driver development.
+
+**Kernel Configuration**
+
+```c
+Device Drivers  --->
+	[*] SPI support  --->
+		[*]   User mode SPI device driver support
+```
+
+**DTS Configuration**
+
+```c
+&spi0 {
+    status = "okay";
+    max-freq = <50000000>;
+    spi_test@00 {
+        compatible = "rockchip,spidev";
+        reg = <0>;
+        spi-max-frequency = <5000000>;
+    };
+};
+```
+
+**Using Instruction**
+
+After the driver device is successfully registered, a device like this name will be displayed: /dev/spidev1.1
+
+Please refer to Documentation/spi/spidev_test.c
+
 ## SPI Testing Driver in Kernel
 
-### Kernel Driver
+### Code Path
 
 drivers/spi/spi-rockchip-test.c
-You need to add below：
+
+### SPI Testing Device Configuration
+
+**Kernel Path**
 
 ```c
 drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
 ```
 
-### DTS Configuraion
+**DTS Configuraion**
 
 ```c
 &spi0 {
-        status = "okay";
-        max-freq = <48000000>;   //spi internal clk, don't modify
-        //dma-names = "tx", "rx";   //enable dma
-        pinctrl-names = "default";  //pinctrl according to you board
-        pinctrl-0 = <&spi0_clk &spi0_tx &spi0_rx &spi0_cs0 &spi0_cs1>;
-        spi_test@00 {
-                compatible = "rockchip,spi_test_bus0_cs0";
-                id = <0>;		//This attribute is used to distinguish different SPI slave devices in "spi-rockchip-test.c".
-                reg = <0>;   //chip select  0:cs0  1:cs1
-                spi-max-frequency = <24000000>;   //spi output clock
-        };
-
-        spi_test@01 {
-                compatible = "rockchip,spi_test_bus0_cs1";
-                id = <1>;
-                reg = <1>;
-                spi-max-frequency = <24000000>;
-                spi-slave-mode;
-        };
+    status = "okay";
+    spi_test@00 {
+        compatible = "rockchip,spi_test_bus0_cs0";
+        id = <0>;       //This attribute is used to distinguish different SPI slave devices in "spi-rockchip-test.c".
+        reg = <0>;      //chip select  0:cs0  1:cs1
+        spi-max-frequency = <24000000>;                 //spi output clock
+    };
+    spi_test@01 {
+        compatible = "rockchip,spi_test_bus0_cs1";
+        id = <1>;
+        reg = <1>;
+        spi-max-frequency = <24000000>;
+    };
 };
 ```
 
-### Driver log
+**Driver log**
 
 ```c
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
 [    0.530774] spi_test spi32766.0: fail to get type, default set 0
 [    0.531342] spi_test spi32766.0: fail to get enable_dma, default set 0
 //If you donnot use it,please ignore it.
-[	 0.531929]   rockchip_spi_test_probe:name=spi_test_bus1_cs0,bus_num=32766,cs=0,mode=0,speed=5000000
+[    0.531929]   rockchip_spi_test_probe:name=spi_test_bus1_cs0,bus_num=32766,cs=0,mode=0,speed=5000000
 [    0.532711] rockchip_spi_test_probe:poll_mode=0, type=0, enable_dma=0
 //This is the mark of succesful register.
 ```
