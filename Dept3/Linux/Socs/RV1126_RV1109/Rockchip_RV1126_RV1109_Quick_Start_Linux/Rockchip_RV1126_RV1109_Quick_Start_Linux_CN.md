@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.3.0
+发布版本：V1.3.1
 
-日期：2020-07-09
+日期：2020-07-15
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -72,6 +72,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.2.0 | HJC | 2020-06-22 | 增加智能USB Camera产品章节 |
 | V1.2.1 | CWW | 2020-06-29 | 1. 更新4.4章节<br>2. 增加编译环境安装fakeroot工具 |
 | V1.3.0 | CWW | 2020-07-09 | 1. 增加模块目录以及文档说明<br>2. 增加编译不同板级配置 |
+| V1.3.1 | CWW | 2020-07-15 | 1. 修正eMMC拼写 |
 
 ---
 
@@ -145,7 +146,6 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 
 ### RV1109/RV1126 开发相关文档
 
-
 ```shell
 ├── docs
 │   ├── Linux
@@ -208,11 +208,11 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 | 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                               | 支持快速开机 |
 | ------ | -------------------------------------------- | -------- | --------------------------------------------------- | ------------ |
 | RV1109 | BoardConfig-38x38-spi-nand-rv1109.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO           |
-| RV1109 | BoardConfig-rv1109.mk                        | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
-| RV1109 | BoardConfig-tb-rv1109.mk                     | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
+| RV1109 | BoardConfig-rv1109.mk                        | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
+| RV1109 | BoardConfig-tb-rv1109.mk                     | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
 | RV1126 | BoardConfig-spi-nand.mk                      | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
-| RV1126 | BoardConfig.mk                               | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
-| RV1126 | BoardConfig-tb.mk                            | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
+| RV1126 | BoardConfig.mk                               | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
+| RV1126 | BoardConfig-tb.mk                            | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
 
 切换板级配置命令：
 

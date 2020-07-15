@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.3.0
+Release Version: V1.3.1
 
-Release Date: 2020-07-09
+Release Date: 2020-07-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -67,6 +67,7 @@ This document (this guide) is mainly intended for:
 | V1.2.0 | HJC | 2020-06-22 | Add smart usb camera product section |
 | V1.2.1 | CWW | 2020-06-29 | 1. update chapter 4.4<br>2. Add install fakeroot for building environment |
 | V1.3.0 | CWW | 2020-07-09 | 1. Add module path and document introduction<br>2. Add Build different Boards |
+| V1.3.1 | CWW | 2020-07-15 | 1. Remove unused board config introduction<br>2. fix same content<bt>3. fix eMMC typo |
 
 ---
 
@@ -200,19 +201,14 @@ SDK Download Address:
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
 ```
 
-| Board Configuration                                 | Comment                |
-| ----------------------------------------------- | ---------------------- |
-| device/rockchip/rv1126_rv1109/BoardConfig.mk    | General Version        |
-| device/rockchip/rv1126_rv1109/BoardConfig-tb.mk | Support Fast Boot      |
-
 | Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      | Support Thunder Boot |
 | ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- | -------------------- |
 | RV1109    | BoardConfig-38x38-spi-nand-rv1109.mk                      | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO                   |
-| RV1109    | BoardConfig-rv1109.mk                                     | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
-| RV1109    | BoardConfig-tb-rv1109.mk                                  | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
+| RV1109    | BoardConfig-rv1109.mk                                     | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
+| RV1109    | BoardConfig-tb-rv1109.mk                                  | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
 | RV1126    | BoardConfig-spi-nand.mk                                   | SPI NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
-| RV1126    | BoardConfig.mk                                            | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
-| RV1126    | BoardConfig-tb.mk                                         | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
+| RV1126    | BoardConfig.mk                                            | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
+| RV1126    | BoardConfig-tb.mk                                         | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
 
 Command of select board configure:
 
@@ -519,7 +515,7 @@ The smart USB camera product supports the following functions:
 
 The compilation and configuration of the smart USB camera product is based on the public SDK and adopts the separate rv1126_rv1109_linux_Ai_camera_release.xml Code list management update.
 
-#### To Select Board Configure
+#### Select Board Configuration for USB Camera Product
 
 SDK download address ：
 
@@ -534,8 +530,8 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 | Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      |
 | ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- |
-| RV1109    | BoardConfig-rv1109-uvcc.mk                                | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
-| RV1126    | BoardConfig-uvcc.mk                                       | EMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| RV1109    | BoardConfig-rv1109-uvcc.mk                                | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| RV1126    | BoardConfig-uvcc.mk                                       | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 
 Command of selecting board configure :
 
