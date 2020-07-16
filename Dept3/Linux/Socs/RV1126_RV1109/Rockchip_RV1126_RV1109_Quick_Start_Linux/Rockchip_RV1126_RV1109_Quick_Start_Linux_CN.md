@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.3.1
+发布版本：V1.4.1
 
-日期：2020-07-15
+日期：2020-07-17
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -73,6 +73,8 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.2.1 | CWW | 2020-06-29 | 1. 更新4.4章节<br>2. 增加编译环境安装fakeroot工具 |
 | V1.3.0 | CWW | 2020-07-09 | 1. 增加模块目录以及文档说明<br>2. 增加编译不同板级配置 |
 | V1.3.1 | CWW | 2020-07-15 | 1. 修正eMMC拼写 |
+| V1.4.0 | CWW | 2020-07-16 | 1. 增加ISP工具RKISP2.x_Tuner说明<br>2. 增加开发工具说明<br>3. 增加板级配置选择说明 |
+| V1.4.1 | CWW | 2020-07-17 | 1. 更新SDK编译说明章节 |
 
 ---
 
@@ -171,25 +173,63 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 │       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
 │       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
 │       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
-└── external
-    ├── rknn-toolkit (模型转换、推理和性能评估的开发套件文档)
-    │   └── doc
-    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
-    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
-    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
-    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
-    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
-    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
-    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
-    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
-    │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
-    │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
-    └── rknpu
-        └── rknn (Rockchip NPU 开发文档)
-            └── doc
-                ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
-                └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
+├── external
+│   ├── rknn-toolkit (模型转换、推理和性能评估的开发套件文档)
+│   │   └── doc
+│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
+│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
+│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
+│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
+│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
+│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
+│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
+│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
+│   │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+│   └── rknpu
+│       └── rknn (Rockchip NPU 开发文档)
+│           └── doc
+│               ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
+│               └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
+└── tools
+    └── windows
+        └── RKISP2.x_Tuner (ISP 调试工具)
+            └── RKISP2.x_Tuner_User_Manual_v1.0.pdf
 ```
+
+### RV1109/RV1126 开发相关工具
+
+#### Windows工具
+
+工具说明文档：tools/windows/ToolsRelease.txt
+
+工具名称              | 工具用途
+----------------------|-------------------------------------------
+RKDevTool             | 分立升级固件及整个update升级固件工具
+FactoryTool           | 量产升级工具
+SecureBootTool        | 固件签名工具
+efuseTool             | efuse烧写工具
+RKDevInfoWriteTool    | 写号工具
+SDDiskTool            | SD卡镜像制作
+SpiImageTools         | 烧录器升级工具
+DriverAssitant        | 驱动安装工具
+RKImageMaker          | 打包工具(打包成updata.img)
+SpeakerPCBATool       | 音箱PCBA测试工具
+RKDevTool_Release     | 固件烧录工具
+ParameterTool         | 分区表修改工具
+RKISP2.x_Tuner        | ISP工具
+RK_IPCamera_Tool      | IPC设备搜索工具
+
+#### Linux工具
+
+工具说明文档：tools/linux/ToolsRelease.txt
+
+工具名称               | 工具用途
+---------------------- | -------------------------------------------
+Linux_Pack_Firmware    | 固件打包工具(打包成updata.img)
+Linux_Upgrade_Tool     | 烧录固件工具
+Linux_SecureBoot       | 固件签名工具
+Firmware_Merger        | SPI NOR固件打包工具(生成的固件可以用于烧录器)
 
 ### SDK 配置框架图
 
@@ -216,11 +256,37 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 切换板级配置命令：
 
+方法1
+./build.sh 后面加上板级配置文件, 例如：
+
 ```shell
 ### 选择通用版本的板级配置
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
 ### 选择快速开机的板级配置
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
+```
+
+方法2
+
+```shell
+./build.sh lunch
+processing board option: lunch
+processing option: lunch
+
+You're building on Linux
+Lunch menu...pick a combo:
+
+0. default BoardConfig.mk
+1. BoardConfig-38x38-spi-nand-rv1109.mk
+2. BoardConfig-rv1109-uvcc.mk
+3. BoardConfig-rv1109.mk
+4. BoardConfig-spi-nand.mk
+5. BoardConfig-tb-rv1109.mk
+6. BoardConfig-tb.mk
+7. BoardConfig-uvcc.mk
+8. BoardConfig.mk
+Which would you like? [0]: 8
+switching to board: /home/user/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
 
 ### 查看编译命令
@@ -232,8 +298,10 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
+lunch              -list current SDK boards and switch to specified board config
 uboot              -build uboot
 spl                -build spl
+loader             -build loader
 kernel             -build kernel
 modules            -build kernel modules
 toolchain          -build toolchain
@@ -351,6 +419,10 @@ tools/
 MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”进行烧写，也可以按 “recovery" 按键不放并按下复位键 “RESET” 后松手进入 loader 模式进行烧写，下面是 MASKROM 模式的分区偏移及烧写文件。(注意： Windows PC 需要在管理员权限运行工具才可执行)
 
 ![](resources/window-flash-firmware.jpg)
+
+烧录update.img方法：
+
+![](resources/window-flash-firmware-update-img.jpg)
 
 注：
 

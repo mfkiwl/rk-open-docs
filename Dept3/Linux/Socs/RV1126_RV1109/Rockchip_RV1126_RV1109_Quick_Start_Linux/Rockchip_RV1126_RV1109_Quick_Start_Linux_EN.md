@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.3.1
+Release Version: V1.4.1
 
-Release Date: 2020-07-15
+Release Date: 2020-07-17
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -68,6 +68,8 @@ This document (this guide) is mainly intended for:
 | V1.2.1 | CWW | 2020-06-29 | 1. update chapter 4.4<br>2. Add install fakeroot for building environment |
 | V1.3.0 | CWW | 2020-07-09 | 1. Add module path and document introduction<br>2. Add Build different Boards |
 | V1.3.1 | CWW | 2020-07-15 | 1. Remove unused board config introduction<br>2. fix same content<bt>3. fix eMMC typo |
+| V1.4.0 | CWW | 2020-07-16 | 1. Add ISP Tool RKISP2.x_Tuner introduction<br>2. Add Develop Tool introduction<br>3. Add board config introduction |
+| V1.4.1 | CWW | 2020-07-17 | 1. Update chapter of SDK Building Introduction<br>2. Update Tool's Description |
 
 ---
 
@@ -167,25 +169,64 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 │       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
 │       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
 │       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
-└── external
-    ├── rknn-toolkit (Development kit for model transformation, reasoning and performance evaluation)
-    │   └── doc
-    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
-    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
-    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
-    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
-    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
-    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
-    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
-    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
-    │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
-    │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
-    └── rknpu
-        └── rknn (Rockchip NPU Develop Guide)
-            └── doc
-                ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
-                └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
+├── external
+│   ├── rknn-toolkit (Development kit for model transformation,
+│   │   │                  reasoning and performance evaluation)
+│   │   └── doc
+│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
+│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
+│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
+│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
+│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
+│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
+│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
+│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
+│   │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+│   └── rknpu
+│       └── rknn (Rockchip NPU Develop Guide)
+│           └── doc
+│               ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
+│               └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
+└── tools
+    └── windows
+        └── RKISP2.x_Tuner (ISP Tool)
+            └── RKISP2.x_Tuner_User_Manual_v1.0.pdf
 ```
+
+### RV1109/RV1126 Develop Tools
+
+#### Windows Tools
+
+Release Note: tools/windows/ToolsRelease.txt
+
+Tool's Name           | Tool's Description
+----------------------|-------------------------------------------
+RKDevTool             | discrete firmware upgrade and the entire update.img firmware upgrade tool
+FactoryTool           | factory production upgrade tool
+SecureBootTool        | firmware signing tool
+efuseTool             | efuse flash tool
+RKDevInfoWriteTool    | serial number burning tool
+SDDiskTool            | sd card firmware create tool
+SpiImageTools         | burner upgrade tool
+DriverAssitant        | rockchip pc driver for upgrade tool
+RKImageMaker          | firmware package tool (generate update.img)
+SpeakerPCBATool       | soundbox PCBA test tool
+RKDevTool_Release     | rockchip firmware flash tool
+ParameterTool         | rockchip partition modify tool
+RKISP2.x_Tuner        | ISP tool
+RK_IPCamera_Tool      | rockchip ipc camera search tool
+
+#### Linux Tools
+
+Release Note: tools/linux/ToolsRelease.txt
+
+Tool's Name            | Tool's Description
+---------------------- | -------------------------------------------
+Linux_Pack_Firmware    | firmware package tool (generate update.img)
+Linux_Upgrade_Tool     | rockchip firmware flash tool
+Linux_SecureBoot       | firmware signing tool
+Firmware_Merger        | SPI NOR firmware package tool (generate firmware.img for burner)
 
 ### SDK Configuration Framework
 
@@ -212,12 +253,38 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 Command of select board configure:
 
+Method 1
+./build.sh "path to board config file", for example:
+
 ```shell
 ### select general version board configuration
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
 
 ### select fast boot board configuration
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
+```
+
+Method 2
+
+```shell
+./build.sh lunch
+processing board option: lunch
+processing option: lunch
+
+You're building on Linux
+Lunch menu...pick a combo:
+
+0. default BoardConfig.mk
+1. BoardConfig-38x38-spi-nand-rv1109.mk
+2. BoardConfig-rv1109-uvcc.mk
+3. BoardConfig-rv1109.mk
+4. BoardConfig-spi-nand.mk
+5. BoardConfig-tb-rv1109.mk
+6. BoardConfig-tb.mk
+7. BoardConfig-uvcc.mk
+8. BoardConfig.mk
+Which would you like? [0]: 8
+switching to board: /home/user/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
 
 ### To View Building Commands
@@ -229,8 +296,10 @@ Execute the following command in the root directory: `./build.sh -h|help`
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
+lunch              -list current SDK boards and switch to specified board config
 uboot              -build uboot
 spl                -build spl
+loader             -build loader
 kernel             -build kernel
 modules            -build kernel modules
 toolchain          -build toolchain
@@ -346,6 +415,10 @@ tools/
 As shown below, after building and generating the firmware, device needs to enter MASKROM or BootROM  mode for flashing. After connecting USB cable, long press the "Update" button and press "RESET" button at the same time and then release, device will enter MASKROM mode. Then you should load the paths of the corresponding images and click "Run" to start update. You can also press the "recovery" button and press “RESET" button "RESET" then release to enter loader mode to update. Partition offset and update files of MASKROM Mode are shown as follows (Note: you have to run the tool as an administrator in Windows PC):
 
 ![](resources/window-flash-firmwareEN.png)
+
+The method to flash update.img:
+
+![](resources/window-flash-firmware-update-img.jpg)
 
 Note:
 
