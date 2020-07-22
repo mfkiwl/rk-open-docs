@@ -2,27 +2,25 @@
 
 ID: RK-FB-CS-002
 
-Release Version: V2.4.0
+Release Version: V2.4.1
 
-Release Date: 2020-04-30
+Release Date: 2020-07-22
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -36,7 +34,7 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
-## Preface
+**Preface**
 
 **Overview**
 
@@ -47,6 +45,7 @@ The document presents Rockchip RK3399 Linux SDK release notes, aiming to help en
 This document (this guide) is mainly intended for:
 
 Technical support engineers
+
 Software development engineers
 
 **Chipset and System Support**
@@ -54,6 +53,8 @@ Software development engineers
 | **Chipset** | **Buildroot** | **Debian 9** | **Debian 10** | **Yocto** |
 | ----------- | :-------------- | :------------- | :---------- | :---------- |
 | RK3399      | Y               | Y              | Y           | Y           |
+
+---
 
 **Revision History**
 
@@ -67,14 +68,17 @@ Software development engineers
 | 2018-04-18 | V1.5.0 | Caesar Wang | Fix some mistaken words and repository address |
 | 2018-05-17 | V2.0.0 | Caesar Wang | Integrate Buildroot and Debian documents <br/>Add SSH public key operation introduction |
 | 2019-01-24 | V2.1.0 | Caesar Wang | Rename project rootfs chapter to Debian <br/>update U-boot config |
-| 2019-06-28 | V2.2.0 | Caesar Wang | Add Yocto introduction <br/>EVB renamed to excavator |
+| 2019-06-28 | V2.2.0 | Caesar Wang | Add Yocto introduction ; <br/>EVB renamed to excavator |
 | 2019-12-03 | V2.3.0 | Caesar Wang | Update Debian 64 bit building<br/>Updated chapters 1, 2, 3 and 9.6 <br/>Updated Chapter 5 SDK Directory Introduction<br/>Update Chapter 6 Debian10 Building。 |
 | 2020-04-30 | V2.4.0 | Caesar Wang | Rewrite the document with Markdown <br/>Add and use RK3399 EVB IND by default。 |
-
-## Contents
+| 2020-7-22 | V2.4.1 | Ruby Zhang | Update the company name, <br/>the format and the file name of the document |
 
 ---
+
+**Contents**
+
 [TOC]
+
 ---
 
 ## Overview
