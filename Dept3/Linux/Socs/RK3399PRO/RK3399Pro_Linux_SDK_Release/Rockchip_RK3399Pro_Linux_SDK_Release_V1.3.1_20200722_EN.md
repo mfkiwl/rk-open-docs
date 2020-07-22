@@ -2,27 +2,25 @@
 
 ID: RK-FB-CS-009
 
-Release Version: V1.3.0
+Release Version: V1.3.1
 
-Release Date: 2020-03-24
+Release Date: 2020-07-22
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -36,7 +34,7 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
-## **Preface**
+**Preface**
 
 **Overview**
 
@@ -59,18 +57,21 @@ Software development engineers
 | **Date** | **Version** | **Author** | **Revision History** |
 | -----------| :-------------- | :------------- | :---------- |
 | 2019-02-17 | V0.0.1   | Caesar Wang		| Initial Beta version |
-| 2019-03-21 | V0.0.2   | Caesar Wang   	| Modify method of using ./mkfirmware.sh to generate image in chapter 5.1.3 <br/>Change the description of adding Debian to rknn_demo in chapter 8. <br/>Change the SDK firmware to v0.02 in chapter 8 |
+| 2019-03-21 | V0.0.2   | Caesar Wang   	| Modify method of using ./mkfirmware.sh<br/> to generate image in chapter 5.1.3 <br/>Change the description of adding <br/>Debian to rknn_demo in chapter 8. <br/>Change the SDK firmware to v0.02 in chapter 8 |
 | 2019-06-06 | V1.0.0   | Caesar Wang		| Release version<br/>Add NPU related instructions<br/>Add Yocto compilation instructions<br/>Add github download instructions。 |
 | 2019-06-21 | V1.0.1   | Caesar Wang		| Update software development guide。    |
 | 2020-10-14 | V1.1.2   | Caesar Wang		| Update Debian build note     |
 | 2020-10-23 | V1.1.3   | Caesar Wang		| Support RK3399Pro EVB V13     |
 | 2020-12-03 | V1.2.0   | Caesar Wang		| Update chapter 3,4,6,7,8,9,10     |
-| 2020-03-24 | V1.3.0   | Caesar Wang		| Add  RK3399Pro EVB V14 Support  |
-
-## **Contents**
+| 2020-03-24 | V1.3.0   | Caesar Wang		| Add  RK3399Pro EVB V14 support  |
+| 2020-07-22 | V1.3.1 | Ruby Zhang	| Update the company name, <br/>the format and the file name of the document |
 
 ---
+
+**Contents**
+
 [TOC]
+
 ---
 
 ## Overview
