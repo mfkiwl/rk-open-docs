@@ -349,25 +349,25 @@ CONFIG_RT_USING_CHARGER_RK816
 
   RK816 带有智能电源路径管理功能，来自适配器的供电优先给系统使用，剩余的再给电池充电。软件上配置的允许向电池充电的最大剩余电流值称之为最大充电电流。
 
-  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_BATCUR_SET`。
+  ioctl访问方式：`RT_DEVICE_CTRL_CHAGER_BATCUR_SET`。
 
 - 最大输入电流
 
   软件上配置可从适配器获取的最大电流，称之为“最大输入电流”。例如 5V/2A 的适配器，我们一般软件配置最大输入电流为 2A（也可以设置为 1.8A...）。
 
-  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_SRCCUR_SET`。
+  ioctl访问方式：`RT_DEVICE_CTRL_CHAGER_SRCCUR_SET`。
 
 - 最大充电电压
 
   电池满充状态的电压。
 
-  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_BATVOL_SET`。
+  ioctl访问方式：`RT_DEVICE_CTRL_CHAGER_BATVOL_SET`。
 
 - 充电截止电流
 
   PMIC对电池停止充电的最小电流阈值。
 
-  ioctrl访问方式：`RT_DEVICE_CTRL_CHAGER_FNSCUR_SET`。
+  ioctl访问方式：`RT_DEVICE_CTRL_CHAGER_FNSCUR_SET`。
 
 - 采样电阻
 
