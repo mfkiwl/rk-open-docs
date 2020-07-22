@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-074
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-06-29
+日期：2020-07-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0     | 陈健洪   | 2020-01-06   |       初始版本       |
 | V1.1.0     | 陈健洪   | 2020-05-26   |   增加电池温度功能   |
 | V1.2.0     | 陈健洪   | 2020-06-29   | 完善Charger和NTC章节 |
+| V1.3.0     | 陈健洪   | 2020-07-22   |  增加RTC的alarm功能  |
 
 **目录**
 
@@ -257,18 +258,28 @@ rt_err_t regulator_disable(struct regulator_desc *desc);
 void regulator_desc_init(struct regulator_desc *descs, uint32_t cnt);
 ```
 
-## RTC
+## RTC/Alarm
 
-目前的RTC驱动仅实现了时间配置、获取的功能，闹钟功能没有实现。
+RTC驱动实现了如下功能：
+
+- 实时时间的配置、获取
+
+  时间范围：年月日时分秒。
+
+- 闹钟(alarm)时间的配置、获取
+
+  时间范围：年月日时分秒，但是不支持设置过期的闹钟；触发方式：仅单次触发。
 
 ### 驱动文件
 
 ```c
-./bsp/rockchip/common/drivers/rk816_rtc.c
+./bsp/rockchip/common/drivers/pmic/rk816_rtc.c
 
 // 用户层接口
 ./components/drivers/rtc/rtc.c
 ./components/drivers/include/drivers/rtc.h
+./components/drivers/rtc/alarm.c
+./components/drivers/include/drivers/alarm.h
 ```
 
 ### 配置使能
@@ -276,27 +287,46 @@ void regulator_desc_init(struct regulator_desc *descs, uint32_t cnt);
 ```
 CONFIG_RT_USING_PMIC
 CONFIG_RT_USING_RTC
+CONFIG_RT_USING_ALARM
+CONFIG_RT_USING_ALARM_CMD
 CONFIG_RT_USING_RTC_RK816
 ```
 
 ### 用户接口
 
-设置时间和日期
+实时时间和日期的设置
 
 ```c
 rt_err_t set_time(rt_uint32_t hour, rt_uint32_t minute, rt_uint32_t second);
 rt_err_t set_date(rt_uint32_t year, rt_uint32_t month, rt_uint32_t day);
 ```
 
-获取时间和日期：RTC时间一般通过时间管理框架的接口获取。例如：
+实时时间和日期的获取：RTC时间一般通过时间管理框架的接口获取。例如：
 
 ```c
 struct tm* localtime(const time_t* t)
 ```
 
+Alarm时间的操作
+
+```c
+rt_alarm_t rt_alarm_create(rt_alarm_callback_t callback, struct rt_alarm_setup *setup);
+rt_err_t rt_alarm_control(rt_alarm_t alarm, int cmd, void *arg);
+void rt_alarm_update(rt_device_t dev, rt_uint32_t event);
+rt_err_t rt_alarm_delete(rt_alarm_t alarm);
+rt_err_t rt_alarm_start(rt_alarm_t alarm);
+rt_err_t rt_alarm_stop(rt_alarm_t alarm);
+```
+
+用户可直接参考RT-Thread官方API手册：
+
+alarm: <https://www.rt-thread.org/document/api/group__alarm.html>
+
+rtc: <https://www.rt-thread.org/document/api/group__rtc.html>
+
 ### 测试命令
 
-RTC框架提供了`date`命令用于读写rtc时间。实现代码：
+`date`命令用于读写rtc时间。实现代码：
 
 ```
 ./components/drivers/rtc/rtc.c
@@ -305,8 +335,48 @@ RTC框架提供了`date`命令用于读写rtc时间。实现代码：
 范例：
 
 ```c
-=> date                     // 获取当前rtc时间
-=> date 2019 12 10 8 10 30  // 设置时间：2019-12-10 8:10:30
+msh />date 2018 04 01 12 25 07  // 设置时间：2018-04-01 12:15:07
+msh />date                      // 获取当前时间
+Sun Apr  1 12:25:07 2018
+```
+
+`alarm`命令用于读写闹钟时间。实现代码：
+
+```c
+./components/drivers/rtc/alarm.c
+```
+
+范例：
+
+```c
+// 闹钟列表(当前无)
+msh />alarm
+No alarm
+// 设置闹钟前先确认当前的时间，避免设置过期闹钟（框架不支持）
+msh />date
+Sun Apr  1 12:25:07 2018
+// 设置3个闹钟
+msh />alarm 2018 04 01 12 30 30
+msh />alarm 2018 04 01 12 30 40
+msh />alarm 2018 04 01 12 30 50
+// 查看闹钟列表，其中"*"表示即将触发或最后一个已触发过的闹钟。
+// 已触发的闹钟如果不调用rt_alarm_delete()进行删除，则依旧会留在闹钟列表里。
+msh />alarm
+Alarm list:
+	  Sun Apr  1 12:30:50 2018
+	  Sun Apr  1 12:30:40 2018
+	* Sun Apr  1 12:30:30 2018
+
+// 设置完闹钟之后等待它们触发，闹钟触发时可以看到打印（仅限alarm命令）：
+Alarm is ringing: Sun Apr  1 12:30:30 2018
+Alarm is ringing: Sun Apr  1 12:30:40 2018
+Alarm is ringing: Sun Apr  1 12:30:50 2018
+// 再次查看闹钟列表，"*"指向最后一个已触发闹钟。
+msh />alarm
+Alarm list:
+	* Sun Apr  1 12:30:50 2018
+	  Sun Apr  1 12:30:40 2018
+	  Sun Apr  1 12:30:30 2018
 ```
 
 ## Charger
