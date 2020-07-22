@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-CS-001
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-06-24
+日期：2020-07-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -81,6 +81,7 @@ Rockchip Electronics Co., Ltd.
 | 2019-12-26 | V1.0.1   | Jair Wu  | 更新播放、录音测试命令 |
 | 2019-12-26 | V1.0.2   | Conway   | 更新Wi-Fi频偏测试说明  |
 | 2020-06-24 | V1.1.0   | Conway   | 更新xmode等日志和说明  |
+| 2020-07-22 | V1.2.0   | Conway   | 添加TFTP、Telnet       |
 
 ---
 
@@ -1262,3 +1263,80 @@ task.lw
 
 ![](resources/13.2_task.lw.png)
 
+## **14 TFTP**
+
+本系统支持设备端做TFTP服务器，电脑端做TFTP客户端。
+
+开启配置： COMPONENTS_SHELL_TFTP
+
+测试步骤：
+
+```
+启动Wi-Fi：       wifi.start sta
+连接Wi-Fi:        wifi.connect Wi-Fi账号 Wi-Fi密码
+查看设备端IP地址：  ip.config
+启动TFTP服务器：   tftp
+```
+
+日志：
+
+```
+RK2206>tftp
+[A.14.00][000134.002171]create thread classId = -1, objectid = 5, name = tftp_s, remain = 6019288
+[A.14.00][000134.005143]
+[A.tftp_][000134.010374]tftp_server.c:478 tftp_server_run():tftp server start!
+[A.tftp_][000134.014215]
+```
+
+PC 端安装 Tftpd64-4.60-setup.exe软件（软件自行网络下载）后打开，按如下操作进行客户端的配置：
+
+注意事项：
+
+1. 不支持中文命名的文件。
+2. 传输过程服务器如果检测报文出错，会自动断开。
+3. block 设置512。
+4. 建议传10MB以下文件，大文件传输容易出现文件错误。
+5. 电脑端发送文件到设备端，如果是同名文件，会直接在内容开头追加，并不会直接覆盖。如果不想追加，就重新命名文件。
+6. 关于测试速度，具体测试还要考虑硬件特性和网络特性。block 设置512，电脑端发送10MByte文件到设备端，耗时236秒。block 设置512，导出设备端10MByte文件到电脑端，耗时197秒。
+
+使用步骤：
+
+1. 选择Tftp Client 。
+
+2. Server interfaces 设置本地网络接口，注意要与设备同网段。
+
+3. Host填写TFTP 服务器即设备端的 IP 地址。串口Shell界面输入ip.config查看设备端获取的IP地址。
+
+4. Post填写TFTP 服务器端口号，默认： 69
+
+![](resources/14-0_telnet.png)
+
+### **14.1 发送文件到设备端**
+
+1. Local File 是PC端发送到设备端的文件路径。
+
+2. Remote File 是服务器端保存文件的路径（包括文件名）。路径为SDK中规定的，A盘代表内部flash、C盘代表外置TF卡。例如`C:\big.txt` 表示在TF卡中的big.txt文件。
+
+3. 点击Put按钮发送文件到设备端。
+
+![image-20200730142412276](resources/14-1.png)
+
+发送过程会有进度条显示block已经传输的数量，发送成功会有提示框如下示例:
+
+![image-20200730142828793](resources/14-2_send.png)
+
+### **14.2 从设备端接收文件**
+
+1. Local File 是PC端接收文件的存放路径（包含文件名）。
+2. Remote File 是服务器发送文件的路径（包括文件名）。路径为SDK中规定的，A盘代表内部flash、C盘代表外置TF卡。比如`C:\big.txt` 表示在TF卡中的big.txt文件。
+3. 点击Get按钮即可。
+
+## **15 Telnet**
+
+目前支持设备做Telnet 服务器， Telnet客户端连接成功后，同步显示日志。
+
+开启配置 COMPONENTS_SHELL_TELNET
+
+设备端：使用前，需要成功连接网络，输入命令telnet启动Telnet服务器，查看设备端IP地址（ip.config），Telnet服务端口为23。
+
+电脑端：使用SecureCRT等软件连接设备端的Telnet服务器。
