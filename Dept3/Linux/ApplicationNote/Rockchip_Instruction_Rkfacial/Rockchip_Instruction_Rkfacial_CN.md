@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-363
 
-发布版本：V1.1.0
+发布版本：V2.0.0
 
-日期：2020-06-08
+日期：2020-07-28
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -40,7 +40,7 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## **前言**
+**前言**
 
  **概述**
 
@@ -66,18 +66,19 @@ Rockchip Electronics Co., Ltd.
 | ---------- | -------- | :---------- | ---------------- |
 | 2020-05-21 | V1.0.0   | Zhihua Wang | 初始版本         |
 | 2020-06-08 | V1.1.0   | Zhihua Wang | 修改用户信息回调 |
+| 2020-07-28 | V2.0.0   | Zhihua Wang | 更新接口和流程图 |
 
 ---
 
-## **目录**
+**目录**
 
 [TOC]
 
 ---
 
-## **1 代码模块说明**
+## 代码模块说明
 
-### **1.1 rockface_control**
+### rockface_control
 
 #### int rockface_control_init(int face_cnt)
 
@@ -107,79 +108,158 @@ void
 
 void
 
+#### int rockface_control_add_ui(int id, const char *name, void *feature)
+
+**说明**
+
+通过UI注册用户
+
+**参数**
+
+id         用户id
+
+name   用户名
+
+feature 用户人脸特征值
+
+**返回**
+
+int   0成功
+
+#### int rockface_control_add_web(int id, const char *name)
+
+**说明**
+
+通过web server注册用户
+
+**参数**
+
+name   用户名
+
+**返回**
+
+int   0成功
+
+#### int rockface_control_add_local(const char *name)
+
+**说明**
+
+通过本机存储图片注册用户
+
+**参数**
+
+name   用户名
+
+**返回**
+
+int   0成功
+
+#### int rockface_control_delete(int id, const char *pname, bool notify)
+
+**说明**
+
+删除用户
+
+**参数**
+
+id          用户id
+
+pname  用户名，web server删除使用
+
+notify   是否通知web server
+
+**返回**
+
+int   0成功
+
 默认宏定义说明：
 
 ```c
 #define DEFAULT_FACE_NUMBER 1000 表示默认人脸数据库最大支持人脸数量
 #define DEFAULT_FACE_PATH "/userdata" 开机默认从这个目录加载jpg文件获取特征值
-#define FACE_SCORE_RGB 0.55 RGB人脸检测的分数最小要求
-#define FACE_SCORE_IR 0.7 IR人脸检测的分数最小要求
-#define FACE_SCORE_LANDMARK 0.9 RGB人脸特征值的分数最小要求
-#define FACE_SCORE_REGISTER 0.9999 人脸注册的人脸分数最小要求
+#define FACE_DETECT_SCORE 0.55 人脸检测的分数，范围0-1，越大越严格
+#define FACE_SCORE_LANDMARK_RUNNING 0.9 RGB预览人脸特征值的分数，范围0-1，越大越严格
+#define FACE_SCORE_LANDMARK_IMAGE 0.5 RGB照片人脸特征值的分数，范围0-1，越大越严格
+#define FACE_SIMILARITY_CONVERT(f) powf(2.0, -((f))) RGB人脸识别的分数转化公式
+#define FACE_SIMILARITY_SCORE 1.0 RGB人脸识别的分数，范围建议0.7-1.3，越小越严格
+#define FACE_SCORE_REGISTER 0.99 人脸注册的人脸分数，范围0-1，越大越严格
 #define FACE_REGISTER_CNT 5 人脸注册时连续读到的多少次人脸特征值均在数据库里面，提示已经注册
-#define FACE_REAL_SCORE 0.7 活体检测分数最小要求
-#define LICENCE_PATH "/oem/key.lic" rockface人脸授权key存放路径
+#define FACE_REAL_SCORE 0.5 活体检测分数最小要求，范围0-1，越大越严格
+#define LICENCE_PATH PRE_PATH "/key.lic" rockface人脸授权key存放路径
+#define BAK_LICENCE_PATH BAK_PATH "/key.lic" rockface人脸授权备份key存放路径
 #define FACE_DATA_PATH "/usr/lib" rockface data存放路径
-#define MIN_FACE_WIDTH(w) ((w) / 5) 人脸检测、特征值提取人脸框宽度最小要求
-#define CONVERT_RGB_WIDTH 640 用于算法的RGB图像宽度
-#define CONVERT_IR_WIDTH 640 用于算法的IR图像宽度
+#define MIN_FACE_WIDTH(w) ((w) / 5) 人脸检测、特征值提取人脸最小像素要求
 #define FACE_TRACK_FRAME 0 人脸跟踪最大跟踪时间(帧)
 #define FACE_RETRACK_TIME 1 人脸跟踪再次跟踪时间(秒)
+#define SNAP_TIME 3 抓拍最低间隔时间（秒）
 ```
 
 **应用流程图**
 
-```mermaid
-graph TD
-	start(开始) --> isp_get[获取ISP帧]
-	isp_get --> isp_rga[旋转90度]
-	isp_rga --> face_detect[人脸检测]
-	face_detect --> face_track[人脸跟踪]
-	face_track --> conditionA{人脸检测成功}
-	conditionA -- YES --> paint_box[UI绘制人脸]
-	paint_box --> isp_expo[局部曝光]
-	conditionA -- NO --> paint_box_clear[UI清空人脸]
-	paint_box_clear --> isp_expo_def[默认曝光]
-	isp_expo --> isp_put[归还ISP帧]
-	isp_expo_def --> isp_put[归还ISP帧]
-	face_track --> conditionB{符合跟踪}
-	conditionB -- YES --> rgb_rga[RGA缩放]
-	rgb_rga --> get_feature[等待并获取特征值]
-	get_feature --> search[搜索特征值]
-	search --> find{特征值存在}
-	find -- YES --> find_return[返回特征值]
-	find -- NO --> register[符合注册]
-	register -- YES --> find_return[返回特征值]
-	register -- NO --> find_return_null[返回空]
-	find_return_null --> clear_ui[清空UI]
-	find_return --> delete{符合删除}
-	delete -- YES --> delete_from[删除特征值]
-	delete -- NO --> conditionC{识别成功}
-	conditionC -- NO --> clear_ui_2[清空UI]
-	conditionC -- YES --> conditionD{CIF运行}
-	conditionD -- YES --> wiat_ir{等待获取IR帧}
-	wiat_ir -- YES --> ir_detect[IR人脸检测]
-	ir_detect --> conditionE{人脸检测成功}
-	conditionE -- YES --> liveness[活体检测]
-	liveness --> conditonF{活体检测成功}
-	conditonF -- YES --> real[返回活体]
-	wiat_ir -- NO --> fake[返回非活体]
-	conditionE -- NO --> fake[返回非活体]
-	conditonF -- NO --> fake[返回非活体]
-	conditionD -- NO --> fake[返回非活体]
-	fake --> paint_info_y[UI绘制信息,黄框]
-	real --> paint_info_g[UI绘制信息,绿框]
-	real --> conditonG{非注册且非上一人}
-	conditonG -- YES --> pass[通行]
-	fake --> clear_track[清除跟踪]
-	clear_ui_2 --> next[等待获取特征值]
-	delete_from --> next[等待获取特征值]
-	clear_track --> next[等待获取特征值]
-	pass --> next[等待获取特征值]
-	conditonG -- NO --> next[等待获取特征值]
+- RGB人脸检测
+
+~~~flow
+```flow
+st=>start: start
+camera=>operation: camera capture
+rotate=>operation: rga rotate
+detect=>operation: face detect
+track=>operation: face track
+cond=>condition: face ok
+box=>operation: paint face box
+rga=>operation: rga convert
+sub1=>subroutine: liveness
+e=>end: end
+st->camera->rotate->detect->track->cond
+cond(yes)->box->e
+cond(no)->rga(right)->sub1->
+```
+~~~
+
+- IR人脸检测、活体检测
+
+```flow
+​```flow
+st=>start: start
+camera=>operation: camera capture
+rotate=>operation: rga rotate
+detect=>operation: face detect
+cond=>condition: face ok
+liveness=>operation: face liveness
+live=>condition: liveness ok
+sub1=>subroutine: face feature
+e=>end: end
+st->camera->rotate->detect->cond
+cond(yes)->liveness->live
+cond(no)->camera
+live(yes)->sub1(right)->
+live(no)->camera
+sub1->e
+​```
 ```
 
-### **1.2 datebase**
+- RGB人脸特征值识别
+
+```flow
+​```flow
+st=>start: start
+wait=>operation: wait signal
+landmark=>condition: face landmark
+align=>condition: face align
+extract=>condition: face feature extract
+search=>condition: face feature search
+notify=>operation: notify
+e=>end: end
+st->wait->landmark(yes)->align(yes)->extract(yes)->search(yes)->notify
+landmark(no)->wait
+align(no)->wait
+extract(no)->wait
+search(wait)->wait
+notify->e
+​```
+```
+
+### datebase
 
 #### int database_init(void)
 
@@ -200,6 +280,20 @@ int    0成功，-1失败
 **说明**
 
 完成数据库的反初始化
+
+**参数**
+
+void
+
+**返回**
+
+void
+
+#### void database_bak(void)
+
+**说明**
+
+完成数据库的备份
 
 **参数**
 
@@ -283,6 +377,24 @@ name   用户名
 
 bool    true存在，false不存在
 
+#### bool database_is_id_exist(int id, char *name, size_t size)
+
+**说明**
+
+判断用户id是否已经存在于数据库
+
+**参数**
+
+id        用户id
+
+name   用户名存储地址
+
+size     用户名存储大小
+
+**返回**
+
+bool    true存在，false不存在
+
 #### int database_get_user_name_id(void)
 
 **说明**
@@ -313,13 +425,159 @@ sync_flag  为true时会实时sync保存数据库
 
 void
 
-### **1.3 rkisp_control**
+### db_monitor
 
-#### int rkisp_control_init(void)
+#### void db_monitor_init()
 
 **说明**
 
-实现了isp video的初始化，在process线程进行图像数据的读取、旋转、显示、送数据给rockface做人脸识别、检测、特征值提取、轨迹跟踪处理。
+db_monitor初始化，用于接收web server相关消息
+
+**参数**
+
+void
+
+**返回**
+
+void
+
+#### void db_monitor_face_list_add(int id, char *path, char *name, char *type)
+
+**说明**
+
+发送添加用户消息到web server
+
+**参数**
+
+id      用户id
+
+path  用户路径
+
+name 用户名
+
+type   用户类型
+
+**返回**
+
+void
+
+#### void db_monitor_face_list_delete(int id)
+
+**说明**
+
+发送删除用户消息到web server
+
+**参数**
+
+id      用户id
+
+**返回**
+
+void
+
+#### void db_monitor_snapshot_record_set(char *path)
+
+**说明**
+
+发送抓拍消息到web server
+
+**参数**
+
+path      抓拍路径
+
+**返回**
+
+void
+
+#### void db_monitor_control_record_set(int face_id, char *path, char *status, char *similarity)
+
+**说明**
+
+发送控制消息到web server
+
+**参数**
+
+face_id     用户id
+
+path          抓拍路径
+
+status        开关状态
+
+similarity  相似度
+
+**返回**
+
+void
+
+#### void db_monitor_get_user_info(struct user_info *info, int id)
+
+**说明**
+
+通过web server获取用户信息
+
+**参数**
+
+info  存储用户信息
+
+id     用户id
+
+**返回**
+
+void
+
+### display
+
+#### int display_init(int width, int height)
+
+**说明**
+
+双层vop视频显示层初始化
+
+**参数**
+
+width   屏幕宽
+
+height  屏幕高
+
+**返回**
+
+void
+
+#### void display_exit(void)
+
+**说明**
+
+双层vop视频显示层反初始化
+
+**参数**
+
+void
+
+**返回**
+
+void
+
+#### void display_switch(enum display_video_type type)
+
+**说明**
+
+切换IR/RGB/USB摄像头显示
+
+**参数**
+
+type   需要显示的摄像头类型
+
+**返回**
+
+void
+
+### camrgb_control
+
+#### int camrgb_control_init(void)
+
+**说明**
+
+实现了rgb video的初始化，在process线程进行图像数据的读取、旋转、显示、送数据给rockface做人脸识别、检测、特征值提取、轨迹跟踪处理。
 
 **参数**
 
@@ -329,11 +587,11 @@ void
 
 int    0成功，-1失败
 
-#### void rkisp_control_exit(void)
+#### void camrgb_control_exit(void)
 
 **说明**
 
-实现了isp video的反初始化。
+实现了rgb video的反初始化。
 
 **参数**
 
@@ -343,31 +601,11 @@ void
 
 void
 
-#### void rkisp_control_expo_weights_270(int left, int top, int right, int bottom)
+#### void camrgb_control_expo_weights_270(int left, int top, int right, int bottom)
 
 **说明**
 
-用于实现ISP图像顺时针旋转270度局部曝光，可以实现人脸坐标在暗处局部曝光。
-
-**参数**
-
-left      人脸矩形框左边的坐标
-
-top      人脸矩形框顶部的坐标
-
-right    人脸矩形框右边的坐标
-
-bottom 人脸矩形框底部的坐标
-
-**返回**
-
-void
-
-#### void rkisp_control_expo_weights_90(int left, int top, int right, int bottom)
-
-**说明**
-
-用于实现ISP图像顺时针旋转90度局部曝光，可以实现人脸坐标在暗处局部曝光。
+用于实现rgb图像顺时针旋转270度局部曝光，可以实现人脸坐标在暗处局部曝光。
 
 **参数**
 
@@ -383,7 +621,27 @@ bottom 人脸矩形框底部的坐标
 
 void
 
-#### void rkisp_control_expo_weights_default(void)
+#### void camrgb_control_expo_weights_90(int left, int top, int right, int bottom)
+
+**说明**
+
+用于实现rgb图像顺时针旋转90度局部曝光，可以实现人脸坐标在暗处局部曝光。
+
+**参数**
+
+left      人脸矩形框左边的坐标
+
+top      人脸矩形框顶部的坐标
+
+right    人脸矩形框右边的坐标
+
+bottom 人脸矩形框底部的坐标
+
+**返回**
+
+void
+
+#### void camrgb_control_expo_weights_default(void)
 
 **说明**
 
@@ -397,13 +655,41 @@ void
 
 void
 
-### rkcif_control
-
-#### int rkcif_control_init(void)
+#### void set_rgb_display(display_callback cb)
 
 **说明**
 
-实现了cif video的初始化，在process线程进行图像数据的读取、旋转、送数据给rockface做活体检测处理。
+设置RGB摄像头显示回调
+
+**参数**
+
+cb        RGB摄像头显示回调
+
+**返回**
+
+void
+
+#### void set_rgb_rotation(int angle)
+
+**说明**
+
+设置RGB摄像头旋转角度
+
+**参数**
+
+angle        旋转角度，支持90，270
+
+**返回**
+
+void
+
+### camir_control
+
+#### int camir_control_init(void)
+
+**说明**
+
+实现了ir video的初始化，在process线程进行图像数据的读取、旋转、送数据给rockface做活体检测处理。
 
 **参数**
 
@@ -413,11 +699,11 @@ void
 
 int    0成功，-1失败
 
-#### void rkcif_control_exit(void)
+#### void camir_control_exit(void)
 
 **说明**
 
-实现了cif video的反初始化。
+实现了ir video的反初始化。
 
 **参数**
 
@@ -427,7 +713,49 @@ void
 
 void
 
-### **1.5 shadow_display**
+#### bool camir_control_run(void)
+
+**说明**
+
+判断IR摄像头是否运行
+
+**参数**
+
+void
+
+**返回**
+
+bool  true，运行；false，没运行
+
+#### void set_ir_display(display_callback cb)
+
+**说明**
+
+设置IR摄像头显示回调
+
+**参数**
+
+cb        IR摄像头显示回调
+
+**返回**
+
+void
+
+#### void set_ir_rotation(int angle)
+
+**说明**
+
+设置IR摄像头旋转角度
+
+**参数**
+
+angle        旋转角度，支持90，270
+
+**返回**
+
+void
+
+### shadow_display
 
 #### void shadow_display(void *src_ptr, int src_fd, int src_fmt, int src_w, int src_h)
 
@@ -523,7 +851,7 @@ height  屏幕的高
 
 void
 
-### **1.6 load_feature**
+### load_feature
 
 #### int count_file(const char *path, char *fmt)
 
@@ -561,7 +889,7 @@ cnt	  最多读取多少个
 
 void
 
-### **1.7 play_wav**
+### play_wav
 
 #### int play_wav_thread_init(void)
 
@@ -617,7 +945,7 @@ void
 
 CMakeLists.txt里install(DIRECTORY wav/cn/ DESTINATION ../etc)指定使用中文或者英文音频文件安装到指定目录。
 
-### **1.8 rga_control**
+### rga_control
 
 #### int rga_control_buffer_init(bo_t *bo, int *buf_fd, int width, int height, int bpp)
 
@@ -657,7 +985,7 @@ buf_fd   申请目标内存buf_fd参数
 
 void
 
-### **1.9 rkfacial**
+### rkfacial
 
 #### typedef void (*display_callback)(void *ptr, int fd, int fmt, int w, int h, int rotation)
 
@@ -683,39 +1011,39 @@ rotation   buffer旋转参数（参考linux-rga定义）
 
 void
 
-#### void set_isp_param(int width, int height, display_callback cb, bool expo)
+#### void set_rgb_param(int width, int height, display_callback cb, bool expo)
 
 **说明**
 
-设置ISP摄像头的参数
+设置rgb摄像头的参数
 
 **参数**
 
-width          ISP摄像头初始化宽
+width          rgb摄像头初始化宽
 
-height         ISP摄像头初始化高
+height         rgb摄像头初始化高
 
-cb               ISP摄像头显示回调，可以为NULL
+cb               rgb摄像头显示回调，可以为NULL
 
-expo           ISP摄像头局部曝光
+expo           rgb摄像头局部曝光
 
 **返回**
 
 void
 
-#### void set_cif_param(int width, int height, display_callback cb)
+#### void set_ir_param(int width, int height, display_callback cb)
 
 **说明**
 
-设置CIF摄像头的参数
+设置ir摄像头的参数
 
 **参数**
 
-width          CIF摄像头初始化宽
+width          ir摄像头初始化宽
 
-height         CIF摄像头初始化高
+height         ir摄像头初始化高
 
-cb               CIF摄像头显示回调，可以为NULL
+cb               ir摄像头显示回调，可以为NULL
 
 **返回**
 
@@ -836,6 +1164,278 @@ void
 **参数**
 
 cb           UI绘制用户信息回调
+
+**返回**
+
+void
+
+### snapshot
+
+#### int snapshot_init(struct snapshot *s, int w, int h)
+
+**说明**
+
+snapshot初始化
+
+**参数**
+
+s           snapshot信息
+
+w          snapshot 图片宽
+
+h           snapshot图片高
+
+**返回**
+
+int        0成功
+
+#### void snapshot_exit(struct snapshot *s)
+
+**说明**
+
+snapshot反初始化
+
+**参数**
+
+s           snapshot信息
+
+**返回**
+
+void
+
+#### int snapshot_run(struct snapshot *s, rockface_image_t *image, rockface_det_t *face, RgaSURF_FORMAT fmt, long int sec, char mark)
+
+**说明**
+
+snapshot拍照
+
+**参数**
+
+s           snapshot信息
+
+image  图像image
+
+face     人脸face
+
+fmt      图像格式
+
+sec       抓拍最小间隔（秒）
+
+mark    抓拍标记
+
+**返回**
+
+int      0成功
+
+### turbojpeg_decode
+
+#### void *turbojpeg_decode_get(const char *name, int *w, int *h, int *b)
+
+**说明**
+
+turbojpeg解码MJPEG获取图像buffer
+
+**参数**
+
+name    图像路径名
+
+w          存储图像分辨率宽
+
+h           存储图像分辨率高
+
+b           存储图像每个像素的byte数
+
+**返回**
+
+void *   MJPEG解码后buffer
+
+#### void turbojpeg_decode_put(void *data)
+
+**说明**
+
+释放turbojpeg解码MJPEG获取图像的buffer
+
+**参数**
+
+data       MJPEG解码后buffer
+
+**返回**
+
+void
+
+### usb_camera
+
+#### int usb_camera_init(void)
+
+**说明**
+
+usb camera初始化
+
+**参数**
+
+void
+
+**返回**
+
+int        0成功
+
+#### void usb_camera_exit(void)
+
+**说明**
+
+usb camera反初始化
+
+**参数**
+
+void
+
+**返回**
+
+void
+
+#### void set_usb_display(display_callback cb)
+
+**说明**
+
+设置usb camera显示回调
+
+**参数**
+
+cb     显示回调
+
+**返回**
+
+void
+
+#### void set_usb_rotation(int angle)
+
+**说明**
+
+设置usb camera
+
+**参数**
+
+angle    旋转角度，支持90，270
+
+**返回**
+
+void
+
+### vpu decode(MJPEG decode)
+
+#### int vpu_decode_jpeg_init(struct vpu_decode* decode, int width, int height)
+
+**说明**
+
+vpu decode初始化
+
+**参数**
+
+decode    vpu_decode信息
+
+width      MJPEG图像宽
+
+height     MJPEG图像高
+
+**返回**
+
+int          0成功
+
+#### int vpu_decode_jpeg_doing(struct vpu_decode* decode, void* in_data, RK_S32 in_size, int out_fd, void* out_data)
+
+**说明**
+
+vpu decode解码
+
+**参数**
+
+decode    vpu_decode信息
+
+in_data   MJPEG图像数据
+
+in_size   MJPEG图像大小
+
+out_fd    解码数据fd
+
+out_data 解码数据data
+
+**返回**
+
+int          0成功
+
+#### int vpu_decode_jpeg_done(struct vpu_decode* decode)
+
+**说明**
+
+vpu decode反初始化
+
+**参数**
+
+decode    vpu_decode信息
+
+**返回**
+
+int          0成功
+
+### vpu encode(MJPEG encode)
+
+#### int vpu_encode_jpeg_init(struct vpu_encode* encode, int width, int height, int quant, MppFrameFormat format)
+
+**说明**
+
+vpu encode初始化
+
+**参数**
+
+encode    vpu_encode信息
+
+width      MJPEG图像宽
+
+height     MJPEG图像高
+
+quant      MJPEG编码quant
+
+format    编码输入图像格式
+
+**返回**
+
+int          0成功
+
+#### int vpu_encode_jpeg_doing(struct vpu_encode* encode, void* srcbuf, int src_fd, size_t src_size, void *dst_buf, int dst_fd, size_t dst_size)
+
+**说明**
+
+vpu encode初始化
+
+**参数**
+
+encode    vpu_encode信息
+
+srcbuf     输入图像buffer
+
+src_fd     输入图像fd
+
+src_size  输入图像大小
+
+dst_buf   输出图像buf
+
+dst_fd     输出图像fd
+
+dst_size  输出图像buf初始化大小
+
+**返回**
+
+int          0成功
+
+#### void vpu_encode_jpeg_done(struct vpu_encode* encode)
+
+**说明**
+
+vpu encode反初始化
+
+**参数**
+
+encode    vpu_encode信息
 
 **返回**
 
