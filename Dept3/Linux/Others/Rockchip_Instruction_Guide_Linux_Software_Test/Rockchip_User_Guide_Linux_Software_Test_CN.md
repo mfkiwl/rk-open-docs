@@ -2,13 +2,11 @@
 
 文档标识：RK-SM-YF-352
 
-发布版本：V1.1.1
+发布版本：V1.1.2
 
-日期：2020-03-30
+日期：2020-08-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
-
----
 
 **免责声明**
 
@@ -42,7 +40,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **前言**
+**前言**
 
 **概述**
 
@@ -70,14 +68,17 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
-| 2017-01-15 | V1.0.0 | 陈清	| 初始版本 |
-| 2020-03-24 | V1.1.0 | 陈清	| 更新测试项 |
-| 2020-03-30 | V1.1.1 | 王晓腾	| 修改格式 |
-
-## **目录**
+| 2017-01-15 | V1.0.0 | CQ	| 初始版本 |
+| 2020-03-24 | V1.1.0 | CQ	| 更新测试项 |
+| 2020-03-30 | V1.1.1 | Caesar Wang	| 修改格式 |
+| 2020-08-02 | V1.1.2 | Ruby Zhang	| 格式修正 |
 
 ---
+
+**目录**
+
 [TOC]
+
 ---
 
 ## 功能测试
@@ -105,7 +106,7 @@ ps | grep audio
  1248 root      2412 S    grep audio
 ```
 
-删除后台音频播放 kill 569
+删除后台音频播放： kill 569
 
 #### 录像
 
@@ -116,7 +117,8 @@ rkisp_demo --device=/dev/video1 --output=/tmp/isp.yuv --iqfile=/etc/iqfiles/OV56
 ```
 
 播放录像：
-将/tmp/cif.yuv下的文件pull到电脑端： adb pull /tmp/cif.yuv /tmp/cif.yuv，通过 YUVPlayer.exe 工具播放。
+
+将/tmp/cif.yuv下的文件pull到电脑端： `adb pull /tmp/cif.yuv /tmp/cif.yuv`，通过 YUVPlayer.exe 工具播放。
 YUVPlayer.exe 工具播放 YUV 录像文件时的设置如下：
 
 ![camera](resources/camera.png)
@@ -130,39 +132,39 @@ arecord -c 通道 -r 采样频率 –f 采样位数 –d 录音时长 /录音存
 封装格式=”wmv、wav、mp3 等”
 例：
 
-**限时录音-录音10秒自动退出并保存**
+**限时录音-录音10秒自动退出并保存:**
 
 ```shell
 arecord -c 2 -r 44100 -f S16_LE –d 10 /tmp/record.wav
 ```
 
-**不限时录音-ctrl+c退出即可保存**
+**不限时录音-ctrl+c退出即可保存:**
 
 ```shell
 arecord -c 2 -r 44100 -f S16_LE /tmp/record.wav
 ```
 
-**播放录音文件**
+**播放录音文件:**
 
 ```shell
 aplay /tmp/record.wav
 ```
 
-#### WI-FI 连接
+#### Wi-Fi 连接
 
-**方法1**
+**方法1:**
 
 ```shell
 cp data/cfg/wpa_supplicant.conf userdata/
 vi /userdata/cfg/wpa_supplicant.conf
 ```
 
-添加如下配置项
+添加如下配置项:
 
 ```
 network={
-ssid="WiFi-AP" // WiFi 名字
-psk="12345678" // WiFi 密码
+ssid="WiFi-AP" // Wi-Fi 名字
+psk="12345678" // Wi-Fi 密码
 key_mgmt=WPA-PSK // 加密方式
 key_mgmt=NONE // 不加密
 }
@@ -170,20 +172,22 @@ key_mgmt=NONE // 不加密
 ```
 
 重新读取上述配置:wpa_cli reconfigure
+
 并重新连接:wpa_cli reconnect
+
 ping baidu.com
 
 **方法2**
 
 ```
-./usr/sbin/wpa_supplicant -D nl80211 -i wlan0 -c /etc/wpa_supplicant.conf &  #打开wifi
+./usr/sbin/wpa_supplicant -D nl80211 -i wlan0 -c /etc/wpa_supplicant.conf &  #打开Wi-Fi
 wpa_cli -i wlan0 add_network  #添加一个网络连接ID号，这里的ID号在第3-6步的时候用到
 wpa_cli -i wlan0 set_network 0 ssid \"pzb\"    #添加要连接的路由器SSID，如：pzb
 wpa_cli -iwlan0 set_network 0 psk \"123456789\"    #添加要连接的ap密码，如：123456789
 wpa_cli -iwlan0 enable_network 0   #这里的0是根据第2步得来的，使该网络ID可以使用
 wpa_cli -iwlan0 select_network 0  #这里的0是根据第2步得来的，连接该ID
-wpa_cli -iwlan0 set_network 0 psk \""   （无密码）
-ifconfig 以及ping baidu.com    #能获取正常ip地址以及能ping通就代表可以上网
+wpa_cli -iwlan0 set_network 0 psk \""    #（无密码）
+ifconfig 以及ping baidu.com    #能获取正常IP地址以及能ping通就代表可以上网
 ```
 
 #### 音频播放
@@ -195,15 +199,15 @@ aplay /media/usb0/musicdemo.wmv
 #### 系统时间查看/设置
 
 ```shell
-date  （查看系统时间）
-date --set='2018-12-24 15:17:42'   （设置系统时间）
-hwclock --show  （查看硬件时间）
-hwclock --systohc  （硬件时间同步显示系统时间）
+date                               #查看系统时间
+date --set='2018-12-24 15:17:42'   #设置系统时间
+hwclock --show                     #查看硬件时间
+hwclock --systohc                  #硬件时间同步显示系统时间
 ```
 
 #### RTC 时钟测试
 
-cat /路径/time 查看当前状态下或重启后时间是否有变化
+`cat /路径/time` 用于查看当前状态下或重启后时间是否有变化。
 如：
 RK3399 挖掘机 EVB：
 
@@ -223,7 +227,7 @@ RK3399Pro EVB：
 cat /sys/devices/platform/ff3c0000.i2c/i2c-0/0-0020/rk808-rtc/rtc/rtc0/time
 ```
 
-不同平台对应的time所在节点路径不同，可以通过find ./ -name time 来查找以上类似节点。
+不同平台对应的time所在节点路径不同，可以通过`find ./ -name time` 来查找以上类似节点。
 
 ![RTC](resources/RTC.png)
 
@@ -237,7 +241,7 @@ name=eDP-1
 transform=90
 ```
 
-其中name需要根据实际的情况写入，通过 ls /sys/class/drm 获取：
+其中name需要根据实际的情况写入，通过 `ls /sys/class/drm` 获取：
 
 ```shell
 [root@rk3399:/]# ls /sys/class/drm/
@@ -248,19 +252,22 @@ card0 card0-HDMI-A-1  controlD64    version card0-DP-1     card0-eDP-1    render
 
 #### 视频播放
 
-**单窗口视频播放**
+**单窗口视频播放:**
 
 ```shell
 gst-play-1.0 /oem/SampleVideo_1280x720_5mb.mp4
 ```
 
-**多窗口视频播放**
+**多窗口视频播放:**
 
-先找着多窗口的脚本再执行，
+先找着多窗口的脚本再执行:
+
+```shell
 cd rockchip_test/video/
-sh test_gst_multivideo.sh test  (pro,有可能名称不是这个，可能是test_multivideo.sh )
+sh test_gst_multivideo.sh test  #pro,有可能名称不是这个，可能是test_multivideo.sh
+```
 
-**停止多窗口**
+**停止多窗口:**
 
 ```shell
 killall videowidget
@@ -321,18 +328,20 @@ sudo xset s off
 xset dpms force off (立即关闭屏幕)
 ```
 
-备注：重启样机后，以上设置就失效
+备注：重启样机后，以上设置就失效。
+
 终端位置：主界面左下角开始-> System Tools -> LXTerminal
 
-#### 连接 WI-FI
+#### 连接 Wi-Fi
 
 在串口输入如下命令：
 
 ```shell
-1. 开启WI-FI：nmcli r wifi on
-2. 扫描附近AP：nmcli dev wifi
-3. 连接AP：nmcli dev wifi connect "DIR-803" password "839919060" ifname wlan0
-4. 关闭WI-FI：nmcli r wifi off
+nmcli r wifi on  #第1步：开启Wi-Fi
+nmcli dev wifi   #第2步：扫描附近AP
+#第3步：连接AP
+nmcli dev wifi connect "DIR-803" password "839919060" ifname wlan0
+nmcli r wifi off #第4步：关闭Wi-Fi
 ```
 
 #### 双屏异显
@@ -347,7 +356,8 @@ xrandr 来设置两个屏幕的关系：
 su linaro-c "DISPLAY=:0xrandr--outputHDMI-1--aboveDP-1" 其中--above
 ```
 
-其中 --above 可以代换成 right-of, left-of,below,same-as,preferred,off 等等
+其中 --above 可以代换成 right-of, left-of, below, same-as, preferred, off 等等。
+
 这样就可以完成双屏异显的功能。
 
 #### 双屏异声
@@ -372,7 +382,7 @@ DPaudio: aplay-Dplughw:2,0/dev/urandom
 
 #### 显示屏旋转
 
-旋转 normal/left/right
+旋转 normal/left/right：
 
 ```shell
 vi /etc/X11/xorg.conf.d/20-modesetting.conf
@@ -383,14 +393,15 @@ vi /etc/X11/xorg.conf.d/20-modesetting.conf
 #### U盘自动挂载默认路径
 
 /media/linaro/B4EA-8716
-备注：不同U盘名称不同,实际名称为准。
+
+备注：不同U盘名称不同，实际名称为准。
 
 ## 性能测试
 
 ### 磁盘读写测试
 
-测试前先查一下节点：fdisk –l
-查看分区可读写的是mmcblk1p9,这个分区容量最大13.5G,其它P1-8的容量比较小，P8的容量3.5G ,在此盘读写后易造成系统损坏，重启机器发现无法开机,所以选择p9。
+测试前先查一下节点：`fdisk –l`
+查看分区可读写的是mmcblk1p9，这个分区容量最大13.5G，其它P1-8的容量比较小，P8的容量3.5G ,在此盘读写后易造成系统损坏，重启机器发现无法开机,所以选择p9。
 
 #### e读写
 
@@ -479,7 +490,7 @@ sh test_glmark2_offscreen.sh
 
 ## 压力测试
 
-压力测试列表
+压力测试列表:
 
 ![linux_rockchip_test](resources/linux_rockchip_test.png)
 
@@ -501,12 +512,15 @@ while true; do /usr/local/bin/test_glmark2_fullscreen.sh sleep 2; done
 
 ### reboot test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
+- 打开压力测试列表：
 
-开始测试
-压力测试列表内选择测试项对应序号10
+  ```shell
+  sh rockchip_test/rockchip_test.sh
+  ```
 
-退出测试
+- 开始测试（压力测试列表内选择测试项对应序号10）
+
+- 退出测试：
 
 ```shell
 echo off > /data/cfg/rockchip_test/reboot_cnt
@@ -514,12 +528,15 @@ echo off > /data/cfg/rockchip_test/reboot_cnt
 
 ### recovery test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
+- 打开压力测试列表：
 
-开始测试：
-压力测试列表内选择测试项对应序号6
+```
+sh rockchip_test/rockchip_test.sh
+```
 
-退出测试：
+- 开始测试 （压力测试列表内选择测试项对应序号6）
+
+- 退出测试：
 
 ```shell
 echo off > /oem/rockchip_test/reboot_cnt
@@ -527,68 +544,115 @@ echo off > /oem/rockchip_test/reboot_cnt
 
 ### memtester test
 
-方法1
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号1
-再选择memtester test对应序号（默认memtester 128M）
+方法1：
+
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号1）
+
+- 再选择memtester test对应序号（默认memtester 128M）
 
 方法2
-直接执行 memtester 300M
-注：300MB 是可以根据实际的 DDR 大小设置，例如：100MB、200MB，但是这个值不能大于 DDR 的大小。
+
+- 直接执行 memtester 300M
+
+  注：300MB 是可以根据实际的 DDR 大小设置，例如：100MB、200MB，但是这个值不能大于 DDR 的大小。
 
 ### stressapptest
 
 方法1：
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号1
-再选择 stressapptest 对应序号（默认48小时）。
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号1）
+
+- 再选择 stressapptest 对应序号（默认48小时）。
 
 方法2：
 
 ```shell
-stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 300 （测试24小时自动停止）
+stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 300 #测试24小时自动停止
 ```
 
 ### cpufreq test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号2
-再选择 cpu freq stress test 以及 cpu freq test:(with out stress test) 对应序号。
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号2）
+
+- 再选择 cpu freq stress test 以及 cpu freq test:(with out stress test) 对应序号。
 
 ### flash stress test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号3。
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号3）
 
 ### bluetooth test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号4。
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号4）
 
 ### suspend_resume test
 
 **Buildroot**
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号7
-再选择auto suspend (resume by rtc) 对应序号3开始测试。
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号7）
+
+- 再选择auto suspend (resume by rtc) 对应序号3开始测试。
 
 **Debian**
 
-cd /usr/local/bin/
-sh test_suspend_resume.sh
-再选择auto suspend (resume by rtc) 对应序号3开始测试。
+- cd /usr/local/bin/
+- sh test_suspend_resume.sh
+- 再选择auto suspend (resume by rtc) 对应序号3开始测试。
 
-### WI-FI test
+### Wi-Fi test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号8
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号8）
 
 ### ddr freq scaling test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号11
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号11）
 
 ### npu stress test
 
@@ -597,18 +661,25 @@ SDK 端串口连接到 NPU 端口：
 ![pro_npu_debug](resources/pro_npu_debug.png)
 
 ```shell
-stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 300 （测试24小时自动停止）。
+stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 300 #测试24小时自动停止
 ```
 
 ### camera test
 
-sh rockchip_test/rockchip_test.sh（打开压力测试列表）
-压力测试列表内选择测试项对应序号13
-再选择camera stresstest 对应序号3开始测试。
+- 打开压力测试列表：
+
+```
+sh rockchip_test/rockchip_test.sh
+```
+
+- 开始测试 （压力测试列表内选择测试项对应序号13）
+
+- 再选择camera stresstest 对应序号3开始测试。
 
 ### video test
 
 播放放器无法设备循环所有视频播放，用脚本执行。
+
 先把全英文视频文件的视频文件夹及脚本拷入设备内，再执行脚本测试：
 
 ```shell
