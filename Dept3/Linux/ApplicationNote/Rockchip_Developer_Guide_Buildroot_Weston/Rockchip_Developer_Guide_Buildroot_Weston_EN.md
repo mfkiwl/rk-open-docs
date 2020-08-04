@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-326
 
-Release Version: V1.0.1
+Release Version: V1.1.0
 
-Release Date: 2020-07-22
+Release Date: 2020-08-04
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -59,6 +59,7 @@ Software development engineers
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0    | Jeffy Chen | 2019-11-27 | Initial version |
 | V1.0.1 | Ruby Zhang | 2020-07-23 | Update the company name  <br/> and the format of the document |
+| V1.1.0 | Jeffy Chen | 2020-08-04 | Update contents for the newest SDK |
 
 ---
 
@@ -72,7 +73,7 @@ Software development engineers
 
 ### Overview
 
-Weston is the official implementation reference of Wayland open source display protocol, and Weston 3.0 drm back-end is used in Rockchip Buildroot SDK by default.
+Weston is the official implementation reference of Wayland open source display protocol, and Weston 8.0 drm back-end is used in Rockchip Buildroot SDK by default.
 
 [^Note]: For more details about Weston and Wayland, please refer to the official website：<https://wayland.freedesktop.org>.
 
@@ -80,9 +81,9 @@ Weston is the official implementation reference of Wayland open source display p
 
 There are multiple ways to configure Rockchip Buildroot SDK Weston:
 
-a. Command line parameters
+a. Command line options
 
-That is, the parameters of the command when starting Weston, such as weston --tty=2.
+That is, the options of the command when starting Weston, such as weston --tty=2.
 
 b. weston.ini configuration file
 
@@ -138,7 +139,7 @@ Weston supports setting the background color and position of status bar in the `
 Currently, Weston does not support setting the size of status bar. You have to modify in the code level when need some adjustments:
 
 ```c
-    // weston-3.0.0/clients/desktop-shell.c
+    // weston-8.0.0/clients/desktop-shell.c
 
     static void
     panel_configure(void *data,
@@ -159,10 +160,10 @@ Currently, Weston does not support setting the size of status bar. You have to m
                             width = 32;
                             break;
                     case CLOCK_FORMAT_MINUTES:
-                            width = 170;
+                            width = 150;
                             break;
                     case CLOCK_FORMAT_SECONDS:
-                            width = 190;
+                            width = 170;
                             break;
                     }
                     break;
@@ -189,7 +190,7 @@ Weston supports setting the background pattern and color in the `shell` section 
 
 ### Idle Time and Lock Screen Configuration
 
-The idle timeout of Weston can be configured in the startup parameters or in the `core` section of weston.ini, such as:
+The idle timeout of Weston can be configured in the command options or in the `core` section of weston.ini, such as:
 
 ```shell
     # /etc/init.d/S50launcher
@@ -305,11 +306,22 @@ If you want to configure resolution and scaling dynamically, the dynamic configu
     echo "output:eDP-1:rect=<10,20,410,620>" > /tmp/.weston_drm.conf # eDP-1 display to the position of (10,20), the size is scaled to 400x600
 ```
 
-This kind of scale depends on Rockchip's RGA 2D acceleration.
+When the VOP hardware doesn't support scaling, it would try to use Rockchip's RGA 2D acceleration.
 
 ### Freeze the Screen
 
-When Weston is started, there will be a black screen that switches between boot logo and UI display temporarily. If you want to prevent this black screen, you can freeze the Weston screen content temporarily through the following dynamic configuration file:
+When Weston is started, there will be a black screen that switches between boot logo and UI display temporarily. If you want to prevent this black screen, you can freeze the Weston screen content temporarily through the following ways:
+
+Add --warm-up to Weston's command options
+
+```shell
+    # /etc/init.d/S50launcher
+      start)
+                    ...
+                    weston --tty=2 -B=drm-backend.so --idle-time=0 --warm-up&
+```
+
+Or
 
 ```shell
     # /etc/init.d/S50launcher
@@ -328,11 +340,11 @@ Or
     # /etc/init.d/S50launcher
       start)
                     ...
-    				echo "output:all:freeze" > /tmp/.weston_drm.conf # Freeze the display
+                    echo "output:all:freeze" > /tmp/.weston_drm.conf # Freeze the display
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
                     ...
                     sleep 1 && \
-    					echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # unfreeze  after 1 second
+                        echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # unfreeze  after 1 second
 ```
 
 ### Multi-screen Configuration
@@ -343,15 +355,15 @@ The Buildroot SDK Weston supports multi-screen with the same or different displa
     # /etc/init.d/S50launcher
       start)
                     ...
-    				export WESTON_DRM_PRIMARY=HDMI-A-1 # Specify HDMI-A-1 as a main display
-    				export WESTON_DRM_MIRROR=1 # In mirror mode (multi-screen with the same display), without setting this environment variable will be with different display
-    				export WESTON_DRM_KEEP_RATIO=1 # In mirror mode, scaling maintains the aspect ratio, without setting this variable will be full screen by force
-    				export WESTON_DRM_PREFER_EXTERNAL=1 # Turn off the built-in monitor automatically when an external monitor is connected
-    				export WESTON_DRM_PREFER_EXTERNAL_DUAL=1 # When an external monitor is connected, keep the first external monitor as the main display by default
+                    export WESTON_DRM_PRIMARY=HDMI-A-1 # Specify HDMI-A-1 as a main display
+                    export WESTON_DRM_MIRROR=1 # In mirror mode (multi-screen with the same display), without setting this environment variable will be with different display
+                    export WESTON_DRM_KEEP_RATIO=1 # In mirror mode, scaling maintains the aspect ratio, without setting this variable will be full screen by force
+                    export WESTON_DRM_PREFER_EXTERNAL=1 # Turn off the built-in monitor automatically when an external monitor is connected
+                    export WESTON_DRM_PREFER_EXTERNAL_DUAL=1 # When an external monitor is connected, keep the first external monitor as the main display by default
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
 ```
 
-In mirror mode, scaling display content depends on Rockchip's RGA 2D acceleration.
+When the VOP hardware doesn't support scaling, it would try to use Rockchip's RGA 2D acceleration.
 
 It also supports disabling the specified screen individually in the `output` section of weston.ini:
 
@@ -385,46 +397,42 @@ If there are multiple screens in Weston, input devices should be bound to screen
     name=LVDS-1
 
     seat=default
-    # The id for seat of the input device can be found through buildroot/output/*/build/weston-3.0.0/weston-info tool
+    # The id for seat of the input device can be found through buildroot/output/*/build/weston-8.0.0/weston-info tool
 ```
 
-Input devices of Weston are based on libinput, so if you need to calibrate the touch screen, you can configure LIBINPUT_CALIBRATION_MATRIX in udev rules through the standard method of libinput, such as:
-
-```shell
-    # cat /etc/udev/rules.d/99-touch-cali.rules
-    ATTRS{name}=="Fujitsu Component USB Touch Panel", ENV{LIBINPUT_CALIBRATION_MATRIX}="1.013788 0.0 -0.061495 0.0 1.332709 -0.276154"
-```
-
-The calibration parameters can be obtained by Weston calibration tool: buildroot/output/\<board\>/build/weston/weston-calibrator. After running this tool, a number of random points will be generated, and then click them in sequence to output the calibration parameters, such as: calibration values: 1.013788 0.0- 78.713867 0.0 1.332709 -220.923355
-
-The third and sixth parameters should be divided by the screen's width and height respectively. Taking the resolution of 1280x800 as an example, the final calibration parameter is 1.013788 0.0 -0.061495 (that is, -78.713867 divided by 1280) 0.0 1.332709 -0.276154 (that is -220.923355 divided by 800).
-
-### Configuration on the Platform without GPU
-
-The Weston in the SDK uses GPU for render acceleration by default. For platforms without GPUs, Rockchip RGA 2D acceleration can also be used instead.
-
-To enable this function, please ensure that the Buildroot repository is updated after this commit:
-
-```
-    commit 6873e04dd246c0b969c19bcc38549c3e012a4b20
-    Author: Jeffy Chen <jeffy.chen@rock-chips.com>
-    Date:   Fri Nov 1 18:44:36 2019 +0800
-
-        pixman: pixman_image_composite32: Support rockchip RGA 2D accel
-
-        Disabled by default, set env PIXMAN_USE_RGA=1 to enable.
-
-        Change-Id: I674450da1fd713609cb7a1da790a5a3b8057d3c4
-        Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-```
-
-The detailed configuration requires to enable BR2_PACKAGE_LINUX_RGA in the Buildroot SDK, and then configure PIXMAN_USE_RGA environment variable to 1, and add --use-pixman to Weston startup parameters, such as:
+If you need to calibrate the touch screen, you can use WESTON_TOUCH_CALIBRATION environment, such as:
 
 ```shell
     # /etc/init.d/S50launcher
       start)
                     ...
-                    export PIXMAN_USE_RGA=1
+                    export WESTON_TOUCH_CALIBRATION="1.013788 0.0 -0.061495 0.0 1.332709 -0.276154"
+                    weston --tty=2 -B=drm-backend.so --idle-time=0&
+```
+
+The calibration parameters can be obtained by Weston calibration tool: weston-calibrator. After running this tool, a number of random points will be generated, and then click them in sequence to output the calibration parameters, such as: Final calibration values: 1.013788 0.0 -0.061495 0.0 1.332709 -0.276154
+
+### Booting without monitor
+
+Weston doesn't support none-screen usage, forcing a connected status is required. For example:
+
+```shell
+    # /etc/init.d/S50launcher
+      start)
+                    ...
+                    echo on > /sys/class/drm/card0-HDMI-A-1/status # Forcing HDMI-A-1 as connected
+                    weston --tty=2 -B=drm-backend.so --idle-time=0&
+```
+
+### Configuration on the Platform without GPU
+
+The Weston in the SDK uses GPU for render acceleration by default. For platforms without GPUs, Rockchip RGA 2D acceleration can also be used instead.
+
+The detailed configuration requires to enable BR2_PACKAGE_LINUX_RGA and BR2_PACKAGE_PIXMAN in the Buildroot SDK, and add --use-pixman to Weston's command options, such as:
+
+```shell
+    # /etc/init.d/S50launcher
+      start)
                     ...
                     weston --tty=2 -B=drm-backend.so --idle-time=0 --use-pixman&
 ```

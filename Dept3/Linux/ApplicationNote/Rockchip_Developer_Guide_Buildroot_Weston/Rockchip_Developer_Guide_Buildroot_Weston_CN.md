@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-326
 
-发布版本：V1.0.1
+发布版本：V1.1.0
 
-日期：2020-07-22
+日期：2020-08-04
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0    | Jeffy Chen | 2019-11-27 | 初始版本     |
 | V1.0.1 | Ruby Zhang | 2020-07-22 | 更新公司名称和文档格式 |
+| V1.1.0 | Jeffy Chen | 2020-08-04 | 适配最新SDK |
 
 ---
 
@@ -75,11 +76,11 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 相关介绍
+## 简介
 
 ### 相关介绍
 
-Weston是Wayland开源显示协议的官方参考实现，Rockchip Buildroot SDK的显示服务默认使用Weston 3.0 drm后端。
+Weston是Wayland开源显示协议的官方参考实现，Rockchip Buildroot SDK的显示服务默认使用Weston 8.0 drm后端。
 
 [^注]: Weston及Wayland相关资料可以参考官方网站：<https://wayland.freedesktop.org>
 
@@ -145,7 +146,7 @@ Weston支持在weston.ini配置文件的shell段设置状态栏的背景色、�
 Weston目前不支持设置状态栏的大小，如要调整，必须进行代码级别的修改：
 
 ```c
-    // weston-3.0.0/clients/desktop-shell.c
+    // weston-8.0.0/clients/desktop-shell.c
 
     static void
     panel_configure(void *data,
@@ -166,10 +167,10 @@ Weston目前不支持设置状态栏的大小，如要调整，必须进行代�
                             width = 32;
                             break;
                     case CLOCK_FORMAT_MINUTES:
-                            width = 170;
+                            width = 150;
                             break;
                     case CLOCK_FORMAT_SECONDS:
-                            width = 190;
+                            width = 170;
                             break;
                     }
                     break;
@@ -312,11 +313,22 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
     echo "output:eDP-1:rect=<10,20,410,620>" > /tmp/.weston_drm.conf # eDP-1显示到(10,20)位置，大小缩放为400x600
 ```
 
-这种方式缩放时需要依赖RGA加速。
+这种方式缩放时，如果硬件VOP显示模块不支持缩放，则需要依赖RGA处理。
 
 ### 冻结屏幕
 
-在启动Weston时，开机logo到UI显示之间存在短暂切换黑屏。如需要防止黑屏，可以通过以下种动态配置文件方式短暂冻结Weston屏幕内容：
+在启动Weston时，开机logo到UI显示之间存在短暂切换黑屏。如需要防止黑屏，可以通过以下方式短暂冻结Weston屏幕内容：
+
+使用定制--warm-up运行参数在UI启动后开始显示
+
+```shell
+    # /etc/init.d/S50launcher
+      start)
+                    ...
+                    weston --tty=2 -B=drm-backend.so --idle-time=0 --warm-up&
+```
+
+或者
 
 ```shell
     # /etc/init.d/S50launcher
@@ -329,17 +341,17 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
                     sleep 1 && rm /tmp/.weston_freeze& # 1秒后解冻
 ```
 
-或者
+又或者
 
 ```shell
     # /etc/init.d/S50launcher
       start)
                     ...
-    				echo "output:all:freeze" > /tmp/.weston_drm.conf # 冻结显示
+                    echo "output:all:freeze" > /tmp/.weston_drm.conf # 冻结显示
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
                     ...
                     sleep 1 && \
-    					echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # 1秒后解冻
+                        echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # 1秒后解冻
 ```
 
 ### 多屏配置
@@ -350,14 +362,15 @@ Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示�
     # /etc/init.d/S50launcher
       start)
                     ...
-    				export WESTON_DRM_PRIMARY=HDMI-A-1 # 指定主显为HDMI-A-1
-    				export WESTON_DRM_MIRROR=1 # 使用镜像模式（多屏同显），不设置此环境变量即为异显					export WESTON_DRM_KEEP_RATIO=1 # 镜像模式下缩放保持纵横比，不设置此变量即为强制全屏
-    				export WESTON_DRM_PREFER_EXTERNAL=1 # 外置显示器连接时自动关闭内置显示器
-    				export WESTON_DRM_PREFER_EXTERNAL_DUAL=1 # 外置显示器连接时默认以第一个外显为主显
+                    export WESTON_DRM_PRIMARY=HDMI-A-1 # 指定主显为HDMI-A-1
+                    export WESTON_DRM_MIRROR=1 # 使用镜像模式（多屏同显），不设置此环境变量即为异显
+                    export WESTON_DRM_KEEP_RATIO=1 # 镜像模式下缩放保持纵横比，不设置此变量即为强制全屏
+                    export WESTON_DRM_PREFER_EXTERNAL=1 # 外置显示器连接时自动关闭内置显示器
+                    export WESTON_DRM_PREFER_EXTERNAL_DUAL=1 # 外置显示器连接时默认以第一个外显为主显
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
 ```
 
-镜像模式缩放显示内容时需要依赖RGA加速。
+镜像模式缩放时，如果硬件VOP显示模块不支持缩放，则需要依赖RGA处理。
 
 同时也支持在weston.ini的output段单独禁用指定屏幕：
 
@@ -391,46 +404,42 @@ Weston中如存在多个屏幕，需要把输入设备和屏幕进行绑定，�
     name=LVDS-1
 
     seat=default
-    # 输入设备对于seat的id可以通过buildroot/output/*/build/weston-3.0.0/weston-info工具查询
+    # 输入设备对于seat的id可以通过buildroot/output/*/build/weston-8.0.0/weston-info工具查询
 ```
 
-Weston的输入设备是基于libinput的，所以如果需要校准触屏，可以通过libinput标准方式，在udev rules中配置LIBINPUT_CALIBRATION_MATRIX，如：
-
-```shell
-    # cat /etc/udev/rules.d/99-touch-cali.rules
-    ATTRS{name}=="Fujitsu Component USB Touch Panel", ENV{LIBINPUT_CALIBRATION_MATRIX}="1.013788 0.0 -0.061495 0.0 1.332709 -0.276154"
-```
-
-校准参数的获取可以使用Weston校准工具：buildroot/output/\<board\>/build/weston/weston-calibrator，工具运行后会生成若干随机点，依次点击后输出校准参数，如：Calibration values: 1.013788 0.0 -78.713867 0.0 1.332709 -220.923355
-
-其中第3、6参数需要分别除以屏幕宽和高，以分辨率1280x800为例，前面的最终校准参数为1.013788 0.0 -0.061495(即-78.713867除以1280) 0.0 1.332709 -0.276154(即-220.923355除以800)。
-
-### 无GPU平台配置
-
-SDK中的Weston默认使用GPU进行渲染合成加速，对于无GPU的平台，也可以选用RGA替代进行加速。
-
-使用此功能需要确保Buildroot仓库更新到此commit之后：
-
-```
-    commit 6873e04dd246c0b969c19bcc38549c3e012a4b20
-    Author: Jeffy Chen <jeffy.chen@rock-chips.com>
-    Date:   Fri Nov 1 18:44:36 2019 +0800
-
-        pixman: pixman_image_composite32: Support rockchip RGA 2D accel
-
-        Disabled by default, set env PIXMAN_USE_RGA=1 to enable.
-
-        Change-Id: I674450da1fd713609cb7a1da790a5a3b8057d3c4
-        Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-```
-
-具体配置需要Buildroot SDK开启BR2_PACKAGE_LINUX_RGA，之后配置PIXMAN_USE_RGA环境变量为1，并且Weston启动参数加入--use-pixman，如：
+Weston如果需要校准触屏，可以通过WESTON_TOUCH_CALIBRATION环境变量，如：
 
 ```shell
     # /etc/init.d/S50launcher
       start)
                     ...
-                    export PIXMAN_USE_RGA=1
+                    export WESTON_TOUCH_CALIBRATION="1.013788 0.0 -0.061495 0.0 1.332709 -0.276154"
+                    weston --tty=2 -B=drm-backend.so --idle-time=0&
+```
+
+校准参数的获取可以使用Weston校准工具: weston-calibrator，工具运行后会生成若干随机点，依次点击后输出校准参数，如：Final calibration values: 1.013788 0.0 -0.061495 0.0 1.332709 -0.276154
+
+### 无屏启动
+
+Weston不支持无屏显示，需要将显示器设置成强制接入状态，如：
+
+```shell
+    # /etc/init.d/S50launcher
+      start)
+                    ...
+                    echo on > /sys/class/drm/card0-HDMI-A-1/status # 强制HDMI-A-1为接入状态
+                    weston --tty=2 -B=drm-backend.so --idle-time=0&
+```
+
+### 无GPU平台配置
+
+SDK中的Weston默认使用GPU进行渲染合成加速，对于无GPU的平台，也可以选用RGA替代进行加速。
+
+具体配置需要Buildroot SDK开启BR2_PACKAGE_LINUX_RGA和BR2_PACKAGE_PIXMAN，并且Weston启动参数加入--use-pixman，如：
+
+```shell
+    # /etc/init.d/S50launcher
+      start)
                     ...
                     weston --tty=2 -B=drm-backend.so --idle-time=0 --use-pixman&
 ```
