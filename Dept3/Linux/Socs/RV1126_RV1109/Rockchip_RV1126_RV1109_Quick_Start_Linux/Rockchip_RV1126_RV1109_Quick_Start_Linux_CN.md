@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.4.1
+发布版本：V1.5.0
 
-日期：2020-07-17
+日期：2020-08-07
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -75,6 +75,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.3.1 | CWW | 2020-07-15 | 1. 修正eMMC拼写 |
 | V1.4.0 | CWW | 2020-07-16 | 1. 增加ISP工具RKISP2.x_Tuner说明<br>2. 增加开发工具说明<br>3. 增加板级配置选择说明 |
 | V1.4.1 | CWW | 2020-07-17 | 1. 更新SDK编译说明章节 |
+| V1.5.0 | CWW | 2020-08-07 | 1. 更新SDK板级配置和编译说明章节<br>2. 开发环境增加安装cmake |
 
 ---
 
@@ -90,7 +91,7 @@ Ubuntu 16.04系统：
 编译环境搭建所依赖的软件包以及安装命令如下：
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake
 ```
 
 Ubuntu 17.04系统：
@@ -247,12 +248,15 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 | 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                               | 支持快速开机 |
 | ------ | -------------------------------------------- | -------- | --------------------------------------------------- | ------------ |
-| RV1109 | BoardConfig-38x38-spi-nand-rv1109.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO           |
-| RV1109 | BoardConfig-rv1109.mk                        | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
-| RV1109 | BoardConfig-tb-rv1109.mk                     | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
-| RV1126 | BoardConfig-spi-nand.mk                      | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
-| RV1126 | BoardConfig.mk                               | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO           |
-| RV1126 | BoardConfig-tb.mk                            | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES          |
+| RV1126/RV1109 | BoardConfig-38x38-spi-nand.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO  |
+| RV1126/RV1109 | BoardConfig-robot.mk                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
+| RV1126/RV1109 | BoardConfig-tb-v12.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES |
+| RV1126/RV1109 | BoardConfig-tb-v13.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | YES |
+| RV1126/RV1109 | BoardConfig-spi-nand.mk               | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
+| RV1126/RV1109 | BoardConfig.mk                        | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
+| RV1126/RV1109 | BoardConfig-v12.mk                    | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
+| RV1126/RV1109 | BoardConfig-v10-v11.mk                | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       | NO  |
+| RV1126/RV1109 | BoardConfig-facial_gate.mk            | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
 
 切换板级配置命令：
 
@@ -262,8 +266,8 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 ```shell
 ### 选择通用版本的板级配置
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
-### 选择快速开机的板级配置
-./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
+### 选择快速开机的板级配置, 对应EVB板RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
 ```
 
 方法2
@@ -277,16 +281,20 @@ You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-38x38-spi-nand-rv1109.mk
-2. BoardConfig-rv1109-uvcc.mk
-3. BoardConfig-rv1109.mk
-4. BoardConfig-spi-nand.mk
-5. BoardConfig-tb-rv1109.mk
-6. BoardConfig-tb.mk
-7. BoardConfig-uvcc.mk
-8. BoardConfig.mk
-Which would you like? [0]: 8
-switching to board: /home/user/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
+1. BoardConfig-38x38-spi-nand.mk
+2. BoardConfig-facial_gate.mk
+3. BoardConfig-ramboot-uvc.mk
+4. BoardConfig-robot.mk
+5. BoardConfig-sl.mk
+6. BoardConfig-spi-nand.mk
+7. BoardConfig-tb-v12.mk
+8. BoardConfig-tb-v13.mk
+9. BoardConfig-uvcc.mk
+10. BoardConfig-v10-v11.mk
+11. BoardConfig-v12.mk
+12. BoardConfig.mk
+Which would you like? [0]:
+switching to board: /home/cww/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
 
 ### 查看编译命令
@@ -602,8 +610,7 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 | 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                                |
 | ------ | -------------------------------------------- | -------- | --------------------------------------------------- |
-| RV1109 | BoardConfig-rv1109-uvcc.mk                   | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
-| RV1126 | BoardConfig-uvcc.mk                          | EMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| RV1126/RV1109 | BoardConfig-uvcc.mk                   | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 
 切换板级配置命令：
 

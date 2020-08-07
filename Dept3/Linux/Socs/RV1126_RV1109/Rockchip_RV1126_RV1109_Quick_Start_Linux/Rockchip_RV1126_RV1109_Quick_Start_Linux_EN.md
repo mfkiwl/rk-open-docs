@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.4.1
+Release Version: V1.5.0
 
-Release Date: 2020-07-17
+Release Date: 2020-08-07
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -70,6 +70,7 @@ This document (this guide) is mainly intended for:
 | V1.3.1 | CWW | 2020-07-15 | 1. Remove unused board config introduction<br>2. fix same content<bt>3. fix eMMC typo |
 | V1.4.0 | CWW | 2020-07-16 | 1. Add ISP Tool RKISP2.x_Tuner introduction<br>2. Add Develop Tool introduction<br>3. Add board config introduction |
 | V1.4.1 | CWW | 2020-07-17 | 1. Update chapter of SDK Building Introduction<br>2. Update Tool's Description |
+| V1.5.0 | CWW | 2020-08-07 | 1. Update SDK board configure and compile instruction<br>2. Add install cmake for development environment |
 
 ---
 
@@ -85,7 +86,7 @@ This document (this guide) is mainly intended for:
 Please install software packages with below commands to set up a building environment:
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake
 ```
 
 **Ubuntu 17.04 or later version system:**
@@ -244,12 +245,15 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 | Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      | Support Thunder Boot |
 | ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- | -------------------- |
-| RV1109    | BoardConfig-38x38-spi-nand-rv1109.mk                      | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO                   |
-| RV1109    | BoardConfig-rv1109.mk                                     | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
-| RV1109    | BoardConfig-tb-rv1109.mk                                  | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
-| RV1126    | BoardConfig-spi-nand.mk                                   | SPI NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
-| RV1126    | BoardConfig.mk                                            | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO                   |
-| RV1126    | BoardConfig-tb.mk                                         | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES                  |
+| RV1126/RV1109 | BoardConfig-38x38-spi-nand.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO  |
+| RV1126/RV1109 | BoardConfig-robot.mk                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
+| RV1126/RV1109 | BoardConfig-tb-v12.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES |
+| RV1126/RV1109 | BoardConfig-tb-v13.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | YES |
+| RV1126/RV1109 | BoardConfig-spi-nand.mk               | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
+| RV1126/RV1109 | BoardConfig.mk                        | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
+| RV1126/RV1109 | BoardConfig-v12.mk                    | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
+| RV1126/RV1109 | BoardConfig-v10-v11.mk                | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       | NO  |
+| RV1126/RV1109 | BoardConfig-facial_gate.mk            | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
 
 Command of select board configure:
 
@@ -260,8 +264,8 @@ Method 1
 ### select general version board configuration
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
 
-### select fast boot board configuration
-./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb.mk
+### select fast boot board configuration, apply to EVB Board RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
 ```
 
 Method 2
@@ -275,16 +279,20 @@ You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-38x38-spi-nand-rv1109.mk
-2. BoardConfig-rv1109-uvcc.mk
-3. BoardConfig-rv1109.mk
-4. BoardConfig-spi-nand.mk
-5. BoardConfig-tb-rv1109.mk
-6. BoardConfig-tb.mk
-7. BoardConfig-uvcc.mk
-8. BoardConfig.mk
-Which would you like? [0]: 8
-switching to board: /home/user/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
+1. BoardConfig-38x38-spi-nand.mk
+2. BoardConfig-facial_gate.mk
+3. BoardConfig-ramboot-uvc.mk
+4. BoardConfig-robot.mk
+5. BoardConfig-sl.mk
+6. BoardConfig-spi-nand.mk
+7. BoardConfig-tb-v12.mk
+8. BoardConfig-tb-v13.mk
+9. BoardConfig-uvcc.mk
+10. BoardConfig-v10-v11.mk
+11. BoardConfig-v12.mk
+12. BoardConfig.mk
+Which would you like? [0]:
+switching to board: /home/cww/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
 
 ### To View Building Commands
@@ -603,8 +611,7 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 
 | Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      |
 | ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- |
-| RV1109    | BoardConfig-rv1109-uvcc.mk                                | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
-| RV1126    | BoardConfig-uvcc.mk                                       | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| RV1126/RV1109 | BoardConfig-uvcc.mk                                   | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 
 Command of selecting board configure :
 
