@@ -1,18 +1,16 @@
-# **RT-Thread ASR 应用开发指南**
+# RT-Thread ASR 应用开发指南
 
 文件标识：RK-KF-YF-364
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-05-27
+日期：2020-08-11
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -40,9 +38,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
-<div style="page-break-after: always;"></div>
+---
 
-## 前言
+**前言**
 
 **概述**
 
@@ -59,6 +57,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 本文档（本指南）主要适用于以下工程师：
 
 技术支持工程师
+
 软件开发工程师
 
 **修订记录**
@@ -68,18 +67,15 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | V1.0.0   | 马龙昌   | 2019-09-06 | 初始发布                  |
 | V1.0.1   | 马龙昌   | 2020-03-30 | 更新第2章节               |
 | V1.1.0   | 马龙昌   | 2020-05-27 | 更新文档格式，更新第2章节 |
-
-<div style="page-break-after: always;"></div>
-
-## 目录
+| V1.2.0   | 吴佳健   | 2020-08-11 | 更新文档格式，更新配置说明 |
 
 ---
+
+** 目录**
 
 [TOC]
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 ## 概述
 
@@ -91,60 +87,32 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ### 代码路径
 
-```
+```bash
 ./applications/
 ├── rk_iot_app/asr
 ```
 
-### 固件及内存地址配置
-
-使用思必驰固件需要按照2.2.1节进行配置，其他固件可跳过此节。
-
-#### DSP固件
-
-思必驰固件使用dsp_fw/rkdsp_fw_speech.c，按如下配置：
-
-bsp/rockchip/rk2108目录下，执行scons --menuconfig
-
-```bash
-> RT-Thread rockchip rk2108 drivers >
-	Enable DSP >
-        [*] Enable DSP
-        [*]   Enable firmware loader to dsp #使能将固件加载到dsp
-        	Dsp firmware path (Store firmware data in builtin)  --->
-        (rkdsp_fw_speech.c) Dsp firmware file name  #此处选择speech dsp固件文件
-        [ ]   Enable dsp send trace to cm4
-        (0)   Config dsp debug uart port
-```
-
-其中ext_rkdsp.bin将作为系统固件一部分，随系统固件一起打包进Firmware。
-
-#### 替换setting.ini
-
-使用bsp/rockchip/rk2108/Image/setting_speech.ini替换bsp/rockchip/rk2108/Image/setting.ini，并保持setting.ini名称不变。
-
 ### 配置说明
 
-bsp/rockchip/rk2108目录下，执行scons --menuconfig
+bsp/rockchip/rk2108目录下，执行scons --menuconfig，参考配置如下：
 
-- 开启DSP配置
+- 开启DSP配置（选中其中标注*的项，下同）
 
 ```bash
-> RT-Thread rockchip rk2108 drivers >
-	Enable DSP >
-        [*] Enable DSP
-        [*]   Enable firmware loader to dsp #使能将固件加载到dsp
-        	Dsp firmware path (Store firmware data in builtin)  --->
-        (rkdsp_fw.c) Dsp firmware file name  #此处选择dsp固件文件名，根据dsp_fw目录中固件												 #文件名
-        [ ]   Enable dsp send trace to cm4
-        (0)   Config dsp debug uart port
+> RT-Thread rockchip rk2108 drivers > Enable DSP >
+[*] Enable DSP
+[*]   Enable firmware loader to dsp  #使能将固件加载到dsp
+        Dsp firmware path (Store firmware data in builtin)  --->
+(rkdsp_fw.c) Dsp firmware file name  #此处填入dsp_fw目录下固件文件名
+[ ]   Enable dsp send trace to cm4
+(0)   Config dsp debug uart port
 ```
 
 这里dsp debug uart的port配置根据实际使用中调试串口端口保持一致。
 
 若这里使用uart0作为M4调试端口，DSP同样也需配置成端口0，否则无法接收DSP端的调试信息。
 
-- 开启codec（即其中标注**的项，下同）
+- 开启codec
 
 ```bash
 > RT-Thread rockchip rk2108 drivers > Enable Audio > Audio Card >
@@ -166,41 +134,53 @@ bsp/rockchip/rk2108目录下，执行scons --menuconfig
 
 ```bash
 > RT-Thread application
-    [*] rk iot app
-    [*]   system info save to flash
-    [*]   boot app automatically
-    [ ]   network and wlan enable
-    [ ]   Enable aispeech
-          Select asr wake up mode (use speech wake up words)  ---> #使用思必驰唤醒词
-    (es8311p) Playback sound card	#播放声卡设置
-    (pdmc) ASR sound card
-    [ ]   dsp get data through vad path
-    [ ] Enable dual-tracking
-    [ ] Recording pen app
+    Display demo select (Applications disable)  --->
+[*] rk iot app
+[*]   system info save to flash
+[*]   boot app automatically
+[ ]   network and wlan enable
+[ ]   Enable aispeech
+      Select asr wake up mode (use xiaodu wake up words)  ---> #选择唤醒词
+(es8311p) Playback sound card   #播放声卡设置
+(pdmc) ASR sound card	        #录音声卡设置
+[ ]   dsp get data through vad path
+[ ] Enable dual-tracking
 ```
 
-- 开启mp3解码器
+- 开启Audio Server
 
 ```bash
 > RT-Thread third party package
 [*] Audio server  --->
     --- Audio server
-        Compile type (Use source code)  --->  #选择使用源码
-    [*]   Enable player						  #使能播放器
-    [ ]     Enable player test
-    [ ]   Enable recorder
-    [*]   Enable encode and decode  --->      #使能编解码功能
-            --- Enable encode and decode
-               Codec run on (CM4)  --->
-            [*]   Enable mp3 decode			  #使能mp3解码
-            [ ]   Enable amr decode
-            [ ]   Enable amr encode
-            [ ]   Enable speex encode
-            [ ]   Enable opus encode
-    -*-   Enable audio plugins  --->
+        Compile type (Use static library)  --->  #选择使用静态库
 ```
 
-- 由于思必驰固件较大，需要使用部分SRAM，因此将CPU可用内存SRAM缩小。
+### 思必驰固件配置说明
+
+思必驰固件使用dsp_fw/rkdsp_fw_speech.c，需在[配置说明](# 配置说明)基础上修改如下配置：
+
+**固件选择**
+
+```bash
+> RT-Thread rockchip rk2108 drivers > Enable DSP >
+...
+(rkdsp_fw_speech.c) Dsp firmware file name  #此处选择思必驰dsp固件文件
+...
+
+> RT-Thread application
+...
+      Select asr wake up mode (use speech wake up words)  ---> #使用思必驰唤醒词
+...
+```
+
+**替换setting.ini**
+
+使用bsp/rockchip/rk2108/board/common/setting_speech.ini替换bsp/rockchip/rk2108/board/common/setting.ini，并保持setting.ini名称不变。
+
+**修改内存地址**
+
+由于思必驰固件较大，需要使用部分SRAM，因此将CPU可用内存SRAM缩小。
 
 ```bash
 > RT-Thread board config  --->
@@ -331,19 +311,15 @@ Location:
 [*] rk iot app
 ```
 
-### 代码配置
-
-本文中显示实例使用CM4唤醒通路。具体参考 [2.4.2 使用CM4通路](# 2.4.2 使用CM4通路)
-
 ### 应用开机启动
 
 RT-Thread 开机启动应用的代码在applications/start_app/application.c中，test_thread_entry接口。
 
 ## 文件系统打包
 
-bsp/rockchip/rk2108目录下，执行./mkroot.sh，即会在Image目录下生产root.img文件。
+bsp/rockchip/rk2108目录下，执行`./mkroot.sh resource/userdata/normal`，即会在Image目录下生成root.img文件。
 
-该脚本将bsp/rockchip/rk2108/resource/userdata目录下的文件或目录制作成Fat12格式的文件系统，大小为setting.ini中设定的root分区 PartSize的大小。
+该脚本将bsp/rockchip/rk2108/resource/userdata/normal目录下的文件或目录制作成Fat12格式的文件系统，大小为setting.ini中设定的root分区 PartSize的大小。
 
 ## 固件编译与生成
 
