@@ -1,14 +1,12 @@
-Rockchip HDMI-CEC软件说明
+# Rockchip HDMI-CEC软件说明
 
 文档标识：RK-SM-YF-119
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-06-24
+日期：2020-08-11
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
-
----
 
 **免责声明**
 
@@ -22,7 +20,7 @@ Rockchip HDMI-CEC软件说明
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **瑞芯微电子股份有限公司**
+**版权所有© 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -41,6 +39,7 @@ Rockchip Electronics Co., Ltd.
 客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
+
 **前言**
 
 文本主要介绍 CEC 相关基本概念，基于 Android 5.X 以上以及LINUX kernel 4.4/4.19 的 CEC 相关软件流程以及常用的 DEBUG 方法。
@@ -56,17 +55,22 @@ Rockchip Electronics Co., Ltd.
 **读者对象**
 
 本文档（本指南）主要适用于以下工程师：
+
 技术支持工程师
+
 软件开发工程师
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2020-06-24 | V1.0.0   | 操瑞杰   | 初始发布     |
+| **日期**   | **版本** | **作者**   | **修改说明**               |
+| ---------- | -------- | ---------- | -------------------------- |
+| 2020-06-24 | V1.0.0   | 操瑞杰     | 初始发布                   |
+| 2020-08-11 | V1.1.0   | Ruby Zhang | 新增2.2节 linux 用户层介绍 |
 
 ---
+
 [TOC]
+
 ---
 
 ## CEC简介
@@ -125,17 +129,17 @@ HdmiControlService 是和系统的其他部分（例如 TIF、Audio 服务、电
 
 - 代码位于：
 
-  ```
+```
   frameworks/base/core/java/android/hardware/hdmi
-  ```
+```
 
 - 这个服务设计成可用来支持多种类型的逻辑设备。
 
 - 代码位于：
 
-  ```
+```
   frameworks/base/services/core/java/com/android/server/hdmi
-  ```
+```
 
 - HDMI-CEC 通过硬件抽象层来操作硬件，这可以简化设备间在协议和信号机制之间的不同。厂商可以利用已有的硬件抽象层的定义来实现自己的硬件抽象层。
 
@@ -326,6 +330,134 @@ Android 代码路径如下：
 | frameworks/base/services/core/java/com/android/server/hdmi/HdmiCecLocalDevice.java | 在系统中建模一个逻辑上的 CEC 设备的类，处理初始化以及收到针对特定设备的 CEC MSG 后调用特定设备的处理接口。 |
 | frameworks/base/services/core/java/com/android/server/hdmi/HdmiCecLocalDevicePlayback.java | 抽象出了 PLAYBACK 设备，提供相关接口。                       |
 
+### Linux HDMI CEC 应用说明
+
+Linux 上可以使用v4l-utils提供的cec-ctl工具，来通过命令行控制CEC设备。
+
+#### v4l-utils的安装
+
+- 在debian上，用户可以通过以下命令安装v4l-utils：
+
+```shell
+sudo apt-get install v4l-utils
+```
+
+- 在buildroot上，用户可以通过配置以下编译选项来安装v4l-utils：
+
+```shell
+BR2_PACKAGE_LIBV4L=y
+BR2_PACKAGE_LIBV4L_UTILS=y
+```
+
+#### 相关命令
+
+- Playback命令：
+
+```shell
+[root@rk3288:/]#cec-ctl --playback -o Rockchip -V 0xaabbcc -M -T
+```
+
+部分输出log：
+
+```
+CEC_ADAP_G_CAPS returned 0 (Success)
+CEC_ADAP_G_PHYS_ADDR returned 0 (Success)
+CEC_ADAP_S_LOG_ADDRS returned 0 (Success)
+CEC_ADAP_S_LOG_ADDRS returned 0 (Success)
+CEC_ADAP_G_LOG_ADDRS returned 0 (Success)
+Driver Info:
+Driver Name : dwhdmi-rockchip
+Adapter Name : dw_hdmi
+Capabilities : 0x0000000e
+Logical Addresses
+Transmit
+Passthrough
+Driver version : 4.4.167
+Available Logical Addresses: 4
+Physical Address : 1.0.0.0
+Logical Address Mask : 0x0010
+CEC Version : 2.0
+Vendor ID : 0xaabbcc
+Logical Address : 4 (Playback Device 1)
+Primary Device Type : Playback
+Logical Address Type : Playback
+All Device Types : Playback
+RC TV Profile : None
+Device Features : None
+Monitor All mode is not supported, falling back to regular monitoring
+CEC_S_MODE returned 0 (Success)
+CEC_DQEVENT returned 0 (Success)
+```
+
+CEC初始化会进行基本信息的交互，比如vendor id、osd name、CEC版本：
+
+```
+Received from TV to Playback Device 1 (0 to 4): CEC_MSG_GIVE_DEVICE_VENDOR_ID (0x8c)
+CEC_RECEIVE returned 0 (Success)
+Transmitted by Playback Device 1 to all (4 to 15): CEC_MSG_DEVICE_VENDOR_ID (0x87):
+vendor-id: 11189196 (0x00aabbcc)
+CEC_RECEIVE returned 0 (Success)
+
+Received from TV to Playback Device 1 (0 to 4): CEC_MSG_GIVE_OSD_NAME (0x46)
+CEC_RECEIVE returned 0 (Success)
+Transmitted by Playback Device 1 to TV (4 to 0): CEC_MSG_SET_OSD_NAME (0x47):
+name: Rockchip
+CEC_RECEIVE returned 0 (Success)
+```
+
+当电视待机，电视会向芯片发送standby 信息：
+
+```
+Received from TV to all (0 to 15): CEC_MSG_STANDBY (0x36)
+CEC_RECEIVE returned 0 (Success)
+```
+
+当电视切换显示源，电视会向芯片发送的相关信息：
+
+```
+Received from TV to all (0 to 15): CEC_MSG_SET_STREAM_PATH (0x86):
+phys-addr: 2.0.0.0
+CEC_RECEIVE returned 0 (Success)
+Received from TV to all (0 to 15): CEC_MSG_ROUTING_CHANGE (0x80):
+orig-phys-addr: 0.0.0.0
+new-phys-addr: 2.0.0.0
+CEC_RECEIVE returned 0 (Success)
+```
+
+- One-touch-play命令：
+
+```shell
+[root@rk3288:/]# cec-ctl --help-one-touch-play
+One Touch Play Feature:
+--active-source=phys-addr=<val> Send ACTIVE_SOURCE message (0x82)
+--image-view-on Send IMAGE_VIEW_ON message (0x04)
+--text-view-on Send TEXT_VIEW_ON message (0x0d)
+```
+
+唤醒TV：
+
+```shell
+[root@rk3288:/]#cec-ctl --image-view-on -to 0
+```
+
+- Standby命令：
+
+```shell
+[root@rk3288:/]# cec-ctl --standby --to 0
+```
+
+CEC用户层更多命令的使用，可通过cec-ctl --help 获得。
+
+**注意事项**
+
+- 目前还未支持通过TV端的待机唤醒来对芯片进行待机唤醒的操作
+
+待机可参考2.2.2 Playback命令，在收到CEC_MSG_STANDBY，通过系统调用
+`echo  mem > /sys/power/state` 就可以实现芯片端的同步待机。
+唤醒由于涉及到trust以及待机时 cec-clk，hdmi phy等的操作，当前还没很好的支持。
+
+- 并非所有HDMI设备都支持 CEC 功能，请先确认TV端或者HDMI显示设备是否支持 CEC 以及是否支持特定的CEC 指令。
+
 ### CEC软件流程介绍
 
 #### CEC初始化流程
@@ -402,46 +534,46 @@ struct cec_adapter {
 
 针对其中较为重要的几项结构体成员说明见下表：
 
-|        名称         |                             说明                             |
-| :-----------------: | :----------------------------------------------------------: |
-|   transmit_queue    |                  CEC MSG 待发送消息的队列。                  |
-|  transmit_queue_sz  |                CEC MSG待发送消息的队列长度。                 |
-|     wait_queue      | 选择对发出的 CEC MSG 的响应 MSG 进行等待时，进行等待的 MSG 将被储存进该队列，当前版本没有使用该功能。 |
-|    transmitting     |                    当前正在发送的 CEC MSG                    |
-|   kthread_config    |                配置 CEC 初始化时运行的线程。                 |
-|  config_completion  |              等待 CEC 初始化配置完成的信号量。               |
-|       kthread       |  用于 CEC MSG 发送队列管理的线程 cec_thread_func 的描述符。  |
-|    kthread_waitq    |                 cec_thread_func 的等待队列。                 |
-|         ops         | adapter的 callbacks，详见 kernel/drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c |
-|    capabilities     |                     adapter设定的功能。                      |
-| available_log_addrs |              最大可获取 Logical address 数量。               |
-|      phys_addr      |                   当前 Physical address。                    |
-|   is_configuring    |                   当前正在进行初始化配置。                   |
-|    is_configured    |                       初始化配置完成。                       |
-|    follower_cnt     |               follower 的数量，当前方案为 1。                |
-|    cec_follower     |             当前的 cec_follower，当前版本为 fh。             |
-|    cec_initiator    |            当前的 cec_initiator，当前版本为 fh。             |
-|     passthrough     |         当前 cec_follower 是否为 passthrough 模式。          |
-|      log_addrs      |         当前已经绑定的 Logical address，一个或多个。         |
-|     tx_timeouts     |         发送 CEC MSG 超时次数，一般极少发生该情况。          |
-|      notifier       |                         cec notifier                         |
-|     phys_addrs      |     Physical address，针对多个 Logic address 时的情况。      |
-|      sequence       |   adapter 发送 CEC MSG 的序号，用于追溯等待 reply 的 MSG。   |
+| 名称                | 说明                                                         |
+| :------------------ | :----------------------------------------------------------- |
+| transmit_queue      | CEC MSG 待发送消息的队列。                                   |
+| transmit_queue_sz   | CEC MSG待发送消息的队列长度。                                |
+| wait_queue          | 选择对发出的 CEC MSG 的响应 MSG 进行等待时，进行等待的 MSG 将被储存进该队列，当前版本没有使用该功能。 |
+| transmitting        | 当前正在发送的 CEC MSG                                       |
+| kthread_config      | 配置 CEC 初始化时运行的线程。                                |
+| config_completion   | 等待 CEC 初始化配置完成的信号量。                            |
+| kthread             | 用于 CEC MSG 发送队列管理的线程 cec_thread_func 的描述符。   |
+| kthread_waitq       | cec_thread_func 的等待队列。                                 |
+| ops                 | adapter的 callbacks，详见 kernel/drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c |
+| capabilities        | adapter设定的功能。                                          |
+| available_log_addrs | 最大可获取 Logical address 数量。                            |
+| phys_addr           | 当前 Physical address。                                      |
+| is_configuring      | 当前正在进行初始化配置。                                     |
+| is_configured       | 初始化配置完成。                                             |
+| follower_cnt        | follower 的数量，当前方案为 1。                              |
+| cec_follower        | 当前的 cec_follower，当前版本为 fh。                         |
+| cec_initiator       | 当前的 cec_initiator，当前版本为 fh。                        |
+| passthrough         | 当前 cec_follower 是否为 passthrough 模式。                  |
+| log_addrs           | 当前已经绑定的 Logical address，一个或多个。                 |
+| tx_timeouts         | 发送 CEC MSG 超时次数，一般极少发生该情况。                  |
+| notifier            | cec notifier                                                 |
+| phys_addrs          | Physical address，针对多个 Logic address 时的情况。          |
+| sequence            | adapter 发送 CEC MSG 的序号，用于追溯等待 reply 的 MSG。     |
 
 （2）运行管理 CEC MSG 传输队列的线程 cec_thread_func。
 
 （3）配置cec adapter的功能，详细说明见下表：
 
-|    capabilities     |                             说明                             |
-| :-----------------: | :----------------------------------------------------------: |
-|  CEC_CAP_PHYS_ADDR  |              用户层必须设定 Physical address。               |
-|  CEC_CAP_LOG_ADDRS  |               用户层必须设定 Logical address。               |
-|  CEC_CAP_TRANSMIT   |                   允许用户层传递 CEC MSG。                   |
-| CEC_CAP_PASSTHROUGH |       CEC 驱动不处理收到的 CEC MSG，直接上报用户空间。       |
-|     CEC_CAP_RC      |                    支持遥控驱动控制 CEC。                    |
+| capabilities        | 说明                                                         |
+| :------------------ | :----------------------------------------------------------- |
+| CEC_CAP_PHYS_ADDR   | 用户层必须设定 Physical address。                            |
+| CEC_CAP_LOG_ADDRS   | 用户层必须设定 Logical address。                             |
+| CEC_CAP_TRANSMIT    | 允许用户层传递 CEC MSG。                                     |
+| CEC_CAP_PASSTHROUGH | CEC 驱动不处理收到的 CEC MSG，直接上报用户空间。             |
+| CEC_CAP_RC          | 支持遥控驱动控制 CEC。                                       |
 | CEC_CAP_MONITOR_ALL | CEC 驱动接收所有 CEC MSG，包括不是发送给自己的，通常用作 DEBUG 用途。 |
-|  CEC_CAP_NEEDS_HPD  |             只在 HDMI HPD pin为高时才启用 CEC。              |
-| CEC_CAP_MONITOR_PIN |                 CEC 驱动监视 CEC pin的变化。                 |
+| CEC_CAP_NEEDS_HPD   | 只在 HDMI HPD pin为高时才启用 CEC。                          |
+| CEC_CAP_MONITOR_PIN | CEC 驱动监视 CEC pin的变化。                                 |
 
 - cec_register_adapter：
 
@@ -475,10 +607,10 @@ initializeCec 为初始化过程最主要的环节，不单是开机初始化过
 
 初始化过程中将会调用到 HAL 层使能 CEC 的相关开关，如下表所示：
 
-|              开关              |                             说明                             |
-| :----------------------------: | :----------------------------------------------------------: |
-|       HDMI_OPTION_WAKEUP       | 当设置为 false 时，收到<Image View On>或 <Text View On>这类 CEC 协议中规定会唤醒系统的CEC MSG，也不会把系统从待机中唤醒。由于当前版本没有实现 CEC 唤醒系统的功能，所以实际上该开关没有实际作用。 |
-|     HDMI_OPTION_ENABLE_CEC     | 可认为是 CEC 功能的总开关，当设置为 false 时。HAL 不再发送和接收任何 CEC MSG，CEC 功能被关闭。通过设置菜单中的 CEC 功能总开关来进行开关。 |
+| 开关                           | 说明                                                         |
+| :----------------------------- | :----------------------------------------------------------- |
+| HDMI_OPTION_WAKEUP             | 当设置为 false 时，收到\<Image View On>或 \<Text View On>这类 CEC 协议中规定会唤醒系统的CEC MSG，也不会把系统从待机中唤醒。由于当前版本没有实现 CEC 唤醒系统的功能，所以实际上该开关没有实际作用。 |
+| HDMI_OPTION_ENABLE_CEC         | 可认为是 CEC 功能的总开关，当设置为 false 时。HAL 不再发送和接收任何 CEC MSG，CEC 功能被关闭。通过设置菜单中的 CEC 功能总开关来进行开关。 |
 | HDMI_OPTION_SYSTEM_CEC_CONTROL | 系统时进入待机时被设置为 false，唤醒被设置为 true。当设置为 false 时，表示安卓系统不再处理上报的CEC MSG，转由底层接手处理。目前该开关也无实际作用，后续版本实现 CEC 唤醒系统功能时可能会添加相关功能。 |
 
 - allocateLogicalAddress：
@@ -611,20 +743,20 @@ struct cec_msg {
 
 结构体成员说明如下表：
 
-|    结构体成员    |                             说明                             |
-| :--------------: | :----------------------------------------------------------: |
-|      tx_ts       |     纳秒级的时间戳，当 CEC 驱动完成发送 MSG 后会被设置。     |
-|      rx_ts       |     纳秒级的时间戳，当 CEC 驱动完成接收 MSG 后会被设置。     |
-|       len        |                         MSG 的长度。                         |
-|     sequence     | CEC 驱动框架为发送的消息分配一个序号。这可以用来踪对以前发送的消息的回复。 |
-|       msg        |                 实际保存 CEC MSG 的payload。                 |
-|      reply       | 仅供发送 CEC MSG 时使用，若其非 0 则 CEC 驱动会在发出该 CEC MSG 后，等待对该消息的回复（如发出<give device power status>后，按照 CEC 协议，将会得到<report  power status>的回复）。目前都将其设置为 0，不会专门在 CEC 驱动中对 MSG 响应进行等待。 |
-|    rx_status     | CEC 驱动完成接收 MSG 后将会对其设置，标记接收的状态 :<br> CEC_RX_STATUS_OK<br/>CEC_RX_STATUS_TIMEOUT<br/>CEC_RX_STATUS_FEATURE_ABORT |
-|    tx_status     | CEC 驱动完成发送 MSG 后将会对其设置，标记发送的状态:<br/>CEC_TX_STATUS_OK<br/>CEC_TX_STATUS_ARB_LOST<br/>CEC_TX_STATUS_NACK<br/>CEC_TX_STATUS_LOW_DRIVE<br/>CEC_TX_STATUS_ERROR<br/>CEC_TX_STATUS_MAX_RETRIES |
-| tx_arb_lost_cnt  |    CEC MSG 发送完成后，统计 Arbitration Lost 错误的次数。    |
-|   tx_nack_cnt    |    CEC MSG 发送完成后，统计 Not Acknowledged 错误的次数。    |
-| tx_low_drive_cnt |   CEC MSG 发送完成后，统计 Low Drive Detected 错误的次数。   |
-|   tx_error_cnt   |         CEC MSG 发送完成后，统计 Error 错误的次数。          |
+| 结构体成员       | 说明                                                         |
+| :--------------- | :----------------------------------------------------------- |
+| tx_ts            | 纳秒级的时间戳，当 CEC 驱动完成发送 MSG 后会被设置。         |
+| rx_ts            | 纳秒级的时间戳，当 CEC 驱动完成接收 MSG 后会被设置。         |
+| len              | MSG 的长度。                                                 |
+| sequence         | CEC 驱动框架为发送的消息分配一个序号。这可以用来踪对以前发送的消息的回复。 |
+| msg              | 实际保存 CEC MSG 的payload。                                 |
+| reply            | 仅供发送 CEC MSG 时使用，若其非 0 则 CEC 驱动会在发出该 CEC MSG 后，等待对该消息的回复（如发出\<give device power status>后，按照 CEC 协议，将会得到\<report  power status>的回复）。目前都将其设置为 0，不会专门在 CEC 驱动中对 MSG 响应进行等待。 |
+| rx_status        | CEC 驱动完成接收 MSG 后将会对其设置，标记接收的状态 :<br\> CEC_RX_STATUS_OK<br/>CEC_RX_STATUS_TIMEOUT<br/>CEC_RX_STATUS_FEATURE_ABORT |
+| tx_status        | CEC 驱动完成发送 MSG 后将会对其设置，标记发送的状态:<br/>CEC_TX_STATUS_OK<br/>CEC_TX_STATUS_ARB_LOST<br/>CEC_TX_STATUS_NACK<br/>CEC_TX_STATUS_LOW_DRIVE<br/>CEC_TX_STATUS_ERROR<br/>CEC_TX_STATUS_MAX_RETRIES |
+| tx_arb_lost_cnt  | CEC MSG 发送完成后，统计 Arbitration Lost 错误的次数。       |
+| tx_nack_cnt      | CEC MSG 发送完成后，统计 Not Acknowledged 错误的次数。       |
+| tx_low_drive_cnt | CEC MSG 发送完成后，统计 Low Drive Detected 错误的次数。     |
+| tx_error_cnt     | CEC MSG 发送完成后，统计 Error 错误的次数。                  |
 
 - cec_thread_func 为管理 CEC MSG 发送队列的线程。当此时无 MSG 正在发送时，线程等待新的 MSG 加入队列。
 
@@ -638,7 +770,7 @@ struct cec_msg {
 - cec_transmit_msg_fh 将待发送的消息加入队列后，若此时无 MSG 正在发送，则会唤醒 cec_thread_func 进行发送,若此时有 MSG 正在发送，则将 MSG 加入等待发送的队列，并等待发送完毕。
 
 ```c
-if (fh)
+	if (fh)
 		list_add_tail(&data->xfer_list, &fh->xfer_list);
 
 	list_add_tail(&data->list, &adap->transmit_queue);
@@ -740,14 +872,14 @@ HAL 层对底层事件监听的线程 uevent_loop 收到上报的收到 CEC MSG 
 
 CEC 驱动通过上报事件通知上层当前状态的变化，目前事件种类如表所示：
 
-|          名称          |                            已实现                            |
-| :--------------------: | :----------------------------------------------------------: |
+| 名称                   | 已实现                                                       |
+| :--------------------- | :----------------------------------------------------------- |
 | CEC_EVENT_STATE_CHANGE | adapter 的状态发生了改变，如：从 configured 的状态变为 unconfigured。 |
-|  CEC_EVENT_LOST_MSGS   |  CEC 接收 MSG 队列里的 MSG 没有及时被读取，导致 MSG 丢失。   |
-| CEC_EVENT_PIN_CEC_LOW  |           CEC 引脚变为低电平，该事件暂时没被使用。           |
-| CEC_EVENT_PIN_CEC_HIGH |           CEC 引脚变为高电平，该事件暂时没被使用。           |
-| CEC_EVENT_PIN_HPD_LOW  |     HDMI 的 HPD 引脚变为高电平，通常情况是 HDMI 被插入。     |
-| CEC_EVENT_PIN_HPD_HIGH |     HDMI 的 HPD 引脚变为低电平，通常情况是 HDMI被拔出。      |
+| CEC_EVENT_LOST_MSGS    | CEC 接收 MSG 队列里的 MSG 没有及时被读取，导致 MSG 丢失。    |
+| CEC_EVENT_PIN_CEC_LOW  | CEC 引脚变为低电平，该事件暂时没被使用。                     |
+| CEC_EVENT_PIN_CEC_HIGH | CEC 引脚变为高电平，该事件暂时没被使用。                     |
+| CEC_EVENT_PIN_HPD_LOW  | HDMI 的 HPD 引脚变为高电平，通常情况是 HDMI 被插入。         |
+| CEC_EVENT_PIN_HPD_HIGH | HDMI 的 HPD 引脚变为低电平，通常情况是 HDMI被拔出。          |
 
 以 HDMI 热插拔事件为例，如图所示：
 
@@ -1026,14 +1158,14 @@ CEC 工作状态 DEBUG 节点路径为：
 
 各项参数说明如下表：
 
-|                    名称                    |                             说明                             |
-| :----------------------------------------: | :----------------------------------------------------------: |
-|                 configured                 |      1：CEC 已经被正确配置。<br>0：CEC 尚未被正确配置。      |
-|                configuring                 |    1：正在配置 CEC<br>0：尚未开始配置 CEC 或已经配置完成     |
-|                 phys_addr                  | 物理地址，从电视 EDID 中读取。为 f.f.f.f 时表示 CEC 为初始化或获取物理地址失败。 |
-|                  LA mask                   | 逻辑地址mask，CEC 未初始化时为 0x0000，正常情况下其值右移几位成为 0x1，则逻辑地址就为多少。如：  0x0010 >> 4 = 0x1，则此时的逻辑地址为 0x4. |
-| has CEC follower   （in passthrough mode） |                  表示 CEC 驱动不直接处理。                   |
-|             pending transmits              |                 正等待发送的 CEC MSG 数量。                  |
+| 名称                                       | 说明                                                         |
+| :----------------------------------------- | :----------------------------------------------------------- |
+| configured                                 | 1：CEC 已经被正确配置。<br>0：CEC 尚未被正确配置。           |
+| configuring                                | 1：正在配置 CEC<br>0：尚未开始配置 CEC 或已经配置完成        |
+| phys_addr                                  | 物理地址，从电视 EDID 中读取。为 f.f.f.f 时表示 CEC 为初始化或获取物理地址失败。 |
+| LA mask                                    | 逻辑地址mask，CEC 未初始化时为 0x0000，正常情况下其值右移几位成为 0x1，则逻辑地址就为多少。如：  0x0010 >> 4 = 0x1，则此时的逻辑地址为 0x4. |
+| has CEC follower   （in passthrough mode） | 表示 CEC 驱动不直接处理。                                    |
+| pending transmits                          | 正等待发送的 CEC MSG 数量。                                  |
 
 HDMI 控制器寄存器查看节点:
 
