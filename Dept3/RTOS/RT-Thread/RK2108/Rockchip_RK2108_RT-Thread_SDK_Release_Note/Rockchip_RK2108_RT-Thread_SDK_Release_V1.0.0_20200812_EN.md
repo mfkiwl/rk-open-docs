@@ -70,11 +70,11 @@ Software development engineers
 
 ---
 
-## 1 Overview
+## Overview
 
 This SDK is based on RT-Thread v3.1.3, which contains system source code, drivers, tools, and application software packages used for RT-Thread system development, and it also contains development documents and tool usage documents. Adapting to RK2108 chip platform, it is suitable for RK2108 EVB development board and all products developed based on RK2108 platform.
 
-## 2 Main Functions
+## Main Functions
 
 | **Functions** | **Module Name** |
 | ----------- | :-------------- |
@@ -83,13 +83,13 @@ This SDK is based on RT-Thread v3.1.3, which contains system source code, driver
 | Display Interfaces | MCU panel、SPI panel |
 | Application Demo | Audio control module, voice recorder |
 
-## 3 How to Get the SDK
+## How to Get the SDK
 
-Rockchip SDKs are released by Rockchip server. Please refer to [Chapter 5 SDK Building Introduction](## 5 SDK Building Introduction) to build a development environment.
+Rockchip SDKs are released by Rockchip server. Please refer to Chapter 5 [SDK Building Introduction](# SDK Building Instructions) to build a development environment.
 
-To get RK2108 RT-Thread SDK software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window(e-Mail: [fae@rock-chips.com](mailto:fae@rock-chips.com)). About Rockchip server SSH public key authorization, please refer to [Chapter 6 SSH  Public Key Operation Introduction](## 6 Public Key Operation Introduction).
+To get RK2108 RT-Thread SDK software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window(e-Mail: [fae@rock-chips.com](mailto:fae@rock-chips.com)). About Rockchip server SSH public key authorization, please refer to Chapter 6 [SSH  Public Key Operation Introduction](# SSH Public Key Operation Introduction).
 
-### 3.1 SDK Download Command
+### SDK Download Command
 
 Repo, a tool built on Python script by Google to help manage git repositories, is mainly used to download and manage software repository of projects. The download address is as follows:
 
@@ -109,7 +109,7 @@ After the code  repository is initialized, you can use the following command to 
 .repo/repo/repo sync
 ```
 
-### 3.2 SDK Code Compression Package
+### SDK Code Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
 
@@ -122,7 +122,7 @@ cd RK2108_RT-Thead_SDK_Release_V1.0.0_20200812
 .repo/repo/repo sync
 ```
 
-### 3.3 To Get the SDK Version
+### To Get the SDK Version
 
 Please get the SDK release version through project xml file by the following command:
 
@@ -133,13 +133,13 @@ git log rk2108_release.xml
 
 Or check the current SDK version through RKDocs/RK2108_RT-Thread_Release_Note.txt.
 
-### 3.4 SDK Code Update
+### SDK Code Update
 
 ```shell
 .repo/repo/repo sync
 ```
 
-## 4 RK2108 RT-Thread  Project Directory Introduction
+## RK2108 RT-Thread  Project Directory Introduction
 
 The following is the main SDK directory:
 
@@ -180,9 +180,9 @@ The following is the main SDK directory:
 |-- tools                   # RT-Thread official tool directory, including menuconfig and building scripts
 ```
 
-## 5 SDK Building Instructions
+## SDK Building Instructions
 
-### 5.1 Set up the Building Environment
+### Set up the Building Environment
 
 It is recommended to take 64-bit Ubuntu 16.04 or Ubuntu 18.04 system as an building environment, for other Linux systems have not been tested yet, it is recommended to install the release version consistent with Rockchip developers.
 
@@ -202,7 +202,7 @@ tar xvf gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
 export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 ```
 
-### 5.2 Basic Building and Packaging Commands
+### Basic Building and Packaging Commands
 
 The building command is as follows:
 
@@ -224,12 +224,12 @@ For more detailed buildings, debugs, and flashes instructions about RK2108 RT-Th
 
 <SDK>/RKDocs/manuals/Rockchip_RK2108_Quick_Start_RT-Thread_CN.pdf
 
-## 6 SSH Public Key Operation Introduction
+## SSH Public Key Operation Introduction
 
 Please follow the introduction in the “Rockchip SDK Application and Synchronization Guide” to generate an SSH public key and send the email to [fae@rock-chips.com](mailto:fae@rock-chips.com), applying for permission to download SDK code.
 This document will be released to customers during the process of applying for permission.
 
-### 6.1 Multi-device Use the Same SSH Public Key
+### Multi-device Use the Same SSH Public Key
 
 If the same SSH public key should be used in different devices, you can copy the SSH private key file id_rsa to “~/.ssh/id_rsa” of the device you want to use.
 
@@ -253,7 +253,7 @@ Please enter the following command in console to solve:
 ssh-add ~/.ssh/id_rsa
 ```
 
-### 6.2  Switch Different SSH Public Keys on the Same Device
+### Switch Different SSH Public Keys on the Same Device
 
 You can configure SSH according to the ssh_config documentation.
 
@@ -274,13 +274,13 @@ As shown in the figure, SSH uses the file “~/.ssh1/id_rsa” of another direct
 
 ![ssh4](resources/ssh4.png)</left>
 
-### 6.3 Key Authority Management
+### Key Authority Management
 
 Server can monitor download times and IP information of a key in real time. If an abnormality is found, download permission of the corresponding key will be disabled.
 
 Keep the private key file properly. Do not grant second authorization to third parties.
 
-### 6.4 Reference Documents
+### Reference Documents
 
 For more details, please refer to the document :
 
