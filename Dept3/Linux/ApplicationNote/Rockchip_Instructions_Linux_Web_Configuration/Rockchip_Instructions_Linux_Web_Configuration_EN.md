@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-357
 
-Release Version: V1.3.1
+Release Version: V1.4.0
 
-Release Date: 2020-07-25
+Release Date: 2020-08-14
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -64,7 +64,8 @@ Software development engineers
 | V1.1.0      | Allen Chen | 2020-05-19 | Add introduction about face-output and user management.   |
 | V1.2.0      | Allen Chen | 2020-06-04 | Add introduction on record about preview and face mode switch. |
 | V1.3.0      | Allen Chen | 2020-07-14 | Add introduction on ISP, storage management and face recognition. |
-| V1.3.1 | Allen Chen | 2020-07-25 | Correction |
+| V1.3.1 | Allen Chen | 2020-07-25 | Correction. |
+| V1.4.0 | Allen Chen | 2020-08-14 | Add introduction on face function changes. |
 
 **Contents**
 
@@ -89,6 +90,7 @@ Software development engineers
 | Plan Config              | ×        | √       |
 | Storage Config           | √        | √       |
 | Intelligence Analysis    | ×        | √       |
+| Peripherals              | √        | ×       |
 
 ## User Authentication
 
@@ -126,17 +128,21 @@ Use a browser to access the login address, you can see the login address as show
 
 ②Review: Inquire video review and snap. Please refer to chapter 5.Review for details.
 
-③Face: Set white list/black list and inquire record. Please refer to chapter 6.Face Recognition Manager for details.
+③Face: Set white list/black list and inquire record. Please refer to chapter 6.Face Recognition Manager for details. This item is a function of the IPC product, and gate products don‘t have this item.
 
-④Config: Set most config of device. Please refer to chapter 7.Config for details.
+④Face Config: Correspond to config in Face. This item is a function of the gate product, and IPC products don‘t have this item.
 
-⑤About: View copyright information.
+⑤Manage: Corresponding to member list, registration, snapshot record, control record function. This item is a function of the gate product, and IPC products do not have this item.
 
-⑥Language: Double click to switch English/Chinese.
+⑥Config: Set most config of device. Please refer to chapter 7.Config for details.
 
-⑦User Name: Show User name.
+⑦About: View copyright information.
 
-⑧Logout: Logout and enter login page.
+⑧Language: Double click to switch English/Chinese.
+
+⑨User Name: Show User name.
+
+⑩Logout: Logout and enter login page.
 
 ## Preview
 
@@ -186,19 +192,13 @@ Inquire snap and record.
 
 ①Search: Search by conditions or by name.
 
-②Add: Add face information for person.
+②Output: Export all information except image to excel.
 
-Picture: File format should be jpg and its size should be smaller than 1MB.
+③Switch Mode: Switch Search/Delete Mode. Support data deletion and information reset in delete mode. Deleting a person will also delete the control records related to that person.
 
-Remark: When optional message is blank, it would be filled with default.
+④Edit: Double click on raw to show edit menu. With that, you could modify or delete information selected.
 
-③Output: Export all information except image to excel.
-
-④Batch Delete: Delete information selected with control recording deleted together.
-
-⑤Edit: Double click on raw to show edit menu. With that, you could modify or delete information selected.
-
-⑥Feature: Feature determines a image whether can be used in face system.
+⑤Feature: Feature determines a image whether can be used in face system.
 
 Wait: It means that device is trying to get feature. If it shows 'wait' for a long time, maybe something wrong with getting feature. At this case, you could delete it and reupload.
 
@@ -208,7 +208,19 @@ Fail: Image could not be used for face recognition.
 
 Repeat: Image that has the same feature has been registered.
 
-### Batch Input
+### Single Registration
+
+![face-add-one](resources/face-add-one_en.png)
+
+Add face information for person.
+
+Picture: File format should be jpg and its size should be smaller than 1MB.
+
+Remark: When optional message is blank, it would be filled with default.
+
+### Batch Registration
+
+#### Introduce
 
 ![face-batch-input](resources/face-batch-input_en.png)
 
@@ -216,13 +228,31 @@ Repeat: Image that has the same feature has been registered.
 
 ②Batch: After click show input menu.
 
-③Input Menu: Batch input information.
+③Unqualified image info: Show reason of unqualified image.
 
 Picture: File format should be jpg and its size should be smaller than 1MB.
 
 Remark: If image is not qualified, it will fail when device gets feature. Feature of Please refer to chapter 6.Member List for details.
 
-④Unqualified image info: Show reason of unqualified image.
+#### Import speed
+
+Browser: chrome84.0.4147.105
+
+Sample: 100 pcs 50KB pictures
+
+| **Internet speed**(KB) | **Time（s/100pcs）** | **Average speed（pcs/s）** |
+| ---------------------- | :------------------- | -------------------------- |
+| 2048                   | 43                   | 2.3                        |
+| 1024                   | 63                   | 1.6                        |
+| 500                    | 110                  | 0.91                       |
+
+If the import speed is quite different from the table in actual use, please try the following:
+
+1.Check whether the router has a speed limit.
+
+2.After closing the firewall, re-import to check whether the firewall is speed limited.
+
+3.Update the browser.
 
 ### Other Functions
 
@@ -645,3 +675,7 @@ To be realized.
 #### Advanced Settings
 
 To be realized.
+
+### Peripherals
+
+It supports the data configuration of gates and display screens, without practical application. This item is an extended function and is only used by gate products. The realization of specific functions needs to be developed according to actual products.
