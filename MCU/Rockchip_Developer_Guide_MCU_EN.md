@@ -1,16 +1,42 @@
-# **MCU Developer Guide**
+# MCU Developer Guide
 
-Release Version：1.1
+ID: RK-KF-YF-123
 
-E-mail：frank.wang@rock-chips.com
+Release Version: V1.2.0
 
-Release Date：2017.12
+Release Date: 2020-08-17
 
-Classified Level：Publicity
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
+
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
 
 **Preface**
 
-This document introduces the Cortex-M0 Devices Generic User Guide.
+This document introduces the RK3399 Cortex-M0 Devices Generic User Guide.
 
 **Chipset Version**
 
@@ -30,7 +56,8 @@ Software Engineer
 | **Revision Date** | **Version** | **Author** | **Revision Description** |
 | ----------------- | ----------- | ---------- | ------------------------ |
 | 2017-09-20        | V1.0        | Frank.Wang | Initial version          |
-| 2017-12-27        | V1.1        | Frank.Wang | modify format            |
+| 2017-12-27        | V1.1        | Frank.Wang | Modify format          |
+| 2020-08-17 | V1.2.0 | Frank.Wang | Modify format and amend the source codes repository |
 
 [TOC]
 
@@ -196,9 +223,8 @@ The Rockchip MCU can also communicate with the master SoC via UART or other meth
 
 Git repository path:
 
-- <ssh://git@10.10.10.29/rk/mcu> or <https://github.com/frawang/rk-mcu.git>.
-- The code  at "10.10.10.29" can refer to the rk3399-pmu-m0 branch
-- the github code can refer to the rk3399-box-m0 branch.
+- <https://github.com/rockchip-linux/mcu>
+- Refer to the rk3399-pmu-m0 branch
 
 ### Code Intruduction
 
@@ -312,7 +338,7 @@ About the external interrupt supported by RK3399 Perilp M0 , please refer to Cha
 
 - Set iomux, tck, tms about JTAG in GRF, please refer to [2.2.1 Enabling JTAG configuration](#2.2.1 Enabling JTAG configuration).
 - Development board JTAG switch or "tck/tms" switch to the MCU;
-- DS-5, ICE or Jlink connect to m3/m0 for debugging.
+- DS-5, ICE or Jlink connect to MCU for debugging.
 
 ### Console Printing
 
@@ -334,5 +360,4 @@ This section lists relevant documents published by third parties:
 [Cortex-M0 Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.ddi0432c/index.html)  
 [ARM Cortex-M3 Processor Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.100165_0201_00_en/index.html)  
 [Cortex-M3 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0552a/index.html)  
-Rockchip RK3399 TRM V0.4  
-Rockchip RK3368 TRM V2.0  
+Rockchip RK3399 TRM V1.4  
