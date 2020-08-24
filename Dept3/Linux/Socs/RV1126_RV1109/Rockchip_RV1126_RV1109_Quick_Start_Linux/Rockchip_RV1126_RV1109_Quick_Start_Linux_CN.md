@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.5.0
+发布版本：V1.6.0
 
-日期：2020-08-07
+日期：2020-08-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -76,6 +76,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.4.0 | CWW | 2020-07-16 | 1. 增加ISP工具RKISP2.x_Tuner说明<br>2. 增加开发工具说明<br>3. 增加板级配置选择说明 |
 | V1.4.1 | CWW | 2020-07-17 | 1. 更新SDK编译说明章节 |
 | V1.5.0 | CWW | 2020-08-07 | 1. 更新SDK板级配置和编译说明章节<br>2. 开发环境增加安装cmake |
+| V1.6.0 | LJH | 2020-08-22 | 1. 增加闸机和门禁类产品章节<br>2. 更新SDK编译说明 |
 
 ---
 
@@ -240,34 +241,63 @@ Firmware_Merger        | SPI NOR固件打包工具(生成的固件可以用于�
 
 ### 选择不同板级配置
 
-SDK下载地址：
+#### SDK下载地址
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
 ```
 
-| 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                               | 支持快速开机 |
-| ------ | -------------------------------------------- | -------- | --------------------------------------------------- | ------------ |
-| RV1126/RV1109 | BoardConfig-38x38-spi-nand.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO  |
-| RV1126/RV1109 | BoardConfig-robot.mk                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
-| RV1126/RV1109 | BoardConfig-tb-v12.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES |
-| RV1126/RV1109 | BoardConfig-tb-v13.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | YES |
-| RV1126/RV1109 | BoardConfig-spi-nand.mk               | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
-| RV1126/RV1109 | BoardConfig.mk                        | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
-| RV1126/RV1109 | BoardConfig-v12.mk                    | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
-| RV1126/RV1109 | BoardConfig-v10-v11.mk                | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       | NO  |
-| RV1126/RV1109 | BoardConfig-facial_gate.mk            | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
-
-切换板级配置命令：
-
-方法1
-./build.sh 后面加上板级配置文件, 例如：
+#### SDK软件同步命令以及log
 
 ```shell
-### 选择通用版本的板级配置
+.repo/repo/repo sync -c -j4
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+Fetching projects: 100% (71/71), done.
+info: A new version of repo is available
+
+warning: project 'repo' branch 'stable' is not signed
+warning: Skipped upgrade to unverified version
+Checking out projects: 100% (71/71), done.
+repo sync has finished successfully.
+```
+
+#### SDK板级配置目录device/rockchip/rv1126_rv1109
+
+| 板级配置                      | 适用产品说明                 | 存储介质 | EVB板                                               |
+| ----------------------------- | --------------------------   | -------- | --------------------------------------------------- |
+| BoardConfig-38x38-spi-nand.mk | 通用IPC                      | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
+| BoardConfig-robot.mk          | 扫地机类IPC                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-tb-v12.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-tb-v13.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-spi-nand.mk       | 通用IPC                      | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig.mk                | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-v12.mk            | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-v10-v11.mk        | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
+| BoardConfig-facial_gate.mk    | 门禁和闸机类产品             | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| ++++++++++++++++++++++++++    | ++++++++++++++++++++++       | +++++    | ++++++++++++++++++++++++++++++++++++++++++++        |
+
+#### 切换板级配置命令
+
+方法1
+`./build.sh` 后面加上板级配置文件, 例如：
+
+选择**通用IPC类产品**的板级配置
+
+```shell
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
-### 选择快速开机的板级配置, 对应EVB板RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
+```
+
+选择**门锁、门铃、猫眼等带电池产品**的板级配置, 对应EVB板RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
+
+```shell
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
+```
+
+选择**门禁和闸机类产品**, 对应EVB板RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY
+
+```shell
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
 ```
 
 方法2
@@ -375,6 +405,8 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ./build.sh -h recovery
 ```
 
+注：Recovery是非必需的功能，有些板级配置不会设置
+
 ### Rootfs编译
 
 ```shell
@@ -385,9 +417,28 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ./build.sh -h rootfs
 ```
 
+Buildroot的package编译方法：
+注：SDK根目录app和external下的工程都是buildroot的package包，编译方法相同。
+
+```shell
+### 1. 先查看Board Config对应的rootfs是哪个配置
+./build.sh -h rootfs
+###Current SDK Default [ rootfs ] Build Command###
+source envsetup.sh rockchip_rv1126_rv1109
+make
+
+### 2. source buildroot对应的defconfig
+source envsetup.sh rockchip_rv1126_rv1109
+
+### 3. 查看对应模块的makefile文件名
+### 例如：buildroot/package/rockchip/ipc-daemon/ipc-daemon.mk
+make ipc-daemon-dirclean
+make ipc-daemon-rebuild
+```
+
 ### 固件打包
 
-固件打包命令：./mkfirmware.sh
+固件打包命令：`./mkfirmware.sh`
 
 固件目录：rockdev
 
@@ -396,7 +447,15 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 进入工程根目录执行以下命令自动完成所有的编译：
 
 ```shell
-./build.sh all
+./build.sh all # 只编译模块代码（u-Boot，kernel，Rootfs，Recovery）
+               # 需要再执行./mkfirmware.sh 进行固件打包
+
+./build.sh     # 在./build.sh all基础上
+               # 1. 增加固件打包 ./mkfirmware.sh
+               # 2. update.img打包
+               # 3. 复制rockdev目录下的固件到IMAGE/***_RELEASE_TEST/IMAGES目录
+               # 4. 保存各个模块的补丁到IMAGE/***_RELEASE_TEST/PATCHES目录
+               # 注：./build.sh 和 ./build.sh allsave 命令一样
 ```
 
 ## 刷机说明
@@ -705,3 +764,76 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 在电视端打开RKAICameraTest应用，看到预览后点击RNDIS按钮连接RNDIS，成功后点击SETTINGS按钮选择“EPTZ模式切换”选项，在倒计时完成后，再打开应用即可，此时在界面左上角会显示是EPTZ模型还是普通智能预览模式：
 
 ![](resources/uvcc/uvc_camera_eptz.jpg)
+
+## 闸机和门禁类产品配置
+
+闸机和门禁类产品支持如下功能：
+
+- 支持人脸检测，人脸特征点提取，人脸识别和活体检测
+- 支持本地屏幕1280x720显示
+- 支持网页端访问设备
+
+### 产品编译说明
+
+闸机和门禁类产品编译配置基于公版SDK，代码下载和开发环境配置请参考SDK。
+
+#### 选择对应板级配置
+
+| 支持的板级配置                                           | 备注                       |
+| -------------------------------------------------------- | -------------------------- |
+| device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk | 闸机和门禁类产品的板级配置 |
+
+说明：默认支持V12的EVB板，板上丝印是RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY，如果客户手头是V13的EVB，请修改kernel/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts，导入rv1126-evb-v13.dtsi
+
+```shell
+--- a/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
++++ b/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
+@@ -4,7 +4,7 @@
+  */
+ /dts-v1/;
+ #include "rv1109.dtsi"
+-#include "rv1126-evb-v12.dtsi"
++#include "rv1126-evb-v13.dtsi"
+ / {
+```
+
+切换板级配置命令：
+
+```shell
+### 选择闸机和门禁类产品的板级配置
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
+```
+
+#### 编译命令
+
+闸机和门禁类产品的编译命令，请参考[第三章 SDK编译说明](# SDK编译说明)。
+
+### **QFacialGate** 应用
+
+QFacialGate 是闸机和门禁类产品主应用，默认开机自动运行，该应用选用QT做UI，通过Rkfacial库调用RK自有算法rockface，实现人脸检测，人脸特征点提取，人脸识别，活体检测。
+
+具体包含以下功能：
+
+- 获取RGB摄像头图像数据做人脸识别，获取IR摄像头图像数据做活体检测。
+
+- 使用SQLITE3作为数据库来存储人脸特征值和用户名。
+
+- 实现用户注册，删除注册数据，人脸框跟踪及用户名显示等操作。
+
+- 利用ALSA接口实现各流程语音播报功能。
+
+### 其它说明
+
+- SDK中包含了RK自研算法rockface，但需要获取授权使用，如何获取授权请联系业务并参考sdk/external/rockface/auth/README.md文档。SDK自带一个小时的测试模式，测试时间到后可以断电重启，重复测试。
+- 闸机公版上使用RGB摄像头型号ov2718, IR摄像头型号gc2053
+- 红外补光灯视角要达到90度，电流要达到120ma
+
+- 相关文档
+
+  QFacialGate介绍：app\QFacialGate\doc\Rockchip_Instruction_Linux_QFacialGate_CN.pdf
+
+  Rkfacial库介绍：external\rkfacial\doc\Rockchip_Instruction_Rkfacial_CN.pdf
+
+  Web后端开发框架：docs\Linux\ApplicationNote\LinuxRockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+
+  Web网页端介绍：docs\Linux\ApplicationNote\Rockchip_Instructions_Linux_Web_Configuration_CN.pdf

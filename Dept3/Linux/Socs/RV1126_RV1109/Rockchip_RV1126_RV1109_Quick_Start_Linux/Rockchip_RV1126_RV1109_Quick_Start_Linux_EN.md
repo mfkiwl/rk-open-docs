@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.5.0
+Release Version: V1.6.0
 
-Release Date: 2020-08-07
+Release Date: 2020-08-22
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -71,6 +71,7 @@ This document (this guide) is mainly intended for:
 | V1.4.0 | CWW | 2020-07-16 | 1. Add ISP Tool RKISP2.x_Tuner introduction<br>2. Add Develop Tool introduction<br>3. Add board config introduction |
 | V1.4.1 | CWW | 2020-07-17 | 1. Update chapter of SDK Building Introduction<br>2. Update Tool's Description |
 | V1.5.0 | CWW | 2020-08-07 | 1. Update SDK board configure and compile instruction<br>2. Add install cmake for development environment |
+| V1.6.0 | LJH | 2020-08-22 | 1. Add facial gate product section<br>2. Update SDK compile instruction |
 
 ---
 
@@ -237,35 +238,61 @@ Firmware_Merger        | SPI NOR firmware package tool (generate firmware.img fo
 
 ### To Select Board Configure
 
-SDK Download Address:
+#### SDK Download Address
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
 ```
 
-| Chip Name | Board Configuration (path: device/rockchip/rv1126_rv1109) | Storage Medium | EVB Board name                                      | Support Thunder Boot |
-| ------    | --------------------------------------------------------- | -------------- | --------------------------------------------------- | -------------------- |
-| RV1126/RV1109 | BoardConfig-38x38-spi-nand.mk         | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF | NO  |
-| RV1126/RV1109 | BoardConfig-robot.mk                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
-| RV1126/RV1109 | BoardConfig-tb-v12.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | YES |
-| RV1126/RV1109 | BoardConfig-tb-v13.mk                 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | YES |
-| RV1126/RV1109 | BoardConfig-spi-nand.mk               | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
-| RV1126/RV1109 | BoardConfig.mk                        | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       | NO  |
-| RV1126/RV1109 | BoardConfig-v12.mk                    | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
-| RV1126/RV1109 | BoardConfig-v10-v11.mk                | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       | NO  |
-| RV1126/RV1109 | BoardConfig-facial_gate.mk            | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       | NO  |
+#### SDK Sync and log
+
+```shell
+.repo/repo/repo sync -c -j4
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+Fetching projects: 100% (71/71), done.
+info: A new version of repo is available
+
+warning: project 'repo' branch 'stable' is not signed
+warning: Skipped upgrade to unverified version
+Checking out projects: 100% (71/71), done.
+repo sync has finished successfully.
+```
+
+| Board Configuration           | Product Use                                 | Storage Medium | EVB Board name                                      |
+| ----------------------------- | --------------------------                  | --------       | --------------------------------------------------- |
+| BoardConfig-38x38-spi-nand.mk | General IPC                                 | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
+| BoardConfig-robot.mk          | Robot Sweeper IPC                           | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-tb-v12.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-tb-v13.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-spi-nand.mk       | General IPC                                 | SPI NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig.mk                | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-v12.mk            | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-v10-v11.mk        | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
+| BoardConfig-facial_gate.mk    | Door Control or Turnstile                   | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| ++++++++++++++++++++++++++    | ++++++++++++++++++++++                      | +++++          | ++++++++++++++++++++++++++++++++++++++++++++        |
 
 Command of select board configure:
 
 Method 1
-./build.sh "path to board config file", for example:
+`./build.sh` "path to board config file", for example:
+
+select **General IPC** board configuration
 
 ```shell
-### select general version board configuration
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
+```
 
-### select fast boot board configuration, apply to EVB Board RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
+select **Door lock or doorbell products with battery** board configuration, apply to EVB Board RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
+
+```shell
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
+```
+
+select **Door Control or Turnstile**, apply to EVB Board RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY
+
+```shell
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
 ```
 
 Method 2
@@ -373,6 +400,8 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ./build.sh -h recovery
 ```
 
+NOTE: Recovery is a non-essential function, some board configuration will not be set.
+
 ### Rootfs Building
 
 ```shell
@@ -381,6 +410,25 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 
 ### to view detailed Rootfs build command
 ./build.sh -h rootfs
+```
+
+To compile the package of Buildroot:
+[NOTE]: <SDK>/app and <SDK>/external is also the package of Buildroot.
+
+```shell
+### 1. Get the rootfs configure of the board config.
+./build.sh -h rootfs
+### Current SDK Default [ rootfs ] Build Command###
+source envsetup.sh rockchip_rv1126_rv1109
+make
+
+### 2. source the defconfig of buildroot
+source envsetup.sh rockchip_rv1126_rv1109
+
+### 3. Get the name of the package makefile
+### eg: buildroot/package/rockchip/ipc-daemon/ipc-daemon.mk
+make ipc-daemon-dirclean
+make ipc-daemon-rebuild
 ```
 
 ### Firmware Package
@@ -394,7 +442,15 @@ Firmware directory: rockdev
 Enter the project root directory and execute the following command to automatically complete all buildings:
 
 ```shell
-./build.sh all
+./build.sh all # Only build with u-Boot, kernel, Rootfs and Recovery
+               # then use ./mkfirmware.sh to package firmware.
+
+./build.sh     # build with ./build.sh all, and then do these as follow:
+               # 1. package firmware to directory "rockdev"
+               # 2. package update.img
+               # 3. copy rockdev directory to IMAGE/***_RELEASE_TEST/IMAGES
+               # 4. copy the patches of modules to IMAGE/***_RELEASE_TEST/PATCHES
+               # NOTE: ./build.sh allsave is the same as ./build.sh
 ```
 
 ## Upgrade Introduction
@@ -706,3 +762,75 @@ Open the RKAICameraTest application on the TV terminal, click the rndis button t
 Open the RKAICameraTest application at the TV end, click the rndis button to connect to rndis after seeing the preview, click the settings button to select the "eptz mode switch" option after the countdown is completed, and then open the application, at this time, the top left corner of the interface will display whether it is the eptz model or the general intelligent preview mode:
 
 ![](resources/uvcc/uvc_camera_eptz.jpg)
+
+## Facial Gate Product
+
+The facial gate product supports the following functions:
+
+- Support face feature extraction,face detection and recognition, liveness detection
+- Support 1280x720 local screen display
+- Support access device from web
+
+### Product Building Introduction
+
+The compilation and configuration of the facial gate product is based on the public SDK, so SDK download and Environment set up please refer to the SDK.
+
+#### Select Board Configuration for Facial Gate Product
+
+| Board Configuration                                      | Comment                  |
+| -------------------------------------------------------- | ------------------------ |
+| device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk | Facial Gate board config |
+
+**Note**: The SDK supports the EVB with the mark of RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY by default,so if you get the EVB V13 Board, please modify kernel/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts,change rv1126-evb-v12.dtsi to rv1126-evb-v13.dtsi
+
+```shell
+--- a/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
++++ b/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
+@@ -4,7 +4,7 @@
+  */
+ /dts-v1/;
+ #include "rv1109.dtsi"
+-#include "rv1126-evb-v12.dtsi"
++#include "rv1126-evb-v13.dtsi"
+ / {
+```
+
+Command of selecting board configuration:
+
+```shell
+### To select Facial Gate board config
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
+```
+
+#### Building
+
+The building command of the intelligent Facial Gate product is the same as that of the SDK. Please refer to the SDK Building Introduction in Section 3.
+
+### **QFacialGate** **Application**
+
+QFacialGate is the main application of facial gate product, Which runs automatically by default when power on. and QT is used for UI.and RK's own algorithm Rockface is called through Rkfacial library to realize face detection, face feature point extraction, face recognition and live detection.
+
+The following functions are included:
+
+- RGB camera image data was obtained for face recognition, and IR camera image data was obtained for live detection
+- SQLITE3 is used as a database to store face feature values and user names
+- User register and delete, face tracking, user name display and other operations
+- ALSA interface is used to realize the voice broadcast function of each process
+
+#### Other
+
+- SDK comes with its own algorithm Rockface, it's need to authorization. How to obtain authorization please contact business and refer to sdk/external/rockface/auth/README.md the SDK has one hour test mode, time out please reboot.
+
+- The SDK use RGB camera OV2718, IR camea gc2053
+
+- IR LED angle of view need 90°, electric current need 120ma
+
+- Related documents
+
+  QFacialGate introduction: app\QFacialGate\doc\Rockchip_Instruction_Linux_QFacialGate_CN.pdf
+
+  The interface of Rkfacial: externa\rkfacial\doc\Rockchip_Instruction_Rkfacial_CN.pdf
+
+  Web back-end framework: docs\Linux\ApplicationNote\LinuxRockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+
+  Web configuration introduction: docs\Linux\ApplicationNote\Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
