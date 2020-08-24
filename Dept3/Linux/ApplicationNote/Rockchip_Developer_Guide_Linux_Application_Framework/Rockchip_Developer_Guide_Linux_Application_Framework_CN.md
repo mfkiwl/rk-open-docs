@@ -2,9 +2,9 @@
 
 文件标识：RK-FB-YF-358
 
-发布版本：V1.1.1
+发布版本：V1.2.0
 
-日期：2020-06-29
+日期：2020-08-24
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0     | Fenrir Lin | 2020-04-28   | 初始版本                        |
 | V1.1.0     | Fenrir Lin | 2020-06-04   | 增加ispserver和onvif_server部分 |
 | V1.1.1     | CWW        | 2020-06-29   | 更新RK_OEM编译打包命令          |
+| V1.2.0     | Allen Chen | 2020-08-24   | 更新ipcweb-ng部分               |
 
 ---
 
@@ -210,7 +211,7 @@ web后端的部分接口会再获取一次最新值，返还给前端。
 
 web前端，采用Angular 8框架。
 
-**开发语言：** Typescript，JavaScript，HTML5，CSS3
+**开发语言：** Typescript，JavaScript，HTML5，SCSS
 
 **参考文档:**
 
@@ -223,17 +224,46 @@ web前端，采用Angular 8框架。
 **编译命令：**
 
 ```shell
-#在app/ipcweb-ng目录下
+# 初次使用需安装开发环境见3.2开发环境
+# 在app/ipcweb-ng目录下
 ng build --prod
-#将编译生成在app/ipcweb-ng/dist目录下的文件，都移动到device/rockchip/oem/oem_ipc/www路径下
-#在SDK根目录下
-make rk_oem-dirclean && make rk_oem target-finalize #重新编译oem
-./mkfirmware.sh #打包oem.img,再进行烧写
+# 将编译生成在app/ipcweb-ng/dist目录下的文件，都移动到app/ipcweb-backend/www路径下，如此操作后在编译ipcweb-backend的同时将会进行www的复制
+# 在SDK根目录下
+make ipcweb-backend-rebuild # 重新编译后端文件，并根据配置复制www到对应路径
+make rk_oem-dirclean && make rk_oem target-finalize # 重新编译oem
+./mkfirmware.sh # 打包oem.img,再进行烧写
+```
+
+**常见编译冲突：**
+
+```shell
+# 错误提示如下，为类型定义冲突
+ERROR in ./src/app/shared/player/download.worker.ts (./node_modules/worker-plugin/dist/loader.js?{"name":"0"}!./src/app/shared/player/download.worker.ts)
+Module build failed (from ./node_modules/worker-plugin/dist/loader.js):
+# 解决修改node_modules\@types\emscripten\index.d.ts文件
+# 冲突语句
+declare function addFunction(func: () => any, signature?: string): number;
+# 修改如下
+declare function addFunction(func: Function, signature?: string): number;
+
+# 错误提示如下，为别名冲突
+Type alias 'PluginConfig' circularly reference
+Type alias 'ProtractorPlugin' circularly reference
+# 解决修改node_modules\protractor\built\index.d.ts文件
+# 冲突语句
+import { PluginConfig, ProtractorPlugin } from './plugins';
+export declare type PluginConfig = PluginConfig;
+export declare type ProtractorPlugin = ProtractorPlugin;
+# 修改如下
+import { PluginConfig as PluginCfg, ProtractorPlugin as ProtractorPlu} from './plugins';
+export declare type PluginConfig = PluginCfg;
+export declare type ProtractorPlugin = ProtractorPlu;
 ```
 
 ### 开发环境
 
 ```shell
+# Ubuntu
 sudo apt update
 sudo apt install nodejs
 sudo apt install npm
@@ -241,6 +271,17 @@ sudo npm install -g n # 安装 n 模块
 sudo n stable # 用 n 模块升级
 npm npm --version # 确认 npm 版本
 sudo npm install -g @angular/cli # 安装 Angular 命令行工具
+# 在app/ipcweb-ng目录下
+sudo npm install # 安装 Angular 以及相关依赖库
+
+# Windows
+# https://nodejs.org/en/download/官网内下载对应Nodejs并安装
+# 检查 npm node是否安装成功，若失败至官网下载最新版本安装
+npm --version
+node --version
+npm install -g @angular/cli # 安装 Angular 命令行工具
+# 在ipcweb-ng 目录下
+npm install # 安装 Angular 以及相关依赖库
 ```
 
 ### 在线调试
@@ -259,7 +300,7 @@ ng serve
 
 随后使用chrome浏览器访问 <http://localhost:4200/>，即可在线调试。
 
-也可使用`ng build --prod`命令编译，将生成在dist目录下的文件，推送到板端，替换/oem/www下的文件。如果浏览器访问页面未更新，需要清理浏览器图片和文件的缓存。
+也可使用`ng build --prod`命令编译，将生成在dist目录下的文件，推送到板端，替换oem/www或usr/www(根据产品类型而定)下的文件。如果浏览器访问页面未更新，需要清理浏览器图片和文件的缓存。
 
 ### 代码框架
 
@@ -279,7 +320,16 @@ src/
 │ ├── config.service.ts # 配置模块服务，用于与设备通信以及模块间通信
 │ ├── footer # footer 模块，版权声明
 │ ├── header # header 模块，导航路由，用户登录/登出
-│ └── preview # 预览模块，主页面码流播放器
+│ ├── preview # 预览模块，主页面码流播放器
+│ ├── download # 录像/截图下载模块，录像/截图的查询以及下载
+│ ├── face # 人脸模块，人脸总模块，包含参数以及人员管理功能
+│ ├── face-manage # 人员管理模块，人脸识别注册以及人脸识别记录管理功能
+│ ├── face-para # 人脸参数配置模块
+│ ├── shared # 共享资源
+│ │ ├── func-service # 通用服务以及函数
+│ │ ├── player # player 模块，播放器功能模块
+│ │ └── validators # Angular输入验证函数
+│ └── tip # 提示框管理模块
 ├── assets
 │ ├── css # 样式
 │ ├── i18n # 多国语言翻译
@@ -294,7 +344,6 @@ src/
 ├── polyfills.ts
 ├── styles.scss # 项目总的样式配置文件
 └── test.ts
-14 directories, 16 files
 ```
 
 详细模块位于 src/app/config
@@ -302,13 +351,12 @@ src/
 ```shell
 $ tree -L 2 src/app/config
 ├── config-audio # 音频配置
-│ ├── config-audio.component.html
-│ ├── config-audio.component.scss
-│ ├── config-audio.component.spec.ts
-│ └── config-audio.component.ts
 ├── config.component.html # config组件主页面
+├── config.component.scss # config组件样式
+├── config.component.spec.ts
+├── config.component.ts # config组件
 ├── config-event # 事件配置
-├── config-image # ISP图像配置
+├── config-image # ISP/OSD图像配置
 ├── config-intel # Intelligent智能分析配置
 ├── config.module.ts # 配置模块
 ├── config-network # 网络配置
@@ -318,16 +366,18 @@ $ tree -L 2 src/app/config
 ├── config-video # 视频编码配置
 ├── MenuGroup.ts # 菜单数据类
 ├── NetworkInterface.ts # 网络接口数据类
+├── peripherals # 外设拓展模块
 └── shared # 一些共享子模块，可复用，方便后面主模块调整
     ├── abnormal
+    ├── advanced-encoder
     ├── alarm-input
     ├── alarm-output
-    ├── center-tip
     ├── cloud
     ├── ddns
     ├── email
     ├── encoder-param
     ├── ftp
+    ├── gate-config
     ├── hard-disk-management
     ├── info
     ├── intrusion-detection
@@ -339,6 +389,7 @@ $ tree -L 2 src/app/config
     ├── motion-region
     ├── ntp
     ├── osd
+    ├── overlay-snap
     ├── picture-mask
     ├── port
     ├── pppoe
@@ -346,13 +397,14 @@ $ tree -L 2 src/app/config
     ├── protocol
     ├── region-crop
     ├── roi
-    ├── save-tip
+    ├── screen-config
     ├── screenshot
     ├── smtp
     ├── tcpip
     ├── time-table
     ├── upgrade
     ├── upnp
+    ├── user-manage
     └── wifi
 ```
 

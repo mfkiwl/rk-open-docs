@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-358
 
-Release Version: V1.1.1
+Release Version: V1.2.0
 
-Release Date: 2020-06-29
+Release Date: 2020-08-24
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -62,6 +62,7 @@ Software development engineers
 | V1.0.0      | Fenrir Lin | 2020-04-28 | Initial version                      |
 | V1.1.0      | Fenrir Lin | 2020-06-04 | Add ispserver and onvif_server       |
 | V1.1.1      | CWW        | 2020-06-29 | Update RK_OEM build and pack command |
+| V1.2.0      | Allen Chen | 2020-08-24 | Update ipcweb-ng                     |
 
 ---
 
@@ -99,7 +100,7 @@ The libraries are mainly located in the app directory of the SDK project, and ta
 | librkdb        | based on sql, provides an interface to database operations.  |
 | libgdbus       | provide dbus support.                                        |
 
-###  Application Framework
+### Application Framework
 
 The Application framework is as follows:
 
@@ -204,7 +205,7 @@ Some interfaces of the web back-end will obtain the latest value again and retur
 
 The web front-end takes Angular 8 framework.
 
-**Development language:** Typescript, JavaScript, HTML5, CSS3
+**Development language:** Typescript, JavaScript, HTML5, SCSS
 
 **Reference documents:**
 
@@ -217,17 +218,46 @@ The web front-end takes Angular 8 framework.
 **Build command:**
 
 ```shell
-#In app/ipcweb-ng directory
+# The development environment needs to be installed for the first use, see 3.2 Development Environment
+# In app/ipcweb-ng directory
 ng build --prod
-#Move the files generated in the app/ipcweb-ng/dist directory to the device/rockchip/oem/oem_ipc/www directory
-#In SDK root directory
-make rk_oem-dirclean && make rk_oem target-finalize #rebuild oem
-./mkfirmware.sh #pack oem.img, and then flash again
+# Move the compiled files in the app/ipcweb-ng/dist directory to the app/ipcweb-backend/www path. After this operation, the www will be copied while compiling ipcweb-backend
+# In SDK root directory
+make ipcweb-backend-rebuild # Recompile the back-end file and copy www to the corresponding path according to the configuration
+make rk_oem-dirclean && make rk_oem target-finalize # rebuild oem
+./mkfirmware.sh # pack oem.img, and then flash again
+```
+
+**Common compilation conflicts:**
+
+```shell
+# The error message is as follows, for the type definition conflict
+ERROR in ./src/app/shared/player/download.worker.ts (./node_modules/worker-plugin/dist/loader.js?{"name":"0"}!./src/app/shared/player/download.worker.ts)
+Module build failed (from ./node_modules/worker-plugin/dist/loader.js):
+# You should modify node_modules\@types\emscripten\index.d.ts as following
+# conflict
+declare function addFunction(func: () => any, signature?: string): number;
+# modify
+declare function addFunction(func: Function, signature?: string): number;
+
+# The error message is as follows, which is an alias conflict
+Type alias 'PluginConfig' circularly reference
+Type alias 'ProtractorPlugin' circularly reference
+# You should modify node_modules\protractor\built\index.d.ts as following
+# conflict
+import { PluginConfig, ProtractorPlugin } from './plugins';
+export declare type PluginConfig = PluginConfig;
+export declare type ProtractorPlugin = ProtractorPlugin;
+# modify
+import { PluginConfig as PluginCfg, ProtractorPlugin as ProtractorPlu} from './plugins';
+export declare type PluginConfig = PluginCfg;
+export declare type ProtractorPlugin = ProtractorPlu;
 ```
 
 ### Development Environment
 
 ```shell
+# Ubuntu
 sudo apt update
 sudo apt install nodejs
 sudo apt install npm
@@ -235,6 +265,17 @@ sudo npm install -g n # Install n module
 sudo n stable # Upgrade with n module
 npm npm --version # Confirm the npm version
 sudo npm install -g @angular/cli # Install Angular command line tool
+# in app/ipcweb-ng
+sudo npm install # Install Angular and related dependencies
+
+# Windows
+# view https://nodejs.org/en/download/ to download nodejs
+# Check whether the npm&node installation is successful, if it fails, go to the official website to download the latest version and install it
+npm --version
+node --version
+npm install -g @angular/cli # Install Angular command line tool
+# in pcweb-ng
+npm install # Install Angular and related dependencies
 ```
 
 ### Online Debug
@@ -270,10 +311,19 @@ src/
 │ ├── auth # Authentication module, including login page, user authentication
 │ ├── config # Configuration module, including all configuration subcomponents
 │ ├── config.service.spec.ts # Configure module test spec files
-│ ├── config.service.ts # Configure module services for communication with devices and communication between modules
+│ ├── config.service.ts # Configure module services for communication with  devices and communication between modules
 │ ├── footer # The footer module, copyright notice
 │ ├── header # The header modules, navigation routing, user login/logout
-│ └── preview # Preview module, stream player of the main page
+│ ├── preview # Preview module, stream player of the main page
+│ ├── download # Video/screenshot download module, query and download of video/screenshot
+│ ├── face # Face module, total face module, including parameters and management functions
+│ ├── face-manage # Management module, face recognition registration and face recognition record management functions
+│ ├── face-para # Face parameter configuration module
+│ ├── shared # Share resource
+│ │ ├── func-service # General services and functions
+│ │ ├── player # Player module, player function module
+│ │ └── validators # Angular validators functions
+│ └── tip #Tip Box Management Module
 ├── assets
 │ ├── css # Style
 │ ├── i18n # Multilingual translation
@@ -288,7 +338,6 @@ src/
 ├── polyfills.ts
 ├── styles.scss # Total style profile of the project
 └── test.ts
-14 directories, 16 files
 ```
 
 Detailed modules are located in src/app/config.
@@ -296,13 +345,12 @@ Detailed modules are located in src/app/config.
 ```shell
 $ tree -L 2 src/app/config
 ├── config-audio # Audio configuration
-│ ├── config-audio.component.html
-│ ├── config-audio.component.scss
-│ ├── config-audio.component.spec.ts
-│ └── config-audio.component.ts
 ├── config.component.html # Main page of config component
+├── config.component.scss # Main page style
+├── config.component.spec.ts
+├── config.component.ts # config component
 ├── config-event # Event configuration
-├── config-image # ISP image configuration
+├── config-image # ISP/OSD image configuration
 ├── config-intel # Intelligent analysis configuration
 ├── config.module.ts # Module configuration
 ├── config-network # Network configuration
@@ -312,16 +360,18 @@ $ tree -L 2 src/app/config
 ├── config-video # Video encoding configuration
 ├── MenuGroup.ts # Menu data
 ├── NetworkInterface.ts # Network interface data
+├── peripherals # Peripheral expansion module
 └── shared # Some shared sub-modules can be reused to facilitate further adjustment of the main module
     ├── abnormal
+    ├── advanced-encoder
     ├── alarm-input
     ├── alarm-output
-    ├── center-tip
     ├── cloud
     ├── ddns
     ├── email
     ├── encoder-param
     ├── ftp
+    ├── gate-config
     ├── hard-disk-management
     ├── info
     ├── intrusion-detection
@@ -333,6 +383,7 @@ $ tree -L 2 src/app/config
     ├── motion-region
     ├── ntp
     ├── osd
+    ├── overlay-snap
     ├── picture-mask
     ├── port
     ├── pppoe
@@ -340,13 +391,14 @@ $ tree -L 2 src/app/config
     ├── protocol
     ├── region-crop
     ├── roi
-    ├── save-tip
+    ├── screen-config
     ├── screenshot
     ├── smtp
     ├── tcpip
     ├── time-table
     ├── upgrade
     ├── upnp
+    ├── user-manage
     └── wifi
 ```
 
@@ -356,7 +408,7 @@ $ tree -L 2 src/app/config
 
 The web back-end takes nginx+fastcgi, and debugs by curl and postman, or directly debugs with the web front-end.
 
-**Development language: ** C++
+**Development language:** C++
 
 **reference documents:**
 
@@ -405,7 +457,7 @@ location /cgi-bin/ {
 }
 ```
 
-###  Building Environment
+### Building Environment
 
 Please build `make ipcweb-backend` in the SDK root directory, or use the following command to build.
 
@@ -454,9 +506,9 @@ $ cat /var/log/nginx/access.log
 # Web server access log
 ```
 
-##  ipc-daemon
+## ipc-daemon
 
-###  Development Preparation
+### Development Preparation
 
 A system daemon, provide system maintenance services, initialize and ensure the operation of dbserver/netserver/storage_manager/mediaserver.
 
@@ -485,7 +537,7 @@ The following interfaces are located in: app/libIPCProtocol/system_manager.h.
 
 A storage management service, providing file query, hard drive management, video snapshot, quota and other functions.
 
-**Development language: ** C
+**Development language:** C
 
 **Code path:** app/storage_manager
 
@@ -509,13 +561,13 @@ The following interface is located in app/libIPCProtocol/storage_manager.h.
 
 A network service, providing functions such as obtaining network information, scanning Wi-Fi, and configuring networks.
 
-**Development language: ** C
+**Development language:** C
 
 **Code path:** app/netserver
 
 **Build command:**  in the SDK root directory, `make netserver-dirclean && make netserver`
 
-###  External Interface
+### External Interface
 
 The following interfaces are in the app/libIPCProtocol/netserver.h.
 
@@ -532,7 +584,7 @@ The following interfaces are in the app/libIPCProtocol/netserver.h.
 
 A database service, initializes the database and provides related operation interfaces to the database.
 
-**Development language: ** C
+**Development language:** C
 
 **Code path:** app/dbserver
 
@@ -542,7 +594,7 @@ A database service, initializes the database and provides related operation inte
 
 The interfaces are located in app/libIPCProtocol/dbserver.h, which are mainly used to select, update, delete and other operations on different tables of the database.
 
-###  Debug Environment
+### Debug Environment
 
 After modifying the code and rebuilding, the device needs  following operations:
 
@@ -569,7 +621,7 @@ method return time=1588123823.096268 sender=:1.5 -> destination=:1.6 serial=7 re
 
 Provides the main application of multimedia services, please refer to "MediaServer Development Basics" for details.
 
-**Development language: ** C++
+**Development language:** C++
 
 **Code path:** app/mediaserver
 
@@ -579,9 +631,9 @@ Provides the main application of multimedia services, please refer to "MediaServ
 
 ### Development Preparation
 
-Provides a functional interface for inter-process communication based on dbus. 
+Provides a functional interface for inter-process communication based on dbus.
 
-**Development language: ** C
+**Development language:** C
 
 **Code path:** app/LibIPCProtocol
 
@@ -670,7 +722,7 @@ dbus_method_call(userdata->connection,
 
 For detailed development about image signal processing server, please refer to "ISP IPC Module Framework Description and Interface Specification"
 
-**Development language: ** C
+**Development language:** C
 
 **Code path:** external/isp2-ipc
 
@@ -682,7 +734,7 @@ For detailed development about image signal processing server, please refer to "
 
 onvif protocol server.
 
-**Development language: ** C
+**Development language:** C
 
 **Reference documents:**
 
