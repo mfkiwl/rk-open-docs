@@ -2,9 +2,9 @@
 
 文档标识：RK-SM-YF-119
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-07-30
+日期：2020-08-26
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -61,9 +61,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2020-06-24 | V1.0.0   | 操瑞杰   | 初始发布     |
+| **日期**   | **版本** | **作者** | **修改说明**                                                 |
+| ---------- | -------- | -------- | ------------------------------------------------------------ |
+| 2020-06-24 | V1.0.0   | 操瑞杰   | 初始发布                                                     |
+| 2020-08-26 | V1.1.0   | 操瑞杰   | 新增 HDCP 2.2 使用说明<br/>新增 RK3288/RK3399 HDMI-PHY-PLL 修改方法 |
 
 ---
 [TOC]
@@ -152,7 +153,7 @@ RK3368 由于 CEC CLOCK 对精度的要求，还需要做以下修改：
 
 如果需要支持 HDCP 1.4 需要如下步骤：
 
-- 在板级dts文件的hdmi节点里添加rockchip,hdcp_enable = <1>，例如：
+- 在板级 dts 文件的 hdmi 节点里添加 rockchip,hdcp_enable = <1>，例如：
 
   ```
   &hdmi {
@@ -179,11 +180,56 @@ RK3368 由于 CEC CLOCK 对精度的要求，还需要做以下修改：
   hdcp_int is 0x80
   ```
 
+#### 使能 HDCP 2.2
+
+RK3368/RK3288/RK322X 支持 FB 框架下的 HDCP 2.2 功能，需要注意的是，想使用 HDCP 2.2 功能必须确保 HDCP 1.4 工作正常。想要开启该功能需要以下步骤：
+
+- 在板级 dts 文件里开启 HDCP 2.2：
+
+  ```
+  &hdmi_hdcp2 {
+  	status = "okay";
+  };
+  ```
+
+- 向 Rockchip FAE 申请 Key 打包工具，并按照 readme 打包 Key。
+
+- 向 Rockchip FAE 申请 HDCP 2.2 补丁包，并按照 readme 打上补丁。
+
+- 重新编译并烧写后，使用以下节点开启/关闭 HDCP 2.2 功能：
+
+  ```
+  echo 1 > sys/class/hdmi_hdcp2/hdcp2/enable
+  ```
+
+开启 HDCP 功能后可以通过以下方法确认 HDCP 是否正常工作：
+
+- 分别找一台不支持 HDCP 2.2 的电视和支持 HDCP 2.2 的电视。若开启 HDCP 功能后，不支持 HDCP 2.2 的电视显示白屏而支持 HDCP 2.2 的电视可以正常显示，则说明 HDCP 工作正常。
+
+- 开启 HDCP 2.2 功能后，如果内核 Log 中出现以下内容则说明认证失败：
+
+  ```
+  hdcp check failed
+  ```
+
+  出现认证失败的情况，可以上传以下路径的 Log 至 redmine：
+
+  ```
+  /data/hdcp_tx.log
+  ```
+
+  或是执行以下两条命令抓取 Log 并上传 redmine：
+
+  ```
+  logcat –s HMDI_HDCP2
+  dmesg | grep HDCP2
+  ```
+
 #### Android 配置 HDMI 默认分辨率
 
 在用户未在 setting 中手动设置 HDMI 分辨率的情况下，HDMI 使用的默认分辨率设置方法如下：
 
-在板级dts文件的hdmi节点里添加 `rockchip,defaultmode = <value>` ，`<value>`值仅限于 CEA MODE（即有对应 VIC 值的分辨率） 可以在 `kernel/drivers/video/rockchip/hdmi/rockchip-hdmi.h` 的 `hdmi_video_infomation_code` 中查到不同分辨率对应的值，或是查阅 CEA-186-F。例如，设置默认分辨率为720P60Hz 输出：
+在板级dts文件的 hdmi 节点里添加 `rockchip,defaultmode = <value>` ，`<value>`值仅限于 CEA MODE（即有对应 VIC 值的分辨率） 可以在 `kernel/drivers/video/rockchip/hdmi/rockchip-hdmi.h` 的 `hdmi_video_infomation_code` 中查到不同分辨率对应的值，或是查阅 CEA-186-F。例如，设置默认分辨率为 720P60Hz 输出：
 
 ```
 &hdmi {
@@ -208,7 +254,7 @@ HDMI 在开机时使用的分辨率按照以下优先级：
 
 ![add_timing_fb.png](Rockchip_Developer_Guide_HDMI/add_timing_fb.png)
 
-##### 配置 HDMI-PHY-PLL
+##### 配置RK322X/RK3328 HDMI-PHY-PLL
 
 RK322X/RK3328 芯片 HDMI PHY PLL 除了供 HDMI PHY 使用外，还作为显示的时钟源，供 HDMI/CVBS/VOP 使用。在产品开发设计中，当需要增加特殊分辨率的支持，需要新增 PHY PLL 配置，使 HDMI PHY PLL 能输出该分辨率对应的时钟。
 
@@ -492,6 +538,82 @@ struct ext_pll_config_tab {
 ppll_nd，ppll_nf，ppll_no 对应 DRM 框架驱动中的 `post_pll_config` 中的 prediv，fbdiv，postdiv。其值的选择需要根据 TMDS CLOCK 以及芯片版本，选择方法详见 3.1.8 节。
 
 需要注意的是，部分版本的sdk代码较旧不包括 frac。RK322X 系列的芯片 PHY 的版本不支持浮点，所以 frac 只能为 0。
+
+##### 配置 RK3328/RK3368/RK3399 HDMI-PHY-PLL
+
+RK3328/RK3368/RK3399 的 PHY-PLL配置保存在 `PHY_MPLL_TABLE` 当中，路径为：
+
+```
+kernel/drivers/video/rockchip/hdmi/rockchip-hdmiv2/rockchip_hdmiv2_hw.c
+```
+
+```c
+static const struct phy_mpll_config_tab PHY_MPLL_TABLE[] = {
+/*	tmdsclk = (pixclk / ref_cntrl ) * (fbdiv2 * fbdiv1) / nctrl / tmdsmhl
+ *	opmode: 0:HDMI1.4	1:HDMI2.0
+ *
+ *	|pixclock|	tmdsclock|pixrepet|colordepth|prepdiv|tmdsmhl|opmode|
+ *		fbdiv2|fbdiv1|ref_cntrl|nctrl|propctrl|intctrl|gmpctrl|
+ */
+	{27000000,	27000000,	0,	8,	0,	0,	0,
+		2,	3,	0,	3,	3,	0,	0},
+	{27000000,	27000000,	1,	8,	0,	0,	0,
+		2,	3,	0,	3,	3,	0,	0},
+	{27000000,	33750000,	0,	10,	1,	0,	0,
+		5,	1,	0,	3,	3,	0,	0},
+	{27000000,	33750000,	1,	10,	1,	0,	0,
+		5,	1,	0,	3,	3,	0,	0},
+	{27000000,	40500000,	0,	12,	2,	0,	0,
+		3,	3,	0,	3,	3,	0,	0},
+	{27000000,	54000000,	0,	16,	3,	0,	0,
+		2,	3,	0,	2,	5,	0,	1},
+	{59400000,	59400000,	0,	8,	0,	0,	0,
+		1,	3,	0,	2,	5,	0,	1},
+```
+
+结构体 `phy_mpll_config_tab` 定义如下：
+
+```c
+struct phy_mpll_config_tab {
+	u32 pix_clock;
+	u32 tmdsclock;
+	u8 pix_repet;
+	u8 color_depth;
+	u16 prep_div;
+	u16 tmdsmhl_cntrl;
+	u16 opmode;
+	u32 fbdiv2_cntrl;
+	u16 fbdiv1_cntrl;
+	u16 ref_cntrl;
+	u16 n_cntrl;
+	u32 prop_cntrl;
+	u32 int_cntrl;
+	u16 gmp_cntrl;
+};
+```
+
+各项参数说明如下：
+
+| 参数          | 说明                                                         |
+| ------------- | ------------------------------------------------------------ |
+| pix_clock     | 像素时钟                                                     |
+| tmdsclock     | TMDS 时钟                                                    |
+| pix_repet     | 像素重复                                                     |
+| color_depth   | 色深                                                         |
+| prep_div      | Digital Pixel repetition divider TMDS CLOCK 分频生成 PREPCLK 分频系数，与色深有关： <br/>11: Divides by 1 (8 bits)<br/>10: Divides by 1.25 (10 bits)<br/>01: Divides by 1.5 (12 bits)<br/>00: Divides by 2 (16 bits) |
+| tmdsmhl_cntrl | Programmable Divider<br/>11: Divides by 4<br/>10: Divides by 3<br/>01: Not used<br/>00: Divides by 1 |
+| opmode        | 工作模式，分为 HDMI1.4 和 HDMI 2.0 两种：<br/>00: HDMI 1.4 <br/>01: HDMI 2.0 (Data rate greater than 3.4 Gbps)<br/>10: Not used<br/>11: Not used |
+| fbdiv2_cntrl  | Second Programmable Feedback Divider Control<br/>111: Not used<br/>110: Divides by 6<br/>101: Divides by 5<br/>100: Divides by 4<br/>011: Divides by 3<br/>010: Divides by 2<br/>001: Divides by 1<br/>000: Not used |
+| fbdiv1_cntrl  | First Programmable Feedback Divider Control<br/>11: Divides by 4<br/>10: Divides by 3<br/>01: Divides by 2<br/>00: Divides by 1 |
+| ref_cntrl     | Programmable Input Divider Control<br/>11: Divides by 4<br/>10: Not used<br/>01: Divides by 2<br/>00: Divides by 1 |
+| n_cntrl       | 控制可编程输出分配器模块，根据输入参考频率 ck_ref_mpll_p/m，使环形振荡器保持在要求的范围内。 |
+| prop_cntrl    | PLL 均衡控制。                                               |
+| int_cntrl     | PLL 电荷泵整体控制。                                         |
+| gmp_cntrl     | 控制有效环路滤波器电阻 (=1/gmp) 以增加或减少 PLL 带宽。      |
+
+在使用的过程中，HDMI 驱动会针对像素时钟、TMDS 时钟、像素重复、色深与  `PHY_MPLL_TABLE` 中的各项进行逐一对比。若存在以上四项都相符的一组配置，则使用该组配置。
+
+由于部分参数的取值需要查阅 PHY 的 DATASHEET 获取，若需要新增 HDMI-PHY-PLL 配置，可以向 FAE 提出所需的像素时钟、TMDS 时钟、像素重复、色深。获取新的配置后，直接按照格式添加进 `PHY_MPLL_TABLE` 即可。
 
 #### HDMI 信号强度配置
 
@@ -1098,6 +1220,48 @@ echo 1 > /sys/class/misc/hdmi_hdcp1x/enable
 
 - 分别找一台不支持 HDCP 1.4 的电视和支持 HDCP 1.4 的电视。若开启 HDCP 功能后，不支持 HDCP 1.4 的电视显示粉屏而支持 HDCP 1.4 的电视可以正常显示，则说明 HDCP 工作正常。
 
+#### 使能 HDCP 2.2
+
+RK3288/RK3399 支持 DRM 框架下的 HDCP 2.2 功能，需要注意的是，想使用 HDCP 2.2 功能必须确保 HDCP 1.4 工作正常。想要开启该功能需要以下步骤：
+
+- 向 FAE 申请 HDCP 2.2 Key 打包工具以及补丁包，按照 readme 将 Key 打包并打上补丁。
+
+- 重新编译并烧写后，使用以下节点开启/关闭 HDCP 2.2 功能：
+
+  ```
+  echo 1 > /sys/class/misc/hdcp2_node/enable
+  ```
+
+使能后可以通过以下方法判断 HDCP 2.2 是否正常工作：
+
+- 分别找一台不支持 HDCP 2.2 的电视和支持 HDCP 2.2 的电视。若开启 HDCP 功能后，不支持 HDCP 2.2 的电视显示白屏而支持 HDCP 2.2 的电视可以正常显示，则说明 HDCP 工作正常。
+
+- 通过以下节点获取 HDCP 2.2 工作状态：
+
+  ```
+  cat /sys/class/misc/hdcp2_node/status
+  ```
+
+  | status 值              | 说明                                 |
+  | ---------------------- | ------------------------------------ |
+  | hdcp2 auth sucess      | 认证成功。                           |
+  | no enable hdcp2        | HDCP 2.2 已关闭。                    |
+  | hdcp2 no auth          | HDMI 未连接或是设备不支持 HDCP 2.2。 |
+  | no already auth sucess | 认证失败。                           |
+
+- 如果出现了认证失败的情况，请在 redmine 上传以下 Log 文件：
+
+  ```
+  /cache/hdcp_tx0.log
+  ```
+
+  或是执行以下命令抓取 Log：
+
+  ```
+  logcat -s HDMI_HDCP2
+  dmesg | grep hdcp
+  ```
+
 #### DDC 的 I2C 速率配置
 
 目前 I2C 速率通过 clk 高电平和低电平的时间来调整，如下为实测 I2C 速率为 50 khz 时候的配置。
@@ -1188,7 +1352,7 @@ DRM 框架目前代码已经支持了绝大部分分辨率时序，但是部分 
 
 各项参数描述如上表，具体时序的含义可以参考 3.2.4 节。
 
-##### 新增 PLL 配置
+##### RK322X/RK3328 新增 PLL 配置
 
 RK322X/RK3328 芯片新增特殊分辨率还需要新增 HDMI-PHY-PLL 的配置。具体配置的计算过程请参考 2.1.5.2 节。
 
@@ -1329,6 +1493,78 @@ struct post_pll_config {
 ```
 
 3. 最终配置值为：prediv = 18，fbdiv = 80， postdiv = 8。在 LINUX 3.10 内核的驱动中对应 `struct ext_pll_config_tab` 中的 ppll_nd,  ppll_nf, ppll_no 三项。由于是 RK3328 量产芯片切 TMDS CLOCK <= 74.25Mhz，所以需要添加在`RK322XH_V1_PLL_TABLE` 当中。
+
+##### RK3288/RK3368/RK3399 新增 PLL 配置
+
+RK3288/RK3368/RK3399 的 HDMI-PHY-PLL 配置保存在 `rockchip_mpll_cfg` 和 `rockchip_mpll_cfg_420` 中：
+
+```c
+static const struct dw_hdmi_mpll_config rockchip_mpll_cfg[] = {
+	{
+		30666000, {
+			{ 0x00b3, 0x0000 },
+			{ 0x2153, 0x0000 },
+			{ 0x40f3, 0x0000 },
+		},
+	},  {
+		36800000, {
+			{ 0x00b3, 0x0000 },
+			{ 0x2153, 0x0000 },
+			{ 0x40a2, 0x0001 },
+		},
+	},  {
+		46000000, {
+			{ 0x00b3, 0x0000 },
+			{ 0x2142, 0x0001 },
+			{ 0x40a2, 0x0001 },
+		},
+	},  {
+```
+
+路径为：
+
+```
+kernel/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
+```
+
+其中 `rockchip_mpll_cfg` 为 RGB/YUV444/YUV422 的配置，`rockchip_mpll_cfg_420` 为 YUV420 的配置。
+
+结构体 `dw_hdmi_mpll_config` 定义如下：
+
+```c
+struct dw_hdmi_mpll_config {
+        unsigned long mpixelclock;
+        struct {
+                u16 cpce;
+                u16 gmp;
+        } res[DW_HDMI_RES_MAX];
+};
+```
+
+各项参数说明如下：
+
+| 参数        | 说明                   |
+| ----------- | ---------------------- |
+| mpixelclock | 像素时钟               |
+| cpce        | OPMODE_PLLCFG 寄存器值 |
+| gmp         | PLLGMPCTRL 寄存器值    |
+
+以 `rockchip_mpll_cfg` 中的第一项配置为例：
+
+```c
+static const struct dw_hdmi_mpll_config rockchip_mpll_cfg[] = {
+	{
+		30666000, {
+			{ 0x00b3, 0x0000 },
+			{ 0x2153, 0x0000 },
+			{ 0x40f3, 0x0000 },
+		},
+	},  {
+```
+
+首先，HDMI 驱动会判断是否颜色格式为 YUV420，若是，则选择 `rockchip_mpll_cfg_420`， 否则选择 `rockchip_mpll_cfg` 30666000 表示像素时钟为 30666000 及以下的分辨率适用该项配置，`{ 0x00b3, 0x0000 }`、`{ 0x2153, 0x0000 }`、`{ 0x40f3, 0x0000 }` 三项依次对应色深为 8 BIT、10 BIT、12 BIT（目前 Rockchip 方案实际只支持 8/10 bit 两种模式） 情况下使用的配置。
+
+由于参数的取值需要查阅 PHY 的 DATASHEET 获取，若需要新增 HDMI-PHY-PLL 配置，可以向 FAE 提出所需的像素时钟。然后根据上述的规则，将新增的配置添加到 `rockchip_mpll_cfg` 或 `rockchip_mpll_cfg_420` 中。
 
 #### 打开音频
 
