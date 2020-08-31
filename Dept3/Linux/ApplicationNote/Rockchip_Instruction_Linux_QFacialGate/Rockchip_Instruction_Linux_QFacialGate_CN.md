@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-374
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-07-24
+日期：2020-08-31
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -62,9 +62,10 @@ Rockchip Electronics Co., Ltd.
 
  **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | :------- | ------------ |
-| 2020-07-24 | V1.0.0   | ctf      | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**       |
+| ---------- | -------- | :------- | ------------------ |
+| 2020-07-24 | V1.0.0   | ctf      | 初始版本           |
+| 2020-08-31 | V1.1.0   | ctf      | 添加Qt配置编译说明 |
 
 ---
 
@@ -100,6 +101,60 @@ QFacialGate -f num
 
 ---
 
+## Qt配置
+
+### 配置
+
+- 根目录下运行`make menuconfig` 开启如下配置
+
+  ```cpp
+  BR2_PACKAGE_QT5=y
+  BR2_PACKAGE_QT5_VERSION_5_9=y
+  BR2_PACKAGE_QT5BASE_EXAMPLES=n        //Qt examples
+  BR2_PACKAGE_QT5BASE_WIDGETS=y
+  BR2_PACKAGE_QT5BASE_GIF=y
+  BR2_PACKAGE_QT5BASE_JPEG=y
+  BR2_PACKAGE_QT5BASE_PNG=y
+  BR2_PACKAGE_QT5MULTIMEDIA=y
+  BR2_PACKAGE_QT5QUICKCONTROLS=y
+  BR2_PACKAGE_QT5QUICKCONTROLS2=y
+  BR2_PACKAGE_QT5BASE_LINUXFB_ARGB32=y
+  BR2_PACKAGE_QT5BASE_USE_RGA=y         //RGA优化, 详见章节3.4.2, 运行Qt examples时关闭该配置
+
+  # Fonts                               //字库配置
+  BR2_PACKAGE_BITSTREAM_VERA=y
+  BR2_PACKAGE_CANTARELL=y
+  BR2_PACKAGE_DEJAVU=y
+  BR2_PACKAGE_FONT_AWESOME=y
+  BR2_PACKAGE_GHOSTSCRIPT_FONTS=y
+  BR2_PACKAGE_INCONSOLATA=y
+  BR2_PACKAGE_LIBERATION=y
+  BR2_PACKAGE_QT5BASE_FONTCONFIG=y
+  BR2_PACKAGE_SOURCE_HAN_SANS_CN=y
+  ```
+
+  如果想要运行Qt 自带示例程序，可以开启`BR2_PACKAGE_QT5BASE_EXAMPLES`，编译后会在`usr/lib/qt/examples` 目录下生成相应示例程序。
+
+- 配置完成，需要运行`make savedefconfig` 将配置保存到`buildroot/configs` 目录下对应的xxx_defconfig文件。
+
+### 编译
+
+- 通过`make menuconfig`和 `make savedefconfig` 方式配置，可以直接使用 `make qt5base-dirclean && make qt5base-rebuild` 进行编译。
+- 直接在`buildroot/configs/xxx_defconfig`中添加配置选项的，必须使用 `./build.sh rootfs` 编译，配置才会生效。
+
+### 运行
+
+- 以QFacialGate 运行为例
+
+  ```cpp
+  //配置使用drm还是fb的api操作显示, fb效率低且未优化, 均配置为1
+  export QT_QPA_FB_DRM=1
+  //显示终端配置: linuxfb显示, 不做旋转; 通过rotation设置屏幕旋转角度, 可配置为: 0、90、180、270
+  export QT_QPA_PLATFORM=linuxfb:rotation=0
+  //设置人脸底库最大支持30000张
+  QFacialGate -f 30000 &
+  ```
+
 ## UI 介绍
 
 ### UI 控件
@@ -108,6 +163,7 @@ QFacialGate -f num
 - Delete按键：实时从数据库删除摄像头采集到人脸特征值。
 - RGB/IR按键：RGB/IR摄像头显示切换按键；当按键显示RGB时，屏幕显示RGB图像和人脸检测结果；当按键切换到IR时，屏幕仅显示IR图像，不显示人脸检测结果。
 - Capture按键：保存屏幕当前显示的30帧图像数据，保存的文件以当前时间命名，RGB图像保存在/data/rgb/目录下，IR图像保存在/data/ir/目录下。
+- Setting 图标按键：设置IP地址，点击会弹出IP地址设置窗，输入IP地址、子网掩码、网关地址。
 - 人脸框：红色表示非活体；蓝色表示未注册到数据库的活体；绿色表示活体，并且是已注册到数据库的白名单；黑色表示活体，并且是已注册到数据库的黑名单。
 - 底部信息显示区：显示时间，检测到的用户信息，如果设备连接以太网，还会显示IP地址，在PC端浏览器输入该IP地址，可以登录web端管理工具， web管理工具具体操作请参考：docs/Linux/ApplicationNote/Rockchip_Instructions_Linux_Web_Configuration_CN.pdf 。
 
@@ -154,6 +210,10 @@ QFacialGate -f num
 
 - 保存屏幕当前显示的图像数据，点击Capture按键开始保存，保存30帧后自动停止。
 
+#### class qtkeyboard
+
+- 自定义键盘。支持0 ~ 9 ，26个字母大小写，删除、空格、斜杠等常见符号按键，键盘布局位于qtkeyboard.ui
+
 ### 性能优化
 
 #### QFacialGate 优化
@@ -168,6 +228,6 @@ QFacialGate -f num
 
 - 使用RGA 合成优化drawImage，提升帧率，降低CPU，由BR2_PACKAGE_QT5BASE_USE_RGA 宏控制。该宏必须开启，否则帧率下降严重，画面会有明显卡顿。
 
-- UI 数据直接绘制到Linuxfb buffer，跳过涂黑和两次neon合成，进一步降低CPU，由BR2_PACKAGE_QT5BASE_LINUXFB_DIRECT_PAINTING 宏控制，该优化只在单窗口有效。如果UI使用多窗口显示，可以关闭该宏，但是CPU占用会升高，可能导致帧率下降。
+- UI 数据直接绘制到Linuxfb buffer，跳过涂黑和两次neon合成，进一步降低CPU，由BR2_PACKAGE_QT5BASE_LINUXFB_DIRECT_PAINTING 宏控制，该优化只在单窗口有效。如果UI使用多窗口显示，请关闭该宏，CPU占用会略微升高，可能导致帧率小幅度下降。
 
 - 以上宏开关均可在根目录下运行`make menuconfig` 配置，修改后需要`make savedefconfig` 保存配置，并运行`make qt5base-dirclean && make qt5base-rebuild`重新编译Qt，运行`make QFacialGate-dirclean && QFacialGate-rebuild`重新编译QFacialGate，使配置生效。
