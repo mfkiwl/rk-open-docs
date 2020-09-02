@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-302
 
-发布版本：V1.8.0
+发布版本：V1.9.0
 
-日期：2020-08-06
+日期：2020-09-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -75,6 +75,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-05-22 | V1.6.0 | 钟勇汪 | 修改编译工具源码路径 |
 | 2020-06-18 | V1.7.0 | 吴佳健 | 更新打包工具说明 |
 | 2020-08-06 | V1.8.0 | 吴佳健 | 新增Vendor Key校验说明 |
+| 2020-09-18 | V1.9.0 | 吴佳健 | 更新Map配置信息修改方式和XIP模式说明 |
 
 ---
 
@@ -392,7 +393,72 @@ generate_dsp_fw.bat 脚本会将对应工程目录的 FwConfig.xml 、Bin2Array.
 
 Xplorer 在链接阶段需要根据 Map 配置信息进行各个数据段的空间分配。在 ”T:(active build target) ” -->  ”Modify”，选择 Linker。可以看到 Standard 选项，可以选择默认的 Map 配置，Xplorer 为开发者提供了 min-rt、sim 等配置，这些配置文件目录存放在“<工具安装目录>\explor8\XtDevTools\install\builds\RG-2018.9-win32\HiFi3Dev181203\xtensa-elf\lib”目录下。配置相关信息可以查看文档“ <工具安装目录> \XtDevTools\downloads\RI-2018.0\docs\lsp_rm.pdf”。
 
-段配置文件为“memmap.xmm”，text、data 等会存放在 sram0 中，这是 Share Memory 的地址空间，需要将这些段存放在 TCM 中。可以参考“<工程目录>\rkdsp\projects\PISCES\map\min-rt\memmap.xmm”中的相关修改。修改完后，需要使用命令”<工具安装目录>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b  <map目录> --xtensa-core=HiFi3Dev181203”。这时候可以在 Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成“.map”文件，里面记录了具体函数分配到的地址空间，以验证上述修改是否生效。
+#### 修改配置文件
+
+段配置文件为`memmap.xmm`，以map\min-rt\memmap.xmm为例，其中设置了sram、iram0、dram0三个段空间，其中iram0和dram0属于DSP的TCM内存，访问速度较快，sram属于系统内存，DSP可以访问，但速度较TCM慢。sram和iram0属性为可读写、可执行，dram0属性为可读写。因此，通常在iram0中放置代码段，在dram0中放置数据段，在iram0或dram0空间不足时，可以考虑将代码段或数据段放至sram。
+
+将代码段放至sram有两种方式，一种为在函数前加上`__attribute__ ((section((".sram.text"))))`。另一种直接将默认段移至sram。以将默认代码段放至sram为例，作如下修改：
+
+```diff
+@@ -51,7 +51,7 @@
+ BEGIN sram
+ 0x20000000: sysram : sram : 0x100000 : executable, writable ;
+- sram0 : C : 0x200C0000 - 0x200fffff : .sram.rodata .sram.literal .sram.text .sram.data  .sram.bss;
++ sram0 : C : 0x200C0000 - 0x200fffff : .sram.rodata .sram.literal .sram.text .literal .text .sram.data .sram.bss;
+ END sram
+
+ BEGIN iram0
+@@ -61,7 +61,7 @@ BEGIN iram0
+  iram0_2 : F : 0x3000057c - 0x3000059b : .DebugExceptionVector.text .KernelExceptionVector.literal;
+  iram0_3 : F : 0x3000059c - 0x300005bb : .KernelExceptionVector.text .UserExceptionVector.literal;
+  iram0_4 : F : 0x300005bc - 0x300005db : .UserExceptionVector.text .DoubleExceptionVector.literal;
+- iram0_5 : F : 0x300005dc - 0x3000ffff : .DoubleExceptionVector.text .iram0.literal .literal .iram0.text .text;
++ iram0_5 : F : 0x300005dc - 0x3000ffff : .DoubleExceptionVector.text .iram0.literal .iram0.text;
+ END iram0
+```
+
+修改完后需要进入map目录下，使用工具根据该配置文件重新生成链接脚本：
+
+```shell
+cd rkdsp\projects\RK2108\map
+<install path>\XtDevTools\install\tools\RG-2018.9-win32\XtensaTools\bin\xt-genldscripts.exe -b <map directory> --xtensa-core=HiFi3Dev181203
+```
+
+其中`<install path>`为工具安装目录，如`C:\usr\XtDevTools\... `，`<map directory>`为目标map文件夹，如`min-rt`。
+
+成功生成会有如下提示：
+
+```
+New linker scripts generated in min-rt/ldscripts
+```
+
+若生成失败，会打印相应错误，请根据错误提示进行调整。
+
+注意：由于sram为系统内存，若使用到sram，则需与CPU端开发人员协商sram空间分配，避免出现双方同时访问同一块内存导致出错，如在sram0中指定起始地址为0x200C0000，则该地址往前的空间为CPU可用，该地址往后的空间为DSP可用，CPU端也需要进行相应设置。
+
+#### 修改链接脚本
+
+修改memmap.xmm文件的方式，只能以段为单位进行修改，在某些情况下，存在将某一文件指定至某一段空间的需求，则可以直接修改链接脚本实现：
+
+```diff
+--- a/rkdsp/projects/RK2108/map/min-rt/ldscripts/elf32xtensa.x
++++ b/rkdsp/projects/RK2108/map/min-rt/ldscripts/elf32xtensa.x
+@@ -211,6 +211,8 @@ SECTIONS
+   {
+     _iram0_text_start = ABSOLUTE(.);
+     *(.iram0.literal .iram.literal .iram.text.literal .iram0.text .iram.text)
++    *file1.o(.literal .literal.* .text .text.*)
++    *file2.c.o(.literal .literal.* .text .text.*)
++    *libx.a:*.o(.literal .literal.* .text .text.*)
+
+     . = ALIGN (4);
+     _iram0_text_end = ABSOLUTE(.);
+   } >iram0_5_seg :iram0_5_phdr
+```
+
+注意：存在.o和.c.o两种情况，一般情况下，.c.o为由Xplorer编译产生，.o为标准库内文件，具体是以.o或.c.o结尾，可以直接查看.map文件确认。`*libx.a:*.o(.literal .literal.* .text .text.*)`则是将库内所有.o指定到该段。另外执行[修改配置文件](# 修改配置文件)中的命令重新生成链接脚本，将会丢失手动部分修改，因此如果有手动修改，执行自动生成工具前注意做好备份。
+
+修改完成后在Xplorer的Target-> Linker 中指定 map 目录，重新编译即可。如果选中“Generate linker map file”，那么就会在编译完成后生成`.map`文件，里面记录了详细的地址空间分配，以验证上述修改是否生效。
 
 ## RT-THREAD 代码解析
 
@@ -603,6 +669,43 @@ config end
 [A.DspTe][000024.61]work result:0x00000000
 [A.DspTe][000024.61]work result:0x00000000
 ```
+
+## XIP模式
+
+在TCM和SRAM都不够使用的情况下，允许将.text和.rodata两段放至Flash中，需要CPU端开启XIP支持，可咨询相关开发人员。放至Flash中的代码和数据读取较慢，会比较明显的影响执行效率，因此关键函数和数据建议优先放至TCM和SRAM中。
+
+### 开发包
+
+XIP模式下需要使用call0方式跳转，目前使用的开发包为`HiFi3Prod200605_Call0_win32.tgz`，请咨询相关开发人员获取，编译时请注意开启Target->Optmization->Enable long calls选项。
+
+### Map修改
+
+在memmap.xmm文件添加如下配置，重新生成链接脚本及指定代码到该段的方法请参考 [Map配置信息修改](# Map 配置信息修改)一章：
+
+```
+BEGIN srom
+0x60000000: sysrom : srom : 0x800000 : executable ;
+ srom0 : C : 0x607C0000 - 0x607fffff : .srom.info.rodata .srom.rodata .srom.literal .srom.text .rom.store;
+END srom
+```
+
+注意：该段仅可以放置只读段，如`.literal .text .rodata`。
+
+### 固件打包
+
+编译固件后，打包固件时需要使用FwConfigXIP.xml配置文件，使用方式如下：
+
+```shell
+generate_dsp_fw.bat RK2108 FwConfigXIP.xml
+```
+
+成功打包后会有LOG提醒当前是否为XIP模式，如果与预期不符请检查FwConfigXIP.xml中EXT段的地址范围与Map中地址范围是否一致。
+
+注：若工程目录下不存在FwConfigXIP.xml文件，可以参考[固件打包配置文件](# 固件打包配置文件)在FwConfig.xml文件基础上自行添加EXT段即可。
+
+### 固件烧录
+
+固件打包后将会生成rkdsp_fw.c和ext_rkdsp.bin两个文件，其中rkdsp_fw.c文件使用方法不变。ext_rkdsp.bin文件直接烧录至Flash指定位置。以[Map修改](# Map修改)中的地址为例，srom0的起始地址为0x607C0000，与SROM起始地址0x60000000偏移为0x7C0000，Flash的块大小为0x200，因此0x7C0000 / 0x200 = 0x3E00。烧录固件时则将ext_rkdsp.bin烧录至0x3E00位置。
 
 ## 通信协议
 
