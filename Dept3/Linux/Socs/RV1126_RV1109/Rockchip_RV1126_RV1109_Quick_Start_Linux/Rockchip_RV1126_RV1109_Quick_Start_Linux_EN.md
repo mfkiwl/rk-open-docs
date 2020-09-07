@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.6.0
+Release Version: V1.6.1
 
-Release Date: 2020-08-22
+Release Date: 2020-09-07
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -72,6 +72,7 @@ This document (this guide) is mainly intended for:
 | V1.4.1 | CWW | 2020-07-17 | 1. Update chapter of SDK Building Introduction<br>2. Update Tool's Description |
 | V1.5.0 | CWW | 2020-08-07 | 1. Update SDK board configure and compile instruction<br>2. Add install cmake for development environment |
 | V1.6.0 | LJH | 2020-08-22 | 1. Add facial gate product section<br>2. Update SDK compile instruction |
+| V1.6.1 | CWW | 2020-09-07 | 1. Add new board RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
 
 ---
 
@@ -262,6 +263,7 @@ repo sync has finished successfully.
 | Board Configuration           | Product Use                                 | Storage Medium | EVB Board name                                      |
 | ----------------------------- | --------------------------                  | --------       | --------------------------------------------------- |
 | BoardConfig-38x38-spi-nand.mk | General IPC                                 | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
+| BoardConfig-38x38-spi-nand.mk | General IPC                                 | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-robot.mk          | Robot Sweeper IPC                           | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-tb-v12.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-tb-v13.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |

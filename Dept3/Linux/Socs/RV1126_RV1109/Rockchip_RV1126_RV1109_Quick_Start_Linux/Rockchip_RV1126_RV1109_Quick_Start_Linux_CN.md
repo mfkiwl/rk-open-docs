@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.6.0
+发布版本：V1.6.1
 
-日期：2020-08-22
+日期：2020-09-07
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -77,6 +77,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.4.1 | CWW | 2020-07-17 | 1. 更新SDK编译说明章节 |
 | V1.5.0 | CWW | 2020-08-07 | 1. 更新SDK板级配置和编译说明章节<br>2. 开发环境增加安装cmake |
 | V1.6.0 | LJH | 2020-08-22 | 1. 增加闸机和门禁类产品章节<br>2. 更新SDK编译说明 |
+| V1.6.1 | CWW | 2020-09-07 | 1. 增加新开发板RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
 
 ---
 
@@ -267,6 +268,7 @@ repo sync has finished successfully.
 | 板级配置                      | 适用产品说明                 | 存储介质 | EVB板                                               |
 | ----------------------------- | --------------------------   | -------- | --------------------------------------------------- |
 | BoardConfig-38x38-spi-nand.mk | 通用IPC                      | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
+| BoardConfig-38x38-spi-nand.mk | 通用IPC                      | SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-robot.mk          | 扫地机类IPC                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-tb-v12.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-tb-v13.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
