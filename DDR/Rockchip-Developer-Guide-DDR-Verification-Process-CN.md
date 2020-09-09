@@ -2,46 +2,46 @@
 
 文件标识：RK-CS-YF-082
 
-发布版本：1.3.1
+发布版本：V1.4.0
 
-日       期：2019.11
+日期：2020-09-06
 
-文件密级：公开资料
-
-------
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
-本文档仅作为使用指导的参考。由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
 **商标声明**
 
- “Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
 
-**版权所有 © 2019 福州瑞芯微电子股份有限公司**
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
- 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+**版权所有 © 2020 瑞芯微电子股份有限公司**
 
-福州瑞芯微电子股份有限公司
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-Fuzhou Rockchip Electronics Co., Ltd.
+瑞芯微电子股份有限公司
 
-地址：         福建省福州市铜盘路软件园A区18号
+Rockchip Electronics Co., Ltd.
 
-网址：         www.rock-chips.com
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
 
 客户服务电话： +86-4007-700-590
 
 客户服务传真： +86-591-83951833
 
-客户服务邮箱： fae@rock-chips.com
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
-------
+---
 
 **前言**
-​	对各个芯片平台 DDR 颗粒兼容性和稳定性的验证流程进行说明。文档分为 Linux 3.10，Linux 4.4，RV1108，RK3308 四个章节，请根据实际测试平台情况选择对应章节进行参考。
+​对各个芯片平台 DDR 颗粒兼容性和稳定性的验证流程进行说明。文档分为 Linux 3.10，Linux 4.xx(Linux 4.4 和 Linux 4.19)，RV1108，RK3308 四个章节，请根据实际测试平台情况选择对应章节进行参考。
 
 **概述**
 
@@ -63,28 +63,29 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本** | **日期** | **作者** | **修改说明**               |
-| ---------- | -------- | -------- | -------------------------- |
-| V1.0.0 | 2017.11.21 | 陈有敏   | 初版                       |
-| V1.1.0 | 2018.03.22 | 陈有敏   | 公开资料                   |
-| V1.2.0 | 2018.10.11 | 何智欢   | 增加 RK3308 颗粒验证流程说明 |
-| V1.3.0 | 2019.06.03 | 陈有敏   | 修复关于 RebootTest 和 SleepTest 的描述错误 |
-| V1.3.1 | 2019.11.27 | 何智欢 | 修改文档格式，同步中英文文档 |
+| **版本号** | **作者** | **修改日期** | **修改说明** |
+| ---------- | --------| :--------- | ------------ |
+| V1.0.0 | 陈有敏 | 2017.11.21 | 初版 |
+| V1.1.0 | 陈有敏 | 2018.03.22 | 公开资料 |
+| V1.2.0 | 何智欢 | 2018.10.11 | 增加 RK3308 颗粒验证流程说明 |
+| V1.3.0 | 陈有敏 | 2019.06.03 | 修复关于 RebootTest 和 SleepTest 的描述错误 |
+| V1.3.1 | 何智欢 | 2019.11.27 | 修改文档格式，同步中英文文档 |
+| V1.4.0 | 陈有敏 | 2020.09.06 | 修改stressapptest和memtester描述 |
+
+---
 
 **目录**
 
-------
-
 [TOC]
 
-------
+---
 
 **NOTE**
 
 1. RV1108 平台 DDR 颗粒验证流程与其它平台不同，RV1108 请详见本文档的"RV1108 DDR 颗粒验证流程说明"章节；RK3308 请详见本文档的"RK3308 DDR 颗粒验证流程说明"章节。其他平台，请根据 Linux Kernel 版本选择对应章节进行参考。
 2. 本文中所述颗粒验证过程需要的 DDR 测试资源文件随该文档提供。
 
-------
+---
 
 ## Linux 3.10 DDR 颗粒验证流程说明
 
@@ -107,11 +108,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 测试开始前，需要先明确测试过程需要的如下信息：
 
-1. 测试固件 android 版本信息（eg: android4.4，android5.0，android6.0，android7.1 ...）
-2. 测试固件操作系统位数（eg: 32bit or 64bit）
-3. 测试机器 DDR 总容量（eg: 512MB or 1GB or 2GB ...）
-4. 定频测试，DDR 要跑的最高频率（eg: 456MHz or 533MHz ...）
-5. 变频测试，DDR 要跑的频率范围（eg: 200MHz - 456MHz or 200MHz-533MHz ...）
+1. 测试固件操作系统位数（eg: 32bit or 64bit）
+2. 测试机器 DDR 总容量（eg: 512MB or 1GB or 2GB ...）
+3. 定频测试，DDR 要跑的最高频率（eg: 456MHz or 533MHz ...）
+4. 变频测试，DDR 要跑的频率范围（eg: 200MHz - 456MHz or 200MHz-533MHz ...）
 
 #### 自动搭建测试环境
 
@@ -121,52 +121,51 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ​	如果自动搭建测试环境失败，可以通过手动搭建来完成。请选择"linux3.10_ddr_test_files"目录里的测试文件进行安装。
 
-1. 安装捕鱼达人
+1. 安装捕鱼达人APK
+
+   Note:捕鱼达人为第三方APK，请自行获取，也可选择其他能在测试期间自动运行的APK或者循环播放视频。
 
 ```
 <adb_tool> adb.exe install fishingjoy1.apk
 ```
 
 2. push google stressapptest
-  请根据测试机器的固件 android 版本是不是 android4.4，选择对应版本的 stressapptest 进行 push。
+
+请根据测试机器的固件为 linux 64bit 或 linux 32bit，在 “static_stressapptest” 目录下选择对应的 stressapptest 进行 push。
+
+  Eg:
+
+* 如测试机器的固件为 linux 32bit，则选择对应的 stressapptest_32bit
 
 ```
-<adb_tool> adb.exe root
-<adb_tool> adb.exe remount
-<adb_tool> adb.exe push libstlport.so /system/lib/libstlport.so
-<adb_tool> adb.exe shell chmod 644 /system/lib/libstlport.so
-```
-
-* 如测试机器的固件 android 版本是 android4.4，则选择对应的 stressapptest_android4.4 进行 push
-
-```
-<adb_tool> adb.exe push stressapptest_android4.4 /data/stressapptest
+<adb_tool> adb.exe push stressapptest_32bit /data/stressapptest
 <adb_tool> adb.exe shell chmod 0777 /data/stressapptest
 ```
 
-* 如测试机器的固件 android 版本不是 android4.4，则选择对应的 stressapptest 进行 push
+* 如测试机器的固件为 linux 64bit，则选择对应的 stressapptest_64bit
 
 ```
-<adb_tool> adb.exe push stressapptest /data/stressapptest
+<adb_tool> adb.exe push stressapptest_64bit /data/stressapptest
 <adb_tool> adb.exe shell chmod 0777 /data/stressapptest
 ```
 
 3. push memtester
-  请根据测试机器的固件为 linux 64bit 还是 linux 32bit，选择对应的 memtester 进行 push。
+
+  请根据测试机器的固件为 linux 64bit 或 linux 32bit，在 “static_memtester” 目录下选择对应的 memtester 进行 push。
   Eg：
 
 * 如测试机器的固件为 linux  32bit，则选择对应的 memtester_32bit
 
 ```
 <adb_tool> adb.exe push memtester_32bit /data/memtester
-<adb_tool> adb.exe shell chmod 644 /data/memtester
+<adb_tool> adb.exe shell chmod 0777 /data/memtester
 ```
 
 * 如测试机器的固件为 linux 64bit，则选择对应的 memtester_64bit
 
 ```
 <adb_tool> adb.exe push memtester_64bit /data/memtester
-<adb_tool> adb.exe shell chmod 644 /data/memtester
+<adb_tool> adb.exe shell chmod 0777 /data/memtester
 ```
 
 4. sync
@@ -178,6 +177,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 ### Linux 3.10 确认容量是否正确
 
 通过`<rkxxxx:/ $>  cat /proc/meminfo`查看 MemTotal 容量是否与测试机器实际容量相符。
+
 log eg：
 
 ```
@@ -223,61 +223,45 @@ MemTotal:        2038904 kB
 
 4. google stressapptest 拷机，拷机时间 12 小时以上
 
-* 如果总容量是 512MB 则申请 64MB 进行 stressapptest
+* 执行 stressapptest 程序
 
-```
-<rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 64
-```
+  stressapptest 关键参数说明：
 
-* 如果总容量是 1GB 则申请 128MB 进行 stressapptest
+  -M mbytes，指定申请测试的内存空间大小，单位为MB。一般申请总容量的八分之一进行测试，如果总容量是 1GB 则申请 128MB 进行 测试，如果总容量是 2GB 则申请 256MB 进行测试。
+
+  -s seconds，指定测试运行时间，单位是秒。运行时间12小时则参数为43200。
+
+  Eg：
+
+  内存总容量 1GB 则申请 128MB 进行 stressapptest，运行时间12小时(43200秒)，执行命令如下：
 
 ```
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 128
 ```
 
-* 如果总容量是 2GB 则申请 256MB 进行 stressapptest
+* 确认拷机结果
 
-```
-<rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 256
-```
-
-* 如果总容量是 4GB 则申请 512MB 进行 stressapptest
-
-```
-<rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 512
-```
-
-5. 确认拷机结果
-  ​	拷机结束，确认机器是否正常，捕鱼达人是否正常运行，stressapptest 结果是 PASS 还是 FAIL。stressapptest 每隔 10 秒会打印一条 log，log 显示测试剩余时间。测试完成后会打印测试结果，如果测试通过打印 Status: PASS，测试失败打印 Status: FAIL。
+  	拷机结束，确认机器是否正常，捕鱼达人是否正常运行，stressapptest 结果是 PASS 还是 FAIL。stressapptest 每隔 10 秒会打印一条 log，log 显示测试剩余时间。测试完成后会打印测试结果，如果测试通过打印  Status: PASS - please verify no corrected errors，如果测试失败打印 Status: FAIL - test discovered HW problems。
 
 6. memtester 拷机，拷机时间 memtester 12 小时以上
 
-* 如果总容量是 512MB 则申请 64MB 进行 memtester
+* 执行 memtester 程序
 
-```
-<rkxxxx:/ #> /data/memtester 64m
-```
+   memtester 关键参数说明：
 
-* 如果总容量是 1GB 则申请 128MB 进行 memtester
+   \<mem>m，指定申请测试的内存空间大小，单位为MB。一般申请总容量的八分之一进行测试，如果总容量是 1GB 则申请 128MB 进行 测试，如果总容量是 2GB 则申请 256MB 进行测试。
+
+   Eg:
+
+   内存总容量 1GB 则申请 128MB 进行 memtester，执行命令如下：
 
 ```
 <rkxxxx:/ #> /data/memtester 128m
 ```
 
-* 如果总容量是 2GB 则申请 256MB 进行 memtester
+* 确认拷机结果
 
-```
-<rkxxxx:/ #> /data/memtester 256m
-```
-
-* 如果总容量是 4GB 则申请 512MB 进行 memtester
-
-```
-<rkxxxx:/ #> /data/memtester 512m
-```
-
-7. 确认拷机结果
-  ​	拷机结束，确认机器是否正常，捕鱼达人是否正常运行，memtester 是否在正常运行。DDR 测试资源文件目录里的 memtester 程序进行过修改，测试过程如果有发现错误会自动停止测试，如果持续测试 12 小时以上后，memtester 仍在继续运行，说明测试过程没有发现错误。
+拷机结束，确认机器是否正常，捕鱼达人是否正常运行，memtester 是否在正常运行。DDR 测试资源文件目录里的 memtester 程序进行过修改，测试过程如果有发现错误会自动停止测试，如果持续测试 12 小时以上后，memtester 仍在继续运行，说明测试过程没有发现错误。
 
 * memtester 运行过程如果没有发现错误，会持续打印如下 log：
 
@@ -322,38 +306,29 @@ MemTotal:        2038904 kB
 
 3. 后台执行 memtester
 
-* 如果总容量是 512MB 则申请 64MB 进行 memtester
+   memtester 关键参数说明：
 
-```
-<rkxxxx:/ #> /data/memtester 64m > /data/_log.txt &
-```
+   \<mem>m，指定申请测试的内存空间大小，单位为MB。一般申请总容量的八分之一进行测试，如果总容量是 1GB 则申请 128MB 进行 测试，如果总容量是 2GB 则申请 256MB 进行测试。
 
-* 如果总容量是 1GB 则申请 128MB 进行 memtester
+   Eg:
+
+   如果总容量是 1GB 则申请 128MB 进行 memtester，执行命令如下：
 
 ```
 <rkxxxx:/ #> /data/memtester 128m > /data/memtester_log.txt &
 ```
 
-* 如果总容量是 2GB 则申请 256MB 进行 memtester
-
-```
-<rkxxxx:/ #> /data/memtester 256m > /data/memtester_log.txt &
-```
-
-* 如果总容量是 4GB 则申请 512MB 进行 memtester
-
-```
-<rkxxxx:/ #> /data/memtester 512m > /data/memtester_log.txt &
-```
-
 4. 执行变频命令
+
   根据测试机器支持的 DDR 频率范围进行设置。
   Eg：
-  如果测试机器支持的 DDR 频率范围为 200MHZ 到 533MHz。
+  如果测试机器支持的 DDR 频率范围为 200MHz 到 533MHz。
 
 ```
 <rkxxxx:/ #> echo 'a:200M-533M-1000000T' > proc/driver/ddr_ts
 ```
+
+  Note: 变频测试测试过程，由于是强制变频，机器可能会出现由于带宽不足等原因所致的屏幕闪烁等现象，属正常现象。
 
 5. 确认拷机结果，拷机时间 12 小时以上
 * 确认捕鱼达人是否正常运行，机器是否正常
@@ -371,11 +346,11 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 
 ​	开启计算器 Calculator,输入 "83991906=",点击"RebootTest"，拷机时间 12 小时以上。
 
-------
+---
 
-## Linux 4.4 DDR 颗粒验证流程说明
+## Linux 4.xx DDR 颗粒验证流程说明
 
-### Linux 4.4 测试固件编译
+### Linux 4.xx 测试固件编译
 
 ​	使能 DDR 变频功能，打开测试机器对应的板级 DTS 文件，找到 dfi 和 dmc 节点，配置 status = "okay"。
 
@@ -392,7 +367,7 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 
 ​	关于测试固件编译这里只做简单说明，详细介绍请参考《Rockchip-Developer-Guide-DDR-CN》的"如何 enable/disable kernel 中的 DDR 变频功能"章节。
 
-### Linux 4.4 测试环境搭建
+### Linux 4.xx 测试环境搭建
 
 #### 烧写固件
 
@@ -404,15 +379,17 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 
 #### 自动搭建测试的环境
 
-1. 进入 DDR 测试资源文件的"linux4.4_ddr_test_files"目录，双击 push_files.bat 脚本文件，根据脚本提示和固件类型信息进行选择输入 1 或者 2，自动完成测试环境搭建。
+1. 进入 DDR 测试资源文件的"linux4.xx_ddr_test_files"目录，双击 push_files.bat 脚本文件，根据脚本提示和固件类型信息进行选择输入 1 或者 2，自动完成测试环境搭建。
   Note:运行脚本后，需要通过打印的 log 检查是否每项都有被正常执行，确认是否有报错信息。
 2. 自动搭建无异常，可以跳过下面的"手动搭建测试环境"这一章节。
 
 #### 手动搭建测试的环境
 
-如果自动搭建测试环境失败，可以通过手动搭建来完成。请选择"linux4.4_ddr_test_files"目录里的测试文件进行安装。
+如果自动搭建测试环境失败，可以通过手动搭建来完成。请选择"linux4.xx_ddr_test_files"目录里的测试文件进行安装。
 
-1. 安装捕鱼达人
+1. 安装捕鱼达人APK
+
+   Note:捕鱼达人为第三方APK，请自行获取，也可选择其他能在测试期间自动运行的APK或者循环播放视频。
 
 ```
 <adb_tool> adb.exe install fishingjoy1.apk
@@ -420,36 +397,42 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 
 2. push google stressapptest
 
+请根据测试机器的固件为 linux 64bit 或 linux 32bit，在 “static_stressapptest” 目录下选择对应的 stressapptest 进行 push。
+
+  Eg:
+
+* 如测试机器的固件为 linux  32bit，则选择对应的 stressapptest_32bit
+
 ```
-<adb_tool> adb.exe root
-<adb_tool> adb.exe disable-verity
-<adb_tool> adb.exe reboot
-/* 等机器完成重启，adb出来后，再输入 */
-<adb_tool> adb.exe root
-<adb_tool> adb.exe push stressapptest /data/stressapptest
+<adb_tool> adb.exe push stressapptest_32bit /data/stressapptest
 <adb_tool> adb.exe shell chmod 0777 /data/stressapptest
-<adb_tool> adb.exe remount
-<adb_tool> adb.exe push libstlport.so /system/lib/libstlport.so
-<adb_tool> adb.exe shell chmod 644 /system/lib/libstlport.so
-<adb_tool> adb.exe shell sync
+```
+
+* 如测试机器的固件为 linux  64bit，则选择对应的 stressapptest_64bit
+
+```
+<adb_tool> adb.exe push stressapptest_64bit /data/stressapptest
+<adb_tool> adb.exe shell chmod 0777 /data/stressapptest
 ```
 
 3. push memtester
-  请根据测试机器固件为 linux 64bit 还是 linux 32bit，选择对应的 memtester 进行 push。
+
+  请根据测试机器的固件为 linux 64bit 或 linux 32bit，在 “static_memtester” 目录下选择对应的 memtester 进行 push。
+
   Eg：
 
-* 如测试固件为 linux  32bit，则选择对应的 memtester_32bit
+* 如测试机器的固件为 linux  32bit，则选择对应的 memtester_32bit
 
 ```
 <adb_tool> adb.exe push memtester_32bit /data/memtester
-<adb_tool> adb.exe shell chmod 644 /data/memtester
+<adb_tool> adb.exe shell chmod 0777 /data/memtester
 ```
 
-* 如测试固件为 linux 64bit，则选择对应的 memtester_64bit
+* 如测试机器的固件为 linux 64bit，则选择对应的 memtester_64bit
 
 ```
 <adb_tool> adb.exe push memtester_64bit /data/memtester
-<adb_tool> adb.exe shell chmod 644 /data/memtester
+<adb_tool> adb.exe shell chmod 0777 /data/memtester
 ```
 
 4. push ddr_freq_scan.sh 脚本
@@ -459,13 +442,19 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 <adb_tool> adb.exe shell chmod 0777 /data/ddr_freq_scan.sh
 ```
 
+5. sync
+
+```
+<adb_tool> adb.exe shell sync
+```
+
 #### 通过 U 盘和串口搭建测试环境
 
 ​	如果测试机器的 ADB 无法连接，可以通过 U 盘将测试过程需要用到文件拷贝到测试板，然后通过串口搭建测试环境。
 
 1. 准备工作
 * 开机后，添加 wake_lock 防止机器进入二级待机`echo 1 > /sys/power/wake_lock`，或者通过设置 Setting->Dsiplay->Sleep->Never sleep 让机器保持唤醒状态
-* U 盘接入电脑，将"linux4.4_ddr_test_files"目录拷贝到 U 盘
+* U 盘接入电脑，将"linux4.xx_ddr_test_files" ， “static_memtester” 和 “static_stressapptest” 目录拷贝到 U 盘
 
 * 测试板串口控制台上输入 su 命令
 
@@ -473,31 +462,54 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 <rk3399:/ $> su
 ```
 
-* U 盘接入测试板，将"linux4.4_ddr_test_files"目录下的测试所需文件拷贝到机器/data 目录。U 盘正常是加载在/mnt/media_rw/\*\*\*目录下（\*\*\*：每块 U 盘的挂载节点名有不同，请用 tab 键补全）。
+* U 盘接入测试板，将 "linux4.xx_ddr_test_files" ， “static_memtester” 和 “static_stressapptest” 目录拷贝到机器 /data 目录。U 盘正常是加载在/mnt/media_rw/\*\*\*目录下（\*\*\*：每块 U 盘的挂载节点名有不同，请用 tab 键补全）。
+
   Eg:
 
+  如果U盘的挂载节点为/mnt/media_rw/B4FE-5315，执行命令如下：
+
 ```
-<rk3399:/ #> cp /mnt/media_rw/B4FE-5315/linux4.4_ddr_test_files/*   /data/
+<rk3399:/ #> cp -rf /mnt/media_rw/B4FE-5315/linux4.xx_ddr_test_files   /data/
+<rk3399:/ #> cp -rf /mnt/media_rw/B4FE-5315/static_memtester   /data/
+<rk3399:/ #> cp -rf /mnt/media_rw/B4FE-5315/static_stressapptest   /data/
 ```
 
 2. 自动搭建测试环境
 
+* 如测试机器的固件为 linux 32bit，则选择对应的 test_files_install_32bit.sh 脚本
+
 ```
-<rk3399:/ #> chmod 777 /data/test_files_install.sh
-<rk3399:/ #> /data/test_files_install.sh
+<rk3399:/ #> chmod 0777 /data/linux4.xx_ddr_test_files/test_files_install_32bit.sh
+<rk3399:/ #> /data/linux4.xx_ddr_test_files/test_files_install_32bit.sh
+```
+
+* 如测试机器的固件为 linux 64bit，则选择对应的 test_files_install_64bit.sh 脚本
+
+```
+<rk3399:/ #> chmod 0777 /data/linux4.xx_ddr_test_files/test_files_install_64bit.sh
+<rk3399:/ #> /data/linux4.xx_ddr_test_files/test_files_install_64bit.sh
 ```
 
 ​	需要通过打印的 log 检查是否每项都有被正常执行。自动搭建无异常，可以跳过下面的"手动搭建测试环境"这一部分。
 
 3. 手动搭建测试环境
+
   如果自动搭建测试环境失败，可以通过手动搭建来完成。
 
-* 将 libstlport.so 拷贝到/system 目录
+* 如测试机器的固件为 linux 32bit，则拷贝对应的测试所需文件
 
 ```
-<rk3399:/ #> mount -o rw,remount /system
-<rk3399:/ #> cp /data/libstlport.so /system/lib/
-<rk3399:/ #> chmod 644 /system/lib/libstlport.so
+<rk3399:/ #> cp /data/static_stressapptest/stressapptest_32bit /data/stressapptest
+<rk3399:/ #> cp /data/static_memtester/memtester_32bit /data/memtester
+<rk3399:/ #> cp /data/linux4.xx_ddr_test_files/ddr_freq_scan.sh /data/ddr_freq_scan.sh
+```
+
+* 如测试机器的固件为 linux 64bit，则拷贝对应的测试所需文件
+
+```
+<rk3399:/ #> cp /data/static_stressapptest/stressapptest_64bit /data/stressapptest
+<rk3399:/ #> cp /data/static_memtester/memtester_64bit /data/memtester
+<rk3399:/ #> cp /data/linux4.xx_ddr_test_files/ddr_freq_scan.sh /data/ddr_freq_scan.sh
 ```
 
 * 更改文件权限
@@ -507,6 +519,8 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 ```
 
 * 安装捕鱼达人 APK
+
+  Note:捕鱼达人为第三方APK，请自行获取，也可选择其他能在测试期间自动运行的APK或者循环播放视频。
 
 ```
 <rk3399:/ #> pm install /data/fishingjoy1.apk
@@ -518,7 +532,7 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 <rk3399:/ #> sync
 ```
 
-### Linux 4.4 确认颗粒容量
+### Linux 4.xx 确认颗粒容量
 
 通过`<rkxxxx:/ #>  cat /proc/meminfo`查看 MemTotal 项所示容量是否与测试机器 DDR 总容量一致。
 log eg：
@@ -542,7 +556,7 @@ MemTotal:        2038904 kB
 
 由于系统内存分配管理差异的原因，得到的容量有些偏差，属于正常。
 
-### Linux 4.4 定频拷机
+### Linux 4.xx 定频拷机
 
 1. 开启捕鱼达人 APK
 
@@ -585,61 +599,45 @@ change frequency to available max frequency done.
 
 5. google stressapptest 拷机，拷机时间 12 小时以上
 
-* 如果总容量是 512MB 则申请 64MB 进行 stressapptest
+* 执行 stressapptest 程序
 
-```
-<rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 64
-```
+  stressapptest 关键参数说明：
 
-* 如果总容量是 1GB 则申请 128MB 进行 stressapptest
+  -M mbytes，指定申请测试的内存空间大小，单位为MB。一般申请总容量的八分之一进行测试，如果总容量是 1GB 则申请 128MB 进行 测试，如果总容量是 2GB 则申请 256MB 进行测试。
+
+  -s seconds，指定测试运行时间，单位是秒。运行时间12小时则参数为43200。
+
+  Eg：
+
+  内存总容量 1GB 则申请 128MB 进行 stressapptest，运行时间12小时(43200秒)，执行命令如下：
 
 ```
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 128
 ```
 
-* 如果总容量是 2GB 则申请 256MB 进行 stressapptest
+* 确认拷机结果
 
-```
-<rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 256
-```
+  拷机结束，确认机器是否正常，捕鱼达人是否正常运行，stressapptest 结果是 PASS 还是 FAIL。stressapptest 每隔 10 秒会打印一条 log，log 显示测试剩余时间。测试完成后会打印测试结果，如果测试通过打印  Status: PASS - please verify no corrected errors，如果测试失败打印 Status: FAIL - test discovered HW problems。
 
-* 如果总容量是 4GB 则申请 512MB 进行 stressapptest
+6. memtester 拷机，拷机时间 12 小时以上
 
-```
-<rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 512
-```
+* 执行 memtester 程序
 
-6. 确认拷机结果
-  ​	拷机结束，确认机器是否正常，捕鱼达人是否正常运行，stressapptest 结果是 PASS 还是 FAIL。stressapptest 每隔 10 秒会打印一条 log，log 显示测试剩余时间。测试完成后会打印测试结果，如果测试通过打印 Status: PASS，测试失败打印 Status: FAIL。
+   memtester 关键参数说明：
 
-7. memtester 拷机，拷机时间 12 小时以上
+   \<mem>m，指定申请测试的内存空间大小，单位为MB。一般申请总容量的八分之一进行测试，如果总容量是 1GB 则申请 128MB 进行 测试，如果总容量是 2GB 则申请 256MB 进行测试。
 
-* 如果总容量是 512MB 则申请 64MB 进行 memtester
+   Eg:
 
-```
-<rkxxxx:/ #> /data/memtester 64m
-```
-
-* 如果总容量是 1GB 则申请 128MB 进行 memtester
+   内存总容量 1GB 则申请 128MB 进行 memtester，执行命令如下：
 
 ```
 <rkxxxx:/ #> /data/memtester 128m
 ```
 
-* 如果总容量是 2GB 则申请 256MB 进行 memtester
+* 确认拷机结果
 
-```
-<rkxxxx:/ #> /data/memtester 256m
-```
-
-* 如果总容量是 4GB 则申请 512MB 进行 memtester
-
-```
-<rkxxxx:/ #> /data/memtester 512m
-```
-
-8. 确认拷机结果
-  ​	拷机结束，确认机器是否正常，捕鱼达人是否正常运行，memtester 是否正常运行。"DDR 测试资源文件"目录里的 memtester 程序进行过修改，测试过程如果有发现错误会自动停止测试，如果持续测试 12 小时后，memtester 仍在继续运行，说明测试过程没有发现错误。
+拷机结束，确认机器是否正常，捕鱼达人是否正常运行，memtester 是否在正常运行。DDR 测试资源文件目录里的 memtester 程序进行过修改，测试过程如果有发现错误会自动停止测试，如果持续测试 12 小时以上后，memtester 仍在继续运行，说明测试过程没有发现错误。
 
 * memtester 运行过程如果没有发现错误，会持续打印如下 log：
 
@@ -661,7 +659,6 @@ change frequency to available max frequency done.
     Bit Flip            : ok
     Walking Ones        : ok
     Walking Zeroes      : ok
-
   ```
 
 * memtester 运行过程如果有发现错误，会自动停止测试并退出，退出时打印如下 log：
@@ -671,7 +668,7 @@ change frequency to available max frequency done.
   EXIT_FAIL_OTHERTEST
   ```
 
-### Linux 4.4 变频拷机
+### Linux 4.xx 变频拷机
 
 1. 开启捕鱼达人 APK
 
@@ -683,35 +680,25 @@ change frequency to available max frequency done.
 
 3. 后台执行 memtester
 
-* 如果总容量是 512MB 则申请 64MB 进行 memtester
+   memtester 关键参数说明：
 
-```
-<rkxxxx:/ #> /data/memtester 64m > /data/memtester_log.txt &
-```
+   \<mem>m，指定申请测试的内存空间大小，单位为MB。一般申请总容量的八分之一进行测试，如果总容量是 1GB 则申请 128MB 进行 测试，如果总容量是 2GB 则申请 256MB 进行测试。
 
-* 如果总容量是 1GB 则申请 128MB 进行 memtester
+   Eg:
+
+   如果总容量是 1GB 则申请 128MB 进行 memtester，执行命令如下：
 
 ```
 <rkxxxx:/ #> /data/memtester 128m > /data/memtester_log.txt &
 ```
 
-* 如果总容量是 2GB 则申请 256MB 进行 memtester
-
-```
-<rkxxxx:/ #> /data/memtester 256m > /data/memtester_log.txt &
-```
-
-* 如果总容量是 4GB 则申请 512MB 进行 memtester
-
-```
-<rkxxxx:/ #> /data/memtester 512m > /data/memtester_log.txt &
-```
-
 4. 执行测试脚本
 
 ```
-<rkxxxx9:/ #> /data/ddr_freq_scan.sh
+<rkxxxx:/ #> /data/ddr_freq_scan.sh
 ```
+
+  Note: 变频测试测试过程，由于是强制变频，机器可能会出现由于带宽不足等原因所致的屏幕闪烁等现象，属正常现象。
 
 5. 确认拷机结果，拷机时间 12 小时以上
 * 确认捕鱼达人是否正常运行，机器是否正常
@@ -728,7 +715,6 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
   log eg:
 
 ```
-
 DDR freq will change to 600000000 8786
 already change to 600000000 done
 DDR freq will change to 800000000 8787
@@ -737,17 +723,17 @@ DDR freq will change to 200000000 8788
 already change to 200000000 done
 ```
 
-### Linux 4.4 reboot 拷机
+### Linux 4.xx reboot 拷机
 
 ​	==为防止做 reboot 过程机器进入休眠，影响测试，请通过设置 setting->security->set screen lock->None，让机器一开机跳过锁屏界面，直接进入主界面。同时通过设置 Setting->Dsiplay->Sleep->Never sleep 让机器保持唤醒状态。==
 
 ​	开启计算器 Calculator,输入 "83991906=",点击"RebootTest"，拷机时间 12 小时以上。
 
-### Linux 4.4 sleep 拷机
+### Linux 4.xx sleep 拷机
 
 ​	拔掉连接 ADB 的 USB 线，开启计算器 Calculator,输入 "83991906=",点击"SleepTest"，拷机时间 12 小时以上。3399 LPDDR4，这项测试是必须的；其他 DDR 类型及其他平台是 optional。
 
-------
+---
 
 ## RV1108 DDR 颗粒验证流程说明
 
@@ -893,7 +879,7 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 
 ​	可用 1108 自带 reboot 功能，menu -> debug -> reboot test。
 
-------
+---
 
 ## RK3308 DDR 颗粒验证流程说明
 
