@@ -269,9 +269,9 @@ USB MSC (Mass Storage Class) 的功能，可以将设备作为U盘使用。当�
 
 1. **USB MSC Device 配置**
 
-   执行命令`scons --menuconfig`，将USB 配置为 Mass Storage device。
+执行命令`scons --menuconfig`，将USB 配置为 Mass Storage device。
 
-   *Note*. 需要手动修改 `msc class disk name`为`root`
+*Note*. 需要手动修改 `msc class disk name`为`root`
 
 ~~~c
    RT-Thread Components  --->
@@ -286,39 +286,15 @@ USB MSC (Mass Storage Class) 的功能，可以将设备作为U盘使用。当�
                (root) msc class disk name
 ~~~
 
-2. **USB MSC 驱动修改**
+同时，需要使能 `CONFIG_RT_USING_DFS_MNTTABLE`
 
-   由于 USB MSC 和 文件系统 都是使用 `root` 分区，而系统起来之后， `root` 分区默认挂载到文件系统，所以，如果要使用 USB MSC 功能，需要更新如下的补丁，将  `root` 分区从文件系统 unmount。
+2. **USB MSC的使用**
 
-~~~c
-   diff --git a/components/drivers/usb/usbdevice/class/mstorage.c b/components/drivers/usb/usbdevice/class/mstorage.c
-   index 507e3e0..b96c90d 100644
-   --- a/components/drivers/usb/usbdevice/class/mstorage.c
-   +++ b/components/drivers/usb/usbdevice/class/mstorage.c
-   @@ -16,6 +16,7 @@
-    #include "drivers/usb_device.h"
-    #include "mstorage.h"
-    #include "dma.h"
-   +#include <dfs_fs.h>
+开机后，如果设备没有通过 USB 连接到 PC，`root` 分区默认挂载到设备端的文件系统上。此时，设备端可以对`root`分区进行读写。
 
-    #ifdef RT_USB_DEVICE_MSTORAGE
+当设备通过 USB 连接到 PC 后，USB 驱动会自动将`root`分区从设备端的文件系统上卸载掉，此时，设备端无法对`root`分区进行读写，而 PC 端可以自动识别到U盘，并可以对U盘进行读写。
 
-   @@ -958,6 +959,8 @@ static rt_err_t _function_enable(ufunction_t func)
-        RT_DEBUG_LOG(RT_DEBUG_USB, ("Mass storage function enabled\n"));
-        data = (struct mstorage*)func->user_data;
-
-   +    dfs_unmount("/");
-   +
-        data->disk = rt_device_find(RT_USB_MSTORAGE_DISK_NAME);
-        if(data->disk == RT_NULL)
-        {
-~~~
-
-3. **USB MSC的使用**
-
-   开机后，如果设备没有通过 USB 连接到 PC，`root` 分区是默认挂在设备端的文件系统上。此时，设备端可以对`root`分区进行读写。
-
-   当设备通过 USB 连接到 PC 后，USB 驱动会将`root`分区从设备端的文件系统上umount掉。此时，设备端无法对`root`分区进行读写，而PC端可以自动识别到U盘，并可以对U盘进行读写。
+当设备断开 USB 连接后，USB 驱动会自动卸载 `root`分区，并重新挂载到设备端的文件系统上。
 
 #### USB UAC 使用示例
 
