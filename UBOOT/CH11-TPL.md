@@ -55,11 +55,31 @@ RV1126配置TPL DRAM TYPE为支持DDR3。
 CONFIG_ROCKCHIP_TPL_INIT_DRAM_TYPE=3
 ```
 
-方式2）通过make menuconfig
+方式2）通过make menuconfig，需要注意的是编译时如果make.sh后面有带上芯片型号的话，make时会有一个make xxxdefconfig的动作，会覆盖menuconfig的改动。可不带参数的执行make.sh编译，来防止menuconfig的改动被覆盖。
 
 ```
 Device Drivers ---> (3) TPL select DRAM type
 ```
+
+Example:
+
+make rv1126_defconfig或者./make.sh rv1126 -> make menuconfig修改相关配置 -> ./make.sh。
+
+- 快速开机配置
+
+如果需要编译生成支持快速开机的tpl.bin，可以通过打开CONFIG_SPL_KERNEL_BOOT来编译生成。
+
+当前仅支持RV1126/RV1109平台。
+
+- 宽温的支持
+
+如果需要编译生成支持宽温的tpl.bin，可以通过打开CONFIG_ROCKCHIP_DRAM_EXTENDED_TEMP_SUPPORT来编译生成。
+
+当前仅支持RV1126/RV1109平台。
+
+- 其他参数修改
+
+ddr初始化源码位于drivers/ram/rockchip目录下，其他ddr相关参数如频率，驱动强度，ODT强度等均需要在源码中修改。对于RV1126/RV1109来说有将ddr相关参数集中到该目录下的“sdram_inc/rv1126/sdram-rv1126-loader_params.inc”中，可以直接在该文件中修改对应的参数。其他平台参数修改需要在对应sdram_xxx.c中修改。
 
 ### 编译
 
@@ -108,9 +128,15 @@ Example:
 
 ### 打包
 
-编译生成tpl后，需要跟spl或miniloader进行打包后，生成的Loader文件才能通过烧写工具进行烧写。
+1. 编译生成的u-boot-tpl.bin需要将头4个byte替换成相应平台的tag后才是一个合法的ddr bin。如RV1126/RV1109平台该tag是“110B”。如果只需要ddr bin的话需要自己手动完成该步骤tag的替换动作，该动作可参考scripts/spl.sh脚本。
 
-- 将编译得到的tpl与spl或miniloader进行打包，生成Loader。
+Example：替换RV1126 u-boot-tpl.bin的tag。
+
+```
+dd bs=4 skip=1 if=tpl/u-boot-tpl.bin of=tpl/u-boot-tpl-tag.bin && sed -i '1s/^/110B&/' tpl/u-boot-tpl-tag.bin
+```
+
+2. 如果需要生成完整的可烧写入板子的Loader文件的话，可通过下面命令自动完成u-boot-tpl.bin tag的替换动作以及和spl.bin打包成一个完整的Loader文件动作。
 
 ```
 ./make.sh tpl
