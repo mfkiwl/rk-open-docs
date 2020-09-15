@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-358
 
-Release Version: V1.2.0
+Release Version: V1.3.0
 
-Release Date: 2020-08-24
+Release Date: 2020-09-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -57,12 +57,13 @@ Software development engineers
 
 **Revision History**
 
-| **Version** | **Author** | **Date**   | **Change Description**               |
-| ----------- | ---------- | :--------- | ------------------------------------ |
-| V1.0.0      | Fenrir Lin | 2020-04-28 | Initial version                      |
-| V1.1.0      | Fenrir Lin | 2020-06-04 | Add ispserver and onvif_server       |
-| V1.1.1      | CWW        | 2020-06-29 | Update RK_OEM build and pack command |
-| V1.2.0      | Allen Chen | 2020-08-24 | Update ipcweb-ng                     |
+| **Version** | **Author** | **Date**   | **Change Description**                                       |
+| ----------- | ---------- | :--------- | ------------------------------------------------------------ |
+| V1.0.0      | Fenrir Lin | 2020-04-28 | Initial version                                              |
+| V1.1.0      | Fenrir Lin | 2020-06-04 | Add ispserver and onvif_server                               |
+| V1.1.1      | CWW        | 2020-06-29 | Update RK_OEM build and pack command                         |
+| V1.2.0      | Allen Chen | 2020-08-24 | Update ipcweb-ng                                             |
+| V1.3.0      | Fenrir Lin | 2020-09-16 | Add dbserver external interface,<br/>update onvif_server development environment |
 
 ---
 
@@ -594,6 +595,133 @@ A database service, initializes the database and provides related operation inte
 
 The interfaces are located in app/libIPCProtocol/dbserver.h, which are mainly used to select, update, delete and other operations on different tables of the database.
 
+#### Storage configuration interface
+
+| Function name                             | Functions                 |
+| ----------------------------------------- | ------------------------- |
+| dbserver_update_storage_media_folder_duty | Update media folder duty  |
+| dbserver_update_storage_config_mountpath  | Update mount path         |
+| dbserver_update_storage_config_freesize   | Update storage free size  |
+| dbserver_get_storage_disk_path            | Get disk path             |
+| dbserver_get_storage_media_folder         | Get media folder path     |
+| dbserver_get_storage_config               | Get storage configuration |
+| dbserver_get_storage_plan_snap            | Get snap plan             |
+| dbserver_set_storage_plan_snap            | Set snap plan             |
+| dbserver_storage_snap_plan_parse          | Parse snap plan           |
+| dbserver_storage_video_plan_parse         | Parse video plan          |
+| dbserver_storage_get                      | Get storage table         |
+| dbserver_storage_set                      | Set storage table         |
+
+#### Network configuration interface
+
+| Function name                        | Functions                              |
+| ------------------------------------ | -------------------------------------- |
+| dbserver_network_power_get           | Get network power status               |
+| dbserver_network_ipv4_set            | Set IPv4 Configuration                 |
+| dbserver_network_dns_set             | Set DNS Configuration                  |
+| dbserver_network_nicspeed_set        | Set network interface controller speed |
+| dbserver_network_ip_gets             | Get IP                                 |
+| dbserver_network_service_delete      | Delete Wi-Fi                           |
+| dbserver_network_service_connect_set | Connect Wi-Fi                          |
+| dbserver_network_service_get         | get Wi-Fi configuration                |
+| dbserver_network_power_set           | Set network power                      |
+| dbserver_wifi_power_set              | Set Wi-Fi power                        |
+| dbserver_ethernet_power_set          | Set ether net power                    |
+| dbserver_wifi_power_get              | Get Wi-Fi power status                 |
+| dbserver_ethernet_power_get          | Get ether net power status             |
+| dbserver_ntp_set                     | Set NTP                                |
+| dbserver_ntp_get                     | Get NTP configuration                  |
+| dbserver_zone_get                    | Get time zone configuration            |
+| dbserver_port_set                    | Set port                               |
+| dbserver_port_get                    | Get port configuration                 |
+
+#### Media configuration interface
+
+| Function name                  | Functions                                       |
+| ------------------------------ | ----------------------------------------------- |
+| dbserver_media_set             | Set media table                                 |
+| dbserver_media_set_by_token    | Set media table by token                        |
+| dbserver_media_del_by_token    | Delete media table by token                     |
+| dbserver_media_get             | Get media table                                 |
+| dbserver_media_get_by_id       | Get media table by id                           |
+| dbserver_osd_get               | Get OSD configuration                           |
+| dbserver_audio_set             | Set audio                                       |
+| dbserver_audio_get             | Get audio configuration                         |
+| dbserver_video_set             | Set video                                       |
+| dbserver_video_get             | Get video configuration                         |
+| dbserver_video_region_clip_set | Set video region clip                           |
+| dbserver_video_region_clip_get | Get video region clip configuration             |
+| dbserver_stream_url_set        | Set stream URL                                  |
+| dbserver_stream_url_get        | Get stream URL                                  |
+| dbserver_media_profile_get     | Get media profile                               |
+| dbserver_media_get_by_key_char | Get media table by the primary key of char type |
+| dbserver_video_source_cfg_get  | Get video source configuration                  |
+| dbserver_video_source_get      | Get video source                                |
+| dbserver_video_enc_cfg_get     | Get video encode configuration                  |
+
+#### System configuration interface
+
+| Function name                     | Functions                                           |
+| --------------------------------- | --------------------------------------------------- |
+| dbserver_system_set               | Set system table                                    |
+| dbserver_system_get               | Get system table                                    |
+| dbserver_system_get_by_key_char   | Set system table by the primary key of char type    |
+| dbserver_system_para_get_by_name  | Get system parameter by name                        |
+| dbserver_system_para_set_by_name  | Set system parameter by name                        |
+| dbserver_set_static_cap_option    | Set static capability options                       |
+| dbserver_set_dynamic_cap_option   | Set dynamic capability options                      |
+| dbserver_set_static_cap_range     | Set static capability range                         |
+| dbserver_set_dynamic_cap_range    | Set dynamic capability range                        |
+| dbserver_system_user_delete       | Delete user by id                                   |
+| dbserver_system_user_add          | Add user by id                                      |
+| dbserver_system_user_del_username | Delete user by user name                            |
+| dbserver_system_user_set          | Set user information                                |
+| dbserver_system_user_get          | Get user information                                |
+| dbserver_system_user_num_get      | Get the number of users                             |
+| dbserver_scopes_add               | Add Scopes                                          |
+| dbserver_system_del_by_key_char   | Delete system table by the primary key of char type |
+| dbserver_system_del_by_key_int    | Delete system table by the primary key of int type  |
+
+#### Event configuration interface
+
+| Function name                       | Functions                                                    |
+| ----------------------------------- | ------------------------------------------------------------ |
+| dbserver_event_set                  | Set event table                                              |
+| dbserver_event_set_by_char_key      | Set event table by the primary key of char type              |
+| dbserver_event_get                  | Get event table                                              |
+| dbserver_event_get_by_id            | Get event table by id                                        |
+| dbserver_event_get_by_key_int       | Get event table by the primary key of int type               |
+| dbserver_event_get_by_key_char      | Get event table by the primary key of char type              |
+| dbserver_event_delete_by_key_int    | Delete event table by the primary key of int type            |
+| dbserver_event_delete_by_key_char   | Delete event table by the primary key of char type           |
+| dbserver_face_list_add              | Add face to the face list                                    |
+| dbserver_face_load_complete         | Write facial feature value recognition result                |
+| dbserver_face_load_complete_by_path | Write facial feature value recognition result through image path |
+| dbserver_face_list_delete           | Delete face from the face list                               |
+| dbserver_snapshot_record_set        | Add snapshot record                                          |
+| dbserver_face_reset                 | Delete all people                                            |
+| dbserver_control_record_set         | Add control record                                           |
+| dbserver_event_schedules_parse      | Parse event schedules                                        |
+| dbserver_event_triggers_parse       | Parse event triggers                                         |
+
+#### Peripherals configuration interface
+
+| Function name            | Functions             |
+| ------------------------ | --------------------- |
+| dbserver_peripherals_set | Set peripherals table |
+| dbserver_peripherals_get | Get peripherals table |
+
+#### Basic database configuration interface
+
+| Function name         | Functions                          |
+| --------------------- | ---------------------------------- |
+| dbserver_select       | Select database                    |
+| dbserver_update       | Update database                    |
+| dbserver_delete       | Delete database                    |
+| dbserver_sql          | Use SQL to manipulate the database |
+| dbserver_drop_table   | Drop table                         |
+| dbserver_create_table | Create table                       |
+
 ### Debug Environment
 
 After modifying the code and rebuilding, the device needs  following operations:
@@ -753,35 +881,32 @@ onvif protocol server.
 ### Development Environment
 
 1. Download gSOAP toolkit, build and install it.
-2. Confirm the required wsdl file according to the requirements of each profile on the onvif official website. Convert wsdl file to pure C style header file onvif.h by wsdl2h tool. The typemap.dat file is located in the gsoap folder in the unzipped directory of the gSOAP toolkit.
 
-```shell
-wsdl2h -c -s -t typemap.dat -o onvif.h
-http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl
-http://www.onvif.org/onvif/ver10/device/wsdl/devicemgmt.wsdl
-http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl
-http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl
-http://www.onvif.org/onvif/ver10/media/wsdl/media.wsdl
-http://www.onvif.org/onvif/ver20/media/wsdl/media.wsdl
-http://www.onvif.org/onvif/ver10/deviceio.wsdl
-http://www.onvif.org/onvif/ver10/display.wsdl
-http://www.onvif.org/onvif/ver10/event/wsdl/event.wsdl
-http://www.onvif.org/onvif/ver20/imaging/wsdl/imaging.wsdl
-http://www.onvif.org/onvif/ver10/recording.wsdl
-http://www.onvif.org/onvif/ver10/replay.wsdl
-http://www.onvif.org/onvif/ver10/search.wsdl
-http://www.onvif.org/onvif/ver10/receiver.wsdl
-http://www.onvif.org/onvif/ver20/ptz/wsdl/ptz.wsdl
+2. Confirm the required wsdl file according to the requirements of each profile on the onvif official website. The typemap.dat file is located in the gsoap folder in the unzipped directory of the gSOAP toolkit. In order to recognize the event notification, you need to add the following content at the end of typemap.dat:
+
+```c
+_wsnt__NotificationMessageHolderType_Message = $ struct _tt__Message* tt__Message;
 ```
 
-3. Generate the .h and .c files needed for server development with the onvif.h header file by soapcpp2 tool.
+3. Convert wsdl file to pure C style header file onvif.h by wsdl2h tool.
 
 ```shell
-soapcpp2 -s -2 onvif.h -x -I ../gsoap/import/ -I ../gsoap/
+wsdl2h -P -x -c -s -t typemap.dat -o onvif.h http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl http://www.onvif.org/onvif/ver10/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver20/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver10/deviceio.wsdl http://www.onvif.org/onvif/ver10/display.wsdl http://www.onvif.org/onvif/ver20/imaging/wsdl/imaging.wsdl http://www.onvif.org/onvif/ver10/recording.wsdl http://www.onvif.org/onvif/ver10/replay.wsdl http://www.onvif.org/onvif/ver10/search.wsdl http://www.onvif.org/onvif/ver10/receiver.wsdl http://www.onvif.org/onvif/ver20/ptz/wsdl/ptz.wsdl
 ```
 
-4. Select the required parts and move to the app/onvif_server directory, taking care not to overwrite the implemented functions.
-5. Implement the functions in server_operation.c according to the detailed needs. The structures of input parameters and output parameters have been defined in soapStub.h in details, which can be filled in according to the specifications.
+4. In onvif.h, add `#import“ wsse.h”`, and modify `tev__StringAttrList` to `tt__StringAttrList`.
+
+5. In wsa5.h, modify `SOAP_ENV__Fault` to `SOAP_ENV__Fault_alex`.
+
+6. Generate the .h and .c files needed for server development with the onvif.h header file by soapcpp2 tool.
+
+```shell
+soapcpp2 -s -2 onvif.h -x -I import/ -I .
+```
+
+7. Select the required parts and move to the app/onvif_server directory, taking care not to overwrite the implemented functions.
+
+8. Implement the functions in server_operation.c according to the detailed needs. The structures of input parameters and output parameters have been defined in soapStub.h in details, which can be filled in according to the specifications.
 
 ### Debug Environment
 

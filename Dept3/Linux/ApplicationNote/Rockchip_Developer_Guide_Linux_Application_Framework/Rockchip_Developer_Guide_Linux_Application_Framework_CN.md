@@ -2,9 +2,9 @@
 
 文件标识：RK-FB-YF-358
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-08-24
+日期：2020-09-16
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -62,12 +62,13 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本号** | **作者**   | **修改日期** | **修改说明**                    |
-| ---------- | ---------- | :----------- | ------------------------------- |
-| V1.0.0     | Fenrir Lin | 2020-04-28   | 初始版本                        |
-| V1.1.0     | Fenrir Lin | 2020-06-04   | 增加ispserver和onvif_server部分 |
-| V1.1.1     | CWW        | 2020-06-29   | 更新RK_OEM编译打包命令          |
-| V1.2.0     | Allen Chen | 2020-08-24   | 更新ipcweb-ng部分               |
+| **版本号** | **作者**   | **修改日期** | **修改说明**                                   |
+| ---------- | ---------- | :----------- | ---------------------------------------------- |
+| V1.0.0     | Fenrir Lin | 2020-04-28   | 初始版本                                       |
+| V1.1.0     | Fenrir Lin | 2020-06-04   | 增加ispserver和onvif_server部分                |
+| V1.1.1     | CWW        | 2020-06-29   | 更新RK_OEM编译打包命令                         |
+| V1.2.0     | Allen Chen | 2020-08-24   | 更新ipcweb-ng部分                              |
+| V1.3.0     | Fenrir Lin | 2020-09-16   | 增加dbserver对外接口，更新onvif_server开发环境 |
 
 ---
 
@@ -601,6 +602,133 @@ $ cat /var/log/nginx/access.log
 
 接口位于app/libIPCProtocol/dbserver.h中，主要对数据库不同table进行select、update、delete等操作。
 
+#### 存储配置接口
+
+| 函数名称                                  | 函数功能               |
+| ----------------------------------------- | ---------------------- |
+| dbserver_update_storage_media_folder_duty | 更新存储媒体文件夹配额 |
+| dbserver_update_storage_config_mountpath  | 更新存储路径           |
+| dbserver_update_storage_config_freesize   | 更新存储保留区大小     |
+| dbserver_get_storage_disk_path            | 获取存储路径           |
+| dbserver_get_storage_media_folder         | 获取媒体文件夹路径     |
+| dbserver_get_storage_config               | 获取存储配置           |
+| dbserver_get_storage_plan_snap            | 获取抓图计划           |
+| dbserver_set_storage_plan_snap            | 设置抓图计划           |
+| dbserver_storage_snap_plan_parse          | 抓图计划解析           |
+| dbserver_storage_video_plan_parse         | 视频存储计划解析       |
+| dbserver_storage_get                      | 获取存储表项           |
+| dbserver_storage_set                      | 设置存储表项           |
+
+#### 网络配置接口
+
+| 函数名称                             | 函数功能           |
+| ------------------------------------ | ------------------ |
+| dbserver_network_power_get           | 获取网络开关状态   |
+| dbserver_network_ipv4_set            | 设置IPv4配置       |
+| dbserver_network_dns_set             | 设置DNS配置        |
+| dbserver_network_nicspeed_set        | 设置网卡速度       |
+| dbserver_network_ip_get              | 获取IP             |
+| dbserver_network_service_delete      | 删除已连接Wi-Fi    |
+| dbserver_network_service_connect_set | 连接Wi-Fi          |
+| dbserver_network_service_get         | 获取Wi-Fi配置      |
+| dbserver_network_power_set           | 设置网络开关       |
+| dbserver_wifi_power_set              | 设置Wi-Fi开关      |
+| dbserver_ethernet_power_set          | 设置以太网开关     |
+| dbserver_wifi_power_get              | 获取Wi-Fi开关状态  |
+| dbserver_ethernet_power_get          | 获取以太网开关状态 |
+| dbserver_ntp_set                     | 设置NTP            |
+| dbserver_ntp_get                     | 获取NTP配置        |
+| dbserver_zone_get                    | 获取时区配置       |
+| dbserver_port_set                    | 设置端口           |
+| dbserver_port_get                    | 获取端口配置       |
+
+#### 媒体配置接口
+
+| 函数名称                       | 函数功能                   |
+| ------------------------------ | -------------------------- |
+| dbserver_media_set             | 设置媒体表项               |
+| dbserver_media_set_by_token    | 通过token来设置媒体表项    |
+| dbserver_media_del_by_token    | 通过token来删除媒体表项    |
+| dbserver_media_get             | 获取媒体表项               |
+| dbserver_media_get_by_id       | 通过id来获取媒体表项       |
+| dbserver_osd_get               | 获取OSD配置                |
+| dbserver_audio_set             | 设置音频                   |
+| dbserver_audio_get             | 获取音频配置               |
+| dbserver_video_set             | 设置视频                   |
+| dbserver_video_get             | 获取视频配置               |
+| dbserver_video_region_clip_set | 设置区域裁剪               |
+| dbserver_video_region_clip_get | 获取区域裁剪配置           |
+| dbserver_stream_url_set        | 设置码流地址               |
+| dbserver_stream_url_get        | 获取码流地址配置           |
+| dbserver_media_profile_get     | 获取媒体Profile            |
+| dbserver_media_get_by_key_char | 通过char型主键获取媒体表项 |
+| dbserver_video_source_cfg_get  | 获取视频源配置信息         |
+| dbserver_video_source_get      | 获取视频源信息             |
+| dbserver_video_enc_cfg_get     | 获取视频编码配置信息       |
+
+#### 系统配置接口
+
+| 函数名称                          | 函数功能                   |
+| --------------------------------- | -------------------------- |
+| dbserver_system_set               | 设置系统表项               |
+| dbserver_system_get               | 获取系统表项               |
+| dbserver_system_get_by_key_char   | 通过char型主键获取系统表项 |
+| dbserver_system_para_get_by_name  | 通过名称获取系统参数       |
+| dbserver_system_para_set_by_name  | 通过名称设置系统参数       |
+| dbserver_set_static_cap_option    | 设置静态能力级选项         |
+| dbserver_set_dynamic_cap_option   | 设置动态能力级选项         |
+| dbserver_set_static_cap_range     | 设置静态能力级范围         |
+| dbserver_set_dynamic_cap_range    | 设置动态能力级范围         |
+| dbserver_system_user_delete       | 通过id来删除用户           |
+| dbserver_system_user_add          | 通过id来增加用户           |
+| dbserver_system_user_del_username | 通过用户名来删除用户       |
+| dbserver_system_user_set          | 设置用户信息               |
+| dbserver_system_user_get          | 获取用户信息               |
+| dbserver_system_user_num_get      | 获取用户数量               |
+| dbserver_scopes_add               | 增加Scopes                 |
+| dbserver_system_del_by_key_char   | 通过char型主键删除系统表项 |
+| dbserver_system_del_by_key_int    | 通过int型主键删除系统表项  |
+
+#### 事件配置接口
+
+| 函数名称                            | 函数功能                           |
+| ----------------------------------- | ---------------------------------- |
+| dbserver_event_set                  | 设置事件表项                       |
+| dbserver_event_set_by_char_key      | 通过char型主键设置事件表项         |
+| dbserver_event_get                  | 获取事件表项                       |
+| dbserver_event_get_by_id            | 通过id获取事件表项                 |
+| dbserver_event_get_by_key_int       | 通过int型主键获取事件表项          |
+| dbserver_event_get_by_key_char      | 通过char型主键获取事件表项         |
+| dbserver_event_delete_by_key_int    | 通过int型主键删除事件表项          |
+| dbserver_event_delete_by_key_char   | 通过char型主键删除事件表项         |
+| dbserver_face_list_add              | 增加人员到人员清单中               |
+| dbserver_face_load_complete         | 写入人脸特征值识别结果             |
+| dbserver_face_load_complete_by_path | 通过图片路径写入人脸特征值识别结果 |
+| dbserver_face_list_delete           | 从人员清单中删除人员               |
+| dbserver_snapshot_record_set        | 增加抓拍记录                       |
+| dbserver_face_reset                 | 删除所有人员                       |
+| dbserver_control_record_set         | 增加控制记录                       |
+| dbserver_event_schedules_parse      | 事件时间表解析                     |
+| dbserver_event_triggers_parse       | 事件触发配置解析                   |
+
+#### 外设配置接口
+
+| 函数名称                 | 函数功能     |
+| ------------------------ | ------------ |
+| dbserver_peripherals_set | 设置外设表项 |
+| dbserver_peripherals_get | 获取外设表项 |
+
+#### 基础数据库接口
+
+| 函数名称              | 函数功能              |
+| --------------------- | --------------------- |
+| dbserver_select       | 查询数据              |
+| dbserver_update       | 更新数据              |
+| dbserver_delete       | 删除数据              |
+| dbserver_sql          | 使用SQL语句操作数据库 |
+| dbserver_drop_table   | 丢弃表项              |
+| dbserver_create_table | 创建表项              |
+
 ### 调试环境
 
 修改完代码，重新编译后，设备端需要执行以下操作：
@@ -762,36 +890,31 @@ onvif协议服务端。
 
 1. 下载gSOAP工具包，并编译安装。
 
-2. 根据onvif官网各个profile的要求，确定所需的wsdl文件。使用wsdl2h工具，wsdl文件，转换为纯C风格的头文件onvif.h。typemap.dat文件位于gSOAP工具包解压目录的gsoap文件夹下。
+2. 根据onvif官网各个profile的要求，确定所需的wsdl文件。typemap.dat文件位于gSOAP工具包解压目录的gsoap文件夹下。为了识别到事件通知，需要在typemap.dat的末尾添加以下内容：
 
-```shell
-wsdl2h -c -s -t typemap.dat -o onvif.h
-http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl
-http://www.onvif.org/onvif/ver10/device/wsdl/devicemgmt.wsdl
-http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl
-http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl
-http://www.onvif.org/onvif/ver10/media/wsdl/media.wsdl
-http://www.onvif.org/onvif/ver20/media/wsdl/media.wsdl
-http://www.onvif.org/onvif/ver10/deviceio.wsdl
-http://www.onvif.org/onvif/ver10/display.wsdl
-http://www.onvif.org/onvif/ver10/event/wsdl/event.wsdl
-http://www.onvif.org/onvif/ver20/imaging/wsdl/imaging.wsdl
-http://www.onvif.org/onvif/ver10/recording.wsdl
-http://www.onvif.org/onvif/ver10/replay.wsdl
-http://www.onvif.org/onvif/ver10/search.wsdl
-http://www.onvif.org/onvif/ver10/receiver.wsdl
-http://www.onvif.org/onvif/ver20/ptz/wsdl/ptz.wsdl
+```c
+_wsnt__NotificationMessageHolderType_Message = $ struct _tt__Message* tt__Message;
 ```
 
-3. 使用soapcpp2工具，用onvif.h头文件生成服务端开发需要的.h和.c文件
+3. 使用wsdl2h工具，将wsdl文件转换为纯C风格的头文件onvif.h。
 
 ```shell
-soapcpp2 -s -2 onvif.h -x -I ../gsoap/import/ -I ../gsoap/
+wsdl2h -P -x -c -s -t typemap.dat -o onvif.h http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl http://www.onvif.org/onvif/ver10/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver20/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver10/deviceio.wsdl http://www.onvif.org/onvif/ver10/display.wsdl http://www.onvif.org/onvif/ver20/imaging/wsdl/imaging.wsdl http://www.onvif.org/onvif/ver10/recording.wsdl http://www.onvif.org/onvif/ver10/replay.wsdl http://www.onvif.org/onvif/ver10/search.wsdl http://www.onvif.org/onvif/ver10/receiver.wsdl http://www.onvif.org/onvif/ver20/ptz/wsdl/ptz.wsdl
 ```
 
-4. 选取其中需要的部分，移到app/onvif_server的目录下，注意不要覆盖已实现的函数。
+4. 在onvif.h中，增加`#import "wsse.h"`，并修改`tev__StringAttrList`为`tt__StringAttrList`。
 
-5. 根据具体需求，实现server_operation.c中的函数。输入参数和输出参数的结构体已经有详细定义在soapStub.h中，按规范填充实现即可。
+5. 在wsa5.h中，修改`SOAP_ENV__Fault`为`SOAP_ENV__Fault_alex`。
+
+6. 使用soapcpp2工具，用onvif.h头文件生成服务端开发需要的.h和.c文件
+
+```shell
+soapcpp2 -s -2 onvif.h -x -I import/ -I .
+```
+
+7. 选取其中需要的部分，移到app/onvif_server的目录下，注意不要覆盖已实现的函数。
+
+8. 根据具体需求，实现server_operation.c中的函数。输入参数和输出参数的结构体已经有详细定义在soapStub.h中，按规范填充实现即可。
 
 ### 调试环境
 
