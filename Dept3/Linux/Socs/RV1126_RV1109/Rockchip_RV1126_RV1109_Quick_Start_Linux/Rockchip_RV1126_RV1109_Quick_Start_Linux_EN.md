@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.6.1
+Release Version: V1.7.0
 
-Release Date: 2020-09-07
+Release Date: 2020-09-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -39,7 +39,6 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 **Overview**
 
 The document presents the basic usage of  Rockchip RV1126/RV1109 Linux SDK, aiming to help engineers get started with RV1126/RV1109 Linux SDK faster.
-After the SDK is downloaded, you can check docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt to confirm the current SDK version.
 
 **Product Version**
 
@@ -73,6 +72,7 @@ This document (this guide) is mainly intended for:
 | V1.5.0 | CWW | 2020-08-07 | 1. Update SDK board configure and compile instruction<br>2. Add install cmake for development environment |
 | V1.6.0 | LJH | 2020-08-22 | 1. Add facial gate product section<br>2. Update SDK compile instruction |
 | V1.6.1 | CWW | 2020-09-07 | 1. Add new board RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
+| V1.7.0 | CWW | 2020-09-16 | 1. Add WiFi and Upgrade documents<br>2. Update compilation<br>3. update install bison and flex<br>4. Add print SDK version<br>5. Add two methods of compiling SDK in the chapter of "SDK Building Introduction"  |
 
 ---
 
@@ -88,7 +88,7 @@ This document (this guide) is mainly intended for:
 Please install software packages with below commands to set up a building environment:
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake flex bison
 ```
 
 **Ubuntu 17.04 or later version system:**
@@ -147,6 +147,8 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 
 ### RV1109/RV1126 Develop Document
 
+#### Directory of docs index
+
 ```shell
 ├── docs
 │   ├── Linux
@@ -154,48 +156,83 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 │   │   │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
 │   │   │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
 │   │   │   └── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
-│   │   └── Multimedia (1. ISP Develop Guide 2. Multimedia Encoding and Decoding Interface Develop Guide)
-│   │       ├── camera
-│   │       │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
-│   │       │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
-│   │       │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
-│   │       │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_MPP_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_MPP_EN.pdf
-│   │       └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf
-│   └── RV1126_RV1109 (1. Quick Start Guide 2. Hardware Develop Guide 3. SDK Release Note 4. Encoding&Decoding Introduction)
-│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
+│   │   │
+│   │   ├── Multimedia
+│   │   │   ├── camera (ISP Develop Guide)
+│   │   │   │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
+│   │   │   │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
+│   │   │   │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
+│   │   │   │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
+│   │   │   ├── Rockchip_Developer_Guide_MPP_CN.pdf (multimedia encoding and decoding interface develop guide)
+│   │   │   ├── Rockchip_Developer_Guide_MPP_EN.pdf
+│   │   │   └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf (Rockchip multimedia application interface develop guide)
+│   │   │
+│   │   ├── Recovery (upgrade document)
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_CN.pdf
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_EN.pdf
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Upgrade_CN.pdf
+│   │   │   └── Rockchip_Developer_Guide_Linux_Upgrade_EN.pdf
+│   │   │
+│   │   └── Wifibt (WiFi and Bluetooth)
+│   │       ├── AP模组RF测试文档
+│   │       │   ├── BT RF Test Commands for Linux-v05.pdf
+│   │       │   └── Wi-Fi RF Test Commands for Linux-v03.pdf
+│   │       ├── REALTEK模组RF测试文档
+│   │       │   ├── 00014010-WS-170731-RTL8723D_COB_MP_FLOW_R04.pdf
+│   │       │   ├── MP tool user guide for linux20180319.pdf
+│   │       │   └── Quick_Start_Guide_V6.txt
+│   │       ├── RK平台_RTL8723DS_AIRKISS配网说明.pdf
+│   │       ├── Rockchip_Developer_Guide_DeviceIo_Bluetooth_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_EN.pdf
+│   │       ├── Rockchip_Developer_Guide_Network_Config_CN.pdf
+│   │       └── WIFI性能测试PC工具
+│   │           └── iperf-2.0.5-2-win32.zip
+│   │
+│   └── RV1126_RV1109
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (Hardware Develop Guide)
 │       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf (SDK Release Note)
 │       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf (Quick Start Guide)
 │       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
-│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
+│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf (Encoding&Decoding Introduction)
 │       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
-├── external
-│   ├── rknn-toolkit (Development kit for model transformation,
-│   │   │                  reasoning and performance evaluation)
-│   │   └── doc
-│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
-│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
-│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
-│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
-│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
-│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
-│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
-│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
-│   │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
-│   └── rknpu
-│       └── rknn (Rockchip NPU Develop Guide)
-│           └── doc
-│               ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
-│               └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
-└── tools
-    └── windows
-        └── RKISP2.x_Tuner (ISP Tool)
-            └── RKISP2.x_Tuner_User_Manual_v1.0.pdf
+│
+└── external
+    ├── rknn-toolkit (Development kit for model transformation,
+    │   │                  reasoning and performance evaluation)
+    │   └── doc
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
+    │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+    └── rknpu
+        └── rknn (Rockchip NPU Develop Guide)
+            └── doc
+                ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
+                └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
 ```
+
+#### ISP Tuner tool and document
+
+Path of document: `external/camera_engine_rkaiq/rkisp2x_tuner/doc/Rockchip_IQ_Tools_Guide_ISP2x_v1.3.pdf`
+Path of Tool: `external/camera_engine_rkaiq/rkisp2x_tuner/RKISP2.x_Tuner_v0.2.1_AIQ1.2.1.exe`
+
+#### Some of modules video training
+
+- Instructions to RKMedia of RV1109 & RV1126: `https://v.qq.com/x/page/d31495v9g4h.html`
+- Instructions to development kit of RK NPU and Q&A: `https://v.qq.com/x/page/d3149yyam9s.html`
+- Instructions to debug camera's sensor driver: `https://v.qq.com/x/page/z31500n7x9q.html`
+- IQ tool:
+    Instructions to calibration process of RK ISP2: `https://v.qq.com/x/page/i3152ng42ib.html`
+    Instructions to calibration method of RK ISP2 base modules and tool usage: `https://v.qq.com/x/page/h3152x52ys1.html`
 
 ### RV1109/RV1126 Develop Tools
 
@@ -237,6 +274,11 @@ Firmware_Merger        | SPI NOR firmware package tool (generate firmware.img fo
 
 ## SDK Building Introduction
 
+Description of two methods of compiling SDK:
+
+- One is to rely on the entire SDK environment to compile (the method introduced in this chapter)
+- The other is to compile U-Boot, Linux Kernel, Rootfs and application libraries independently from the SDK (refer to the document for specific methods: **docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf**）
+
 ### To Select Board Configure
 
 #### SDK Download Address
@@ -246,6 +288,8 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 ```
 
 #### SDK Sync and log
+
+##### SDK Sync
 
 ```shell
 .repo/repo/repo sync -c -j4
@@ -260,10 +304,33 @@ Checking out projects: 100% (71/71), done.
 repo sync has finished successfully.
 ```
 
+##### Get the version of SDK
+
+Run this command in the root directory of SDK:
+
+```shell
+realpath .repo/manifests/rv1126_rv1109_linux_release.xml
+
+# e.g.  SDK version is v1.3.1
+#       update time is 2020-09-21
+# /home/rv1109-SDK/.repo/manifests/rv1126_rv1109_linux/rv1126_rv1109_linux_v1.3.1_20200921.xml
+```
+
+##### Create the branch name default for every project
+
+```shell
+.repo/repo/repo start default --all
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+Starting default: 100% (71/71), done.
+```
+
+#### The directory of SDK board config (device/rockchip/rv1126_rv1109)
+
 | Board Configuration           | Product Use                                 | Storage Medium | EVB Board name                                      |
 | ----------------------------- | --------------------------                  | --------       | --------------------------------------------------- |
-| BoardConfig-38x38-spi-nand.mk | General IPC                                 | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
-| BoardConfig-38x38-spi-nand.mk | General IPC                                 | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
+| BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
+| BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-robot.mk          | Robot Sweeper IPC                           | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-tb-v12.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-tb-v13.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
@@ -272,7 +339,7 @@ repo sync has finished successfully.
 | BoardConfig-v12.mk            | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
 | BoardConfig-facial_gate.mk    | Door Control or Turnstile                   | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
-| ++++++++++++++++++++++++++    | ++++++++++++++++++++++                      | +++++          | ++++++++++++++++++++++++++++++++++++++++++++        |
+| ++++++++++++++++++++++++++    | +++++++++++++++++++++++++++++++++           | +++++++++++++  | ++++++++++++++++++++++++++++++++++++++++++++        |
 
 Command of select board configure:
 
@@ -375,31 +442,91 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ### U-Boot Building
 
 ```shell
-### U-Boot building command
-./build.sh uboot
-
 ### to view detailed U-Boot build command
 ./build.sh -h uboot
+
+### U-Boot building command
+./build.sh uboot
+```
+
+#### Instructions to U-Boot config
+
+```shell
+### use menuconfig to configure U-Boot, select config, save and exit.
+### rv1126_defconfig can be found in the directory of u-boot/configs
+### command format: make "RK_UBOOT_DEFCONFIG"_defconfig
+### RK_UBOOT_DEFCONFIG define in the BoardConfig*.mk file which ./build.sh select
+cd u-boot
+make rv1126_defconfig
+make menuconfig
+
+### save config to rv1126_defconfig
+make savedefconfig
+cp defconfig configs/rv1126_defconfig
 ```
 
 ### Kernel Building
 
 ```shell
-### Kernel building command
-./build.sh kernel
-
 ### to view detailed Kernel build command
 ./build.sh -h kernel
+
+### use menuconfig to configure Kernel, select config, save and exit.
+### e.g. EVB Board
+cd kernel
+make ARCH=arm rv1126_defconfig
+make ARCH=arm menuconfig
+
+### Kernel building command
+./build.sh kernel
+```
+
+#### Instructions to kernel config
+
+```shell
+### e.g. device/rockchip/rv1126_rv1109/BoardConfig.mk
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
+cd kernel
+
+### command format: make ARCH=arm "RK_KERNEL_DEFCONFIG" "RK_KERNEL_DEFCONFIG_FRAGMENT"
+### RK_KERNEL_DEFCONFIG and RK_KERNEL_DEFCONFIG_FRAGMENT is define in the BoardConfig*.mk file which ./build.sh select
+### RK_KERNEL_DEFCONFIG_FRAGMENT is optional, refer to BoardConfig*.mk
+make ARCH=arm rv1126_defconfig
+make ARCH=arm menuconfig
+
+make ARCH=arm savedefconfig
+cp defconfig arch/arm/configs/rv1126_defconfig
 ```
 
 ### Recovery Building
 
 ```shell
-### Recovery building command
-./build.sh recovery
-
 ### to view detailed Recovery build command
 ./build.sh -h recovery
+
+### Recovery building command
+./build.sh recovery
+```
+
+#### Instructions to Recovery config
+
+```shell
+### 1. Get the recovery configure of the board config.
+./build.sh -h recovery
+#   ###Current SDK Default [ recovery ] Build Command###
+#   source envsetup.sh rockchip_rv1126_rv1109_recovery
+#   device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
+
+### 2. source the defconfig of buildroot
+source envsetup.sh rockchip_rv1126_rv1109_recovery
+
+### 3. use menuconfig to configure Recovery, select config, save and exit.
+### e.g. disable recovery ui config is BR2_PACKAGE_RECOVERY_NO_UI (see buildroot/package/rockchip/recovery/Config.in)
+make menuconfig  # enter menuconfig, input “/" and goto search mode, input BR2_PACKAGE_RECOVERY_NO_UI
+
+### 4. save to recovery config file
+###    ./buildroot/configs/rockchip_rv1126_rv1109_recovery_defconfig
+make savedefconfig
 ```
 
 NOTE: Recovery is a non-essential function, some board configuration will not be set.
@@ -407,31 +534,40 @@ NOTE: Recovery is a non-essential function, some board configuration will not be
 ### Rootfs Building
 
 ```shell
-### Rootfs building command
-./build.sh rootfs
-
 ### to view detailed Rootfs build command
 ./build.sh -h rootfs
+
+### Rootfs building command
+./build.sh rootfs
 ```
 
-To compile the package of Buildroot:
-[NOTE]: <SDK>/app and <SDK>/external is also the package of Buildroot.
+#### Instructions to Rootfs config and the compilation of projects which under the directory of app and external
 
 ```shell
-### 1. Get the rootfs configure of the board config.
+### 1. In the root directory SDK, get the rootfs configure of the board config.
 ./build.sh -h rootfs
-### Current SDK Default [ rootfs ] Build Command###
-source envsetup.sh rockchip_rv1126_rv1109
-make
+#   ### Current SDK Default [ rootfs ] Build Command###
+#   source envsetup.sh rockchip_rv1126_rv1109
+#   make
 
 ### 2. source the defconfig of buildroot
 source envsetup.sh rockchip_rv1126_rv1109
 
-### 3. Get the name of the package makefile
+### 3. use menuconfig to configure Rootfs, select config, save and exit.
+### e.g. ipc-daemon's config is BR2_PACKAGE_IPC_DAEMON (see buildroot/package/rockchip/ipc-daemon/Config.in)
+make menuconfig  # enter menuconfig, input “/" and goto search mode, input BR2_PACKAGE_IPC_DAEMON
+
+### 4. save to rootfs config file
+###    ./buildroot/configs/rockchip_rv1126_rv1109_defconfig
+make savedefconfig
+
+### 5. Get the name of the package makefile
 ### eg: buildroot/package/rockchip/ipc-daemon/ipc-daemon.mk
 make ipc-daemon-dirclean
 make ipc-daemon-rebuild
 ```
+
+[NOTE]: <SDK>/app and <SDK>/external are also the package of Buildroot.
 
 ### Firmware Package
 

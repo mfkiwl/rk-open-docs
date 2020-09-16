@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.6.1
+发布版本：V1.7.0
 
-日期：2020-09-07
+日期：2020-09-16
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -45,7 +45,6 @@ Rockchip Electronics Co., Ltd.
 **概述**
 
 本文主要描述了RV1126/RV1109 Linux SDK的基本使用方法，旨在帮助开发者快速了解并使用RV1126/RV1109 SDK开发包。
-SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，确认当前SDK版本。
 
 **产品版本**
 
@@ -78,6 +77,7 @@ SDK下载后，可以查看docs/RV1126_RV1109/RV1126_RV1109_Release_Note.txt，�
 | V1.5.0 | CWW | 2020-08-07 | 1. 更新SDK板级配置和编译说明章节<br>2. 开发环境增加安装cmake |
 | V1.6.0 | LJH | 2020-08-22 | 1. 增加闸机和门禁类产品章节<br>2. 更新SDK编译说明 |
 | V1.6.1 | CWW | 2020-09-07 | 1. 增加新开发板RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
+| V1.7.0 | CWW | 2020-09-16 | 1. 增加WiFi和升级相关文档说明<br>2. 增加编译配置说明<br>3. 更新开发环境软件依赖flex和bison<br>4. 增加获取SDK版本号<br>5. “SDK编译说明”章节增加介绍两种编译SDK的方法 |
 
 ---
 
@@ -93,7 +93,7 @@ Ubuntu 16.04系统：
 编译环境搭建所依赖的软件包以及安装命令如下：
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake flex bison
 ```
 
 Ubuntu 17.04系统：
@@ -151,6 +151,8 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 
 ### RV1109/RV1126 开发相关文档
 
+#### 目录docs和external的文档索引
+
 ```shell
 ├── docs
 │   ├── Linux
@@ -158,47 +160,82 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 │   │   │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
 │   │   │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
 │   │   │   └── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
-│   │   └── Multimedia (ISP开发指南、编解码以及接口封装开发指南)
-│   │       ├── camera
-│   │       │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
-│   │       │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
-│   │       │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
-│   │       │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_MPP_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_MPP_EN.pdf
-│   │       └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf
-│   └── RV1126_RV1109 (快速开发指南、硬件开发指南、发布说明、编解码说明)
-│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
+│   │   │
+│   │   ├── Multimedia
+│   │   │   ├── camera (ISP开发指南)
+│   │   │   │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
+│   │   │   │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
+│   │   │   │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
+│   │   │   │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
+│   │   │   ├── Rockchip_Developer_Guide_MPP_CN.pdf (编解码接口开发指南)
+│   │   │   ├── Rockchip_Developer_Guide_MPP_EN.pdf
+│   │   │   └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf (多媒体接口开发指南)
+│   │   │
+│   │   ├── Recovery (升级相关文档)
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_CN.pdf
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_EN.pdf
+│   │   │   ├── Rockchip_Developer_Guide_Linux_Upgrade_CN.pdf
+│   │   │   └── Rockchip_Developer_Guide_Linux_Upgrade_EN.pdf
+│   │   │
+│   │   └── Wifibt (WiFi和蓝牙相关文档)
+│   │       ├── AP模组RF测试文档
+│   │       │   ├── BT RF Test Commands for Linux-v05.pdf
+│   │       │   └── Wi-Fi RF Test Commands for Linux-v03.pdf
+│   │       ├── REALTEK模组RF测试文档
+│   │       │   ├── 00014010-WS-170731-RTL8723D_COB_MP_FLOW_R04.pdf
+│   │       │   ├── MP tool user guide for linux20180319.pdf
+│   │       │   └── Quick_Start_Guide_V6.txt
+│   │       ├── RK平台_RTL8723DS_AIRKISS配网说明.pdf
+│   │       ├── Rockchip_Developer_Guide_DeviceIo_Bluetooth_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_CN.pdf
+│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_EN.pdf
+│   │       ├── Rockchip_Developer_Guide_Network_Config_CN.pdf
+│   │       └── WIFI性能测试PC工具
+│   │           └── iperf-2.0.5-2-win32.zip
+│   │
+│   └── RV1126_RV1109
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (硬件开发指南)
 │       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf (SDK发布说明)
 │       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf (快速开发指南)
 │       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
 │       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
 │       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
-├── external
-│   ├── rknn-toolkit (模型转换、推理和性能评估的开发套件文档)
-│   │   └── doc
-│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
-│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
-│   │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
-│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
-│   │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
-│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
-│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
-│   │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
-│   │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
-│   └── rknpu
-│       └── rknn (Rockchip NPU 开发文档)
-│           └── doc
-│               ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
-│               └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
-└── tools
-    └── windows
-        └── RKISP2.x_Tuner (ISP 调试工具)
-            └── RKISP2.x_Tuner_User_Manual_v1.0.pdf
+│
+└── external
+    ├── rknn-toolkit (模型转换、推理和性能评估的开发套件文档)
+    │   └── doc
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
+    │       ├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
+    │       ├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
+    │       └── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+    └── rknpu
+        └── rknn (Rockchip NPU 开发文档)
+            └── doc
+                ├── Rockchip_User_Guide_RKNN_API_V1.3.3_CN.pdf
+                └── Rockchip_User_Guide_RKNN_API_V1.3.3_EN.pdf
 ```
+
+#### ISP Tuner工具以及文档路径
+
+文档路径： `external/camera_engine_rkaiq/rkisp2x_tuner/doc/Rockchip_IQ_Tools_Guide_ISP2x_v1.3.pdf`
+工具路径： `external/camera_engine_rkaiq/rkisp2x_tuner/RKISP2.x_Tuner_v0.2.1_AIQ1.2.1.exe`
+
+#### 部分模块的培训视频地址
+
+- RV1109&RV1126多媒体RKMedia介绍：`https://v.qq.com/x/page/d31495v9g4h.html`
+- RK NPU开发套件介绍及Q&A：`https://v.qq.com/x/page/d3149yyam9s.html`
+- RV1109&RV1126摄像头驱动调试介绍：`https://v.qq.com/x/page/z31500n7x9q.html`
+- IQ工具：
+    RK ISP2 标定流程介绍：`https://v.qq.com/x/page/i3152ng42ib.html`
+    RK ISP2基础模块的标定方法及工具使用：`https://v.qq.com/x/page/h3152x52ys1.html`
 
 ### RV1109/RV1126 开发相关工具
 
@@ -240,6 +277,11 @@ Firmware_Merger        | SPI NOR固件打包工具(生成的固件可以用于�
 
 ## SDK编译说明
 
+SDK的编译有2种方法：
+
+- 一种是依赖整个SDK环境编译（本章节介绍的方法）
+- 另一种是把U-Boot、Linux Kernel、Rootfs以及应用库独立出SDK来编译（具体方法参考文档：**docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf**）
+
 ### 选择不同板级配置
 
 #### SDK下载地址
@@ -249,6 +291,8 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 ```
 
 #### SDK软件同步命令以及log
+
+##### SDK软件同步
 
 ```shell
 .repo/repo/repo sync -c -j4
@@ -263,12 +307,33 @@ Checking out projects: 100% (71/71), done.
 repo sync has finished successfully.
 ```
 
+##### 查看SDK版本
+
+在SDK根目录执行命令：
+
+```shell
+realpath .repo/manifests/rv1126_rv1109_linux_release.xml
+
+# 例如：打印的版本号为v1.3.1
+#       更新时间为2020-09-21
+# /home/rv1109-SDK/.repo/manifests/rv1126_rv1109_linux/rv1126_rv1109_linux_v1.3.1_20200921.xml
+```
+
+##### 为每个工程创建default分支
+
+```shell
+.repo/repo/repo start default --all
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
+Starting default: 100% (71/71), done.
+```
+
 #### SDK板级配置目录device/rockchip/rv1126_rv1109
 
 | 板级配置                      | 适用产品说明                 | 存储介质 | EVB板                                               |
 | ----------------------------- | --------------------------   | -------- | --------------------------------------------------- |
-| BoardConfig-38x38-spi-nand.mk | 通用IPC                      | SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
-| BoardConfig-38x38-spi-nand.mk | 通用IPC                      | SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
+| BoardConfig-38x38-spi-nand.mk | 通用IPC（产品是分立电源方案）| SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
+| BoardConfig-38x38-spi-nand.mk | 通用IPC（产品是分立电源方案）| SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-robot.mk          | 扫地机类IPC                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-tb-v12.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-tb-v13.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
@@ -277,7 +342,7 @@ repo sync has finished successfully.
 | BoardConfig-v12.mk            | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
 | BoardConfig-facial_gate.mk    | 门禁和闸机类产品             | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
-| ++++++++++++++++++++++++++    | ++++++++++++++++++++++       | +++++    | ++++++++++++++++++++++++++++++++++++++++++++        |
+| ++++++++++++++++++++++++++    | ++++++++++++++++++++++++++++ | +++++    | ++++++++++++++++++++++++++++++++++++++++++++        |
 
 #### 切换板级配置命令
 
@@ -380,31 +445,85 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ### U-Boot编译
 
 ```shell
-### U-Boot编译命令
-./build.sh uboot
-
 ### 查看U-Boot详细编译命令
 ./build.sh -h uboot
+
+### U-Boot编译命令
+./build.sh uboot
+```
+
+#### U-Boot配置说明
+
+```shell
+### 使用menuconfig配置U-Boot，选择需要的模块，最后保存退出。
+### rv1126_defconfig 文件在目录 u-boot/configs
+### 命令格式：make "RK_UBOOT_DEFCONFIG"_defconfig
+### RK_UBOOT_DEFCONFIG 定义在./build.sh选择的BoardConfig*.mk
+cd u-boot
+make rv1126_defconfig
+make menuconfig
+
+### 保存配置到对应的文件rv1126_defconfig
+make savedefconfig
+cp defconfig configs/rv1126_defconfig
 ```
 
 ### Kernel编译
 
 ```shell
-### Kernel编译命令
-./build.sh kernel
-
 ### 查看Kernel详细编译命令
 ./build.sh -h kernel
+
+### Kernel编译命令
+./build.sh kernel
+```
+
+#### Kernel配置说明
+
+```shell
+### 例如 device/rockchip/rv1126_rv1109/BoardConfig.mk
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
+cd kernel
+
+### 命令格式：make ARCH=arm "RK_KERNEL_DEFCONFIG" "RK_KERNEL_DEFCONFIG_FRAGMENT"
+### RK_KERNEL_DEFCONFIG 和RK_KERNEL_DEFCONFIG_FRAGMENT 都定义在./build.sh选择的BoardConfig*.mk
+### RK_KERNEL_DEFCONFIG_FRAGMENT 是可选项，具体看BoardConfig*.mk配置。
+make ARCH=arm rv1126_defconfig
+make ARCH=arm menuconfig
+
+make ARCH=arm savedefconfig
+cp defconfig arch/arm/configs/rv1126_defconfig
 ```
 
 ### Recovery编译
 
 ```shell
-### Recovery编译命令
-./build.sh recovery
-
 ### 查看Recovery详细编译命令
 ./build.sh -h recovery
+
+### Recovery编译命令
+./build.sh recovery
+```
+
+#### Recovery配置说明
+
+```shell
+### 1. 获取对应板级文件的recovery配置
+./build.sh -h recovery
+#   ###Current SDK Default [ recovery ] Build Command###
+#   source envsetup.sh rockchip_rv1126_rv1109_recovery
+#   device/rockchip/common/mk-ramdisk.sh recovery.img rockchip_rv1126_rv1109_recovery
+
+### 2. source 对应的recovery配置
+source envsetup.sh rockchip_rv1126_rv1109_recovery
+
+### 3. 使用menuconfig配置recovery，选择需要的模块，最后保存退出。
+### 比如：去掉recovery的UI显示 BR2_PACKAGE_RECOVERY_NO_UI (查看 buildroot/package/rockchip/recovery/Config.in)
+make menuconfig  # 进入menuconfig后，按“/"进入查找模式，输入BR2_PACKAGE_RECOVERY_NO_UI
+
+### 4. 保存到选择的recovery配置文件
+###    ./buildroot/configs/rockchip_rv1126_rv1109_recovery_defconfig
+make savedefconfig
 ```
 
 注：Recovery是非必需的功能，有些板级配置不会设置
@@ -412,31 +531,40 @@ make ARCH=arm rv1126-evb-ddr3-v10.img -j12
 ### Rootfs编译
 
 ```shell
-### Rootfs编译命令
-./build.sh rootfs
-
 ### 查看Rootfs详细编译命令
 ./build.sh -h rootfs
+
+### Rootfs编译命令
+./build.sh rootfs
 ```
 
-Buildroot的package编译方法：
-注：SDK根目录app和external下的工程都是buildroot的package包，编译方法相同。
+#### 目录app和external里的工程编译方法以及Rootfs配置说明
 
 ```shell
-### 1. 先查看Board Config对应的rootfs是哪个配置
+### 1. 先SDK根目录查看Board Config对应的rootfs是哪个配置
 ./build.sh -h rootfs
-###Current SDK Default [ rootfs ] Build Command###
-source envsetup.sh rockchip_rv1126_rv1109
-make
+#   ###Current SDK Default [ rootfs ] Build Command###
+#   source envsetup.sh rockchip_rv1126_rv1109
+#   make
 
 ### 2. source buildroot对应的defconfig
 source envsetup.sh rockchip_rv1126_rv1109
 
-### 3. 查看对应模块的makefile文件名
+### 3. 使用menuconfig配置文件系统，选择需要的模块，最后保存退出。
+### 例如：ipc-daemon的配置是BR2_PACKAGE_IPC_DAEMON (查看buildroot/package/rockchip/ipc-daemon/Config.in)
+make menuconfig  # 进入menuconfig后，按“/"进入查找模式，输入BR2_PACKAGE_IPC_DAEMON
+
+### 4. 保存到rootfs配置文件
+###    ./buildroot/configs/rockchip_rv1126_rv1109_defconfig
+make savedefconfig
+
+### 5. 查看对应模块的makefile文件名
 ### 例如：buildroot/package/rockchip/ipc-daemon/ipc-daemon.mk
 make ipc-daemon-dirclean
 make ipc-daemon-rebuild
 ```
+
+注：SDK根目录app和external下的工程都是buildroot的package包，编译方法相同。
 
 ### 固件打包
 
@@ -810,7 +938,7 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 
 闸机和门禁类产品的编译命令，请参考[第三章 SDK编译说明](# SDK编译说明)。
 
-### **QFacialGate** 应用
+### QFacialGate应用
 
 QFacialGate 是闸机和门禁类产品主应用，默认开机自动运行，该应用选用QT做UI，通过Rkfacial库调用RK自有算法rockface，实现人脸检测，人脸特征点提取，人脸识别，活体检测。
 
