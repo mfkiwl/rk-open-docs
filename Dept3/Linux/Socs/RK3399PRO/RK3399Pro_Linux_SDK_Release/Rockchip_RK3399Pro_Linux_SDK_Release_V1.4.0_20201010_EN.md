@@ -2,9 +2,9 @@
 
 ID: RK-FB-CS-009
 
-Release Version: V1.3.3
+Release Version: V1.4.0
 
-Release Date: 2020-08-13
+Release Date: 2020-10-10
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -66,7 +66,8 @@ Software development engineers
 | 2020-03-24 | V1.3.0      | Caesar Wang | Add  RK3399Pro EVB V14 support                               |
 | 2020-07-22 | V1.3.1      | Ruby Zhang  | Update the company name, <br/>the format and the file name of the document |
 | 2020-08-06 | V1.3.2      | Caesar Wang | Support Debian 10                                            |
-| 2020-08-13 | V1.3.3      | Caesar Wang | Upgrade rknpu to 1.3.4，adjust the directory structure and Firmware upgrade |
+| 2020-08-13 | V1.3.3      | Caesar Wang | Upgrade rknpu to 1.3.4, and update the directory <br/>structure and Firmware upgrade |
+| 2020-10-10 | V1.4.0      | Caesar Wang | Upgrade rknpu to 1.4.0, <br/>and update the directory structure |
 
 ---
 
@@ -90,9 +91,11 @@ This SDK supports NPU TensorFlow/Caffe model, VPU hardware decoding, GPU 3D, Way
 
 ## How to Get the SDK
 
-SDK is released by Rockchip server or got from [Github](https://github.com/rockchip-linux)  open source website. Please refer to Chapter 7 [SDK Compilation Introduciton](# SDK Compilation Introduciton) to build a development environment.
+The SDK is released by Rockchip server. Please refer to Chapter 7 [SDK Compilation Introduciton](# SDK Compilation Introduciton) to build a development environment.
 
-**First method to get the SDK: get source code from Rockchip code server**
+### General RK3399Pro Linux SDK Obtain
+
+#### Get Source Code from Rockchip Code Server
 
 To get RK3399Pro Linux software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window. About Rockchip server SSH public key authorization, please refer to Chapter 10  [SSH  Public Key Operation Introduction](# Public Key Operation Introduction).
 
@@ -108,53 +111,20 @@ Repo, a tool built on Python script by Google to help manage git repositories, i
 git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
+#### Get Source Code from Local Compression Package
+
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
 Take rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk3399pro
-tar xvf rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz -C
-rk3399pro
+tar xvf rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz -C rk3399pro
 cd rk3399pro
 .repo/repo/repo sync -l
 .repo/repo/repo sync
 ```
 
 Developers can update via `.repo/repo/repo sync` command according to update instructions that are regularly released by FAE window.
-
-**Second method to get the SDK: get source code from Github open source website:**
-
-Download repo tools:
-
-```shell
-git clone https://github.com/rockchip-linux/repo.git
-```
-
-Make an rk3399pro linux work directory:
-
-```shell
-mkdir rk3399pro_linux
-```
-
-Enter the rk3399pro linux work directory
-
-```shell
-cd rk3399pro_linux/
-```
-
-Initialize the repo repository:
-
-```shell
-../repo/repo init --repo-url=https://github.com/rockchip-linux/repo -u https://github.com/rockchip-linux/manifests -b master -m rk3399pro_linux_release.xml
-```
-
-Synchronize the whole project:
-
-```shell
-../repo/repo sync
-```
-
-Note: If your project has already started, please choose the first Method to get the code first. Unlike Github, it has passed by internal stress testing and version control. The second method is more suitable for enthusiasts and project evaluation.
 
 ## Software Development Guide
 
@@ -163,23 +133,25 @@ Note: If your project has already started, please choose the first Method to get
 The SDK NPU development tool includes following items:
 
 **RKNN_DEMO (MobileNet SSD)** ：
-Please refer to the directory “external/rknn_demo/” for RKNN Demo, please refer to the document in the project directory docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_EN.pdf for detailed operation introduction.
+Please refer to the directory “external/rknn_demo/” for RKNN Demo, and refer to the document in the project directory docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN.pdf for detailed operation introduction.
 
 **RKNN-TOOLKIT** ：
 Development tools are in project directory “external/rknn-toolkit”. Which is used for model conversion, model reasoning, model performance evaluation functions, etc. Please refer to documents in the docs/ directory for details.
 
 ```
-├── changelog-v1.3.2.txt
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
-└── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+├── changelog.txt
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_CN.pdf
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_EN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_CN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_EN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_CN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_CN.pdf
+└── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_EN.pdf
 ```
 
 **RKNN-DRIVER**:
@@ -217,14 +189,14 @@ Or refer to the project directory:
 Please refer to user guides in the project directory for hardware development :
 
 ```
-<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_User_Guide_Hardware_CN/EN.pdf
+<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_User_Guide_Hardware_CN.pdf
 ```
 
 ## SDK Project Directory Introduction
 
 There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, external and other directories in the project directory. Each directory or its sub-directories will correspond to a git project, and the commit should be done in the respective directory.
 
-- app: store application apps like qcamera/qfm/qplayer/qseting and other applications.
+- app: store application APPs like qcamera/qfm/qplayer/qseting and other applications.
 - buildroot: root file system based on Buildroot (2018.02-rc3).
 - debian: root file system based on Debian 9.
 - device/rockchip: store board-level configuration for each chip and some scripts and prepared files for compiling and packaging firmware.
@@ -241,165 +213,118 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 - u-boot: store U-Boot code developed based on v2017.09 version.
 - yocto: stores the root file system developed based on Yocto Thud 3.0.
 
-## SDK Compilation Instroduction
+## SDK Build Introduction
 
-**Ubuntu 16.04 system:**
-Please install software packages with below commands to setup Buildroot compiling environment:
+### SDK Dependency Packages Installation
+
+This SDK  is developed and tested on Ubuntu system. We recommend using Ubuntu 18.04 for compilation. Other Linux versions may need to adjust the software package accordingly. In addition to the system requirements, there are other hardware and software requirements.
+Hardware requirements: 64-bit system, hard disk space greater than 40G. If you do multiple builds, you will need more hard drive space
+
+Software requirements: Ubuntu 18.04 system:
+
+Please install software packages with below commands to setup SDK compiling environment:
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev texinfo liblz4-tool genext2fs expect patchelf xutils-dev
-```
-
-Please install software packages with below commands to setup Debian compiling environment:
-
-```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools gcc-arm-linux-gnueabihf libssl-dev gcc-aarch64-linux-gnu g+conf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev texinfo liblz4-tool genext2fs xutils-dev
-```
-
-**Ubuntu 17.04 or later version system:**In addition to the above, the following dependencies is needed:
-
-```
-sudo apt-get install lib32gcc-7-dev g++-7 libstdc++-7-dev
+repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build
 ```
 
 It is recommended to use Ubuntu 18.04 system or higher version for development. If you encounter an error during compilation, you can check the error message and install the corresponding software packages.
 
-**Note:**
+### SDK Board Level Configuration
 
-NPU firmware will be uploaded when RK3399Pro power on. The default NPU firmware is pre-compiled into “/usr/share/npu_fw” directory of rootfs. For NPU firmware flashing and setup methods, please refer to the document :
+Enter the project  SDK/device/rockchip/rk3399pro directory:
 
-```
-<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf
-```
+| Board level configuration | Note                                            |
+| ----------------------------- | --------------------------------------------------- |
+| BoardConfig-rk3399pro_evb_v10-usb.mk  | Suitable for RK3399Pro V10 development board  |
+| BoardConfig-rk3399pro_evb_v11_v12-usb.mk    | Suitable for RK3399Pro V11 and V12 development boards |
+| BoardConfig_rk3399pro_evb_v13_pcie.mk  | Suitable for RK3399Pro V13  development board |
+| BoardConfig_rk3399pro_evb_v14-combine.mk  |  Suitable for RK3399Pro V14 development board  |
+| BoardConfig-rk3399pro_evb_lpd4_v11_v12-usb.mk  |  Suitable for RK3399Pro LPDDR4 development board  |
+| BoardConfig-rk3399pro_npu-pcie.mk |  Suitable for linking NPU by hardware PCIe  |
+| BoardConfig-rk3399pro_npu-usb.mk  | Suitable for linking NPU by hardware USB3.0 |
 
-It is going to introduce NPU and RK3399Pro firmware compiling methods below.
+The first way:
 
-### NPU Compilation Introduction
+Add board configuration file behind `/build.sh` , for example:
 
-#### Full Automatic Compilation
-
-Enter root directory of project directory and execute the following commands to automatically complete all compilation:
-
-RK3399Pro EVB V10/V11/V12  boards：
-
-```shell
-cd npu/device/rockchip
-cp rk3399pro-npu/BoardConfig.mk .BoardConfig.mk
-cd - && cd npu
-./build.sh uboot
-./build.sh kernel
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu
-```
-
-RK3399Pro EVB V13/V14 boards：
+Select the board configuration of  **RK3399Pro V10 development board**:
 
 ```shell
-cd npu/device/rockchip
-cp rk3399pro-npu-multi-cam/BoardConfig.mk .BoardConfig.mk
-cd ../../
-./build.sh uboot
-./build.sh kernel
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu-multi-cam
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_evb_v10-usb.mk
 ```
 
-After compiling, boot.img, uboot.img, trust.img, MiniLoaderAll.bin are generated in rockdev directory.
-
-**Note:** the generated npu firmware under rockdev should be placed in the specified directory of rootfs “/usr/share/npu_fw”.
-
-#### Compile package and module
-
-##### Uboot Compilation
-
-Enter project npu/u-boot directory and run `make.sh` to get rknpu_lion_loader_v1.03.103.bin trust.img uboot.img:
-
-rk3399pro-npu：
+Select the board configuration of the **RK3399Pro V11 or V12 development board**:
 
 ```shell
-./make.sh rknpu-lion
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_evb_v11_v12-usb.mk
 ```
 
-The compiled files are in u-boot directory:
+Select the board-level configuration of the **RK3399Pro V13 development board**:
 
 ```shell
-u-boot/
-├── rknpu_lion_loader_v1.03.103.bin
-├── trust.img
-└── uboot.img
+./build.sh device/rockchip/rk3399pro/BoardConfig_rk3399pro_evb_v13_pcie.mk
 ```
 
-##### Kernel Compilation
-
-Enter project root directory and run the following command to automatically compile and package kernel:
-
-RK3399Pro EVB V10/V11/V12 boards：
+Select the board-level configuration of the **RK3399Pro V14 development board**:
 
 ```shell
-cd npu/kernel
-git checkout remotes/rk/stable-4.4-rk3399pro_npu-linux
-make ARCH=arm64 rk3399pro_npu_defconfig
-make ARCH=arm64 rk3399pro-npu-evb-v10.img -j12
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-pcie.mk
 ```
 
-RK3399Pro EVB V13/V14 boards：
+Select the board configuration of the **RK3399Pro LPDDR4 development board**:
 
 ```shell
-cd kernel //change to stable-4.4-rk3399pro_npu-pcie-linux branch
-make ARCH=arm64 rk3399pro_npu_pcie_defconfig
-make ARCH=arm64 rk3399pro-npu-evb-v10-multi-cam.img -j12
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_evb_lpd4_v11_v12-usb.mk
 ```
 
-##### Boot.img and NPU Firmware Generation Steps
-
-Enter project npu directory and run the following command to automatically compile and package boot.img:
-
-RK3399Pro EVB V10/V11/V12  boards：
+Select the board-level configuration of **NPU in the hardware PCIe mode**:
 
 ```shell
-cd npu
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-pcie.mk
 ```
 
-RK3399Pro EVB V13/V14  boards：
+Select the board-level configuration of  **NPU in the hardware USB3.0 mode**:
 
 ```shell
-cd npu/device/rockchip
-cp rk3399pro-npu-multi-cam/BoardConfig.mk .BoardConfig.mk
-cd - && cd npu
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu-multi-cam
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-usb.mk
 ```
 
-### RK3399Pro Compilation Introduction
-
-#### Automatic Compilation
-
-Enter root directory of project directory and execute the following commands to automatically complete all compilation:
+The second way:
 
 ```shell
-$./build.sh all
+rk3399pro$ ./build.sh lunch
+processing option: lunch
+
+You're building on Linux
+Lunch menu...pick a combo:
+
+0. default BoardConfig.mk
+1. BoardConfig-rk3399pro_evb_lpd4_v11_v12-usb.mk
+2. BoardConfig-rk3399pro_evb_v10-usb.mk
+3. BoardConfig-rk3399pro_evb_v11_v12-usb.mk
+4. BoardConfig-rk3399pro_npu-pcie.mk
+5. BoardConfig-rk3399pro_npu-usb.mk
+6. BoardConfig.mk
+7. BoardConfig_rk3399pro_evb_v13_pcie.mk
+8. BoardConfig_rk3399pro_evb_v14-combine.mk
+Which would you like? [0]:
+...
 ```
 
-Debian is to compile Debian 9 system, distro is to compile Debian 10 system.
+### Compilation Commands
 
-It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are four types of system for RK_ROOTFS_SYSTEM ,builderoot, Debian, distro and yocto. If Yocto is needed, you can generate with the following commands:
-
-```shell
-$export RK_ROOTFS_SYSTEM=yocto
-$./build.sh all
-```
-
-Detailed parameters usage, you can use help to search, for example
+Execute the command in the root directory: `./build.sh -h|help`
 
 ```shell
-rk3399pro$ ./build.sh --help
+rk3399pro$ ./build.sh -h
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
+lunch              -list current SDK boards and switch to specified board config
 uboot              -build uboot
 spl                -build spl
+loader             -build loader
 kernel             -build kernel
 modules            -build kernel modules
 toolchain          -build toolchain
@@ -423,131 +348,196 @@ allsave            -build all & firmware & updateimg & save
 Default option is 'allsave'.
 ```
 
-Board level configurations of each board need to be configured in the “/device/rockchip/rk3399pro/Boardconfig.mk”.
-
-Main configurations of RK3399Pro EVB are as follows:
+View detailed build commands for some modules, for example: `./build.sh -h kernel`
 
 ```shell
-# Target arch
-export RK_ARCH=arm64
-# Uboot defconfig
-export RK_UBOOT_DEFCONFIG=rk3399pro
-# Kernel defconfig
-export RK_KERNEL_DEFCONFIG=rockchip_linux_defconfig
-# Kernel dts
-export RK_KERNEL_DTS=rk3399pro-evb-v14-linux
-# boot image type
-export RK_BOOT_IMG=boot.img
-# kernel image path
-export RK_KERNEL_IMG=kernel/arch/arm64/boot/Image
-# parameter for GPT table
-export RK_PARAMETER=parameter.txt
-# Buildroot config
-export RK_CFG_BUILDROOT=rockchip_rk3399pro_combine
-# Recovery config
-export RK_CFG_RECOVERY=rockchip_rk3399pro_recovery
-```
-
-#### Compile package and  module
-
-##### U-boot  Compilation
-
-Enter project u-boot directory and execute `make.sh` to get rk3399pro_loader_v1.23.115.bin trust.img uboot.img:
-RK3399Pro EVB boards：
-
-```shell
-./make.sh rk3399pro
-```
-
-The compiled file is in u-boot directory:
-
-```
-u-boot/
-├── rk3399pro_loader_v1.24.119.bin
-├── trust.img
-└── uboot.img
-```
-
-##### Kernel  Compilation
-
-Enter project root directory and run the following command to automatically compile and package kernel:
-
-RK3399Pro EVB V10 boards：
-
-```shell
-cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399pro-evb-v10-linux.img -j12
-```
-
-RK3399Pro EVB V11/V12  boards：
-
-```
-cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399pro-evb-v11-linux.img -j12
-```
-
-RK3399Pro EVB V13  boards：
-
-```
-cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399pro-evb-v13-linux.img -j12
-```
-
-RK3399Pro EVB V14 boards：
-
-```
+rk3399pro$ ./build.sh -h kernel
+###Current SDK Default [ kernel ] Build Command###
 cd kernel
 make ARCH=arm64 rockchip_linux_defconfig
 make ARCH=arm64 rk3399pro-evb-v14-linux.img -j12
 ```
 
-After compiling, boot.img which contains image and DTB of kernel will be generated in kernel directory.
+[^note]: The detailed compilation commands should depending on corresponding SDK version, and there may be some differences between configurations. But the build.sh build command is fixed.
 
-##### Recovery  Compilation
+NPU firmware will be uploaded when RK3399Pro power on. The default NPU firmware is pre-build into “/usr/share/npu_fw” directory of rootfs. For NPU firmware flashing and setup methods, please refer to the document :
 
-Enter project root directory and run the following command to automatically complete compilation and packaging of Recovery.
-
-RK3399Pro EVB  boards：
-
-```shell
-./build.sh recovery
+```
+<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf
 ```
 
-The recovery.img is generated in Buildroot directory “output/rockchip_rk3399pro_recovery/images” after compiling.
+It is going to introduce NPU and RK3399Pro firmware compiling methods next.
 
-##### Buildroot  Compilation
+### NPU Build Introduction
+
+#### Full Automatic Build
+
+Enter root directory of project directory and execute the following commands to automatically complete all build:
+
+RK3399Pro EVB V10/V11/V12  development boards：
+
+```shell
+cd npu
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-usb.mk
+cd kernel
+git checkout remotes/rk/stable-4.4-rk3399pro_npu-linux
+cd -
+./build.sh uboot
+./build.sh kernel
+./build.sh ramboot
+./mkfirmware.sh
+```
+
+RK3399Pro EVB V13/V14 development boards：
+
+```shell
+cd npu
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-pcie.mk
+cd kernel
+git checkout remotes/rk/stable-4.4-rk3399pro_npu-pcie-linux
+cd -
+./build.sh uboot
+./build.sh kernel
+./build.sh ramboot
+./mkfirmware.sh
+```
+
+After compiling, boot.img, uboot.img, trust.img, MiniLoaderAll.bin are generated in rockdev directory.
+
+**Note:** the generated NPU firmware under rockdev should be placed in the specified directory of rootfs “/usr/share/npu_fw”.
+
+#### Build and package each module
+
+##### Uboot Build
+
+```shell
+### U-Boot build command
+./build.sh uboot
+
+### To view detailed U-Boot build command
+./build.sh -h uboot
+```
+
+##### Kernel Build
+
+```shell
+### Kernel build command
+./build.sh kernel
+
+### To view detailed Kernel build command
+./build.sh -h kernel
+```
+
+##### Rootfs Build
+
+```shell
+### Rootfs  build command
+./build.sh ramboot
+
+### To view detailed Rootfs build command
+./build.sh -h ramboot
+```
+
+The way to build Buildroot package:
+
+Note: The projects in the SDK root directory app and external are all Buildroot packages, they are in the same build way.
+
+```shell
+### 1. First check which configuration of the rootfs is corresponding to Board Config
+./build.sh -h rootfs
+### Current SDK Default [ rootfs ] Build Command###
+source envsetup.sh rockchip_rk3399pro-npu-multi-cam
+make
+
+### 2. source buildroot corresponding defconfig
+source envsetup.sh rockchip_rk3399pro-npu-multi-cam
+
+### 3. Check the makefile file name of the corresponding module
+### eg: buildroot/package/rockchip/rknpu/rknpu.mk
+make rknpu-dirclean
+make rknpu-rebuild
+```
+
+##### Firmware Package
+
+Firmware Package command: `./mkfirmware.sh`
+
+Firmware directory: rockdev
+
+### RK3399Pro Build Introduction
+
+#### Automatic Build
+
+Enter root directory of project directory and execute the following commands to automatically complete all buid:
+
+```shell
+./build.sh all # Only build module code(u-Boot，kernel，Rootfs，Recovery)
+               # Need to execute ./mkfirmware.sh again for firmware package
+
+./build.sh     # Base on ./build.sh all
+               # 1. Add firmware package ./mkfirmware.sh
+               # 2. update.img package
+               # 3. Copy the firmware in the rockdev directory to the IMAGE/***_RELEASE_TEST/IMAGES directory
+               # 4. Save the patches of each module to the IMAGE/***_RELEASE_TEST/PATCHES directory
+               # Note：./build.sh  and  ./build.sh allsave command are the same
+```
+
+It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are four types of system for RK_ROOTFS_SYSTEM: buildroot, Debian, distro and yocto. In which, debian is used to build Debian 9 system, distro is used to build debian10 system
+
+For example, if you need debain, you can generate it with the following command:
+
+```shell
+$export RK_ROOTFS_SYSTEM=debian
+$./build.sh
+```
+
+#### Build and package each  module
+
+##### U-boot  Build
+
+```shell
+### U-Boot build command
+./build.sh uboot
+
+### To view the detailed U-Boot build command
+./build.sh -h uboot
+```
+
+##### Kernel Build
+
+```shell
+### Kernel build command
+./build.sh kernel
+
+### To view the detailed Kernel build command
+./build.sh -h kernel
+```
+
+##### Recovery Build
+
+```shell
+### Recovery build command
+./build.sh recovery
+
+### To view the detailed Recovery build command
+./build.sh -h recovery
+```
+
+Note: Recovery is a unnecessary function, some board configuration will not be set
+
+##### Buildroot Build
 
 Enter project root directory and run the following commands to automatically complete compiling and packaging of Rootfs.
-
-RK3399Pro EVB V10/V11/V12  boards:
-
-```shell
-cd device/rockchip/rk3399pro
-cp BoardConfig_rk3399pro_usb.mk ../.BoardConfig.mk
-cd - && ./build.sh rootfs
-```
-
-RK3399Pro EVB V13 boards:
-
-```shell
-cd device/rockchip/rk3399pro
-cp BoardConfig_rk3399pro_multi_cam_pcie.mk ../.BoardConfig.mk
-cd - && ./build.sh rootfs
-```
-
-RK3399Pro EVB V14 boards:
 
 ```shell
 ./build.sh rootfs
 ```
 
-After compiling, rootfs.ext4 is generated in Buildroot directory “output/rockchip_rk3399pro/images”.
+After build, rootfs.ext4 is generated in Buildroot directory “output/rockchip_chipset/images”.
 
-**Note:**
-If you need to compile a single module or a third-party application, you need to setup the cross-compiling environment.Cross-compiling tool is located in “buildroot/output/rockchip_rk3399pro/host/usr” directory. You need to set bin/ directory of tools and aarch64-buildroot-linux-gnu/bin/ directory to environment variables, and execute auto-configuration environment variable script in the top-level directory (only valid for current console):
+###### Buildroot Cross Compilation
+
+If you need to build a single module or a third-party application, you need to setup the cross compilation environment. Cross compilation tool is located in “buildroot/output/rockchip_rk3399pro_combine/host/usr” directory. You need to set bin/ directory of tools and aarch64-buildroot-linux-gnu/bin/ directory to environment variables, and execute auto-configuration environment variable script in the top-level directory (only valid for current console):
 
 ```shell
 source envsetup.sh
@@ -560,19 +550,43 @@ cd buildroot/output/rockchip_rk3399pro_combine/host/usr/bin
 ./aarch64-linux-gcc --version
 ```
 
-When the following logs are printed, configuration is successful:
+Then the following logs are printed:
 
 ```
 aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
 ```
 
-##### Debian 9 Compilation
+###### Build Modules in Buildroot
+
+For example, for the qplayer module, commonly used build commands are as follows:
+
+- Build qplayer
+
+```
+SDK$make qplayer
+```
+
+- Rebuild qplayer
+
+```
+SDK$make qplayer-rebuild
+```
+
+- delete qplayer
+
+```
+SDK$make qplayer-dirclean
+or
+SDK$rm -rf /buildroot/output/rockchip_rk3399pro/build/qlayer-1.0
+```
+
+##### Debian 9  Build
 
 ```
  ./build.sh debian
 ```
 
-Enter debian/ directory firstly:
+Or enter debian/ directory:
 
 ```shell
 cd debian/
@@ -594,26 +608,28 @@ Compile 64-bit Debian:
 RELEASE=stretch TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
 ```
 
-After compiling, linaro-stretch-alip-xxxxx-1.tar.gz (xxxxx is generated timestampwill be generated in debian/ directory.)
+After compiling, linaro-stretch-alip-xxxxx-1.tar.gz (xxxxx is generated timestamp will be generated in debian/ directory.)
 
 FAQ:
 If you encounter the following problem during above compiling:
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target '/home/foxluo/work3/rockchip/rk_linux/rk3399_linux/rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot' mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target
+...
+mounted with noexec or nodev
 ```
 
 Solution：
 
 ```
-mount -o remount,exec,dev xxx  (xxx is the mount place), then
-rebuild it.
+mount -o remount,exec,dev xxx
+(xxx is the project directory path, then rebuild)
 ```
 
 In addition, if there are other compilation issues, please check firstly that the compiler system is not ext2/ext4.
 
-- Building Base Debian need to access to foreign websites, but it often fail to download in domestic networks.
+- Building Base Debian need to access to foreign websites, it often fail to download in domestic networks.
 
 Debian 9 uses live build, it can be configured like below to change the image source to domestic
 
@@ -633,7 +649,7 @@ Debian 9 uses live build, it can be configured like below to change the image so
   --apt-secure false \
 ```
 
-If the package cannot be downloaded for other network reasons, a pre-compiled package is shared in [Baidu Cloud Network Disk](https://eyun.baidu.com/s/3nxdWke1), put it in the current directory, and then do the next step directly.
+If the package cannot be downloaded for other network reasons, a pre-build package is shared in [Baidu Cloud Network Disk](<<https://eyun.baidu.com/s/3bqwrvo7>), put it in the current directory, and then do the next step directly.
 
 **(2) Building rk-debian rootfs**
 
@@ -651,7 +667,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 
 Will generate linaro-rootfs.img.
 
-##### Debian 10 Building
+##### Debian 10 Build
 
 ```
 ./build.sh distro
@@ -664,15 +680,15 @@ cd distro/ && make ARCH=arm64 rk3399pro_defconfig && ./make.sh
 ```
 
 After building, the rootfs.ext4 will be generated in the distro directory “distro/output/images/”.
-**Note**: The current building of Debian10 Qt also depends on the building of Buildroot qmake, so please build Buildroot before building Debian10.
+**Note**: The current build of Debian10 Qt also depends on the build of Buildroot qmake, so please build Buildroot before building Debian10.
 
 Please refer to the following document for more introductions about Debian10.
 
 ```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Debian10_CN.pdf
+<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Debian10_EN.pdf
 ```
 
-##### Yocto Compilation
+##### Yocto Build
 
 Enter project root directory and execute the following commands to automatically complete compiling and packaging Rootfs.
 
@@ -717,7 +733,7 @@ Firmware generation:
 
 ## Upgrade Introduction
 
-There are V10/V11/V12/V13/V14 Five versions of current RK3399Pro EVB, V10 version board is green, and V10/V11/V12/V13/V14 version board is black. Board function positions are the same. The following is the introduction of RK3399Pro EVB V12 board, as shown in the following figure
+There are V10/V11/V12/V13/V14 Five versions of current RK3399Pro EVB, V10 version board is green, and V10/V11/V12/V13/V14 version board is black. Board function positions are the same. The following is the introduction of RK3399Pro EVB V14 board, as shown in the following figure
 
 ![RK3399Pro-V14](resources/RK3399Pro-V14.png)
 
@@ -842,7 +858,7 @@ Yocto:
 ### RKNN_DEMO Test
 
 Firstly, insert usb camera, run  rknn_demo in Buildroot system or run test_rknn_demo.sh in Debian system.
-Please refer to the project document: <SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN/EN.pdf for details, the results of running in Buildroot are as follows:
+Please refer to the project document: SDK/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN/EN.pdf for details, the results of running in Buildroot are as follows:
 
 ```shell
 [root@rk3399pro:/]# rknn_demo
@@ -935,4 +951,4 @@ Keep the private key file properly. Do not grant second authorization to third p
 
 ### Reference Documents
 
-For more details, please refer to document “<SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf
+For more details, please refer to document “SDK/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf

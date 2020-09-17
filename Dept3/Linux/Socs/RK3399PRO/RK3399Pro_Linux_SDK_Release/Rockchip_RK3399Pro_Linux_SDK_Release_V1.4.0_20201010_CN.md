@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-CS-009
 
-发布版本：V1.3.3
+发布版本：V1.4.0
 
-日期：2020-08-13
+日期：2020-10-10
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -75,6 +75,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-07-22 | V1.3.1   | Ruby Zhang  | 更新公司名称，文件名以及文档格式                             |
 | 2020-08-06 | V1.3.2   | Caesar Wang | Debian 10 的支持                                             |
 | 2020-08-13 | V1.3.3   | Caesar Wang | rknpu版本更新搭配1.3.4，目录结构调整和固件升级               |
+| 2020-10-10 | V1.4.0   | Caesar Wang | rknpu版本更新搭配1.4.0，目录结构调整                         |
 
 ---
 
@@ -98,9 +99,11 @@ Rockchip Electronics Co., Ltd.
 
 ## SDK 获取说明
 
-SDK 通过瑞芯微代码服务器对外发布或者从 [Github](https://github.com/rockchip-linux) 开源网站上获取。其编译开发环境，参考第 7 节 [SDK编译说明](# SDK 编译说明)。
+SDK 通过瑞芯微代码服务器对外发布获取。其编译开发环境，参考第 7 节 [SDK编译说明](# SDK 编译说明)。
 
-**获取 SDK 方法 一: 从瑞芯微代码服务器获取源码**
+### RK3399Pro Linux 通用软件包获取方法
+
+#### 通过代码服务器下载
 
 获取 RK3399Pro Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](# SSH 公钥操作说明)。
 
@@ -116,6 +119,8 @@ repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用
 git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
+#### 通过本地压缩包解压获取
+
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
 以 rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
@@ -129,40 +134,6 @@ cd rk3399pro
 
 后续开发者可根据 FAE 窗口定期发布的更新说明，通过 ”.repo/repo/repo sync” 命令同步更新。
 
-**获取 SDK 方法二: 从  Github 开源网站获取源码**
-
-下载 repo 工具：
-
-```
-git clone https://github.com/rockchip-linux/repo.git
-```
-
-建立 rk3399pro linux 工作目录
-
-```
-mkdir rk3399pro_linux
-```
-
-进入 rk3399pro linux 工作目录
-
-```
-cd rk3399pro_linux/
-```
-
-初始化 repo 仓库
-
-```
-../repo/repo init --repo-url=https://github.com/rockchip-linux/repo -u https://github.com/rockchip-linux/manifests -b master -m rk3399pro_linux_release.xml
-```
-
-同步下载整个工程：
-
-```
-../repo/repo sync
-```
-
-注意: 如果是已立项的项目请优先选择用方法一获取代码，不同于 Github 的是它会经过内部稳定测试和版本控制，方法二更多适用于爱好者和前期项目评估。
-
 ## 软件开发指南
 
 ### NPU 开发工具
@@ -171,23 +142,25 @@ cd rk3399pro_linux/
 
 **RKNN_DEMO (MobileNet SSD)** ：
 RKNN 的 Demo 请参考目录 external/rknn_demo/，相关操作说明详见工程目录
-docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN/EN.pdf。
+docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN.pdf。
 
 **RKNN-TOOLKIT** ：
 开发工具在 external/rknn-toolkit 目录下，主要用来实现模型转换，模型推理，模型性能评估功能等，具体使用说明请参考当前 doc/ 的目录文档：
 
 ```
-├── changelog-v1.3.2.txt
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_CN.pdf
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.3.2_EN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_CN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.3.2_EN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_CN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.3.2_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_CN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.3.2_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_CN.pdf
-└── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.3.2_EN.pdf
+├── changelog.txt
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_CN.pdf
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_EN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_CN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_EN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_CN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_CN.pdf
+└── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_EN.pdf
 ```
 
 **RKNN-DRIVER**：
@@ -225,7 +198,7 @@ Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf。
 硬件相关开发可以参考用户使用指南，在工程目录：
 
 ```
-<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_User_Guide_Hardware_CN/EN.pdf
+<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_User_Guide_Hardware_CN.pdf
 ```
 
 ## SDK 工程目录介绍
@@ -247,167 +220,117 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 - rockdev：存放编译输出固件。
 - tools：存放 Linux 和 Window 操作系统下常用工具。
 - u-boot：存放基于 v2017.09 版本进行开发的 U-Boot 代码。
-- yocto：存放基于 YoctoThud 3.0 开发的根文件系统。
+- yocto：存放基于 Yocto Thud 3.0 开发的根文件系统。
 
 ## SDK 编译说明
 
-Ubuntu 16.04 系统:
-编译 Buildroot 环境搭建所依赖的软件包安装命令如下：
+### SDK依赖包安装
+
+本 SDK 开发环境是在 Ubuntu 系统上开发测试。我们推荐使用 Ubuntu 18.04 的系统进行编译。其他的 Linux 版本可能需要对软件包做相应调整。除了系统要求外，还有其他软硬件方面的要求。
+硬件要求：64 位系统，硬盘空间大于 40G。如果您进行多个构建，将需要更大的硬盘空间。
+软件要求：Ubuntu 18.04 系统：
+编译 SDK 环境搭建所依赖的软件包安装命令如下：
 
 ```
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev texinfo liblz4-tool genext2fs expect patchelf xutils-dev
-```
-
-编译 Debian 环境搭建所依赖的软件包安装命令如下：
-
-```
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools gcc-arm-linux-gnueabihf libssl-dev gcc-aarch64-linux-gnu g+conf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev texinfo liblz4-tool genext2fs xutils-dev
-```
-
-Ubuntu 17.04 或更高版本系统：
-除了上述外还需如下依赖包：
-
-```
-sudo apt-get install lib32gcc-7-dev g++-7 libstdc++-7-dev
+repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build
 ```
 
 建议使用 Ubuntu18.04 系统或更高版本开发，若编译遇到报错，可以视报错信息，安装对应的软件包。
 
-**注意**：
-RK3399Pro 每次上电启动后会加载 NPU 固件。 默认 NPU 固件都是预编好放到
-Rootfs 的 /usr/share/npu_fw 目录下, NPU 固件烧写以及启动方式请参考文档
+### SDK板级配置
 
-```
-<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf。
-```
+进入工程<SDK>/device/rockchip/rk3399pro目录：
 
-下面分别对 NPU 和 RK3399Pro 固件编译方法进行介绍：
+| 板级配置                       | 说明                                               |
+| ----------------------------- | --------------------------------------------------- |
+| BoardConfig-rk3399pro_evb_v10-usb.mk  |   适用于 RK3399Pro V10 开发板  |
+| BoardConfig-rk3399pro_evb_v11_v12-usb.mk    |  适用于 RK3399Pro V11、V12 开发板       |
+| BoardConfig_rk3399pro_evb_v13_pcie.mk  |  适用于 RK3399Pro V13  开发板 |
+| BoardConfig_rk3399pro_evb_v14-combine.mk  |  适用于 RK3399Pro V14 开发板  |
+| BoardConfig-rk3399pro_evb_lpd4_v11_v12-usb.mk  |  适用于 RK3399Pro LPDDR4 开发板  |
+| BoardConfig-rk3399pro_npu-pcie.mk |   适用于硬件PCIe方式链接NPU  |
+| BoardConfig-rk3399pro_npu-usb.mk  |  适用于硬件USB3.0方式链接NPU      |
 
-### NPU 编译说明
+方法1
+`./build.sh` 后面加上板级配置文件, 例如：
 
-#### 全自动编译
-
-进入工程目录根目录执行以下命令自动完成所有的编译：
-RK3399Pro EVB V10/V11/V12 开发板：
-
-```shell
-cd npu/device/rockchip
-cp rk3399pro-npu/BoardConfig.mk .BoardConfig.mk
-cd - && cd npu
-./build.sh uboot
-./build.sh kernel
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu
-```
-
-RK3399Pro EVB V13/V14 开发板：
+选择**RK3399Pro V10 开发板**的板级配置：
 
 ```shell
-cd npu/device/rockchip
-cp rk3399pro-npu-multi-cam/BoardConfig.mk .BoardConfig.mk
-cd ../../
-./build.sh uboot
-./build.sh kernel
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu-multi-cam
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_evb_v10-usb.mk
 ```
 
-在 rockdev 目录下生成 boot.img，uboot.img，trust.img，MiniLoaderAll.bin
-注意：rockdev下生成 NPU 固件需要存放在 Rootfs 指定位置/usr/share/npu_fw。
-
-#### 各模块编译及打包
-
-##### U-boot 编译
-
-进入工程 npu/u-boot 目录下执行 make.sh 来获取 rknpu_lion_loader_v1.03.103.bin trust.img uboot.img：
-
-rk3399pro-npu：
+选择**RK3399Pro V11/V12 开发板**的板级配置：
 
 ```shell
-./make.sh rknpu-lion
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_evb_v11_v12-usb.mk
 ```
 
-编译后生成文件在 u-boot 目录下：
-
-```
-u-boot/
-├── rknpu_lion_loader_v1.03.103.bin
-├── trust.img
-└── uboot.img
-```
-
-##### Kernel 编译步骤
-
-进入工程目录根目录执行以下命令自动完成 kernel 的编译及打包：
-
-RK3399Pro EVB V10/V11/V12 开发板：
-
-```
-cd npu/kernel
-git checkout remotes/rk/stable-4.4-rk3399pro_npu-linux
-make ARCH=arm64 rk3399pro_npu_defconfig
-make ARCH=arm64 rk3399pro-npu-evb-v10.img -j12
-```
-
-RK3399Pro EVB V13/V14 开发板：
-
-```
-cd npu/kernel
-git checkout remotes/rk/stable-4.4-rk3399pro_npu-pcie-linux
-make ARCH=arm64 rk3399pro_npu_pcie_defconfig
-make ARCH=arm64 rk3399pro-npu-evb-v10-multi-cam.img -j12
-```
-
-##### Boot.img 以及 NPU 固件生成步骤
-
-进入工程 npu 目录执行以下命令自动完成 boot.img 的打包：
-RK3399Pro EVB V10/V11/V12 板：
+选择**RK3399Pro V13 开发板**的板级配置：
 
 ```shell
-cd npu
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu
+./build.sh device/rockchip/rk3399pro/BoardConfig_rk3399pro_evb_v13_pcie.mk
 ```
 
-RK3399Pro EVB V13/V14 开发板：
+选择**RK3399Pro V14 开发板**的板级配置：
 
 ```shell
-cd npu/device/rockchip
-cp rk3399pro-npu-multi-cam/BoardConfig.mk .BoardConfig.mk
-cd - && cd npu
-./build.sh ramboot
-./mkfirmware.sh rockchip_rk3399pro-npu-multi-cam
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-pcie.mk
 ```
 
-### RK3399Pro 编译说明
-
-#### 自动编译
-
-进入工程目录根目录执行以下命令，自动完成所有的编译：
+选择**RK3399Pro LPDDR4 开发板**的板级配置：
 
 ```shell
-$./build.sh
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_evb_lpd4_v11_v12-usb.mk
 ```
 
-默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定四个类型：buildroot、debian、distro 和 yocto 。
-其中debian是编译Debian 9系统， distro是编译debian10系统 。
-
-比如需要 Yocto 可以通过以下命令进行生成：
+选择**硬件PCIe方式的NPU**的板级配置：
 
 ```shell
-$export RK_ROOTFS_SYSTEM=yocto
-$./build.sh
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-pcie.mk
 ```
 
-具体参数使用情况，可 help 查询，比如：
+选择**硬件USB3.0方式的NPU**的板级配置：
 
 ```shell
-rk3399pro$ ./build.sh --help
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-usb.mk
+```
+
+方法2
+
+```shell
+rk3399pro$ ./build.sh lunch
+processing option: lunch
+
+You're building on Linux
+Lunch menu...pick a combo:
+
+0. default BoardConfig.mk
+1. BoardConfig-rk3399pro_evb_lpd4_v11_v12-usb.mk
+2. BoardConfig-rk3399pro_evb_v10-usb.mk
+3. BoardConfig-rk3399pro_evb_v11_v12-usb.mk
+4. BoardConfig-rk3399pro_npu-pcie.mk
+5. BoardConfig-rk3399pro_npu-usb.mk
+6. BoardConfig.mk
+7. BoardConfig_rk3399pro_evb_v13_pcie.mk
+8. BoardConfig_rk3399pro_evb_v14-combine.mk
+Which would you like? [0]:
+...
+```
+
+### 查看编译命令
+
+在根目录执行命令：./build.sh -h|help
+
+```shell
+rk3399pro$ ./build.sh -h
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
+lunch              -list current SDK boards and switch to specified board config
 uboot              -build uboot
 spl                -build spl
+loader             -build loader
 kernel             -build kernel
 modules            -build kernel modules
 toolchain          -build toolchain
@@ -431,126 +354,195 @@ allsave            -build all & firmware & updateimg & save
 Default option is 'allsave'.
 ```
 
-每个板子的板级配置需要在 /device/rockchip/.Boardconfig.mk 进行相关配置。
-RK3399Pro EVB 主要配置如下：
+查看部分模块详细编译命令，例如：./build.sh -h kernel
 
 ```shell
-# Target arch
-export RK_ARCH=arm64
-# Uboot defconfig
-export RK_UBOOT_DEFCONFIG=rk3399pro
-# Kernel defconfig
-export RK_KERNEL_DEFCONFIG=rockchip_linux_defconfig
-# Kernel dts
-export RK_KERNEL_DTS=rk3399pro-evb-v14-linux
-# boot image type
-export RK_BOOT_IMG=boot.img
-# kernel image path
-export RK_KERNEL_IMG=kernel/arch/arm64/boot/Image
-# parameter for GPT table
-export RK_PARAMETER=parameter.txt
-# Buildroot config
-export RK_CFG_BUILDROOT=rockchip_rk3399pro_combine
-# Recovery config
-export RK_CFG_RECOVERY=rockchip_rk3399pro_recovery
-```
-
-#### 各模块编译及打包
-
-##### U-boot 编译
-
-进入工程 u-boot 目录下执行 make.sh 来获取 rk3399pro_loader_v1.24.119.bin trust.img
-uboot.img：
-RK3399Pro EVB 板子：
-
-```shell
-./make.sh rk3399pro
-```
-
-编译后生成文件在 u-boot 目录下：
-
-```
-u-boot/
-├── rk3399pro_loader_v1.24.119.bin
-├── trust.img
-└── uboot.img
-```
-
-##### Kernel 编译
-
-进入工程目录根目录执行以下命令自动完成 kernel 的编译及打包：
-RK3399Pro EVB V10 开发板：
-
-```
-cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399pro-evb-v10-linux.img -j12
-```
-
-RK3399Pro EVB V11/V12 开发板：
-
-```
-cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399pro-evb-v11-linux.img -j12
-```
-
-RK3399Pro EVB V13 开发板：
-
-```
-cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399pro-evb-v13-linux.img -j12
-```
-
-RK3399Pro EVB V14 开发板：
-
-```
+rk3399pro$ ./build.sh -h kernel
+###Current SDK Default [ kernel ] Build Command###
 cd kernel
 make ARCH=arm64 rockchip_linux_defconfig
 make ARCH=arm64 rk3399pro-evb-v14-linux.img -j12
 ```
 
-编译后在 kernel目录生成 boot.img，此 boot.img 就是包含 Kernel 的 Image 和 DTB。
+[^注]: 详细的编译命令以实际对应的SDK版本为准，主要是配置可能会有差异。build.sh编译命令是固定的。
 
-##### Recovery 编译
+RK3399Pro 每次上电启动后会加载 NPU 固件。 默认 NPU 固件都是预编好放到
+根文件系统的 /usr/share/npu_fw 目录下, NPU 固件烧写及启动方式请参考文档
 
-进入工程目录根目录执行以下命令自动完成 Recovery 的编译及打包：
-RK3399Pro EVB 开发板：
-
-```shell
-./build.sh recovery
+```
+<SDK>/docs/RK3399PRO/Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf。
 ```
 
-编译后在 Buildroot 目录 output/rockchip_rk3399pro_recovery/images 生成 recovery.img。
+下面分别对 NPU 和 RK3399Pro 固件编译方法进行介绍：
+
+### NPU 编译说明
+
+#### 全自动编译
+
+进入工程目录根目录执行以下命令自动完成所有的编译：
+
+RK3399Pro EVB V10/V11/V12 开发板：
+
+```shell
+cd npu
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-usb.mk
+cd kernel
+git checkout remotes/rk/stable-4.4-rk3399pro_npu-linux
+cd -
+./build.sh uboot
+./build.sh kernel
+./build.sh ramboot
+./mkfirmware.sh
+```
+
+RK3399Pro EVB V13/V14 开发板：
+
+```shell
+cd npu
+./build.sh device/rockchip/rk3399pro/BoardConfig-rk3399pro_npu-pcie.mk
+cd kernel
+git checkout remotes/rk/stable-4.4-rk3399pro_npu-pcie-linux
+cd -
+./build.sh uboot
+./build.sh kernel
+./build.sh ramboot
+./mkfirmware.sh
+```
+
+在 rockdev 目录下生成 boot.img，uboot.img，trust.img，MiniLoaderAll.bin
+注意：rockdev下生成 NPU 固件需要存放在 Rootfs 指定位置/usr/share/npu_fw。
+
+#### 各模块编译及打包
+
+##### U-Boot编译
+
+```shell
+### U-Boot编译命令
+./build.sh uboot
+
+### 查看U-Boot详细编译命令
+./build.sh -h uboot
+```
+
+##### Kernel编译
+
+```shell
+### Kernel编译命令
+./build.sh kernel
+
+### 查看Kernel详细编译命令
+./build.sh -h kernel
+```
+
+##### Rootfs编译
+
+```shell
+### Rootfs编译命令
+./build.sh ramboot
+
+### 查看Rootfs详细编译命令
+./build.sh -h ramboot
+```
+
+Buildroot的package编译方法：
+注：SDK根目录app和external下的工程都是buildroot的package包，编译方法相同。
+
+```shell
+### 1. 先查看Board Config对应的rootfs是哪个配置
+./build.sh -h rootfs
+###Current SDK Default [ rootfs ] Build Command###
+source envsetup.sh rockchip_rk3399pro-npu-multi-cam
+make
+
+### 2. source buildroot对应的defconfig
+source envsetup.sh rockchip_rk3399pro-npu-multi-cam
+
+### 3. 查看对应模块的makefile文件名
+### 例如：buildroot/package/rockchip/rknpu/rknpu.mk
+make rknpu-dirclean
+make rknpu-rebuild
+```
+
+##### 固件打包
+
+固件打包命令：`./mkfirmware.sh`
+
+固件目录：rockdev
+
+### RK3399Pro 编译说明
+
+#### 自动编译
+
+进入工程根目录执行以下命令自动完成所有的编译：
+
+```shell
+./build.sh all # 只编译模块代码（u-Boot，kernel，Rootfs，Recovery）
+               # 需要再执行./mkfirmware.sh 进行固件打包
+
+./build.sh     # 在./build.sh all基础上
+               # 1. 增加固件打包 ./mkfirmware.sh
+               # 2. update.img打包
+               # 3. 复制rockdev目录下的固件到IMAGE/***_RELEASE_TEST/IMAGES目录
+               # 4. 保存各个模块的补丁到IMAGE/***_RELEASE_TEST/PATCHES目录
+               # 注：./build.sh 和 ./build.sh allsave 命令一样
+```
+
+默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定四个类型：buildroot、debian、distro 和 yocto 。
+其中debian是编译Debian 9系统，distro是编译debian10系统。
+
+比如需要 debain 可以通过以下命令进行生成：
+
+```shell
+$export RK_ROOTFS_SYSTEM=debian
+$./build.sh
+```
+
+#### 各模块编译及打包
+
+##### U-Boot编译
+
+```shell
+### U-Boot编译命令
+./build.sh uboot
+
+### 查看U-Boot详细编译命令
+./build.sh -h uboot
+```
+
+##### Kernel编译
+
+```shell
+### Kernel编译命令
+./build.sh kernel
+
+### 查看Kernel详细编译命令
+./build.sh -h kernel
+```
+
+##### Recovery编译
+
+```shell
+### Recovery编译命令
+./build.sh recovery
+
+### 查看Recovery详细编译命令
+./build.sh -h recovery
+```
+
+注：Recovery是非必需的功能，有些板级配置不会设置
 
 ##### Buildroot  编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
-RK3399Pro EVB V10/V11/V12 开发板：
-
-```shell
-cd device/rockchip/rk3399pro
-cp BoardConfig_rk3399pro_usb.mk ../.BoardConfig.mk
-cd - && ./build.sh rootfs
-```
-
-RK3399Pro EVB V13 开发板：
-
-```shell
-cd device/rockchip/rk3399pro
-cp BoardConfig_rk3399pro_multi_cam_pcie.mk ../.BoardConfig.mk
-cd - && ./build.sh rootfs
-```
-
-RK3399Pro EVB V14 开发板：
 
 ```shell
 ./build.sh rootfs
 ```
 
-编译后在 Buildroot 目录 output/rockchip_rk3399pro_combine/images下生成 rootfs.ext4。
-备注：
+编译后在 Buildroot 目录 output/rockchip_芯片命令/images下生成 rootfs.ext4。
+
+###### Buildroot 的交叉编译
+
 若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。交叉编译工具位于 buildroot/output/rockchip_rk3399pro_combine/host/usr 目录下，需要将工具的bin/目录和 aarch64-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
 
 ```shell
@@ -568,6 +560,30 @@ cd buildroot/output/rockchip_rk3399pro_combine/host/usr/bin
 
 ```
 aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
+```
+
+###### Buildroot 中模块编译
+
+比如 qplayer 模块，常用相关编译命令如下：
+
+- 编译 qplayer
+
+```
+SDK$make qplayer
+```
+
+- 重编 qplayer
+
+```
+SDK$make qplayer-rebuild
+```
+
+- 删除 qplayer
+
+```
+SDK$make qplayer-dirclean
+或者
+SDK$rm -rf /buildroot/output/rockchip_rk3399pro/build/qlayer-1.0
 ```
 
 ##### Debian 9 编译
@@ -606,7 +622,9 @@ FAQ:
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target '/home/foxluo/work3/rockchip/rk_linux/rk3399_linux/rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot' mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target
+...
+mounted with noexec or nodev
 ```
 
 解决方法：
