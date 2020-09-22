@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-38
 
-发布版本：V1.4.0
+发布版本：V1.5.0
 
-日期：2020-06-02
+日期：2021-01-21
 
 文件密级：□绝密   □秘密   ■内部资料   □公开
 
@@ -68,6 +68,7 @@ Rockchip Electronics Co., Ltd.
 | 2017.01.14 | V1.2   | 汤云平    | 增加 RK3326 描述及 LPDDR2/LPDDR3 要求 |
 | 2018.10.08 | V1.3   | 陈有敏    | 增加总容量 3GB 说明和 RK3399 单通道布线要求   |
 | 2020.06.02 | V1.4.0 | 汤云平 | 增加RV1126/RV1109相关要求 |
+| 2020.01.21 | V1.5.0 | 汤云平 | 增加RK3566/RK3568相关要求，以及更新RV1126/1109描述 |
 
 **目录**
 
@@ -259,7 +260,7 @@ AXI SPLIT 模式下，要求所有颗粒的 column,bank 是相同的。
 
 3. LPDDR3：由于MRR的数据是从DQ0-7返回，Loader中目前将MRR返回的数据按模板“RV1126_RV1109_EVB_LP3S178P132SD6_V10_20191227”的连接顺序对调后得到正确的MRR值。所以后续模板必须与该模板的DQ0-7保持一致的连接顺序，否则MRR的结果会出错。
 
-4. LPDDR4：由于CA Training会用到所有的DQ，所以所有的DQ需要保持一一对应。
+4. LPDDR4：由于CA Training会用到所有的DQ，所以所有的DQ需要保持一一对应。PHY端LPDDR4的Byte顺序和其他类型颗粒并不同，具体参考“RV1126_RV1109_EVB_LP4S200P132SD6_V10_20200205.pdf”。
 
 5. DDR3/4有高低16bit贴不同容量颗粒需求的模版、总位宽16bit的模版、以及16bit/32bit兼容的模版，这3种模版必须保持一样的PHY和DQS对应关系，不允许这3种模版对应关系变化。
 
@@ -271,7 +272,7 @@ AXI SPLIT 模式下，要求所有颗粒的 column,bank 是相同的。
 
 2. CLK和DQS之间的相位差控制在±640ps左右。
 
-   原因：1. 颗粒wrlvl的原理决定DQS和CLK的相位差不能超过1个cycle。2. PHY wrlvl的原理是CLK固定一个de-skew值，DQS的de-skew从0开始增大寻找DQS与CLK上升沿对齐的点。PHY的de-skew一共64个单位每个单位20ps。目前CLK de-skew的default值设置为0x20，所以CLK与DQS之间的相位差可以是-640ps到640ps。与硬件约定CLK和DQS之间的相位差控制在±150ps内。
+   原因：1. 颗粒wrlvl的原理决定DQS和CLK的相位差不能超过1个cycle。2. PHY wrlvl的原理是CLK固定一个de-skew值，DQS的de-skew从0开始增大寻找DQS与CLK上升沿对齐的点。PHY的de-skew一共64个单位每个单位20ps。目前CLK de-skew的default值设置为0x20，所以CLK与DQS之间的相位差可以是-640ps到640ps。但是还需要考虑为DQS和DQ training留下一些de-skew余量，CLK/CMD留下一些de-skew余量，与硬件约定CLK和DQS之间的相位差控制在±150ps内。
 
 3. 对于DQS/DQ所有类型的颗粒都可以不做等长，但是需要保证如下几点：
 
@@ -282,3 +283,44 @@ AXI SPLIT 模式下，要求所有颗粒的 column,bank 是相同的。
    2. 由于de-skew受温度电压影响会有±20%的误差。De-skew每个单位典型值是20ps实际值可能是16-24ps。由于不等长是通过de-skew来补偿的，当DQS和DQ之间的长度差200ps时，DQS和DQ设置的de-skew差为10个。这时候实际补偿值可能会是160-240ps。会吃掉±40ps的margin，需要保证在极限频率下能够多预留这±40ps的margin出来，否则的话需要考虑减小DQS与DQ的长度差。
 
    3. 由于write training PHY没做DM的training，PHY直接将DM和组内的DQ0设置为一样的de-skew值。所以实际需要让DM0和DQ0，DM1和DQ8，DM2和DQ16，DM3和DQ24等长。
+
+---
+
+## RK3566/3568需求
+
+### DQ的对调
+
+除DDR4的DQ变为可以任意对调外，其他和RV1126类似。具体规则如下。
+
+1. DDR3：所有DQ顺序组内可任意对调，DQS组间可任意对调。
+
+2. DDR4：使用提前写入到DDR的数据来做read training，所以不带ECC的版本所有DQ顺序组内可任意对调，DQS组间可任意对调。带ECC的版本由于写入到ECC byte的数据是自动生成的不受控，所以无法使用提前写入到DDR中的数据来做read training，还是和RV1126一样的通过MPR寄存器来做read training，所以所有带ECC的DDR4板子所有的DQ需要保持一样的顺序。
+
+3. LPDDR3：由于MRR的数据是从颗粒的DQ0-7返回，Loader需要对返回的数据按照PCB的DQ连接顺序对调一遍。所以所有的LPDDR3模板颗粒的DQS0以及DQ0-DQ7连接到主控的顺序需要保持一致。其他DQS/DQ的顺序不做要求。
+
+4. LPDDR4/LPDDR4x：由于CA Training会用到所有的DQ，所以所有的DQ需要保持一一对应。具体Byte顺序需要按照硬件同事与Inno沟通的最终结果对应连接。
+
+5. DDR3/4总位宽16bit的模版、以及16bit/32bit兼容的模版，这2种模版必须保持一样的PHY和DQS对应关系，不允许这2种模版对应关系变化。
+
+   原因：对于16bit位宽模式颗粒必须连接在DQS0和DQS1上，高低16bit贴不同容量颗粒必须是DQS0和DQS1上贴大容量的那颗颗粒。而这一版本的PHY提供了PHY的BYTE整组对调的功能。如loader设置上将PHY的DQS2组和DQS1组对调的话，可以看做PHY IO上命名的DQS2组实际上已经是DQS1组了。这时候16bit模式实际上就需要将PHY的DQS0和DQS2连接到颗粒上。
+
+### 长度的控制
+
+**1. CMD/Address线**
+
+1. DDR3/DDR4：默认开启2T mode，这版芯片的2T可以做到前后各增加半个cycle的margin。所以除CS/CKE/ODT外的其他CMD/ADDRESS线可以不做等长，延迟需要控制在半个cycle以内。而CS/CKE/ODT由于没有2T mode依然需要对CLK做等长。
+2. LPDDR3：由于没有2T以及CA traininng，所以需要对CA做严格等长。
+3. LPDDR4/4x：1/2cs的情况有做CA training，CA可以不需要等长。
+4. LPDDR4/4x 4CS的情况：4cs CA training异常，CA需要严格等长。
+
+**2. CLK于DQS的长度差**
+
+RK3566/RK3568的CLK和DQS的de-skew为4UI，考虑到需要为CA/DQ training留够magrin，建议CLK/DQS之间的长度差控制在±1UI内。UI：半个CLK cycle，如1.6GHz(3200Mbps)下为312ps。
+
+**3. DQS/DQ的等长**
+
+RK3566/RK3568做了如下优化：1. 对de-skew进行了PVT补偿，2. 调整范围增加到了4UI，3. 所有类型的颗粒增加TX方向的DM training，而RX方向只有LPDDR4/LPDDR4x有DM的training。
+
+RX方向的DM在DDR4 开启DBI功能下也需要使用到，所以如果DDR4开启DBI功能的话需要保证DM和组内的第一个DQ等长，否则DM也不需要等长。而当前暂时没有开启DBI功能的需求，所以DDR4 DM也可以不需要做等长处理。后续如果有DBI需求的话再考虑重新layout。
+
+DQS/DQ处上面描述提到的DDR4可能存在的DM的特殊需求外均可不做等长。
