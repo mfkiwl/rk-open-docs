@@ -1,6 +1,6 @@
 [TOC]
 
-# FIT 方案
+# FIT
 
 ## 简介
 
@@ -79,8 +79,9 @@ FIT 是U-Boot默认支持且主推的固件格式，SPL和U-Boot阶段都支持�
 			fdt = "fdt";
 			signature {
 				algo = "sha256,rsa2048";
+				padding = "pss";
 				key-name-hint = "dev";
-			        sign-images = "fdt", "firmware", "loadables";
+				sign-images = "fdt", "firmware", "loadables";
 			};
 		};
 	};
@@ -113,8 +114,9 @@ cjh@ubuntu:~/uboot-nextdev/u-boot$ fdtdump fit/u-boot.itb | less
 
 /memreserve/ 7f34d3411000 600;
 / {
+    version = <0x00000001>;               // 新增固件版本号
     totalsize = <0x000bb600>;             // 新增字段描述整个itb文件的大小
-    timestamp = <0x5ecb3553>;
+    timestamp = <0x5ecb3553>;             // 新增当前固件生成时刻的时间戳
     description = "Simple image with OP-TEE support";
     #address-cells = <0x00000001>;
     images {
@@ -128,6 +130,7 @@ cjh@ubuntu:~/uboot-nextdev/u-boot$ fdtdump fit/u-boot.itb | less
             compression = "none";
             load = <0x00400000>;
             hash {
+                // 新增固件的sha256校验和
                 value = <0xeda8cd52 0x8f058118 0x00000003 0x35360000 0x6f707465 0x0000009f 0x00000091 0x00000000>;
                 algo = "sha256";
             };
@@ -163,12 +166,13 @@ cjh@ubuntu:~/uboot-nextdev/u-boot$ fdtdump fit/u-boot.itb | less
         default = "conf";
         conf {
             description = "Rockchip armv7 with OP-TEE";
-            rollback-index = <0x00000000>;
+            rollback-index = <0x00000001>; // 固件防回滚版本号，没有手动指定时默认为0
             firmware = "optee";
             loadables = "uboot";
             fdt = "fdt";
             signature {
                 algo = "sha256,rsa2048";
+                padding = "pss";
                 key-name-hint = "dev";
                 sign-images = "fdt", "firmware", "loadables";
             };
@@ -258,7 +262,7 @@ CONFIG_SPL_FIT_ROLLBACK_PROTECT=y
 
 ### 镜像文件
 
-FIT方案上最终输出两个FIT格式的固件用于烧写，分别是uboot.img和boot.img，还有一个SPL文件用于打包成loader。
+FIT方案上最终输出两个FIT格式的固件用于烧写，分别是uboot.img（没有trust.img）和boot.img，还有一个SPL文件用于打包成loader。
 
 - uboot.img 文件
 
@@ -274,6 +278,45 @@ FIT方案上最终输出两个FIT格式的固件用于烧写，分别是uboot.im
 
   boot.img  = boot.itb * M份（M一般是1）
 
+- MCU 配置
+
+  目前某些平台可能带有MCU固件，不同产品可以根据相应的 TRUST ini 配置来决定是否启用。例如：
+
+  ```c
+  // 文件：RKTRUST/RV1126TOS_TB.ini，用于快速开机产品，启用了MCU。
+  [TOS]
+  TOSTA=bin/rv11/rv1126_tee_ta_tb_v1.04.bin
+  ADDR=0x00040000
+
+  // MCU配置格式：固件路径，启动地址，状态(okay或disabled)。
+  // 如果为disabled，则mcu不会被打包进uboot.img中。
+  [MCU]
+  MCU=bin/rv11/rv1126_mcu_v1.02.bin,0x108000,okay
+  ```
+
+- 固件压缩
+
+  目前某些平台可以支持uboot.img内部子固件的压缩，支持如下：
+
+  | 平台   | 压缩格式   | 固件                             |
+  | ------ | ---------- | -------------------------------- |
+  | RV1126 | gzip、none | u-boot.bin, trust, mcu(optional) |
+
+  用户可以在 rkbin 工程中对应的 TRUST ini 增加属性来启用。例如：
+
+  ```c
+  // 文件：RKTRUST/RV1126TOS_SPI_NOR_TINY.ini，用于小容量SPI Nor产品。
+  [TOS]
+  TOS=bin/rv11/rv1126_tee_v1.02.bin
+  ADDR=0x08400000
+  [MCU]
+  MCU=bin/rv11/rv1126_mcu_v1.00.bin,0x208000,disabled
+
+  // 压缩格式：gzip或none，不存在如下配置字段则默认非压缩。
+  [COMPRESSION]
+  COMPRESSION=gzip
+  ```
+
 - SPL 文件
 
   SPL文件指的是编译完成后生成的`spl/u-boot-spl.bin`，负责引导FIT格式的uboot.img。用户需要用它替换RK平台上不开源的miniloader，最终打包出loader。
@@ -286,7 +329,7 @@ boot.img和uboot.img分别在sdk工程和uboot工程下被编译生成。但是�
 
 ### its 文件
 
-- uboot的its文件为./u-boot.its，由defconfig中`CONFIG_SPL_FIT_GENERATOR`指定的脚本动态创建，固件编译成功够可见。
+- uboot的its文件为./fit/u-boot.its，由defconfig中`CONFIG_SPL_FIT_GENERATOR`指定的脚本动态创建，固件编译成功后可见。
 
 - boot的its文件位于SDK工程下：
 
@@ -305,14 +348,30 @@ device/rockchip/[platform]/xxx.its  // [platform]是平台目录
 scripts/fit-resign.sh
 // 固件解包脚本
 scripts/fit-unpack.sh
+// 固件替换脚本
+./scripts/fit-repack.sh
 ```
 
 脚本工具的使用在后续章节会介绍，此处先重点介绍make.sh的参数：
 
-- `--spl-new`：传递此参数，表示使用当前编译的spl文件打包loader；否则使用rkbin工程里的spl文件。**由用户根据实际情况决定是否传递 **
-- `--rollback-index-uboot [n]`：指定uboot.img 固件版本号，n必须是十进制正整数；
-- `--rollback-index-boot [n]`：指定boot.img 固件版本号，n必须是十进制正整数；
+**可选项(用户根据实际情况决定是否传递)：**
+
+- `--spl-new`：传递此参数，表示使用当前编译的spl文件打包loader；否则使用rkbin工程里的spl文件。
+- `--version-uboot [n]`：指定uboot.img的固件版本号，n必须是十进制正整数。
+- `--version-boot [n]`：指定uboot.img的固件版本号，n必须是十进制正整数；
+
+**必选项(启用安全启动的情况)：**
+
+- `--rollback-index-uboot [n]`：指定uboot.img 固件防回滚版本号，n必须是十进制正整数；
+- `--rollback-index-boot [n]`：指定boot.img 固件防回滚版本号，n必须是十进制正整数；
+
 - `--no-check`：打包安全固件时被使用，用于跳过安全固件打包脚本的自校验。
+
+> 说明：
+>
+> 1. 固件防回滚版本号：只有在启用了安全启动的前提下才允许被激活使用，该版本号保存在OTP或者其它安全存储中。主要作用：为了防止固件版本被回退后进行漏洞攻击。
+>
+> 2. 固件版本号：可选，不指定的情况下默认为0。主要作用：只是作为固件版本标识，方便用户对固件进行版本管理。
 
 ## 非安全启动
 
@@ -321,7 +380,7 @@ scripts/fit-unpack.sh
 编译命令：
 
 ```c
-./make.sh rv1126 --spl-new  // 可不指定 --spl-new
+./make.sh rv1126 --spl-new --uboot-version 10  // 可不指定 --spl-new和--uboot-version
 ```
 
 编译结果：
@@ -349,8 +408,8 @@ pack loader(SPL) okay! Input: /home4/cjh/rkbin/RKBOOT/RV1126MINIALL.ini
 // 来自 --spl-new 参数的提示；用户可以选择不加这个参数。
 pack loader with new: spl/u-boot-spl.bin
 
-// 生成 uboot.img（包含trust和uboot）
-Image(no-signed):  uboot.img (FIT with uboot, trust) is ready
+// 生成 uboot.img（包含trust和uboot），版本号为10
+Image(no-signed, version=10):  uboot.img (FIT with uboot, trust...) is ready
 // trust ini文件来源
 pack uboot.img okay! Input: /home4/cjh/rkbin/RKTRUST/RV1126TOS.ini
 
@@ -376,7 +435,7 @@ FIT方案如果作为SDK正式发布的feature，SDK编译完成后会生成FIT�
 
 FIT方案支持安全启动，相关的feature：
 
-- sha256 + rsa2048
+- sha256 + rsa2048 + pkcs-v2.1(pss) padding
 - 固件防回滚
 - 固件重签名(远程签名)
 - Crypto硬件加速
@@ -389,7 +448,7 @@ FIT方案支持安全启动，相关的feature：
 - SPL 校验uboot.img（包含trust、U-Boot...）
 - U-Boot校验boot.img（包含kernel，fdt，ramdisk...）
 
-目前默认只支持 sha256+rsa2048 的安全校验模式。
+目前默认只支持 sha256+rsa2048+pkcs-v2.1(pss) padding 的安全校验模式。
 
 #### key存放
 
@@ -442,7 +501,7 @@ cjh@ubuntu:~/uboot-nextdev$ fdtdump u-boot.dtb | less
 
   U-Boot把RSA公钥保存在u-boot.dtb中，u-boot.dtb会被打包进u-boot.bin文件（最后打包为uboot.img）；安全启动时U-Boot从自己的dtb文件中拿RSA公钥对boot.img进行校验。
 
-所以当前的RSA Key已经作为自身固件的一部分，由前一级loader完成了安全校验，从而保证了Key 的安全。
+所以当前这级的RSA Key已经作为自身固件的一部分，由前一级loader完成了安全校验，从而保证了Key 的安全。
 
 #### 签名存放
 
@@ -469,7 +528,7 @@ cjh@ubuntu:~/uboot-nextdev$ fdtdump uboot.img | less
             signature {
                 hashed-strings = <0x00000000 0x000000da>;
                 // 指定被签名内容
-                hashed-nodes = "/", "/configurations/conf", "/images/fdt", "/images/fdt/hash", "/images/optee", "/images/optee/hash", "/images/uboot", "/images/uboot/hash";
+                hashed-nodes = "/", "/configurations", "/configurations/conf", "/images/fdt", "/images/fdt/hash", "/images/optee", "/images/optee/hash", "/images/uboot", "/images/uboot/hash";
                 // 进行签名的时间、签名者、版本
                 timestamp = <0x5e9427b4>;
                 signer-version = "2017.09-g8bb63db-200413-dirty #cjh";
@@ -488,7 +547,7 @@ cjh@ubuntu:~/uboot-nextdev$ fdtdump uboot.img | less
 
 - 安全启动支持对boot.img和uboot.img分别指定当前固件版本号，如果当前固件版本号小于机器上的最小版本号，则不允许启动。
 
-- 最小版本号的更新：完成安全校验且确认系统可以正常启动后，被更新到OTP中。
+- 最小版本号的更新：完成安全校验且确认系统可以正常启动后，被更新到OTP或安全存储中。
 
 ### 前期准备
 
@@ -523,12 +582,14 @@ U-Boot的defconfig打开如下配置：
 ```c
 // 必选。
 CONFIG_FIT_SIGNATURE=y
-CONFIG_FIT_SPL_SIGNATURE=y
+CONFIG_SPL_FIT_SIGNATURE=y
 
 // 可选。
 CONFIG_FIT_ROLLBACK_PROTECT=y       // boot.img防回滚
 CONFIG_SPL_FIT_ROLLBACK_PROTECT=y   // uboot.img防回滚
 ```
+
+> 建议通过make menuconfig的方式选中配置后，再通过make savedefconfig更新原本的defconfig文件。这样可以避免因为强加defconfig配置而导致依赖关系不对，进而导致编译失败的情况。
 
 #### 固件
 
@@ -589,8 +650,8 @@ pack loader(SPL) okay! Input: /home4/cjh/rkbin/RKBOOT/RV1126MINIALL.ini
 
 // 编译完成后，生成已签名的uboot.img和boot.img，且包含防回滚版本号。
 // rv1126_spl_loader_v1.00.100.bin需要用RK的"SecureBootTool"工具单独签名。
-Image(signed, rollback-index=10):  uboot.img (FIT with uboot, trust) is ready
-Image(signed, rollback-index=12):  boot.img (FIT with kernel, fdt, resource...) is ready
+Image(signed, version=0, rollback-index=10):  uboot.img (FIT with uboot, trust) is ready
+Image(signed, version=0, rollback-index=12):  boot.img (FIT with kernel, fdt, resource...) is ready
 Image(no-signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is ready
 ```
 
@@ -899,3 +960,17 @@ Unpack to directory out:
 ```
 
 > 如果img包含多备份，脚本只解包第一份itb；sha256+表示固件没有损坏，否则显示sha256-。
+
+## 固件替换
+
+用户可以借助脚本批量替换子固件。例如：用out目录里存在的子固件去替换uboot.img里同名的子固件。
+
+```c
+cjh@ubuntu:~/uboot-nextdev$ ./scripts/fit-repack.sh -f uboot.img -d out/
+Unpack to directory out/repack/:
+  uboot               : 6 bytes... sha256+
+  optee               : 6 bytes... sha256+
+  fdt                 : 4 bytes... sha256+
+....
+Image(repack):  uboot.img is ready
+```
