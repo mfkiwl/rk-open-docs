@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-326
 
-Release Version: V1.1.0
+Release Version: V1.2.0
 
-Release Date: 2020-08-04
+Release Date: 2020-09-25
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -60,6 +60,7 @@ Software development engineers
 | V1.0.0    | Jeffy Chen | 2019-11-27 | Initial version |
 | V1.0.1 | Ruby Zhang | 2020-07-23 | Update the company name  <br/> and the format of the document |
 | V1.1.0 | Jeffy Chen | 2020-08-04 | Update contents for the newest SDK |
+| V1.2.0 | Jeffy Chen | 2020-09-25 | Update contents for the newest SDK |
 
 ---
 
@@ -93,7 +94,9 @@ Please refer to: <https://fossies.org/linux/weston/man/weston.ini.man>.
 
 c. Special environment variables
 
-Generally, these environment variables are set in the startup script of Weston, which is located in /etc/init.d/S50launcher of the SDK firmware, for example:
+Generally, these environment variables are set in these places:
+
+1. The startup script of Weston, which is located in /etc/init.d/S50launcher of the SDK firmware, for example:
 
 ```shell
     # /etc/init.d/S50launcher
@@ -103,6 +106,8 @@ Generally, these environment variables are set in the startup script of Weston, 
                     ...
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
 ```
+
+2. The environment script of Weston, which is located in /etc/profile.d/weston.sh of the SDK firmware.
 
 d. Dynamic configuration file
 
@@ -287,7 +292,7 @@ Screen's resolution and scale of Weston can be configured in the `output` sectio
     # value must be an integer, support application level scaling
 ```
 
-If you want to scale to a specific resolution, you can configure it through WESTON_DRM_VIRTUAL_SIZE environment variable, such as:
+If you want to scale to a specific resolution(without changing the physical resolution), you can configure it through WESTON_DRM_VIRTUAL_SIZE environment variable, such as:
 
 ```shell
     # /etc/init.d/S50launcher
@@ -297,8 +302,6 @@ If you want to scale to a specific resolution, you can configure it through WEST
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
 ```
 
-It requires the display driver to support hardware scaling. Some chip platforms do not support scaling with alpha transparency. Please refer to the above description to modify the display color format to XRGB8888 or other formats.
-
 If you want to configure resolution and scaling dynamically, the dynamic configuration file can be used, for example:
 
 ```shell
@@ -306,7 +309,7 @@ If you want to configure resolution and scaling dynamically, the dynamic configu
     echo "output:eDP-1:rect=<10,20,410,620>" > /tmp/.weston_drm.conf # eDP-1 display to the position of (10,20), the size is scaled to 400x600
 ```
 
-When the VOP hardware doesn't support scaling, it would try to use Rockchip's RGA 2D acceleration.
+When the VOP hardware doesn't support scaling, these kinds of scale requires Rockchip's RGA 2D acceleration.
 
 ### Freeze the Screen
 
@@ -345,6 +348,25 @@ Or
                     ...
                     sleep 1 && \
                         echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # unfreeze  after 1 second
+```
+
+### Screen Status Configuration
+
+The DRM framework supports setting force status for screens:
+
+```shell
+    echo on > /sys/class/drm/card0-HDMI-A-1/status # Force HDMI-A-1 connected
+    #on|off|detect, detect means hot-plug
+```
+
+For more specific screen status configuration, the dynamic configuration file can be used, for example:
+
+```shell
+    echo "output:DSI-1:off" >> /tmp/.weston_drm.conf # Turn off DSI
+    echo "output:eDP-1:on" >> /tmp/.weston_drm.conf # Turn on eDP
+    echo "compositor:state:off" >> /tmp/.weston_drm.conf # Turn off display
+    echo "compositor:state:sleep" >> /tmp/.weston_drm.conf # Turn off display and touch to wake
+    echo "compositor:state:on" >> /tmp/.weston_drm.conf # Turn on display
 ```
 
 ### Multi-screen Configuration
@@ -400,6 +422,8 @@ If there are multiple screens in Weston, input devices should be bound to screen
     # The id for seat of the input device can be found through buildroot/output/*/build/weston-8.0.0/weston-info tool
 ```
 
+### Calibration of Input Devices
+
 If you need to calibrate the touch screen, you can use WESTON_TOUCH_CALIBRATION environment, such as:
 
 ```shell
@@ -412,17 +436,17 @@ If you need to calibrate the touch screen, you can use WESTON_TOUCH_CALIBRATION 
 
 The calibration parameters can be obtained by Weston calibration tool: weston-calibrator. After running this tool, a number of random points will be generated, and then click them in sequence to output the calibration parameters, such as: Final calibration values: 1.013788 0.0 -0.061495 0.0 1.332709 -0.276154
 
-### Booting without monitor
+Or you can use the new Weston touch calibrator with:
 
-Weston doesn't support none-screen usage, forcing a connected status is required. For example:
+```ini
+    # /etc/xdg/weston/weston.ini
 
-```shell
-    # /etc/init.d/S50launcher
-      start)
-                    ...
-                    echo on > /sys/class/drm/card0-HDMI-A-1/status # Forcing HDMI-A-1 as connected
-                    weston --tty=2 -B=drm-backend.so --idle-time=0&
+                [libinput]
+                touchscreen_calibrator=true
+                calibration_helper=/bin/weston-calibration-helper.sh
 ```
+
+Then reboot and run weston-touch-calibrator to calibrate.
 
 ### Configuration on the Platform without GPU
 

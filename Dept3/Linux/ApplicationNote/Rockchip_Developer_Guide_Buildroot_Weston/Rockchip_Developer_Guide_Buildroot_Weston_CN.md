@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-326
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-08-04
+日期：2020-09-25
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0    | Jeffy Chen | 2019-11-27 | 初始版本     |
 | V1.0.1 | Ruby Zhang | 2020-07-22 | 更新公司名称和文档格式 |
 | V1.1.0 | Jeffy Chen | 2020-08-04 | 适配最新SDK |
+| V1.2.0 | Jeffy Chen | 2020-09-25 | 适配最新SDK |
 
 ---
 
@@ -100,7 +101,9 @@ b、weston.ini配置文件
 
 c、特殊环境变量
 
-此类环境变量一般设置于Weston的启动脚本内，SDK固件中位于/etc/init.d/S50launcher，如：
+此类环境变量一般设置于:
+
+1. Weston的启动脚本内，SDK固件中位于/etc/init.d/S50launcher，如：
 
 ```shell
     # /etc/init.d/S50launcher
@@ -110,6 +113,8 @@ c、特殊环境变量
                     ...
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
 ```
+
+2. Weston的环境变量配置文件，SDK固件中位于/etc/profile.d/weston.sh
 
 d、动态配置文件
 
@@ -294,7 +299,7 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
     # 需为整数倍数，支持应用内部实现缩放
 ```
 
-如需要缩放到特定分辨率，可以通过WESTON_DRM_VIRTUAL_SIZE环境变量配置，如：
+如需要缩放到特定分辨率(物理分辨率不变)，可以通过WESTON_DRM_VIRTUAL_SIZE环境变量配置，如：
 
 ```shell
     # /etc/init.d/S50launcher
@@ -304,8 +309,6 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
                     weston --tty=2 -B=drm-backend.so --idle-time=0&
 ```
 
-这种方式需要显示驱动支持硬件缩放。个别芯片平台不支持带alpha透明度的缩放，需要参考前面说明修改显示颜色格式为XRGB8888等格式。
-
 如果需要动态配置分辨率及缩放，可以通过动态配置文件，如：
 
 ```shell
@@ -313,7 +316,7 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
     echo "output:eDP-1:rect=<10,20,410,620>" > /tmp/.weston_drm.conf # eDP-1显示到(10,20)位置，大小缩放为400x600
 ```
 
-这种方式缩放时，如果硬件VOP显示模块不支持缩放，则需要依赖RGA处理。
+以上缩放时，如果硬件VOP显示模块不支持缩放，则需要依赖RGA处理。
 
 ### 冻结屏幕
 
@@ -354,6 +357,25 @@ Weston的屏幕分辨率及缩放可以在weston.ini的output段配置，如：
                         echo "output:all:unfreeze" > /tmp/.weston_drm.conf& # 1秒后解冻
 ```
 
+### 屏幕状态配置
+
+DRM框架支持强制配置屏幕状态:
+
+```shell
+    echo on > /sys/class/drm/card0-HDMI-A-1/status # 强制HDMI-A-1为接入状态
+    #on|off|detect，detect为热拔插
+```
+
+如果需要更具体的动态屏幕状态配置，可以通过动态配置文件，如：
+
+```shell
+    echo "output:DSI-1:off" >> /tmp/.weston_drm.conf #关闭DSI
+    echo "output:eDP-1:on" >> /tmp/.weston_drm.conf #开启eDP
+    echo "compositor:state:sleep" >> /tmp/.weston_drm.conf #显示休眠，触屏唤醒
+    echo "compositor:state:off" >> /tmp/.weston_drm.conf #显示休眠
+    echo "compositor:state:on" >> /tmp/.weston_drm.conf #显示唤醒
+```
+
 ### 多屏配置
 
 Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示器屏幕的区分根据drm的name（通过Weston启动log或者/sys/class/drm/card0-\<name\>获取），相关配置通过环境变量设置，如：
@@ -384,7 +406,7 @@ Buildroot SDK的Weston支持多屏同异显及热拔插等功能，不同显示�
     # off|current|preferred|<WIDTHxHEIGHT@RATE>
 ```
 
-### 输入设备相关配置
+### 输入设备配置
 
 Weston服务默认需要至少一个输入设备，如无输入设备，则需要在weston.ini中的core段特殊设置：
 
@@ -407,6 +429,8 @@ Weston中如存在多个屏幕，需要把输入设备和屏幕进行绑定，�
     # 输入设备对于seat的id可以通过buildroot/output/*/build/weston-8.0.0/weston-info工具查询
 ```
 
+### 触屏校准
+
 Weston如果需要校准触屏，可以通过WESTON_TOUCH_CALIBRATION环境变量，如：
 
 ```shell
@@ -419,17 +443,17 @@ Weston如果需要校准触屏，可以通过WESTON_TOUCH_CALIBRATION环境变�
 
 校准参数的获取可以使用Weston校准工具: weston-calibrator，工具运行后会生成若干随机点，依次点击后输出校准参数，如：Final calibration values: 1.013788 0.0 -0.061495 0.0 1.332709 -0.276154
 
-### 无屏启动
+也可以使用新版weston提供的校准工具，配置:
 
-Weston不支持无屏显示，需要将显示器设置成强制接入状态，如：
+```ini
+    # /etc/xdg/weston/weston.ini
 
-```shell
-    # /etc/init.d/S50launcher
-      start)
-                    ...
-                    echo on > /sys/class/drm/card0-HDMI-A-1/status # 强制HDMI-A-1为接入状态
-                    weston --tty=2 -B=drm-backend.so --idle-time=0&
+    [libinput]
+    touchscreen_calibrator=true
+    calibration_helper=/bin/weston-calibration-helper.sh
 ```
+
+然后重启，执行weston-touch-calibrator进行校准。
 
 ### 无GPU平台配置
 
