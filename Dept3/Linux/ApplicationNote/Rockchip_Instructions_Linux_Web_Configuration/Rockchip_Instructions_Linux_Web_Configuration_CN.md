@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-357
 
-发布版本：V1.4.0
+发布版本：V1.5.0
 
-日期：2020-08-14
+日期：2020-08-31
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -70,6 +70,7 @@ Rockchip Electronics Co., Ltd.
 | V1.3.0 | 陈茂森 | 2020-07-14 | 增加isp详细说明，人脸识别功能说明，存储详细说明 |
 | V1.3.1 | 陈茂森 | 2020-07-25 | 名称修正 |
 | V1.4.0 | 陈茂森 | 2020-08-14 | 人脸功能变更说明 |
+| V1.5.0 | 陈茂森 | 2020-08-31 | 增加直连调试的说明 |
 
 ---
 
@@ -146,9 +147,11 @@ Rockchip Electronics Co., Ltd.
 
 ⑩注销：退出登录，回到登录界面。
 
+---
+
 ## 预览界面
 
-![preview](resources/preview_cn.png)
+<img src="resources/preview_cn.png" alt="preview" style="zoom:67%;" />
 
 ①播放器菜单：目前仅支持开始播放以及暂停播放功能。
 
@@ -166,7 +169,7 @@ Rockchip Electronics Co., Ltd.
 
 ### 录像
 
-![review-video](resources/review-video_cn.png)
+<img src="resources/review-video_cn.png" alt="review-video" style="zoom:67%;" />
 
 ①查询：对已有录像进行条件查询。
 
@@ -180,7 +183,7 @@ Rockchip Electronics Co., Ltd.
 
 查看所有的抓图记录。
 
-![review-snap](resources/review-snap_cn.png)
+<img src="resources/review-snap_cn.png" alt="review-snap" style="zoom: 67%;" />
 
 ①查询：按条件搜索所有截图。
 
@@ -192,9 +195,9 @@ Rockchip Electronics Co., Ltd.
 
 ### 人员清单
 
-进入界面按默认条件自动查询。
+<img src="resources/face-member-list_cn.png" alt="face-member-list" style="zoom: 67%;" />
 
-![face-member-list](resources/face-member-list_cn.png)
+进入界面按默认条件自动查询。
 
 ①查询：条件查询已添加的人员信息，现支持条件查询以及人名查询。
 
@@ -216,7 +219,7 @@ Rockchip Electronics Co., Ltd.
 
 ### 单人注册
 
-![face-add-one](resources/face-add-one_cn.png)
+<img src="resources/face-add-one_cn.png" alt="face-add-one" style="zoom:67%;" />
 
 进行单人注册。
 
@@ -228,7 +231,7 @@ Rockchip Electronics Co., Ltd.
 
 #### 功能介绍
 
-![face-batch-input](resources/face-batch-input_cn.png)
+<img src="resources/face-batch-input_cn.png" alt="face-batch-input" style="zoom:67%;" />
 
 ①刷新：刷新导入数据。
 
@@ -303,8 +306,6 @@ Rockchip Electronics Co., Ltd.
 ④NTP测试：测试NTP校准情况，暂未实现。
 
 ⑤手动校准：按手动设置的时间对设备时间进行校准。
-
----
 
 #### 系统维护
 
@@ -512,6 +513,8 @@ I帧间隔：两个关键帧间的间隔。
 
 ⑧视频调整：目前仅支持制式设置。
 
+---
+
 #### OSD设置
 
 <img src="resources/osd_cn.png" alt="osd" style="zoom:67%;" />
@@ -530,7 +533,7 @@ I帧间隔：两个关键帧间的间隔。
 
 #### 视频遮挡
 
-<img src="resources/privacy_cn.png" alt="privacy" style="zoom: 67%;" />
+<img src="resources/privacy_cn.png" alt="privacy" style="zoom: 50%;" />
 
 绘制区域：绘制视频遮挡区域，目前最多绘制1个区域，计划最多绘制4个区域。
 
@@ -580,7 +583,7 @@ I帧间隔：两个关键帧间的间隔。
 
 ##### 联动方式
 
-![linkage](resources/linkage_cn.png)
+<img src="resources/linkage_cn.png" alt="linkage" style="zoom:50%;" />
 
 选择检测的联动方式，该功能暂未实现。
 
@@ -699,3 +702,19 @@ I帧间隔：两个关键帧间的间隔。
 ### 外设
 
 支持闸机以及显示屏数据配置，无实际应用。此项属于拓展功能，仅供闸机产品使用，具体功能实现需根据实际产品开发。
+
+## 设备直连
+
+调试时，使用设备直连PC操作如下：
+
+1. 设置PC与设备处于同一网段IP，且子网掩码为255.255.255.0；
+
+2. 使用网页访问登录地址，并登录；
+
+3. 如下图，进入配置/网络/基础设置/TCPIP/LAN中，设置网卡为自动，关闭自动获取，并设置IP为之前所设置的设备IP，IPv4子网掩码为255.255.255.0，其余设置满足IP规范即可保存。
+
+![link-pc](resources/link-pc_cn.png)
+
+4. 进行web操作。
+
+说明：若未进行以上设置，将会出现预览，下载等功能异常。

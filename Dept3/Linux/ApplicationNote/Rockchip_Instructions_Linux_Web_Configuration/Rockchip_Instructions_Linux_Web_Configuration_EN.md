@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-357
 
-Release Version: V1.4.0
+Release Version: V1.5.0
 
-Release Date: 2020-08-14
+Release Date: 2020-08-31
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -61,11 +61,12 @@ Software development engineers
 | **Version** | **Author** | **Date** | **Change Description** |
 | --------- | ---------- | :-------- | ------------ |
 | V1.0.0      | Allen Chen | 2020-04-29 | Initial version                                              |
-| V1.1.0      | Allen Chen | 2020-05-19 | Add introduction about face-output and user management.   |
-| V1.2.0      | Allen Chen | 2020-06-04 | Add introduction on record about preview and face mode switch. |
-| V1.3.0      | Allen Chen | 2020-07-14 | Add introduction on ISP, storage management and face recognition. |
+| V1.1.0      | Allen Chen | 2020-05-19 | Add introduction about face-output </br>and user management. |
+| V1.2.0      | Allen Chen | 2020-06-04 | Add introduction on record about </br>preview and face mode switch. |
+| V1.3.0      | Allen Chen | 2020-07-14 | Add introduction on ISP, storage </br>management and face recognition. |
 | V1.3.1 | Allen Chen | 2020-07-25 | Correction. |
 | V1.4.0 | Allen Chen | 2020-08-14 | Add introduction on face function changes. |
+| V1.5.0 | Allen Chen | 2020-08-31 | Add introduction about direct connection. |
 
 **Contents**
 
@@ -94,7 +95,7 @@ Software development engineers
 
 ## User Authentication
 
-![login](resources/login_en.png)
+<img src="resources/login_en.png" alt="login" style="zoom: 67%;" />
 
 Login address: device IP + /login
 
@@ -143,6 +144,8 @@ Use a browser to access the login address, you can see the login address as show
 ⑨User Name: Show User name.
 
 ⑩Logout: Logout and enter login page.
+
+---
 
 ## Preview
 
@@ -494,7 +497,7 @@ FEC: You can choose "on" and "off". After turning on this function, the distorti
 
 #### OSD
 
-<img src="resources/osd_en.png" alt="osd" style="zoom:67%;" />
+<img src="resources/osd_en.png" alt="osd" style="zoom: 50%;" />
 
 Set the OSD font style and OSD content.
 
@@ -510,7 +513,7 @@ Character overlay currently only supports the setting of two overlay areas, and 
 
 #### Privacy Cover
 
-<img src="resources/privacy_en.png" alt="privacy" style="zoom: 67%;" />
+<img src="resources/privacy_en.png" alt="privacy" style="zoom: 50%;" />
 
 Drawing: Draw the occluded area of the video, currently at most 1 area is drawn, and it is planned to draw at most 4 areas.
 
@@ -560,7 +563,7 @@ Draw an arming time schedule, and set up to 8 different time intervals per day.
 
 ##### Notification Mode
 
-![linkage](resources/linkage_en.png)
+<img src="resources/linkage_en.png" alt="linkage" style="zoom: 50%;" />
 
 Select the detection notification mode, this function has not yet been implemented.
 
@@ -679,3 +682,19 @@ To be realized.
 ### Peripherals
 
 It supports the data configuration of gates and display screens, without practical application. This item is an extended function and is only used by gate products. The realization of specific functions needs to be developed according to actual products.
+
+## Directly connected
+
+When debugging, use the device to directly connect to the PC as follows:
+
+1. Set the PC and the device to be in the same network segment IP, and the net mask is 255.255.255.0;
+
+2. Use the web page to access the login address and log in;
+
+3. As shown in the figure below, enter the config/network/basic/TCPIP/LAN, set the network card to automatic, close the automatic acquisition, and set the IP to the device IP set before, the IPv4 net mask to 255.255.255.0, and the rest of the settings meet the IP Standard can be saved.
+
+![link-pc](resources/link-pc_en.png)
+
+4. Perform web operations.
+
+Note: If the above settings are not performed, the preview, download and other functions will be abnormal.
