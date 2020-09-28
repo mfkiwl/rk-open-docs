@@ -8,11 +8,9 @@
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2019** **福州瑞芯微电子股份有限公司**
+**版权所有© 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -42,9 +40,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **前言**
+**前言**
 
- **概述**
+**概述**
 
  本文主要描述了Linux USB Gadget基本使用方法，旨在帮助开发者快速了解并使用Linux USB Gadget功能。
 
@@ -71,13 +69,13 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **目录**
+**目录**
 
 [TOC]
 
 ---
 
-## **1 Linux-USB Gadget API Framework**
+## Linux-USB Gadget API Framework
 
 USB Gadget 是运行在USB Peripheral 上配置USB功能的子系统，正常可被枚举的USB设备至少有3层逻辑层，有些功能还会在用户空间多跑一层逻辑代码。Gadget API就是具体功能和硬件底层交互的中间层。
 
@@ -92,7 +90,7 @@ USB Gadget 是运行在USB Peripheral 上配置USB功能的子系统，正常可
 
 **NOTE:** 参考资料 <https://www.kernel.org/doc/htmldocs/gadget/intro.html>
 
-### **1.1 Kernel 配置**
+### Kernel 配置
 
 USB Gadget功能配置在menuconfig如下位置：
 
@@ -117,7 +115,7 @@ CONFIG_USB_CONFIGFS_F_UAC2
 CONFIG_USB_CONFIGFS_F_UVC
 ~~~
 
-### **1.2 USB configfs**
+### USB configfs
 
 configfs 是一套基于可读写空间的文件系统，与sysfs类似，也有不同。
 
@@ -125,9 +123,9 @@ sysfs的节点都是由kernel创建并注册到sysfs里。sysfs中，用户通�
 
 configfs通过用户使用mkdir创建，rmdir销毁。节点内容是在mkdir后出现，这些内容可用通过read/write修改。和sysfs一样，readdir可以批量查看这些内容，symlink可以方便管理内容。不同的是，节点内容的生命周期完全由用户决定。支持这个功能的Kernel模块必须响应用户操作。
 
-## **2 USB Gadget 使用**
+## USB Gadget 使用
 
-### **2.1 USB 管理流程**
+### USB 管理流程
 
 RKScript中，有三个USB相关文件：
 
@@ -153,7 +151,7 @@ USB功能配置成功会有如下log，表明进入USB Ready:
 [   66.180663] android_work: sent uevent USB_STATE=CONFIGURED
 ~~~
 
-### **2.2 功能配置**
+### 功能配置
 
 USB 功能配置写在/etc/init.d/.usb_config中，运行状态下，修改USB功能可以修改/tmp/.usb_config，并运行/etc/init.d/S50usbdevice restart。
 
@@ -445,7 +443,7 @@ Host查看工具，Linux推荐guvcview，Windows推荐Amcap工具，选中Device
 - 如果系统是只读文件系统，S50usbdevice需要在系统打包前提前修改
 - UVC对热拔插支持不友好，只要USB Gadget一旦完成unbind动作，UVC就无法正常使用，这个问题是V4L2节点注册机制决定的。
 
-### **2.3 USB复合设备**
+### USB复合设备
 
 在端口及带宽条件允许下，USB Gadget可以使用复合功能，将多个USB Gadegt功能复合到一个USB Port上。
 

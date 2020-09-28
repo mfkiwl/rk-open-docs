@@ -41,6 +41,7 @@ Rockchip Electronics Co., Ltd.
 ---
 
 **前言**
+
 **概述**
 
 Rockchip Linux平台 Wi-Fi/BT 开发移植调试
@@ -551,7 +552,7 @@ wpa_cli -i wlan0 -p /var/run/wpa_supplicant save_config
 
 如果出现`wpa_state=COMPLETED`但没有出现有效的ip_address, 则检查下**dhcpcd**获取IP地址的进程是否有启动；如果wpa_state不为COMPLETED，则**先排查2.1.1扫描章节**。
 
-###	Wi-Fi AP热点验证
+### Wi-Fi AP热点验证
 
 SDK集成了相关程序，执行：softapDemo apName （开启名为apName默认无加密的热点）即可开启热点模式.
 代码及编译文件位置：

@@ -8,21 +8,19 @@ Release Date: 2020-03-27
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -36,7 +34,7 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
-## **Preface**
+**Preface**
 
  **Overview**
 
@@ -73,13 +71,13 @@ Software development engineers
 
 ---
 
-## **1 Set up the Development Environment**
+## Set up the Development Environment
 
-### **1.1 Choose a Development System**
+### Choose a Development System
 
 Ubuntu 18.04 is recommended to be used as an operating system of a compilation host. After the operating system is installed and the network environment is configured, you can continue with the following steps to complete installation of compilation tools.
 
-### **1.2 Compilation Tools Installation**
+### Compilation Tools Installation
 
 ```bash
 sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev texinfo liblz4-tool genext2fs xutils-dev libwayland-bin bison flex cmake
@@ -87,7 +85,7 @@ sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-t
 
 If an error is reported during compilation, you can install corresponding software packages according to the error messages.
 
-## **2 Directory Structure**
+## Directory Structure
 
 ```bash
 .
@@ -110,9 +108,9 @@ If an error is reported during compilation, you can install corresponding softwa
 
 At present, when building Qt APP on Debian10, qmake built by Buildroot will be used. So if you need to build Qt APP on Debian10, please build Buildroot first.
 
-## **3 Configuration and Compilation**
+## Configuration and Compilation
 
-### **3.1 Default Configuration and Compilation**
+### Default Configuration and Compilation
 
 Take RK3288 as an example to introduce the compilation and development of Debian10 system as follows:
 
@@ -127,7 +125,7 @@ After execution, the final configuration file used for building will be generate
 ./make.sh               #Automatically complete download, compilation, and packaging of each package into a file system
 ```
 
-### **3.2 Add Local Source Code Package and Build**
+### Add Local Source Code Package and Build
 
 It is going to describe how to integrate a local package into Debain10 below. Building `package` means that distro/make.s script executes make.sh in the corresponding packages according to the configurations enabled in `.config`. Here we will take rktoolkit as an example:
 
@@ -193,11 +191,11 @@ Individual packages building will also be installed in the output/target directo
 ./make.sh image
 ```
 
-### **3.3 Modify Configurations**
+### Modify Configurations
 
 The above steps are all default configurations. When there are some customized requirements, you have to add or remove some packages, or modify the package configuration options. Debian10 supports two ways to modify configurations: graphical modification and modify directly.
 
-#### **3.3.1 Direct Modification**
+#### Direct Modification
 
 Add in the configs/rk3288_defconfig directly:
 
@@ -205,7 +203,7 @@ Add in the configs/rk3288_defconfig directly:
  BR2_PACKAGE_RKTOOLKIT=y
 ```
 
-#### **3.3.2 Graphical Modification**
+#### Graphical Modification
 
 Take adding rktoolkit as an example:
 
@@ -237,7 +235,7 @@ Save to the `.config` used in build finally.
 
 Build rktoolkit and package it into the root file system.
 
-#### **3.3.3 Save Configurations**
+#### Save Configurations
 
 ```
 make savedefconfig
@@ -245,9 +243,9 @@ make savedefconfig
 
 The above commands will save output /.config configurations back to configs /rk3288_defconfig.
 
-## **4 FAQs**
+## FAQs
 
-### **4.1 Lack of mkdir Permissions**
+### Lack of mkdir Permissions
 
 The following log appears when `make rk3288_defconfig`:
 
@@ -260,7 +258,7 @@ make: *** [/output/build/buildroot-config/conf] Error 1
 
 Solution: because the $CURDIR variable required in Makefile is empty, restart a shell terminal.
 
-### **4.2 Public Key is not Available**
+### Public Key is not Available
 
 The log of public key is not available appears during build:
 

@@ -8,11 +8,9 @@
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **福州瑞芯微电子股份有限公司**
+**版权所有© 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -42,7 +40,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **前言**
+**前言**
 
  **概述**
 
@@ -72,19 +70,19 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## **目录**
+**目录**
 
 [TOC]
 
 ---
 
-## **1 开发环境搭建**
+## 开发环境搭建
 
-### **1.1 开发环境选择**
+### 开发环境选择
 
  推荐使用**Ubuntu 18.04**作为编译主机的操作系统，操作系统安装且配置好网络环境后，可继续如下步骤完成编译工具的安装。
 
-### **1.2 编译工具安装**
+### 编译工具安装
 
 ```bash
 sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev texinfo liblz4-tool genext2fs xutils-dev libwayland-bin bison flex cmake
@@ -92,7 +90,7 @@ sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-t
 
 如果编译遇到报错，可以视报错信息，安装对应的软件包。
 
-## **2 目录结构**
+## 目录结构
 
 ```bash
 .
@@ -116,9 +114,9 @@ sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-t
 
 目前编译Debian10上qt app的时候会使用buildroot编出来的qmake。所以如果需要编译Debian10上的qt app请先编译buildroot。
 
-## **3 配置和编译**
+## 配置和编译
 
-### **3.1 默认配置和编译**
+### 默认配置和编译
 
 下面以RK3288为例，介绍Debian10系统的编译和相关开发。
 
@@ -133,7 +131,7 @@ make rk3288_defconfig   #defconfig位于configs目录下
 ./make.sh               #自动完成各个包的下载、编译、并打包成文件系统
 ```
 
-### **3.2 新增本地源码包和编译**
+### 新增本地源码包和编译
 
 下面介绍本地的package如何集成到 Debain10中。 package的编译是由distro/make.sh脚本根据.config里面打开的配置来执行对应package里的make.sh。这里使用rktoolkit作为示例来讲解：
 
@@ -199,11 +197,11 @@ make rk3288_defconfig   #defconfig位于configs目录下
 ./make.sh image
 ```
 
-### **3.3 修改配置**
+### 修改配置
 
 上述的步骤是默认配置，当有客制化的需求时，需要增加或移除一些包，或者修改包的编译配置选项，Debian10支持图形化和直接修改配置的更改方式。
 
-#### **3.3.1 直接修改**
+#### 直接修改
 
 在configs/rk3288_defconfig 中直接添加
 
@@ -211,7 +209,7 @@ make rk3288_defconfig   #defconfig位于configs目录下
  BR2_PACKAGE_RKTOOLKIT=y
 ```
 
-#### **3.3.2 图形化修改**
+#### 图形化修改
 
 以添加rktoolkit为示例，
 
@@ -243,7 +241,7 @@ make menuconfig
 
 编译rktoolkit，并打包进根文件系统中。
 
-#### **3.3.3保存配置**
+#### 保存配置
 
 ```
 make savedefconfig
@@ -251,9 +249,9 @@ make savedefconfig
 
 上述命令会把output/.config配置保存回configs/rk3288_defconfig。
 
-## **4常见问题**
+## 常见问题
 
-### **4.1 提示mkdir权限不够**
+### 提示mkdir权限不够
 
 make rk3288_defconfig时出现如下log：
 
@@ -266,7 +264,7 @@ make: *** [/output/build/buildroot-config/conf] Error 1
 
 解决：因为Makefile中需要的$CURDIR变量为空，重启一个shell终端即可。
 
-### **4.2 public key is not available**
+### public key is not available
 
 编译过程中出现 public key is not available的相关log:
 

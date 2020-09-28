@@ -8,21 +8,19 @@ Date：2020-03-10
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -36,9 +34,9 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
-## **Preface**
+**Preface**
 
- **Overview**
+**Overview**
 
 This document mainly introduces the basic usage of Linux USB Gadget, aiming to help developers understand and use Linux USB Gadget functions faster.
 
@@ -64,13 +62,13 @@ Software development engineers
 
 ---
 
-## **Contents**
+**Contents**
 
 [TOC]
 
 ---
 
-## **1 Linux-USB Gadget API Framework**
+## Linux-USB Gadget API Framework
 
 USB Gadget is a system running inside a USB peripheral normally has at least three layers inside the kernel to handle USB protocol processing, and may have additional layers in user space code. The gadget API is used by the middle layer to interact with the lowest level (which directly handles hardware).
 
@@ -85,7 +83,7 @@ In Linux, from the bottom up, these layers are:
 
 **NOTE:** reference documents: <https://www.kernel.org/doc/htmldocs/gadget/intro.html>
 
-### **1.1 Kernel Configuration**
+### Kernel Configuration
 
 USB Gadget function is configured in menuconfig as follows:
 
@@ -110,7 +108,7 @@ CONFIG_USB_CONFIGFS_F_UAC2
 CONFIG_USB_CONFIGFS_F_UVC
 ~~~
 
-### **1.2 USB configfs**
+### USB configfs
 
 configfs is a ram-based filesystem that provides the converse of sysfs's functionality. Where sysfs is a filesystem-based view of kernel objects, configfs is a filesystem-based manager of kernel objects, or config_items.
 
@@ -118,9 +116,9 @@ With sysfs, an object is created in kernel (for example, when a device is discov
 
 A configfs config_item is created via an explicit userspace operation: mkdir. It is destroyed via rmdir. The attributes appear at mkdir time, and can be read or modified via read and write. As with sysfs, readdir queries the list of items and/or attributes. symlink can be used to group item together. Unlike sysfs, the lifetime of the representation is completely driven by userspace. The kernel modules backing the items must respond to this.
 
-## **2 USB Gadget Usage**
+## USB Gadget Usage
 
-### **2.1 USB Management Process**
+### USB Management Process
 
 There are three USB related files in `RKScript` package：
 
@@ -146,7 +144,7 @@ After USB function is configured successfully, the following log will be showed 
 [   66.180663] android_work: sent uevent USB_STATE=CONFIGURED
 ~~~
 
-### **2.2 Function Configuration**
+### Function Configuration
 
 USB function configuration is written in `/etc/init.d/.usb_config`. You can change USB function by modifying `/tmp/.usb_config` and run `/etc/init.d/S50usbdevice restart` during running state.
 
@@ -440,7 +438,7 @@ The bottom left corner shows the frame rate.
 - If your system is a read-only file system, S50usbdevice should be modified in advance before the system is packaged
 - UVC is not friendly support hot plug. Once USB Gadget completes unbind action, UVC will not be used normally, which is caused by V4L2 registration mechanism.
 
-### **2.3 USB Composite Device**
+### USB Composite Device
 
 If conditions of port and bandwidth permits, The composite function of USB Gadget can be used to combine multiple USB Gadegt functions into one USB Port.
 
