@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-520
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-07-13
+日期：2020-10-01
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -70,6 +70,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0     | 黄建财   | 2020-04-15   | 初始版本     |
 | V1.1.0     | 黄建财   | 2020-06-23   | 更新格式     |
 | V1.2.0     | 林其浩/黄建财 | 2020-07-13   | 添加扩展功能和h265支持章节 |
+| V1.3.0     | 黄建财   | 2020-10-01   | 添加UVC PTZ/H265等接口说明 |
 |            |          |              |              |
 
 ---
@@ -108,16 +109,21 @@ uvc_app实现了完整的UVC device的功能，包括配置、预览、切换、
 ## 源码说明
 
 ```shell
+├── camera_uvc.c
+├── cJSON
+│   ├── cJSON.c
+│   └── cJSON.h
 ├── CMakeLists.txt
-├── debug.patch
+├── conf
+│   └── uvc.json
 ├── doc
 │   └── zh-cn
-│       ├── Resource
-│       │   └── uvc.png
-│       └── Rockchip_Instructions_Linux_UVCApp_CN.md
+│       └── Rockchip_Introduction_Linux_UVCApp_CN.pdf
 ├── libs
 │   └── libuvcAlgorithm.so
 ├── main.c
+├── mFeature
+├── mpp_enc_cfg.conf
 ├── process
 │   ├── camera_control.cpp
 │   ├── camera_control.h
@@ -138,10 +144,15 @@ uvc_app实现了完整的UVC device的功能，包括配置、预览、切换、
 │   ├── uevent.h
 │   ├── uvc_control.c
 │   ├── uvc_control.h
+│   ├── uvc_data.proto
 │   ├── uvc_encode.cpp
 │   ├── uvc_encode.h
 │   ├── uvc-gadget.c
 │   ├── uvc-gadget.h
+│   ├── uvc_ipc.cpp
+│   ├── uvc_ipc_ext.h
+│   ├── uvc_ipc.h
+│   ├── uvc_log.h
 │   ├── uvc_video.cpp
 │   ├── uvc_video.h
 │   ├── yuv.c
@@ -157,13 +168,13 @@ uvc_app实现了完整的UVC device的功能，包括配置、预览、切换、
 
 - process：camera初始化、配置、Zoom处理、EPTZ处理、PU处理、反初始化等处理
 
-    - camera_control.cpp：camera线程处理实现
+    - camera_control.cpp：camera线程处理实现，提供EPTZ各接口供 uvc gadget线程调用
 
     - camera_pu_control.cpp：camera PU处理实现
 
-    - eptz_control.cpp：camera EPTZ 算法实现
+    - eptz_control.cpp：camera EPTZ 算法实现参考
 
-    - zoom_control.cpp：camera 动态变焦处理实现
+    - zoom_control.cpp：camera 软件缩放处理实现参考
 
 - 热拔插事件：uevent.c， uevent.h
 
@@ -177,7 +188,7 @@ uvc_app实现了完整的UVC device的功能，包括配置、预览、切换、
 
     - uvc多节点操作，buffer管理：uvc_video.cpp，uvc_video.h
 
-    - MJPG/H264编码：mpi_enc.c，mpi_enc.h
+    - MJPG/H264/h265编码：mpi_enc.c，mpi_enc.h
 
     - YUV格式转化：yuv.c，yuv.h
 
@@ -189,7 +200,7 @@ uvc_app实现了完整的UVC device的功能，包括配置、预览、切换、
 
 ## 扩展功能
 
-### RV1126/RV1109 XU扩展协议
+### RV1126/RV1109 UVC XU扩展协议
 
 rv1126/1109 camera实现了UVC标准扩展单元请求控制，可进行host端与camera端的自定义XU命令控制。目前已预置的控制请求包括以下类型，其中CMD_GET_CAMERA_VERSION、CMD_SET_CAMERA_IP、CMD_SET_EPTZ有进行相关处理，其余指令预留，客户可根据需求进行开发。
 
@@ -243,9 +254,9 @@ bmControls               : 0x07
 
 其中bUnitID、guidExtensionCode等信息即为kernel中配置信息，host端通过指定bUnitID以及对应的XuCmd命令即可实现对camera device端的控制。如对EPTZ进行开关，host端需要bUnitID为0x06的XU单元发送对应的EPTZ控制指令0x0a以及数据1或0，uvc_app记录当前状态后，在下次打开预览时则使能或关闭EPTZ功能。（**若使用SDK中默认的指令控制，需参考7.6节修改kernel相关文件**）。
 
-### EPTZ功能介绍
+### AUTO EPTZ功能介绍
 
-EPTZ是指通过软件手段，实现预览界面的“数字平移 - 倾斜 - 缩放/变焦”功能。RV1126/RV1109 UVC Camera方案，结合智能识别技术实现该功能支持，其实现流程框图大致如下：
+AUTO EPTZ是指通过软件手段，结合智能识别技术实现预览界面的“数字平移 - 倾斜 - 缩放/变焦”功能。RV1126/RV1109 UVC Camera方案，该功能默认已支持，其实现流程框图大致如下：
 
 ![uvc](resource/eptz.png)
 
@@ -255,9 +266,9 @@ EPTZ是指通过软件手段，实现预览界面的“数字平移 - 倾斜 - �
 
 - 多人：在camera可视范围内，尽可能的显示人多画面，且将其保持在画面中间。
 
-### EPTZ功能验证
+### AUTO EPTZ功能验证
 
-RV1126/RV1109使用EPTZ功能，需将dts中的otp节点使能，evb默认配置中已将其使能：
+RV1126/RV1109使用AUTO EPTZ功能，需将dts中的otp节点使能，evb默认配置中已将其使能：
 
 ```diff
 &otp {
@@ -265,11 +276,21 @@ RV1126/RV1109使用EPTZ功能，需将dts中的otp节点使能，evb默认配置
 };
 ```
 
-在RV1126/RV1109中，提供两种方案进行EPTZ功能验证及使用。
+在RV1126/RV1109中，提供三种方案进行AUTO EPTZ功能验证及使用。
 
 - 环境变量：在启动脚本（例如：RkLunch.sh）中添加环境变量export ENABLE_EPTZ=1，默认开启EPTZ功能，在所有预览条件下都将启用人脸跟随效果。
 
 - XU控制：通过UVC扩展协议，参考5.1中描述进行实现。当uvc_app接收到XU的CMD_SET_EPTZ(0x0a)指令时，将根据指令中所带的int参数1或0，进行EPTZ功能的开关，以确认下次预览时是否开启人脸跟随效果。
+
+- dbus指令：最新版本已支持通过dbus指令通知aiserver进程跨进程动态启动 AUTO EPTZ能力：
+
+```diff
+#开启命令
+dbus-send --system --print-reply --type=method_call --dest=rockchip.aiserver.control /rockchip/aiserver/control/graph rockchip.aiserver.control.graph.EnableEPTZ int32:1
+
+#关闭命令
+dbus-send --system --print-reply --type=method_call --dest=rockchip.aiserver.control /rockchip/aiserver/control/graph rockchip.aiserver.control.graph.EnableEPTZ int32:0
+```
 
 通过RV1126/RV1109套件串口的输出日志进行判断EPTZ功能是否生效，若EPTZ功能生效，串口输出如下：
 
@@ -285,6 +306,58 @@ uvc_camera :uvc width:xxx,height:xxx, needEPTZ 0, needRGA x \n
 uvc_camera :needEPTZ, match fail
 uvc_camera :needEPTZ, not support this width(>1920) and height(>1080).
 ```
+
+### UVC PTZ/EPTZ接口说明
+
+RV1126/RV1109已实现USB UVC 协议中关于缩放、平移、倾斜（上下移）等云台PTZ功能，对应CT指令为：CT_ZOOM_ABSOLUTE_CONTROL和CT_PANTILT_ABSOLUTE_CONTROL。其中CT_PANTILT_ABSOLUTE_CONTROL包含pan（左右平移）和tilt（一般为上下移）控制，参考章节7.7 打开对应CT指令描述符即可：
+
+```diff
+rv1109/kernel$ git diff
+diff --git a/drivers/usb/gadget/function/f_uvc.c b/drivers/usb/gadget/function/f_uvc.c
+index 4888af0..32f8ae4 100644
+--- a/drivers/usb/gadget/function/f_uvc.c
++++ b/drivers/usb/gadget/function/f_uvc.c
+@@ -1026,7 +1026,7 @@ static struct usb_function_instance *uvc_alloc_inst(void)
+        cd->wOcularFocalLength          = cpu_to_le16(0);
+        cd->bControlSize                = 3;
+        cd->bmControls[0]               = 2;
+-       cd->bmControls[1]               = 0;
++       cd->bmControls[1]               = 0x2a;
+        cd->bmControls[2]               = 0;
+
+        pd = &opts->uvc_processing;
+```
+
+PTZ接口定义在process/camera_control.h中,客户对应云台控制操作可以在对应接口中实现：
+
+```c
+ void camera_control_set_zoom(int val);//zoom 缩放接口，默认1-5.0缩放
+ void camera_control_set_pan(int val); //左右平移接口
+ void camera_control_set_tilt(int val);//上下移接口
+```
+
+EPTZ是在上述PTZ接口中通过软件来处理，达到类似电机控制画面位置的效果。
+简单来讲如HOST端设置480p分辨率，开启EPTZ功能时，程序会先读取720p或1080p等sensor支持的大分辨率画面crop或scale成需要的480p画面。其具体实现目前在外部aiserver进程中调用rockit库处理，uvc app仅处理调用流程。
+
+其中对应CT指令默认值定义在uvc/uvc-gadget.c中，如zoom：
+
+```c
+//ZOOM
+#define CT_ZOOM_ABSOLUTE_CONTROL_MIN_VAL         10
+#define CT_ZOOM_ABSOLUTE_CONTROL_MAX_VAL         50
+#define CT_ZOOM_ABSOLUTE_CONTROL_STEP_SIZE       1
+#define CT_ZOOM_ABSOLUTE_CONTROL_DEFAULT_VAL     10
+
+//PANTILT
+#define CT_PANTILT_ABSOLUTE_CONTROL_MIN_VAL         -36000
+#define CT_PANTILT_ABSOLUTE_CONTROL_MAX_VAL          36000
+#define CT_PANTILT_ABSOLUTE_CONTROL_STEP_SIZE        3600
+#define CT_PANTILT_ABSOLUTE_CONTROL_DEFAULT_VAL      0
+```
+
+windows pc上amcap软件中调试窗口显示如图
+
+![1600823441510](resource\ptz.png)
 
 ## 调试方法介绍
 
@@ -667,6 +740,16 @@ index 3ec44a2..0d09deb 100644
          break;
      default:
          LOG_INFO("%s: not support fcc: %d\n", __func__, fcc);
+```
+
+目前为了能同时支持H264和H265切换，外部程序可以通过执行如下命令来切换选择：
+
+```shell
+#切到H265编码
+touch /tmp/use_encodec_h265
+
+#关闭H265编码
+rm /tmp/use_encodec_h265
 ```
 
 方案二：
