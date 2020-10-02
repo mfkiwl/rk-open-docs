@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-386
 
-Release Version: V1.4.0
+Release Version: V1.5.0
 
-Release Date: 2020-09-15
+Release Date: 2020-09-27
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -14,7 +14,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 **Trademark Statement**
 
-"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by      their respective owners.
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
 **All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
@@ -40,6 +40,10 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 The document presents the separate compiling kernel U-Boot or Rootfs of Rockchip RV1126/RV1109 Linux SDK, aiming to help engineers get started with RV1126/RV1109 Linux SDK faster.
 
+**[NOTICE]: Please update SDK version to V1.3.0 or the latest**
+
+Get the version of SDK: `realpath .repo/manifests/rv1126_rv1109_linux_release.xml`
+
 **Product Version**
 
 | **Chipset**   | **Kernel Version** |
@@ -62,6 +66,7 @@ This document (this guide) is mainly intended for:
 | 2020-09-01 | V1.2.0 | CWW  | 1. Support eMMC compile instructions                           |
 | 2020-09-10 | V1.3.0 | CWW  | 1. Add Debug info chapter                           |
 | 2020-09-15 | V1.4.0 | CWW  | 1. Support AB system compilation                           |
+| 2020-09-27 | V1.5.0 | CWW  | 1. Fix BSP library build<br>2. Add print cif info |
 
 [TOC]
 
@@ -71,11 +76,11 @@ This document (this guide) is mainly intended for:
 
 Get thses directories from root directory of SDK:
 
-| Directory | Instructions                      |
-| --------- | ------------                      |
-| rkbin     | about DDR and prebuilt loader bin |
-| u-boot    | U-Boot code                       |
-| prebuilts | cross-compile tool                |
+| Directory or File | Instructions                      |
+| ----------------- | --------------------------------- |
+| rkbin             | about DDR and prebuilt loader bin |
+| u-boot            | U-Boot code                       |
+| prebuilts         | cross-compile tool                |
 
 ### For SPI NOR U-Boot compilation
 
@@ -122,10 +127,10 @@ cd u-boot
 
 Get thses directories from root directory of SDK:
 
-| Directory | Instructions       |
-| --------- | ------------       |
-| kernel    | linux kernel code  |
-| prebuilts | cross-compile tool |
+| Directory or File | Instructions       |
+| ----------------- | ------------------ |
+| kernel            | linux kernel code  |
+| prebuilts         | cross-compile tool |
 
 ### Build command explanation
 
@@ -351,11 +356,13 @@ firmware_merger
 
 Get thses directories from root directory of SDK:
 
-| Directory | Instructions       |
-| --------- | ------------       |
-| buildroot | buildroot's source |
-| external  | rockchip BSP codes |
-| prebuilts | cross-compile tool |
+| Directory or File | Instructions                        |
+| ----------------- | ----------------------------------- |
+| buildroot         | buildroot's source                  |
+| external          | rockchip BSP codes                  |
+| prebuilts         | cross-compile tool                  |
+| envsetup.sh       | link to buildroot/build/envsetup.sh |
+| Makefile          | link to buildroot/build/Makefile    |
 
 ### Command to build BSP's libraries
 
@@ -965,9 +972,36 @@ echo 0x100 > /sys/module/rk_vcodec/parameters/mpp_dev_debug
 echo 0 > /sys/module/rk_vcodec/parameters/mpp_dev_debug
 ```
 
-#### Print encode summary info
+### Print CIF info
 
-` cat /proc/mpp_service/session_summary `
+`cat /proc/rkcif_mipi_lvds`
+
+```shell
+Driver Version:v00.01.08
+Work Mode:ping pong
+aclk_cif:500000000
+hclk_cif:250000000
+dclk_cif:297000000
+Input Info:
+        src subdev:m01_f_os04a10 1-0036-1
+        interface:mipi csi2
+        lanes:4
+        vc channel: 0 1
+        hdr mode: hdr_x2
+        format:SBGGR10_1X10/2688x1520@30
+        crop.bounds:(0, 0)/2688x1520
+Output Info:
+        format:BG10/2688x1520(0,0)
+        compact:enable
+        frame amount:79
+        fps:30
+        irq statistics:
+                        total:158
+                        csi over flow:0
+                        csi bandwidth lack:0
+                        all err count:0
+                        frame dma end:158
+```
 
 ### Print ISPP info
 
