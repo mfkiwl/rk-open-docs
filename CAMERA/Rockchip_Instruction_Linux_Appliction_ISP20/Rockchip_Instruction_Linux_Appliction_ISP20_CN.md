@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-366
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-06-10
+日期：2020-10-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -65,6 +65,7 @@ Rockchip Electronics Co., Ltd.
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0    | 曾益清 | 2020-06-10 | 初始版本     |
+| V1.1.0    | CWW | 2020-10-02 | 修正文档路径 |
 
 ---
 
@@ -84,7 +85,7 @@ Rockchip Electronics Co., Ltd.
 
 Camera数据流通路如图1所示，Camera数据经过ISP20采集，ISP20再输出经过一系列图像处理算法后的数据，RkAiq不断从ISP20获取统计数据，并经过3A等算法生成新的参数反馈给ISP20，
 
-RkAiq具体实现可以参考Linux/Multimedia/camera/目录中的文档《Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf》。
+RkAiq具体实现可以参考**docs/RV1126_RV1109/Camera**目录中的文档《Rockchip_Development_Guide_ISP2x_CN_v1.2.0.pdf》。
 
 本文着重介绍应用层如何获取经过ISP20处理后的数据流。
 
@@ -96,6 +97,8 @@ RkAiq具体实现可以参考Linux/Multimedia/camera/目录中的文档《Rockch
 | rkispp_scale0   | /dev/video14 | **max width: 3264, 最大支持8倍缩放** | NV12/NV16/YUYV |
 | rkispp_scale1   | /dev/video15 | **max width: 1280, 最大支持8倍缩放** | NV12/NV16/YUYV |
 | rkispp_scale2   | /dev/video16 | **max width: 1280, 最大支持8倍缩放** | NV12/NV16/YUYV |
+
+[^注]：**video id** 节点不是固定的，可以使用media-ctl查看对应的节点。
 
 <center>表1 四路数据流</center>
 
@@ -159,9 +162,9 @@ ISP20可以输出四路数据流，如表1所示，entity name及对应的设备
 
 ### 基于RKMEDIA获取数据流
 
-RKMEDIA是RockChip Linux平台的多媒体库，详情请阅读docs/Linux/Multimedia/目录中的文档《Rockchip_Instructions_Linux_Rkmedia_CN.pdf》，本文着重介绍摄像头采集接口部分。
+RKMEDIA是RockChip Linux平台的多媒体库，详情请阅读**docs/RV1126_RV1109/Multimedia**目录中的文档《Rockchip_Instructions_Linux_Rkmedia_CN.pdf》，本文着重介绍摄像头采集接口部分。
 
-摄像头采集接口仅支持V4L2，源码参考**范例：external/rkmedia/test/stream/camera_capture_test.cc** （可能默认生成的固件里没有此可执行bin，需要到PC上生成的路径手动push到板端），使用命令查看使用方法：
+摄像头采集接口仅支持V4L2，源码参考**范例：external/rkmedia/examples/uintTest/stream/camera_capture_test.cc** （可能默认生成的固件里没有此可执行bin，需要到PC上生成的路径手动push到板端），使用命令查看使用方法：
 
 ```shell
 # ./camera_cap_test -h
@@ -297,7 +300,7 @@ v4l2-ctl -d /dev/video13 --set-ctrl="exposure=234,analogue_gain=76"  \
 
 SDK提供了一种3A独立进程的方式（ispserver）集成了RkAiq库librkaiq.so，旨在用[2 数据流获取](## 2 数据流获取)中的方法获取数据流时，能够得到具有ISP调试效果的图像。
 
-Ispserver具体实现可以阅读docs/Linux/Multimedia/camera/目录中的文档《Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf》，文档有具体介绍。
+Ispserver具体实现可以阅读**docs/RV1126_RV1109/camera**目录中的文档《Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf》，文档有具体介绍。
 
 **请首先确认该模组是否在支持列表中，**
 
