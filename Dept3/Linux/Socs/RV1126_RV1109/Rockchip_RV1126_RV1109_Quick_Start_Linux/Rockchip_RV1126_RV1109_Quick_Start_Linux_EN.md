@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.7.0
+Release Version: V1.8.0
 
-Release Date: 2020-09-16
+Release Date: 2020-09-25
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -73,6 +73,7 @@ This document (this guide) is mainly intended for:
 | V1.6.0 | LJH | 2020-08-22 | 1. Add facial gate product section<br>2. Update SDK compile instruction |
 | V1.6.1 | CWW | 2020-09-07 | 1. Add new board RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
 | V1.7.0 | CWW | 2020-09-16 | 1. Add WiFi and Upgrade documents<br>2. Update compilation<br>3. update install bison and flex<br>4. Add print SDK version<br>5. Add two methods of compiling SDK in the chapter of "SDK Building Introduction"  |
+| V1.8.0 | CWW | 2020-09-25 | 1. Add install liblz4-tool, keychain and libtool for development environment<br>2. Update documents<br>3. Add ADB debug via network |
 
 ---
 
@@ -88,7 +89,7 @@ This document (this guide) is mainly intended for:
 Please install software packages with below commands to set up a building environment:
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake flex bison
+sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
 ```
 
 **Ubuntu 17.04 or later version system:**
@@ -151,29 +152,26 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 
 ```shell
 ├── docs
-│   ├── Linux
-│   │   ├── ApplicationNote (Rockchip Application Framework Develop Introduction and Web Develop Guide)
-│   │   │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
-│   │   │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
-│   │   │   └── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
+│   │
+│   ├── Kernel (drivers documents for Linux kernel, for RV1126/RV1109 reference only)
+│   │
+│   ├── Linux (Rockchip Linux general documents, for RV1126/RV1109 reference only)
 │   │   │
 │   │   ├── Multimedia
-│   │   │   ├── camera (ISP Develop Guide)
-│   │   │   │   ├── Rockchip_Developer_Guide_ISP20_RkAiq_CN.pdf
-│   │   │   │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
-│   │   │   │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
-│   │   │   │   └── Rockchip_User_Manual_Linux_ISP2_CN.pdf
+│   │   │   ├── camera (ISP Develop Guide, for RV1126/RV1109 reference only)
 │   │   │   ├── Rockchip_Developer_Guide_MPP_CN.pdf (multimedia encoding and decoding interface develop guide)
-│   │   │   ├── Rockchip_Developer_Guide_MPP_EN.pdf
-│   │   │   └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf (Rockchip multimedia application interface develop guide)
+│   │   │   └── Rockchip_Developer_Guide_MPP_EN.pdf
 │   │   │
-│   │   ├── Recovery (upgrade document)
+│   │   ├── Recovery (upgrade document, apply to RV1126/RV1109)
 │   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_CN.pdf
 │   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_EN.pdf
 │   │   │   ├── Rockchip_Developer_Guide_Linux_Upgrade_CN.pdf
 │   │   │   └── Rockchip_Developer_Guide_Linux_Upgrade_EN.pdf
 │   │   │
-│   │   └── Wifibt (WiFi and Bluetooth)
+│   │   ├── Security (security document, apply to RV1126/RV1109)
+│   │   │   └── Rockchip_Developer_Guide_TEE_Secure_SDK_CN.pdf
+│   │   │
+│   │   └── Wifibt (WiFi and Bluetooth, apply to RV1126/RV1109)
 │   │       ├── AP模组RF测试文档
 │   │       │   ├── BT RF Test Commands for Linux-v05.pdf
 │   │       │   └── Wi-Fi RF Test Commands for Linux-v03.pdf
@@ -190,14 +188,39 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 │   │           └── iperf-2.0.5-2-win32.zip
 │   │
 │   └── RV1126_RV1109
-│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (Hardware Develop Guide)
-│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_CN.pdf (SDK Release Note)
-│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.0.0_20200616_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf (Quick Start Guide)
-│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
-│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf (Encoding&Decoding Introduction)
-│       └── RV1126 Multimedia Codec Benchmark v1.1.pdf
+│       ├── ApplicationNote (Rockchip Application Framework Develop Introduction and Web Develop Guide)
+│       │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+│       │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_EN.pdf
+│       │   ├── Rockchip_Instructions_Linux_CGI_API_CN.pdf
+│       │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
+│       │   ├── Rockchip_Instructions_Linux_MediaServer_EN.pdf
+│       │   ├── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
+│       │   └── Rockchip_Instructions_Linux_Web_Configuration_EN.pdf
+│       │
+│       ├── Camera (ISP develop guide)
+│       │   ├── Camera_External_FAQ_v1.0.pdf
+│       │   ├── Rockchip_Color_Optimization_Guide_ISP2x_V1.1.0.pdf
+│       │   ├── Rockchip_Development_Guide_ISP2x_CN_v1.2.0.pdf
+│       │   ├── Rockchip_Driver_Guide_ISP2x_CN_v0.1.0.pdf
+│       │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
+│       │   ├── Rockchip_IQ_Tools_Guide_ISP2x_CN_v1.0.0.pdf
+│       │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
+│       │   └── Rockchip_Tuning_Guide_ISP2x_CN_v1.0.0.pdf
+│       │
+│       ├── Multimedia
+│       │   ├── Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf
+│       │   └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf (multimedia interface develop guide)
+│       │
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (Hardware Develop Guide)
+│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
+│       ├── Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf (Separate U-Boot/Kernel/Rootfs building from SDK)
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.1.1_20200711_CN.pdf (SDK Release Note)
+│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.1.1_20200711_EN.pdf
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf  (Quick Start Guide)
+│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
+│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf (Encoding&Decoding Introduction)
+│       ├── RV1126 Multimedia Codec Benchmark v1.1.pdf
+│       └── RV1126_RV1109_Release_Note.txt
 │
 └── external
     ├── rknn-toolkit (Development kit for model transformation,
@@ -224,6 +247,8 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 
 Path of document: `external/camera_engine_rkaiq/rkisp2x_tuner/doc/Rockchip_IQ_Tools_Guide_ISP2x_v1.3.pdf`
 Path of Tool: `external/camera_engine_rkaiq/rkisp2x_tuner/RKISP2.x_Tuner_v0.2.1_AIQ1.2.1.exe`
+
+ISP develop guide documents and the support list of camera sensor can be got from the Redmine `https://redmine.rock-chips.com/documents/53`
 
 #### Some of modules video training
 
@@ -254,7 +279,6 @@ RKImageMaker          | firmware package tool (generate update.img)
 SpeakerPCBATool       | soundbox PCBA test tool
 RKDevTool_Release     | rockchip firmware flash tool
 ParameterTool         | rockchip partition modify tool
-RKISP2.x_Tuner        | ISP tool
 RK_IPCamera_Tool      | rockchip ipc camera search tool
 
 #### Linux Tools
@@ -605,6 +629,14 @@ Enter the project root directory and execute the following command to automatica
 
 ![](resources/EVB-function-interfaceEN.png)
 
+### Bottom Surface of EVB Sensor board
+
+![](resources/EVB-Sensor-board.jpg)
+
+**Scan the QR code which on sensor board and get the prebuilt firmware image of EVB.**
+
+![](resources/firmware-lists.png)
+
 ### Windows Upgrade Introduction
 
 The SDK provides a windows flash tool (this tool should be V2.71 or later version) which is located in project root directory:
@@ -775,6 +807,26 @@ root@192.168.1.159's password:
 ### input the default passwd：rockchip
 ```
 
+#### Debug with ADB via TCP/IP
+
+```shell
+### e.g. EVB IP address: 192.168.1.159
+adb connect 192.168.1.159
+
+adb devices
+List of devices attached
+192.168.1.159:5555      device
+
+### login on EVB via ADB
+adb -s 192.168.1.159:5555 shell
+
+### Upload the test-file from PC to EVB board dirctory /userdata
+adb -s 192.168.1.159:5555 push test-file /userdata/
+
+### Download the EVB file (/userdata/test-file) to PC
+adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
+```
+
 ## Smart USB Camera Product
 
 The smart USB camera product supports the following functions:
@@ -845,7 +897,7 @@ Please refer to：
 Please refer to：
 
 ```shell
-<SDK>/docs/Linux/AppcationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
+<SDK>/docs/RV1126_RV1109/AppcationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
 ```
 
 #### Other
@@ -853,7 +905,8 @@ Please refer to：
 For other Linux application framework or module materials, please refer to the corresponding documents in the following directory：
 
 ```shell
-<SDK>/docs/Linux/
+<SDK>/docs/RV1126_RV1109/  # Use for RV1126/RV1109 platform
+<SDK>/docs/Linux/          # Use for Rockchip Linux general platform, for RV1126/RV1109 reference only
 ```
 
 ### Function Introduction
@@ -969,6 +1022,6 @@ The following functions are included:
 
   The interface of Rkfacial: externa\rkfacial\doc\Rockchip_Instruction_Rkfacial_CN.pdf
 
-  Web back-end framework: docs\Linux\ApplicationNote\LinuxRockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+  Web back-end framework: docs\RV1126_RV1109\ApplicationNote\Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
 
-  Web configuration introduction: docs\Linux\ApplicationNote\Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
+  Web configuration introduction: docs\RV1126_RV1109\ApplicationNote\Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
