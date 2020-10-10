@@ -2,13 +2,11 @@
 
 文件标识：RK-CS-YF-129
 
-发布版本：V1.0
+发布版本：V1.0.0
 
 日期：2020-10-09
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
-
----
 
 **免责声明**
 
@@ -76,10 +74,14 @@ Rockchip Electronics Co., Ltd.
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | ---------- | -------- | -------- | ------------ |
-| 2020-10-09 | V1.0     | 吴良峰   | 初始版本     |
+| 2020-10-09 | V1.0.0   | 吴良峰   | 初始版本     |
 
 ---
+
+**目录**
+
 [TOC]
+
 ---
 
 ## USB 2.0 功能特性测试
@@ -94,7 +96,6 @@ USB20CV 工具只支持Windows系统，下载地址如下：
 
 注意：仅 Windows 7 和更高版本支持 USB20CV 工具，并且该工具需要计算机支持增强型主机控制器接口 EHCI。
 
----
 ## USB 2.0 电气特性测试
 
 USB 2.0 电气特性测试：主要测试产品的电气信号，USB 2.0 电气测试规范为 USB 2.0 产品定义了一组电气测试标准^[2][3]^ ，所有 USB 产品都必须通过 USB 电气特性测试，才能获得 USB-IF 的认证。
@@ -153,7 +154,6 @@ USB 2.0 的电气特性测试需要覆盖高速，全速和低速三种信号，
 
 测试命令请参考文档 《Rockchip_Developer_Guide_USB_SQ_Test_CN》的章节"USB 2.0 测试命令和测试工具"。
 
----
 ## USB 2.0 互通特性测试
 
 USB 2.0 互通特性测试：主要测试 USB 设备在不同的软件操作系统和不同硬件控制器下的兼容性。可能会使用"Gold Tree"上的一些设备来做互操作性测试，以测试设备和不同主机的兼容性，如设备在使用 EHCI 控制器的主机下能否枚举成功等。
@@ -162,7 +162,6 @@ USB 2.0 互通特性测试：主要测试 USB 设备在不同的软件操作系�
 
 [《xHCI Interoperability Test Procedures For Peripherals, Hubs and Hosts Version》](https://usb.org/document-library/xhci-interoperability-test-procedures-peripherals-hubs-and-hosts-version)
 
----
 ## USB 2.0 认证
 
 USB 2.0 认证是指 USB 产品通过 USB-IF 所规定的特定测试，并获得使用 USB 标志的授权。产品接收测试的方法有两种：
@@ -170,7 +169,7 @@ USB 2.0 认证是指 USB 产品通过 USB-IF 所规定的特定测试，并获�
 - 参加 USB-IF 赞助的兼容性测试大会
 - USB-IF 认可的测试实验室
 
-可以从网站 <https://www.usb.org/labs> 找到符合 USB-IF 要求的独立测试实验室。当产品通过兼容性测试后，它就会获得一个 USB 协会测试号（TESTING ID, TID），通过这个 TID，可以再 USB-IF 官网上查到这个测试设备的相关信息，并有权使用 USB 标志。
+可以从网站 <https://www.usb.org/labs> 找到符合 USB-IF 要求的独立测试实验室。当产品通过兼容性测试后，它就会获得一个 USB 协会测试号（TESTING ID, TID），通过这个 TID，可以在 USB-IF 官网上查到这个测试设备的相关信息，并有权使用 USB 标志。
 
 USB 兼容性测试认证的一般流程如下：
 
@@ -182,7 +181,6 @@ USB 兼容性测试认证的一般流程如下：
 
 注意：Rockchip 是 USB-IF 的会员，VID 为 0x2207，并且，SDK USB 默认配置的 VID 也是 0x2207，但该 VID 供产品开发和调试使用，无法授权给开发者使用。如果产品需要过 USB-IF 认证，需要开发者独立申请成为 USB-IF 会员，以获取唯一的 Vendor ID。
 
----
 ## 参考文献
 
 1. [USB 2.0 Testing Information](https://usb.org/usb2)
