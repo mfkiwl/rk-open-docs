@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-366
 
-发布版本：V1.1.0
+发布版本：V1.1.1
 
-日期：2020-10-02
+日期：2020-10-14
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -64,8 +64,9 @@ Rockchip Electronics Co., Ltd.
 
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
-| V1.0.0    | 曾益清 | 2020-06-10 | 初始版本     |
+| V1.0.0    | Zack Zeng | 2020-06-10 | 初始版本     |
 | V1.1.0    | CWW | 2020-10-02 | 修正文档路径 |
+| V1.1.1 | Ruby Zhang | 2020-10-14 | 格式修正 |
 
 ---
 
@@ -212,7 +213,7 @@ camera_cap_test -i rkispp_m_bypass -o output.yuv -w 2688 -h 1520 -f image:nv12
 
 #### 三路scale down节点数据流获取
 
-三路scale down节点支持缩放，每一路支持的最大分辨率如[1.2 数据流概述](## 1.2 数据流概述)中的表1所示，同时也支持entity name和/dev/videoX来抓取数据流，以scale0为例：
+三路scale down节点支持缩放，每一路支持的最大分辨率如 1.2 节 [数据流概述](# 数据流概述)中的表1所示，同时也支持entity name和/dev/videoX来抓取数据流，以scale0为例：
 
 ```shell
 camera_cap_test -i /dev/video14 -o output.yuv -w 2688 -h 1520 -f image:nv12
@@ -298,7 +299,7 @@ v4l2-ctl -d /dev/video13 --set-ctrl="exposure=234,analogue_gain=76"  \
 
 当Sensor输出RAW BAYER RGB格式时，如RGGB,BGGR,GBRG,GRBG等，需要ISP20提供一系列图像处理算法来优化图像效果，此时需要RkAiq模块介入。
 
-SDK提供了一种3A独立进程的方式（ispserver）集成了RkAiq库librkaiq.so，旨在用[2 数据流获取](## 2 数据流获取)中的方法获取数据流时，能够得到具有ISP调试效果的图像。
+SDK提供了一种3A独立进程的方式（ispserver）集成了RkAiq库librkaiq.so，旨在用第 2 章 [数据流获取](# 数据流获取)中的方法获取数据流时，能够得到具有ISP调试效果的图像。
 
 Ispserver具体实现可以阅读**docs/RV1126_RV1109/camera**目录中的文档《Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf》，文档有具体介绍。
 
@@ -311,36 +312,36 @@ Ispserver具体实现可以阅读**docs/RV1126_RV1109/camera**目录中的文档
 
 - 从源码中查看
 
-  ```shell
+```shell
   # grep RK_AIQ_VERSION RkAiqVersion.h
   #define RK_AIQ_VERSION "v0.1.6"           # 输出的v0.1.6是librkaiq.so的版本号
-  ```
+```
 
 #### 如何确认RkAiq所匹配的ISP20驱动版本号
 
 - 从kernel源码中查看ISP以及ISPP驱动版本
 
-  ```shell
+```shell
   # grep RKISP_DRIVER_VERSION drivers/media/platform/rockchip/isp/version.h
   #define RKISP_DRIVER_VERSION KERNEL_VERSION(0, 1, 0x5) # 输出的v0.1.5是rkisp驱动的版本号
 
   # grep RKISPP_DRIVER_VERSION drivers/media/platform/rockchip/ispp/version.h
   #define RKISPP_DRIVER_VERSION KERNEL_VERSION(0, 1, 0x0) # 输出的v0.1.0是rkispp驱动的版本号
-  ```
+```
 
 - 从kernel log中查看ISP以及ISPP驱动版本
 
-  ```shell
+```shell
   # dmesg  | grep "rkisp driver version"
   [    0.332831] rkisp ffb50000.rkisp: rkisp driver version: v00.01.05
 
   # dmesg  | grep "rkispp driver version"
   [    0.340370] rkispp ffb60000.rkispp: rkispp driver version: v00.01.00
-  ```
+```
 
 ### 如何确认3A是否正常工作
 
-如果产品带屏幕，可以直接预览，如果是IPC类产品，可以打开网页预览，针对没有屏幕也不是IPC类产品，可以通过[2 数据流获取](## 2 数据流获取)中的方法获取数据流，来确认AE, AWB等是否正常。
+如果产品带屏幕，可以直接预览，如果是IPC类产品，可以打开网页预览，针对没有屏幕也不是IPC类产品，可以通过第 2 章 [数据流获取](# 数据流获取)中的方法获取数据流，来确认AE, AWB等是否正常。
 
 同时，通过查看后台是否有ispserver进程在执行，如下：
 
