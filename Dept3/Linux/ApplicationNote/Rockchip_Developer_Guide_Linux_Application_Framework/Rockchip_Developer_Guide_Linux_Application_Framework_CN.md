@@ -2,9 +2,9 @@
 
 文件标识：RK-FB-YF-358
 
-发布版本：V1.3.0
+发布版本：V1.3.1
 
-日期：2020-09-16
+日期：2020-10-15
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ Rockchip Electronics Co., Ltd.
 | V1.1.1     | CWW        | 2020-06-29   | 更新RK_OEM编译打包命令                         |
 | V1.2.0     | Allen Chen | 2020-08-24   | 更新ipcweb-ng部分                              |
 | V1.3.0     | Fenrir Lin | 2020-09-16   | 增加dbserver对外接口，更新onvif_server开发环境 |
+| V1.3.1     | Fenrir Lin | 2020-10-15   | 更新文件路径                                   |
 
 ---
 
@@ -437,7 +438,7 @@ make rk_oem-dirclean && make rk_oem target-finalize #重新编译oem
 
 **配置文件：**
 
-nginx配置文件位于buildroot/board/rockchip/puma/fs-overlay/etc/nginx/nginx.conf，部分摘要如下：
+nginx配置文件位于buildroot/board/rockchip/rv1126_rv1109/fs-overlay/etc/nginx/nginx.conf，部分摘要如下：
 
 ```nginx
 location /cgi-bin/ {
@@ -754,7 +755,7 @@ method return time=1588123823.096268 sender=:1.5 -> destination=:1.6 serial=7 re
 
 ### 开发基础
 
-提供多媒体服务的主应用，具体开发请参考《MediaServer开发基础》
+提供多媒体服务的主应用，具体开发请参考docs/RV1126_RV1109/ApplicationNote/Rockchip_Instructions_Linux_MediaServer_CN.pdf
 
 **开发语言：** C++
 
@@ -856,7 +857,7 @@ dbus_method_call(userdata->connection,
 
 ### 开发基础
 
-图像信号处理服务端，具体开发请参考《ISP IPC模块框架说明及接口规范》
+图像信号处理服务端，具体开发请参考docs/RV1126_RV1109/Camera/Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
 
 **开发语言：** C
 

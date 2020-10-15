@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-358
 
-Release Version: V1.3.0
+Release Version: V1.3.1
 
-Release Date: 2020-09-16
+Release Date: 2020-10-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -64,6 +64,7 @@ Software development engineers
 | V1.1.1      | CWW        | 2020-06-29 | Update RK_OEM build and pack command                         |
 | V1.2.0      | Allen Chen | 2020-08-24 | Update ipcweb-ng                                             |
 | V1.3.0      | Fenrir Lin | 2020-09-16 | Add dbserver external interface,<br/>update onvif_server development environment |
+| V1.3.1      | Fenrir Lin | 2020-10-15 | Update file path                                             |
 
 ---
 
@@ -431,7 +432,7 @@ make rk_oem-dirclean && make rk_oem target-finalize #Rebuild oem
 
 **Configuration files：**
 
-The nginx configuration file is located in buildroot/board/rockchip/puma/fs-overlay/etc/nginx/nginx.conf, part of the summary is as follows:
+The nginx configuration file is located in buildroot/board/rockchip/rv1126_rv1109/fs-overlay/etc/nginx/nginx.conf, part of the summary is as follows:
 
 ```nginx
 location /cgi-bin/ {
@@ -747,7 +748,7 @@ method return time=1588123823.096268 sender=:1.5 -> destination=:1.6 serial=7 re
 
 ### Development Preparation
 
-Provides the main application of multimedia services, please refer to "MediaServer Development Basics" for details.
+Provides the main application of multimedia services, please refer to "docs/RV1126_RV1109/ApplicationNote/Rockchip_Instructions_Linux_MediaServer_EN.pdf" for details.
 
 **Development language:** C++
 
@@ -848,7 +849,7 @@ dbus_method_call(userdata->connection,
 
 ### Development Preparation
 
-For detailed development about image signal processing server, please refer to "ISP IPC Module Framework Description and Interface Specification"
+For detailed development about image signal processing server, please refer to "docs/RV1126_RV1109/Camera/Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf"
 
 **Development language:** C
 
