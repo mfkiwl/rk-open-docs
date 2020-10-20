@@ -102,7 +102,8 @@ To get RK3399Pro Linux software package, customers need an account to access the
 RK3399Pro_Linux_SDK  download command is as follows：
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399pro_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399pro_linux_release.xml
 ```
 
 Repo, a tool built on Python script by Google to help manage git repositories, is mainly used to download and manage software repository of projects. The download address is as follows:
@@ -114,17 +115,17 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take rk3399pro_linux_sdk_release_v1.4.0_20201010.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk3399pro
-tar xvf rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz -C rk3399pro
+tar xvf rk3399pro_linux_sdk_release_v1.4.0_20201010.tgz -C rk3399pro
 cd rk3399pro
 .repo/repo/repo sync -l
-.repo/repo/repo sync
+.repo/repo/repo sync -c
 ```
 
-Developers can update via `.repo/repo/repo sync` command according to update instructions that are regularly released by FAE window.
+Developers can update via `.repo/repo/repo sync -c` command according to update instructions that are regularly released by FAE window.
 
 ## Software Development Guide
 
@@ -175,13 +176,13 @@ Software release version upgrade can be checked through project xml file by the 
 Software release version updated information can be checked through the project text file by the following command:
 
 ```shell
-.repo/manifests$ cat rk3399pro_linux_v0.01/RK3399PRO_Linux_SDK_Release_Note.txt
+.repo/manifests$ cat rk3399pro_linux_v0.01/RK3399PRO_Linux_SDK_Release_Note.md
 ```
 
 Or refer to the project directory:
 
 ```shell
-<SDK>/docs/RK3399PRO/RK3399PRO_Linux_SDK_Release_Note.txt
+<SDK>/docs/RK3399PRO/RK3399PRO_Linux_SDK_Release_Note.md
 ```
 
 ## Hardware Development Guide
@@ -225,7 +226,8 @@ Software requirements: Ubuntu 18.04 system:
 Please install software packages with below commands to setup SDK compiling environment:
 
 ```shell
-repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo \
+chrpath diffstat binfmt-support qemu-user-static live-build bison flex fakeroot cmake
 ```
 
 It is recommended to use Ubuntu 18.04 system or higher version for development. If you encounter an error during compilation, you can check the error message and install the corresponding software packages.
@@ -951,4 +953,4 @@ Keep the private key file properly. Do not grant second authorization to third p
 
 ### Reference Documents
 
-For more details, please refer to document “SDK/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf
+For more details, please refer to document “<SDK>/docs/Others/Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf"

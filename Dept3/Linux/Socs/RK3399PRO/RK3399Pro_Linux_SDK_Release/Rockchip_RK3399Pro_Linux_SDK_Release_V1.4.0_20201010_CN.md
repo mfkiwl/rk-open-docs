@@ -110,7 +110,8 @@ SDK 通过瑞芯微代码服务器对外发布获取。其编译开发环境，�
 RK3399Pro_Linux_SDK 下载命令如下：
 
 ```
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399pro_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399pro_linux_release.xml
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -129,10 +130,10 @@ mkdir rk3399pro
 tar xvf rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz -C rk3399pro
 cd rk3399pro
 .repo/repo/repo sync -l
-.repo/repo/repo sync
+.repo/repo/repo sync -c
 ```
 
-后续开发者可根据 FAE 窗口定期发布的更新说明，通过 ”.repo/repo/repo sync” 命令同步更新。
+后续开发者可根据 FAE 窗口定期发布的更新说明，通过 ”.repo/repo/repo sync -c” 命令同步更新。
 
 ## 软件开发指南
 
@@ -184,13 +185,13 @@ Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf。
 软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
 
 ```
-.repo/manifests$ cat rk3399pro_linux_v0.01/RK3399PRO_Linux_SDK_Release_Note.txt
+.repo/manifests$ cat rk3399pro_linux_v0.01/RK3399PRO_Linux_SDK_Release_Note.md
 ```
 
 或者参考工程目录：
 
 ```
-<SDK>/docs/RK3399PRO/RK3399PRO_Linux_SDK_Release_Note.txt
+<SDK>/docs/RK3399PRO/RK3399PRO_Linux_SDK_Release_Note.md
 ```
 
 ## 硬件开发指南
@@ -232,7 +233,8 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 编译 SDK 环境搭建所依赖的软件包安装命令如下：
 
 ```
-repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo \
+chrpath diffstat binfmt-support qemu-user-static live-build bison flex fakeroot cmake
 ```
 
 建议使用 Ubuntu18.04 系统或更高版本开发，若编译遇到报错，可以视报错信息，安装对应的软件包。
@@ -488,7 +490,7 @@ make rknpu-rebuild
 ```
 
 默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定四个类型：buildroot、debian、distro 和 yocto 。
-其中debian是编译Debian 9系统，distro是编译debian10系统。
+其中debian是编译Debian9系统，distro是编译debian10系统。
 
 比如需要 debain 可以通过以下命令进行生成：
 
