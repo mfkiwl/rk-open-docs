@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-532
 
-发布版本：V0.7.0
+发布版本：V0.8.0
 
-日期：2020-09-15
+日期：2020-10-28
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -64,11 +64,12 @@ Rockit定位于通用媒体pipeline, 将常用媒体组件插件化，以积木�
 
 **修订记录**
 
-| **版本号** | **作者** | **修改日期** | **修改说明**             |
-| ---------- | -------- | :----------- | ------------------------ |
-| V0.6.1     | 程明传   | 2020-09-11   | rockit特性和接口         |
-| V0.6.2     | 许丽明   | 2020-09-11   | 如何开发rockit插件和应用 |
-| V0.7.0     | 程明传   | 2020-09-15   | 完善rockit应用开发接口   |
+| **版本号** | **作者** | **修改日期** | **修改说明**              |
+| ---------- | -------- | :----------- | ------------------------- |
+| V0.6.1     | 程明传   | 2020-09-11   | rockit特性和接口          |
+| V0.6.2     | 许丽明   | 2020-09-11   | 如何开发rockit插件和应用  |
+| V0.7.0     | 程明传   | 2020-09-15   | 完善rockit应用开发接口    |
+| V0.8.0     | 方兴文   | 2020-10-28   | UVC应用定制与部分接口完善 |
 
 ---
 
@@ -170,32 +171,67 @@ virtual RT_RET RTTaskNode::invoke(RtMetaData *meta);
 // 函数功能：根据用户配置生成TaskGraph
 RT_RET   RTTaskGraph::autoBuild(const char* configFile);
 
+// 输入参数：覆盖配置文件中的参数配置
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：准备内部运行资源
+RT_RET   RTTaskGraph::prepare(RtMetaData *params = RT_NULL);
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：启动任务图运行
+RT_RET   RTTaskGraph::start();
+
+// 输入参数：默认为阻塞，将会等待停止运行。非阻塞通常用于异步操作，配合waitUntilDone
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：停止任务图运行
+RT_RET   RTTaskGraph::stop(RT_BOOL block = RT_TRUE);
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：恢复任务图运行
+RT_RET   RTTaskGraph::resume();
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：暂停任务图运行
+RT_RET   RTTaskGraph::pause();
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：清除任务图内部数据
+RT_RET   RTTaskGraph::flush();
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：退出时释放任务图内部资源
+RT_RET   RTTaskGraph::release();
+
 // 输入参数：cmd: 见枚举定义；params：cmd的额外参数。
 // 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
-// 函数功能：根据用户配置配置节点参数
+// 函数功能：自定义扩展API，根据用户配置节点参数
 RT_RET   RTTaskGraph::invoke(INT32 cmd, RtMetaData *params);
-
-// 输入参数：NONE
-// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
-// 函数功能：等待运行结束
-RT_RET   RTTaskGraph::waitUntilDone();
-
-// 输入参数：NONE
-// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
-// 函数功能：等待观察者的输出。
-RT_RET   RTTaskGraphImpl::waitForObservedOutput();
 
 // 输入参数：streamName，流的名字；streamId，流的ID号；streamCallback，流的回调。
 // 输出参数：NONE
 // 函数功能：观察指定的输出流
-RT_RET   observeOutputStream(const std::string& streamName,
+RT_RET   RTTaskGraph::observeOutputStream(const std::string& streamName,
               INT32 streamId,
               std::function<RT_RET(RTMediaBuffer *)> streamCallback);
 
 // 输入参数：streamId，流的ID号。
 // 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
-// 函数功能：观察指定的输出流
-RT_RET   cancelObserveOutputStream(INT32 streamId);
+// 函数功能：取消观察指定的输出流
+RT_RET   RTTaskGraph::cancelObserveOutputStream(INT32 streamId);
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：等待观察者的输出。若要做成同步输出时，才需调用此接口
+RT_RET   RTTaskGraph::waitForObservedOutput();
+
+// 输入参数：NONE
+// 输出参数：RT_RET: RT_OK为执行成功，其他为失败。
+// 函数功能：等待运行结束，主要用于MAIN函数阻塞不退出
+RT_RET   RTTaskGraph::waitUntilDone();
 ```
 
 和RTTaskGraph相关的类包括：TaskNode、 Scheduler、SchedulerQueue、Executor、ThreadPool。上述这些类是内部类，对于开发rockit应用来说不用关心。
@@ -208,13 +244,11 @@ RTTaskGraph读取插件配置文件之后，会自动构建Pipeline, 然后自�
 RTTaskGraph *graph = new RTTaskGraph();
 graph->autoBuild("your_graph.json");
 // 准备pipeline, 包括：插件准备、链接输入和输出等
-graph->invoke(GRAPH_CMD_PREPARE, NULL);
+graph->prepare();
 // 启动pipeline，打通整个数据流
-graph->invoke(GRAPH_CMD_START, NULL);
-// 等待pipeline结束
-graph->waitUntilDone();
+graph->start();
 // 停止pipeline
-graph->invoke(GRAPH_CMD_STOP, NULL)；
+graph->stop();
 
 // 设置pipleline的参数
 // 配置框架的参数: GRAPH_CMD_PRIVATE_CMD
@@ -238,15 +272,16 @@ graph->invoke(GRAPH_CMD_TASK_NODE_PRIVATE_CMD, &params);
 ```c++
 // 自定义的OBSERVER后处理函数，一般用于应用程序和ROCKIT的输出数据对接。
 RT_RET YOUR_OBSERVER_FUNC(RTMediaBuffer *buffer) {
-    RTRknnAnalysisResults *nnResult = NULL;
-    buffer->getMetaData()->findPointer(ROCKX_OUT_RESULT,
-                           reinterpret_cast<RT_PTR *>(&nnResult));
-    if (nnResult->counter > 0) {
-#ifdef HAVE_ROCKX
-        INT32 rawX = nnResult->results[0].face_info.object.box.left;
-        INT32 rawY = nnResult->results[0].face_info.object.box.top;
-#endif
+    // 以下示例：获取AI检测结果
+    RTAIDetectResults *aiResult  = RT_NULL;
+    buffer->getMetaData()->findPointer(OPT_AI_DETECT_RESULT,
+                           reinterpret_cast<RT_PTR *>(&aiResult));
+    if (!strcmp(aiResult->vendor, "rockx")) {
+        RTRknnAnalysisResults *result = (RTRknnAnalysisResults *)aiResult->privData;
+    } else {
+        OtherAnalysisResults *result = (OtherAnalysisResults *)aiResult->privData;
     }
+
     buffer->release();
     return RT_OK;
 }
@@ -254,11 +289,11 @@ RT_RET YOUR_OBSERVER_FUNC(RTMediaBuffer *buffer) {
 RTTaskGraph *graph = new RTTaskGraph();
 graph->autoBuild("your_ai_vision.json");
 // 准备pipeline, 包括：插件准备、链接输入和输出等
-graph->invoke(GRAPH_CMD_PREPARE, NULL);
+graph->preare();
 // 观察pipeline的输出
 graph->observeOutputStream("ai_rockx", ${stream_id} << 16, YOUR_OBSERVER_FUNC);
 // 启动pipeline，打通整个数据流
-graph->invoke(GRAPH_CMD_START, NULL);
+graph->start();
 // 其他操作....
 ```
 
@@ -598,11 +633,13 @@ RT_RET unit_test_graph_transcoding(INT32 index, INT32 total) {
     // 通过配置文件完成自动化构建
     transcodingGraph->autoBuild(RT_GRAPH_TRANSCODING_FILE);
     // 完成图的准备工作
-    transcodingGraph->invoke(GRAPH_CMD_PREPARE, NULL);
+    transcodingGraph->perpare();
     // 启动图
-    transcodingGraph->invoke(GRAPH_CMD_START, NULL);
-    // 等待图完成工作
-    transcodingGraph->waitUntilDone();
+    transcodingGraph->start();
+    // ....
+    // 停止图
+    transcodingGraph->stop();
+    transcodingGraph->release();
     // 销毁图
     rt_safe_delete(transcodingGraph);
 
@@ -626,15 +663,11 @@ RTTaskNode *freadNode = demoGraph->createNode(nodeConfig, streamConfig);
 XXX
 ......
 // 链接节点数据流
-demoGraph->addNodeLink(3, freadNode, demoNode, fwriteNode);
+demoGraph->linkNode(freadNode, demoNode, fwriteNode);
 // 图资源准备
-demoGraph->invoke(GRAPH_CMD_PREPARE, NULL);
+demoGraph->prepare();
 // 图开始工作
-demoGraph->invoke(GRAPH_CMD_START, NULL);
-// 等待图所有工作完成
-demoGraph->waitUntilDone();
-// 销毁图
-rt_safe_delete(demoGraph);
+demoGraph->start();
 ```
 
 下面介绍详细的步骤
@@ -665,27 +698,20 @@ RTTaskNode *freadNode = demoGraph->createNode(nodeConfig, streamConfig);
 
 #### 手动链接插件示例
 
-链接节点有两种方法，两种方法本质是一样的，只是参数不同。
+链接节点:
 
 ```c++
 // 输入参数:
 //     srcNode: 链接的上游节点，提供链接中的输出。
 //     dstNode: 链接的下游节点，提供链接中的输入。
+//         ...: 可支持传入多个节点
 // 输出参数: RT_RET, 链接成功返回RT_OK，失败返回具体原因的返回值。
 // 函数功能: 完成节点的链接，完成链接后，上游节点process完成的输出数据将会流向下游节点的输入队列。
 //          需要注意的是，节点输入输出类型等信息需要匹配才能完成链接。
-RT_RET linkNode(RTTaskNode *srcNode, RTTaskNode *dstNode);
-
-// 输入参数:
-//     srcNodeId: 链接的上游节点ID。
-//     dstNodeId: 链接的下游节点ID。
-// 输出参数: RT_RET, 链接成功返回RT_OK，失败返回具体原因的返回值。
-// 函数功能: 完成节点的链接，完成链接后，上游节点process完成的输出数据将会流向下游节点的输入队列。
-//          需要注意的是，节点输入输出类型等信息需要匹配才能完成链接。
-RT_RET linkNode(INT32 srcNodeId, INT32 dstNodeId);
+RT_RET linkNode(RTTaskNode *srcNode, RTTaskNode *dstNode, ...);
 ```
 
-取消链接节点有两种方法，两种方法本质是一样的，只是参数不同。
+取消链接节点:
 
 ```c++
 // 输入参数:
@@ -694,28 +720,93 @@ RT_RET linkNode(INT32 srcNodeId, INT32 dstNodeId);
 // 输出参数: RT_RET, 链接成功返回RT_OK，失败返回具体原因的返回值。
 // 函数功能：取消插件之间的链接关系。
 RT_RET   unlinkNode(RTTaskNode *srcNode, RTTaskNode *dstNode);
-
-// 输入参数:
-//     srcNodeId: 链接的上游节点ID。
-//     dstNodeId: 链接的下游节点ID。
-// 输出参数: RT_RET, 链接成功返回RT_OK，失败返回具体原因的返回值。
-// 函数功能：取消插件之间的链接关系。
-RT_RET   unlinkNode(INT32 srcNodeId, INT32 dstNodeId);
 ```
 
 ## 如何扩展现有应用
 
-### 扩展UVC(新增Video AI插件)
+目前内置支持UVC+NN、UAC应用，UVC与NN应用对应接口RTUVCGraph、RTUACGraph，详见external\rockit\sdk\headers下对应头文件的接口。下面将介绍如何在现有应用上扩展以及重写部分插件。
 
-- 明确UVC功能需求
-- 评估哪些媒体插件可以复用，哪些媒体插件需要开发。
-- 明确UVC的pipeline的插件的拓扑结构，并定义配置文件。
-- 新增Video AI插件，按照自定义媒体插件的方式实现。
+### UVC应用定制
 
-### 扩展UAC(新增Audio 3A插件)
+#### UVC功能裁剪
 
-- 明确UVC功能需求
+RTUVCGraph应用支持ZOOM、Pan&Tile、EPTZ、NN可根据项目需求进行功能裁剪，减少内存等资源占用。external\rockit\sdk\conf下有提供以下几种裁剪，可参考进行个性化需求定制。
+
+| 配置文件名称                      | 功能说明                             |
+| --------------------------------- | ------------------------------------ |
+| aicamera_uvc.json                 | 仅包含UVC预览功能                    |
+| aicamera_rockx_only.json          | 仅包含Rockx功能                      |
+| aicamera_uvc_zoom.json            | 支持UVC、ZOOM、Pan&Tile              |
+| aicamera_uvc_zoom_eptz.json       | 支持UVC、ZOOM、Pan&Tile、EPTZ        |
+| aicamera_uvc_zoom_rockx.json      | 支持UVC、ZOOM、Pan&Tile、Rockx       |
+| aicamera_uvc_zoom_eptz_rockx.json | 支持UVC、ZOOM、Pan&Tile、EPTZ、Rockx |
+
+将上述配置文件重命名为aicamera_rockx.json，即可裁剪覆盖原来支持的功能。
+
+#### UVC插件重写
+
+当内置的插件不能满足项目需求时，可根据需要自定义插件，替换UVC pipeline中的插件，具体步骤如下：
+
+- 编写自定义插件
+
+  在app\aiserver\src\vendor工程目录下创建自定义插件。该目录下有eptz、rockx等插件示例，可参考实现。新增节点实现可参见**<如何开发rockit插件>**。
+
+- 修改配置文件中插件名
+
+  修改external\rockit\sdk\conf\aicamera_rockx.json，将要修改的插件名称替换成自定义插件名称。
+
+通过以上两个步骤后，重写编译固件即可完成UVC插件自定义。当节点间链接关系需要发生变化时，可参考如下**<配置节点链接>**说明
+
+#### 配置节点链接
+
+配置文件中的节点配置可参见**<图配置文件实例>**，节点之间的链接关系既支持配置文件自动链接(通过上级的节点的stream_output与下级节点的stream_input匹配链接)，也支持通过NodeID直接指定上下级链接方式(可用于复杂的场景节点链接)。通过以下示例来说明指定式链接方式。
+
+示例一：单链接
+
+```json
+"link_0": {
+    "link_name"          : "uvc",
+    "link_ship"          : "0,7"
+},
+
+```
+
+link_name: 该场景功能是UVC，代码中选择开启UVC来根据此名字查找对应链接关系，所以名字不可变。
+
+link_ship: "0,7" 表示节点0与节点7建立链接，即节点0的数据流向节点7。
+
+示例二：多链接
+
+```json
+"link_1": {
+    "link_name"          : "nn_isp",
+    "link_ship"          : "2,8-8,11,1000-8,12,1000-8,13,1000"
+},
+"link_2": {
+    "link_name"          : "nn_linkout",
+    "link_ship"          : "10,8-8,11,1000-8,12,1000-8,13,1000"
+}
+```
+
+link_name: 该场景功能是NN算法，"nn_isp"表示NN算法数据源来自isp(节点2是ispp scale1)，同样名字不可变；"nn_linkout"也是NN算法功能，与"nn_isp"的区别在于数据源是来自节点10(EPTZ裁剪、缩放等处理后的图像数据)。
+
+link_ship: "2,8-8,11,1000-8,12,1000-8,13,1000"，链接是以”-“分割表示链接分组，”,“分割表示一组链接。即”2,8“表示节点2链接节点8；”8,11,1000“表示节点8链接节点11，节点11链接节点1000；”8,12,1000“表示节点8链接节点12，节点12链接节点1000；节点11、12、13分别表示人脸、人脸特征点、骨骼算法，也可以用单个节点实现所有NN算法时，此时可以合并NN节点，如按以下配置可修改为stasteria算法，对应节点11也需配置为stasteria节点。
+
+```json
+"link_1": {
+    "link_name"          : "nn_isp",
+    "link_ship"          : "2,8,11,1000"
+},
+"link_2": {
+    "link_name"          : "nn_linkout",
+    "link_ship"          : "10,8,11,1000"
+}
+```
+
+### UAC应用定制(新增Audio 3A插件)
+
+- 明确UAC功能需求
 - 评估哪些媒体插件可以复用，哪些媒体插件需要开发。
 - UAC的音频3A插件，参考Rockchip Linux UAC相关文档。
-- 明确UVC的pipeline的插件的拓扑结构，并定义配置文件。
+- 明确UAC的pipeline的插件的拓扑结构，并定义配置文件。
 - 新增Audio 3A插件，按照自定义媒体插件的方式实现。
