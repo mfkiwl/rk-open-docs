@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.8.0
+发布版本：V1.8.1
 
-日期：2020-09-25
+日期：2020-10-29
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -79,6 +79,7 @@ Rockchip Electronics Co., Ltd.
 | V1.6.1 | CWW | 2020-09-07 | 1. 增加新开发板RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
 | V1.7.0 | CWW | 2020-09-16 | 1. 增加WiFi和升级相关文档说明<br>2. 增加编译配置说明<br>3. 更新开发环境软件依赖flex和bison<br>4. 增加获取SDK版本号<br>5. “SDK编译说明”章节增加介绍两种编译SDK的方法 |
 | V1.8.0 | CWW | 2020-09-25 | 1. 编译环境添加liblz4-tool，libtool和keychain<br>2. 更新文档<br>3. 添加网络ADB调试方法 |
+| V1.8.1 | CWW | 2020-10-29 | 更新视频培训地址|
 
 ---
 
@@ -255,12 +256,47 @@ ISP相关文档以及支持的sensor列表也可以在Redmine上获取`https://r
 
 #### 部分模块的培训视频地址
 
-- RV1109&RV1126多媒体RKMedia介绍：`https://v.qq.com/x/page/d31495v9g4h.html`
-- RK NPU开发套件介绍及Q&A：`https://v.qq.com/x/page/d3149yyam9s.html`
-- RV1109&RV1126摄像头驱动调试介绍：`https://v.qq.com/x/page/z31500n7x9q.html`
-- IQ工具：
-    RK ISP2 标定流程介绍：`https://v.qq.com/x/page/i3152ng42ib.html`
-    RK ISP2基础模块的标定方法及工具使用：`https://v.qq.com/x/page/h3152x52ys1.html`
+- 多媒体RKMedia介绍
+
+```
+链接：https://pan.baidu.com/s/1Z4o2v2KL6eCKXgI2fMEcSA
+提取码：vhk2
+```
+
+- RK NPU开发套件介绍及Q&A
+
+```
+链接：https://pan.baidu.com/s/10w7R_q857uVEXq-88Pu-1g
+提取码：c66l
+```
+
+- RV1126&RV1109摄像头驱动调试介绍
+
+```
+链接：https://pan.baidu.com/s/1rva6ZDj1x-T1rNcxV354KA
+提取码：z4uh
+```
+
+- RV1126&RV1109 Linux SDK 快速开发指南
+
+```
+链接：https://pan.baidu.com/s/1iXwOdXH0jIR3iGQc0gluow
+提取码：t9o0
+```
+
+- RK ISP2 标定流程介绍
+
+```
+链接：https://pan.baidu.com/s/1tZloen4B4jIIl2w1R2hWfg
+提取码：nrp3
+```
+
+- RK ISP2 基础模块的标定方法及工具使用
+
+```
+链接：https://pan.baidu.com/s/1L0zSxInjqTyqDBesg4RL1w
+提取码：8yc6
+```
 
 ### RV1109/RV1126 开发相关工具
 

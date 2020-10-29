@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.8.0
+Release Version: V1.8.1
 
-Release Date: 2020-09-25
+Release Date: 2020-10-29
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -74,6 +74,7 @@ This document (this guide) is mainly intended for:
 | V1.6.1 | CWW | 2020-09-07 | 1. Add new board RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
 | V1.7.0 | CWW | 2020-09-16 | 1. Add WiFi and Upgrade documents<br>2. Update compilation<br>3. update install bison and flex<br>4. Add print SDK version<br>5. Add two methods of compiling SDK in the chapter of "SDK Building Introduction"  |
 | V1.8.0 | CWW | 2020-09-25 | 1. Add install liblz4-tool, keychain and libtool for development environment<br>2. Update documents<br>3. Add ADB debug via network |
+| V1.8.1 | CWW | 2020-10-29 | update training video link |
 
 ---
 
@@ -252,12 +253,47 @@ ISP develop guide documents and the support list of camera sensor can be got fro
 
 #### Some of modules video training
 
-- Instructions to RKMedia of RV1109 & RV1126: `https://v.qq.com/x/page/d31495v9g4h.html`
-- Instructions to development kit of RK NPU and Q&A: `https://v.qq.com/x/page/d3149yyam9s.html`
-- Instructions to debug camera's sensor driver: `https://v.qq.com/x/page/z31500n7x9q.html`
-- IQ tool:
-    Instructions to calibration process of RK ISP2: `https://v.qq.com/x/page/i3152ng42ib.html`
-    Instructions to calibration method of RK ISP2 base modules and tool usage: `https://v.qq.com/x/page/h3152x52ys1.html`
+- Instructions to RKMedia of RV1109 & RV1126
+
+```
+link: https://pan.baidu.com/s/1Z4o2v2KL6eCKXgI2fMEcSA
+fetch code: vhk2
+```
+
+- Instructions to development kit of RK NPU and Q&A
+
+```
+link: https://pan.baidu.com/s/10w7R_q857uVEXq-88Pu-1g
+fetch code: c66l
+```
+
+- Instructions to debug camera's sensor driver
+
+```
+link: https://pan.baidu.com/s/1rva6ZDj1x-T1rNcxV354KA
+fetch code: z4uh
+```
+
+- RV1126&RV1109 Linux SDK Quick Start develop guide
+
+```
+link: https://pan.baidu.com/s/1iXwOdXH0jIR3iGQc0gluow
+fetch code: t9o0
+```
+
+- Instructions to calibration process of RK ISP2
+
+```
+link: https://pan.baidu.com/s/1tZloen4B4jIIl2w1R2hWfg
+fetch code: nrp3
+```
+
+- Instructions to calibration method of RK ISP2 base modules and tool usage
+
+```
+link: https://pan.baidu.com/s/1L0zSxInjqTyqDBesg4RL1w
+fetch code: 8yc6
+```
 
 ### RV1109/RV1126 Develop Tools
 
