@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-520
 
-发布版本：V1.3.0
+发布版本：V1.4.0
 
-日期：2020-10-01
+日期：2020-11-04
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -71,7 +71,8 @@ Rockchip Electronics Co., Ltd.
 | V1.1.0     | 黄建财   | 2020-06-23   | 更新格式     |
 | V1.2.0     | 林其浩/黄建财 | 2020-07-13   | 添加扩展功能和h265支持章节 |
 | V1.3.0     | 黄建财   | 2020-10-01   | 添加UVC PTZ/H265等接口说明 |
-|            |          |              |              |
+| V1.4.0 | 黄建财 | 2020-11-04 | FAQ添加MAC OS低版本兼容性处理 |
+| | | | |
 
 ---
 
@@ -866,5 +867,25 @@ index dfa6113..05c0213 100644
  #define V4L2_PIX_FMT_H264     v4l2_fourcc('H', '2', '6', '4') /* H264 with start codes */
  #define V4L2_PIX_FMT_H264_NO_SC v4l2_fourcc('A', 'V', 'C', '1') /* H264 without start codes */
  #define V4L2_PIX_FMT_H264_MVC v4l2_fourcc('M', '2', '6', '4') /* H264 MVC */
+```
+
+### 苹果电脑低OS版本UVC无法预览兼容性处理方法
+
+我们在兼容性测试中发现，苹果电脑系统MAC OS 10.15版本及以上才支持UVC maxpacket配置为3K ，以下的版本最大只支持配置到1K，若产品为通用USB CAMERA且对HOST兼容性要求比较高，可以按下面修改UVC maxpacket配置为默认1K即可。
+
+```diff
+huangjc@tv-server:~/SDK_Linux/rv1109/device/rockchip/oem/oem_uvcc$ git diff .
+diff --git a/oem/oem_uvcc/usb_config.sh b/oem/oem_uvcc/usb_config.sh
+index 8d0af97..efcc181 100755
+--- a/oem/oem_uvcc/usb_config.sh
++++ b/oem/oem_uvcc/usb_config.sh
+@@ -63,7 +63,7 @@ configure_uvc_resolution_h264()
+ uvc_device_config()
+ {
+   mkdir ${USB_FUNCTIONS_DIR}/uvc.gs6
+-  echo 3072 > ${USB_FUNCTIONS_DIR}/uvc.gs6/streaming_maxpacket
++#  echo 3072 > ${USB_FUNCTIONS_DIR}/uvc.gs6/streaming_maxpacket
+   echo 2 > ${USB_FUNCTIONS_DIR}/uvc.gs6/uvc_num_request
+   #echo 1 > /sys/kernel/config/usb_gadget/rockchip/functions/uvc.gs6/streaming_bulk
 ```
 
