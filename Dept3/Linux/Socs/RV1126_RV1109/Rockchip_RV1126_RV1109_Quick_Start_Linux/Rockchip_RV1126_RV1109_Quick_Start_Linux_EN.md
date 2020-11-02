@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.8.1
+Release Version: V1.8.2
 
-Release Date: 2020-10-29
+Release Date: 2020-11-02
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -75,6 +75,7 @@ This document (this guide) is mainly intended for:
 | V1.7.0 | CWW | 2020-09-16 | 1. Add WiFi and Upgrade documents<br>2. Update compilation<br>3. update install bison and flex<br>4. Add print SDK version<br>5. Add two methods of compiling SDK in the chapter of "SDK Building Introduction"  |
 | V1.8.0 | CWW | 2020-09-25 | 1. Add install liblz4-tool, keychain and libtool for development environment<br>2. Update documents<br>3. Add ADB debug via network |
 | V1.8.1 | CWW | 2020-10-29 | update training video link |
+| V1.8.2 | LJH | 2020-11-02 | update facial gate product section |
 
 ---
 
@@ -388,7 +389,7 @@ Starting default: 100% (71/71), done.
 #### The directory of SDK board config (device/rockchip/rv1126_rv1109)
 
 | Board Configuration           | Product Use                                 | Storage Medium | EVB Board name                                      |
-| ----------------------------- | --------------------------                  | --------       | --------------------------------------------------- |
+| ----------------------------- | ------------------------------------------- | -------------- | --------------------------------------------------- |
 | BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
 | BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-robot.mk          | Robot Sweeper IPC                           | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
@@ -398,7 +399,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig.mk                | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-v12.mk            | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
-| BoardConfig-facial_gate.mk    | Door Control or Turnstile                   | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-facial_gate.mk    | Door Control or Turnstile                   | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | ++++++++++++++++++++++++++    | +++++++++++++++++++++++++++++++++           | +++++++++++++  | ++++++++++++++++++++++++++++++++++++++++++++        |
 
 Command of select board configure:
@@ -418,7 +419,7 @@ select **Door lock or doorbell products with battery** board configuration, appl
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
 ```
 
-select **Door Control or Turnstile**, apply to EVB Board RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY
+select **Door Control or Turnstile**, apply to EVB Board RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
 
 ```shell
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
@@ -1008,18 +1009,21 @@ The compilation and configuration of the facial gate product is based on the pub
 | -------------------------------------------------------- | ------------------------ |
 | device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk | Facial Gate board config |
 
-**Note**: The SDK supports the EVB with the mark of RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY by default,so if you get the EVB V13 Board, please modify kernel/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts,change rv1126-evb-v12.dtsi to rv1126-evb-v13.dtsi
+**Note**: The SDK supports the EVB with the mark of RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF  by default,so if you get the EVB with the mark of RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY, please modify device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
 
-```shell
---- a/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
-+++ b/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
-@@ -4,7 +4,7 @@
-  */
- /dts-v1/;
- #include "rv1109.dtsi"
--#include "rv1126-evb-v12.dtsi"
-+#include "rv1126-evb-v13.dtsi"
- / {
+```diff
+--- a/rv1126_rv1109/BoardConfig-facial_gate.mk
++++ b/rv1126_rv1109/BoardConfig-facial_gate.mk
+@@ -11,7 +11,7 @@ export RK_KERNEL_DEFCONFIG=rv1126_defconfig
+ # Kernel defconfig fragment
+ export RK_KERNEL_DEFCONFIG_FRAGMENT=rv1126-facial-gate.config
+ # Kernel dts
+-export RK_KERNEL_DTS=rv1109-evb-ddr3-v13-facial-gate
++export RK_KERNEL_DTS=rv1109-evb-ddr3-v12-facial-gate
+ # boot image type
+ export RK_BOOT_IMG=zboot.img
+ # kernel image path
+
 ```
 
 Command of selecting board configuration:

@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.8.1
+发布版本：V1.8.2
 
-日期：2020-10-29
+日期：2020-11-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -80,6 +80,7 @@ Rockchip Electronics Co., Ltd.
 | V1.7.0 | CWW | 2020-09-16 | 1. 增加WiFi和升级相关文档说明<br>2. 增加编译配置说明<br>3. 更新开发环境软件依赖flex和bison<br>4. 增加获取SDK版本号<br>5. “SDK编译说明”章节增加介绍两种编译SDK的方法 |
 | V1.8.0 | CWW | 2020-09-25 | 1. 编译环境添加liblz4-tool，libtool和keychain<br>2. 更新文档<br>3. 添加网络ADB调试方法 |
 | V1.8.1 | CWW | 2020-10-29 | 更新视频培训地址|
+| V1.8.2 | LJH | 2020-11-02 | 更新闸机和门禁类产品章节 |
 
 ---
 
@@ -401,7 +402,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig.mk                | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-v12.mk            | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
-| BoardConfig-facial_gate.mk    | 门禁和闸机类产品             | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-facial_gate.mk    | 门禁和闸机类产品             | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | ++++++++++++++++++++++++++    | ++++++++++++++++++++++++++++ | +++++    | ++++++++++++++++++++++++++++++++++++++++++++        |
 
 #### 切换板级配置命令
@@ -421,7 +422,7 @@ Starting default: 100% (71/71), done.
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
 ```
 
-选择**门禁和闸机类产品**, 对应EVB板RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY
+选择**门禁和闸机类产品**, 对应EVB板RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF
 
 ```shell
 ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
@@ -1002,18 +1003,20 @@ Android智能电视使用RKAICameraTest应用或其他标准camera应用，PC端
 | -------------------------------------------------------- | -------------------------- |
 | device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk | 闸机和门禁类产品的板级配置 |
 
-说明：默认支持V12的EVB板，板上丝印是RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY，如果客户手头是V13的EVB，请修改kernel/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts，导入rv1126-evb-v13.dtsi
+说明：默认支持V13的EVB板，板上丝印是RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF，如果客户的板子上丝印是RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY，请按如下修改device/rockchip/rv1126_rv1109/BoardConfig-facial_gate.mk
 
-```shell
---- a/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
-+++ b/arch/arm/boot/dts/rv1109-evb-ddr3-v12-facial-gate.dts
-@@ -4,7 +4,7 @@
-  */
- /dts-v1/;
- #include "rv1109.dtsi"
--#include "rv1126-evb-v12.dtsi"
-+#include "rv1126-evb-v13.dtsi"
- / {
+```diff
+--- a/rv1126_rv1109/BoardConfig-facial_gate.mk
++++ b/rv1126_rv1109/BoardConfig-facial_gate.mk
+@@ -11,7 +11,7 @@ export RK_KERNEL_DEFCONFIG=rv1126_defconfig
+ # Kernel defconfig fragment
+ export RK_KERNEL_DEFCONFIG_FRAGMENT=rv1126-facial-gate.config
+ # Kernel dts
+-export RK_KERNEL_DTS=rv1109-evb-ddr3-v13-facial-gate
++export RK_KERNEL_DTS=rv1109-evb-ddr3-v12-facial-gate
+ # boot image type
+ export RK_BOOT_IMG=zboot.img
+ # kernel image path
 ```
 
 切换板级配置命令：
