@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-075
 
-Release Version: V2.2.0
+Release Version: V2.3.0
 
-Release Date: 2020-07-114
+Release Date: 2020-11-02
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -64,6 +64,7 @@ Software development engineers
 | V2.0.0      | Dingqiang Lin | 2019-12-09 | Support Linux 4.19                                           |
 | V2.1.0      | Dingqiang Lin | 2020-02-13 | Adjust SPI slave configuration                               |
 | V2.2.0      | Dingqiang Lin | 2020-07-14 | Linux 4.19 DTS configuration change, Optimize document layout |
+| V2.3.0      | Dingqiang Lin | 2020-11-02 | Add comment for supporting spi-bus cs-gpios property         |
 
 ---
 
@@ -91,7 +92,7 @@ the following are some of the new features supported by the Linux 4.19 SPI drive
 
 ### Code Path
 
-```c
+```
 drivers/spi/spi.c               /* SPI Driver framework */
 drivers/spi/spi-rockchip.c      /* RK SPI  implement of interface */
 drivers/spi/spidev.c            /* Create  SPI  device node for using */
@@ -101,9 +102,11 @@ Documentation/spi/spidev_test.c /* SPI test tool in user state */
 
 ### SPI Device Configuration: RK SPI As  Master Port
 
+#### Linux 4.4 Configuration
+
 **Kernel Configuration**
 
-```c
+```
 Device Drivers  --->
 	[*] SPI support  --->
 		<*>   Rockchip SPI controller driver
@@ -111,9 +114,7 @@ Device Drivers  --->
 
 **DTS Node Configuration**
 
-Linux 4.4 Configuration:
-
-```c
+```
 &spi1 {                                  //Quote SPI controller node
     status = "okay";
     max-freq = <48000000>;               //SPI internal clock
@@ -136,9 +137,19 @@ Configuration instructions for max-freq and spi-max-frequency:
 - max-freq should not be lower than 24M, otherwise there may be problems.
 - If you need to configure spi-cpha, max-freq <= 6M, 1M <= spi-max-frequency >= 3M.
 
-Linux 4.19 Configuration:
+#### Linux 4.19 Configuration
 
-```c
+**Kernel Configuration**
+
+```
+Device Drivers  --->
+	[*] SPI support  --->
+		<*>   Rockchip SPI controller driver
+```
+
+**DTS Node Configuration**
+
+```
 &spi1 {                                  //Quote SPI controller node
     status = "okay";
     max-freq = <48000000>;               //SPI internal clock, find the clock witch is named spiclk in dtsi
@@ -224,7 +235,7 @@ index cce80e6..ce2cec6 100644
 
 DTS configuration：
 
-```c
+```
 &spi0 {
     max-freq = <48000000>;   //spi internal clk, don't modify
     spi_test@01 {
@@ -251,7 +262,7 @@ Device Drivers  --->
 
 **DTS configuration**
 
-```c
+```
 &spi1 {
     status = "okay";
     assigned-clocks = <&pmucru CLK_SPI0>;
@@ -353,7 +364,7 @@ There is no need to change the kernel to facilitate driver development.
 
 **Kernel Configuration**
 
-```c
+```
 Device Drivers  --->
 	[*] SPI support  --->
 		[*]   User mode SPI device driver support
@@ -361,7 +372,7 @@ Device Drivers  --->
 
 **DTS Configuration**
 
-```c
+```
 &spi0 {
     status = "okay";
     max-freq = <50000000>;
@@ -379,6 +390,83 @@ After the driver device is successfully registered, a device like this name will
 
 Please refer to Documentation/spi/spidev_test.c
 
+### Support cs-gpios
+
+Users can use the cs-gpios attribute of spi-bus to implement gpio simulation cs to extend SPI chip selection signal. Users can refer to the kernel document `Documentation/devicetree/bindings/spi/spi-bus.txt` to learn more about cs-gpios.
+
+#### Linux 4.4 configuration
+
+ This support needs more support patches. Please contact RK Engineer for the corresponding patches.
+
+#### Linux 4.19 configuration
+
+Take spi1_cs2n in GPIO0_C4 for example:
+
+**Set the cs-gpio pin and reference it in the SPI node**
+
+```diff
+diff --git a/arch/arm/boot/dts/rv1126-evb-v10.dtsi b/arch/arm/boot/dts/rv1126-evb-v10.dtsi
+index 144e9edf1831..c17ac362289e 100644
+--- a/arch/arm/boot/dts/rv1126-evb-v10.dtsi
++++ b/arch/arm/boot/dts/rv1126-evb-v10.dtsi
+
+&pinctrl {
+        ...
++
++       spi1 {
++               spi1_cs2n: spi1-cs2n {
++                       rockchip,pins =
++                               <0 RK_PC4 RK_FUNC_GPIO &pcfg_pull_up_drv_level_0>;
++               };
++       };
+};
+
+diff --git a/arch/arm/boot/dts/rv1126.dtsi b/arch/arm/boot/dts/rv1126.dtsi
+index 351bc668ea42..986a85f13832 100644
+--- a/arch/arm/boot/dts/rv1126.dtsi
++++ b/arch/arm/boot/dts/rv1126.dtsi
+
+spi1: spi@ff5b0000 {
+        compatible = "rockchip,rv1126-spi", "rockchip,rk3066-spi";
+        reg = <0xff5b0000 0x1000>;
+        interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clocks = <&cru CLK_SPI1>, <&cru PCLK_SPI1>;
+        clock-names = "spiclk", "apb_pclk";
+        dmas = <&dmac 3>, <&dmac 2>;
+        dma-names = "tx", "rx";
+        pinctrl-names = "default", "high_speed";
+-       pinctrl-0 = <&spi1m0_clk &spi1m0_cs0n &spi1m0_cs1n &spi1m0_miso &spi1m0_mosi>;
+-       pinctrl-1 = <&spi1m0_clk_hs &spi1m0_cs0n &spi1m0_cs1n &spi1m0_miso_hs &spi1m0_mosi_hs>;
++       pinctrl-0 = <&spi1m0_clk &spi1m0_cs0n &spi1m0_cs1n &spi1_cs2n &spi1m0_miso &spi1m0_mosi>;
++       pinctrl-1 = <&spi1m0_clk_hs &spi1m0_cs0n &spi1m0_cs1n &spi1_cs2n &spi1m0_miso_hs &spi1m0_mosi_hs>
+        status = "disabled";
+};
+```
+
+**SPI node reassigns CS pin**
+
+```
++&spi1 {
++       status = "okay";
++       max-freq = <48000000>;
++       cs-gpios = <0>, <0>, <&gpio0 RK_PC4 GPIO_ACTIVE_LOW>;	/* 该行定义：cs0-native，cs1-native，cs2-gpio */
+        spi_test@00 {
+                compatible = "rockchip,spi_test_bus1_cs0";
+...
++       spi_test@02 {
++               compatible = "rockchip,spi_test_bus1_cs2";
++               id = <2>;
++               reg = <0x2>;
++               spi-cpha;
++               spi-cpol;
++               spi-lsb-first;
++               spi-max-frequency = <16000000>;
++       };
+};
+```
+
 ## SPI Testing Driver in Kernel
 
 ### Code Path
@@ -389,14 +477,14 @@ drivers/spi/spi-rockchip-test.c
 
 **Kernel Path**
 
-```c
+```
 drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
 ```
 
 **DTS Configuraion**
 
-```c
+```
 &spi0 {
     status = "okay";
     spi_test@00 {
@@ -416,7 +504,7 @@ drivers/spi/Makefile
 
 **Driver log**
 
-```c
+```
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
 [    0.530774] spi_test spi32766.0: fail to get type, default set 0
 [    0.531342] spi_test spi32766.0: fail to get enable_dma, default set 0
@@ -428,7 +516,7 @@ drivers/spi/Makefile
 
 ### Test Command
 
-```c
+```
 echo write 0 10 255 > /dev/spi_misc_test
 echo write 0 10 255 init.rc > /dev/spi_misc_test
 echo read 0 10 255 > /dev/spi_misc_test

@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-020
 
-发布版本：V2.2.0
+发布版本：V2.3.0
 
-日期：2020-07-14
+日期：2020-11-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ Rockchip Electronics Co., Ltd.
 | V2.0.0 | 林鼎强 | 2019-12-03 | 新增 linux4.19 支持 |
 | V2.1.0 | 林鼎强 | 2020-02-13 | 修改 SPI slave 配置 |
 | V2.2.0 | 林鼎强 | 2020-07-14 | 修订 Linux 4.19 DTS 相关配置，优化文档排版结构 |
+| V2.3.0 | 林鼎强 | 2020-11-02 | 新增 spi-bus cs-gpios 属性的支持说明 |
 
 ---
 
@@ -106,9 +107,11 @@ Documentation/spi/spidev_test.c  用户态spi测试工具
 
 ### SPI 设备配置 —— RK 芯片做 Master 端
 
+#### Linux 4.4 配置
+
 **内核配置**
 
-```c
+```
 Device Drivers  --->
 	[*] SPI support  --->
 		<*>   Rockchip SPI controller driver
@@ -116,9 +119,7 @@ Device Drivers  --->
 
 **DTS 节点配置**
 
-Linux 4.4 配置：
-
-```c
+```
 &spi1 {                                             //引用spi 控制器节点
     status = "okay";
     max-freq = <48000000>;                          //spi内部工作时钟
@@ -142,9 +143,19 @@ max-freq 和 spi-max-frequency 的配置说明：
 * max-freq 不要低于 24M，否则可能有问题；
 * 如果需要配置 spi-cpha 的话， 要求 max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
 
-Linux 4.19 配置：
+#### Linux 4.19 配置
 
-```c
+**内核配置**
+
+```
+Device Drivers  --->
+	[*] SPI support  --->
+		<*>   Rockchip SPI controller driver
+```
+
+**DTS 节点配置**
+
+```
 &spi1 {                                             //引用spi 控制器节点
     status = "okay";
     assigned-clocks = <&pmucru CLK_SPI0>;           //指定 SPI sclk，可以通过查看 dtsi 中命名为 spiclk 的时钟
@@ -231,7 +242,7 @@ index cce80e6..ce2cec6 100644
 
 **DTS 节点配置**
 
-```c
+```
 &spi0 {
     max-freq = <48000000>;   //spi internal clk, don't modify
     spi_test@01 {
@@ -258,7 +269,7 @@ Device Drivers  --->
 
  **DTS 节点配置**
 
-```c
+```
 &spi1 {
     status = "okay";
     assigned-clocks = <&pmucru CLK_SPI0>;
@@ -360,7 +371,7 @@ User mode SPI device 指的是用户空间直接操作 SPI 接口，这样方便
 
 **内核配置**
 
-```c
+```
 Device Drivers  --->
 	[*] SPI support  --->
 		[*]   User mode SPI device driver support
@@ -368,7 +379,7 @@ Device Drivers  --->
 
 **DTS 配置**
 
-```c
+```
 &spi0 {
 	status = "okay";
 	max-freq = <50000000>;
@@ -386,11 +397,88 @@ Device Drivers  --->
 
 请参照 Documentation/spi/spidev_test.c
 
+### cs-gpios 支持
+
+用户可以通过 spi-bus 的 cs-gpios 属性来实现 gpio 模拟 cs 以扩展 SPI 片选信号，cs-gpios 属性详细信息可以查阅内核文档 `Documentation/devicetree/bindings/spi/spi-bus.txt`。
+
+#### Linux 4.4 配置
+
+该支持需要较多支持补丁，请联系 RK 工程师获取相应的补丁。
+
+#### Linux 4.19 配置
+
+以 SPI1 设定 GPIO0_C4 为 spi1_cs2n 扩展脚为例。
+
+**设置 cs-gpio 脚并在 SPI 节点中引用**
+
+```diff
+diff --git a/arch/arm/boot/dts/rv1126-evb-v10.dtsi b/arch/arm/boot/dts/rv1126-evb-v10.dtsi
+index 144e9edf1831..c17ac362289e 100644
+--- a/arch/arm/boot/dts/rv1126-evb-v10.dtsi
++++ b/arch/arm/boot/dts/rv1126-evb-v10.dtsi
+
+&pinctrl {
+        ...
++
++       spi1 {
++               spi1_cs2n: spi1-cs2n {
++                       rockchip,pins =
++                               <0 RK_PC4 RK_FUNC_GPIO &pcfg_pull_up_drv_level_0>;
++               };
++       };
+};
+
+diff --git a/arch/arm/boot/dts/rv1126.dtsi b/arch/arm/boot/dts/rv1126.dtsi
+index 351bc668ea42..986a85f13832 100644
+--- a/arch/arm/boot/dts/rv1126.dtsi
++++ b/arch/arm/boot/dts/rv1126.dtsi
+
+spi1: spi@ff5b0000 {
+        compatible = "rockchip,rv1126-spi", "rockchip,rk3066-spi";
+        reg = <0xff5b0000 0x1000>;
+        interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clocks = <&cru CLK_SPI1>, <&cru PCLK_SPI1>;
+        clock-names = "spiclk", "apb_pclk";
+        dmas = <&dmac 3>, <&dmac 2>;
+        dma-names = "tx", "rx";
+        pinctrl-names = "default", "high_speed";
+-       pinctrl-0 = <&spi1m0_clk &spi1m0_cs0n &spi1m0_cs1n &spi1m0_miso &spi1m0_mosi>;
+-       pinctrl-1 = <&spi1m0_clk_hs &spi1m0_cs0n &spi1m0_cs1n &spi1m0_miso_hs &spi1m0_mosi_hs>;
++       pinctrl-0 = <&spi1m0_clk &spi1m0_cs0n &spi1m0_cs1n &spi1_cs2n &spi1m0_miso &spi1m0_mosi>;
++       pinctrl-1 = <&spi1m0_clk_hs &spi1m0_cs0n &spi1m0_cs1n &spi1_cs2n &spi1m0_miso_hs &spi1m0_mosi_hs>
+        status = "disabled";
+};
+```
+
+**SPI 节点重新指定 cs 脚**
+
+```
++&spi1 {
++       status = "okay";
++       max-freq = <48000000>;
++       cs-gpios = <0>, <0>, <&gpio0 RK_PC4 GPIO_ACTIVE_LOW>;	/* 该行定义：cs0-native，cs1-native，cs2-gpio */
+        spi_test@00 {
+                compatible = "rockchip,spi_test_bus1_cs0";
+...
++       spi_test@02 {
++               compatible = "rockchip,spi_test_bus1_cs2";
++               id = <2>;
++               reg = <0x2>;
++               spi-cpha;
++               spi-cpol;
++               spi-lsb-first;
++               spi-max-frequency = <16000000>;
++       };
+};
+```
+
 ## 内核测试软件
 
 ### 代码路径
 
-```c
+```
 drivers/spi/spi-rockchip-test.c
 ```
 
@@ -398,7 +486,7 @@ drivers/spi/spi-rockchip-test.c
 
 **内核补丁**
 
-```c
+```
 需要手动添加编译：
 drivers/spi/Makefile
 +obj-y                                  += spi-rockchip-test.o
@@ -406,7 +494,7 @@ drivers/spi/Makefile
 
 **DTS 配置**
 
-```c
+```
 &spi0 {
     status = "okay";
     spi_test@00 {
@@ -427,7 +515,7 @@ drivers/spi/Makefile
 
 **驱动 log**
 
-```c
+```
 [    0.530204] spi_test spi32766.0: fail to get poll_mode, default set 0
 [    0.530774] spi_test spi32766.0: fail to get type, default set 0
 [    0.531342] spi_test spi32766.0: fail to get enable_dma, default set 0
@@ -439,7 +527,7 @@ drivers/spi/Makefile
 
 ### 测试命令
 
-```c
+```
 echo write 0 10 255 > /dev/spi_misc_test
 echo write 0 10 255 init.rc > /dev/spi_misc_test
 echo read 0 10 255 > /dev/spi_misc_test
