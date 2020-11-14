@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.8.2
+发布版本：V1.9.0
 
-日期：2020-11-02
+日期：2020-11-14
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -81,6 +81,7 @@ Rockchip Electronics Co., Ltd.
 | V1.8.0 | CWW | 2020-09-25 | 1. 编译环境添加liblz4-tool，libtool和keychain<br>2. 更新文档<br>3. 添加网络ADB调试方法 |
 | V1.8.1 | CWW | 2020-10-29 | 更新视频培训地址|
 | V1.8.2 | LJH | 2020-11-02 | 更新闸机和门禁类产品章节 |
+| V1.9.0 | CWW | 2020-11-14 | 1. 更新spi nand/slc nand 板级配置和文档<br>2. 更新windows和Linux烧录工具版本要求 |
 
 ---
 
@@ -255,6 +256,10 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 
 ISP相关文档以及支持的sensor列表也可以在Redmine上获取`https://redmine.rock-chips.com/documents/53`
 
+#### SPI NAND/SLC NAND文档路径
+
+文档路径： `docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_Nand_Flash_Open_Source_Solution_CN.pdf`
+
 #### 部分模块的培训视频地址
 
 - 多媒体RKMedia介绍
@@ -401,6 +406,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig-spi-nand.mk       | 通用IPC                      | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig.mk                | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-v12.mk            | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-slc-nand-v12.mk   | 通用IPC                      | SLC NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
 | BoardConfig-facial_gate.mk    | 门禁和闸机类产品             | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | ++++++++++++++++++++++++++    | ++++++++++++++++++++++++++++ | +++++    | ++++++++++++++++++++++++++++++++++++++++++++        |
@@ -673,7 +679,7 @@ make ipc-daemon-rebuild
 
 ### Windows 刷机说明
 
-SDK 提供 Windows 烧写工具(工具版本需要 V2.71 或以上)，工具位于工程根目录：
+SDK 提供 Windows 烧写工具(工具版本需要 V2.78 或以上)，工具位于工程根目录：
 
 ```shell
 tools/
@@ -702,7 +708,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 
 ### Linux 刷机说明
 
-Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.49 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
+Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.57 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
 ```shell
 ### 除了MiniLoaderAll.bin和parameter.txt，实际需要烧录的分区根据rockdev/parameter.txt配置为准。
@@ -862,6 +868,55 @@ adb -s 192.168.1.159:5555 push test-file /userdata/
 ### 下载EVB板上的文件/userdata/test-file下载到PC端
 adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
 ```
+
+#### SPI NAND/SLC NAND ubi文件系统镜像打包说明
+
+##### 根文件系统打包说明
+
+Nand Flash的文件系统使用的是ubifs，SDK默认的配置是Page Size 2KB，Block Size 128KB的Nand Flash。
+通过修改buildroot对应的defconfig配置buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+步骤如下：
+
+```shell
+source envsetup.sh rockchip_rv1126_rv1109_spi_nand
+make menuconfig
+# 然后配置BR2_TARGET_ROOTFS_UBI_PEBSIZE/BR2_TARGET_ROOTFS_UBI_SUBSIZE/BR2_TARGET_ROOTFS_UBIFS_LEBSIZE/BR2_TARGET_ROOTFS_UBIFS_MINIOSIZE/BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT
+# 详细的配置说明可以参考SPI NAND/SLC NAND文档
+make savedefconfig
+```
+
+默认文件系统是用ubifs，如果要改成squashfs，那在buildroot对buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig打上如下补丁
+
+```diff
+diff --git a/configs/rockchip_rv1126_rv1109_spi_nand_defconfig b/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+index 5da9b25935..8af9226920 100644
+--- a/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
++++ b/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+@@ -41,6 +41,8 @@ BR2_PACKAGE_RK_OEM=y
+ BR2_PACKAGE_RK_OEM_RESOURCE_DIR="$(TOPDIR)/../device/rockchip/oem/oem_ipc"
+ BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE="ubi"
+ BR2_PACKAGE_RK_OEM_IMAGE_PARTITION_SIZE=0x6400000
++BR2_PACKAGE_ROOTFS_UBI_USE_CUSTOM_FILESYSTEM=y
++BR2_PACKAGE_ROOTFS_UBI_CUSTOM_FILESYSTEM="squashfs"
+ BR2_PACKAGE_CAMERA_ENGINE_RKAIQ=y
+ BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE="os04a10_CMK-OT1607-FV1_M12-40IRC-4MP-F16.xml"
+ BR2_PACKAGE_IPC_DAEMON=y
+@@ -79,4 +81,5 @@ BR2_PACKAGE_NGINX=y
+ BR2_PACKAGE_NGINX_HTTP_SSL_MODULE=y
+ BR2_PACKAGE_NGINX_DEBUG=y
+ BR2_PACKAGE_NGINX_RTMP=y
++BR2_TARGET_ROOTFS_SQUASHFS4_XZ=y
+ BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT=4096
+```
+
+##### oem和userdata分区的ubifs打包说明
+
+SDK默认oem是在buildroot里打包成ubi镜像。
+userdata分区默认不打包成镜像，系统启动后会自动格式化成ubifs。
+
+如果在对应的BoardConfig.mk里配置RK_OEM_DIR（RK_OEM_BUILDIN_BUILDROOT不配置）或RK_USERDATA_DIR，那可以使用SDK根目录下`./mkfirmware.sh`进行打包。
+RK_OEM_DIR是对应device/rockchip/oem/目录下自定义的目录。
+RK_USERDATA_DIR则是对应device/rockchip/userdata/目录下自定义的目录。
 
 ## 智能USB Camera产品配置
 

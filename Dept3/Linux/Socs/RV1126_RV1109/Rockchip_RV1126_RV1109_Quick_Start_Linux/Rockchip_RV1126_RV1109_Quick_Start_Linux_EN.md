@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.8.2
+Release Version: V1.9.0
 
-Release Date: 2020-11-02
+Release Date: 2020-11-14
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -76,6 +76,7 @@ This document (this guide) is mainly intended for:
 | V1.8.0 | CWW | 2020-09-25 | 1. Add install liblz4-tool, keychain and libtool for development environment<br>2. Update documents<br>3. Add ADB debug via network |
 | V1.8.1 | CWW | 2020-10-29 | update training video link |
 | V1.8.2 | LJH | 2020-11-02 | update facial gate product section |
+| V1.9.0 | CWW | 2020-11-14 | 1. Update spi nand/slc nand BoardConfig and Document<br>2. Update requirement version for windows and Linux tool |
 
 ---
 
@@ -252,6 +253,10 @@ Path of Tool: `external/camera_engine_rkaiq/rkisp2x_tuner/RKISP2.x_Tuner_v0.2.1_
 
 ISP develop guide documents and the support list of camera sensor can be got from the Redmine `https://redmine.rock-chips.com/documents/53`
 
+#### SPI NAND/SLC NAND document
+
+Path of document: `docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_Nand_Flash_Open_Source_Solution_EN.pdf`
+
 #### Some of modules video training
 
 - Instructions to RKMedia of RV1109 & RV1126
@@ -398,6 +403,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig-spi-nand.mk       | General IPC                                 | SPI NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig.mk                | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-v12.mk            | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
+| BoardConfig-slc-nand-v12.mk   | General IPC                                 | SLC NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
 | BoardConfig-facial_gate.mk    | Door Control or Turnstile                   | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | ++++++++++++++++++++++++++    | +++++++++++++++++++++++++++++++++           | +++++++++++++  | ++++++++++++++++++++++++++++++++++++++++++++        |
@@ -676,7 +682,7 @@ Enter the project root directory and execute the following command to automatica
 
 ### Windows Upgrade Introduction
 
-The SDK provides a windows flash tool (this tool should be V2.71 or later version) which is located in project root directory:
+The SDK provides a windows flash tool (this tool should be V2.78 or later version) which is located in project root directory:
 
 ```shell
 tools/
@@ -703,7 +709,7 @@ Note:
 
 ### Linux Upgrade Introduction
 
-The Linux upgrade tool (Linux_Upgrade_Tool should be v1.49 or later versions) is located in "tools/linux" directory. Please make sure your board is connected to MASKROM/loader rockusb, if the generated firmware is in rockdev directory, upgrade commands are as below:
+The Linux upgrade tool (Linux_Upgrade_Tool should be v1.57 or later versions) is located in "tools/linux" directory. Please make sure your board is connected to MASKROM/loader rockusb, if the generated firmware is in rockdev directory, upgrade commands are as below:
 
 ```shell
 ### In addition to MiniLoader All.bin and parameter.txt, the actual partition to be burned is based on rockdev / parameter.txt configuration.
@@ -863,6 +869,55 @@ adb -s 192.168.1.159:5555 push test-file /userdata/
 ### Download the EVB file (/userdata/test-file) to PC
 adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
 ```
+
+#### SPI NAND/SLC NAND ubi filesystem introduction
+
+##### Introduction to ubi filesystem of rootfs
+
+The rootfs of Nand Flash is ubifs, SDK default configure Nand Flash information is Page Size 2KB and Block Size 128KB.
+To modify buildroot defconfig "buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig".
+Steps are as follows:
+
+```shell
+source envsetup.sh rockchip_rv1126_rv1109_spi_nand
+make menuconfig
+# configure these: BR2_TARGET_ROOTFS_UBI_PEBSIZE/BR2_TARGET_ROOTFS_UBI_SUBSIZE/BR2_TARGET_ROOTFS_UBIFS_LEBSIZE/BR2_TARGET_ROOTFS_UBIFS_MINIOSIZE/BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT
+# detail to see document of SPI NAND/SLC NAND
+make savedefconfig
+```
+
+The rootfs is ubifs default, if want to use squashfs, then configure buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+
+```diff
+diff --git a/configs/rockchip_rv1126_rv1109_spi_nand_defconfig b/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+index 5da9b25935..8af9226920 100644
+--- a/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
++++ b/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+@@ -41,6 +41,8 @@ BR2_PACKAGE_RK_OEM=y
+ BR2_PACKAGE_RK_OEM_RESOURCE_DIR="$(TOPDIR)/../device/rockchip/oem/oem_ipc"
+ BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE="ubi"
+ BR2_PACKAGE_RK_OEM_IMAGE_PARTITION_SIZE=0x6400000
++BR2_PACKAGE_ROOTFS_UBI_USE_CUSTOM_FILESYSTEM=y
++BR2_PACKAGE_ROOTFS_UBI_CUSTOM_FILESYSTEM="squashfs"
+ BR2_PACKAGE_CAMERA_ENGINE_RKAIQ=y
+ BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE="os04a10_CMK-OT1607-FV1_M12-40IRC-4MP-F16.xml"
+ BR2_PACKAGE_IPC_DAEMON=y
+@@ -79,4 +81,5 @@ BR2_PACKAGE_NGINX=y
+ BR2_PACKAGE_NGINX_HTTP_SSL_MODULE=y
+ BR2_PACKAGE_NGINX_DEBUG=y
+ BR2_PACKAGE_NGINX_RTMP=y
++BR2_TARGET_ROOTFS_SQUASHFS4_XZ=y
+ BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT=4096
+```
+
+##### Introduction to oem and userdata partition used in ubifs
+
+The SDK default OEM is packaged in Buildroot as a UBI image.
+The userdata partition default is not packaged, when system boot up userdata will fotmat to ubifs auto.
+
+If configure RK_OEM_DIR (RK_OEM_BUILDIN_BUILDROOT is not defined) or RK_USERDATA_DIRi in the BoardConfig.mk, then use `./mkfirmware.sh` which in the root directory of SDK.
+RK_OEM_DIR define as the directory which in the device/rockchip/oem/.
+RK_USERDATA_DIR define as the directory which in the device/rockchip/userdata/.
 
 ## Smart USB Camera Product
 
