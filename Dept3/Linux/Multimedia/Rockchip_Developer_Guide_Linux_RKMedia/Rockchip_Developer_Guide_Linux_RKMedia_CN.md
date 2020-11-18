@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-09-03
+日期：2020-11-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | --------| :--------- | ------------ |
 | V0.0.1   | 范立创 / 余永镇 | 2020-08-31 | 初始版本     |
 | V1.0.0 | 林刘迪铭 | 2020-09-03 | 增加数据类型和错误码，关联链接 |
+| V1.1.0 | 范立创 /陈茂森 | 2020-11-18 | 1.增加API说明：<br />（1）[RK_MPI_MB_CreateBuffer](#RK_MPI_MB_CreateBuffer)<br />（2）[RK_MPI_MB_CreateImageBuffer](#RK_MPI_MB_CreateImageBuffer)<br />（3）[RK_MPI_MB_CreateAudioBuffer](#RK_MPI_MB_CreateAudioBuffer)<br />（4）[RK_MPI_MB_ConvertToImgBuffer](#RK_MPI_MB_ConvertToImgBuffer)<br />（5）[RK_MPI_MB_ConvertToAudBuffer](#RK_MPI_MB_ConvertToAudBuffer)<br />（6）[RK_MPI_MB_SetSzie](#RK_MPI_MB_SetSzie)<br />（7）[RK_MPI_MB_SetTimestamp](#RK_MPI_MB_SetTimestamp)<br />（8）[RK_MPI_MB_GetFlag](#RK_MPI_MB_GetFlag)<br />（9）[RK_MPI_MB_GetTsvcLevel](#RK_MPI_MB_GetTsvcLevel)<br />（10）[RK_MPI_MB_IsViFrame](#RK_MPI_MB_IsViFrame)<br />（11）[RK_MPI_MB_GetImageInfo](#RK_MPI_MB_GetImageInfo)<br />（12）[RK_MPI_MB_BeginCPUAccess](#RK_MPI_MB_BeginCPUAccess)<br />（13）[RK_MPI_MB_EndCPUAccess](#RK_MPI_MB_EndCPUAccess)<br />（14）[RK_MPI_VI_StartRegionLuma](#RK_MPI_VI_StartRegionLuma)<br />（15）[RK_MPI_VI_StopRegionLuma](#RK_MPI_VI_StopRegionLuma)<br />（16）[RK_MPI_VENC_GetVencChnAttr](#RK_MPI_VENC_GetVencChnAttr)<br />（17）[RK_MPI_VENC_SetVencChnAttr](#RK_MPI_VENC_SetVencChnAttr)<br />（18）[RK_MPI_VENC_CreateJpegLightChn](#RK_MPI_VENC_CreateJpegLightChn)<br />（19）[RK_MPI_VENC_GetRcParam](#RK_MPI_VENC_GetRcParam)<br />（20）[RK_MPI_VENC_SetResolution](#RK_MPI_VENC_SetResolution)<br />（21）[RK_MPI_VENC_GetRoiAttr](#RK_MPI_VENC_GetRoiAttr)<br />（22）[RK_MPI_VENC_RGN_SetPaletteId](#RK_MPI_VENC_RGN_SetPaletteId)<br />（23）[RK_MPI_VENC_GetFd](#RK_MPI_VENC_GetFd)<br />（24）[RK_MPI_VENC_QueryStatus](#RK_MPI_VENC_QueryStatus)<br />（25）[RK_MPI_ALGO_MD_EnableSwitch](#RK_MPI_ALGO_MD_EnableSwitch)<br />（26）[RK_MPI_ALGO_OD_EnableSwitch](#RK_MPI_ALGO_OD_EnableSwitch)<br />（27）[RK_MPI_VO_SetChnAttr](#RK_MPI_VO_SetChnAttr)<br />（28）[RK_MPI_AI_StartStream](#RK_MPI_AI_StartStream)<br />（29）[RK_MPI_AO_QueryChnStat](#RK_MPI_AO_QueryChnStat)<br />（30）[RK_MPI_AO_ClearChnBuf](#RK_MPI_AO_ClearChnBuf)<br />（31）[RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)<br />（32）[RK_MPI_SYS_StopGetMediaBuffer](#RK_MPI_SYS_StopGetMediaBuffer)<br />（33）[RK_MPI_VDEC_CreateChn](#RK_MPI_VDEC_CreateChn)<br />（34）[RK_MPI_VDEC_DestroyChn](#RK_MPI_VDEC_DestroyChn)<br />2.修改API：[RK_MPI_VO_CreateChn](#RK_MPI_VO_CreateChn)<br />3.[新增示例说明板块](#示例) |
 
 ---
 
@@ -182,10 +183,7 @@ RK_VOID RK_MPI_SYS_DumpChn([MOD_ID_E](#MOD_ID_E) enModId);
 
 【返回值】
 
-| 返回值 | 描述                             |
-| ------ | -------------------------------- |
-| 0      | 成功。                           |
-| 非0    | 失败，其值参见[错误码](#common-error)。 |
+无
 
 【需求】
 
@@ -239,7 +237,7 @@ RK_S32 RK_MPI_SYS_Bind(const [MPP_CHN_S](#MPP_CHN_S) *pstSrcChn,const [MPP_CHN_S
 
 系统目前支持的绑定关系，请参见[表2-1](#bind-relation)。
 
-如果使用了此函数，则不能使用[RK_MPI_MB_ReleaseBuffer](#RK_MPI_MB_ReleaseBuffer)获取数据。
+在释放被绑定的通道前，需先通过[RK_MPI_SYS_UnBind](#RK_MPI_SYS_UnBind)进行解绑。
 
 【举例】
 
@@ -327,7 +325,7 @@ RK_S32 RK_MPI_SYS_RegisterEventCb(const [MPP_CHN_S](#MPP_CHN_S) *pstChn, [EventC
 
 【举例】
 
-无。
+[rkmedia_vi_md_test](#rkmedia_vi_md_test)。
 
 【相关主题】
 
@@ -341,7 +339,7 @@ RK_S32 RK_MPI_SYS_RegisterEventCb(const [MPP_CHN_S](#MPP_CHN_S) *pstChn, [EventC
 
 【描述】
 
-注册数据输出回调。注意：回调函数不能处理耗时操作，否则对应通道数据流将被阻塞。
+注册数据输出回调。与[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)相比，无需缓存buffer等待用户索取，因此更节省内存。
 
 【语法】
 
@@ -359,7 +357,7 @@ RK_S32 RK_MPI_SYS_RegisterOutCb(const [MPP_CHN_S](#MPP_CHN_S) *pstChn, [OutCbFun
 | 返回值 | 描述                             |
 | ------ | -------------------------------- |
 | 0      | 成功。                           |
-| 非0    | 失败，其值参见[错误码](#表2-2)。 |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
 
 【需求】
 
@@ -373,7 +371,7 @@ RK_S32 RK_MPI_SYS_RegisterOutCb(const [MPP_CHN_S](#MPP_CHN_S) *pstChn, [OutCbFun
 
 【举例】
 
-无。
+[rkmedia_vi_venc_test](#rkmedia_vi_venc_test)。
 
 【相关主题】
 
@@ -402,7 +400,7 @@ RK_S32 RK_MPI_SYS_SendMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID
 | 返回值 | 描述                             |
 | ------ | -------------------------------- |
 | 0      | 成功。                           |
-| 非0    | 失败，其值参见[错误码](#表2-2)。 |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
 
 【需求】
 
@@ -416,9 +414,97 @@ RK_S32 RK_MPI_SYS_SendMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID
 
 【举例】
 
+[rkmedia_vo_display_test](#rkmedia_vo_display_test)。
+
+【相关主题】
+
+[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
+
+#### RK_MPI_SYS_StartGetMediaBuffer
+
+【描述】
+
+启用接收缓冲区。启用接收缓冲区后，即使通道Bind，也能通过[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)获取MediaBuffer。
+
+【语法】
+
+RK_S32 RK_MPI_SYS_StartGetMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID);
+
+【参数】
+
+| 参数名称 | 描述     | 输入/输出 |
+| -------- | -------- | --------- |
+| enModID  | 模块号。 | 输入      |
+| s32ChnID | 通道号。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+启用接收缓冲区后，要及时调用[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)取走MediaBuffer，否则会提示丢包警告。
+
+【举例】
+
 无。
 
 【相关主题】
+
+[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
+
+[RK_MPI_SYS_StopGetMediaBuffer](#RK_MPI_SYS_StopGetMediaBuffer)
+
+#### RK_MPI_SYS_StopGetMediaBuffer
+
+【描述】
+
+关闭接收缓冲区，并清理缓冲区现有MediaBuffer。
+
+【语法】
+
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_SYS_StopGetMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID);
+
+【参数】
+
+| 参数名称 | 描述     | 输入/输出 |
+| -------- | -------- | --------- |
+| enModID  | 模块号。 | 输入      |
+| s32ChnID | 通道号。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+调用该接口后，若再次调用[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)获取数据，则接收缓冲区再次被打开。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)
 
 [RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
 
@@ -430,7 +516,7 @@ RK_S32 RK_MPI_SYS_SendMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID
 
 【语法】
 
-[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_SYS_GetMediaBuffer(MOD_ID_E enModID, RK_S32 s32ChnID, RK_S32 s32MilliSec);
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_SYS_GetMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID, RK_S32 s32MilliSec);
 
 【参数】
 
@@ -454,44 +540,83 @@ RK_S32 RK_MPI_SYS_SendMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID
 
 【注意】
 
-如果使用了[RK_MPI_SYS_Bind](#RK_MPI_SYS_Bind)，则此函数获取不到数据。
+该接口会自动触发[RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)。
 
 【举例】
 
-无。
+[rkmedia_vi_get_frame_test](#rkmedia_vi_get_frame_test)。
 
 【相关主题】
 
-[RK_MPI_SYS_SendMediaBuffer](#RK_MPI_SYS_SendMediaBuffer)
+[RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)
 
-[RK_MPI_MB_ReleaseBuffer](#RK_MPI_MB_ReleaseBuffer)
+[RK_MPI_SYS_StopGetMediaBuffer](#RK_MPI_SYS_StopGetMediaBuffer)
 
-#### RK_MPI_MB_ReleaseBuffer
+#### RK_MPI_MB_CreateBuffer
 
 【描述】
 
-释放缓冲区。
+创建普通缓冲区。
 
 【语法】
 
-RK_S32 RK_MPI_MB_ReleaseBuffer([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_MB_CreateBuffer(RK_U32 u32Size, RK_BOOL boolHardWare, RK_U8 u8Flag);
 
-【参数】
-
-| 参数名称 | 描述     | 输入/输出 |
-| -------- | -------- | --------- |
-| mb       | 缓冲区。 | 输入      |
+| 参数名称     | 描述                                                         | 输入/输出 |
+| ------------ | ------------------------------------------------------------ | --------- |
+| u32Size      | 创建缓冲区大小。                                             | 输入      |
+| boolHardWare | 是否创建硬件类型Buffer（DMA Buffer）。                       | 输入      |
+| u8Flag       | 硬件类型Buffer附加标记，取值：<br />0：开辟带缓存类型的硬件Buffer<br />MB_FLAG_NOCACHED：开辟不带缓存类型的硬件Buffer | 输入      |
 
 【返回值】
 
-| 返回值 | 描述                             |
-| ------ | -------------------------------- |
-| 0      | 成功。                           |
-| 非0    | 失败，其值参见[错误码](#表2-2)。 |
+| 返回值类型                    | 描述         |
+| ----------------------------- | ------------ |
+| [MEDIA_BUFFER](#MEDIA_BUFFER) | 缓冲区指针。 |
 
 【需求】
 
-头文件：rkmedia_api.h
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+普通缓冲区不携带图像信息结构体。
+
+【举例】
+
+[rkmedia_venc_local_file_test](#rkmedia_venc_local_file_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_CreateImageBuffer
+
+【描述】
+
+创建图像缓冲区。与普通缓冲区相比，携带图像信息结构体。在图像处理过程中，推荐使用该方法获取缓冲区。
+
+【语法】
+
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_MB_CreateImageBuffer([MB_IMAGE_INFO_S](#MB_IMAGE_INFO_S) *pstImageInfo, RK_BOOL boolHardWare, RK_U8 u8Flag);
+
+| 参数名称     | 描述                                                         | 输入/输出 |
+| ------------ | ------------------------------------------------------------ | --------- |
+| pstImageInfo | 图像缓冲区信息结构体。                                       | 输入      |
+| boolHardWare | 是否创建硬件类型Buffer（DMA Buffer）。                       | 输入      |
+| u8Flag       | 硬件类型Buffer附加标记，取值：<br />0：开辟带缓存类型的硬件Buffer<br />MB_FLAG_NOCACHED：开辟不带缓存类型的硬件Buffer | 输入      |
+
+【返回值】
+
+| 返回值类型                    | 描述         |
+| ----------------------------- | ------------ |
+| [MEDIA_BUFFER](#MEDIA_BUFFER) | 缓冲区指针。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
 
 库文件：libeasymedia.so
 
@@ -501,33 +626,71 @@ RK_S32 RK_MPI_MB_ReleaseBuffer([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【举例】
 
-无。
+[rkmedia_venc_local_file_test](#rkmedia_venc_local_file_test)。
 
 【相关主题】
 
-[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
+无。
 
-#### RK_MPI_MB_GetPtr
+#### RK_MPI_MB_CreateAudioBuffer
 
 【描述】
 
-从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取缓冲区指针。
+创建音频缓冲区。
 
 【语法】
 
-void *RK_MPI_MB_GetPtr([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_MB_CreateAudioBuffer(RK_U32 u32BufferSize, RK_BOOL boolHardWare);
 
-【参数】
-
-| 参数名称 | 描述     | 输入/输出 |
-| -------- | -------- | --------- |
-| mb       | 缓冲区。 | 输入      |
+| 参数名称      | 描述                                   | 输入/输出 |
+| ------------- | -------------------------------------- | --------- |
+| u32BufferSize | 缓冲区大小。                           | 输入      |
+| boolHardWare  | 是否创建硬件类型Buffer（DMA Buffer）。 | 输入      |
 
 【返回值】
 
-| 返回值类型 | 描述         |
-| ---------- | ------------ |
-| void *     | 缓冲区指针。 |
+| 返回值类型                    | 描述         |
+| ----------------------------- | ------------ |
+| [MEDIA_BUFFER](#MEDIA_BUFFER) | 缓冲区指针。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_adec_ao_test](#rkmedia_adec_ao_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_ConvertToImgBuffer
+
+【描述】
+
+将普通缓冲区转换为图像缓冲区。
+
+【语法】
+
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_MB_ConvertToImgBuffer([MEDIA_BUFFER](#MEDIA_BUFFER) mb, [MB_IMAGE_INFO_S](#MB_IMAGE_INFO_S) *pstImageInfo);
+
+| 参数名称     | 描述                        | 输入/输出 |
+| ------------ | --------------------------- | --------- |
+| mb | 普通缓冲区指针。        | 输入      |
+| pstImageInfo | 图像缓冲区信息结构体。      | 输入      |
+
+【返回值】
+
+| 返回值类型                    | 描述         |
+| ----------------------------- | ------------ |
+| [MEDIA_BUFFER](#MEDIA_BUFFER) | 缓冲区指针。 |
 
 【需求】
 
@@ -547,6 +710,125 @@ void *RK_MPI_MB_GetPtr([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 无。
 
+#### RK_MPI_MB_ConvertToAudBuffer
+
+【描述】
+
+将普通缓冲区转换为音频缓冲区。
+
+【语法】
+
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_MB_ConvertToAudBuffer([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+
+| 参数名称 | 描述             | 输入/输出 |
+| -------- | ---------------- | --------- |
+| mb       | 普通缓冲区指针。 | 输入      |
+
+【返回值】
+
+| 返回值类型                    | 描述         |
+| ----------------------------- | ------------ |
+| [MEDIA_BUFFER](#MEDIA_BUFFER) | 缓冲区指针。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_ReleaseBuffer
+
+【描述】
+
+释放缓冲区。
+
+【语法】
+
+RK_S32 RK_MPI_MB_ReleaseBuffer([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+
+【参数】
+
+| 参数名称 | 描述         | 输入/输出 |
+| -------- | ------------ | --------- |
+| mb       | 缓冲区指针。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_venc_local_file_test](#rkmedia_venc_local_file_test)。
+
+【相关主题】
+
+[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
+
+#### RK_MPI_MB_GetPtr
+
+【描述】
+
+从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取缓冲区数据指针。
+
+【语法】
+
+void *RK_MPI_MB_GetPtr([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+
+【参数】
+
+| 参数名称 | 描述         | 输入/输出 |
+| -------- | ------------ | --------- |
+| mb       | 缓冲区指针。 | 输入      |
+
+【返回值】
+
+| 返回值类型 | 描述             |
+| ---------- | ---------------- |
+| void *     | 缓冲区数据指针。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_venc_local_file_test](#rkmedia_venc_local_file_test)。
+
+【相关主题】
+
+无。
+
 #### RK_MPI_MB_GetFD
 
 【描述】
@@ -559,9 +841,9 @@ int RK_MPI_MB_GetFD([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【参数】
 
-| 参数名称 | 描述     | 输入/输出 |
-| -------- | -------- | --------- |
-| mb       | 缓冲区。 | 输入      |
+| 参数名称 | 描述         | 输入/输出 |
+| -------- | ------------ | --------- |
+| mb       | 缓冲区指针。 | 输入      |
 
 【返回值】
 
@@ -581,7 +863,7 @@ int RK_MPI_MB_GetFD([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【举例】
 
-无。
+[rkmedia_venc_local_file_test](#rkmedia_venc_local_file_test)。
 
 【相关主题】
 
@@ -591,7 +873,7 @@ int RK_MPI_MB_GetFD([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【描述】
 
-从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取缓冲区大小。
+从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取缓冲区数据大小。
 
 【语法】
 
@@ -605,9 +887,9 @@ size_t RK_MPI_MB_GetSize([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【返回值】
 
-| 返回值类型 | 描述         |
-| ---------- | ------------ |
-| size_t     | 缓冲区大小。 |
+| 返回值类型 | 描述             |
+| ---------- | ---------------- |
+| size_t     | 缓冲区数据大小。 |
 
 【需求】
 
@@ -621,11 +903,53 @@ size_t RK_MPI_MB_GetSize([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【举例】
 
-无。
+[rkmedia_venc_local_file_test](#rkmedia_venc_local_file_test)。
 
 【相关主题】
 
 无。
+
+#### RK_MPI_MB_SetSzie
+
+【描述】
+
+设置指定的[MEDIA_BUFFER](#MEDIA_BUFFER)数据大小。
+
+【语法】
+
+RK_S32 RK_MPI_MB_SetSzie([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_U32 size);
+
+【参数】
+
+| 参数名称 | 描述           | 输入/输出 |
+| -------- | -------------- | --------- |
+| mb       | 缓冲区指针。   | 输入      |
+| size     | 缓冲区数据大小 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+在操作缓冲区，并改变其大小后需使用此函数设置缓冲区数据大小，否则[RK_MPI_MB_GetSize](#RK_MPI_MB_GetSize)将无法获取到正确的缓冲区数据大小。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_MB_GetSize](#RK_MPI_MB_GetSize)。
 
 #### RK_MPI_MB_GetModeID
 
@@ -661,7 +985,7 @@ size_t RK_MPI_MB_GetSize([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【举例】
 
-无。
+[rkmedia_vi_multi_bind_test](#rkmedia_vi_multi_bind_test)。
 
 【相关主题】
 
@@ -701,7 +1025,7 @@ RK_S16 RK_MPI_MB_GetChannelID([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【举例】
 
-无。
+[rkmedia_vi_multi_bind_test](#/rkmedia_vi_multi_bind_test)。
 
 【相关主题】
 
@@ -727,7 +1051,7 @@ RK_U64 RK_MPI_MB_GetTimestamp([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 | 返回值类型 | 描述     |
 | ---------- | -------- |
-| RK_S16     | 时间戳。 |
+| RK_U64     | 时间戳。 |
 
 【需求】
 
@@ -741,6 +1065,311 @@ RK_U64 RK_MPI_MB_GetTimestamp([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【举例】
 
+[rkmedia_vi_rockx_venc_rtsp_test](#rkmedia_vi_rockx_venc_rtsp_test)。
+
+【相关主题】
+
+[RK_MPI_MB_SetTimestamp](#RK_MPI_MB_SetTimestamp)。
+
+#### RK_MPI_MB_SetTimestamp
+
+【描述】
+
+设置指定的[MEDIA_BUFFER](#MEDIA_BUFFER)的时间戳。
+
+【语法】
+
+RK_S32 RK_MPI_MB_SetTimestamp([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_U64 timestamp);
+
+【参数】
+
+| 参数名称  | 描述     | 输入/输出 |
+| --------- | -------- | --------- |
+| mb        | 缓冲区。 | 输入      |
+| timestamp | 时间戳   | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+直接调用librga库（相对RGA Channel）处理MEDIA_BUFFER时，需要用户手动处理时间戳属性。比如：
+
+```c
+// 调用librga api处理MediaBuffer0，输出的MediaBuffer1的时间戳属性将丢失
+// MediaBuffer0 --> RGA Crop -->  MediaBuffer1
+// 需要调用该接口手动拷贝MediaBuffer0的时间戳
+RK_MPI_MB_SetTimestamp(MediaBuffer1, RK_MPI_MB_GetTimestamp(MediaBuffer0));
+```
+
+【举例】
+
+[rkmedia_vi_rockx_venc_rtsp_test](#rkmedia_vi_rockx_venc_rtsp_test)。
+
+【相关主题】
+
+[RK_MPI_MB_GetTimestamp](#RK_MPI_MB_GetTimestamp)。
+
+#### RK_MPI_MB_GetFlag
+
+【描述】
+
+从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取Flag。Flag用于标记该Buffer的特殊属性，比如帧类型：I帧、P帧等。
+
+【语法】
+
+RK_S32 RK_MPI_MB_GetFlag([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+
+【参数】
+
+| 参数名称 | 描述     | 输入/输出 |
+| -------- | -------- | --------- |
+| mb       | 缓冲区。 | 输入      |
+
+【返回值】
+
+| 返回值类型 | 描述                                                         |
+| ---------- | ------------------------------------------------------------ |
+| RK_S32     | 硬件类型Buffer附加标记：<br />0：开辟带缓存类型的硬件Buffer<br />MB_FLAG_NOCACHED：开辟不带缓存类型的硬件Buffer |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_venc_smartp_test](#rkmedia_venc_smartp_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_GetTsvcLevel
+
+【描述】
+
+从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取TSVC等级。TSVC表示时间维度上的SVC，启用TSVC功能后，码流将分三个Level：L0、L1、L2。高等级的编码帧需要依赖低等级编码帧才能解码（如L2依赖L1、L0；L1依赖L0），而低等级的变编码帧可独立解码（L0可独立解码，L1、L0可独立于L2进行解码）。比如60fps的视频，如果只解码L1、L0，则会获得一个30fps的视频，如果只解码L0，则获得一个15fps的视频。
+
+【语法】
+
+RK_S32 RK_MPI_MB_GetTsvcLevel([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+
+【参数】
+
+| 参数名称 | 描述     | 输入/输出 |
+| -------- | -------- | --------- |
+| mb       | 缓冲区。 | 输入      |
+
+【返回值】
+
+| 返回值类型 | 描述       |
+| ---------- | ---------- |
+| RK_S32     | TSVC等级。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+若编码器没开启TSVC/SMARTP模式，该接口返回值无效。
+
+【举例】
+
+[rkmedia_venc_smartp_test](#rkmedia_venc_smartp_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_IsViFrame
+
+【描述】
+
+判断指定的[MEDIA_BUFFER](#MEDIA_BUFFER)是否为VirtualIntra帧（虚拟I帧）。
+
+【语法】
+
+RK_BOOL RK_MPI_MB_IsViFrame([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
+
+【参数】
+
+| 参数名称 | 描述     | 输入/输出 |
+| -------- | -------- | --------- |
+| mb       | 缓冲区。 | 输入      |
+
+【返回值】
+
+| 返回值类型 | 描述         |
+| ---------- | ------------ |
+| RK_BOOL    | 是否为VI帧。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+仅在smartp模式下有效。
+
+【举例】
+
+[rkmedia_venc_smartp_test](#rkmedia_venc_smartp_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_GetImageInfo
+
+【描述】
+
+从指定的图像缓冲区[MEDIA_BUFFER](#MEDIA_BUFFER)中获取图像信息。
+
+【语法】
+
+RK_S32 RK_MPI_MB_GetImageInfo([MEDIA_BUFFER](#MEDIA_BUFFER) mb, [MB_IMAGE_INFO_S](#MB_IMAGE_INFO_S) *pstImageInfo);
+
+【参数】
+
+| 参数名称     | 描述                       | 输入/输出 |
+| ------------ | -------------------------- | --------- |
+| mb           | 缓冲区指针。               | 输入      |
+| pstImageInfo | 缓冲区图像信息结构体指针。 | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+仅图像缓冲区可使用该函数获取信息。
+
+【举例】
+
+[rkmedia_vi_get_frame_test](#rkmedia_vi_get_frame_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_BeginCPUAccess
+
+【描述】
+
+解决CPU与硬件模块（如：ENCODER）操作同一个[MEDIA_BUFFER](#MEDIA_BUFFER)产生的同步问题。
+
+【语法】
+
+RK_S32 RK_MPI_MB_BeginCPUAccess([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_BOOL bReadonly);
+
+【参数】
+
+| 参数名称  | 描述         | 输入/输出 |
+| --------- | ------------ | --------- |
+| mb        | 缓冲区指针。 | 输入      |
+| bReadonly | 是否只读。   | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+需与[RK_MPI_MB_EndCPUAccess](#RK_MPI_MB_EndCPUAccess)一同使用。
+
+【举例】
+
+比如CPU填充Buffer后送给VENC编码的场景，使用[RK_MPI_MB_CreateImageBuffer](#RK_MPI_MB_CreateImageBuffer)接口开辟的MediaBuffer默认是带Cache（缓存）的（可通过flag=MB_FLAG_NOCACHED开辟NoCache类型的MediaBuffer），因此CPU写Buffer后会有部分数据留在缓存中没没能及时同步到内存（DDR）中，此时立即送入VENC编码，会导致画面有异常（比如间断性绿色条短线）。使用该接口就是保障CPU操作Buffer之后，缓存被立即刷新到内存。
+
+```
+MEDIA_BUFFER mb;
+RK_MPI_MB_BeginCPUAccess(mb, RK_FALSE);
+// CPU fill data to mb.
+memset(RK_MPI_MB_GetPtr(mb), 'F', size);
+RK_MPI_MB_EndCPUAccess(mb, RK_FALSE);
+// Send mb to VENC
+RK_MPI_SYS_SendMediaBuffer(RK_ID_VENC, 0, mb);
+```
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_EndCPUAccess
+
+【描述】
+
+解决CPU与硬件模块（如：ENCODER）操作同一个[MEDIA_BUFFER](#MEDIA_BUFFER)产生的同步问题。
+
+【语法】
+
+RK_S32 RK_MPI_MB_BeginCPUAccess([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_BOOL bReadonly);
+
+【参数】
+
+| 参数名称  | 描述         | 输入/输出 |
+| --------- | ------------ | --------- |
+| mb        | 缓冲区指针。 | 输入      |
+| bReadonly | 是否只读。   | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                             |
+| ------ | -------------------------------- |
+| 0      | 成功。                           |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+需与[RK_MPI_MB_BeginCPUAccess](#RK_MPI_MB_BeginCPUAccess)一同使用。
+
+【举例】
+
 无。
 
 【相关主题】
@@ -751,9 +1380,13 @@ RK_U64 RK_MPI_MB_GetTimestamp([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 #### 基本数据类型
 
-基本数据类型定义如下：
-
 ##### 公共数据类型
+
+【说明】
+
+基本数据类型定义。
+
+【定义】
 
 ```c
 typedef unsigned char RK_U8;
@@ -783,9 +1416,6 @@ typedef char RK_CHAR;
 
 typedef unsigned int RK_HANDLE;
 
-/*----------------------------------------------*
- * const defination                             *
- *----------------------------------------------*/
 typedef enum {
   RK_FALSE = 0,
   RK_TRUE = 1,
@@ -1007,6 +1637,13 @@ typedef struct rkMPP_CHN_S {
 【定义】
 
 ```c
+typedef enum rkEVENT_TYPE_E {
+  RK_EVENT_ERR = 0,
+  RK_EVENT_MD, // Algo::Move detection event.
+  RK_EVENT_OD, // Algo::Occlusion detection event.
+  RK_EVNET_BUT
+} EVENT_TYPE_E;
+
 typedef struct rkMD_EVENT_S {
   RK_U16 u16Cnt;
   RK_U32 u32Width;
@@ -1099,8 +1736,8 @@ typedef struct rkMB_IMAGE_INFO {
 | ------------ | -------------- |
 | u32Width     | 宽度。         |
 | u32Height    | 高度。         |
-| u32VerStride | 虚宽。         |
-| u32HorStride | 虚高。         |
+| u32HorStride | 虚宽。         |
+| u32VerStride | 虚高。         |
 | enImgType    | 图像格式类型。 |
 
 【相关数据类型及接口】
@@ -1127,31 +1764,60 @@ typedef struct rkMB_IMAGE_INFO {
 
 ### 概述
 
-视频输入（VI）模块实现的功能：ISPP驱动实现标准V4L2设备，通过对V4L2 API的封装，可以采集到ISPP多通道视频数据。VI 将接收到的数据存入到指定的内存区域，实现视频数据的采集。
+视频输入（VideoInput，简称VI）用于读取Camera数据。该模块是对标准V4L2接口的封装，依赖Linux V4L2驱动架构。ISP/ISPP/VICAP驱动通过V4L2架构向用户层提供文件节点（如：/dev/video0），VI通过操作文件节点实现参数配置视频帧的读取等操作。
 
 ### 功能描述
 
-#### VI节点名称
+#### VI通路初始化
 
-VI的创建需要指定视频节点名称，比如“/dev/video0”。在RV1126/RV1109平台则比较特殊，对应节点名称如下所示。
+针对rv1126/rv1109平台，需要调用rkaiq接口初始化硬件通路。使用方法可以参考external/rkmedia/examples/common/sample_common.h中的接口。
 
-表3-1 ISPP节点名称（RV1126/RV1109芯片）
+rkaiq与rkmedia VI接口联合使用说明：
 
-| ISPP 节点名称   | 视频节点路径 | 最大宽度                         | 支持的输出格式                   |
+1、限制条件：
+如果所有VI Channel都关闭，那么需要重新进行通路初始化。多VI Channel场景下，如果只关闭部分VI Channel，则不需要重新初始化通路，如果所有VI Channel都关闭，则需要重新初始化。单VI Channel场景下，关闭VI Channel就需要调用ISP Stop逻辑关闭ISP通路；打开VI则需要再次初始化VI通路。
+
+2、通路初始化与反初始化的接口调用顺序如下
+
+ 初始化:
+
+  1) ISP Init // 对应rk_aiq_uapi_sysctl_init
+
+  2) ISP Run // 对应rk_aiq_uapi_sysctl_prepare & rk_aiq_uapi_sysctl_start
+
+  3) VI Enable（single/multi）
+
+反初始化:
+
+ 1) VI disable（single/multi）
+
+ 2) ISP Stop // 对应rk_aiq_uapi_sysctl_stop & rk_aiq_uapi_sysctl_deinit
+
+#### VI视频节点
+
+VI的创建需要指定视频节点（VideoNode），比如“/dev/video0”。每个视频节点对应一路视频流。单摄像头能提供多种分辨率的视频流，比如RV1126/RV1109平台的ISPP可同时提供4种分辨率视频流，也是因为ISPP驱动向用户层提供了4个视频节点。
+
+对于带有RKISP的平台（如：RV1126/RV1109），每个接入ISPP的Camera都将向用户提供4个视频节点，如下表所示。以“rkispp_”开头的名称是驱动提供的一种别名机制，在VI内部会翻译为对应的/dev/videoX节点，使用者只需使用这4个固定名称，就能获取不同分辨率的视频流。
+
+表3-1 ISPP视频节点（RV1126/RV1109芯片）
+
+| ISPP 节点名称   | 最大宽度                         | 缩放倍数             | 支持的输出格式                   |
 | --------------- | ------------ | -------------------------------- | -------------------------------- |
-| rkispp_m_bypass | /dev/video13 | **不支持设置分辨率，不支持缩放** | NV12/NV16/YUYV/**FBC0**/**FBC2** |
-| rkispp_scale0   | /dev/video14 | 3264, 最大支持8倍缩放            | NV12/NV16/YUYV                   |
-| rkispp_scale1   | /dev/video15 | 1280, 最大支持8倍缩放            | NV12/NV16/YUYV                   |
-| rkispp_scale2   | /dev/video16 | 1280, 最大支持8倍缩放            | NV12/NV16/YUYV                   |
+| rkispp_m_bypass | Sensor最大宽度 | 不支持 | NV12/NV16/YUYV/**FBC0**/**FBC2** |
+| rkispp_scale0   | 3264            | 1-8倍               | NV12/NV16/YUYV                   |
+| rkispp_scale1   | 1280            | 2-8倍               | NV12/NV16/YUYV                   |
+| rkispp_scale2   | 1280            | 2-8倍               | NV12/NV16/YUYV                   |
+
+注：rkispp_m_bypass不支持缩放，分辨率仅能保持sensor最大分辨率。rkispp_scale0分辨率超过2K之后，需要使用NV16格式。
 
 #### VI工作模式
 
-VI有两种工作模式，如下表所示
+VI有三种工作模式，如下表所示
 
 | 模式名称 | 宏定义名称             | 功能说明                                                     |
 | -------- | ---------------------- | ------------------------------------------------------------ |
-| 正常模式 | VI_WORK_MODE_NORMAL    | 相对于“亮度模式”，<br/>该模式下正常读取Camera数据并发给后级。 |
-| 亮度模式 | VI_WORK_MODE_LUMA_ONLY | 亮度模式下，VI仅用于亮度统计。<br/>此时VI模块无法通过回调函数或者<br/>RK_MPI_SYS_GetMediaBuffer获取数据。 |
+| 正常模式 | VI_WORK_MODE_NORMAL    | 相对于“亮度模式”，<br />该模式下正常读取Camera数据并发给后级。 |
+| 亮度模式 | VI_WORK_MODE_LUMA_ONLY | 亮度模式下，VI仅用于亮度统计。<br />此时VI模块无法通过回调函数或者<br />RK_MPI_SYS_GetMediaBuffer获取数据。 |
 
 ### API参考
 
@@ -1191,7 +1857,7 @@ RK_S32 RK_MPI_VI_EnableChn([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn);
 
 【举例】
 
-无。
+[rkmedia_vi_get_frame_test](#rkmedia_vi_get_frame_test)。
 
 【相关主题】
 
@@ -1233,7 +1899,7 @@ RK_S32 RK_MPI_VI_DisableChn([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn)
 
 【举例】
 
-无。
+[rkmedia_vi_get_frame_test](#rkmedia_vi_get_frame_test)。
 
 【相关主题】
 
@@ -1272,7 +1938,91 @@ RK_MPI_VI_SetChnAttr([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn, const 
 
 【注意】
 
+若被设置的通道已通过[RK_MPI_SYS_Bind](#RK_MPI_SYS_Bind)与其他通道绑定，则需在使用该函数设置前通过[RK_MPI_SYS_UnBind](#RK_MPI_SYS_UnBind)进行解绑。
+
+若被设置的通道已使用[RK_MPI_VI_EnableChn](#RK_MPI_VI_EnableChn)使能，则需在使用该函数设置前通过[RK_MPI_VI_DisableChn](#RK_MPI_VI_DisableChn) 关闭该通道。
+
+【举例】
+
+[rkmedia_vi_get_frame_test](#rkmedia_vi_get_frame_test)。
+
+【相关主题】
+
 无。
+
+#### RK_MPI_VI_StartRegionLuma
+
+【描述】
+
+开启VI亮度统计。
+
+【语法】
+
+RK_S32 RK_MPI_VI_StartRegionLuma([VI_CHN](#VI_CHN) ViChn);
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| ViChn      | VI 通道号。取值范围：[0, [VI_MAX_CHN_NUM](#VI_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vi-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+仅当[VI工作模式](#VI工作模式)设置[VI_WORK_MODE_LUMA_ONLY](#VI_CHN_ATTR_S)为时生效。在该模式下，缓冲区个数（[u32BufCnt](#VI_CHN_ATTR_S)）需要大于等于3。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VI_StopRegionLuma
+
+【描述】
+
+停止VI亮度统计。
+
+【语法】
+
+RK_S32 RK_MPI_VI_StopRegionLuma([VI_CHN](#VI_CHN) ViChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| ViChn    | VI 通道号。取值范围：[0, [VI_MAX_CHN_NUM](#VI_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vi-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+仅当[VI工作模式](#VI工作模式)设置[VI_WORK_MODE_LUMA_ONLY](#VI_CHN_ATTR_S)为时生效。
 
 【举例】
 
@@ -1286,7 +2036,7 @@ RK_MPI_VI_SetChnAttr([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn, const 
 
 【描述】
 
-获取区域亮度信息。
+获取区域亮度信息。可以用于VENC OSD反色。
 
 【语法】
 
@@ -1321,7 +2071,7 @@ RK_S32 RK_MPI_VI_GetChnRegionLuma([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) 
 
 【举例】
 
-无。
+[rkmedia_vi_luma_only_mode_test](#rkmedia_vi_luma_only_mode_test)。
 
 【相关主题】
 
@@ -1363,7 +2113,7 @@ RK_S32 RK_MPI_VI_StartStream([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn
 
 【举例】
 
-无。
+[rkmedia_vi_get_frame_test](#rkmedia_vi_get_frame_test)。
 
 【相关主题】
 
@@ -1373,9 +2123,7 @@ RK_S32 RK_MPI_VI_StartStream([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn
 
 视频输入相关数据类型定义如下：
 
-[VI_MAX_DEV_NUM](#VI_MAX_DEV_NUM)：定义VI设备的最大个数。
-
-[VI_MAX_CHN_NUM](#VI_MAX_CHN_NUM)：定义 VI 物理通道和扩展通道的总个数。
+[VI_MAX_CHN_NUM](#VI_MAX_CHN_NUM)：定义 VI 物理通道通道的总个数。
 
 [VI_PIPE](#VI_PIPE)：VI管道号。
 
@@ -1385,37 +2133,24 @@ RK_S32 RK_MPI_VI_StartStream([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn
 
 [VIDEO_REGION_INFO_S](#VIDEO_REGION_INFO_S)：定义视频区域信息。
 
-#### VI_MAX_DEV_NUM
-
-【说明】
-
-定义 VI 设备的最大个数。
-
-【定义】
-
-```c
-RV1109/RV1126:
-#define VI_MAX_DEV_NUM 4
-```
-
 #### VI_MAX_CHN_NUM
 
 【说明】
 
-定义 VI 物理通道和扩展通道的总个数。
+定义 VI 物理通道的总个数。RV1126/RV1109平台典型场景是接入1~2个Sensor模组，每个Sensor最大能提供4个视频通道（对应ISPP的4个视频节点），因此个数最大为8个。若使实际使用场景超过当前限制（如接入三个Sensor，或者使用N4扩展板等），可自行对该宏定义进行调整。
 
 【定义】
 
 ```c
 RV1109/RV1126:
-#define VI_MAX_CHN_NUM VI_MAX_DEV_NUM
+#define VI_MAX_CHN_NUM 8
 ```
 
 #### VI_PIPE
 
 【说明】
 
-VI管道号。
+VI管道号，对应Sensor个数。PIPE命名是由于Sensor后端要接入ISP/ISPP等一系列处理单元，形成一个数据PIPE（管道）。
 
 【定义】
 
@@ -1427,7 +2162,7 @@ typedef RK_S32 VI_PIPE;
 
 【说明】
 
-VI通道号。
+VI通道号。与[VI_PIPE](#VI_PIPE)共同决定某个Camera的某路数据。
 
 【定义】
 
@@ -1451,8 +2186,13 @@ typedef enum rkVI_CHN_WORK_MODE {
   // for vi single caculate luma.
   // In this mode, vi has no output,
   // and data cannot be obtained from vi.
-  VI_WORK_MODE_LUMA_ONLY,
+  VI_WORK_MODE_LUMA_ONLY
 } VI_CHN_WORK_MODE;
+
+typedef enum rkVI_CHN_BUF_TYPE {
+  VI_CHN_BUF_TYPE_DMA = 0, // Default
+  VI_CHN_BUF_TYPE_MMAP,
+} VI_CHN_BUF_TYPE;
 
 typedef struct rkVI_CHN_ATTR_S {
   const RK_CHAR *pcVideoNode;
@@ -1460,6 +2200,8 @@ typedef struct rkVI_CHN_ATTR_S {
   RK_U32 u32Height;
   IMAGE_TYPE_E enPixFmt;
   RK_U32 u32BufCnt; // VI capture video buffer cnt.
+  // VI capture video buffer type.
+  VI_CHN_BUF_TYPE enBufType;
   VI_CHN_WORK_MODE enWorkMode;
 } VI_CHN_ATTR_S;
 ```
@@ -1534,7 +2276,7 @@ typedef struct rkVIDEO_REGION_INFO_S {
 
 ### 概述
 
-VENC 模块，即视频编码模块。本模块支持多路实时编码，且每路编码独立，编码协议和编码 profile 可以不同。支持视频编码同时，调度 Region 模块对编码图像内容进行叠加和遮挡。支持H264/H1265/MJPEG/JPEG编码。
+VENC 模块，即视频编码模块。本模块支持多路实时编码，且每路编码独立，编码协议和编码 profile 可以不同。支持视频编码同时，调度 Region 模块对编码图像内容进行叠加和遮挡。支持H264/H265/MJPEG/JPEG编码。
 
 ### 功能描述
 
@@ -1560,13 +2302,13 @@ GOP Mode用于定制参考帧的依赖关系，目前支持如下模式。注：
 | ---------------- | -------------------- | ------------------------------------------------------------ |
 | 普通模式         | VENC_GOPMODE_NORMALP | 最常见场景，每隔GopSize一个I帧                               |
 | 智能P帧模式      | VENC_GOPMODE_SMARTP  | 每隔GopSize一个虚拟I帧，每隔BgInterval一个I帧                |
-| 多层时域参考模式 | VENC_GOPMODE_TSVC    | 编码依赖关系划分为多层，可根据<br/>RK_MPI_MB_GetTsvcLevel获取层信息，<br/>从而定制码流。<br/>比如只播放第0层码流，可实现快速预览。 |
+| 多层时域参考模式 | VENC_GOPMODE_TSVC    | 编码依赖关系划分为多层，可根据<br />RK_MPI_MB_GetTsvcLevel获取层信息，<br />从而定制码流。<br />比如只播放第0层码流，可实现快速预览。 |
 
 #### 感兴趣区域(ROI)
 
 通过配置编码器感兴趣区域，可实现指定区域QP的定制。比如一个对着走廊的镜头，用户真正感兴趣的是走廊中央。可通过配置ROI让走廊中央编码质量更高，图像更清晰，走廊的边框（墙体、天花板等）非感兴趣区域图像质量会偏低。通过这种方式实现保持码率基本不变情况下，突出显示用户关心区域。
 
-系统提供8个感兴趣区域，优先级从REGION_ID_0~REGION_ID_7递增。在多个ROI重叠的区域，其QP策略会按照优先级高的区域进行配置。
+每个VENC通道提供8个感兴趣区域，优先级从REGION_ID_0~REGION_ID_7递增。在多个ROI重叠的区域，其QP策略会按照优先级高的区域进行配置。
 
 ```
   REGION_ID_0
@@ -1593,7 +2335,7 @@ GOP Mode用于定制参考帧的依赖关系，目前支持如下模式。注：
 
 【语法】
 
-RK_MPI_VENC_CreateChn([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S](#VENC_CHN_ATTR_S) *stVencChnAttr);
+RK_S32 RK_MPI_VENC_CreateChn([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S](#VENC_CHN_ATTR_S) *stVencChnAttr);
 
 【参数】
 
@@ -1617,11 +2359,139 @@ RK_MPI_VENC_CreateChn([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S](#VENC_CHN_A
 
 【注意】
 
+与[RK_MPI_VENC_CreateJpegLightChn](#RK_MPI_VENC_CreateJpegLightChn)创建的JPEG/MJPEG  Light相比，该接口创建的JPEG/MJPEG 支持FBC格式、支持OSD、支持旋转、缩放；但不支持分辨率动态切换。
+
+【举例】
+
+[rkmedia_vi_venc_test](#rkmedia_vi_venc_test)。
+
+【相关主题】
+
 无。
+
+#### RK_MPI_VENC_GetVencChnAttr
+
+【描述】
+
+获取编码通道参数。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_GetVencChnAttr([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S](#VENC_CHN_ATTR_S) *stVencChnAttr);
+
+【参数】
+
+| 参数名称      | 描述                                                         | 输入/输出 |
+| ------------- | ------------------------------------------------------------ | --------- |
+| VeChn         | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stVencChnAttr | 编码通道属性指针。                                           | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+该函数仅能获取已创建通道的参数配置。
 
 【举例】
 
 无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VENC_SetVencChnAttr
+
+【描述】
+
+设置编码通道参数。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_SetVencChnAttr([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S](#VENC_CHN_ATTR_S) *stVencChnAttr);
+
+【参数】
+
+| 参数名称      | 描述                                                         | 输入/输出 |
+| ------------- | ------------------------------------------------------------ | --------- |
+| VeChn         | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stVencChnAttr | 编码通道属性指针。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+该函数仅能配置已创建通道的参数。目前支持编码复杂度（仅H264），分辨率，码率，帧率，GOP动态设置。其余配置修改，需销毁后重新创建通道。
+
+分辨率动态配置需要保持编码器输入Buffer的宽高信息与动态配置要一致，否则将引起内存访问越界风险。该接口仅推荐在VENC不使用绑定（Bind）的场景下使用。而且要确保改变分辨率前，VENC Channel的输入buffer已经全部清空（参见[RK_MPI_VENC_QueryStatus](#RK_MPI_VENC_QueryStatus)）
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VENC_CreateJpegLightChn
+
+【描述】
+
+创建轻量级的JPEG编码通道。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_CreateJpegLightChn([VENC_CHN](#VENC_CHN) VeChn,[VENC_CHN_ATTR_S](#VENC_CHN_ATTR_S) *stVencChnAttr);
+
+【参数】
+
+| 参数名称      | 描述                                                         | 输入/输出 |
+| ------------- | ------------------------------------------------------------ | --------- |
+| VeChn         | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stVencChnAttr | 编码通道属性指针。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+与[RK_MPI_VENC_CreateChn](#RK_MPI_VENC_CreateChn)创建的JPEG/MJPEG相比，经过该接口创建的JPEG/MJPEG  Light效率更高，支持分辨率动态切换；但不支持FBC格式、不支持OSD、不支持缩放。如果使用JPEG/MJPEG Light，可配合RGA做OSD和缩放功能。
+
+【举例】
+
+[rkmedia_venc_jpeg_light_test](#rkmedia_venc_jpeg_light_test)。
 
 【相关主题】
 
@@ -1662,11 +2532,53 @@ RK_S32 RK_MPI_VENC_DestroyChn([VENC_CHN](#VENC_CHN) VeChn);
 
 【举例】
 
-无。
+[rkmedia_vi_venc_test](#rkmedia_vi_venc_test)。
 
 【相关主题】
 
 无。
+
+#### RK_MPI_VENC_GetRcParam
+
+【描述】
+
+获取码率控制参数。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_GetRcParam([VENC_CHN](#VENC_CHN) VeChn, [VENC_RC_PARAM_S](#VENC_RC_PARAM_S) *pstRcParam);
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| VeChn      | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| pstRcParam | 编码通道码率控制器的高级参数。                               | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_VENC_SetRcParam](#RK_MPI_VENC_SetRcParam)。
 
 #### RK_MPI_VENC_SetRcParam
 
@@ -1676,7 +2588,7 @@ RK_S32 RK_MPI_VENC_DestroyChn([VENC_CHN](#VENC_CHN) VeChn);
 
 【语法】
 
-RK_MPI_VENC_SetRcParam([VENC_CHN](#VENC_CHN) VeChn, const [VENC_RC_PARAM_S](#VENC_RC_PARAM_S) *pstRcParam);
+RK_S32 RK_MPI_VENC_SetRcParam([VENC_CHN](#VENC_CHN) VeChn, const [VENC_RC_PARAM_S](#VENC_RC_PARAM_S) *pstRcParam);
 
 【参数】
 
@@ -1704,11 +2616,11 @@ RK_MPI_VENC_SetRcParam([VENC_CHN](#VENC_CHN) VeChn, const [VENC_RC_PARAM_S](#VEN
 
 【举例】
 
-无。
+[rkmedia_isp_test](#rkmedia_isp_test)。
 
 【相关主题】
 
-无。
+[RK_MPI_VENC_GetRcParam](#RK_MPI_VENC_GetRcParam)。
 
 #### RK_MPI_VENC_SetRcMode
 
@@ -1760,7 +2672,7 @@ RK_S32 RK_MPI_VENC_SetRcMode([VENC_CHN](#VENC_CHN) VeChn, [VENC_RC_MODE_E](#VENC
 
 【语法】
 
-RK_MPI_VENC_SetRcQuality([VENC_CHN](#VENC_CHN) VeChn, [VENC_RC_QUALITY_E](#VENC_RC_QUALITY_E) RcQuality);
+RK_S32 RK_MPI_VENC_SetRcQuality([VENC_CHN](#VENC_CHN) VeChn, [VENC_RC_QUALITY_E](#VENC_RC_QUALITY_E) RcQuality);
 
 【参数】
 
@@ -1802,7 +2714,7 @@ RK_MPI_VENC_SetRcQuality([VENC_CHN](#VENC_CHN) VeChn, [VENC_RC_QUALITY_E](#VENC_
 
 【语法】
 
-RK_MPI_VENC_SetBitrate([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32BitRate, RK_U32 u32MinBitRate, RK_U32 u32MaxBitRate);
+RK_S32 RK_MPI_VENC_SetBitrate([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32BitRate, RK_U32 u32MinBitRate, RK_U32 u32MaxBitRate);
 
 【参数】
 
@@ -1810,8 +2722,8 @@ RK_MPI_VENC_SetBitrate([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32BitRate, RK_U32 u3
 | ------------- | ------------------------------------------------------------ | --------- |
 | VeChn         | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
 | u32BitRate    | 目标码率。                                                   | 输入      |
-| u32MinBitRate | 最小码率。                                                   | 输入      |
-| u32MaxBitRate | 最大码率。                                                   | 输入      |
+| u32MinBitRate | 最小码率。单位bps                                            | 输入      |
+| u32MaxBitRate | 最大码率。单位bps                                            | 输入      |
 
 【返回值】
 
@@ -1975,7 +2887,7 @@ RK_S32 RK_MPI_VENC_SetGop([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32Gop);
 
 【语法】
 
-RK_MPI_VENC_SetAvcProfile([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32Profile,RK_U32 u32Level);
+RK_S32 RK_MPI_VENC_SetAvcProfile([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32Profile,RK_U32 u32Level);
 
 【参数】
 
@@ -2018,7 +2930,7 @@ RK_MPI_VENC_SetAvcProfile([VENC_CHN](#VENC_CHN) VeChn, RK_U32 u32Profile,RK_U32 
 
 【语法】
 
-RK_MPI_VENC_InsertUserData([VENC_CHN](#VENC_CHN) VeChn, RK_U8 *pu8Data, RK_U32 u32Len);
+RK_S32 RK_MPI_VENC_InsertUserData([VENC_CHN](#VENC_CHN) VeChn, RK_U8 *pu8Data, RK_U32 u32Len);
 
 【参数】
 
@@ -2043,7 +2955,7 @@ RK_MPI_VENC_InsertUserData([VENC_CHN](#VENC_CHN) VeChn, RK_U8 *pu8Data, RK_U32 u
 
 【注意】
 
-暂时只支持u32Profile为66、77、100，分别对应Baseline、Main Profile、High Profile。
+无。
 
 【举例】
 
@@ -2053,22 +2965,65 @@ RK_MPI_VENC_InsertUserData([VENC_CHN](#VENC_CHN) VeChn, RK_U8 *pu8Data, RK_U32 u
 
 无。
 
-#### RK_MPI_VENC_SetRoiAttr
+#### RK_MPI_VENC_SetResolution
 
 【描述】
 
-设置ROI编码感兴趣区。用于H264 / H265编码器。
+设置VENC通道分辨率
 
 【语法】
 
-RK_MPI_VENC_SetRoiAttr([VENC_CHN](#VENC_CHN) VeChn,const [VENC_ROI_ATTR_S](#VENC_ROI_ATTR_S) *pstRoiAttr);
+RK_S32 RK_MPI_VENC_SetResolution([VENC_CHN](#VENC_CHN) VeChn, [VENC_RESOLUTION_PARAM_S](#VENC_RESOLUTION_PARAM_S) stResolutionParam);
+
+【参数】
+
+| 参数名称          | 描述                                                         | 输入/输出 |
+| ----------------- | ------------------------------------------------------------ | --------- |
+| VeChn             | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stResolutionParam | 分辨率参数结构体。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_rga_crop_venc_test](#rkmedia_rga_crop_venc_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VENC_GetRoiAttr
+
+【描述】
+
+获取指定索引值的ROI配置参数。用于H264 / H265编码器。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_GetRoiAttr([VENC_CHN](#VENC_CHN) VeChn,[VENC_ROI_ATTR_S](#VENC_ROI_ATTR_S) *pstRoiAttr, RK_S32 roi_index);
 
 【参数】
 
 | 参数名称   | 描述                                                         | 输入/输出 |
 | ---------- | ------------------------------------------------------------ | --------- |
 | VeChn      | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
-| pstRoiAttr | ROI 区域参数。                                               | 输入      |
+| pstRoiAttr | ROI 区域参数。                                               | 输出      |
+| roi_index  | ROI区域索引值。取值范围：[0,7]。                             | 输入      |
 
 【返回值】
 
@@ -2093,7 +3048,50 @@ RK_MPI_VENC_SetRoiAttr([VENC_CHN](#VENC_CHN) VeChn,const [VENC_ROI_ATTR_S](#VENC
 
 【相关主题】
 
+[RK_MPI_VENC_SetRoiAttr](#RK_MPI_VENC_SetRoiAttr)。
+
+#### RK_MPI_VENC_SetRoiAttr
+
+【描述】
+
+设置ROI编码感兴趣区。用于H264 / H265编码器。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_SetRoiAttr([VENC_CHN](#VENC_CHN) VeChn,const [VENC_ROI_ATTR_S](#VENC_ROI_ATTR_S) *pstRoiAttr, RK_S32 region_cnt);
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| VeChn      | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| pstRoiAttr | ROI 区域参数。                                               | 输入      |
+| region_cnt | ROI区域个数。取值范围：[1,8]。                               | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
 无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_VENC_GetRoiAttr](#RK_MPI_VENC_GetRoiAttr)。
 
 #### RK_MPI_VENC_SetGopMode
 
@@ -2131,7 +3129,7 @@ RK_S32 RK_MPI_VENC_SetGopMode([VENC_CHN](#VENC_CHN) VeChn, [VENC_GOP_ATTR_S](#VE
 
 【举例】
 
-无。
+[rkmedia_venc_smartp_test](#rkmedia_venc_smartp_test)。
 
 【相关主题】
 
@@ -2141,17 +3139,18 @@ RK_S32 RK_MPI_VENC_SetGopMode([VENC_CHN](#VENC_CHN) VeChn, [VENC_GOP_ATTR_S](#VE
 
 【描述】
 
-初始化OSD。
+初始化OSD。每个编码器Channel，在使用OSD模块前都需调用此函数进行初始化。
 
 【语法】
 
-RK_S32 RK_MPI_VENC_RGN_Init([VENC_CHN](#VENC_CHN) VeChn);
+RK_S32 RK_MPI_VENC_RGN_Init([VENC_CHN](#VENC_CHN) VeChn, [VENC_COLOR_TBL_S](#VENC_COLOR_TBL_S) *stColorTbl);
 
 【参数】
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
 | VeChn    | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stColorTbl    | 265色调色板，仅支持ARGB8888格式，设置NULL使用默认调色板。 | 输入      |
 
 【返回值】
 
@@ -2184,7 +3183,7 @@ RK_S32 RK_MPI_VENC_RGN_Init([VENC_CHN](#VENC_CHN) VeChn);
 
 【描述】
 
-设置OSD位图。
+设置OSD位图。仅支持ARGB8888格式位图。
 
 【语法】
 
@@ -2213,11 +3212,11 @@ RK_S32 RK_MPI_VENC_RGN_SetBitMap([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGION_
 
 【注意】
 
-在调用此接口之前，必须先调用[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)。
+在调用此接口之前，必须先调用[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)。该接口与[RK_MPI_VENC_RGN_SetCover](#RK_MPI_VENC_RGN_SetCover)共用编码器的8个图层，参见 [OSD_REGION_INFO_S](#OSD_REGION_INFO_S)。
 
 【举例】
 
-无。
+[rkmedia_venc_jpeg_test](#rkmedia_venc_jpeg_test)。
 
 【相关主题】
 
@@ -2227,7 +3226,7 @@ RK_S32 RK_MPI_VENC_RGN_SetBitMap([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGION_
 
 【描述】
 
-设置隐私遮挡。
+设置隐私遮挡。设置ARGB8888单色遮挡，效率高于[RK_MPI_VENC_RGN_SetBitMap](#RK_MPI_VENC_RGN_SetBitMap)。
 
 【语法】
 
@@ -2256,7 +3255,52 @@ RK_S32 RK_MPI_VENC_RGN_SetCover([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGION_I
 
 【注意】
 
-在调用此接口之前，必须先调用[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)。
+在调用此接口之前，必须先调用[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)。该接口与[RK_MPI_VENC_RGN_SetBitMap](#RK_MPI_VENC_RGN_SetBitMap)共用编码器的8个图层，参见 [OSD_REGION_INFO_S](#OSD_REGION_INFO_S)。
+
+【举例】
+
+[rkmedia_venc_cover_test](#rkmedia_venc_cover_test);
+
+【相关主题】
+
+[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)
+
+#### RK_MPI_VENC_RGN_SetPaletteId
+
+【描述】
+
+使用调色板索引构建buffer用于OSD叠加。无需进行调色板色彩匹配，效率最高。同时使用索引构建buffer，相比ARGB8888格式buffer，内存消耗减少至1/4。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_RGN_SetPaletteId([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGION_INFO_S](#OSD_REGION_INFO_S) *pstRgnInfo,
+
+  const [OSD_COLOR_PALETTE_BUF_S](#OSD_COLOR_PALETTE_BUF_S) *pstColPalBuf);
+
+【参数】
+
+| 参数名称     | 描述                                                         | 输入/输出 |
+| ------------ | ------------------------------------------------------------ | --------- |
+| VeChn        | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| pstRgnInfo   | OSD区域信息。                                                | 输入      |
+| pstColPalBuf | 调色板索引构建的OSD Buffer。                                 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+在调用此接口之前，必须先调用[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)。该接口与[RK_MPI_VENC_RGN_SetBitMap](#RK_MPI_VENC_RGN_SetBitMap)共用编码器的8个图层，参见 [OSD_REGION_INFO_S](#OSD_REGION_INFO_S)。
 
 【举例】
 
@@ -2264,7 +3308,7 @@ RK_S32 RK_MPI_VENC_RGN_SetCover([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGION_I
 
 【相关主题】
 
-[RK_MPI_VENC_RGN_Init](#RK_MPI_VENC_RGN_Init)
+无。
 
 #### RK_MPI_VENC_SetJpegParam
 
@@ -2302,7 +3346,7 @@ RK_S32 RK_MPI_VENC_SetJpegParam([VENC_CHN](#VENC_CHN) VeChn, const [VENC_JPEG_PA
 
 【举例】
 
-无。
+[rkmedia_venc_jpeg_light_test](#rkmedia_venc_jpeg_light_test)。
 
 【相关主题】
 
@@ -2344,7 +3388,89 @@ RK_S32 RK_MPI_VENC_StartRecvFrame([VENC_CHN](#VENC_CHN) VeChn, const [VENC_RECV_
 
 【举例】
 
+[rkmedia_venc_jpeg_light_test](#rkmedia_venc_jpeg_light_test)。
+
+【相关主题】
+
 无。
+
+#### RK_MPI_VENC_GetFd
+
+【描述】
+
+获取编码器通道的文件描述符。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_GetFd([VENC_CHN](#VENC_CHN) VeChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VeChn    | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值类型 | 描述       |
+| ---------- | ---------- |
+| RK_S32     | 文件描述符 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VENC_QueryStatus
+
+【描述】
+
+获取编码器通道状态。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_QueryStatus([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_STATUS_S](#VENC_CHN_STATUS_S) *pstStatus);
+
+【参数】
+
+| 参数名称  | 描述                                                         | 输入/输出 |
+| --------- | ------------------------------------------------------------ | --------- |
+| VeChn     | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| pstStatus | 编码器状态结构体。                                           | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_venc_jpeg_light_test](#rkmedia_venc_jpeg_light_test)。
 
 【相关主题】
 
@@ -2464,8 +3590,8 @@ typedef struct rkVENC_ATTR_JPEG_S {
 | ---------------- | ---------------- |
 | u32ZoomWidth     | 缩放的指定宽度。 |
 | u32ZoomHeight    | 缩放的指定高度。 |
-| u32ZoomVirWidth  | 缩放的虚拟高度。 |
-| u32ZoomVirHeight | 缩放的虚拟宽度。 |
+| u32ZoomVirWidth  | 缩放的虚拟宽度。 |
+| u32ZoomVirHeight | 缩放的虚拟高度。 |
 
 #### VENC_ATTR_MJPEG_S
 
@@ -2549,8 +3675,7 @@ typedef struct rkVENC_ATTR_S {
                        // H.264:   66: baseline; 77:MP; 100:HP;
                        // H.265:   default:Main;
                        // Jpege/MJpege:   default:Baseline
-  RK_BOOL bByFrame;    // RW; Range:[0,1];
-                       // get stream mode is slice mode or frame mode
+  RK_BOOL bByFrame;    // reserve
   RK_U32 u32PicWidth;  // RW; width of a picture to be encoded, in pixel
   RK_U32 u32PicHeight; // RW; height of a picture to be encoded, in pixel
   VENC_ROTATION_E enRotation;
@@ -2569,10 +3694,10 @@ typedef struct rkVENC_ATTR_S {
 | ------------------------------------------------ | ------------------------------------------------------------ |
 | enType                                           | 编码协议类型。                                               |
 | imageType                                        | 输入图像类型。                                               |
-| u32VirWidth                                      | stride宽度（与buffer_width相同），必须大于width，通常设置vir_width=(width+15)&(~15)。 |
-| u32VirHeight                                     | stride高度（与buffer_height相同），必须大于height，通常设置vir_height=(height+15)&(~15)。 |
-| u32Profile                                       | 编码的等级。<br/>H.264:   66: Baseline; 77:Main Profile; 100:High Profile;<br/>H.265:   default:Main;<br/>Jpege/MJpege:   default:Baseline |
-| bByFrame                                         | 是否按帧模式获取码流。取值范围：[0, 1]。<br/>1：frame mode。<br/>0：slice mode。 |
+| u32VirWidth                                      | stride宽度，通常与buffer_width相同。若u32VirWidth大于buffer宽度，则必须满足16对齐。 |
+| u32VirHeight                                     | stride高度，通常与buffer_height相同。若u32VirHeight大于buffer高度，则必须满足16对齐。 |
+| u32Profile                                       | 编码的等级。<br />H.264:   66: Baseline; 77:Main Profile; 100:High Profile;<br />H.265:   default:Main;<br />Jpege/MJpege:   default:Baseline |
+| bByFrame                                         | 预留参数，暂不支持。                                         |
 | u32PicWidth                                      | 编码图像宽度。以像素为单位。                                 |
 | u32PicHeight                                     | 编码图像高度。以像素为单位。                                 |
 | stAttrH264e/stAttrH265e/stAttrMjpege/stAttrJpege | 某种协议的编码器属性。                                       |
@@ -2660,20 +3785,20 @@ typedef struct rkVENC_H264_CBR_S {
   RK_U32 u32SrcFrameRateDen;
   RK_FR32 fr32DstFrameRateNum;
   RK_FR32 fr32DstFrameRateDen;
-  RK_U32 u32BitRate; // RW; Range:[2, 614400]; average bitrate
+  RK_U32 u32BitRate; // RW; Range:[2000, 98000000]; average bitrate
 } VENC_H264_CBR_S;
 ```
 
 【成员】
 
-| 成员名称            | 描述                                |
-| ------------------- | ----------------------------------- |
-| u32Gop              | I帧间隔，取值范围：[1, 65536]。     |
-| u32SrcFrameRateNum  | 数据源帧率分子。                    |
-| u32SrcFrameRateDen  | 数据源帧率分母。                    |
-| fr32DstFrameRateNum | 目标帧率分子。                      |
-| fr32DstFrameRateDen | 目标帧率分母。                      |
-| u32BitRate          | 平均比特率，取值范围：[2, 614400]。 |
+| 成员名称            | 描述                                              |
+| ------------------- | ------------------------------------------------- |
+| u32Gop              | I帧间隔，取值范围：[1, 65536]。                   |
+| u32SrcFrameRateNum  | 数据源帧率分子。                                  |
+| u32SrcFrameRateDen  | 数据源帧率分母。                                  |
+| fr32DstFrameRateNum | 目标帧率分子。                                    |
+| fr32DstFrameRateDen | 目标帧率分母。                                    |
+| u32BitRate          | 平均比特率，取值范围：[2000, 98000000]，单位：bps |
 
 #### VENC_H264_VBR_S
 
@@ -2690,20 +3815,20 @@ typedef struct rkVENC_H264_VBR_S {
   RK_U32 u32SrcFrameRateDen;
   RK_FR32 fr32DstFrameRateNum;
   RK_FR32 fr32DstFrameRateDen;
-  RK_U32 u32MaxBitRate; // RW; Range:[2, 614400];the max bitrate
+  RK_U32 u32MaxBitRate; // RW; Range:[2000, 98000000];the max bitrate
 } VENC_H264_VBR_S;
 ```
 
 【成员】
 
-| 成员名称            | 描述                                |
-| ------------------- | ----------------------------------- |
-| u32Gop              | ISLICE间隔，取值范围：[1, 65536]。  |
-| u32SrcFrameRateNum  | 数据源帧率分子。                    |
-| u32SrcFrameRateDen  | 数据源帧率分母。                    |
-| fr32DstFrameRateNum | 目标帧率分子。                      |
-| fr32DstFrameRateDen | 目标帧率分母。                      |
-| u32BitRate          | 平均比特率，取值范围：[2, 614400]。 |
+| 成员名称            | 描述                                              |
+| ------------------- | ------------------------------------------------- |
+| u32Gop              | ISLICE间隔，取值范围：[1, 65536]。                |
+| u32SrcFrameRateNum  | 数据源帧率分子。                                  |
+| u32SrcFrameRateDen  | 数据源帧率分母。                                  |
+| fr32DstFrameRateNum | 目标帧率分子。                                    |
+| fr32DstFrameRateDen | 目标帧率分母。                                    |
+| u32MaxBitRate       | 最大比特率，取值范围：[2000, 98000000]，单位：bps |
 
 #### VENC_H265_CBR_S
 
@@ -2750,12 +3875,14 @@ typedef enum rkVENC_RC_MODE_E {
   // H264
   VENC_RC_MODE_H264CBR = 1,
   VENC_RC_MODE_H264VBR,
+  VENC_RC_MODE_H264AVBR,
   // MJPEG
   VENC_RC_MODE_MJPEGCBR,
   VENC_RC_MODE_MJPEGVBR,
   // H265
   VENC_RC_MODE_H265CBR,
   VENC_RC_MODE_H265VBR,
+  VENC_RC_MODE_H265AVBR,
   VENC_RC_MODE_BUTT,
 } VENC_RC_MODE_E;
 ```
@@ -2775,12 +3902,14 @@ typedef struct rkVENC_RC_ATTR_S {
   union {
     VENC_H264_CBR_S stH264Cbr;
     VENC_H264_VBR_S stH264Vbr;
+    VENC_H264_AVBR_S stH264Avbr;
 
     VENC_MJPEG_CBR_S stMjpegCbr;
     VENC_MJPEG_VBR_S stMjpegVbr;
 
     VENC_H265_CBR_S stH265Cbr;
     VENC_H265_VBR_S stH265Vbr;
+    VENC_H265_AVBR_S stH265Avbr;
   };
 } VENC_RC_ATTR_S;
 ```
@@ -3062,8 +4191,8 @@ typedef struct hiVENC_ROI_ATTR_S {
 | -------- | ------------------------------------------------------------ |
 | u32Index | ROI索引值，取值范围[0, 7]。                                  |
 | bEnable  | 是否使能ROI。                                                |
-| bAbsQp   | ROI的QP模式，取值范围：[0, 1]。<br/>1：absolute QP。<br/>0：relative QP。 |
-| s32Qp    | QP值，取值范围：[-51, 51]。<br/>只有相对模式才能使QP值小于0。 |
+| bAbsQp   | ROI的QP模式，取值范围：[0, 1]。<br />1：absolute QP。<br />0：relative QP。 |
+| s32Qp    | QP值，取值范围：[-51, 51]。<br />只有相对模式才能使QP值小于0。 |
 | bIntra   | 强制帧内宏块的标志。                                         |
 | stRect   | ROI区域。                                                    |
 
@@ -3075,7 +4204,7 @@ typedef struct hiVENC_ROI_ATTR_S {
 
 【说明】
 
-OSD区域ID枚举类型。
+OSD区域ID枚举类型。由0至7叠加优先级逐步上升，优先级越高的OSD位于更高图层。
 
 【定义】
 
@@ -3138,10 +4267,64 @@ OSD像素格式类型枚举。
 
 ```c
 typedef enum rkOSD_PIXEL_FORMAT_E {
-  PIXEL_FORMAT_ARGB_1555 = 0,
-  PIXEL_FORMAT_ARGB_8888,
+  PIXEL_FORMAT_ARGB_8888 = 0,
+  PIXEL_FORMAT_BUTT // butt of enum
 } OSD_PIXEL_FORMAT_E;
 ```
+
+#### VENC_COLOR_TBL_S
+
+【说明】
+
+调色板结构体。
+
+【定义】
+
+```c
+#define VENC_RGN_COLOR_NUM 256
+typedef struct rkVENC_COLOR_TBL {
+  // PixFormat: ARGB => A:bit31~bit24 R:bit23~bit16 G:bit15~bit8 B:bit7~bit0
+  RK_U32 u32ArgbTbl[VENC_RGN_COLOR_NUM];
+  // Enabling dichotomy will speed up the search for the color table,
+  // but will sort the color table set by the user in ascending order.
+  RK_BOOL bColorDichotomyEnable;
+} VENC_COLOR_TBL_S;
+```
+
+【成员】
+
+| 成员名称              | 描述                                                      |
+| --------------------- | --------------------------------------------------------- |
+| u32ArgbTbl            | 调色板，格式为ARGB8888，最大支持VENC_RGN_COLOR_NUM(256)个 |
+| bColorDichotomyEnable | 开启二分法优化查询。                                      |
+
+#### OSD_COLOR_PALETTE_BUF_S
+
+【说明】
+
+由调色板索引构建的OSD Buffer。
+
+【定义】
+
+```c
+typedef struct rkOSD_COLOR_PALETTE_BUF_S {
+  RK_U32 u32Width;  /* buffer's width */
+  RK_U32 u32Height; /* buffer's height */
+  RK_VOID *pIdBuf;  /* buffer of the color palette id */
+} OSD_COLOR_PALETTE_BUF_S;
+```
+
+【成员】
+
+| 成员名称  | 描述                               |
+| --------- | ---------------------------------- |
+| u32Width  | Buffer宽度。                       |
+| u32Height | Buffer高度                         |
+| pIdBuf    | 由8bit调色板索引构建的Buffer指针。 |
+
+【相关数据类型及接口】
+
+无。
 
 #### BITMAP_S
 
@@ -3229,11 +4412,11 @@ JPEG 协议编码通道的高级参数。
 
 ```c
 typedef struct rkVENC_JPEG_PARAM_S {
-  RK_U32 u32Qfactor; // 1-10
-  RK_U8 u8YQt[64];
-  RK_U8 u8CbQt[64];
-  RK_U8 u8CrQt[64];
-  RK_U32 u32MCUPerECS;
+  RK_U32 u32Qfactor; // 1-99
+  RK_U8 u8YQt[64]; // reserve
+  RK_U8 u8CbQt[64]; // reserve
+  RK_U8 u8CrQt[64]; // reserve
+  RK_U32 u32MCUPerECS; // reserve
 } VENC_JPEG_PARAM_S;
 ```
 
@@ -3241,11 +4424,63 @@ typedef struct rkVENC_JPEG_PARAM_S {
 
 | 成员名称     | 描述                                             |
 | ------------ | ------------------------------------------------ |
-| u32Qfactor   | 具体含义请参见 RFC2435 协议，取值范围：[1, 10]。 |
-| u8YQt        | Y 量化表。                                       |
-| u8CbQt       | Cb 量化表。                                      |
-| u8CrQt       | Cr 量化表。                                      |
-| u32MCUPerECS | 每个 ECS 中包含多少个 MCU。                      |
+| u32Qfactor   | 具体含义请参见 RFC2435 协议，取值范围：[1, 99]。 |
+| u8YQt        | 预留参数，暂未实现。                             |
+| u8CbQt       | 预留参数，暂未实现。                             |
+| u8CrQt       | 预留参数，暂未实现。                             |
+| u32MCUPerECS | 预留参数，暂未实现。                             |
+
+#### VENC_RESOLUTION_PARAM_S
+
+【说明】
+
+VENC分辨率配置结构体。
+
+【定义】
+
+```c
+typedef struct rkVENC_RESOLUTION_PARAM_S {
+  RK_U32 u32Width;
+  RK_U32 u32Height;
+  RK_U32 u32VirWidth;
+  RK_U32 u32VirHeight;
+} VENC_RESOLUTION_PARAM_S;
+```
+
+【成员】
+
+| 成员名称     | 描述                                                         |
+| ------------ | ------------------------------------------------------------ |
+| u32Width     | buffer宽度                                                   |
+| u32Height    | buffer高度                                                   |
+| u32VirWidth  | stride宽度，通常与buffer_width相同。<br />若u32VirWidth大于buffer宽度，则必须满足16对齐。 |
+| u32VirHeight | stride高度，通常与buffer_height相同。<br />若u32VirHeight大于buffer高度，则必须满足16对齐。 |
+
+#### VENC_CHN_STATUS_S
+
+【说明】
+
+编码器状态结构体。
+
+【定义】
+
+```c
+typedef struct rkVENC_CHN_STATUS_S {
+  RK_U32 u32LeftFrames; // The number of unencoded frames remaining in the input buffer.
+  RK_U32 u32TotalFrames; // The capacity of the input buffer.
+  RK_U32 u32LeftPackets; // The number of packets remaining in the output buffer that have not been taken.
+  RK_U32 u32TotalPackets; // The capacity of the output buffer.
+} VENC_CHN_STATUS_S;
+```
+
+【成员】
+
+| 成员名称        | 描述               |
+| --------------- | ------------------ |
+| u32LeftFrames   | 尚未处理帧数。     |
+| u32TotalFrames  | 需处理总帧数。     |
+| u32LeftPackets  | 已处理未输出包数。 |
+| u32TotalPackets | 总输出包数。       |
 
 ### 错误码
 
@@ -3269,6 +4504,214 @@ typedef struct rkVENC_JPEG_PARAM_S {
 | 31       | RK_ERR_VENC_NOTREADY      | 系统没有初始化或没有加载相应模块             |
 | 32       | RK_ERR_VENC_BUSY          | VENC 系统忙                                  |
 
+## 视频解码
+
+### 概述
+
+VDEC 模块，即视频解码模块。本模块支持多路实时解码，且每路解码独立，支持H264/H1265/MJPEG/JPEG解码。
+
+### API参考
+
+#### RK_MPI_VDEC_CreateChn
+
+【描述】
+
+创建解码通道。
+
+【语法】
+
+RK_S32 RK_MPI_VDEC_CreateChn([VDEC_CHN](#VDEC_CHN) VdChn, const [VDEC_CHN_ATTR_S](#VDEC_CHN_ATTR_S) *pstAttr);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VdChn    | 解码通道号。取值范围：[0, [VDEC_MAX_CHN_NUM](#VDEC_MAX_CHN_NUM))。 | 输入      |
+| pstAttr  | 解码通道属性指针。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_vdec_test](#rkmedia_vdec_test)。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VDEC_DestroyChn
+
+【描述】
+
+销毁解码通道。
+
+【语法】
+
+RK_S32 RK_MPI_VDEC_DestroyChn([VDEC_CHN](#VDEC_CHN) VdChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VdChn    | 解码通道号。取值范围：[0, [VDEC_MAX_CHN_NUM](#VDEC_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_vdec_test](#rkmedia_vdec_test)。
+
+【相关主题】
+
+无。
+
+### 数据类型
+
+#### VDEC_MAX_CHN_NUM
+
+【说明】
+
+VDEC物理通道和扩展通道的总个数。
+
+【定义】
+
+```c
+RV1109/RV1126:
+#define VDEC_MAX_CHN_NUM 16
+```
+
+#### VDEC_CHN
+
+【说明】
+
+VDEC通道号。
+
+【定义】
+
+```c
+typedef RK_S32 VDEC_CHN;
+```
+
+#### VDEC_CHN_ATTR_S
+
+【说明】
+
+解码通道属性结构体。
+
+【定义】
+
+```c
+typedef struct rkVDEC_CHN_ATTR_S {
+  CODEC_TYPE_E enCodecType;           // RW; video type to be decoded
+  IMAGE_TYPE_E enImageType;           // RW; image type to be outputed
+  VIDEO_MODE_E enMode;                // RW; send by stream or by frame
+  VIDEO_DECODEC_MODE_E enDecodecMode; // RW; hardware or software
+  union {
+    VDEC_ATTR_VIDEO_S stVdecVideoAttr; // RW; structure with video
+  };
+} VDEC_CHN_ATTR_S;
+```
+
+【成员】
+
+| 成员名称        | 描述                                     |
+| --------------- | ---------------------------------------- |
+| enCodecType     | 解码格式。                               |
+| enImageType     | 解码完成后输出格式。                     |
+| enMode          | 解码输入模式，支持帧/流。                |
+| enDecodecMode   | 解码模式，支持硬件或软件解码。           |
+| stVdecVideoAttr | 解码视频属性结构体。预留属性，暂不支持。 |
+
+【相关数据类型及接口】
+
+[CODEC_TYPE_E](#CODEC_TYPE_E)
+
+[IMAGE_TYPE_E](#IMAGE_TYPE_E)
+
+[VIDEO_MODE_E](#VIDEO_MODE_E)
+
+[VIDEO_DECODEC_MODE_E](#VIDEO_DECODEC_MODE_E)
+
+[VDEC_ATTR_VIDEO_S](#VDEC_ATTR_VIDEO_S)
+
+#### VIDEO_MODE_E
+
+【说明】
+
+输入模式，支持帧/流输入，
+
+【定义】
+
+```c
+typedef enum rkVIDEO_MODE_E {
+  VIDEO_MODE_STREAM = 0, // send by stream
+  VIDEO_MODE_FRAME,      // send by frame
+  VIDEO_MODE_COMPAT, // Not Support now ! One Frame supports multiple packets
+                     // sending.
+  // The current frame is considered to end when bEndOfFrame is equal to RK_TRUE
+  VIDEO_MODE_BUTT
+} VIDEO_MODE_E;
+```
+
+#### VIDEO_DECODEC_MODE_E
+
+【说明】
+
+解码模式。
+
+【定义】
+
+```c
+typedef enum rkVIDEO_DECODEC_MODE_E {
+  VIDEO_DECODEC_SOFTWARE = 0,
+  VIDEO_DECODEC_HADRWARE,
+} VIDEO_DECODEC_MODE_E;
+```
+
+#### VDEC_ATTR_VIDEO_S
+
+【说明】
+
+解码视频属性结构体。预留属性，暂不支持。
+
+【定义】
+
+```c
+typedef struct rkVDEC_ATTR_VIDEO_S {
+
+} VDEC_ATTR_VIDEO_S;
+```
+
 ## 移动侦测
 
 ### 概述
@@ -3289,7 +4732,7 @@ MD算法由软件实现，输入的分辨率不宜太大，典型分辨率640x48
 
 【语法】
 
-RK_MPI_ALGO_MD_CreateChn([ALGO_MD_CHN](#ALGO_MD_CHN) MdChn, const [ALGO_MD_ATTR_S](#ALGO_MD_ATTR_S) *pstChnAttr);
+RK_S32 RK_MPI_ALGO_MD_CreateChn([ALGO_MD_CHN](#ALGO_MD_CHN) MdChn, const [ALGO_MD_ATTR_S](#ALGO_MD_ATTR_S) *pstChnAttr);
 
 【参数】
 
@@ -3317,7 +4760,7 @@ RK_MPI_ALGO_MD_CreateChn([ALGO_MD_CHN](#ALGO_MD_CHN) MdChn, const [ALGO_MD_ATTR_
 
 【举例】
 
-无。
+[rkmedia_vi_md_test](#rkmedia_vi_md_test)。
 
 【相关主题】
 
@@ -3358,11 +4801,53 @@ RK_S32 RK_MPI_ALGO_MD_DestroyChn([ALGO_MD_CHN](#ALGO_MD_CHN) MdChn);
 
 【举例】
 
-无。
+[rkmedia_vi_md_test](#rkmedia_vi_md_test)。
 
 【相关主题】
 
 [RK_MPI_ALGO_MD_CreateChn](#RK_MPI_ALGO_MD_CreateChn)
+
+#### RK_MPI_ALGO_MD_EnableSwitch
+
+【描述】
+
+在保持MD通道开启的条件下，进行MD动态开关。
+
+【语法】
+
+RK_S32 RK_MPI_ALGO_MD_EnableSwitch([ALGO_MD_CHN](#ALGO_MD_CHN) MdChn, RK_BOOL bEnable)
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| MdChn    | 移动侦测通道号。取值范围：[0, [ALGO_MD_MAX_CHN_NUM](#ALGO_MD_MAX_CHN_NUM))。 | 输入      |
+| bEnable  | MD开关。                                                     | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                         |
+| ------ | -------------------------------------------- |
+| 0      | 成功。                                       |
+| 非0    | 失败，其值参见[错误码](#move-detect-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_vi_md_test](#rkmedia_vi_md_test)。
+
+【相关主题】
+
+无。
 
 ### 数据类型
 
@@ -3518,7 +5003,7 @@ RK_S32 RK_MPI_ALGO_OD_CreateChn([ALGO_OD_CHN](#ALGO_OD_CHN) OdChn, const [ALGO_O
 
 【举例】
 
-无。
+[rkmedia_vi_od_test](#rkmedia_vi_od_test)。
 
 【相关主题】
 
@@ -3559,11 +5044,53 @@ RK_S32 RK_MPI_ALGO_OD_DestroyChn([ALGO_OD_CHN](#ALGO_OD_CHN) OdChn);
 
 【举例】
 
-无。
+[rkmedia_vi_od_test](#rkmedia_vi_od_test)。
 
 【相关主题】
 
 [RK_MPI_ALGO_OD_CreateChn](#RK_MPI_ALGO_OD_CreateChn)
+
+#### RK_MPI_ALGO_OD_EnableSwitch
+
+【描述】
+
+在保持OD通道开启的条件下，进行OD动态开关。
+
+【语法】
+
+RK_S32 RK_MPI_ALGO_OD_EnableSwitch([ALGO_OD_CHN](#ALGO_OD_CHN) OdChn, RK_BOOL bEnable);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| OdChn    | 遮挡侦测通道号。取值范围：[0, [ALGO_OD_MAX_CHN_NUM](#ALGO_OD_MAX_CHN_NUM))。 | 输入      |
+| bEnable  | OD开关。                                                     | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                              |
+| ------ | ------------------------------------------------- |
+| 0      | 成功。                                            |
+| 非0    | 失败，其值参见[错误码](#occlusion-detect-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_vi_od_test](#rkmedia_vi_od_test)。
+
+【相关主题】
+
+无。
 
 ### 数据类型
 
@@ -3671,6 +5198,298 @@ typedef struct rkALGO_OD_ATTR_S {
 | 83       | RK_ERR_ALGO_OD_NOT_CONFIG    | 使用前未配置                                 |
 | 84       | RK_ERR_ALGO_OD_ILLEGAL_PARAM | 参数超出合法范围                             |
 
+## 视频输出
+
+### 概述
+
+VO模块用于视频输出管理。
+
+### 功能描述
+
+VO模块是对DRM/KMS的封装，支持多VOP以及多图层显示。
+
+### API参考
+
+#### RK_MPI_VO_CreateChn
+
+【描述】
+
+创建VO通道。
+
+【语法】
+
+RK_S32 RK_MPI_VO_CreateChn([VO_CHN](#VO_CHN) VoChn, const [VO_CHN_ATTR_S](#VO_CHN_ATTR_S) *pstAttr);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VoChn    | VO通道号。取值范围：[0, [VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM))。 | 输入      |
+| pstAttr  | VO通道属性指针。                                             | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vo-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+如果使用RK_MPI_SYS_SendMediaBuffer将MEDIA_BUFFER送给VO，送显后不能直接使用该MEDIA_BUFFER。否则显示内容会出现异常。这是由于VO将会根据fps不停使用刚才送入的MEDIA_BUFFER刷新VOP，如果刷新过程中改动到MEDIA_BUFFER的内容，则会出现显示异常（花屏、撕裂等现象）。可以通过使用双Buffer机制规避该问题。
+
+VO Plane格式支持说明：
+
+|        | Primary | Overlay | Curse |
+| ------ | ------- | ------- | ----- |
+| rv1109 | RGB     | NV12    | /     |
+| rk3399 |         |         |       |
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_VO_DestroyChn](#RK_MPI_VO_DestroyChn)
+
+#### RK_MPI_VO_GetChnAttr
+
+【描述】
+
+获取VO通道参数。
+
+【语法】
+
+RK_S32 RK_MPI_VO_GetChnAttr([VO_CHN](#VO_CHN) VoChn, const [VO_CHN_ATTR_S](#VO_CHN_ATTR_S) *pstAttr);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VoChn    | VO通道号。取值范围：[0, [VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM))。 | 输入      |
+| pstAttr  | VO通道属性指针。                                             | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vo-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_VO_SetChnAttr](#RK_MPI_VO_SetChnAttr)
+
+#### RK_MPI_VO_SetChnAttr
+
+【描述】
+
+设置VO通道参数。
+
+【语法】
+
+RK_S32 RK_MPI_VO_SetChnAttr([VO_CHN](#VO_CHN) VoChn, const [VO_CHN_ATTR_S](#VO_CHN_ATTR_S) *pstAttr);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VoChn    | VO通道号。取值范围：[0, [VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM))。 | 输入      |
+| pstAttr  | VO通道属性指针。                                             | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vo-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_VO_GetChnAttr](#RK_MPI_VO_GetChnAttr)
+
+#### RK_MPI_VO_DestroyChn
+
+【描述】
+
+销毁VO通道。
+
+【语法】
+
+RK_S32 RK_MPI_VO_DestroyChn([VO_CHN](#VO_CHN) VoChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VoChn    | VO通道号。取值范围：[0, [VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vo-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_VO_CreateChn](#RK_MPI_VO_CreateChn)
+
+### 数据类型
+
+视频输出相关数据类型定义如下：
+
+[VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM)：视频输出通道的最大个数。
+
+[VO_CHN](#VO_CHN)：视频输出通道号。
+
+[VO_CHN_ATTR_S](#VO_CHN_ATTR_S)：视频输出属性结构体。
+
+#### VO_MAX_CHN_NUM
+
+【说明】
+
+视频输出通道的最大个数。
+
+【定义】
+
+```c
+RV1109/RV1126:
+#define VO_MAX_CHN_NUM 2
+```
+
+#### VO_CHN
+
+【说明】
+
+视频输出通道号。
+
+【定义】
+
+```c
+typedef RK_S32 VO_CHN;
+```
+
+#### VO_CHN_ATTR_S
+
+【说明】
+
+视频输出属性结构体。
+
+【定义】
+
+```c
+typedef enum rk_VO_PLANE_TYPE_E {
+  VO_PLANE_PRIMARY = 0,
+  VO_PLANE_OVERLAY,
+  VO_PLANE_CURSOR,
+  VO_PLANE_BUTT
+} VO_PLANE_TYPE_E;
+
+typedef struct rkVO_CHN_ATTR_S {
+  const RK_CHAR *pcDevNode;
+  RK_U16 u16ConIdx;  // Connectors idx
+  RK_U16 u16EncIdx;  // Encoder idx
+  RK_U16 u16CrtcIdx; // CRTC idx
+  VO_PLANE_TYPE_E emPlaneType;
+  IMAGE_TYPE_E enImgType;
+  RK_U32 u32Width;  // for select display mode. 0 for default mode.
+  RK_U32 u32Height; // for select display mode. 0 for default mode.
+  RK_U16 u16Fps;    // for select display mode. 0 for default mode.
+  RK_U16 u16Zpos;
+  RECT_S stImgRect;  // for input image rect. default equal mode[0]
+  RECT_S stDispRect; // for vop display rect. default equal mode[0]
+} VO_CHN_ATTR_S;
+```
+
+【成员】
+
+| 成员名称     | 描述           |
+| ------------ | -------------- |
+| pcDevNode     | 视频输出设备节点。 |
+| u16ConIdx     | conn索引。用于多种显示模式指定。 |
+| u16EncIdx     | 编码器索引。用于多种显示模式指定。|
+| u16CrtcIdx    | CRTC索引。用于多种显示模式指定。 |
+| emPlaneType   | 视频输出图层类型。 |
+| enImgType    | 视频输出格式。 |
+| u32Width     | 视频输出宽度。 |
+| u32Height    | 视频输出高度。 |
+| u16Fps       | 视频输出帧率。 |
+| u16Zpos      | 输出图层Z轴高度。 |
+| stImgRect    | 输入图像尺寸参数。 |
+| stDispRect   | 输出图层尺寸参数。用于vop裁剪。  |
+
+【相关数据类型及接口】
+
+[IMAGE_TYPE_E](#IMAGE_TYPE_E)
+
+[RECT_S](#RECT_S)
+
+### 错误码
+
+视频输出 API 错误码如[表9-1](#vo-error)所示：
+
+<a name = "vo-error">表9-1 RGA API 错误码</a>
+
+| 错误代码 | 宏定义                  | 描述                                         |
+| -------- | ----------------------- | -------------------------------------------- |
+| 110      | RK_ERR_VO_INVALID_DEVID | 设备 ID 超出合法范围                         |
+| 111      | RK_ERR_VO_EXIST         | 试图申请或者创建已经存在的设备、通道或者资源 |
+| 112      | RK_ERR_VO_NOT_CONFIG    | 使用前未配置                                 |
+| 113      | RK_ERR_VO_TIMEOUT       | 视频输出超时                                 |
+| 114      | RK_ERR_VO_BUF_EMPTY     | 视频输出缓冲区为空                           |
+| 115      | RK_ERR_VO_ILLEGAL_PARAM | 非法参数                                     |
+| 116      | RK_ERR_VO_NOTREADY      | 系统未初始化                                 |
+
 ## 音频
 
 ### 概述
@@ -3734,7 +5553,7 @@ RK_S32 RK_MPI_AI_EnableChn([AI_CHN](#AI_CHN) AiChn);
 
 【举例】
 
-无。
+[rkmedia_ai_test](#rkmedia_ai_test)。
 
 【相关主题】
 
@@ -3775,7 +5594,7 @@ RK_S32 RK_MPI_AI_DisableChn([AI_CHN](#AI_CHN) AiChn);
 
 【举例】
 
-无。
+[rkmedia_ai_test](#rkmedia_ai_test)。
 
 【相关主题】
 
@@ -3817,7 +5636,7 @@ RK_S32 RK_MPI_AI_SetChnAttr([AI_CHN](#AI_CHN) AiChn, const [AI_CHN_ATTR_S](#AI_C
 
 【举例】
 
-无。
+[rkmedia_ai_test](#rkmedia_ai_test)。
 
 【相关主题】
 
@@ -3943,7 +5762,7 @@ RK_S32 RK_MPI_AI_SetTalkVqeAttr([AI_CHN](#AI_CHN) AiChn, [AI_TALKVQE_CONFIG_S](#
 
 【举例】
 
-无。
+[rkmedia_audio_test](#rkmedia_audio_test)。
 
 【相关主题】
 
@@ -4027,7 +5846,7 @@ RK_S32 RK_MPI_AI_SetRecordVqeAttr([AI_CHN](#AI_CHN) AiChn, [AI_RECORDVQE_CONFIG_
 
 【举例】
 
-无。
+[rkmedia_audio_test](#rkmedia_audio_test)。
 
 【相关主题】
 
@@ -4110,7 +5929,7 @@ RK_S32 RK_MPI_AI_EnableVqe([AI_CHN](#AI_CHN) AiChn);
 
 【举例】
 
-无。
+[rkmedia_audio_test](#rkmedia_audio_test)。
 
 【相关主题】
 
@@ -4125,6 +5944,47 @@ RK_S32 RK_MPI_AI_EnableVqe([AI_CHN](#AI_CHN) AiChn);
 【语法】
 
 RK_S32 RK_MPI_AI_DisableVqe([AI_CHN](#AI_CHN) AiChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#ai-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+##### RK_MPI_AI_StartStream
+
+【描述】
+
+启动音频流。
+
+【语法】
+
+RK_S32 RK_MPI_AI_StartStream([AI_CHN](#AI_CHN) AiChn);
 
 【参数】
 
@@ -4194,7 +6054,7 @@ RK_S32 RK_MPI_AO_EnableChn([AO_CHN](#AO_CHN) AoChn);
 
 【举例】
 
-无。
+[rkmedia_ao_test](#rkmedia_ao_test)。
 
 【相关主题】
 
@@ -4235,7 +6095,7 @@ RK_S32 RK_MPI_AO_DisableChn([AO_CHN](#AO_CHN) AoChn);
 
 【举例】
 
-无。
+[rkmedia_ao_test](#rkmedia_ao_test)。
 
 【相关主题】
 
@@ -4277,7 +6137,7 @@ RK_S32 RK_MPI_AO_SetChnAttr([AO_CHN](#AO_CHN) AoChn, const [AO_CHN_ATTR_S](#AO_C
 
 【举例】
 
-无。
+[rkmedia_ao_test](#rkmedia_ao_test)。
 
 【相关主题】
 
@@ -4403,7 +6263,7 @@ RK_S32 RK_MPI_AO_SetVqeAttr([AO_CHN](#AO_CHN) AoChn, [AO_VQE_CONFIG_S](#AO_VQE_C
 
 【举例】
 
-无。
+[rkmedia_audio_test](#rkmedia_audio_test)。
 
 【相关主题】
 
@@ -4486,7 +6346,7 @@ RK_S32 RK_MPI_AO_EnableVqe([AO_CHN](#AO_CHN) AoChn);
 
 【举例】
 
-无。
+[rkmedia_audio_test](#rkmedia_audio_test)。
 
 【相关主题】
 
@@ -4533,6 +6393,89 @@ RK_S32 RK_MPI_AO_DisableVqe([AO_CHN](#AO_CHN) AoChn);
 
 无。
 
+##### RK_MPI_AO_QueryChnStat
+
+【描述】
+
+获取AO通道状态信息。
+
+【语法】
+
+RK_S32 RK_MPI_AO_QueryChnStat([AO_CHN](#AO_CHN) AoChn, [AO_CHN_STATE_S](#AO_CHN_STATE_S) *pstStatus);
+
+【参数】
+
+| 参数名称  | 描述                                                         | 输入/输出 |
+| --------- | ------------------------------------------------------------ | --------- |
+| AoChn     | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| pstStatus | 状态信息结构体指针。                                         | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#ao-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+##### RK_MPI_AO_ClearChnBuf
+
+【描述】
+
+清空音频输出通道缓冲区数据。
+
+【语法】
+
+RK_S32 RK_MPI_AO_ClearChnBuf([AO_CHN](#AO_CHN) AoChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#ao-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
 #### 音频编码
 
 ##### RK_MPI_AENC_CreateChn
@@ -4543,7 +6486,7 @@ RK_S32 RK_MPI_AO_DisableVqe([AO_CHN](#AO_CHN) AoChn);
 
 【语法】
 
-RK_MPI_AENC_CreateChn([AENC_CHN](#AENC_CHN) AencChn,const [AENC_CHN_ATTR_S](#[AENC_CHN_ATTR_S]()) *pstAttr);
+RK_S32 RK_MPI_AENC_CreateChn([AENC_CHN](#AENC_CHN) AencChn,const [AENC_CHN_ATTR_S](#AENC_CHN_ATTR_S) *pstAttr);
 
 【参数】
 
@@ -4571,7 +6514,7 @@ RK_MPI_AENC_CreateChn([AENC_CHN](#AENC_CHN) AencChn,const [AENC_CHN_ATTR_S](#[AE
 
 【举例】
 
-无。
+[rkmedia_ai_aenc_test](#rkmedia_ai_aenc_test)。
 
 【相关主题】
 
@@ -4612,7 +6555,7 @@ RK_S32 RK_MPI_AENC_DestroyChn([AENC_CHN](#AENC_CHN) AencChn);
 
 【举例】
 
-无。
+[rkmedia_ai_aenc_test](#rkmedia_ai_aenc_test)。
 
 【相关主题】
 
@@ -4656,7 +6599,7 @@ RK_S32 RK_MPI_ADEC_CreateChn([ADEC_CHN](#ADEC_CHN) AdecChn, const [ADEC_CHN_ATTR
 
 【举例】
 
-无。
+[rkmedia_adec_ao_test](#rkmedia_adec_ao_test)。
 
 【相关主题】
 
@@ -4697,7 +6640,7 @@ RK_S32 RK_MPI_ADEC_DestroyChn([ADEC_CHN](#ADEC_CHN) AdecChn);
 
 【举例】
 
-无。
+[rkmedia_adec_ao_test](#rkmedia_adec_ao_test)。
 
 【相关主题】
 
@@ -4753,12 +6696,20 @@ typedef RK_S32 AI_CHN;
 【定义】
 
 ```c
+typedef enum rk_AI_LAYOUT_E {
+  AI_LAYOUT_NORMAL = 0,   /* Normal      */
+  AI_LAYOUT_MIC_REF,        /* chanel layout: [mic:ref];*/
+  AI_LAYOUT_REF_MIC,        /* chanel layout: [ref:mic];*/
+  AI_LAYOUT_BUTT
+} AI_LAYOUT_E;
+
 typedef struct rkAI_CHN_ATTR_S {
   RK_CHAR *pcAudioNode;
   Sample_Format_E enSampleFormat;
   RK_U32 u32Channels;
   RK_U32 u32SampleRate;
   RK_U32 u32NbSamples;
+  AI_LAYOUT_E enAiLayout;
 } AI_CHN_ATTR_S;
 ```
 
@@ -4771,6 +6722,7 @@ typedef struct rkAI_CHN_ATTR_S {
 | u32Channels    | 通道数。           |
 | u32SampleRate  | 采样率。           |
 | u32NbSamples   | 每帧的采样点个数。 |
+| enAiLayout     | 输入布局类型       |
 
 【相关数据类型及接口】
 
@@ -4801,7 +6753,7 @@ typedef struct rkAI_TALKVQE_CONFIG_S {
 
 | 成员名称          | 描述                                                         |
 | ----------------- | ------------------------------------------------------------ |
-| u32OpenMask       | Talk Vqe 的各功能使能的 Mask 值。<br/>目前支持AI_TALKVQE_MASK_AEC、<br/>AI_TALKVQE_MASK_ANR、<br/>AI_TALKVQE_MASK_AGC。 |
+| u32OpenMask       | Talk Vqe 的各功能使能的 Mask 值。<br />目前支持AI_TALKVQE_MASK_AEC、<br />AI_TALKVQE_MASK_ANR、<br />AI_TALKVQE_MASK_AGC。 |
 | s32WorkSampleRate | 工作采样频率。                                               |
 | s32FrameSample    | 采样点数目。                                                 |
 | aParamFilePath    | 参数文件路径。                                               |
@@ -4837,7 +6789,7 @@ typedef struct rkAI_RECORDVQE_CONFIG_S {
 
 | 成员名称                 | 描述                                                         |
 | ------------------------ | ------------------------------------------------------------ |
-| u32OpenMask              | Record Vqe 的各功能使能的 Mask 值。<br/>目前支持AI_RECORDVQE_MASK_ANR。 |
+| u32OpenMask              | Record Vqe 的各功能使能的 Mask 值。<br />目前支持AI_RECORDVQE_MASK_ANR。 |
 | s32WorkSampleRate        | 工作采样频率。                                               |
 | s32FrameSample           | 采样点数目。                                                 |
 | stAnrConfig.fPostAddGain | ANR的post-gain。                                             |
@@ -4938,7 +6890,7 @@ typedef struct rkAO_VQE_CONFIG_S
 
 | 成员名称          | 描述                                                         |
 | ----------------- | ------------------------------------------------------------ |
-| u32OpenMask       | AO Vqe 的各功能使能的 Mask值。<br/>目前支持AO_VQE_MASK_ANR、<br/>AO_VQE_MASK_AGC。 |
+| u32OpenMask       | AO Vqe 的各功能使能的 Mask值。<br />目前支持AO_VQE_MASK_ANR、<br />AO_VQE_MASK_AGC。 |
 | s32WorkSampleRate | 工作采样频率。                                               |
 | s32FrameSample    | 采样点数目。                                                 |
 | aParamFilePath    | 参数文件路径。                                               |
@@ -4946,6 +6898,34 @@ typedef struct rkAO_VQE_CONFIG_S
 【相关数据类型及接口】
 
 [MAX_FILE_PATH_LEN](#公共数据类型)
+
+##### AO_CHN_STATE_S
+
+【说明】
+
+AO通道状态信息结构体。
+
+【定义】
+
+```c
+typedef struct rkAO_CHN_STATE_S {
+  RK_U32 u32ChnTotalNum;
+  RK_U32 u32ChnFreeNum;
+  RK_U32 u32ChnBusyNum;
+} AO_CHN_STATE_S;
+```
+
+【成员】
+
+| 成员名称       | 描述             |
+| -------------- | ---------------- |
+| u32ChnTotalNum | AO总通道数。     |
+| u32ChnFreeNum  | AO空闲通道数。   |
+| u32ChnBusyNum  | AO已占用通道数。 |
+
+【相关数据类型及接口】
+
+无。
 
 #### 音频编码
 
@@ -5013,7 +6993,7 @@ typedef struct rkAENC_ATTR_AAC_S {
 | 成员名称      | 描述                                                         |
 | ------------- | ------------------------------------------------------------ |
 | u32Channels   | 通道数。                                                     |
-| u32SampleRate | 采样率。取值范围为：96000, 88200, 64000, 48000, 44100, 32000, <br/>24000, 22050, 16000, 12000, 11025, 8000, 7350。 |
+| u32SampleRate | 采样率。取值范围为：96000, 88200, 64000, 48000, 44100, 32000, <br />24000, 22050, 16000, 12000, 11025, 8000, 7350。 |
 
 ##### AENC_ATTR_MP2_S
 
@@ -5407,7 +7387,7 @@ RK_S32 RK_MPI_RGA_CreateChn([RGA_CHN](#RGA_CHN) RgaChn, [RGA_ATTR_S](#RGA_ATTR_S
 
 【举例】
 
-无。
+[rkmedia_vi_vo_test](#rkmedia_vi_vo_test)。
 
 【相关主题】
 
@@ -5444,7 +7424,7 @@ RK_S32 RK_MPI_RGA_DestroyChn([RGA_CHN](#RGA_CHN) RgaChn);
 
 【注意】
 
-无。
+[rkmedia_vi_vo_test](#rkmedia_vi_vo_test)。
 
 【举例】
 
@@ -5573,189 +7553,9 @@ RGA API 错误码如[表8-1](#rga-error)所示：
 | 93       | RK_ERR_RGA_NOT_CONFIG    | 使用前未配置                                 |
 | 94       | RK_ERR_RGA_ILLEGAL_PARAM | 非法参数                                     |
 
-## 视频输出
+## 注意事项
 
-### 概述
-
-VO模块用于视频输出管理。
-
-### 功能描述
-
-VO模块是对DRM/KMS的封装，支持多VOP以及多图层显示。
-
-### API参考
-
-#### RK_MPI_VO_CreateChn
-
-【描述】
-
-创建VO通道。
-
-【语法】
-
-RK_S32 RK_MPI_VO_CreateChn([VO_CHN](#VO_CHN) VoChn, const [VO_CHN_ATTR_S](#VO_CHN_ATTR_S) *pstAttr);
-
-【参数】
-
-| 参数名称 | 描述                                                         | 输入/输出 |
-| -------- | ------------------------------------------------------------ | --------- |
-| VoChn    | VO通道号。取值范围：[0, [VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM))。 | 输入      |
-| pstAttr  | VO通道属性指针。                                             | 输入      |
-
-【返回值】
-
-| 返回值 | 描述                                |
-| ------ | ----------------------------------- |
-| 0      | 成功。                              |
-| 非0    | 失败，其值参见[错误码](#vo-error)。 |
-
-【需求】
-
-头文件：rkmedia_api.h
-
-库文件：libeasymedia.so
-
-【注意】
-
-无。
-
-【举例】
-
-无。
-
-【相关主题】
-
-[RK_MPI_VO_DestroyChn](#RK_MPI_VO_DestroyChn)
-
-#### RK_MPI_VO_DestroyChn
-
-【描述】
-
-销毁VO通道。
-
-【语法】
-
-RK_S32 RK_MPI_VO_DestroyChn([VO_CHN](#VO_CHN) VoChn);
-
-【参数】
-
-| 参数名称 | 描述                                                         | 输入/输出 |
-| -------- | ------------------------------------------------------------ | --------- |
-| VoChn    | VO通道号。取值范围：[0, [VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM))。 | 输入      |
-
-【返回值】
-
-| 返回值 | 描述                                |
-| ------ | ----------------------------------- |
-| 0      | 成功。                              |
-| 非0    | 失败，其值参见[错误码](#vo-error)。 |
-
-【需求】
-
-头文件：rkmedia_api.h
-
-库文件：libeasymedia.so
-
-【注意】
-
-无。
-
-【举例】
-
-无。
-
-【相关主题】
-
-[RK_MPI_VO_CreateChn](#RK_MPI_VO_CreateChn)
-
-### 数据类型
-
-视频输出相关数据类型定义如下：
-
-[VO_MAX_CHN_NUM](#VO_MAX_CHN_NUM)：视频输出通道的最大个数。
-
-[VO_CHN](#VO_CHN)：视频输出通道号。
-
-[VO_CHN_ATTR_S](#VO_CHN_ATTR_S)：视频输出属性结构体。
-
-#### VO_MAX_CHN_NUM
-
-【说明】
-
-视频输出通道的最大个数。
-
-【定义】
-
-```c
-RV1109/RV1126:
-#define VO_MAX_CHN_NUM 2
-```
-
-#### VO_CHN
-
-【说明】
-
-视频输出通道号。
-
-【定义】
-
-```c
-typedef RK_S32 VO_CHN;
-```
-
-#### VO_CHN_ATTR_S
-
-【说明】
-
-视频输出属性结构体。
-
-【定义】
-
-```c
-typedef struct rkVO_CHN_ATTR_S {
-  RK_U32 u32Width;
-  RK_U32 u32Height;
-  RK_U32 u32VerStride;
-  RK_U32 u32HorStride;
-  IMAGE_TYPE_E enImgType;
-  RK_U16 u16Fps;
-  RK_U16 u16Zpos;
-} VO_CHN_ATTR_S;
-```
-
-【成员】
-
-| 成员名称     | 描述           |
-| ------------ | -------------- |
-| u32Width     | 视频输出宽度。 |
-| u32Height    | 视频输出高度。 |
-| u32VerStride | 虚宽。         |
-| u32HorStride | 虚高。         |
-| enImgType    | 图像格式类型。 |
-| u16Fps       | 帧率。         |
-| u16Zpos      | 图层选择。     |
-
-【相关数据类型及接口】
-
-[IMAGE_TYPE_E](#IMAGE_TYPE_E)
-
-### 错误码
-
-视频输出 API 错误码如[表9-1](#vo-error)所示：
-
-<a name = "vo-error">表9-1 RGA API 错误码</a>
-
-| 错误代码 | 宏定义                  | 描述                                         |
-| -------- | ----------------------- | -------------------------------------------- |
-| 110      | RK_ERR_VO_INVALID_DEVID | 设备 ID 超出合法范围                         |
-| 111      | RK_ERR_VO_EXIST         | 试图申请或者创建已经存在的设备、通道或者资源 |
-| 112      | RK_ERR_VO_NOT_CONFIG    | 使用前未配置                                 |
-| 113      | RK_ERR_VO_TIMEOUT       | 视频输出超时                                 |
-| 114      | RK_ERR_VO_BUF_EMPTY     | 视频输出缓冲区为空                           |
-| 115      | RK_ERR_VO_ILLEGAL_PARAM | 非法参数                                     |
-| 116      | RK_ERR_VO_NOTREADY      | 系统未初始化                                 |
-
-## 使用限制
+### 通道析构顺序
 
 需要特别注意的是 rkmedia对模块的析构顺序有特殊的要求：数据流管道中后级模块要先于前级模块销毁。比如：
 VI --> RGA --> VENC
@@ -5766,3 +7566,1117 @@ destroy VI
 
 以VI为例，VI是数据产生端。其生产的buffer在数据管道销毁时可能被后级占用，从而导致VI管理的资源也被占用。再次打开就会遇到Device Busy的错误。这个问题在频繁创建销毁数据通道时有概率发生。
 
+### 参数初始化
+
+推荐使用memset将参数初始化为0，避免参数随机初始化带来的影响。
+
+## Proc调试信息说明
+
+### VI
+
+当VI无数据输出时，查看下述节点信息，判断异常节点所在。
+
+【调试信息】
+
+```shell
+# cif command
+cat /proc/rkcif_mipi_lvds | grep "frame amount"; sleep 3; cat /proc/rkcif_mipi_lvds | grep "frame amount"
+# ouput
+frame amount:1836735
+frame amount:1836826
+
+# isp command
+cat /proc/rkisp* | grep Output; sleep 3; cat /proc/rkisp*| grep Output;
+# output
+Output     rkispp0 ON Format:FBC420 Size:2688x1520 (frame:1837606 rate:32ms)
+Output     rkispp_m_bypass Format:NV12 Size:2688x1520 (frame:1837606 rate:31ms delay:29ms)
+Output     rkispp_scale0 Format:NV12 Size:1920x1080 (frame:1837606 rate:31ms delay:29ms)
+Output     rkispp_scale1 Format:NV12 Size:704x576 (frame:1837606 rate:31ms delay:29ms)
+Output     rkispp_scale2 Format:NV12 Size:1280x720 (frame:1837606 rate:31ms delay:29ms)
+Output     rkispp0 ON Format:FBC420 Size:2688x1520 (frame:1837698 rate:33ms)
+Output     rkispp_m_bypass Format:NV12 Size:2688x1520 (frame:1837697 rate:32ms delay:29ms)
+Output     rkispp_scale0 Format:NV12 Size:1920x1080 (frame:1837697 rate:32ms delay:29ms)
+Output     rkispp_scale1 Format:NV12 Size:704x576 (frame:1837697 rate:32ms delay:29ms)
+Output     rkispp_scale2 Format:NV12 Size:1280x720 (frame:1837697 rate:32ms delay:29ms)
+```
+
+【调试信息分析】
+
+获取前后frame变化，若frame正常增加，说明该通路能正常传输数据。若frame没有变化，则可能该通路出现异常，数据堵塞。
+
+【参数说明】
+
+| 参数名             | 描述       |
+| ------------------ | ---------- |
+| frame amount/frame | 输出帧数   |
+| rate               | 输出帧率   |
+| Format             | 输出格式   |
+| Size               | 输出帧大小 |
+
+说明：未涉及参数，在RKMedia的调试中未使用。
+
+### VENC
+
+【调试信息】
+
+```shell
+# command
+cat /proc/mpp_service/session_summary
+# output
+------------------------------------------------------------------------------------------------------------
+| session|  device|   width|  height|  format|  fps_in| fps_out| rc_mode| bitrate|gop_size|fps_calc| profile|
+|8cdb338a|  RKVENC|    2688|    1520|     avc|      25|      16|     vbr| 7549747|      50|   19.49|    high|
+------------------------------------------------------------------------------------------------------------
+| session|  device|
+|0a1be0b6|   VEPU2|
+------------------------------------------------------------------------------------------------------------
+| session|  device|   width|  height|  format|  fps_in| fps_out| rc_mode| bitrate|gop_size|fps_calc| profile|
+|6e6fd71b|  RKVENC|     704|     576|     avc|      25|      25|     cbr|  943718|      50|   30.60|    high|
+------------------------------------------------------------------------------------------------------------
+| session|  device|   width|  height|  format|  fps_in| fps_out| rc_mode| bitrate|gop_size|fps_calc| profile|
+|a87d7eac|  RKVENC|    1920|    1080|    hevc|      25|      25|     cbr| 1887436|      50|   30.51|    main|
+```
+
+【调试信息分析】
+
+查看VENC各通道参数，可判断创建通道/修改通道参数是否正常。
+
+【参数说明】
+
+| 参数名   | 描述           |
+| -------- | -------------- |
+| width    | 分辨率宽       |
+| height   | 分辨率高       |
+| format   | 格式           |
+| fps_in   | 输入帧率       |
+| fps_out  | 输出帧率       |
+| rc_mode  | 码率控制模式   |
+| bitrate  | 码率           |
+| gop_size | I帧间隔        |
+| fps_calc | 实际计算的帧率 |
+| profile  | 编码器profile  |
+
+说明：未涉及参数，在RKMedia的调试中未使用。
+
+## LOG调试等级说明
+
+支持动态修改当前各个模块的调试级别。
+
+修改某个模块的调试等级使用 echo命令，例如：
+
+`echo "venc=3" > /tmp/loglevel`
+
+修改所有模块的调试等级使用：
+
+`echo "all=3" > /tmp/loglevel`
+
+支持[MOD_ID_E](#MOD_ID_E)中所列模块，模块名称均为小写。
+
+数字0~3分别对应ERROR、WARN、INFO、DEBUG四个级别。
+
+## 示例
+
+以下提供功能示例，使用注意事项如下：
+
+1. 运行示例前需保证无其他应用占用示例所用节点，如mediaserver。
+2. 运行ISP相关示例时，需保证无其他ISP应用运行，如ispserver。
+
+### 音频类示例
+
+#### rkmedia_ai_test
+
+【说明】
+
+由设备输入音频保存至文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_ai_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_ai_test
+```
+
+【选项】
+
+| 选项 | 描述           | 默认值      |
+| ---- | -------------- | ----------- |
+| -d   | 音频输入节点名 | default     |
+| -r   | 输入采样率     | 16000       |
+| -c   | 输入通道号     | 2           |
+| -o   | 输出文件路径   | /tmp/ai.pcm |
+
+【注意】
+
+示例仅支持保存至pcm文件。格式为s16_le。
+
+#### rkmedia_ai_aenc_test
+
+【说明】
+
+将设备输入的音频编码为aac文件（含adts头）。请先获得FFMPEG AAC编码器授权后，开启ffmpeg中aac编码器选项，然后再运行此示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_ai_aenc_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_ai_aenc_test
+```
+
+【选项】
+
+| 选项 | 描述           | 默认值        |
+| ---- | -------------- | ------------- |
+| -d   | 音频输入节点名 | default       |
+| -r   | 输入采样率     | 16000         |
+| -c   | 输入通道号     | 2             |
+| -o   | 输出文件路径   | /tmp/aenc.aac |
+
+【注意】
+
+格式为s16_le。
+
+#### rkmedia_ao_test
+
+【说明】
+
+读取音频文件并播放。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_ao_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_ao_test -i /tmp/ao.pcm
+```
+
+【选项】
+
+| 选项 | 描述           | 默认值  |
+| ---- | -------------- | ------- |
+| -d   | 音频输入节点名 | default |
+| -r   | 输入采样率     | 16000   |
+| -c   | 输入通道号     | 2       |
+| -i   | 输入文件路径   | 无      |
+| -s   | 输出帧数       | 1024    |
+
+【注意】
+
+示例仅支持保存至pcm文件。格式为s16_le。
+
+#### rkmedia_adec_ao_test
+
+【说明】
+
+读取aac编码文件（adts封装）解码播放。请先获得FFMPEG AAC解码器授权后，开启ffmpeg中aac解码器选项，然后再运行此示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_adec_ao_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_adec_ao_test -i /tmp/aenc.aac
+```
+
+【选项】
+
+| 选项 | 描述           | 默认值        |
+| ---- | -------------- | ------------- |
+| -d   | 音频输出节点名 | default       |
+| -r   | 输出采样率     | 16000         |
+| -c   | 输出通道号     | 2             |
+| -i   | 输入文件路径   | /tmp/aac.adts |
+
+【注意】
+
+该示例固定编码格式为aac。输出格式为s16_le。
+
+#### rkmedia_audio_test
+
+【说明】
+
+音频功能演示示例。支持AI->AENC->AO循环，AI->AENC->File，File->ADEC->AO，AI输入Vqe增强后AO输出四种模式。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_audio_test.c
+
+【快速使用】
+
+```shell
+# AI->AENC->AO
+./rkmedia_audio_test 0 16000
+
+# AI->AENC->File
+./rkmedia_audio_test 1 16000
+
+# File->ADEC->AO
+./rkmedia_audio_test 2 16000
+
+# AI输入Vqe增强后AO输出
+./rkmedia_audio_test 3 16000
+```
+
+【选项】
+
+| 选项                | 描述                                                         | 默认值            |
+| ------------------- | ------------------------------------------------------------ | ----------------- |
+| 第一个<br />输入参数 | 必选项，<br />0为AI->AENC->AO，<br />1为AI->AENC->File，<br />2为File->ADEC->AO，<br />3为AI输入Vqe增强后AO输出。 | 无                |
+| 第二个<br />输入参数 | 采样率。可选项：0，16000，22050，24000， 32000，44100，48000。 | 无                |
+| 第三个<br />输入参数 | 输出文件路径                                                 | /userdata/out.mp2 |
+
+【注意】
+
+该示例固定编码格式为aac。输出格式为s16_le。
+
+### 基础视频类示例
+
+#### rkmedia_vi_get_frame_test
+
+【说明】
+
+设备输入保存至文件。演示VI没有Bind时如何取视频流。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_get_frame_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_get_frame_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -h \| --height | 分辨率高。                                                   | 1080              |
+| -w \| --width             | 分辨率宽。                                           | 1920 |
+| -d \| --device_name | 设备节点。 | rkispp_scale0 |
+| -o \| --output | 输出文件路径，未设置则不输出。 | /tmp/1080p.nv12 |
+| -c \| --frame_cnt | 输出帧数，设置-1不限制。<br />未设置输出路径不生效。 | -1 |
+| -? \| --help | 显示帮助信息。 | 无 |
+
+【注意】
+
+输出格式为nv12。
+
+#### rkmedia_vi_luma_only_mode_test
+
+【说明】
+
+VI亮度统计示例。演示VI在没Bind时如何启用亮度模式。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_luma_only_mode_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_luma_only_mode_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_vi_multi_bind_test
+
+【说明】
+
+单VI通道绑定多VENC通道演示。
+
+【代码路径】
+
+external/rkmedia/examples/rrkmedia_vi_multi_bind_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_multi_bind_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_vi_venc_test
+
+【说明】
+
+设备输入编码后保存至文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_venc_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_venc_test -o /tmp/venc_output.h264
+```
+
+【选项】
+
+| 选项                | 描述                                                         | 默认值                |
+| ------------------- | ------------------------------------------------------------ | --------------------- |
+| -a \| --aiq         | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/     |
+| -h \| --height      | 分辨率高。                                                   | 1080                  |
+| -w \| --width       | 分辨率宽。                                                   | 1920                  |
+| -d \| --device_name | 设备节点。                                                   | rkispp_scale0         |
+| -o \| --output | 输出文件路径。                                               | /tmp/venc_output.h264 |
+| -c \| --frame_cnt   | 输出帧数。                                                   | 150                   |
+| -e \| --encode      | 编码格式，<br />0制定H264编码，<br />1制定H265编码             | 0                     |
+| -? \| --help | 显示帮助选项。                        | 无。       |
+
+【注意】
+
+无。
+
+#### rkmedia_vi_vo_test
+
+【说明】
+
+VI经rkmedia内置RGA实现单屏双窗口同时播放。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_vo_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_vo_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_venc_avbr_test
+
+【说明】
+
+VENC AVBR模式演示。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_avbr_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_avbr_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值                |
+| -------------- | ------------------------------------------------------------ | --------------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/     |
+| -o \| --output | 输出路径。                                                   | /userdata/output.h265 |
+| -? \| --help   | 显示帮助选项。                                               | 无。                  |
+
+【注意】
+
+输出格式为H265。
+
+#### rkmedia_venc_jpeg_light_test
+
+【说明】
+
+jpeg_light通道使用演示示例。启动后输入回车实时进行jpeg截图保存至tmp目录下，输入quit退出。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_jpeg_light_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_jpeg_light_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_venc_jpeg_test
+
+【说明】
+
+rkmedia内置RGA模块设置位图叠加，并通过jpeg通道保存。启动后输入回车实时进行jpeg截图保存至tmp目录下，输入quit退出。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_jpeg_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_jpeg_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -w \| --width  | 输出分辨率宽。                                               | 720               |
+| -h \| --height | 输出分辨率高。                                               | 480               |
+| -W \| --Width  | 输入分辨率宽。                                               | 1920              |
+| -H \| --Height | 输出分辨率高。                                               | 1080              |
+| -o \| --output | 输出文件夹路径                                               | /tmp/             |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+输出分辨率不可超过4096*4096。
+
+#### rkmedia_venc_local_file_test
+
+【说明】
+
+本地nv12文件经venc编码后保存至本地文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_local_file_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_local_file_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -e \| --encode      | 编码格式，<br />0设定H264编码，<br />1设定H265编码    | 0                     |
+| -i \| --input | 输入路径。                                                  | /tmp/1080p.nv12 |
+| -o \| --output | 输出路径。                                                   | /tmp/output.h264 |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+【注意】
+
+无。
+
+#### rkmedia_venc_smartp_test
+
+【说明】
+
+smartp模式使用示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_smartp_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_smartp_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -o \| --output | 输出文件夹路径，文件名固定                                   | /tmp/output.h264  |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+输出格式h264。
+
+#### rkmedia_main_stream_with_jpeg_test
+
+【说明】
+
+bypass节点经VI，VENC输出h265文件。输入回车可进行实时抓拍。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_main_stream_with_jpeg_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_main_stream_with_jpeg_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -o \| --output | 输出文件夹路径，文件名固定。                                 | /tmp/             |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_vdec_test
+
+【说明】
+
+输入文件解码后输出。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vdec_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vdec_test -w 720 -h 480 -p /userdata/out.jpeg -f 0 -t JPEG
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -w  | 输入文件分辨率宽                                 | 1280             |
+| -h  | 输入文件分辨率高                                 | 720             |
+| -p  | 输入文件路径                                 | 无             |
+| -o | 输出文件夹路径，<br />未指定此参数时，将输出至显示屏，<br />指定后将输出至文件               | 无             |
+| -f  | 解码方式，0：软件解码，1：硬件解码                                 | 1             |
+| -t  | 输入文件编码格式，支持JPEG，MJPEG，H264，H265                                 | 无             |
+| -c  | 输出帧数，设置-1取消限制                                 | -1             |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_vo_display_test
+
+【说明】
+
+VO播放示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vo_display_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vo_display_test
+```
+
+【选项】
+
+| 选项         | 描述                                   | 默认值         |
+| ------------ | -------------------------------------- | -------------- |
+| -d          | VO输出节点。                           | /dev/dri/card0 |
+| -t           | 层类型。<br />可选：Primary，Overlay。 | Primary        |
+| -s           | 随机播放坐标宽高。<br />0：关闭；<br />1：开启。 | 0       |
+| -x          | 播放坐标x。 | 0        |
+| -y          | 播放坐标y。 | 0        |
+| -w         | 播放宽度。 | 720      |
+| -h          | 播放高度。 | 1080     |
+| -f          | 播放频率。 | 60    |
+| -z          | 播放层z坐标。<br />可选0，1，2。 | 0        |
+| -? | 显示帮助选项。                         | 无。           |
+
+【注意】
+
+无。
+
+#### rkmedia_vo_scale_test
+
+【说明】
+
+VI输入，VO输出示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vo_scale_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vo_scale_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+### RGA&OSD相关示例
+
+#### rkmedia_venc_cover_test
+
+【说明】
+
+RKMedia内置RGA API隐私遮盖示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_cover_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_cover_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值                |
+| -------------- | ------------------------------------------------------------ | --------------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/     |
+| -o \| --output | 输出路径。                                                   | /userdata/output.h264 |
+| -? \| --help   | 显示帮助选项。                                               | 无。                  |
+
+【注意】
+
+输出格式为H264。
+
+#### rkmedia_venc_mjpeg_test
+
+【说明】
+
+VI输入，经RKMedia内置RGA API设置位图遮盖，再经由VENC编码mjpeg后输出文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_mjpeg_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_mjpeg_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -m \| --mode   | 码率类型，<br />cbr设定定码率，<br />vbr设定变码率             | vbr               |
+| -o \| --output | 输出路径。                                                   | /tmp/test.mjpg    |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_venc_osd_test
+
+【说明】
+
+VI输入，经RKMedia内置RGA API设置随机OSD位图遮盖，再经由VENC编码mjpeg后输出文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_osd_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_osd_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -o \| --output | 输出路径。                                                   | /tmp/output.h264  |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+输出格式h264。
+
+#### rkmedia_venc_roi_osd_test
+
+【说明】
+
+三路设置不同大小ROI以及OSD叠加，并输出文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_venc_roi_osd_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_venc_roi_osd_test
+```
+
+【选项】
+
+| 选项           | 描述                                                         | 默认值            |
+| -------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq    | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -o \| --output | 输出文件夹路径，文件名固定                                   | /tmp/             |
+| -? \| --help   | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+输出格式h264。
+
+#### rkmedia_rga_api_test
+
+【说明】
+
+VI输入，经外部RGA库裁剪，VO输出示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_rga_api_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_rga_api_test
+```
+
+【选项】
+
+| 选项              | 描述                                                         | 默认值            |
+| ----------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq       | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -H \| --vi_height | VI输入分辨率高。                                             | 1920。            |
+| -W \| --vi_width  | VI输入分辨率宽。                                             | 1080。            |
+| -h \| --crop_height | 裁剪分辨率高。                                             | 640。             |
+| -w \| --crop_width | 裁剪分辨率宽。                                               | 640。         |
+| -x \| --crop_x | 裁剪坐标X，VI左上角为原点。                                       | 300。             |
+| -y \| --crop_y | 裁剪坐标Y，VI左上角为原点。                                       | 300。             |
+| -d \| --device_name | 输入节点。                                       		  | rkispp_scale0。   |
+| -? \| --help      | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+未分配/dev/dri/card0节点设备无法使用。
+
+#### rkmedia_rga_crop_venc_test
+
+【说明】
+
+VI输入，经外部RGA库裁剪，VENC编码，rtsp直播输出示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_rga_crop_venc_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_rga_crop_venc_test
+```
+
+【选项】
+
+| 选项                | 描述                                                         | 默认值            |
+| ------------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq         | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -H \| --vi_height   | VI输入分辨率高。                                             | 1920。            |
+| -W \| --vi_width    | VI输入分辨率宽。                                             | 1080。            |
+| -h \| --crop_height | 裁剪分辨率高。                                               | 640。             |
+| -w \| --crop_width  | 裁剪分辨率宽。                                               | 640。             |
+| -x \| --crop_x      | 裁剪坐标X，VI左上角为原点。                                  | 300。                |
+| -y \| --crop_y      | 裁剪坐标Y，VI左上角为原点。                                  | 300。                |
+| -r \| --rotation    | VENC旋转，<br />支持0，90，180，270。                        | 0。                  |
+| -d \| --device_name | 输入节点。                                                   | rkispp_scale0。   |
+| -? \| --help        | 显示帮助选项。                                               | 无。               |
+
+【注意】
+
+直播网址rtsp://\<ip\>/live/main_stream。
+
+#### rkmedia_rga_osd_test
+
+【说明】
+
+VI输入，经外部RGA添加OSD叠加，VENC编码，jpeg输出示例。使用透明OSD层与非透明混用可实现OSD文字。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_rga_osd_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_rga_osd_test
+```
+
+【选项】
+
+| 选项                | 描述                                                         | 默认值            |
+| ------------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq         | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -m \| --mode   | 模式选择，0为实心长方形模式，1为画框模式。                       | 0。            |
+| -r \| --raw_frame    | 未经RGA处理帧保存帧数。                                             | 0。            |
+| -p \| --process_frame | 经RGA处理保存帧数。                                               | 1。             |
+| -o \| --output  | 输出jpeg文件夹路径。                                             | /tmp/。             |
+| -? \| --help        | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+### ISP示例
+
+#### rkmedia_isp_test
+
+【说明】
+
+ISP功能示例，启动后，根据菜单提示切换ISP设置。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_isp_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_isp_test
+```
+
+【选项】
+
+| 选项                  | 描述                                       | 默认值            |
+| --------------------- | ------------------------------------------ | ----------------- |
+| -a \| --aiq           | 指定aiq文件所在文件夹路径。                | /oem/etc/iqfiles/ |
+| -? \| --help          | 显示帮助选项。                             | 无。              |
+
+【注意】
+
+此示例运行时需保证未开启ispserver。
+
+#### rkmedia_vi_double_cameras_test
+
+【说明】
+
+双目ISP示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_double_cameras_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_double_cameras_test
+```
+
+【选项】
+
+| 选项 | 描述                                                         | 默认值 |
+| ---- | ------------------------------------------------------------ | ------ |
+| -a   | 指定aiq文件所在文件夹。<br />若未指定需在其他应用中开启ISP相关服务。 | 无     |
+| -W   | 输入视频分辨率宽。                                           | 1920   |
+| -H   | 输入视频分辨率高。                                           | 1080   |
+| -w   | 输出视频分辨率宽。                                           | 720    |
+| -h   | 输出视频分辨率高。                                           | 1280   |
+| -u   | ui z层高度，取值范围[0, 1]                                   | 1      |
+
+【注意】
+
+无。
+
+#### rkmedia_vi_double_cameras_switch_test
+
+【说明】
+
+双目ISP示例，根据输入参数，可选择VO播放通路。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_double_cameras_switch_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_double_cameras_switch_test
+```
+
+【选项】
+
+| 选项       | 描述                                                         | 默认值 |
+| ---------- | ------------------------------------------------------------ | ------ |
+| -a   | 指定aiq文件所在文件夹。<br />若未指定需在其他应用中开启ISP相关服务。 | 无     |
+| -W   | 输入视频分辨率宽。                                           | 1920   |
+| -H   | 输入视频分辨率高。                                           | 1080   |
+| -w   | 输出视频分辨率宽。                                           | 720    |
+| -h   | 输出视频分辨率高。                                           | 1280   |
+| -u   | ui z层高度，取值范围[0, 1]                                   | 1      |
+| -i   | 输出channel id，取值范围[0, 1]                                   | 0      |
+
+【注意】
+
+此示例运行时需保证未开启ispserver。
+
+### 智能分析使用示例
+
+#### rkmedia_vi_md_test
+
+【说明】
+
+移动侦测功能示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_md_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_md_test
+```
+
+【选项】
+
+| 选项                  | 描述                                                         | 默认值            |
+| --------------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq           | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help          | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_vi_od_test
+
+【说明】
+
+遮挡检测功能示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_od_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_od_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+无。
+
+#### rkmedia_vi_rknn_venc_rtsp_test
+
+【说明】
+
+基于rknn_api的人脸识别功能示例。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_rknn_venc_rtsp_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_rknn_venc_rtsp_test
+```
+
+【选项】
+
+| 选项         | 描述                                                         | 默认值            |
+| ------------ | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -c \| --cfg_path | rtsp配置文件。                                               | /oem/usr/share/rtsp-nn.cfg。              |
+| -b \| --box_priors | box priors文件。                                           | /oem/usr/share/rknn_model/box_priors.txt。              |
+| -l \| --labels_list | labels list文件。                                         | /oem/usr/share/rknn_model/coco_labels_list.txt。        |
+| -p \| --ssd_path | ssd文件。                                               | /oem/usr/share/rknn_model/<br />ssd_inception_v2_rv1109_rv1126.rknn。         |
+| -? \| --help | 显示帮助选项。                                               | 无。              |
+
+【注意】
+
+默认RTSP地址：rtsp://\<ip\>/live/main_stream。
+
+#### rkmedia_vi_rockx_venc_rtsp_test
+
+【说明】
+
+基于rockx的人脸识别以及人形功能示例。包含识别画框以及识别结果抓拍。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_rockx_venc_rtsp_test.c
+
+【快速使用】
+
+```shell
+./rkmedia_vi_rockx_venc_rtsp_test
+```
+
+【选项】
+
+| 选项                | 描述                                                         | 默认值                                                       |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| -a \| --aiq         | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/                                            |
+| -c \| --cfg_path    | rtsp配置文件。                                               | /oem/usr/share/rtsp-nn.cfg                                 |
+| -r \| --runtime_path | runtime文件路径。                                    | /usr/lib/librknn_runtime.so                                 |
+| -v \| --data_version  | 模型库，<br />0：PERSON_DETECTION_V2；<br />1：PERSON_DETECTION_V3；<br />2：FACE_DETECTION_V2；<br />3：FACE_DETECTION_V3_LARGE；<br /> | 0                  |
+| -l \| --limit_score | 检测分数下限。                                  | 人形检测：0.45；<br />人脸检测V2：0.75；<br />人脸检测V3：0.8。 |
+| -p \| --photo_dirpath | 识别抓拍保存路径。                                           | /tmp/                                                       |
+| -t \| --time_log | 时间统计日志等级。<br />0：禁用；<br />1：检测耗时日志；<br />2：画框耗时日志；<br />3：所有日志。 | 0                                                    |
+| -f \| --fps | ISP帧率。 | 30                                                  |
+| -m \| --hdr_mode | HDR模式。<br />0：普通模式；<br />1：HDR2模式。 | 0                                                    |
+| -? \| --help        | 显示帮助选项。                                               | 无                                                         |
+
+【注意】
+
+默认RTSP地址：rtsp://\<ip\>/live/main_stream。
