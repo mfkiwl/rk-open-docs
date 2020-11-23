@@ -2,9 +2,9 @@
 
 ID: RK-FB-CS-002
 
-Release Version: V2.5.0
+Release Version: V2.5.1
 
-Release Date: 2020-10-13
+Release Date: 2020-12-03
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -50,9 +50,9 @@ Software development engineers
 
 **Chipset and System Support**
 
-| **Chipset** | **Buildroot** | **Debian 9** | **Debian 10** | **Yocto** |
-| ----------- | :-------------- | :------------- | :---------- | :---------- |
-| RK3399      | Y               | Y              | Y           | Y           |
+| **Chipset** | **Buildroot** | **Debian 10** | **Yocto** |
+| ----------- | :------------ | :------------ | :-------- |
+| RK3399      | Y             | Y             | Y         |
 
 ---
 
@@ -73,6 +73,7 @@ Software development engineers
 | 2020-04-30 | V2.4.0 | Caesar Wang | Rewrite the document with Markdown <br/>Add and use RK3399 EVB IND by default。 |
 | 2020-7-22 | V2.4.1 | Ruby Zhang | Update the company name, <br/>the format and the file name of the document |
 | 2020-10-13 | V2.5.0 | Ruby Zhang | Compilation rules for adapting to new version |
+| 2020-12-03 | V2.5.1 | Caesar Wang | debian9/10 merge to debian |
 
 ---
 
@@ -84,7 +85,7 @@ Software development engineers
 
 ## Overview
 
-This SDK is based on Buildroot 2018.02-rc3, Yocto Thud 3.0, Debian 9 and Debian 10 or later version with kernel 4.4 and U-boot v2017.09. It is suitable for RK3399 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, Qt and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
+This SDK is based on Buildroot 2018.02-rc3, Yocto Thud 3.0, and Debian 10 or later version with kernel 4.4 and U-boot v2017.09. It is suitable for RK3399 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, Qt and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
 
 ## Main Functions
 
@@ -107,7 +108,8 @@ RK3399_Linux_SDK  download command is as follows：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
-ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399_linux_release.xml
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m \
+rk3399_linux_release.xml
 ```
 
 Repo, a tool built on Python script by Google to help manage git repositories, is mainly used to download and manage software repository of projects. The download address is as follows:
@@ -119,17 +121,17 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rk3399_linux_sdk_release_v2.5.0_20201013.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take rk3399_linux_sdk_release_v2.5.1_20201203.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk3399
-tar xvf rk3399_linux_sdk_release_v2.5.0_20201013.tgz -C rk3399
+tar xvf rk3399_linux_sdk_release_v2.5.1_20201203.tgz -C rk3399
 cd rk3399
 .repo/repo/repo sync -l
-.repo/repo/repo sync -c
+.repo/repo/repo sync -c --no-tags
 ```
 
-Developers can update via `.repo/repo/repo sync -c` command according to update instructions that are regularly released by FAE window.
+Developers can update via `.repo/repo/repo sync -c --no-tags` command according to update instructions that are regularly released by FAE window.
 
 ## Software Development Guide
 
@@ -175,17 +177,15 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 
 - app: store application APPs like qcamera/qfm/qplayer/qseting and other applications.
 - buildroot: root file system based on Buildroot (2018.02-rc3).
-- debian: root file system based on Debian 9.
-- device/rockchip: store board-level configuration for each chip and some scripts and prepared files for compiling and packaging firmware.
+- debian: root file system based on Debian.
+- device/rockchip: store board-level configuration for each chip and some scripts and prepared files for building and packaging firmware.
 - docs: stores development guides, platform support lists, tool usage, Linux development guides, and so on.
-- distro: a root file system based on Debian 10.
-- IMAGE: stores compilation time, XML, patch and firmware directory for each compilation.
+- IMAGE: stores building time, XML, patch and firmware directory for each building.
 - external: stores some third-party libraries, including audio, video, network, recovery and so on.
 - kernel: stores kernel4.4 development code.
-- npu: store npu code.
-- prebuilts: stores cross-compilation toolchain.
+- prebuilts: stores cross-building toolchain.
 - rkbin: stores Rockchip Binary and tools.
-- rockdev: stores compiled output firmware.
+- rockdev: stores building output firmware.
 - tools: stores some commonly used tools under Linux and Windows system.
 - u-boot: store U-Boot code developed based on v2017.09 version.
 - yocto: stores the root file system developed based on Yocto Thud 3.0.
@@ -202,9 +202,10 @@ Software requirements: Ubuntu 18.04 system:
 Please install software packages with below commands to setup SDK compiling environment:
 
 ```shell
-sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath \
-gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build bison flex fakeroot \
-cmake
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool \
+expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support \
+qemu-user-static live-build bison flex fakeroot cmake gcc-multilib g++-multilib unzip \
+device-tree-compiler python-pip ncurses-dev pyelftools \
 ```
 
 It is recommended to use Ubuntu 18.04 system or higher version for development. If you encounter an error during compilation, you can check the error message and install the corresponding software packages.
@@ -288,8 +289,7 @@ buildroot          -build buildroot rootfs
 ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
-debian             -build debian9 stretch rootfs
-distro             -build debian10 buster rootfs
+debian             -build debian rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
@@ -331,7 +331,7 @@ Enter root directory of project directory and execute the following commands to 
                # Note：./build.sh  and  ./build.sh allsave command are the same
 ```
 
-It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are four types of system for RK_ROOTFS_SYSTEM: buildroot, Debian, distro and yocto. In which, debian is used to build Debian 9 system, distro is used to build debian10 system
+It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are three types of system for RK_ROOTFS_SYSTEM: buildroot, Debian, and yocto.
 
 For example, if you need debain, you can generate it with the following command:
 
@@ -402,7 +402,7 @@ cd buildroot/output/rockchip_rk3399/host/usr/bin
 Then the following logs are printed:
 
 ```
-aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
+gcc version 9.3.0 (Buildroot 2018.02-rc3-02723-gd3fbc6ae13)
 ```
 
 ##### Build Modules in Buildroot
@@ -429,7 +429,7 @@ or
 SDK$rm -rf /buildroot/output/rockchip_rk3399/build/qlayer-1.0
 ```
 
-#### Debian 9  Build
+#### Debian Building
 
 ```
  ./build.sh debian
@@ -437,13 +437,13 @@ SDK$rm -rf /buildroot/output/rockchip_rk3399/build/qlayer-1.0
 
 Or enter debian/ directory:
 
-```shell
+```
 cd debian/
 ```
 
-The following compilation and debian firmware generation, you can refer to “readme.md” in the current directory.
+Please refer to the readme.md in the directory for further building and Debian firmware generation.
 
-**(1) Building Base Debian System**
+**(1) Building base Debian system**
 
 ```
 sudo apt-get install binfmt-support qemu-user-static live-build
@@ -451,61 +451,59 @@ sudo dpkg -i ubuntu-build-service/packages/*
 sudo apt-get install -f
 ```
 
-Compile 64-bit Debian:
+Build 64 bit Debian:
 
 ```shell
-RELEASE=stretch TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
+RELEASE=buster TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
 ```
 
-After compiling, linaro-stretch-alip-xxxxx-1.tar.gz (xxxxx is generated timestamp will be generated in debian/ directory.)
+After building, linaro-buster-alip-xxxxx-1.tar.gz (xxxxx is timestamp generated) will be generated in “debian/”:
 
 FAQ:
-If you encounter the following problem during above compiling:
+
+- If you encounter the following problem during above building:
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-arm64/chroot/test-dev-null: Permission denied E: Cannot install into target
-...
-mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/buster-desktop-arm64/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/buster-desktop-arm64/chroot' mounted with noexec or nodev
 ```
 
 Solution：
 
 ```
-mount -o remount,exec,dev xxx
-(xxx is the project directory path, then rebuild)
+mount -o remount,exec,dev xxx (xxx is the project directory), and then rebuild
 ```
 
-In addition, if there are other compilation issues, please check firstly that the compiler system is not ext2/ext4.
+In addition, if there are other building issues, please check firstly that the building system is not ext2/ext4.
 
-- Building Base Debian need to access to foreign websites, it often fail to download in domestic networks.
+- Because building Base Debian requires to access to foreign websites, and when domestic networks access foreign websites, download failures often occur:
 
-Debian 9 uses live build, it can be configured like below to change the image source to domestic
+The live build is used in Debian10, you can configure like below to change the image source to domestic:
 
 ```diff
-+++ b/ubuntu-build-service/stretch-desktop-arm64/configure
++++ b/ubuntu-build-service/buster-desktop-arm64/configure
 @@ -11,6 +11,11 @@ set -e
  echo "I: create configuration"
  export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
  lb config \
-+ --mirror-bootstrap "http://mirrors.163.com/debian" \
-+ --mirror-chroot "http://mirrors.163.com/debian" \
-+ --mirror-chroot-security "http://mirrors.163.com/debian-security" \
-+ --mirror-binary "http://mirrors.163.com/debian" \
-+ --mirror-binary-security "http://mirrors.163.com/debian-security" \
++ --mirror-bootstrap "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security" \
++ --mirror-binary "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-binary-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security"
   --apt-indices false \
   --apt-recommends false \
   --apt-secure false \
 ```
 
-If the package cannot be downloaded for other network reasons, a pre-build package is shared in [Baidu Cloud Network Disk](<<https://eyun.baidu.com/s/3bqwrvo7>), put it in the current directory, and then do the next step directly.
+If the package cannot be downloaded for other network reasons, there are pre-build packages shared on [Baidu Cloud Disk](https://eyun.baidu.com/s/3mjGXBHA), put it in the current directory, and then do the next step directly.
 
 **(2) Building rk-debian rootfs**
 
-Compile 64-bit Debian:
+Build 64bit Debian：
 
 ```shell
-VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
+VERSION=debug ARCH=arm64 ./mk-rootfs-buster.sh
 ```
 
 **(3) Creating the ext4 image(linaro-rootfs.img)**
@@ -514,28 +512,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 ./mk-image.sh
 ```
 
-Will generate linaro-rootfs.img.
-
-#### Debian 10 Build
-
-```
-./build.sh distro
-```
-
-Or enter distro/directory:
-
-```
-cd distro/ && make ARCH=arm64 rk3399_defconfig && ./make.sh
-```
-
-After building, the rootfs.ext4 will be generated in the distro directory “distro/output/images/”.
-**Note**: The current build of Debian10 Qt also depends on the build of Buildroot qmake, so please build Buildroot before building Debian10.
-
-Please refer to the following document for more introductions about Debian10.
-
-```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Debian10_EN.pdf
-```
+The linaro-rootfs.img will be generated.
 
 #### Yocto Build
 
@@ -606,7 +583,7 @@ As shown below, after compiling the corresponding firmware, device should enter 
 Note：Before upgrade, please install the latest USB driver, which is in the below directory:
 
 ```
-<SDK>/tools/windows/DriverAssitant_v4.91.zip
+<SDK>/tools/windows/DriverAssitant_v5.0.zip
 ```
 
 ### Linux Upgrade Instruction
@@ -667,28 +644,21 @@ Default partition introduction (below is RK3399 IND reference partition):
 
 ## RK3399 SDK Firmware
 
-RK3399_LINUX_SDK_V2.4.0_20200430 firmware download address is as follows (including  Buildroot/Debian 9/Debian 10/Yocto firmwares):
+- Baidu Cloud Disk
 
-- RK3399 IND industry development boards:
+[Buildroot](https://eyun.baidu.com/s/3cXqTDs)
 
-[Buildroot](https://eyun.baidu.com/s/3c3V1eLi)
-[Yocto](https://eyun.baidu.com/s/3i6O5qGd)
-[Debian9](https://eyun.baidu.com/s/3mj2K14G)
-[Debian10](https://eyun.baidu.com/s/3gfW0JhL)
+[Debian rootfs](https://eyun.baidu.com/s/3smu2OH3)
 
-- RK3399 excavator development boards:
+[Yocto rootfs](https://eyun.baidu.com/s/3dPzAwA)
 
-[Buildroot](https://eyun.baidu.com/s/3i6lVGvb)
-[Yocto](https://eyun.baidu.com/s/3c36y74W)
-[Debian9](https://eyun.baidu.com/s/3i6udoET)
-[Debian10](https://eyun.baidu.com/s/3eTDMjqq)
+- Microsoft OneDriver
 
-- RK3399 Firefly development boards:
+[Buildroot](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EmhOOhNkIeNOpDXUs7VDOVUBz48yh4rOWu-QzvLyfz6tZQ?e=D0Pmi8)
 
-[Buildroot](https://eyun.baidu.com/s/3dqTCi6)
-[Yocto](https://eyun.baidu.com/s/3kWtth1H)
-[Debian9](https://eyun.baidu.com/s/3jKkicsu)
-[Debian10](https://eyun.baidu.com/s/3kWCpXB5)
+[Debian rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EgPPa1EfzepNoK_t6fIuSQgBZKoezSjV_N4_HQ2h0g0JNg?e=ITLyGT)
+
+[Yocto rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/Epq-ccBCajpGmxdZJJRkxYYBYRVbG9WflU_6AupdqZyQtQ?e=k19l9i)
 
 ## SSH Public Key Operation Introduction
 

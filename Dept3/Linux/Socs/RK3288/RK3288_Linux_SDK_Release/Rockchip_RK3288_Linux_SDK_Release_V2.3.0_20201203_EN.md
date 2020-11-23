@@ -2,9 +2,9 @@
 
 ID: RK-FB-CS-006
 
-Release Version: V2.2.0
+Release Version: V2.3.0
 
-Release Date: 2020-07-08
+Release Date: 2020-12-03
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -50,9 +50,9 @@ Software development engineers
 
 **Chipset and System Support**
 
-| **Chipset** | **Buildroot** | **Debian 9** | **Debian 10** | **Yocto** |
-| ----------- | :-------------- | :------------- | :---------- | :---------- |
-| RK3288      | Y               | Y              | Y           | N           |
+| **Chipset** | **Buildroot** | **Debian** | **Yocto** |
+| ----------- | :-------------- | :------------- | :---------- |
+| RK3288      | Y               | Y              | Y          |
 
 **Revision History**
 
@@ -64,6 +64,7 @@ Software development engineers
 | 2018-06-20 | V2.0.0      | Nickey Yang | Update SDK buildroot to 2018.02 version.                     |
 | 2019-09-16 | V2.1.0 | Nickey Yang | Update the SDK building and flashing method |
 | 2020-07-08 | V2.2.0 | Caesar Wang | Add Debian10 support; <br/>Rewrite the release document in Markdown format |
+| 2020-12-13 | V2.3.0 | Caesar Wang | SDK update |
 
 ---
 
@@ -75,7 +76,7 @@ Software development engineers
 
 ## Overview
 
-This SDK is based on Buildroot 2018.02-rc3, Yocto Thud 2.6, Debian 9 and Debian 10 with kernel 4.4 and U-boot v2017.09. It is suitable for RK3288 EVB development boards and all other Linux products developed based on it.
+This SDK is based on Buildroot 2018.02-rc3, Yocto Thud 3.0, Debian 10 with kernel 4.4 and U-boot v2017.09. It is suitable for RK3288 EVB development boards and all other Linux products developed based on it.
 
 This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, Qt and other functions. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
 
@@ -88,16 +89,20 @@ This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, Qt and oth
 
 ## How to Get the SDK
 
-SDK is released by Rockchip server or got from [Github](https://github.com/rockchip-linux)  open source website. Please refer to Chapter 7 [SDK Building Introduciton](## 7 SDK Building Introduction) to setup a development environment.
+The SDK is released by Rockchip server. Please refer to Chapter 7 [SDK Building Introduction](# SDK Building Introduction) to set up a development environment.
 
-**The first way to get the SDK: get source code from Rockchip code server**
+### General RK3288 Linux SDK Obtain
 
-To get RK3288 Linux software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window. About Rockchip server SSH public key authorization, please refer to Chapter 10  [SSH  Public Key Operation Introduction](## 10 Public Key Operation Introduction).
+#### Get Source Code from Rockchip Code Server
+
+To get RK3288 Linux software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window. About Rockchip server SSH public key authorization, please refer to Chapter 10  [SSH  Public Key Operation Introduction](# Public Key Operation Introduction).
 
 The command for downloading RK3288_Linux_SDK is as follows:
 
 ```
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3288_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m \
+rk3288_linux_release.xml
 ```
 
 Repo, a tool built on Python script by Google to help manage git repositories, is mainly used to download and manage software repository of projects. The download address is as follows:
@@ -106,58 +111,22 @@ Repo, a tool built on Python script by Google to help manage git repositories, i
 git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
+#### Get Source Code from Local Compression Package
+
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rk3288_linux_sdk_release_v2.2.0_20200708.tgz  as an example. After getting an initialization package, you can get the source code by the following command:
+Take rk3288_linux_sdk_release_v2.3.0_20201203.tgz as an example. After getting an initialization package, you can get the source code by the following command:
 
 ```shell
 mkdir rk3288
-tar xvf rk3288_linux_sdk_release_v2.2.0_20200708.tgz -C rk3288
+tar xvf rk3288_linux_sdk_release_v2.3.0_20201203.tgz -C rk3288
 cd rk3288
 .repo/repo/repo sync -l
-.repo/repo/repo sync
+.repo/repo/repo sync -c --no-tags
 ```
 
-Developers can update via `.repo/repo/repo sync` command according to update instructions that are regularly released by FAE window.
-
-**The second way to get the SDK: get source code from Github open source website:**
-
-Download repo tools:
-
-```
-git clone https://github.com/rockchip-linux/repo.git
-```
-
-Make an rk3288 linux work directory:
-
-```
-mkdir rk3288_linux
-```
-
-Enter rk3288 linux work directory:
-
-```
-cd rk3288_linux/
-```
-
-Initialize the repo repository:
-
-```
-../repo/repo init --repo-url=https://github.com/rockchip-linux/repo -u https://github.com/rockchip-linux/manifests -b master -m rk3288_linux_release.xml
-```
-
-Synchronize the whole project:
-
-```
-../repo/repo sync
-```
-
-Note: If your project has already started, please choose the first way to get the code first. Unlike Github, it has passed by internal stress testing and version control. The second way is more suitable for enthusiasts and project evaluation.
+Developers can update via `.repo/repo/repo sync -c --no-tags` command according to update instructions that are regularly released by FAE window.
 
 ## Software Development Guide
-
-### Development Guide
-
-The Kernel version of  RK3288 Linux SDK Kernel is Kernel 4.4, Rootfs is Buidlroot(2018.02-rc3) and Debian9/10 respectively. To help engineers quick start of SDK development and debugging, “RK3288_Linux_SDK_Release_xxx.pdf” is released with the SDK. It can be obtained in the docs/RK3288 directory and will be continuously updated.
 
 ### Software Update History
 
@@ -170,13 +139,13 @@ Software release version upgrade can be checked through project xml file by the 
 Software release version updated information can be found through the project text file by the following command:
 
 ```
-.repo/manifests$ cat rk3288_linux_v2.0/RK3288_Linux_Release_Note.txt
+.repo/manifests$ cat rk3288_linux/RK3288_Linux_SDK_Release_Note.md
 ```
 
 Or refer to the project directory:
 
 ```
-<SDK>/docs/Socs/RK3288/RK3288_Linux_SDK_Release_Note.txt
+<SDK>/docs/RK3288/RK3288_Linux_SDK_Release_Note.md
 ```
 
 ## Hardware Development Guide
@@ -195,10 +164,9 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 
 - app: store application APPs like qcamera/qfm/qplayer/qseting and other applications.
 - buildroot: root file system based on Buildroot (2018.02-rc3).
-- debian: root file system based on Debian 9.
+- debian: root file system based on Debian 10.
 - device/rockchip: store board-level configuration for each chip and some scripts and prepared files for building and packaging firmware.
 - docs: stores development guides, platform support lists, tool usage, Linux development guides, and so on.
-- distro: a root file system based on Debian 10.
 - IMAGE: stores building time, XML, patch and firmware directory for each building.
 - external: stores some third-party libraries, including audio, video, network, recovery and so on.
 - kernel: stores kernel4.4 development code.
@@ -207,8 +175,11 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 - rockdev: stores building output firmware.
 - tools: stores some commonly used tools under Linux and Windows system.
 - u-boot: store U-Boot code developed based on v2017.09 version.
+- yocto: stores the root file system developed based on Yocto Thud 3.0.
 
 ## SDK Building Introduction
+
+### SDK Dependency Packages Installation
 
 This SDK development environment is developed and tested on Ubuntu system. We recommend using Ubuntu 18.04 system to build. Other Linux versions may need to modify the software package accordingly. In addition to system requirements, there are other hardware and software requirements.
 Hardware requirements: 64-bit system, hard drive space should be greater than 40G. If you do more builds, you will need more hard drive space.
@@ -217,87 +188,170 @@ Software requirements: Ubuntu 18.04 system:
 Please install software packages with below commands to setup SDK building environment:
 
 ```
-repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool \
+expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support \
+qemu-user-static live-build bison flex fakeroot cmake gcc-multilib g++-multilib unzip \
+device-tree-compiler python-pip ncurses-dev pyelftools \
 ```
 
 It is recommended to use Ubuntu 18.04 system or higher version for development. If you encounter an error during building, you can install the corresponding software packages according to the error message.
 
-### U-Boot Building
+### SDK Board Level Configuration
 
-Enter project u-boot directory and run `make.sh` to get rk3288_loader_v1.08.258.bin trust.img and
-uboot.img.
+Enter the project SDK/device/rockchip/rk3288 directory:
 
-RK3288 EVB development boards:
+| Board level configuration | Note                                            |
+| ----------------------------- | --------------------------------------------------- |
+|  BoardConfig-rk3288-evb-rk808.mk | Suitable for RK3288 EVB with RK808 development board |
+| BoardConfig-rk3288-firefly.mk     | Suitable forRK3288 Firefly development boards |
+| BoardConfig_rk3288-evb-act8846.mk | Suitable for RK3288 EVB with ACT8846 development board |
+
+The first way:
+
+Add board configuration file behind `/build.sh` , for example:
+
+Select the board configuration of  **RK3288 EVB with RK808 development board**:
 
 ```shell
-./make.sh rk3288
+ ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-evb-rk808.mk
 ```
 
-RK3288 Firefly development boards:
+Select the board configuration of the **RK3288 firefly development board**:
 
 ```shell
-./make.sh firefly-rk3288
+ ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-firefly.mk
 ```
 
-The generated files after building are in u-boot directory:
+Select the board-level configuration of the **RK3288 EVB with ACT8846 development board**:
 
-```
-u-boot/
-├── rk3288_loader_v1.08.258.bin
-├── trust.img
-└── uboot.img
+```shell
+./build.sh device/rockchip/rk3288/BoardConfig_rk3288-evb-act8846.mk
 ```
 
-### Kernel Building Steps
+The second way:
 
-Enter project root directory and run the following command to automatically build and package kernel:
+```shell
+rk3288$ ./build.sh lunch
+processing option: lunch
 
-RK3288 EVB RK808 development boards:
+You're building on Linux
+Lunch menu...pick a combo:
 
+0. default BoardConfig.mk
+1. BoardConfig-rk3288-evb-rk808.mk
+2. BoardConfig-rk3288-firefly.mk
+3. BoardConfig.mk
+4. BoardConfig_rk3288-evb-act8846.mk
+Which would you like? [0]:
+...
 ```
+
+### Compilation Commands
+
+Execute the command in the root directory: `./build.sh -h|help`
+
+```shell
+Usage: build.sh [OPTIONS]
+Available options:
+BoardConfig*.mk    -switch to specified board config
+lunch              -list current SDK boards and switch to specified board config
+uboot              -build uboot
+spl                -build spl
+loader             -build loader
+kernel             -build kernel
+modules            -build kernel modules
+toolchain          -build toolchain
+rootfs             -build default rootfs, currently build buildroot as default
+buildroot          -build buildroot rootfs
+ramboot            -build ramboot image
+multi-npu_boot     -build boot image for multi-npu board
+yocto              -build yocto rootfs
+debian             -build debian rootfs
+pcba               -build pcba
+recovery           -build recovery
+all                -build uboot, kernel, rootfs, recovery image
+cleanall           -clean uboot, kernel, rootfs, recovery
+firmware           -pack all the image we need to boot up system
+updateimg          -pack update image
+otapackage         -pack ab update otapackage image
+save               -save images, patches, commands used to debug
+allsave            -build all & firmware & updateimg & save
+check              -check the environment of building
+
+Default option is 'allsave'
+```
+
+View detailed build commands for some modules, for example: `./build.sh -h kernel`
+
+```shell
+rk3288$ ./build.sh -h kernel
+###Current SDK Default [ kernel ] Build Command###
 cd kernel
 make ARCH=arm rockchip_linux_defconfig
 make ARCH=arm rk3288-evb-rk808-linux.img -j12
 ```
 
-RK3288  EVB ACT8846 development boards:
+[^note]: The detailed compilation commands should depending on corresponding SDK version, and there may be some differences between configurations. But the build.sh build command is fixed.
 
-```
-cd kernel
-make ARCH=arm rockchip_linux_defconfig
-make ARCH=arm rk3288-evb-act8846.img -j12
-```
+### Automatic Build
 
-RK3288 Firefly development boards:
-
-```
-cd kernel
-make ARCH=arm rockchip_linux_defconfig
-make ARCH=arm rk3288-firefly.img -j12
-```
-
-The zboot.img including zimage and DTB of kernel will be generated in the kernel directory after building.
-
-### Recovery Building Steps
-
-Enter project root directory and execute the following command to automatically complete building and packaging of recovery:
+Enter root directory of project directory and execute the following commands to automatically complete all build:
 
 ```shell
+./build.sh all # Only build module code(u-Boot，kernel，Rootfs，Recovery)
+               # Need to execute ./mkfirmware.sh again for firmware package
+
+./build.sh     # Base on ./build.sh all
+               # 1. Add firmware package ./mkfirmware.sh
+               # 2. update.img package
+               # 3. Copy the firmware in the rockdev directory to the IMAGE/***_RELEASE_TEST/IMAGES directory
+               # 4. Save the patches of each module to the IMAGE/***_RELEASE_TEST/PATCHES directory
+               # Note：./build.sh  and  ./build.sh allsave command are the same
+```
+
+It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are three types of system for RK_ROOTFS_SYSTEM: buildroot, Debian, and yocto.
+For example, if you need debain, you can generate it with the following command:
+
+```shell
+$export RK_ROOTFS_SYSTEM=debian
+$./build.sh
+```
+
+### Build and Package Each  Module
+
+#### U-boot  Build
+
+```shell
+### U-Boot build command
+./build.sh uboot
+
+### To view the detailed U-Boot build command
+./build.sh -h uboot
+```
+
+#### Kernel Build
+
+```shell
+### Kernel build command
+./build.sh kernel
+
+### To view the detailed Kernel build command
+./build.sh -h kernel
+```
+
+#### Recovery Build
+
+```shell
+### Recovery build command
 ./build.sh recovery
+
+### To view the detailed Recovery build command
+./build.sh -h recovery
 ```
 
-The recovery.img will be generated in Buildroot directory “output/rockchip_rk3288_recovery/imagess” after building.
-Please pay attention to that recovery.img including kernel.img, so every time the kernel changes, recovery needs to be repackaged and generated. For example:
+Note: Recovery is a unnecessary function, some board configuration will not be set
 
-```
-SDK$source envsetup.sh rockchip_rk3288
-SDK$make recovery-rebuild
-SDK$./build.sh recovery
-```
-
-### Buildroot Building
-
-#### Buildroot Rootfs Building
+#### Buildroot Build
 
 Enter project root directory and execute the following commands to automatically complete building and packaging of Rootfs.
 
@@ -305,25 +359,30 @@ Enter project root directory and execute the following commands to automatically
  ./build.sh rootfs
 ```
 
-After building, rootfs.ext4 will be generated in the Buildroot directory output/rockchip_rk3288/images.
-Note:
+After building, rootfs.ext4 will be generated in the Buildroot directory output/rockchip_chipset/images.
+
+##### Buildroot Cross Compilation
 
 If you need to build a single module or a third-party application, you need to configure the cross-building environment. Cross-building tool is located in “buildroot/output/rockchip_rk3288/host/usr ” directory. You need to set the “bin/” directory of tools and “arm-buildroot-linux-gnu/bin/ ” directory to environment variables, and execute auto-configuration environment variable script in the top-level directory (only valid for current console):
+
+```shell
+source envsetup.sh
+```
 
 Enter the command to view:
 
 ```shell
-cd buildroot/output/rockchip_rk3288/host/usr
-arm-linux-gcc --version
+cd buildroot/output/rockchip_rk3288/host/usr/bin
+./arm-linux-gcc --version
 ```
 
 When the following log is printed, means configuration is successful:
 
 ```
-gcc version 8.4.0 (Buildroot 2018.02-rc3-02301-ga3d3e23e2c)
+gcc version 9.3.0 (Buildroot 2018.02-rc3-02723-gd3fbc6ae13)
 ```
 
-#### Build Modules in Buildroot
+##### Build Modules in Buildroot
 
 For example, the qplayer module, the commonly used building commands are as follows:
 
@@ -347,7 +406,7 @@ or
 SDK$rm -rf /buildroot/output/rockchip_rk3288/build/qlayer-1.0
 ```
 
-### Debian 9 Building
+#### Debian Building
 
 ```
  ./build.sh debian
@@ -372,10 +431,10 @@ sudo apt-get install -f
 Build 32 bit Debian:
 
 ```shell
-RELEASE=stretch TARGET=desktop ARCH=armhf ./mk-base-debian.sh
+RELEASE=buster TARGET=desktop ARCH=armhf ./mk-base-debian.sh
 ```
 
-After building, linaro-stretch-alip-xxxxx-1.tar.gz (xxxxx is timestamp generated) will be generated in “debian/”:
+After building, linaro-buster-alip-xxxxx-1.tar.gz (xxxxx is timestamp generated) will be generated in “debian/”:
 
 FAQ:
 
@@ -383,7 +442,7 @@ FAQ:
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot' mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/buster-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/buster-desktop-armhf/chroot' mounted with noexec or nodev
 ```
 
 Solution：
@@ -396,32 +455,32 @@ In addition, if there are other building issues, please check firstly that the b
 
 - Because building Base Debian requires to access to foreign websites, and when domestic networks access foreign websites, download failures often occur:
 
-Debian 9 使用 live build,镜像源改为国内可以这样配置:The live build is used in Debian9, you can configure like below to change the image source to domestic:
+The live build is used in Debian10, you can configure like below to change the image source to domestic:
 
 ```diff
-+++ b/ubuntu-build-service/stretch-desktop-armhf/configure
++++ b/ubuntu-build-service/buster-desktop-armhf/configure
 @@ -11,6 +11,11 @@ set -e
  echo "I: create configuration"
  export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
  lb config \
-+ --mirror-bootstrap "http://mirrors.163.com/debian" \
-+ --mirror-chroot "http://mirrors.163.com/debian" \
-+ --mirror-chroot-security "http://mirrors.163.com/debian-security" \
-+ --mirror-binary "http://mirrors.163.com/debian" \
-+ --mirror-binary-security "http://mirrors.163.com/debian-security" \
++ --mirror-bootstrap "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security" \
++ --mirror-binary "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-binary-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security"
   --apt-indices false \
   --apt-recommends false \
   --apt-secure false \
 ```
 
-If the package cannot be downloaded for other network reasons, there are pre-build packages shared on [Baidu Cloud Disk](https://eyun.baidu.com/s/3bqwrvo7), put it in the current directory, and then do the next step directly.
+If the package cannot be downloaded for other network reasons, there are pre-build packages shared on [Baidu Cloud Disk](https://eyun.baidu.com/s/3mjGXBHA), put it in the current directory, and then do the next step directly.
 
 **(2) Building rk-debian rootfs**
 
 Build 32 bit Debian：
 
 ```shell
-VERSION=debug ARCH=armhf ./mk-rootfs-stretch.sh
+VERSION=debug ARCH=armhf ./mk-rootfs-buster.sh
 ```
 
 **(3) Creating the ext4 image(linaro-rootfs.img)**
@@ -432,103 +491,40 @@ VERSION=debug ARCH=armhf ./mk-rootfs-stretch.sh
 
 The linaro-rootfs.img will be generated.
 
-### Debian 10 Building
+#### Yocto Building
 
-```
-./build.sh distro
-```
+Enter project root directory and execute the following commands to automatically complete compiling and packaging Rootfs.
 
-Or enter distro/directory:
-
-```
-cd distro/ && make ARCH=arm rk3288_defconfig && ./make.sh
-```
-
-After building, the rootfs.ext4 will be generated in the distro directory “distro/output/images/”.
-**Note**: The current building of Debian10 Qt also depends on the building of Buildroot qmake, so please build Buildroot before building Debian10.
-
-Please refer to the following document for more introductions about Debian10.
-
-```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Debian10_CN.pdf
-```
-
-### Full Automatic Building
-
-After building various parts of Kernel/U-Boot/Rootfs above, enter root directory of project directory and execute the following commands to automatically complete all building:
+RK3288 EVB boards：
 
 ```shell
-$./build.sh all
+./build.sh yocto
 ```
 
-It is buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. For example, if you need buildroot which will be generated by the following commands:
+After compiling, rootfs.img is generated in yocto directory “/build/lastest”.
+
+FAQ：
+
+If you encounter the following problem during above compiling:
+
+```c
+Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).
+Python can't change the filesystem locale after loading so we need a UTF-8
+when Python starts or things won't work.
+```
+
+Solution:
 
 ```shell
-$export RK_ROOTFS_SYSTEM=buildroot
-$./build.sh all
+locale-gen en_US.UTF-8
+export LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8
 ```
 
-Detailed parameters usage, you can use help to search, for example:
+Or refer to[setup-locale-python3]( https://webkul.com/blog/setup-locale-python3).The image generated after compiling is in “yocto/build/lastest/rootfs.img”. The default login username is root.
 
-```shell
-rk3288$ ./build.sh --help
-Usage: build.sh [OPTIONS]
-Available options:
-BoardConfig*.mk    -switch to specified board config
-uboot              -build uboot
-spl                -build spl
-kernel             -build kernel
-modules            -build kernel modules
-toolchain          -build toolchain
-rootfs             -build default rootfs, currently build buildroot as default
-buildroot          -build buildroot rootfs
-ramboot            -build ramboot image
-multi-npu_boot     -build boot image for multi-npu board
-yocto              -build yocto rootfs
-debian             -build debian9 stretch rootfs
-distro             -build debian10 buster rootfs
-pcba               -build pcba
-recovery           -build recovery
-all                -build uboot, kernel, rootfs, recovery image
-cleanall           -clean uboot, kernel, rootfs, recovery
-firmware           -pack all the image we need to boot up system
-updateimg          -pack update image
-otapackage         -pack ab update otapackage image
-save               -save images, patches, commands used to debug
-allsave            -build all & firmware & updateimg & save
+Please refer to  [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto) for more detailed information of Yocto.
 
-Default option is 'allsave'.
-```
-
-Board level configurations of each board should be configured in /device/rockchip/rk3288/Boardconfig.mk.
-
-Main configurations of RK3288 EVB development board are as follows:
-
-```shell
-# Target arch
-export RK_ARCH=arm
-# Uboot defconfig
-export RK_UBOOT_DEFCONFIG=rk3288
-# Kernel defconfig
-export RK_KERNEL_DEFCONFIG=rockchip_linux_defconfig
-# Kernel dts
-export RK_KERNEL_DTS=rk3288-evb-rk808-linux
-# boot image type
-export RK_BOOT_IMG=zboot.img
-# kernel image path
-export RK_KERNEL_IMG=kernel/arch/arm/boot/zImage
-# parameter for GPT table
-export RK_PARAMETER=parameter.txt
-# Buildroot config
-export RK_CFG_BUILDROOT=rockchip_rk3288
-# Debian 10 config
-export RK_DISTRO_DEFCONFIG=rk3288_defconfig
-# Recovery config
-export RK_CFG_RECOVERY=rockchip_rk3288_recovery
-
-```
-
-### Firmware Package
+#### Firmware Package
 
 After building various parts of Kernel/Uboot/Recovery/Rootfs above, enter root directory of project directory and execute the following command to automatically complete all firmware packaged into rockdev directory:
 
@@ -563,12 +559,12 @@ tools/
 
 As shown below, after building and generating the corresponding firmware, device needs to enter MASKROM or  BootROM modes for upgrade. After connecting USB cable, long press the button “MASKROM” and press reset button “RST” at the same time and then release, device will enter MASKROM mode. Then you should load the paths of the corresponding images and click “Run” to start downloading. You can also press the “recovery” button and press reset button "RST" then release to enter loader mode to download. Partition offset and download files of MASKROM Mode are shown as follows (Note: you have to run the tool as an administrator in Windows PC):
 
-![Tool](resources/Tool_en.png)</left>
+![Tool](resources/Tool.png)</left>
 
 Note: before upgrade, please install the latest USB driver, which is in the below directory:
 
 ```shell
-<SDK>/tools/windows/DriverAssitant_v4.8.zip
+<SDK>/tools/windows/DriverAssitant_v5.0.zip
 ```
 
 ### Linux Upgrade Introduction
@@ -629,13 +625,21 @@ Default partition introduction (below is RK3288 EVB reference partition):
 
 ## RK3288 SDK Firmware
 
-RK3288_Linux_SDK_V2.2.0_20200708 firmware download address is as follows (including  Buildroot/Debian 9/Debian 10/ firmwares):
+- Baidu Cloud Disk
 
-- RK3288 EVB development boards:
+[Buildroot](https://eyun.baidu.com/s/3cXqTDs)
 
-[Buildroot](https://eyun.baidu.com/s/3jJFFLpO)
-[Debian9](https://eyun.baidu.com/s/3o9Gn84U)
-[Debian10](https://eyun.baidu.com/s/3pMeXNlh)
+[Debian rootfs](https://eyun.baidu.com/s/3smu2OH3)
+
+[Yocto rootfs](https://eyun.baidu.com/s/3dPzAwA)
+
+- Microsoft OneDriver
+
+[Buildroot](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EmhOOhNkIeNOpDXUs7VDOVUBz48yh4rOWu-QzvLyfz6tZQ?e=D0Pmi8)
+
+[Debian rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EgPPa1EfzepNoK_t6fIuSQgBZKoezSjV_N4_HQ2h0g0JNg?e=ITLyGT)
+
+[Yocto rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/Epq-ccBCajpGmxdZJJRkxYYBYRVbG9WflU_6AupdqZyQtQ?e=k19l9i)
 
 ## SSH Public Key Operation Introduction
 

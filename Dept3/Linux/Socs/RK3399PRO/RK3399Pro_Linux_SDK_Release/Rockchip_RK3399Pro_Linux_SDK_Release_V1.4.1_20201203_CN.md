@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-CS-009
 
-发布版本：V1.4.0
+发布版本：V1.4.1
 
-日期：2020-10-10
+日期：2020-12-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -56,9 +56,9 @@ Rockchip Electronics Co., Ltd.
 
 **各芯片系统支持状态**
 
-| **芯片名称** | **Buildroot** | **Debian 9** | **Debian 10** | **Yocto** |
-| ------------ | :------------ | :----------- | :------------ | :-------- |
-| RK3399Pro    | Y             | Y            | Y             | Y         |
+| **芯片名称** | **Buildroot** | **Debian ** | **Yocto** |
+| ------------ | :------------ | :---------- | :-------- |
+| RK3399Pro       | Y             | Y           | Y         |
 
  **修订记录**
 
@@ -76,6 +76,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-08-06 | V1.3.2   | Caesar Wang | Debian 10 的支持                                             |
 | 2020-08-13 | V1.3.3   | Caesar Wang | rknpu版本更新搭配1.3.4，目录结构调整和固件升级               |
 | 2020-10-10 | V1.4.0   | Caesar Wang | rknpu版本更新搭配1.4.0，目录结构调整                         |
+| 2020-12-03 | V1.4.1   | Caesar Wang | Debian9/10合并成Debian |
 
 ---
 
@@ -87,7 +88,7 @@ Rockchip Electronics Co., Ltd.
 
 ## 概述
 
-本 SDK支持三个系统分别基于 Buildroot 2018.02-rc3、Yocto Thud 3.0、Debian9 和 Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3399Pro EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
+本 SDK支持三个系统分别基于 Buildroot 2018.02-rc3、Yocto Thud 3.0 和 Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3399Pro EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
 本 SDK 支持 NPU TensorFlow/Caffe 模型、VPU 硬解码、GPU 3D、Wayland 显示、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
 ## 主要支持功能
@@ -111,7 +112,8 @@ RK3399Pro_Linux_SDK 下载命令如下：
 
 ```
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
-ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399pro_linux_release.xml
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m \
+rk3399pro_linux_release.xml
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -123,17 +125,17 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 rk3399pro_linux_sdk_release_v1.4.1_20201203.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk3399pro
-tar xvf rk3399pro_linux_sdk_release_v1.3.0_20200324.tgz -C rk3399pro
+tar xvf rk3399pro_linux_sdk_release_v1.4.1_20201203.tgz -C rk3399pro
 cd rk3399pro
 .repo/repo/repo sync -l
-.repo/repo/repo sync -c
+.repo/repo/repo sync -c --no-tags
 ```
 
-后续开发者可根据 FAE 窗口定期发布的更新说明，通过 ”.repo/repo/repo sync -c” 命令同步更新。
+后续开发者可根据 FAE 窗口定期发布的更新说明，通过 `.repo/repo/repo sync -c --no-tags` 命令同步更新。
 
 ## 软件开发指南
 
@@ -185,7 +187,7 @@ Rockchip_RK3399Pro_Developer_Guide_Linux_NPU_CN.pdf。
 软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
 
 ```
-.repo/manifests$ cat rk3399pro_linux_v0.01/RK3399PRO_Linux_SDK_Release_Note.md
+.repo/manifests$ cat rk3399pro_linux/RK3399PRO_Linux_SDK_Release_Note.md
 ```
 
 或者参考工程目录：
@@ -208,10 +210,9 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 
 - app：存放上层应用 APP，主要是 qcamera/qfm/qplayer/qseting 等一些应用程序。
 - buildroot：基于 Buildroot（2018.02-rc3）开发的根文件系统。
-- debian：基于 Debian 9 开发的根文件系统。
+- debian：基于 Debian 开发的根文件系统。
 - device/rockchip：存放各芯片板级配置以及一些编译和打包固件的脚步和预备文件。
 - docs：存放开发指导文件、平台支持列表、工具使用文档、Linux 开发指南等。
-- distro：基于 Debian 10 开发的根文件系统。
 - IMAGE：存放每次生成编译时间、XML、补丁和固件目录。
 - external：存放第三方相关仓库，包括音频、视频、网络、recovery 等。
 - kernel：存放 Kernel 4.4 开发的代码。
@@ -233,8 +234,10 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 编译 SDK 环境搭建所依赖的软件包安装命令如下：
 
 ```
-sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo \
-chrpath diffstat binfmt-support qemu-user-static live-build bison flex fakeroot cmake
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool \
+expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support \
+qemu-user-static live-build bison flex fakeroot cmake gcc-multilib g++-multilib unzip \
+device-tree-compiler python-pip ncurses-dev pyelftools \
 ```
 
 建议使用 Ubuntu18.04 系统或更高版本开发，若编译遇到报错，可以视报错信息，安装对应的软件包。
@@ -341,8 +344,7 @@ buildroot          -build buildroot rootfs
 ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
-debian             -build debian9 stretch rootfs
-distro             -build debian10 buster rootfs
+debian             -build debian rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
@@ -489,8 +491,7 @@ make rknpu-rebuild
                # 注：./build.sh 和 ./build.sh allsave 命令一样
 ```
 
-默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定四个类型：buildroot、debian、distro 和 yocto 。
-其中debian是编译Debian9系统，distro是编译debian10系统。
+默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定三个类型：buildroot、debian 和 yocto 。
 
 比如需要 debain 可以通过以下命令进行生成：
 
@@ -561,7 +562,7 @@ cd buildroot/output/rockchip_rk3399pro_combine/host/usr/bin
 此时会打印如下信息：
 
 ```
-aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
+gcc version 9.3.0 (Buildroot 2018.02-rc3-02723-gd3fbc6ae13)
 ```
 
 ###### Buildroot 中模块编译
@@ -588,10 +589,10 @@ SDK$make qplayer-dirclean
 SDK$rm -rf /buildroot/output/rockchip_rk3399pro/build/qlayer-1.0
 ```
 
-##### Debian 9 编译
+##### Debian 编译
 
 ```
- ./build.sh debian
+./build.sh debian
 ```
 
 或进入 debian/ 目录：
@@ -613,59 +614,56 @@ sudo apt-get install -f
 编译 64 位的 Debian:
 
 ```shell
-RELEASE=stretch TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
+RELEASE=buster TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
 ```
 
-编译完成会在  debian/ 目录下生成：linaro-stretch-alip-xxxxx-1.tar.gz（xxxxx 表示生成时间戳)。
+编译完成会在  debian/ 目录下生成：linaro-buster-alip-xxxxx-1.tar.gz（xxxxx 表示生成时间戳)。
 
 FAQ:
 
-- 上述编译如果遇到如下问题情况:
+- 上述编译如果遇到如下问题情况：
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target
-...
-mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/buster-desktop-arm64/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/buster-desktop-arm64/chroot' mounted with noexec or nodev
 ```
 
 解决方法：
 
 ```
-mount -o remount,exec,dev xxx
-(其中xxx 是工程目录路径，然后重新编译）
+mount -o remount,exec,dev xxx (xxx 是工程目录), 然后重新编译
 ```
 
 另外如果还有遇到其他编译异常，先排除使用的编译系统是 ext2/ext4 的系统类型。
 
-- 编译 Base Debian 由于访问国外网站，国内网络会经常出现下载失败的情况:
+- 由于编译 Base Debian 需要访问国外网站，而国内网络访问国外网站时，经常出现下载失败的情况:
 
-Debian 9 使用 live build,镜像源改为国内可以这样配置:
+Debian 使用 live build,镜像源改为国内可以这样配置:
 
 ```diff
-+++ b/ubuntu-build-service/stretch-desktop-arm64/configure
++++ b/ubuntu-build-service/buster-desktop-arm64/configure
 @@ -11,6 +11,11 @@ set -e
  echo "I: create configuration"
  export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
  lb config \
-+ --mirror-bootstrap "http://mirrors.163.com/debian" \
-+ --mirror-chroot "http://mirrors.163.com/debian" \
-+ --mirror-chroot-security "http://mirrors.163.com/debian-security" \
-+ --mirror-binary "http://mirrors.163.com/debian" \
-+ --mirror-binary-security "http://mirrors.163.com/debian-security" \
++ --mirror-bootstrap "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security" \
++ --mirror-binary "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-binary-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security"
   --apt-indices false \
   --apt-recommends false \
   --apt-secure false \
 ```
 
-如果其他网络原因不能下载包，有预编生成的包分享在[百度云网盘](<<https://eyun.baidu.com/s/3bqwrvo7>)，放在当前目录直接执行下一步操作。
+如果其他网络原因不能下载包，有预编生成的包分享在[百度云网盘](https://eyun.baidu.com/s/3mjGXBHA)，放在当前目录直接执行下一步操作。
 
 **(2) Building rk-debian rootfs**
 
 编译 64位的 Debian：
 
 ```shell
-VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
+VERSION=debug ARCH=arm64 ./mk-rootfs-buster.sh
 ```
 
 **(3) Creating the ext4 image(linaro-rootfs.img)**
@@ -675,26 +673,6 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 ```
 
 此时会生成 linaro-rootfs.img。
-
-##### Debian 10 编译
-
-```
-./build.sh distro
-```
-
-或进入 distro/ 目录：
-
-```
-cd distro/ && make ARCH=arm64 rk3399pro_defconfig && ./make.sh
-```
-
-编译后在 distro/output/images/ 目录下生成 rootfs.ext4 。
-注意： 目前Debian 10 QT的编译还依赖 Buildroot qmake的编译， 所以编译 Debian 10 前，请先编译 Buildroot。
-更多 Debian 10的介绍参考文档：
-
-```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Debian10_Developer_Guide_CN.pdf
-```
 
 ##### Yocto 编译
 
@@ -747,7 +725,7 @@ Yocto 更多信息请参考 [Rockchip Wiki](http://opensource.rock-chips.com/wik
 
 ### Windows 刷机说明
 
-SDK 提供 Windows 烧写工具(工具版本需要 V2.55 或以上)，工具位于工程根目录：
+SDK 提供 Windows 烧写工具(工具版本需要 V2.79 或以上)，工具位于工程根目录：
 
 ```shell
 tools/
@@ -756,19 +734,19 @@ tools/
 
 如下图，编译生成相应的固件后，设备烧写需要进入 MASKROM 或 BootROM 烧写模式，
 连接好 USB 下载线后，按住按键“MASKROM”不放并按下复位键“RST”后松手，就能进入
-MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”进行烧写，也可以按 “recovery" 按键不放并按下复位键 “RST” 后松手进入 loader 模式进行烧写，下面是 MASKROM 模式的分区偏移及烧写文件。(注意： WIndow PC 需要在管理员权限运行工具才可执行)
+MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”进行烧写，也可以按 “recovery" 按键不放并按下复位键 “RST” 后松手进入 loader 模式进行烧写，下面是 MASKROM 模式的分区偏移及烧写文件。(注意： Windows PC 需要在管理员权限运行工具才可执行)
 
 ![Tool](resources/Tool.png)</left>
 
 注：烧写前，需安装最新 USB 驱动，驱动详见：
 
 ```shell
-<SDK>/tools/windows/DriverAssitant_v4.91.zip
+<SDK>/tools/windows/DriverAssitant_v5.0.zip
 ```
 
 ### Linux 刷机说明
 
-Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.33 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
+Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.57 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
 ```shell
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
@@ -826,44 +804,21 @@ sudo ./upgrade_tool uf rockdev/update.img
 
 ### RK3399Pro SDK 固件
 
-RK3399PRO_LINUX_SDK_V1.3.3_20200813 固件下载链接如下
-（包含 Buildroot/Debian 9/Debian10/Yocto 的固件）
-
 - 百度云网盘
 
-Buildroot:
-[V10(绿色)板子](https://eyun.baidu.com/s/3jJtvqbc)
-[V11/V12(黑色)板子](https://eyun.baidu.com/s/3smrfdKh)
-[V13(黑色)板子](https://eyun.baidu.com/s/3hsVcFqc)
-[V14(黑色)板子](https://eyun.baidu.com/s/3dGzAWVn)
+[Buildroot](https://eyun.baidu.com/s/3cXqTDs)
 
-Debian 9:
-[Debian9 rootfs](https://eyun.baidu.com/s/3mkicbhe)
+[Debian rootfs](https://eyun.baidu.com/s/3smu2OH3)
 
-Debian 10:
-[Debian10 pcie rootfs](https://eyun.baidu.com/s/3kXn3Ker)
-[Debian10 usb rootfs](https://eyun.baidu.com/s/3dT3sF8)
-
-Yocto:
-[Yocto rootfs](https://eyun.baidu.com/s/3dGYgUGx)
+[Yocto rootfs](https://eyun.baidu.com/s/3dPzAwA)
 
 - 微软 OneDriver
 
-Buildroot:
-[V10(绿色)板子](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EXVnKILyA81Fr5jWe9_JyDAB-VOCNXVHyWwtWs7vl4twlg?e=OnItNC)
-[V11/V12(黑色)板子](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/ESd4QW1zci5BtncA6j3OsiIBqKnXEJRqFjyGErZUM1YChA?e=mj7gDl)
-[V13(黑色)板子](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EXD6e97YVwRCp6cha3zvHXkBGJGXwp68eW4z35h6wy6VLA?e=YRehGm)
-[V14(黑色)板子](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EfPM8XYcI3VNsYObulL4w-UBcJ7MLrR63ArSSKtNwo4BKw?e=R5fO9c)
+[Buildroot](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EmhOOhNkIeNOpDXUs7VDOVUBz48yh4rOWu-QzvLyfz6tZQ?e=D0Pmi8)
 
-Debian 9:
-[Debian9 rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EaPhc_ihXZVFgyENngkOu7cBYEVzreiLW7SB97vYmGzzlQ?e=CewU6A)
+[Debian rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EgPPa1EfzepNoK_t6fIuSQgBZKoezSjV_N4_HQ2h0g0JNg?e=ITLyGT)
 
-Debian 10:
-[Debian10 pcie rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/ERb4j2EhaIpHq9uQhzkBxm0BqIj7q0xyuWdsaFM00wx5gg?e=T0Wzn1)
-[Debian10 usb rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/ERb4j2EhaIpHq9uQhzkBxm0BqIj7q0xyuWdsaFM00wx5gg?e=T0Wzn1)
-
-Yocto:
-[Yocto rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EYqMF_CJEqlJu7_rXlpLh3oBUElXqeJ5Mhn7kv7aihZ0cg?e=93OSjN)
+[Yocto rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/Epq-ccBCajpGmxdZJJRkxYYBYRVbG9WflU_6AupdqZyQtQ?e=k19l9i)
 
 ### RKNN_DEMO 测试
 

@@ -1,10 +1,10 @@
-# Rockchip RK3399 Linux SDK 发布说明
+# Rockchip PX30 Linux SDK 发布说明
 
-文档标识：RK-FB-CS-002
+文档标识：RK-FB-CS-005
 
-发布版本：V2.5.0
+发布版本：V1.4.0
 
-日期：2020-10-13
+日期：2020-12-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -44,7 +44,7 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-文档主要介绍 Rockchip RK3399 Linux SDK发布说明，旨在帮助工程师更快上手RK3399 Linux SDK开发及相关调试方法。
+文档主要介绍 Rockchip PX30 Linux SDK发布说明，旨在帮助工程师更快上手PX30 Linux SDK开发及相关调试方法。
 
 **读者对象**
 
@@ -56,27 +56,18 @@ Rockchip Electronics Co., Ltd.
 
 **各芯片系统支持状态**
 
-| **芯片名称**    | **Buildroot** | **Debian 9** | **Debian 10** | **Yocto** |
-| ----------- | :-------------- | :------------- | :---------- | :---------- |
-| RK3399      | Y               | Y              | Y           | Y           |
+| **芯片名称**    | **Buildroot** | **Debian** | **Yocto** |
+| ----------- | :-------------- | :------------- | :---------- |
+| PX30  | Y               | Y           | Y           |
 
  **修订记录**
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
-| 2017-01-16 | V1.0.0 | Guochun Huang | 初始版本。 |
-| 2017-02-27 | V1.1.0 | Guochun Huang | 增加Linux PC下载工具。|
-| 2017-06-08 | V1.2.0 | Caesar Wang | 正式发布版本，添加 NPU 相关说明。<br/>增加 Yocto 的编译说明，增加 github 下载说明。|
-| 2018-04-08 | V1.3.0 | Caesar Wang | 修改软件开发指南名字。 |
-| 2018-04-11 | V1.4.0 | Caesar Wang | 修改 Debian 编译说明。 |
-| 2018-04-18 | V1.5.0 | Caesar Wang | 修改一些错词和仓库地址更改。 |
-| 2018-05-17 | V2.0.0 | Caesar Wang | Buildroot/Debian文档合二为一。<br/>增加 SSH 公钥操作说明。 |
-| 2019-01-24 | V2.1.0 | Caesar Wang | 工程 rootfs 章节改为 Debian。 <br/>U-boot 的 config 更改。 |
-| 2019-06-28 | V2.2.0 | Caesar Wang | 增加 Yocto 说明 <br/>EVB 重命名为挖掘机 |
-| 2019-12-03 | V2.3.0 | Caesar Wang | Debian 64 位编译更改。<br/>9.6章节内容更改更新章节 1、2、3 说明。 <br/>更新章节 5 SDK 目录介绍。<br/>更新章节 6 Debian10 的编译。|
-| 2020-04-30 | V2.4.0 | Caesar Wang | 文档用 Markdown 格式重写。<br/>增加并默认使用 RK3399 EVB IND 板子。 |
-| 2020-07-22 | V2.4.1 | Ruby Zhang | 更新公司名称、文件名和文档分页格式 |
-| 2020-10-13 | V2.5.0 | Caesar Wang | 适配新版本编译规则 |
+| 2019-04-25 | V1.0.0 | Ziyuan Xu | 初始版本。 |
+| 2019-09-17 | V1.2.0 | Ziyuan Xu | 更新 Linux_SDK_v1.2.0 说明。<br/>更新应用编译说明。<br/>新增 github 源码获取说明。 |
+| 2020-02-24 | V1.3.0 | Ziyuan Xu | 完善 robot 说明。<br/>Debian10 说明。 |
+| 2020-12-03 | V1.4.0 | Caesar Wang | SDK 更新到 V1.4.0。 |
 
 ---
 
@@ -88,31 +79,32 @@ Rockchip Electronics Co., Ltd.
 
 ## 概述
 
-本 SDK 支持四个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 3.0，Debian9 和 Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3399 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
+本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 3.0 和 Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 PX30 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
 本 SDK 支持 VPU 硬解码、GPU 3D、Wayland/X11 显示、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
 ## 主要支持功能
 
 | **功能**    | **模块名** |
 | ----------- | :-------------- |
-| 数据通信      | Wi-Fi、以太网卡、USB、SD 卡、PCI-e 接口  |
+| 数据通信      | Wi-Fi、以太网卡、USB、SD 卡 |
 | 应用程序      | 多媒体播放、设置、浏览器、文件管理       |
 
 ## SDK 获取说明
 
 SDK 通过瑞芯微代码服务器对外发布获取。其编译开发环境，参考第 7 节 [SDK编译说明](# SDK 编译说明)。
 
-### RK3399 Linux 通用软件包获取方法
+### PX30 Linux 通用软件包获取方法
 
 #### 通过代码服务器下载
 
-获取 RK3399 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](# SSH 公钥操作说明)。
+获取 PX30 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](# SSH 公钥操作说明)。
 
-RK3399_Linux_SDK 下载命令如下：
+PX30_Linux_SDK 下载命令如下：
 
 ```
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
-ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399_linux_release.xml
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m \
+px30_linux_release.xml
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -124,17 +116,17 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rk3399_linux_sdk_release_v2.5.0_20201013.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 px30_linux_sdk_release_v1.4.0_20201203.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
-mkdir rk3399
-tar xvf rk3399_linux_sdk_release_v2.5.0_20201013.tgz -C rk3399
-cd rk3399
+mkdir px30
+tar xvf px30_linux_sdk_release_v1.4.0_20201203.tgz -C px30
+cd px30
 .repo/repo/repo sync -l
-.repo/repo/repo sync -c
+.repo/repo/repo sync -c --no-tags
 ```
 
-后续开发者可根据 FAE 窗口定期发布的更新说明，通过 ”.repo/repo/repo sync -c” 命令同步更新。
+后续开发者可根据 FAE 窗口定期发布的更新说明，通过 `.repo/repo/repo sync -c --no-tags` 命令同步更新。
 
 ## 软件开发指南
 
@@ -143,35 +135,29 @@ cd rk3399
 软件发布版本升级通过工程 xml 进行查看，具体方法如下：
 
 ```
-.repo/manifests$ ls -l -h rk3399_linux_release.xml
+.repo/manifests$ ls -l -h px30_linux_release.xml
 ```
 
 软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
 
 ```
-.repo/manifests$ cat rk3399_linux/RK3399_Linux_SDK_Release_Note.md
+.repo/manifests$ cat px30_linux/PX30_Linux_SDK_Release_Note.md
 ```
 
 或者参考工程目录：
 
 ```
-<SDK>/docs/RK3399/RK3399_Linux_SDK_Release_Note.md
+<SDK>/docs/px30/PX30_Linux_SDK_Release_Note.md
 ```
 
 ## 硬件开发指南
 
 硬件相关开发可以参考用户使用指南，在工程目录：
 
-RK3399 挖掘机硬件开发指南：
+PX30 MINI EVB 硬件开发指南：
 
 ```
-<SDK>/docs/RK3399/Rockchip_RK3399_User_Manual_Sapphire_EVB_V3.0_CN.pdf
-```
-
-RK3399 IND 行业板硬件开发指南：
-
-```
-<SDK>/docs/RK3399/Rockchip_RK3399_User_Manual_IND_EVB_V1.0_CN.pdf
+<SDK>/docs/PX30/Rockchip_PX30_User_Manual_EVB_V1.0_CN.pdf
 ```
 
 ## SDK 工程目录介绍
@@ -180,14 +166,12 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 
 - app：存放上层应用 APP，主要是 qcamera/qfm/qplayer/qseting 等一些应用程序。
 - buildroot：基于 Buildroot（2018.02-rc3）开发的根文件系统。
-- debian：基于 Debian 9 开发的根文件系统。
-- device/rockchip：存放各芯片板级配置以及一些编译和打包固件的脚步和预备文件。
+- debian：基于 Debian 10 开发的根文件系统。
+- device/rockchip：存放各芯片板级配置以及一些编译和打包固件的脚本和预备文件。
 - docs：存放开发指导文件、平台支持列表、工具使用文档、Linux 开发指南等。
-- distro：基于 Debian 10 开发的根文件系统。
 - IMAGE：存放每次生成编译时间、XML、补丁和固件目录。
 - external：存放第三方相关仓库，包括音频、视频、网络、recovery 等。
 - kernel：存放 Kernel 4.4 开发的代码。
-- npu：存放 NPU 开发的代码。
 - prebuilts：存放交叉编译工具链。
 - rkbin：存放 Rockchip 相关 Binary 和工具。
 - rockdev：存放编译输出固件。
@@ -205,66 +189,71 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 编译 SDK 环境搭建所依赖的软件包安装命令如下：
 
 ```
-sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf \
-chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build \
-bison flex fakeroot cmake
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool \
+expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support \
+qemu-user-static live-build bison flex fakeroot cmake gcc-multilib g++-multilib unzip \
+device-tree-compiler python-pip ncurses-dev pyelftools \
 ```
 
 建议使用 Ubuntu18.04 系统或更高版本开发，若编译遇到报错，可以视报错信息，安装对应的软件包。
 
 ### SDK板级配置
 
-进入工程<SDK>/device/rockchip/rk3399 目录：
+进入工程<SDK>/device/rockchip/px30 目录：
 
 | 板级配置                       | 说明                                               |
 | ----------------------------- | --------------------------------------------------- |
-| BoardConfig-rk3399-evb-ind-lpddr4.mk  |   适用于 RK3399 IND 行业板  |
-| BoardConfig-rk3399-firefly.mk    |  适用于 RK3399 Firefly 开发板  |
-| BoardConfig-rk3399-sapphire-excavator-lp4.mk  |  适用于 RK3399 挖掘机搭配LPDDR4板 |
-| BoardConfig-rk3399-sapphire-excavator.mk  |  适用于 RK3399 挖掘机开发板 |
+| BoardConfig-px30-evb-ddr3-v10.mk |  适用于 PX30 EVB V10 开发板  |
+| BoardConfig-px30-evb-ddr3-v10-32bit.mk |  适用于 PX30 EVB V10 开发板，运行32位系统 |
+| BoardConfig-px30-evb-ddr3-v11.mk |  适用于 PX30 EVB V11 开发板  |
+| BoardConfig-px30-evb-ddr3-v11-32bit.mk |  适用于 PX30 EVB V11 开发板，运行32位系统  |
+| BoardConfig-px30-robot64.mk |  适用于PX30 Robot小系统开发  |
+| BoardConfig-px30-robot64_no_gpu.mk |  适用于PX30 Robot小系统不带GPU开发  |
 
 方法1
 `./build.sh` 后面加上板级配置文件, 例如：
 
-选择**RK3399 IND**的板级配置：
+选择**PX30 EVB V10**的板级配置：
 
 ```shell
-./build.sh device/rockchip/rk3399/BoardConfig-rk3399-evb-ind-lpddr4.mk
+./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v10.mk
+或
+./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v10-32bit.mk
 ```
 
-选择**RK3399 Firefly 开发板**的板级配置：
+选择**PX30 EVB V11**的板级配置：
 
 ```shell
-./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly.mk
+./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v11.mk
+或
+./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v11-32bit.mk
 ```
 
-选择**RK3399 挖掘机搭配LPDDR4板**的板级配置：
+选择**PX30 Robot**的板级配置：
 
 ```shell
-./build.sh device/rockchip/rk3399/BoardConfig-rk3399-sapphire-excavator-lp4.mk
-```
-
-选择**RK3399 挖掘机开发板**的板级配置：
-
-```shell
-./build.sh device/rockchip/rk3399/BoardConfig-rk3399-sapphire-excavator.mk
+./build.sh device/rockchip/px30/BoardConfig-px30-robot64.mk
+或
+./build.sh device/rockchip/px30/BoardConfig-px30-robot64_no_gpu.mk
 ```
 
 方法2
 
 ```shell
-rk3399$ ./build.sh lunch
+px30$ ./build.sh lunch
 processing option: lunch
 
 You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-rk3399-evb-ind-lpddr4.mk
-2. BoardConfig-rk3399-firefly.mk
-3. BoardConfig-rk3399-sapphire-excavator-lp4.mk
-4. BoardConfig-rk3399-sapphire-excavator.mk
-5. BoardConfig.mk
+1. BoardConfig-px30-evb-ddr3-v10-32bit.mk
+2. BoardConfig-px30-evb-ddr3-v10.mk
+3. BoardConfig-px30-evb-ddr3-v11-32bit.mk
+4. BoardConfig-px30-evb-ddr3-v11.mk
+5. BoardConfig-px30-robot64.mk
+6. BoardConfig-px30-robot64_no_gpu.mk
+7. BoardConfig.mk
 Which would you like? [0]:
 ...
 ```
@@ -274,7 +263,7 @@ Which would you like? [0]:
 在根目录执行命令：./build.sh -h|help
 
 ```shell
-rk3399$ ./build.sh -h
+px30$ ./build.sh -h
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
@@ -290,8 +279,7 @@ buildroot          -build buildroot rootfs
 ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
-debian             -build debian9 stretch rootfs
-distro             -build debian10 buster rootfs
+debian             -build debian rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
@@ -308,11 +296,11 @@ Default option is 'allsave'.
 查看部分模块详细编译命令，例如：./build.sh -h kernel
 
 ```shell
-rk3399$ ./build.sh -h kernel
+px30$ ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 cd kernel
-make ARCH=arm64 rockchip_linux_defconfig
-make ARCH=arm64 rk3399-sapphire-excavator-linux.img -j12
+make ARCH=arm64 px30_linux_defconfig
+make ARCH=arm64 px30-evb-ddr3-v11-linux.img -j12
 ```
 
 [^注]: 详细的编译命令以实际对应的SDK版本为准，主要是配置可能会有差异。build.sh编译命令是固定的。
@@ -333,8 +321,7 @@ make ARCH=arm64 rk3399-sapphire-excavator-linux.img -j12
                # 注：./build.sh 和 ./build.sh allsave 命令一样
 ```
 
-默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定四个类型：buildroot、debian、distro 和 yocto 。
-其中debian是编译Debian 9系统，distro是编译debian10系统。
+默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定三个类型：buildroot、debian、 yocto 。
 
 比如需要 debain 可以通过以下命令进行生成：
 
@@ -385,11 +372,11 @@ $./build.sh
 ./build.sh rootfs
 ```
 
-编译后在 Buildroot 目录 output/rockchip_芯片命名/images下生成 rootfs.ext4。
+编译后在 Buildroot 目录 output/rockchip_px30_64/images下生成 rootfs.ext4。
 
 #### Buildroot 的交叉编译
 
-若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。交叉编译工具位于 buildroot/output/rockchip_rk3399/host/usr 目录下，需要将工具的bin/目录和 aarch64-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
+若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。交叉编译工具位于 buildroot/output/rockchip_px30_64/host/usr 目录下，需要将工具的bin/目录和 aarch64-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
 
 ```shell
 source envsetup.sh
@@ -398,14 +385,14 @@ source envsetup.sh
 输入命令查看：
 
 ```shell
-cd buildroot/output/rockchip_rk3399/host/usr/bin
+cd buildroot/output/rockchip_px30_64/host/usr/bin
 ./aarch64-linux-gcc --version
 ```
 
 此时会打印如下信息：
 
 ```
-aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
+gcc version 9.3.0 (Buildroot 2018.02-rc3-02723-gd3fbc6ae13)
 ```
 
 ##### Buildroot 中模块编译
@@ -429,13 +416,13 @@ SDK$make qplayer-rebuild
 ```
 SDK$make qplayer-dirclean
 或者
-SDK$rm -rf /buildroot/output/rockchip_rk3399pro/build/qlayer-1.0
+SDK$rm -rf /buildroot/output/rockchip_px30_64/build/qlayer-1.0
 ```
 
-#### Debian 9 编译
+#### Debian 编译
 
 ```
- ./build.sh debian
+./build.sh debian
 ```
 
 或进入 debian/ 目录：
@@ -457,59 +444,56 @@ sudo apt-get install -f
 编译 64 位的 Debian:
 
 ```shell
-RELEASE=stretch TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
+RELEASE=buster TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
 ```
 
-编译完成会在  debian/ 目录下生成：linaro-stretch-alip-xxxxx-1.tar.gz（xxxxx 表示生成时间戳)。
+编译完成会在  debian/ 目录下生成：linaro-buster-alip-xxxxx-1.tar.gz（xxxxx 表示生成时间戳)。
 
 FAQ:
 
-- 上述编译如果遇到如下问题情况:
+- 上述编译如果遇到如下问题情况：
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-arm64/chroot/test-dev-null: Permission denied E: Cannot install into target
-...
-mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/buster-desktop-arm64/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/buster-desktop-arm64/chroot' mounted with noexec or nodev
 ```
 
 解决方法：
 
 ```
-mount -o remount,exec,dev xxx
-(其中xxx 是工程目录路径，然后重新编译）
+mount -o remount,exec,dev xxx (xxx 是工程目录), 然后重新编译
 ```
 
 另外如果还有遇到其他编译异常，先排除使用的编译系统是 ext2/ext4 的系统类型。
 
-- 编译 Base Debian 由于访问国外网站，国内网络会经常出现下载失败的情况:
+- 由于编译 Base Debian 需要访问国外网站，而国内网络访问国外网站时，经常出现下载失败的情况:
 
-Debian 9 使用 live build,镜像源改为国内可以这样配置:
+Debian 使用 live build,镜像源改为国内可以这样配置:
 
 ```diff
-+++ b/ubuntu-build-service/stretch-desktop-arm64/configure
++++ b/ubuntu-build-service/buster-desktop-arm64/configure
 @@ -11,6 +11,11 @@ set -e
  echo "I: create configuration"
  export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
  lb config \
-+ --mirror-bootstrap "http://mirrors.163.com/debian" \
-+ --mirror-chroot "http://mirrors.163.com/debian" \
-+ --mirror-chroot-security "http://mirrors.163.com/debian-security" \
-+ --mirror-binary "http://mirrors.163.com/debian" \
-+ --mirror-binary-security "http://mirrors.163.com/debian-security" \
++ --mirror-bootstrap "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security" \
++ --mirror-binary "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-binary-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security"
   --apt-indices false \
   --apt-recommends false \
   --apt-secure false \
 ```
 
-如果其他网络原因不能下载包，有预编生成的包分享在[百度云网盘](<<https://eyun.baidu.com/s/3bqwrvo7>)，放在当前目录直接执行下一步操作。
+如果其他网络原因不能下载包，有预编生成的包分享在[百度云网盘](https://eyun.baidu.com/s/3mjGXBHA)，放在当前目录直接执行下一步操作。
 
 **(2) Building rk-debian rootfs**
 
 编译 64位的 Debian：
 
 ```shell
-VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
+VERSION=debug ARCH=arm64 ./mk-rootfs-buster.sh
 ```
 
 **(3) Creating the ext4 image(linaro-rootfs.img)**
@@ -520,30 +504,10 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 
 此时会生成 linaro-rootfs.img。
 
-#### Debian 10 编译
-
-```
-./build.sh distro
-```
-
-或进入 distro/ 目录：
-
-```
-cd distro/ && make ARCH=arm64 rk3399_defconfig && ./make.sh
-```
-
-编译后在 distro/output/images/ 目录下生成 rootfs.ext4 。
-注意： 目前Debian 10 QT的编译还依赖 Buildroot qmake的编译， 所以编译 Debian 10 前，请先编译 Buildroot。
-更多 Debian 10的介绍参考文档：
-
-```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Debian10_Developer_Guide_CN.pdf
-```
-
 #### Yocto 编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
-RK3399 EVB 开发板：
+PX30 EVB 开发板：
 
 ```shell
 ./build.sh yocto
@@ -583,17 +547,13 @@ Yocto 更多信息请参考 [Rockchip Wiki](http://opensource.rock-chips.com/wik
 
 ## 刷机说明
 
-RK3399 挖掘机接口分布图如下：
+PX30 EVB 接口分布图如下：
 
-![RK3399-Sapphire](resources/RK3399-Sapphire.png)
-
-RK3399 IND 行业板接口分布图如下：
-
-![RK3399-IND](resources/RK3399-IND.png)
+![PX30-EVB](resources/PX30-EVB.png)
 
 ### Windows 刷机说明
 
-SDK 提供 Windows 烧写工具(工具版本需要 V2.55 或以上)，工具位于工程根目录：
+SDK 提供 Windows 烧写工具(工具版本需要 V2.79 或以上)，工具位于工程根目录：
 
 ```shell
 tools/
@@ -609,12 +569,12 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 注：烧写前，需安装最新 USB 驱动，驱动详见：
 
 ```shell
-<SDK>/tools/windows/DriverAssitant_v4.91.zip
+<SDK>/tools/windows/DriverAssitant_v5.0.zip
 ```
 
 ### Linux 刷机说明
 
-Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.33 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
+Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.57 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
 ```shell
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
@@ -644,7 +604,7 @@ sudo ./upgrade_tool uf rockdev/update.img
 
 ### 系统分区说明
 
-默认分区说明 ( 下面是 RK3399 IND 分区参考）
+默认分区说明 ( 下面是 PX30 EVB 分区参考）
 
 | **Number** | **Start (sector)** | **End (sector)** | **Size** | **Name** |
 | ---------- | ------------------ | --------------- | --------- | --------- |
@@ -668,31 +628,23 @@ sudo ./upgrade_tool uf rockdev/update.img
 - rootfs 分区：供 buildroot、debian 或 yocto 编出来的 rootfs.img。
 - userdata 分区：供 APP 临时生成文件或给最终用户使用，挂载在 /userdata 目录下。
 
-## RK3399 SDK 固件
+## PX30 SDK 固件
 
-RK3399_LINUX_SDK_V2.4.0_20200430 固件下载链接如下
-（包含 Buildroot/Debian 9/Debian 10/Yocto 的固件）
+- 百度云网盘
 
-- RK3399 IND 行业板
+[Buildroot](https://eyun.baidu.com/s/3cXqTDs)
 
-[Buildroot](https://eyun.baidu.com/s/3c3V1eLi)
-[Yocto](https://eyun.baidu.com/s/3i6O5qGd)
-[Debian9](https://eyun.baidu.com/s/3mj2K14G)
-[Debian10](https://eyun.baidu.com/s/3gfW0JhL)
+[Debian rootfs](https://eyun.baidu.com/s/3smu2OH3)
 
-- RK3399 挖掘机开发板
+[Yocto rootfs](https://eyun.baidu.com/s/3dPzAwA)
 
-[Buildroot](https://eyun.baidu.com/s/3i6lVGvb)
-[Yocto](https://eyun.baidu.com/s/3c36y74W)
-[Debian9](https://eyun.baidu.com/s/3i6udoET)
-[Debian10](https://eyun.baidu.com/s/3eTDMjqq)
+- 微软 OneDriver
 
-- RK3399 Firefly 开发板
+[Buildroot](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EmhOOhNkIeNOpDXUs7VDOVUBz48yh4rOWu-QzvLyfz6tZQ?e=D0Pmi8)
 
-[Buildroot](https://eyun.baidu.com/s/3dqTCi6)
-[Yocto](https://eyun.baidu.com/s/3kWtth1H)
-[Debian9](https://eyun.baidu.com/s/3jKkicsu)
-[Debian10](https://eyun.baidu.com/s/3kWCpXB5)
+[Debian rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EgPPa1EfzepNoK_t6fIuSQgBZKoezSjV_N4_HQ2h0g0JNg?e=ITLyGT)
+
+[Yocto rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/Epq-ccBCajpGmxdZJJRkxYYBYRVbG9WflU_6AupdqZyQtQ?e=k19l9i)
 
 ## SSH 公钥操作说明
 

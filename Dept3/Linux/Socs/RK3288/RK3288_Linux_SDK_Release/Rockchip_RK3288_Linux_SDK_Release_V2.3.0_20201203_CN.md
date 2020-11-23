@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-CS-006
 
-发布版本：V2.2.0
+发布版本：V2.3.0
 
-日期：2020-07-08
+日期：2020-12-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -56,9 +56,9 @@ Rockchip Electronics Co., Ltd.
 
 **各芯片系统支持状态**
 
-| **芯片名称**    | **Buildroot** | **Debian 9** | **Debian 10** | **Yocto** |
+| **芯片名称**    | **Buildroot** | **Debian** | **Yocto** |
 | ----------- | :-------------- | :------------- | :---------- | :---------- |
-| RK3288      | Y               | Y              | Y           | N           |
+| RK3288      | Y               | Y              |Y           |
 
  **修订记录**
 
@@ -70,6 +70,7 @@ Rockchip Electronics Co., Ltd.
 | 2018-06-20 | V2.0.0 | Nickey Yang | 更新 SDK buildroot到2018.02版本。 |
 | 2019-09-26 | V2.1.0 | Nickey Yang | 更新 SDK 编译和烧写方法具。 |
 | 2020-07-08 | V2.2.0 | Caesar Wang | 增加 Debian10支持，Markdown格式重写发布文档 |
+| 2020-12-03 | V2.3.0 | Caesar Wang | SDK整改 |
 
 ---
 
@@ -81,8 +82,8 @@ Rockchip Electronics Co., Ltd.
 
 ## 概述
 
-本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 2.6，Debian 9 和 Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3288 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
-本 SDK 支持 VPU 硬解码、GPU 3D、Wayland/X11 显示、Qt 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
+本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 3.0，Debian 10 上开发，内核基于 Kernel 4.4，引导基于 U-boot v2017.09，适用于 RK3288 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
+本 SDK 支持 VPU 硬解码、GPU 3D、Wayland/X11 显示、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
 ## 主要支持功能
 
@@ -93,16 +94,20 @@ Rockchip Electronics Co., Ltd.
 
 ## SDK 获取说明
 
-SDK 通过瑞芯微代码服务器对外发布或者从 [Github](https://github.com/rockchip-linux) 开源网站上获取。其编译开发环境，参考第 7 节 [SDK编译说明](#7 SDK 编译说明)。
+SDK 通过瑞芯微代码服务器对外发布获取。其编译开发环境，参考第 7 节 [SDK编译说明](# SDK 编译说明)。
 
-**获取 SDK 方法 一: 从瑞芯微代码服务器获取源码**
+### RK3288 Linux 通用软件包获取方法
 
-获取 RK3288 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](#10 SSH 公钥操作说明)。
+#### 通过代码服务器下载
+
+获取 RK3288 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](# SSH 公钥操作说明)。
 
 RK3288_Linux_SDK 下载命令如下：
 
 ```
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3288_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m \
+rk3288_linux_release.xml
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -111,62 +116,26 @@ repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用
 git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 ```
 
+#### 通过本地压缩包解压获取
+
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rk3288_linux_sdk_release_v2.2.0_20200708.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 rk3288_linux_sdk_release_v2.3.0_20201203.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk3288
-tar xvf rk3288_linux_sdk_release_v2.2.0_20200708.tgz -C rk3288
+tar xvf rk3288_linux_sdk_release_v2.3.0_20201203.tgz -C rk3288
 cd rk3288
 .repo/repo/repo sync -l
-.repo/repo/repo sync
+.repo/repo/repo sync -c --no-tags
 ```
 
-后续开发者可根据 FAE 窗口定期发布的更新说明，通过 ”.repo/repo/repo sync” 命令同步更新。
-
-**获取 SDK 方法二: 从 Github 开源网站获取源码**
-
-下载 repo 工具：
-
-```
-git clone https://github.com/rockchip-linux/repo.git
-```
-
-建立 rk3288 linux 工作目录
-
-```
-mkdir rk3288_linux
-```
-
-进入 rk3288 linux 工作目录
-
-```
-cd rk3288_linux/
-```
-
-初始化 repo 仓库
-
-```
-../repo/repo init --repo-url=https://github.com/rockchip-linux/repo -u https://github.com/rockchip-linux/manifests -b master -m rk3288_linux_release.xml
-```
-
-同步下载整个工程：
-
-```
-../repo/repo sync
-```
-
-注意: 如果是已立项的项目请优先选择用方法一获取代码，不同于 Github 的是它会经过内部稳定测试和版本控制，方法二更多适用于爱好者和前期项目评估。
+后续开发者可根据 FAE 窗口定期发布的更新说明，通过 `.repo/repo/repo sync -c --no-tags` 命令同步更新。
 
 ## 软件开发指南
 
-### 开发指南
-
-RK3288 Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.02-rc3) 和 Debian9/10，为帮助开发工程师更快上手熟悉 SDK的开发调试工作，随 SDK 发布《RK3288_Linux_SDK_Release_xxx.pdf》。可在 docs/RK3288 目录下获取，并会不断完善更新。
-
 ### 软件更新记录
 
-软件发布版本升级通过工程 xml 进行查看当前版本，具体方法如下：
+软件发布版本升级通过工程 xml 进行查看，具体方法如下：
 
 ```
 .repo/manifests$ ls -l -h rk3288_linux_release.xml
@@ -175,13 +144,13 @@ RK3288 Linux SDK Kernel 版本是 Kernel 4.4， Rootfs 分别是 Buidlroot(2018.
 软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
 
 ```
-.repo/manifests$ cat rk3288_linux_v2.0/RK3288_Linux_Release_Note.txt
+.repo/manifests$ cat rk3288_linux/RK3288_Linux_SDK_Release_Note.md
 ```
 
 或者参考工程目录：
 
 ```
-<SDK>/docs/Socs/RK3288/RK3288_Linux_SDK_Release_Note.txt
+<SDK>/docs/RK3288/RK3288_Linux_SDK_Release_Note.md
 ```
 
 ## 硬件开发指南
@@ -200,10 +169,9 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 
 - app：存放上层应用 APP，主要是 qcamera/qfm/qplayer/qseting 等一些应用程序。
 - buildroot：基于 Buildroot（2018.02-rc3）开发的根文件系统。
-- debian：基于 Debian 9 开发的根文件系统。
+- debian：基于 Debian 10 开发的根文件系统。
 - device/rockchip：存放各芯片板级配置以及一些编译和打包固件的脚本和预备文件。
 - docs：存放开发指导文件、平台支持列表、工具使用文档、Linux 开发指南等。
-- distro：基于 Debian 10 开发的根文件系统。
 - IMAGE：存放每次生成编译时间、XML、补丁和固件目录。
 - external：存放第三方相关仓库，包括音频、视频、网络、recovery 等。
 - kernel：存放 Kernel 4.4 开发的代码。
@@ -212,8 +180,11 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 - rockdev：存放编译输出固件。
 - tools：存放 Linux 和 Window 操作系统下常用工具。
 - u-boot：存放基于 v2017.09 版本进行开发的 U-Boot 代码。
+- yocto：存放基于 Yocto Thud 3.0 开发的根文件系统。
 
 ## SDK 编译说明
+
+### SDK依赖包安装
 
 本 SDK 开发环境是在 Ubuntu 系统上开发测试。我们推荐使用 Ubuntu 18.04 的系统进行编译。其他的 Linux 版本可能需要对软件包做相应调整。除了系统要求外，还有其他软硬件方面的要求。
 硬件要求：64 位系统，硬盘空间大于 40G。如果您进行多个构建，将需要更大的硬盘空间。
@@ -221,112 +192,201 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 编译 SDK 环境搭建所依赖的软件包安装命令如下：
 
 ```
-repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support qemu-user-static live-build
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool \
+expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support \
+qemu-user-static live-build bison flex fakeroot cmake gcc-multilib g++-multilib unzip \
+device-tree-compiler python-pip ncurses-dev pyelftools \
 ```
 
 建议使用 Ubuntu18.04 系统或更高版本开发，若编译遇到报错，可以视报错信息，安装对应的软件包。
 
-### U-Boot 编译
+### SDK板级配置
 
-进入工程 u-boot 目录下执行 make.sh 来获取 rk3288_loader_v1.08.258.bin trust.img
-uboot.img.
+进入工程<SDK>/device/rockchip/rk3288 目录：
 
-RK3288 EVB 开发板：
+| 板级配置                       | 说明                                               |
+| ----------------------------- | --------------------------------------------------- |
+| BoardConfig-rk3288-evb-rk808.mk  |   适用于 RK3288 EVB 搭配RK808开发板  |
+| BoardConfig-rk3288-firefly.mk    |  适用于 RK3288 Firefly 开发板  |
+| BoardConfig_rk3288-evb-act8846.mk  |  适用于 RK3288 EVB 搭配ACT8846开发板 |
+
+方法1
+`./build.sh` 后面加上板级配置文件, 例如：
+
+选择**RK3288 EVB 搭配RK808**的板级配置：
 
 ```shell
-./make.sh rk3288
+ ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-evb-rk808.mk
 ```
 
-RK3288 Firefly 开发板：
+选择**RK3288 Firefly 开发板**的板级配置：
 
 ```shell
-./make.sh firefly-rk3288
+ ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-firefly.mk
 ```
 
-编译后生成文件在 u-boot 目录下：
+选择**RK3288 EVB 搭配ACT884**的板级配置：
 
-```
-u-boot/
-├── rk3288_loader_v1.08.258.bin
-├── trust.img
-└── uboot.img
+```shell
+./build.sh device/rockchip/rk3288/BoardConfig_rk3288-evb-act8846.mk
 ```
 
-### Kernel 编译步骤
+方法2
 
-进入工程目录根目录执行以下命令自动完成 kernel 的编译及打包。
+```shell
+rk3288$ ./build.sh lunch
+processing option: lunch
 
-RK3288 EVB RK808 开发板：
+You're building on Linux
+Lunch menu...pick a combo:
 
+0. default BoardConfig.mk
+1. BoardConfig-rk3288-evb-rk808.mk
+2. BoardConfig-rk3288-firefly.mk
+3. BoardConfig.mk
+4. BoardConfig_rk3288-evb-act8846.mk
+Which would you like? [0]:
+...
 ```
+
+### 查看编译命令
+
+在根目录执行命令：./build.sh -h
+
+```shell
+Usage: build.sh [OPTIONS]
+Available options:
+BoardConfig*.mk    -switch to specified board config
+lunch              -list current SDK boards and switch to specified board config
+uboot              -build uboot
+spl                -build spl
+loader             -build loader
+kernel             -build kernel
+modules            -build kernel modules
+toolchain          -build toolchain
+rootfs             -build default rootfs, currently build buildroot as default
+buildroot          -build buildroot rootfs
+ramboot            -build ramboot image
+multi-npu_boot     -build boot image for multi-npu board
+yocto              -build yocto rootfs
+debian             -build debian rootfs
+pcba               -build pcba
+recovery           -build recovery
+all                -build uboot, kernel, rootfs, recovery image
+cleanall           -clean uboot, kernel, rootfs, recovery
+firmware           -pack all the image we need to boot up system
+updateimg          -pack update image
+otapackage         -pack ab update otapackage image
+save               -save images, patches, commands used to debug
+allsave            -build all & firmware & updateimg & save
+check              -check the environment of building
+
+Default option is 'allsave'
+```
+
+查看部分模块详细编译命令，例如：./build.sh -h kernel
+
+```shell
+rk3288$ ./build.sh -h kernel
+###Current SDK Default [ kernel ] Build Command###
 cd kernel
 make ARCH=arm rockchip_linux_defconfig
 make ARCH=arm rk3288-evb-rk808-linux.img -j12
 ```
 
-RK3288 EVB ACT8846 开发板：
+[^注]: 详细的编译命令以实际对应的SDK版本为准，主要是配置可能会有差异。build.sh编译命令是固定的。
 
-```
-cd kernel
-make ARCH=arm rockchip_linux_defconfig
-make ARCH=arm rk3288-evb-act8846.img -j12
-```
+### 自动编译
 
-RK3288 Firefly 开发板：
-
-```
-cd kernel
-make ARCH=arm rockchip_linux_defconfig
-make ARCH=arm rk3288-firefly.img -j12
-```
-
-编译后在 kernel目录生成 zboot.img，此zboot.img 就是包含 Kernel 的 zimage 和 DTB。
-
-### Recovery 编译步骤
-
-进入工程目录根目录执行以下命令自动完成 Recovery 的编译及打包：
+进入工程根目录执行以下命令自动完成所有的编译：
 
 ```shell
+./build.sh all # 只编译模块代码（u-Boot，kernel，Rootfs，Recovery）
+               # 需要再执行./mkfirmware.sh 进行固件打包
+
+./build.sh     # 在./build.sh all基础上
+               # 1. 增加固件打包 ./mkfirmware.sh
+               # 2. update.img打包
+               # 3. 复制rockdev目录下的固件到IMAGE/***_RELEASE_TEST/IMAGES目录
+               # 4. 保存各个模块的补丁到IMAGE/***_RELEASE_TEST/PATCHES目录
+               # 注：./build.sh 和 ./build.sh allsave 命令一样
+```
+
+默认是 Buildroot，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs。RK_ROOTFS_SYSTEM目前可设定三个类型：buildroot、debian 和 yocto 。
+
+比如需要 debain 可以通过以下命令进行生成：
+
+```shell
+$export RK_ROOTFS_SYSTEM=debian
+$./build.sh
+```
+
+### 各模块编译及打包
+
+#### U-Boot编译
+
+```shell
+### U-Boot编译命令
+./build.sh uboot
+
+### 查看U-Boot详细编译命令
+./build.sh -h uboot
+```
+
+#### Kernel编译
+
+```shell
+### Kernel编译命令
+./build.sh kernel
+
+### 查看Kernel详细编译命令
+./build.sh -h kernel
+```
+
+#### Recovery编译
+
+```shell
+### Recovery编译命令
 ./build.sh recovery
+
+### 查看Recovery详细编译命令
+./build.sh -h recovery
 ```
 
-编译后在 Buildroot 目录 output/rockchip_rk3288_recovery/images 生成 recovery.img。
-需要特别注意 recovery.img 是包含 kernel.img，所以每次 Kernel 更改，Recovery 是需要重新打包生成。例如下：
+注：Recovery是非必需的功能，有些板级配置不会设置
 
-```
-SDK$source envsetup.sh rockchip_rk3288
-SDK$make recovery-rebuild
-SDK$./build.sh recovery
-```
-
-### Buildroot  编译
-
-#### Buildroot 的 Rootfs 编译
+#### Buildroot  编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
 
 ```shell
- ./build.sh rootfs
+./build.sh rootfs
 ```
 
-编译后在 Buildroot 目录 output/rockchip_rk3288/images下生成 rootfs.ext4。
-备注：
-若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。交叉编译工具位于 buildroot/output/rockchip_rk3288/host/usr 目录下，需要将工具的 bin/ 目录和 arm-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
+编译后在 Buildroot 目录 output/rockchip_芯片命名/images下生成 rootfs.ext4。
+
+##### Buildroot 的交叉编译
+
+若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。交叉编译工具位于 buildroot/output/rockchip_rk3288/host/usr 目录下，需要将工具的bin/目录和 arm-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
+
+```shell
+source envsetup.sh
+```
 
 输入命令查看：
 
 ```shell
-cd buildroot/output/rockchip_rk3288/host/usr
-arm-linux-gcc --version
+cd buildroot/output/rockchip_rk3288/host/usr/bin
+./arm-linux-gcc --version
 ```
 
 此时会打印如下信息：
 
 ```
-gcc version 8.4.0 (Buildroot 2018.02-rc3-02301-ga3d3e23e2c)
+gcc version 9.3.0 (Buildroot 2018.02-rc3-02723-gd3fbc6ae13)
 ```
 
-#### Buildroot 中模块编译
+##### Buildroot 中模块编译
 
 比如 qplayer 模块，常用相关编译命令如下：
 
@@ -350,7 +410,7 @@ SDK$make qplayer-dirclean
 SDK$rm -rf /buildroot/output/rockchip_rk3288/build/qlayer-1.0
 ```
 
-### Debian 9 编译
+#### Debian 编译
 
 ```
  ./build.sh debian
@@ -375,10 +435,10 @@ sudo apt-get install -f
 编译 32 位的 Debian:
 
 ```shell
-RELEASE=stretch TARGET=desktop ARCH=armhf ./mk-base-debian.sh
+RELEASE=buster TARGET=desktop ARCH=armhf ./mk-base-debian.sh
 ```
 
-编译完成会在  debian/ 目录下生成：linaro-stretch-alip-xxxxx-1.tar.gz（xxxxx 表示生成时间戳)。
+编译完成会在  debian/ 目录下生成：linaro-buster-alip-xxxxx-1.tar.gz（xxxxx 表示生成时间戳)。
 
 FAQ:
 
@@ -386,7 +446,7 @@ FAQ:
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot' mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/buster-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/buster-desktop-armhf/chroot' mounted with noexec or nodev
 ```
 
 解决方法：
@@ -399,32 +459,32 @@ mount -o remount,exec,dev xxx (xxx 是工程目录), 然后重新编译
 
 - 由于编译 Base Debian 需要访问国外网站，而国内网络访问国外网站时，经常出现下载失败的情况:
 
-Debian 9 使用 live build,镜像源改为国内可以这样配置:
+Debian 10 使用 live build,镜像源改为国内可以这样配置:
 
 ```diff
-+++ b/ubuntu-build-service/stretch-desktop-armhf/configure
++++ b/ubuntu-build-service/buster-desktop-armhf/configure
 @@ -11,6 +11,11 @@ set -e
  echo "I: create configuration"
  export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
  lb config \
-+ --mirror-bootstrap "http://mirrors.163.com/debian" \
-+ --mirror-chroot "http://mirrors.163.com/debian" \
-+ --mirror-chroot-security "http://mirrors.163.com/debian-security" \
-+ --mirror-binary "http://mirrors.163.com/debian" \
-+ --mirror-binary-security "http://mirrors.163.com/debian-security" \
++ --mirror-bootstrap "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security" \
++ --mirror-binary "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-binary-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security"
   --apt-indices false \
   --apt-recommends false \
   --apt-secure false \
 ```
 
-如果其他网络原因不能下载包，有预编生成的包分享在[百度云网盘](https://eyun.baidu.com/s/3bqwrvo7)，放在当前目录直接执行下一步操作。
+如果其他网络原因不能下载包，有预编生成的包分享在[百度云网盘](https://eyun.baidu.com/s/3mjGXBHA)，放在当前目录直接执行下一步操作。
 
 **(2) Building rk-debian rootfs**
 
 编译 32位的 Debian：
 
 ```shell
-VERSION=debug ARCH=armhf ./mk-rootfs-stretch.sh
+VERSION=debug ARCH=armhf ./mk-rootfs-buster.sh
 ```
 
 **(3) Creating the ext4 image(linaro-rootfs.img)**
@@ -435,103 +495,37 @@ VERSION=debug ARCH=armhf ./mk-rootfs-stretch.sh
 
 此时会生成 linaro-rootfs.img。
 
-### Debian 10 编译
+#### Yocto 编译
 
-```
-./build.sh distro
-```
-
-或进入 distro/ 目录：
-
-```
-cd distro/ && make ARCH=arm rk3288_defconfig && ./make.sh
-```
-
-编译后在 distro/output/images/ 目录下生成 rootfs.ext4 。
-注意： 目前Debian 10 QT的编译还依赖 Buildroot qmake的编译， 所以编译 Debian 10 前，请先编译 Buildroot。
-更多 Debian 10 的介绍参考文档：
-
-```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Debian10_CN.pdf
-```
-
-### 全自动编译
-
-完成上述 Kernel/U-Boot/Recovery/Rootfs 各个部分的编译后，进入工程目录根目录执行以下命
-令自动完成所有的编译：
+进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
+RK3288 EVB 开发板：
 
 ```shell
-$./build.sh all
+./build.sh yocto
 ```
 
-默认是 Buildroot ，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs 。
-比如需要 buildroot 可以通过以下命令进行生成：
+编译后在 yocto 目录 build/lastest 下生成 rootfs.img。
+
+FAQ：
+上面编译如果遇到如下问题情况：
+
+```
+Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).
+Python can't change the filesystem locale after loading so we need a UTF-8
+when Python starts or things won't work.
+```
+
+解决方法:
 
 ```shell
-$export RK_ROOTFS_SYSTEM=buildroot
-$./build.sh all
+locale-gen en_US.UTF-8
+export LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8
 ```
 
-具体参数使用情况，可 help 查询，比如：
+或者参考 [setup-locale-python3]( https://webkul.com/blog/setup-locale-python3) 编译后生成的 image 在 yocto/build/lastest/rootfs.img， 默认用户名登录是 root。
+Yocto 更多信息请参考 [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto)。
 
-```shell
-rk3288$ ./build.sh --help
-Usage: build.sh [OPTIONS]
-Available options:
-BoardConfig*.mk    -switch to specified board config
-uboot              -build uboot
-spl                -build spl
-kernel             -build kernel
-modules            -build kernel modules
-toolchain          -build toolchain
-rootfs             -build default rootfs, currently build buildroot as default
-buildroot          -build buildroot rootfs
-ramboot            -build ramboot image
-multi-npu_boot     -build boot image for multi-npu board
-yocto              -build yocto rootfs
-debian             -build debian9 stretch rootfs
-distro             -build debian10 buster rootfs
-pcba               -build pcba
-recovery           -build recovery
-all                -build uboot, kernel, rootfs, recovery image
-cleanall           -clean uboot, kernel, rootfs, recovery
-firmware           -pack all the image we need to boot up system
-updateimg          -pack update image
-otapackage         -pack ab update otapackage image
-save               -save images, patches, commands used to debug
-allsave            -build all & firmware & updateimg & save
-
-Default option is 'allsave'.
-```
-
-每个板子的板级配置需要在 /device/rockchip/rk3288/Boardconfig.mk 进行相关配置。
-RK3288 EVB 开发板主要配置如下：
-
-```shell
-# Target arch
-export RK_ARCH=arm
-# Uboot defconfig
-export RK_UBOOT_DEFCONFIG=rk3288
-# Kernel defconfig
-export RK_KERNEL_DEFCONFIG=rockchip_linux_defconfig
-# Kernel dts
-export RK_KERNEL_DTS=rk3288-evb-rk808-linux
-# boot image type
-export RK_BOOT_IMG=zboot.img
-# kernel image path
-export RK_KERNEL_IMG=kernel/arch/arm/boot/zImage
-# parameter for GPT table
-export RK_PARAMETER=parameter.txt
-# Buildroot config
-export RK_CFG_BUILDROOT=rockchip_rk3288
-# Debian 10 config
-export RK_DISTRO_DEFCONFIG=rk3288_defconfig
-# Recovery config
-export RK_CFG_RECOVERY=rockchip_rk3288_recovery
-
-```
-
-### 固件的打包
+#### 固件的打包
 
 上面 Kernel/U-Boot/Recovery/Rootfs 各个部分的编译后，进入工程目录根目录执行以下命令自
 动完成所有固件打包到 rockdev 目录下：
@@ -574,7 +568,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 注：烧写前，需安装最新 USB 驱动，驱动详见：
 
 ```shell
-<SDK>/tools/windows/DriverAssitant_v4.8.zip
+<SDK>/tools/windows/DriverAssitant_v5.0.zip
 ```
 
 ### Linux 刷机说明
@@ -635,14 +629,21 @@ sudo ./upgrade_tool uf rockdev/update.img
 
 ## RK3288 SDK 固件
 
-RK3288_Linux_SDK_V2.2.0_20200708 固件下载链接如下
-（包含 Buildroot/Debian 9/Debian 10 的固件）
+- 百度云网盘
 
-- RK3288 EVB 开发板
+[Buildroot](https://eyun.baidu.com/s/3cXqTDs)
 
-[Buildroot](https://eyun.baidu.com/s/3jJFFLpO)
-[Debian9](https://eyun.baidu.com/s/3o9Gn84U)
-[Debian10](https://eyun.baidu.com/s/3pMeXNlh)
+[Debian rootfs](https://eyun.baidu.com/s/3smu2OH3)
+
+[Yocto rootfs](https://eyun.baidu.com/s/3dPzAwA)
+
+- 微软 OneDriver
+
+[Buildroot](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EmhOOhNkIeNOpDXUs7VDOVUBz48yh4rOWu-QzvLyfz6tZQ?e=D0Pmi8)
+
+[Debian rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EgPPa1EfzepNoK_t6fIuSQgBZKoezSjV_N4_HQ2h0g0JNg?e=ITLyGT)
+
+[Yocto rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/Epq-ccBCajpGmxdZJJRkxYYBYRVbG9WflU_6AupdqZyQtQ?e=k19l9i)
 
 ## SSH 公钥操作说明
 

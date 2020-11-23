@@ -2,9 +2,9 @@
 
 ID: RK-FB-CS-009
 
-Release Version: V1.4.0
+Release Version: V1.4.1
 
-Release Date: 2020-10-10
+Release Date: 2020-12-03
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -68,7 +68,7 @@ Software development engineers
 | 2020-08-06 | V1.3.2      | Caesar Wang | Support Debian 10                                            |
 | 2020-08-13 | V1.3.3      | Caesar Wang | Upgrade rknpu to 1.3.4, and update the directory <br/>structure and Firmware upgrade |
 | 2020-10-10 | V1.4.0      | Caesar Wang | Upgrade rknpu to 1.4.0, <br/>and update the directory structure |
-
+| 2020-10-10 | V1.4.0      | Caesar Wang | debian9/10 merge to debian |
 ---
 
 **Contents**
@@ -79,7 +79,7 @@ Software development engineers
 
 ## Overview
 
-This SDK is based on 3 Linux systems: Buildroot 2018.02-rc3, Yocto Thud 3.0, Debian 9, Debian10,  with Kernel 4.4 and U-boot v2017.09. It is suitable to the development of RK3399Pro EVB and all other Linux products developed based on it.
+This SDK is based on 3 Linux systems: Buildroot 2018.02-rc3, Yocto Thud 3.0, and Debian10,  with Kernel 4.4 and U-boot v2017.09. It is suitable to the development of RK3399Pro EVB and all other Linux products developed based on it.
 This SDK supports NPU TensorFlow/Caffe model, VPU hardware decoding, GPU 3D, Wayland display, QT and other functions. For detailed function debugging and interface introduction, please refer to related documents under the docs/ directory in the project.
 
 ## Main Functions
@@ -103,7 +103,8 @@ RK3399Pro_Linux_SDK  download command is as follows：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
-ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rk3399pro_linux_release.xml
+ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m \
+rk3399pro_linux_release.xml
 ```
 
 Repo, a tool built on Python script by Google to help manage git repositories, is mainly used to download and manage software repository of projects. The download address is as follows:
@@ -122,10 +123,10 @@ mkdir rk3399pro
 tar xvf rk3399pro_linux_sdk_release_v1.4.0_20201010.tgz -C rk3399pro
 cd rk3399pro
 .repo/repo/repo sync -l
-.repo/repo/repo sync -c
+.repo/repo/repo sync -c --no-tags
 ```
 
-Developers can update via `.repo/repo/repo sync -c` command according to update instructions that are regularly released by FAE window.
+Developers can update via `.repo/repo/repo sync -c --no-tags` command according to update instructions that are regularly released by FAE window.
 
 ## Software Development Guide
 
@@ -176,7 +177,7 @@ Software release version upgrade can be checked through project xml file by the 
 Software release version updated information can be checked through the project text file by the following command:
 
 ```shell
-.repo/manifests$ cat rk3399pro_linux_v0.01/RK3399PRO_Linux_SDK_Release_Note.md
+.repo/manifests$ cat rk3399pro_linux/RK3399PRO_Linux_SDK_Release_Note.md
 ```
 
 Or refer to the project directory:
@@ -199,10 +200,9 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 
 - app: store application APPs like qcamera/qfm/qplayer/qseting and other applications.
 - buildroot: root file system based on Buildroot (2018.02-rc3).
-- debian: root file system based on Debian 9.
+- debian: root file system based on Debian.
 - device/rockchip: store board-level configuration for each chip and some scripts and prepared files for compiling and packaging firmware.
 - docs: stores development guides, platform support lists, tool usage, Linux development guides, and so on.
-- distro: a root file system based on Debian 10.
 - IMAGE: stores compilation time, XML, patch and firmware directory for each compilation.
 - external: stores some third-party libraries, including audio, video, network, recovery and so on.
 - kernel: stores kernel4.4 development code.
@@ -226,8 +226,10 @@ Software requirements: Ubuntu 18.04 system:
 Please install software packages with below commands to setup SDK compiling environment:
 
 ```shell
-sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool expect g++ patchelf chrpath gawk texinfo \
-chrpath diffstat binfmt-support qemu-user-static live-build bison flex fakeroot cmake
+sudo apt-get install repo git ssh make gcc libssl-dev liblz4-tool \
+expect g++ patchelf chrpath gawk texinfo chrpath diffstat binfmt-support \
+qemu-user-static live-build bison flex fakeroot cmake gcc-multilib g++-multilib unzip \
+device-tree-compiler python-pip ncurses-dev pyelftools \
 ```
 
 It is recommended to use Ubuntu 18.04 system or higher version for development. If you encounter an error during compilation, you can check the error message and install the corresponding software packages.
@@ -335,8 +337,7 @@ buildroot          -build buildroot rootfs
 ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
-debian             -build debian9 stretch rootfs
-distro             -build debian10 buster rootfs
+debian             -build debian rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
@@ -484,7 +485,7 @@ Enter root directory of project directory and execute the following commands to 
                # Note：./build.sh  and  ./build.sh allsave command are the same
 ```
 
-It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are four types of system for RK_ROOTFS_SYSTEM: buildroot, Debian, distro and yocto. In which, debian is used to build Debian 9 system, distro is used to build debian10 system
+It is Buildroot by default, you can specify rootfs by setting the environment variable RK_ROOTFS_SYSTEM. There are three types of system for RK_ROOTFS_SYSTEM: buildroot, Debian,  and yocto.
 
 For example, if you need debain, you can generate it with the following command:
 
@@ -555,7 +556,7 @@ cd buildroot/output/rockchip_rk3399pro_combine/host/usr/bin
 Then the following logs are printed:
 
 ```
-aarch64-linux-gcc.br_real (Buildroot 2018.02-rc3-01797-gcd6c508) 6.5.0
+gcc version 9.3.0 (Buildroot 2018.02-rc3-02723-gd3fbc6ae13)
 ```
 
 ###### Build Modules in Buildroot
@@ -582,7 +583,7 @@ or
 SDK$rm -rf /buildroot/output/rockchip_rk3399pro/build/qlayer-1.0
 ```
 
-##### Debian 9  Build
+##### Debian Building
 
 ```
  ./build.sh debian
@@ -590,13 +591,13 @@ SDK$rm -rf /buildroot/output/rockchip_rk3399pro/build/qlayer-1.0
 
 Or enter debian/ directory:
 
-```shell
+```
 cd debian/
 ```
 
-The following compilation and debian firmware generation, you can refer to “readme.md” in the current directory.
+Please refer to the readme.md in the directory for further building and Debian firmware generation.
 
-**(1) Building Base Debian System**
+**(1) Building base Debian system**
 
 ```
 sudo apt-get install binfmt-support qemu-user-static live-build
@@ -604,61 +605,59 @@ sudo dpkg -i ubuntu-build-service/packages/*
 sudo apt-get install -f
 ```
 
-Compile 64-bit Debian:
+Build 64 bit Debian:
 
 ```shell
-RELEASE=stretch TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
+RELEASE=buster TARGET=desktop ARCH=arm64 ./mk-base-debian.sh
 ```
 
-After compiling, linaro-stretch-alip-xxxxx-1.tar.gz (xxxxx is generated timestamp will be generated in debian/ directory.)
+After building, linaro-buster-alip-xxxxx-1.tar.gz (xxxxx is timestamp generated) will be generated in “debian/”:
 
 FAQ:
-If you encounter the following problem during above compiling:
+
+- If you encounter the following problem during above building:
 
 ```
 noexec or nodev issue /usr/share/debootstrap/functions: line 1450:
-..../rootfs/ubuntu-build-service/stretch-desktop-armhf/chroot/test-dev-null: Permission denied E: Cannot install into target
-...
-mounted with noexec or nodev
+..../rootfs/ubuntu-build-service/buster-desktop-arm64/chroot/test-dev-null: Permission denied E: Cannot install into target '/rootfs/ubuntu-build-service/buster-desktop-arm64/chroot' mounted with noexec or nodev
 ```
 
 Solution：
 
 ```
-mount -o remount,exec,dev xxx
-(xxx is the project directory path, then rebuild)
+mount -o remount,exec,dev xxx (xxx is the project directory), and then rebuild
 ```
 
-In addition, if there are other compilation issues, please check firstly that the compiler system is not ext2/ext4.
+In addition, if there are other building issues, please check firstly that the building system is not ext2/ext4.
 
-- Building Base Debian need to access to foreign websites, it often fail to download in domestic networks.
+- Because building Base Debian requires to access to foreign websites, and when domestic networks access foreign websites, download failures often occur:
 
-Debian 9 uses live build, it can be configured like below to change the image source to domestic
+The live build is used in Debian10, you can configure like below to change the image source to domestic:
 
 ```diff
-+++ b/ubuntu-build-service/stretch-desktop-arm64/configure
++++ b/ubuntu-build-service/buster-desktop-arm64/configure
 @@ -11,6 +11,11 @@ set -e
  echo "I: create configuration"
  export LB_BOOTSTRAP_INCLUDE="apt-transport-https gnupg"
  lb config \
-+ --mirror-bootstrap "http://mirrors.163.com/debian" \
-+ --mirror-chroot "http://mirrors.163.com/debian" \
-+ --mirror-chroot-security "http://mirrors.163.com/debian-security" \
-+ --mirror-binary "http://mirrors.163.com/debian" \
-+ --mirror-binary-security "http://mirrors.163.com/debian-security" \
++ --mirror-bootstrap "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-chroot-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security" \
++ --mirror-binary "https://mirrors.tuna.tsinghua.edu.cn/debian" \
++ --mirror-binary-security "https://mirrors.tuna.tsinghua.edu.cn/debian-security"
   --apt-indices false \
   --apt-recommends false \
   --apt-secure false \
 ```
 
-If the package cannot be downloaded for other network reasons, a pre-build package is shared in [Baidu Cloud Network Disk](<<https://eyun.baidu.com/s/3bqwrvo7>), put it in the current directory, and then do the next step directly.
+If the package cannot be downloaded for other network reasons, there are pre-build packages shared on [Baidu Cloud Disk](https://eyun.baidu.com/s/3mjGXBHA), put it in the current directory, and then do the next step directly.
 
 **(2) Building rk-debian rootfs**
 
-Compile 64-bit Debian:
+Build 64bit Debian：
 
 ```shell
-VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
+VERSION=debug ARCH=arm64 ./mk-rootfs-buster.sh
 ```
 
 **(3) Creating the ext4 image(linaro-rootfs.img)**
@@ -667,28 +666,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-stretch.sh
 ./mk-image.sh
 ```
 
-Will generate linaro-rootfs.img.
-
-##### Debian 10 Build
-
-```
-./build.sh distro
-```
-
-Or enter distro/directory:
-
-```
-cd distro/ && make ARCH=arm64 rk3399pro_defconfig && ./make.sh
-```
-
-After building, the rootfs.ext4 will be generated in the distro directory “distro/output/images/”.
-**Note**: The current build of Debian10 Qt also depends on the build of Buildroot qmake, so please build Buildroot before building Debian10.
-
-Please refer to the following document for more introductions about Debian10.
-
-```
-<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Debian10_EN.pdf
-```
+The linaro-rootfs.img will be generated.
 
 ##### Yocto Build
 
@@ -741,7 +719,7 @@ There are V10/V11/V12/V13/V14 Five versions of current RK3399Pro EVB, V10 versio
 
 ### Windows  Upgrade Introduction
 
-SDK provides windows upgrade tool (this tool should be V2.55 or later version) which is located in project root directory:
+SDK provides windows upgrade tool (this tool should be V2.79 or later version) which is located in project root directory:
 
 ```
 tools/
@@ -755,12 +733,12 @@ As shown below, after compiling the corresponding firmware, device should enter 
 Note：Before upgrade, please install the latest USB driver, which is in the below directory:
 
 ```
-<SDK>/tools/windows/DriverAssitant_v4.91.zip
+<SDK>/tools/windows/DriverAssitant_v5.0.zip
 ```
 
 ### Linux Upgrade Instruction
 
-The Linux upgrade tool (Linux_Upgrade_Tool should be v1.33 or later versions) is located in “tools/linux” directory. Please make sure your board is connected to MASKROM/loader rockusb, if the compiled firmware is in rockdev directory, upgrade commands are as below:
+The Linux upgrade tool (Linux_Upgrade_Tool should be v1.57 or later versions) is located in “tools/linux” directory. Please make sure your board is connected to MASKROM/loader rockusb, if the compiled firmware is in rockdev directory, upgrade commands are as below:
 
 ```shell
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
@@ -818,44 +796,21 @@ Default partition (below is RK3399Pro EVB reference partition) is showed as foll
 
 ### RK3399Pro SDK  Firmware
 
-RK3399PRO_LINUX_SDK_V1.3.3_20200813 firmware download links are as follows:
-(Including Buildroot,Debian and Yocto firmware)
+- Baidu Cloud Disk
 
-- Baidu cloud disk
+[Buildroot](https://eyun.baidu.com/s/3cXqTDs)
 
-Buildroot:
-[V10 (green) development board](https://eyun.baidu.com/s/3jJtvqbc)
-[V11/V12 (black) development board](https://eyun.baidu.com/s/3smrfdKh)
-[V13 (black) development board](https://eyun.baidu.com/s/3hsVcFqc)
-[V14 (black) development board](https://eyun.baidu.com/s/3dGzAWVn)
+[Debian rootfs](https://eyun.baidu.com/s/3smu2OH3)
 
-Debian 9:
-[Debian9 rootfs](https://eyun.baidu.com/s/3mkicbhe)
-
-Debian 10:
-[Debian10 pcie rootfs](https://eyun.baidu.com/s/3kXn3Ker)
-[Debian10 usb rootfs](https://eyun.baidu.com/s/3dT3sF8)
-
-Yocto:
-[Yocto rootfs](https://eyun.baidu.com/s/3dGYgUGx)
+[Yocto rootfs](https://eyun.baidu.com/s/3dPzAwA)
 
 - Microsoft OneDriver
 
-Buildroot:
-[V10 (green) development board](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EXVnKILyA81Fr5jWe9_JyDAB-VOCNXVHyWwtWs7vl4twlg?e=OnItNC)
-[V11/V12 (black) development board](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/ESd4QW1zci5BtncA6j3OsiIBqKnXEJRqFjyGErZUM1YChA?e=mj7gDl)
-[V13 (black) development board](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EXD6e97YVwRCp6cha3zvHXkBGJGXwp68eW4z35h6wy6VLA?e=YRehGm)
-[V14 (black) development board](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EfPM8XYcI3VNsYObulL4w-UBcJ7MLrR63ArSSKtNwo4BKw?e=R5fO9c)
+[Buildroot](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EmhOOhNkIeNOpDXUs7VDOVUBz48yh4rOWu-QzvLyfz6tZQ?e=D0Pmi8)
 
-Debian 9:
-[Debian9 rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EaPhc_ihXZVFgyENngkOu7cBYEVzreiLW7SB97vYmGzzlQ?e=CewU6A)
+[Debian rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/EgPPa1EfzepNoK_t6fIuSQgBZKoezSjV_N4_HQ2h0g0JNg?e=ITLyGT)
 
-Debian 10:
-[Debian10 pcie rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/ERb4j2EhaIpHq9uQhzkBxm0BqIj7q0xyuWdsaFM00wx5gg?e=T0Wzn1)
-[Debian10 usb rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/ERb4j2EhaIpHq9uQhzkBxm0BqIj7q0xyuWdsaFM00wx5gg?e=T0Wzn1)
-
-Yocto:
-[Yocto rootfs](https://rockchips-my.sharepoint.com/:u:/g/personal/lin_huang_rockchips_onmicrosoft_com/EYqMF_CJEqlJu7_rXlpLh3oBUElXqeJ5Mhn7kv7aihZ0cg?e=93OSjN)
+[Yocto rootfs](https://rockchips-my.sharepoint.com/:f:/g/personal/lin_huang_rockchips_onmicrosoft_com/Epq-ccBCajpGmxdZJJRkxYYBYRVbG9WflU_6AupdqZyQtQ?e=k19l9i)
 
 ### RKNN_DEMO Test
 
