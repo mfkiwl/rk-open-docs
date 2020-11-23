@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.0
+Release Version: V1.9.1
 
-Release Date: 2020-11-14
+Release Date: 2020-11-22
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -77,6 +77,7 @@ This document (this guide) is mainly intended for:
 | V1.8.1 | CWW | 2020-10-29 | update training video link |
 | V1.8.2 | LJH | 2020-11-02 | update facial gate product section |
 | V1.9.0 | CWW | 2020-11-14 | 1. Update spi nand/slc nand BoardConfig and Document<br>2. Update requirement version for windows and Linux tool |
+| V1.9.1 | CWW | 2020-11-22 | Add spi nor BoardConfig |
 
 ---
 
@@ -405,6 +406,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig-v12.mk            | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-slc-nand-v12.mk   | General IPC                                 | SLC NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
+| BoardConfig-spi-nor-v12.mk    | Base system and only RTSP stream to preview | SPI NOR        | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-facial_gate.mk    | Door Control or Turnstile                   | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | ++++++++++++++++++++++++++    | +++++++++++++++++++++++++++++++++           | +++++++++++++  | ++++++++++++++++++++++++++++++++++++++++++++        |
 
@@ -435,7 +437,6 @@ Method 2
 
 ```shell
 ./build.sh lunch
-processing board option: lunch
 processing option: lunch
 
 You're building on Linux
@@ -443,19 +444,23 @@ Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
 1. BoardConfig-38x38-spi-nand.mk
-2. BoardConfig-facial_gate.mk
-3. BoardConfig-ramboot-uvc.mk
-4. BoardConfig-robot.mk
-5. BoardConfig-sl.mk
-6. BoardConfig-spi-nand.mk
-7. BoardConfig-tb-v12.mk
-8. BoardConfig-tb-v13.mk
-9. BoardConfig-uvcc.mk
-10. BoardConfig-v10-v11.mk
-11. BoardConfig-v12.mk
-12. BoardConfig.mk
+2. BoardConfig-battery-ipc.mk
+3. BoardConfig-facial_gate.mk
+4. BoardConfig-ramboot-uvc.mk
+5. BoardConfig-robot.mk
+6. BoardConfig-sl.mk
+7. BoardConfig-slc-nand-v12.mk
+8. BoardConfig-spi-nand.mk
+9. BoardConfig-spi-nor-v12.mk
+10. BoardConfig-tb-v12.mk
+11. BoardConfig-tb-v13.mk
+12. BoardConfig-uvcc-spi-nand.mk
+13. BoardConfig-uvcc.mk
+14. BoardConfig-v10-v11.mk
+15. BoardConfig-v12.mk
+16. BoardConfig.mk
 Which would you like? [0]:
-switching to board: /home/cww/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
+switching to board: /home/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
 
 ### To View Building Commands

@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.0
+发布版本：V1.9.1
 
-日期：2020-11-14
+日期：2020-11-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -82,6 +82,7 @@ Rockchip Electronics Co., Ltd.
 | V1.8.1 | CWW | 2020-10-29 | 更新视频培训地址|
 | V1.8.2 | LJH | 2020-11-02 | 更新闸机和门禁类产品章节 |
 | V1.9.0 | CWW | 2020-11-14 | 1. 更新spi nand/slc nand 板级配置和文档<br>2. 更新windows和Linux烧录工具版本要求 |
+| V1.9.1 | CWW | 2020-11-22 | 增加spi nor板级配置 |
 
 ---
 
@@ -408,6 +409,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig-v12.mk            | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-slc-nand-v12.mk   | 通用IPC                      | SLC NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
+| BoardConfig-spi-nor-v12.mk    | 精简系统，只有基本码流预览   | SPI NOR  | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-facial_gate.mk    | 门禁和闸机类产品             | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | ++++++++++++++++++++++++++    | ++++++++++++++++++++++++++++ | +++++    | ++++++++++++++++++++++++++++++++++++++++++++        |
 
@@ -438,7 +440,6 @@ Starting default: 100% (71/71), done.
 
 ```shell
 ./build.sh lunch
-processing board option: lunch
 processing option: lunch
 
 You're building on Linux
@@ -446,19 +447,23 @@ Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
 1. BoardConfig-38x38-spi-nand.mk
-2. BoardConfig-facial_gate.mk
-3. BoardConfig-ramboot-uvc.mk
-4. BoardConfig-robot.mk
-5. BoardConfig-sl.mk
-6. BoardConfig-spi-nand.mk
-7. BoardConfig-tb-v12.mk
-8. BoardConfig-tb-v13.mk
-9. BoardConfig-uvcc.mk
-10. BoardConfig-v10-v11.mk
-11. BoardConfig-v12.mk
-12. BoardConfig.mk
+2. BoardConfig-battery-ipc.mk
+3. BoardConfig-facial_gate.mk
+4. BoardConfig-ramboot-uvc.mk
+5. BoardConfig-robot.mk
+6. BoardConfig-sl.mk
+7. BoardConfig-slc-nand-v12.mk
+8. BoardConfig-spi-nand.mk
+9. BoardConfig-spi-nor-v12.mk
+10. BoardConfig-tb-v12.mk
+11. BoardConfig-tb-v13.mk
+12. BoardConfig-uvcc-spi-nand.mk
+13. BoardConfig-uvcc.mk
+14. BoardConfig-v10-v11.mk
+15. BoardConfig-v12.mk
+16. BoardConfig.mk
 Which would you like? [0]:
-switching to board: /home/cww/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
+switching to board: /home/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
 
 ### 查看编译命令
