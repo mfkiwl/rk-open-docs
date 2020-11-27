@@ -70,6 +70,7 @@ Rockchip SDK默认采用闭源的miniloader 加载 trust 和 u-boot，所有存�
 | V1.0.2   | Ruby Zhang | 2020-07-08 | 格式修订               |
 | V1.1.0   | Jair Wu    | 2020-07-10 | 新增u-boot编译说明     |
 | V2.0.0   | Jon Lin    | 2020-10-19 | 完善驱动配置等详细信息 |
+| V2.0.1 | Jon Lin | 2020-11-27 | 增加 UBIFS 多卷支持、增减 ubiattach 参数说明 |
 
 ---
 
@@ -251,7 +252,7 @@ RK 提供的 SDK 支持 u-boot 中解析 GPT 生成 cmdline mtdparts 信息，�
 
 注意：
 
-* SLC Nand 及 SPI Nand 开源方案每个分区应预留出 2~3 个 flash block size 的冗余空间，以便遇到坏块时，有冗余空间可替换；
+* SLC Nand 及 SPI Nand 开源方案每个分区应预留出 2~3 个 flash block size 的冗余空间，以便遇到坏块时，有冗余空间可替换，尤其注意 uboot 分区是否做到了空间预留；
 
 * 分区起始地址应做 flash block size 对齐；
 
@@ -733,6 +734,46 @@ mkfs.ubifs -F -d /path-to-it/buildroot/output/rockchip_rv1126_rv1109_spi_nand/ta
 ubinize -o ubi.img -m 0x1000 -p 256KiB ubinize.cfg
 ```
 
+**多卷镜像实例**
+
+以 page size 2KB，page per block 64，即 block size 128KB，分区大小 8MB oem 和 分区大小 8MB userdata 复合的多卷分区为例：
+
+```shell
+mkfs.ubifs -F -d oem -e 0x1f000 -c 0x40 -m 0x800 -v -o oem.ubifs
+mkfs.ubifs -F -d userdata -e 0x1f000 -c 0x40 -m 0x800 -v -o userdata.ubifs
+ubinize -o oem_userdata.img -p 0x20000 -m 2048 -s 2048 -v ubinize_oem_userdata.cfg
+```
+
+设置 ubinize_oem_userdata.cfg 如下：
+
+```ini
+[oem-volume]
+mode=ubi
+image=oem.ubifs
+vol_id=0
+vol_size=8MiB
+vol_type=dynamic
+vol_name=oem
+
+[userdata-volume]
+mode=ubi
+image=userdata.ubifs
+vol_id=1
+vol_size=8MiB
+vol_type=dynamic
+vol_name=userdata
+vol_flags=autoresize
+
+```
+
+挂载分区：
+
+```shell
+ubiattach /dev/ubi_ctrl -m 4 -d 4 -b 5
+mount -t ubifs /dev/ubi4_0 /oem
+mount -t ubifs /dev/ubi4_1 /uesrdata
+```
+
 **镜像大小与分区空间**
 
 精确计算：
@@ -767,6 +808,11 @@ ubiattach /dev/ubi_ctrl -m 4 -d 4
 
 * -m：指定 mtd 分区序号
 * -d：绑定后的 ubi 设备编号，建议与 mtd 分区序号一致
+* -b, --max-beb-per1024：每1024个eraseblock预期的最大坏块数，注意：
+  1. 不带参数，默认为 20；
+  2. 如果第一次扫描，冗余空间大于该值，则预留该数值的 block 作为坏块替换区，该区域用户不可获取，如冗余空间小于该值，则冗余空间除了其他必要保留空间外都作为坏块保留区；
+  3. SDK 默认值应设定为 10（可能旧版本 SDK 该值未设定）；
+  4. 如需优化空间，请灵活设定该值：4 + 分区所占 block 数 * 1%，例如：flash block size 128KB，oem 空间大小 16MB，占 128 flash block，可以考虑填值 5；
 
 ```shell
 mount -t ubifs /dev/ubi4_0 /oem
@@ -840,6 +886,14 @@ ubinize -o rootfs.ubi -p 0x20000 -m 2048 -s 2048 -v ubinize.cfg
 注意：
 
 * Nand 产品使用开源方案应将 SquashFS 挂载在 UBI block 上而非 mtdblock，因为 mtdblock 没有加入坏块探测，所以无法跳过坏块.
+
+**手动挂载 UBI block 参考**
+
+```shell
+ubiattach /dev/ubi_ctrl -m 4 -d 4   /* 先挂载 UBI 设备 */
+ubiblock -c /dev/ubi4_0             /* UBI 设备上扩展 UBI block 支持 */
+mount -t squashfs /dev/ubiblock4_0 /oem
+```
 
 ### UBIFS OTA
 

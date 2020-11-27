@@ -64,6 +64,7 @@ Software development engineers
 | V1.0.2      | Ruby Zhang | 2020-07-08 | Update the format of the document                  |
 | V1.1.0      | Jair Wu    | 2020-07-10 | Add u-boot compile introduction                    |
 | V2.0.0      | Jon Lin    | 2020-10-19 | Improve the driver configuration and other details |
+| V2.0.1 | Jon Lin | 2020-11-27 | Add UBIFS multi volume support, increase or decrease ubiattach parameter description |
 
 ---
 
@@ -250,7 +251,7 @@ RK SDK support parsing GPT and generate mtdparts to kernel.
 
 Notes：
 
-* Each partition of SLC NAND and SPI NAND open source solution images should reserve 2 ~ 3 redundant flash block sizes, so that when bad blocks are encountered, there is redundant space to replace;
+* Each partition of SLC NAND and SPI NAND open source solution images should reserve 2 ~ 3 redundant flash block sizes, so that when bad blocks are encountered, there is redundant space to replace，especially for uboot partition。
 
 * Partition should start from address which is flash block size aligned
 
@@ -732,6 +733,46 @@ mkfs.ubifs -F -d /path-to-it/buildroot/output/rockchip_rv1126_rv1109_spi_nand/ta
 ubinize -o ubi.img -m 0x1000 -p 256KiB ubinize.cfg
 ```
 
+**Multi Volume Mirror Instance**
+
+Take a multi volume partition composed of page size 2KB, page per block 64, that is, block size 128KB, partition size 8MB, OEM and partition size 8MB UserData
+
+```shell
+mkfs.ubifs -F -d oem -e 0x1f000 -c 0x40 -m 0x800 -v -o oem.ubifs
+mkfs.ubifs -F -d userdata -e 0x1f000 -c 0x40 -m 0x800 -v -o userdata.ubifs
+ubinize -o oem_userdata.img -p 0x20000 -m 2048 -s 2048 -v ubinize_oem_userdata.cfg
+```
+
+Set ubize_ oem_ userdata.cfg As follows:
+
+```ini
+[oem-volume]
+mode=ubi
+image=oem.ubifs
+vol_id=0
+vol_size=8MiB
+vol_type=dynamic
+vol_name=oem
+
+[userdata-volume]
+mode=ubi
+image=userdata.ubifs
+vol_id=1
+vol_size=8MiB
+vol_type=dynamic
+vol_name=userdata
+vol_flags=autoresize
+
+```
+
+mount：
+
+```shell
+ubiattach /dev/ubi_ctrl -m 4 -d 4 -b 5
+mount -t ubifs /dev/ubi4_0 /oem
+mount -t ubifs /dev/ubi4_1 /uesrdata
+```
+
 ### Mount UBIFS
 
 ```shell
@@ -740,6 +781,11 @@ ubiattach /dev/ubi_ctrl -m 4 -d 4
 
 * -m：mtd num
 * -d：ubi binding device
+* -b, --max-beb-per1024：maximum expected bad block number per 1024 eraseblock, note that：
+  1. 20 in default；
+  2. If the redundant space is larger than the value in the first scan, the block of the value is reserved as the bad block replacement area, which is not available to users. If the redundant space is less than the value, the redundant space is used as the bad block reserve except for other necessary reserved space;
+  3. The default value of SDK should be set to 10 (this value may not be set in the old version of SDK);
+  4. If you need to optimize the space, please set the value flexibly: 4 + the number of blocks occupied by the partition * 1%, for example: flash block size 128KB, OEM space size 16MB, accounting for 128 flash blocks, you can consider filling in the value of 5;
 
 ```shell
 mount -t ubifs /dev/ubi4_0 /oem
@@ -811,6 +857,14 @@ rootfs.ubi is the output file.
 Note：
 
 * When using the open source solution in NAND products, Squashfs should not be directly mounted on the mtdblock, because mtdblock does not add bad block detection, so bad block cannot be skipped.
+
+**Manually mount UBI block reference**
+
+```shell
+ubiattach /dev/ubi_ctrl -m 4 -d 4    /* mount the UBI device */
+ubiblock -c /dev/ubi4_0              /* Extending UBI block support on UBI devices */
+mount -t squashfs /dev/ubiblock4_0 /oem
+```
 
 ### UBIFS OTA
 
