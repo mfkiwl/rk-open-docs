@@ -651,8 +651,8 @@ Creating an empty UBIFS filesystem on an UBIFS volume
         mkfs.ubifs/dev/ubi0_0
 Options:
 -r, -d, --root=DIR         build file system from directory DIR,
--m, --min-io-size=SIZE     minimum I/O unit size, NAND FLASH 的 minimum write size, page size,4096B or 2048B
--e, --leb-size=SIZE        logical erase block size, 为 block size-2x (page size), If block_size 256KB page_size 2KB then -e equals 258048, If block_size 128KB page_size 2KB then -e equals 126976
+-m, --min-io-size=SIZE     minimum I/O unit size, NAND FLASH minimum write size, page size,4096B or 2048B
+-e, --leb-size=SIZE        logical erase block size, block size-2x (page size), If block_size 256KB page_size 2KB then -e equals 258048, If block_size 128KB page_size 2KB then -e equals 126976
 -c, --max-leb-cnt=COUNT    maximum logical erase block count
 -o, --output=FILE          output to FILE
 -j, --jrn-size=SIZE        journal size
@@ -868,9 +868,9 @@ mount -t squashfs /dev/ubiblock4_0 /oem
 
 ### UBIFS OTA
 
-升级使用 UBIFS 的分区应使用 ubiupdatevol 工具, 参考, 命令：
+To upgrade partitions using UBIFS, use the ubiupdatevol tool, the command is as follows:
 
-```
+```shell
 ubiupdatevol /dev/ubi1_0 rootfs.ubiimg
 ```
 
@@ -885,7 +885,7 @@ Note:
 
 * PC will download multyple
 
-注意：
+Note:
 
 * PC tool burning will automatically copy multiple copies of IDB firmware from block 1 to block 7, that is:
   The first 1MB of page size 2KB flash is GPT partition and IDB space
@@ -902,13 +902,13 @@ Note:
 ```shell
 ➜  [/IMAGES] tree
 .
-├── parameter.txt               // 生成 gpt.img
-├── MiniLoaderAll.bin           // 生成 idblock.img
+├── parameter.txt               // generate gpt.img
+├── MiniLoaderAll.bin           // generate idblock.img
 ├── uboot.img
 ├── boot.img
 ├── rootfs.img
 ├── oem.img
-└── update.img                  // 过滤
+└── update.img                  // not care
 ```
 
 **Make Images**
@@ -989,13 +989,13 @@ Table Note：
 ```shell
 ➜  [/IMAGES] tree
 .
-├── parameter.txt               // 生成 gpt.img
-├── MiniLoaderAll.bin           // 生成 idblock.img
+├── parameter.txt               // generate gpt.img
+├── MiniLoaderAll.bin           // generate idblock.img
 ├── uboot.img
 ├── boot.img
 ├── rootfs.img
 ├── oem.img
-└── update.img                  // 过滤
+└── update.img                  // not care
 ```
 
 **Make Images**
