@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.1
+Release Version: V1.9.2
 
-Release Date: 2020-11-22
+Release Date: 2020-12-02
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -78,6 +78,7 @@ This document (this guide) is mainly intended for:
 | V1.8.2 | LJH | 2020-11-02 | update facial gate product section |
 | V1.9.0 | CWW | 2020-11-14 | 1. Update spi nand/slc nand BoardConfig and Document<br>2. Update requirement version for windows and Linux tool |
 | V1.9.1 | CWW | 2020-11-22 | Add spi nor BoardConfig |
+| V1.9.2 | CWW | 2020-12-02 | 1. Add AB system boot-up board config reference <br>2. introduced to U-Boot's tftp |
 
 ---
 
@@ -403,6 +404,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig-tb-v13.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-spi-nand.mk       | General IPC                                 | SPI NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig.mk                | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-ab-v13.mk         | General IPC, Boot-up with AB system         | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-v12.mk            | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-slc-nand-v12.mk   | General IPC                                 | SLC NAND       | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | General IPC                                 | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
@@ -437,6 +439,7 @@ Method 2
 
 ```shell
 ./build.sh lunch
+processing board option: lunch
 processing option: lunch
 
 You're building on Linux
@@ -444,21 +447,23 @@ Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
 1. BoardConfig-38x38-spi-nand.mk
-2. BoardConfig-battery-ipc.mk
-3. BoardConfig-facial_gate.mk
-4. BoardConfig-ramboot-uvc.mk
-5. BoardConfig-robot.mk
-6. BoardConfig-sl.mk
-7. BoardConfig-slc-nand-v12.mk
-8. BoardConfig-spi-nand.mk
-9. BoardConfig-spi-nor-v12.mk
-10. BoardConfig-tb-v12.mk
-11. BoardConfig-tb-v13.mk
-12. BoardConfig-uvcc-spi-nand.mk
-13. BoardConfig-uvcc.mk
-14. BoardConfig-v10-v11.mk
-15. BoardConfig-v12.mk
-16. BoardConfig.mk
+2. BoardConfig-ab-v13.mk
+3. BoardConfig-battery-ipc.mk
+4. BoardConfig-facial_gate.mk
+5. BoardConfig-ramboot-uvc.mk
+6. BoardConfig-robot.mk
+7. BoardConfig-sl.mk
+8. BoardConfig-slc-nand-v12.mk
+9. BoardConfig-spi-nand.mk
+10. BoardConfig-spi-nor-tb-v13.mk
+11. BoardConfig-spi-nor-v12.mk
+12. BoardConfig-tb-v12.mk
+13. BoardConfig-tb-v13.mk
+14. BoardConfig-uvcc-spi-nand.mk
+15. BoardConfig-uvcc.mk
+16. BoardConfig-v10-v11.mk
+17. BoardConfig-v12.mk
+18. BoardConfig.mk
 Which would you like? [0]:
 switching to board: /home/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
@@ -875,9 +880,9 @@ adb -s 192.168.1.159:5555 push test-file /userdata/
 adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
 ```
 
-#### SPI NAND/SLC NAND ubi filesystem introduction
+### SPI NAND/SLC NAND ubi filesystem introduction
 
-##### Introduction to ubi filesystem of rootfs
+#### Introduction to ubi filesystem of rootfs
 
 The rootfs of Nand Flash is ubifs, SDK default configure Nand Flash information is Page Size 2KB and Block Size 128KB.
 To modify buildroot defconfig "buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig".
@@ -915,7 +920,7 @@ index 5da9b25935..8af9226920 100644
  BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT=4096
 ```
 
-##### Introduction to oem and userdata partition used in ubifs
+#### Introduction to oem and userdata partition used in ubifs
 
 The SDK default OEM is packaged in Buildroot as a UBI image.
 The userdata partition default is not packaged, when system boot up userdata will fotmat to ubifs auto.
@@ -923,6 +928,121 @@ The userdata partition default is not packaged, when system boot up userdata wil
 If configure RK_OEM_DIR (RK_OEM_BUILDIN_BUILDROOT is not defined) or RK_USERDATA_DIRi in the BoardConfig.mk, then use `./mkfirmware.sh` which in the root directory of SDK.
 RK_OEM_DIR define as the directory which in the device/rockchip/oem/.
 RK_USERDATA_DIR define as the directory which in the device/rockchip/userdata/.
+
+### Introduced to the usage of U-Boot's tftp
+
+#### Configure U-Boot's ethernet phy
+
+The ethernet phy which U-Boot support is RTL8211F, default. The initialization of U-Boot's ethernet will read dtb from kernel, if fail to read, U-Boot will read from U-Boot's dtb. So we will configure the node gmac of U-Boot's dtb if the phy is not RTL8211F.
+
+The follow is the reference:
+Note: the quote node in the U-Boot's dts (e.g. gpio2/rmiim1_pins/gmac_clk_m1_pins) MUST add "u-boot,dm-pre-reloc;"
+
+```diff
+diff --git a/arch/arm/dts/rv1126-pinctrl.dtsi b/arch/arm/dts/rv1126-pinctrl.dtsi
+index 67f7c742b8..967598b4fb 100644
+--- a/arch/arm/dts/rv1126-pinctrl.dtsi
++++ b/arch/arm/dts/rv1126-pinctrl.dtsi
+@@ -1122,6 +1122,11 @@
+                                /* clk_out_ethernet_m1 */
+                                <2 RK_PC5 2 &pcfg_pull_none>;
+                };
++               gmac_clk_m1_pins: gmac-clk-m1-pins {
++                       rockchip,pins =
++                               /* rgmii_clk_m1 */
++                               <2 RK_PB7 2 &pcfg_pull_none>;
++               };
+        };
+        sdmmc0 {
+                sdmmc0_bus4: sdmmc0-bus4 {
+diff --git a/arch/arm/dts/rv1126-u-boot.dtsi b/arch/arm/dts/rv1126-u-boot.dtsi
+index 01547feff6..baf8509946 100644
+--- a/arch/arm/dts/rv1126-u-boot.dtsi
++++ b/arch/arm/dts/rv1126-u-boot.dtsi
+@@ -166,26 +166,37 @@
+        status = "okay";
+ };
+
++&gpio2 {
++       u-boot,dm-pre-reloc;
++       status = "okay";
++};
++
++&rmiim1_pins {
++       u-boot,dm-pre-reloc;
++       status = "okay";
++};
++
++&gmac_clk_m1_pins{
++       u-boot,dm-pre-reloc;
++       status = "okay";
++};
++
+ &gmac {
+        u-boot,dm-pre-reloc;
+
+-       phy-mode = "rgmii";
+-       clock_in_out = "input";
++       phy-mode = "rmii";
++       clock_in_out = "output";
+
+-       snps,reset-gpio = <&gpio3 RK_PA0 GPIO_ACTIVE_LOW>;
++       snps,reset-gpio = <&gpio2 RK_PA5 GPIO_ACTIVE_LOW>;
+        snps,reset-active-low;
+-       /* Reset time is 20ms, 100ms for rtl8211f */
+-       snps,reset-delays-us = <0 20000 100000>;
++       snps,reset-delays-us = <0 50000 50000>;
+
+-       assigned-clocks = <&cru CLK_GMAC_SRC>, <&cru CLK_GMAC_TX_RX>, <&cru CLK_GMAC_ETHERNET_OUT>;
+-       assigned-clock-parents = <&cru CLK_GMAC_SRC_M1>, <&cru RGMII_MODE_CLK>;
+-       assigned-clock-rates = <125000000>, <0>, <25000000>;
++       assigned-clocks = <&cru CLK_GMAC_SRC>, <&cru CLK_GMAC_TX_RX>;
++       assigned-clock-rates = <50000000>;
++       assigned-clock-parents = <&cru CLK_GMAC_SRC_M1>, <&cru RMII_MODE_CLK>;
+
+        pinctrl-names = "default";
+-       pinctrl-0 = <&rgmiim1_pins &clk_out_ethernetm1_pins>;
+-
+-       tx_delay = <0x2a>;
+-       rx_delay = <0x1a>;
++       pinctrl-0 = <&rmiim1_pins &gmac_clk_m1_pins>;
+
+        phy-handle = <&phy>;
+        status = "okay";
+```
+
+#### The usage of U-Boot's tftp download
+
+Use the command `sysmem_search` to get a free memory address and then set IP address, finally use tftp download file.
+
+```shell
+Hit key to stop autoboot('CTRL+C'):  0
+=> <INTERRUPT>
+=> <INTERRUPT>
+=>
+=> sysmem_search
+sysmem_search - Search a available sysmem region
+
+Usage:
+sysmem_search <size in hex>
+=> sysmem_search 0x6400000
+Sysmem: Available region at address: 0x356f6cc0
+=> setenv ipaddr 172.16.21.47
+=> setenv serverip 172.16.21.199
+=> tftp 0x356f6cc0 uboot.img
+ethernet@ffc40000 Waiting for PHY auto negotiation to complete. done
+Using ethernet@ffc40000 device
+TFTP from server 172.16.21.199; our IP address is 172.16.21.47
+Filename 'uboot.img'.
+Load address: 0x356f6cc0
+Loading: #################################################################
+         #################################################################
+         ######################
+         139.6 KiB/s
+done
+Bytes transferred = 2228224 (220000 hex)
+=>
+```
 
 ## Smart USB Camera Product
 

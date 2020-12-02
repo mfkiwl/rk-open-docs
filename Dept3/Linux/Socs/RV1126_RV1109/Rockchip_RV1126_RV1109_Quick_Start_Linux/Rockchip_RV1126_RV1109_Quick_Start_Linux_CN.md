@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.1
+发布版本：V1.9.2
 
-日期：2020-11-22
+日期：2020-12-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -83,6 +83,7 @@ Rockchip Electronics Co., Ltd.
 | V1.8.2 | LJH | 2020-11-02 | 更新闸机和门禁类产品章节 |
 | V1.9.0 | CWW | 2020-11-14 | 1. 更新spi nand/slc nand 板级配置和文档<br>2. 更新windows和Linux烧录工具版本要求 |
 | V1.9.1 | CWW | 2020-11-22 | 增加spi nor板级配置 |
+| V1.9.2 | CWW | 2020-12-02 | 1. 增加AB系统板级配置参考<br>2. 增加U-Boot使用tftp使用说明 |
 
 ---
 
@@ -406,6 +407,7 @@ Starting default: 100% (71/71), done.
 | BoardConfig-tb-v13.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-spi-nand.mk       | 通用IPC                      | SPI NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig.mk                | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
+| BoardConfig-ab-v13.mk         | 通用IPC，启动方式是AB系统    | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-v12.mk            | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-slc-nand-v12.mk   | 通用IPC                      | SLC NAND | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-v10-v11.mk        | 通用IPC                      | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V11_20200312LXF       |
@@ -440,6 +442,7 @@ Starting default: 100% (71/71), done.
 
 ```shell
 ./build.sh lunch
+processing board option: lunch
 processing option: lunch
 
 You're building on Linux
@@ -447,21 +450,23 @@ Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
 1. BoardConfig-38x38-spi-nand.mk
-2. BoardConfig-battery-ipc.mk
-3. BoardConfig-facial_gate.mk
-4. BoardConfig-ramboot-uvc.mk
-5. BoardConfig-robot.mk
-6. BoardConfig-sl.mk
-7. BoardConfig-slc-nand-v12.mk
-8. BoardConfig-spi-nand.mk
-9. BoardConfig-spi-nor-v12.mk
-10. BoardConfig-tb-v12.mk
-11. BoardConfig-tb-v13.mk
-12. BoardConfig-uvcc-spi-nand.mk
-13. BoardConfig-uvcc.mk
-14. BoardConfig-v10-v11.mk
-15. BoardConfig-v12.mk
-16. BoardConfig.mk
+2. BoardConfig-ab-v13.mk
+3. BoardConfig-battery-ipc.mk
+4. BoardConfig-facial_gate.mk
+5. BoardConfig-ramboot-uvc.mk
+6. BoardConfig-robot.mk
+7. BoardConfig-sl.mk
+8. BoardConfig-slc-nand-v12.mk
+9. BoardConfig-spi-nand.mk
+10. BoardConfig-spi-nor-tb-v13.mk
+11. BoardConfig-spi-nor-v12.mk
+12. BoardConfig-tb-v12.mk
+13. BoardConfig-tb-v13.mk
+14. BoardConfig-uvcc-spi-nand.mk
+15. BoardConfig-uvcc.mk
+16. BoardConfig-v10-v11.mk
+17. BoardConfig-v12.mk
+18. BoardConfig.mk
 Which would you like? [0]:
 switching to board: /home/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
@@ -874,9 +879,9 @@ adb -s 192.168.1.159:5555 push test-file /userdata/
 adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
 ```
 
-#### SPI NAND/SLC NAND ubi文件系统镜像打包说明
+### SPI NAND/SLC NAND ubi文件系统镜像打包说明
 
-##### 根文件系统打包说明
+#### 根文件系统打包说明
 
 Nand Flash的文件系统使用的是ubifs，SDK默认的配置是Page Size 2KB，Block Size 128KB的Nand Flash。
 通过修改buildroot对应的defconfig配置buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
@@ -914,7 +919,7 @@ index 5da9b25935..8af9226920 100644
  BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT=4096
 ```
 
-##### oem和userdata分区的ubifs打包说明
+#### oem和userdata分区的ubifs打包说明
 
 SDK默认oem是在buildroot里打包成ubi镜像。
 userdata分区默认不打包成镜像，系统启动后会自动格式化成ubifs。
@@ -922,6 +927,122 @@ userdata分区默认不打包成镜像，系统启动后会自动格式化成ubi
 如果在对应的BoardConfig.mk里配置RK_OEM_DIR（RK_OEM_BUILDIN_BUILDROOT不配置）或RK_USERDATA_DIR，那可以使用SDK根目录下`./mkfirmware.sh`进行打包。
 RK_OEM_DIR是对应device/rockchip/oem/目录下自定义的目录。
 RK_USERDATA_DIR则是对应device/rockchip/userdata/目录下自定义的目录。
+
+### U-Boot终端下tftp使用说明
+
+#### U-Boot配置以太网
+
+默认U-Boot代码支持的以太网phy是EVB板RTL8211F。U-Boot初始化以太网时，会先读取内核dtb的gmac节点，如果没有获取到内核dtb，会使用U-Boot下的dtb初始化以太网phy。
+所以如果板子上的phy不是RTL8211F，则需要同步修改U-Boot的dtb的gmac节点。
+
+以下是参考例子：
+注：U-Boot的dts节点里有引用的其它节点（如：gpio2/rmiim1_pins/gmac_clk_m1_pins）都需要接上"u-boot,dm-pre-reloc;"
+
+```diff
+diff --git a/arch/arm/dts/rv1126-pinctrl.dtsi b/arch/arm/dts/rv1126-pinctrl.dtsi
+index 67f7c742b8..967598b4fb 100644
+--- a/arch/arm/dts/rv1126-pinctrl.dtsi
++++ b/arch/arm/dts/rv1126-pinctrl.dtsi
+@@ -1122,6 +1122,11 @@
+                                /* clk_out_ethernet_m1 */
+                                <2 RK_PC5 2 &pcfg_pull_none>;
+                };
++               gmac_clk_m1_pins: gmac-clk-m1-pins {
++                       rockchip,pins =
++                               /* rgmii_clk_m1 */
++                               <2 RK_PB7 2 &pcfg_pull_none>;
++               };
+        };
+        sdmmc0 {
+                sdmmc0_bus4: sdmmc0-bus4 {
+diff --git a/arch/arm/dts/rv1126-u-boot.dtsi b/arch/arm/dts/rv1126-u-boot.dtsi
+index 01547feff6..baf8509946 100644
+--- a/arch/arm/dts/rv1126-u-boot.dtsi
++++ b/arch/arm/dts/rv1126-u-boot.dtsi
+@@ -166,26 +166,37 @@
+        status = "okay";
+ };
+
++&gpio2 {
++       u-boot,dm-pre-reloc;
++       status = "okay";
++};
++
++&rmiim1_pins {
++       u-boot,dm-pre-reloc;
++       status = "okay";
++};
++
++&gmac_clk_m1_pins{
++       u-boot,dm-pre-reloc;
++       status = "okay";
++};
++
+ &gmac {
+        u-boot,dm-pre-reloc;
+
+-       phy-mode = "rgmii";
+-       clock_in_out = "input";
++       phy-mode = "rmii";
++       clock_in_out = "output";
+
+-       snps,reset-gpio = <&gpio3 RK_PA0 GPIO_ACTIVE_LOW>;
++       snps,reset-gpio = <&gpio2 RK_PA5 GPIO_ACTIVE_LOW>;
+        snps,reset-active-low;
+-       /* Reset time is 20ms, 100ms for rtl8211f */
+-       snps,reset-delays-us = <0 20000 100000>;
++       snps,reset-delays-us = <0 50000 50000>;
+
+-       assigned-clocks = <&cru CLK_GMAC_SRC>, <&cru CLK_GMAC_TX_RX>, <&cru CLK_GMAC_ETHERNET_OUT>;
+-       assigned-clock-parents = <&cru CLK_GMAC_SRC_M1>, <&cru RGMII_MODE_CLK>;
+-       assigned-clock-rates = <125000000>, <0>, <25000000>;
++       assigned-clocks = <&cru CLK_GMAC_SRC>, <&cru CLK_GMAC_TX_RX>;
++       assigned-clock-rates = <50000000>;
++       assigned-clock-parents = <&cru CLK_GMAC_SRC_M1>, <&cru RMII_MODE_CLK>;
+
+        pinctrl-names = "default";
+-       pinctrl-0 = <&rgmiim1_pins &clk_out_ethernetm1_pins>;
+-
+-       tx_delay = <0x2a>;
+-       rx_delay = <0x1a>;
++       pinctrl-0 = <&rmiim1_pins &gmac_clk_m1_pins>;
+
+        phy-handle = <&phy>;
+        status = "okay";
+```
+
+#### U-Boot的tftp下载说明
+
+使用`sysmem_search`获取一块指定大小的内存地址，然后设置IP地址，最用使用tftp命令下载文件。
+
+```shell
+Hit key to stop autoboot('CTRL+C'):  0
+=> <INTERRUPT>
+=> <INTERRUPT>
+=>
+=> sysmem_search
+sysmem_search - Search a available sysmem region
+
+Usage:
+sysmem_search <size in hex>
+=> sysmem_search 0x6400000
+Sysmem: Available region at address: 0x356f6cc0
+=> setenv ipaddr 172.16.21.47
+=> setenv serverip 172.16.21.199
+=> tftp 0x356f6cc0 uboot.img
+ethernet@ffc40000 Waiting for PHY auto negotiation to complete. done
+Using ethernet@ffc40000 device
+TFTP from server 172.16.21.199; our IP address is 172.16.21.47
+Filename 'uboot.img'.
+Load address: 0x356f6cc0
+Loading: #################################################################
+         #################################################################
+         ######################
+         139.6 KiB/s
+done
+Bytes transferred = 2228224 (220000 hex)
+=>
+```
 
 ## 智能USB Camera产品配置
 
