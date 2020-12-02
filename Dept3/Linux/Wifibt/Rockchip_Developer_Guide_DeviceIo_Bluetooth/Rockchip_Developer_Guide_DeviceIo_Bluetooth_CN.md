@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-343
 
-发布版本：V2.0.1
+发布版本：V2.0.2
 
-日期：2020-07-12
+日期：2020-12-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -46,19 +46,19 @@ Rockchip Electronics Co., Ltd.
 
 该文档旨在介绍RockChip DeviceIo库的蓝牙接口。不同的蓝牙芯片模组对应的DeviceIo库也不同，对应关系如下所示：
 
-libDeviceIo_bluez.so ：基于BlueZ协议栈，主要适用于Realtek的蓝牙模组，如：RTL8723DS.
+bluez/libDeviceIo.so ：基于BlueZ协议栈，主要适用于Realtek的蓝牙模组，如：RTL8723DS.
 
-libDeviceIo_broadcom.so：基于BSA协议栈，主要适用于正基的蓝牙模组，如：AP6255.
+broadcom/libDeviceIo.so：基于BSA协议栈，主要适用于正基的蓝牙模组，如：AP6255.
 
-libDeviceIo_cypress.so：基于BSA协议栈，主要适用于海华的蓝牙模组，如：AW-CM256.
+cypress/libDeviceIo.so：基于BSA协议栈，主要适用于海华的蓝牙模组，如：AW-CM256.
 
 用户在配置好SDK的蓝牙芯片类型后，deviceio编译脚本会根据用户选择的芯片类型自动选择libDeviceIo库。SDK的蓝牙芯片配置方法请参考《Rockchip_Developer_Guide_Network_Config_CN》中“WIFI/BT配置”章节 。基于不同协议栈实现的DeviceIo库的接口尽可能做到了统一，但仍有部分接口有些区别，这些区别会在具体接口介绍时进行详细描述。
 
 **名词说明**
 
-BLUEZ DEVICEIO：基于BlueZ协议栈实现的DeviceIo库，对应libDeviceIo_bluez.so。
+BLUEZ DEVICEIO：基于BlueZ协议栈实现的DeviceIo库，对应bluez/libDeviceIo.so
 
-BSA DEVICEIO：基于BSA协议栈实现的DeviceIo库，对应libDeviceIo_broadcom.so和libDeviceIo_cypress.so
+BSA DEVICEIO：基于BSA协议栈实现的DeviceIo库，对应broadcom/libDeviceIo.so和cypress/libDeviceIo.so
 
 BLUEZ only：接口或文档仅支持BLUEZ DEVICEIO。
 
@@ -84,10 +84,11 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 | 2019-6-24 | V1.5.0 | V1.2.4 | ctf | 增加HFP HF alsa控制 demo<br/>添加hfp断开连接api：rk_bt_hfp_disconnect<br/>修复手机上接听电话和拒接电话时，<br />无法收到PICKUP、HANGUP事件BUG<br />Bsa：增加HFP HF 使能CVSD（8K采样）接口<br />Bsa：修复cypress bsa 配对弹窗提示问题<br/>Bsa：更新broadcom bsa 版本<br /> (rockchip_20190617)<br />Bsa：修复蓝牙扫描时，无法识别<br />个别蓝牙音箱设备类型BUG <br/>Bsa：修复电池电量上报BUG |
 | 2019-10-30 | V1.6.0 | V1.3.0 | ctf | Bluez：实现蓝牙反初始化<br/>Bluez：修正获取本机设备名、<br />本机蓝牙Mac地址接口<br/>Bluez：添加pbap profile 支持<br />Bluez：支持hfp 8K和16K采样率自适应<br/>Bluez：添加sink 播放underrun上报<br/>Bsa：添加设置sink 播放设备节点接口<br/>Bsa：添加ble可见性设置接口<br/>Bsa：添加ble主动断开连接接口<br/>Bsa：支持在蓝牙初始化时，<br/>设置蓝牙地址<br/>添加蓝牙启动状态上报<br />添加蓝牙配对状态上报<br/>添加启动蓝牙扫描、停止蓝牙扫描接口<br/>添加获取蓝牙是否处于扫描状态接口<br/>添加打印当前扫描到的设备列表接口<br />添加主动和指定设备配对、<br />取消和指定设备配对接口<br/>添加获取当前已配对设备列表、<br />释放获取的配对设备列表接口<br/>添加打印当前配对设备列表接口<br />添加设置本机设备名接口<br />添加歌曲信息上报<br/>添加歌曲播放进度上报<br />添加avdtp(a2dp sink)状态上报<br />sink添加主动和指定设备连接、<br />主动断开指定设备连接接口<br/>添加获取当前播放状态接口<br/>添加获取当前连接的远程设备<br />是否支持主动上报播放进度接口<br/>支持打印日志到syslog |
 | 2019-11-16 | V1.7.0 | V1.3.1 | ctf | source 回调增加连接设备的<br />address和name参数 |
-| 2019-12-12 | V1.8.0 | V1.3.2 | ctf | bluez：实现ble client 功能<br/>bluez：实现obex文件传输功能 |
-| 2020-03-17 | V1.9.0 | V1.3.4 | ctf | bluez : 扫描接口添加类型过滤<br />（LE or BR/EDR or both）<br/>bluez : 添加获取扫描设备列表接口<br/>bluez : 添加启动bt source 后，第一次扫描<br />自动回连最后一个连接的sink设备<br/>bluez : 修正扫描期间连接设备失败BUG<br/>bluez : 优化init、deinit执行时间<br/>bluez : 修正在qt 非主mianloop线程<br />启动蓝牙，线程同步BUG<br/>bluez : 添加source 断开连接失败、<br />自动回连事件上报<br/>bluez : 添加source 断开当前连接接口<br/>bluez : 添加获取指定设备连接状态<br/>bluez : 修正ble 初始化内存越界问题<br/>bsa : 添加设置bsa_server.sh 路径接口<br/>ble 状态回调带远程设备地址和名称 |
-| 2020-07-08 | V2.0.0 | V1.3.5 | ctf | 修正一些bluez和bsa bug，<br />详情见Rk_system.h V1.3.5 说明<br/>添加设置ble 广播间隔接口<br/>添加hfp 拨打指定电话号码接口<br/>rk_ble_client_write 增加写数据长度参数<br/>支持ble MTU 上报<br/>ble client 添加获取ble 设备广播api<br/>bluez : 添加obex 状态回调<br/>bluez : 添加设置ble 地址接口<br/>bluez : ble特征值添加<br/>write-without-response 属性<br/>bsa : 添加rk_bt_source_disconnect 接口<br/>bsa : 支持LE BR/EDR 过滤扫描<br/>bsa : 添加source 第一次扫描自动<br />重连上一次连接的sink 设备<br/>bsa : 支持ble client功能<br/>bsa : 添加读取远程连接设备名接口<br/>bsa : 添加获取当前扫描设备列表接口 |
+| 2019-12-12 | V1.8.0 | V1.3.2 | ctf | Bluez：实现ble client 功能<br/>Bluez：实现obex文件传输功能 |
+| 2020-03-17 | V1.9.0 | V1.3.4 | ctf | Bluez : 扫描接口添加类型过滤<br />（LE or BR/EDR or both）<br/>Bluez : 添加获取扫描设备列表接口<br/>Bluez : 添加启动bt source 后，第一次扫描<br />自动回连最后一个连接的sink设备<br/>Bluez : 修正扫描期间连接设备失败BUG<br/>Bluez : 优化init、deinit执行时间<br/>Bluez : 修正在qt 非主mianloop线程<br />启动蓝牙，线程同步BUG<br/>Bluez : 添加source 断开连接失败、<br />自动回连事件上报<br/>Bluez : 添加source 断开当前连接接口<br/>Bluez : 添加获取指定设备连接状态<br/>Bluez : 修正ble 初始化内存越界问题<br/>Bsa : 添加设置bsa_server.sh 路径接口<br/>Ble 状态回调带远程设备地址和名称 |
+| 2020-07-08 | V2.0.0 | V1.3.5 | ctf | 修正一些bluez和bsa bug，<br />详情见Rk_system.h V1.3.5 说明<br/>添加设置ble 广播间隔接口<br/>添加hfp 拨打指定电话号码接口<br/>rk_ble_client_write 增加写数据长度参数<br/>支持ble MTU 上报<br/>ble client 添加获取ble 设备广播api<br/>Bluez : 添加obex 状态回调<br/>Bluez : 添加设置ble 地址接口<br/>Bluez : ble特征值添加<br/>write-without-response 属性<br/>Bsa : 添加rk_bt_source_disconnect 接口<br/>Bsa : 支持LE BR/EDR 过滤扫描<br/>Bsa : 添加source 第一次扫描自动<br />重连上一次连接的sink 设备<br/>Bsa : 支持ble client功能<br/>Bsa : 添加读取远程连接设备名接口<br/>Bsa : 添加获取当前扫描设备列表接口 |
 | 2020-07-12 | V2.0.1 | V1.3.5 | Ruby | 修订格式 |
+| 2020-12-02 | V2.0.2 | V1.3.6 | ctf | 添加获取设备平台类型（ios/非ios）接口 <br/>修正一些Bluez和Bsa Bug，详情见Rk_system.h V1.3.6 说明<br/>Bsa :  添加蓝牙电话簿功能<br/>Bsa : hfp添加来电号码上报<br/>Bsa : hfp添加来电信息（来电号码、联系人）上报 <br/>Bsa  : hfp添加去电事件、去电响铃事件上报<br/>Broadcom Bsa : 添加PAN 蓝牙共享网络功能 |
 
 ---
 
@@ -175,9 +176,10 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 
 ```cpp
   typedef enum {
-  	SCAN_TYPE_AUTO,			//LE and BR/EDR, 扫描所有类型设备
-  	SCAN_TYPE_BREDR,		//只扫描BR/EDR类型设备
-  	SCAN_TYPE_LE			//只扫描LE类型设备
+	SCAN_TYPE_AUTO,			//LE and BR/EDR, 扫描所有类型设备
+	SCAN_TYPE_BREDR,		//只扫描BR/EDR类型设备
+	SCAN_TYPE_LE,			//只扫描LE类型设备
+	SCAN_TYPE_PAN			//过滤扫描带有PAN Service的设备（Broadcom BSA only）
   } RK_BT_SCAN_TYPE;
 ```
 
@@ -346,6 +348,10 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 
   读取addr指定设备的设备名，transport 指定该设备类型，未知设备：RK_BT_TRANSPORT_UNKNOWN ，BR/EDR设备 : RK_BT_TRANSPORT_BR_EDR，LE 设备：RK_BT_TRANSPORT_LE。该接口需和rk_bt_register_name_change_callback配套使用，读取成功会触发RK_BT_NAME_CHANGE_CALLBACK 回调（BSA only）
 
+- `RK_BT_DEV_PLATFORM_TYPE rk_bt_get_dev_platform(char *addr)`
+
+  获取addr指定设备的类型：返回RK_BT_DEV_PLATFORM_IOS代表ios平台，返回RK_BT_DEV_PLATFORM_UNKNOWN代表非ios平台
+
 ## BLE接口介绍（RkBle.h）
 
 - `RK_BLE_STATE`说明
@@ -483,9 +489,9 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 
   注册ble client 数据接收回调函数
 
-- `int rk_ble_client_open(void)`
+- `int rk_ble_client_open(bool mtu_change)`
 
-  初始胡ble client
+  初始化ble client，mtu_change：连接成功后是否自动协商mtu，该参数只对Bsa协议有效。
 
 - `void rk_ble_client_close(void)`
 
@@ -879,6 +885,11 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
           RK_BT_HFP_PICKUP_EVT,               // 主动接通电话
           RK_BT_HFP_HANGUP_EVT,               // 主动挂断电话
           RK_BT_HFP_VOLUME_EVT,               // AG(手机)端音量改变
+          RK_BT_HFP_BCS_EVT,                  // AG(手机)Codec 类型：CVSD 或 mSBC
+          RK_BT_HFP_CLIP_EVT,                 // 来电信息：电话号码、联系人名(仅支持英文)
+          RK_BT_HFP_OUTGOING_CALL_DIAL_EVT,   // 去电
+          RK_BT_HFP_OUTGOING_CALL_RING_EVT,   // 去电响铃
+          RK_BT_HFP_CLCC_EVT,                 // 通话时信息：电话号码、联系人名(仅支持英文)
   } RK_BT_HFP_EVENT;
 ```
 
@@ -974,7 +985,7 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 
   断开当前连接
 
-## OBEX 接口介绍 ( RkBtObex.h BLUEZ only )
+## OBEX 接口介绍 ( RkBtObex.h )
 
 - `RK_BT_OBEX_STATE 介绍`
 
@@ -999,23 +1010,23 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 
 - `int rk_bt_obex_init(char *path)`
 
-  启动obexd进程，蓝牙文件传输功能只需要调用该接口即可，path：文件存储路径
+  启动obexd进程，蓝牙文件传输功能只需要调用该接口即可，path：文件存储路径。(BLUEZ only)
 
 - `int rk_bt_obex_deinit()`
 
-  关闭obexd进程，和rk_bt_obex_init配套使用
+  关闭obexd进程，和rk_bt_obex_init配套使用。(BLUEZ only)
 
 - `int rk_bt_obex_pbap_init()`
 
-  初始化蓝牙电话薄，调用该接口之前必须先调用rk_bt_obex_init启动obexd
+  初始化蓝牙电话薄。Bluez协议调用该接口之前必须先调用rk_bt_obex_init启动obexd。
 
 - `int rk_bt_obex_pbap_deinit()`
 
-  反初始化蓝牙电话薄，调用该接口之后必须调用rk_bt_obex_deinit关闭obexd
+  反初始化蓝牙电话薄。Bluez协议调用该接口之后必须调用rk_bt_obex_deinit关闭obexd。
 
 - `int rk_bt_obex_pbap_connect(char *btaddr)`
 
-  打开pbap服务，并主动和btaddr指定的设备连接
+  主动和btaddr指定的设备连接
 
 - `int rk_bt_obex_pbap_get_vcf(char *dir_name, char *dir_file)`
 
@@ -1040,6 +1051,58 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 - `int rk_bt_obex_pbap_disconnect(char *btaddr)`
 
   主动断开和btaddr指定设备的连接
+
+## PAN 接口介绍 ( RkPan.h Broadcom BSA only )
+
+- `RK_BT_PAN_EVENT 介绍`
+
+```cpp
+typedef enum {
+	RK_BT_PAN_CONNECT_FAILED,		//连接失败
+	RK_BT_PAN_CONNECT,				//连接成功
+	RK_BT_PAN_DISCONNECT			//断连成功
+} RK_BT_PAN_EVENT;
+```
+
+- `typedef void (*RK_BT_PAN_EVENT_CALLBACK)(RK_BT_PAN_EVENT event, char *bd_addr)`
+
+  pan事件回调，bd_addr：连接的远程设备的地址
+
+- `void rk_bt_pan_register_event_cb(RK_BT_PAN_EVENT_CALLBACK cb)`
+
+  注册pan 事件回调
+
+- `int rk_bt_pan_open()`
+
+  初始化蓝牙共享网络
+
+- `int rk_bt_pan_close()`
+
+  反初始化蓝牙共享网络
+
+- `int rk_bt_pan_connect(char *address)`
+
+  连接address指定的设备
+
+- `int rk_bt_pan_disconnect(char *address)`
+
+  断开和address指定的设备的连接
+
+### 蓝牙共享网络配置
+
+​	使用Bsa 蓝牙共享网络功能，kernel需要开启CONFIG_NET_CORE 和 CONFIG_TUN 配置，否则初始化PAN时会出现 ‘app_pan_tap_open: could not open /dev/net/tun, err:2‘ 错误。开启配置后要确保配置选项有更新到对应的defconfig中，以64bit 3308 平台为例：
+
+```diff
+--- a/arch/arm64/configs/rk3308_linux_defconfig
++++ b/arch/arm64/configs/rk3308_linux_defconfig
+@@ -91,7 +91,8 @@ CONFIG_DEVTMPFS_MOUNT=y
+ # CONFIG_ALLOW_DEV_COREDUMP is not set
+ # CONFIG_BLK_DEV is not set
+ CONFIG_NETDEVICES=y
+-# CONFIG_NET_CORE is not set
++CONFIG_NET_CORE=y
++CONFIG_TUN=y
+```
 
 ## 示例程序说明
 
@@ -1453,13 +1516,33 @@ BSA only：接口或文档仅支持BSA DEVICEIO。
 
   关闭obex服务
 
+##### PAN接口测试说明
+
+执行如下函数，进行具体功能测试:
+
+- bt_test_pan_init
+
+  打开pan服务，开启蓝牙共享网络
+
+- bt_test_pan_deinit
+
+  关闭pan服务，关闭蓝牙共享网络
+
+- bt_test_pan_connect
+
+  连接扫描到的手机蓝牙热点，连接成功后，可以使用ping www.baidu.com 测试网络
+
+- bt_test_pan_disconnect
+
+  断开连接
+
 #### 测试步骤
 
 1. 执行测试程序命令：`DeviceIOTest bluetooth`显示如下界面：
 
 ```
 # deviceio_test bluetooth
-version:V1.3.5
+version:V1.3.6
 #### Please Input Your Test Command Index ####
 01.  bt_server_open
 02.  bt_test_set_class
@@ -1471,90 +1554,97 @@ version:V1.3.5
 08.  bt_test_start_discovery
 09.  bt_test_start_discovery_le
 10.  bt_test_start_discovery_bredr
-11.  bt_test_cancel_discovery
-12.  bt_test_is_discovering
-13.  bt_test_display_devices
-14.  bt_test_read_remote_device_name
-15.  bt_test_get_scaned_devices
-16.  bt_test_display_paired_devices
-17.  bt_test_get_paired_devices
-18.  bt_test_free_paired_devices
-19.  bt_test_pair_by_addr
-20.  bt_test_unpair_by_addr
-21.  bt_test_get_connected_properties
-22.  bt_test_source_auto_start
-23.  bt_test_source_connect_status
-24.  bt_test_source_auto_stop
-25.  bt_test_source_open
-26.  bt_test_source_close
-27.  bt_test_source_connect_by_addr
-28.  bt_test_source_disconnect
-29.  bt_test_source_disconnect_by_addr
-30.  bt_test_source_remove_by_addr
-31.  bt_test_sink_open
-32.  bt_test_sink_visibility00
-33.  bt_test_sink_visibility01
-34.  bt_test_sink_visibility10
-35.  bt_test_sink_visibility11
-36.  bt_test_ble_visibility00
-37.  bt_test_ble_visibility11
-38.  bt_test_sink_status
-39.  bt_test_sink_music_play
-40.  bt_test_sink_music_pause
-41.  bt_test_sink_music_next
-42.  bt_test_sink_music_previous
-43.  bt_test_sink_music_stop
-44.  bt_test_sink_set_volume
-45.  bt_test_sink_connect_by_addr
-46.  bt_test_sink_disconnect_by_addr
-47.  bt_test_sink_get_play_status
-48.  bt_test_sink_get_poschange
-49.  bt_test_sink_disconnect
-50.  bt_test_sink_close
-51.  bt_test_ble_start
-52.  bt_test_ble_set_address
-53.  bt_test_ble_set_adv_interval
-54.  bt_test_ble_write
-55.  bt_test_ble_disconnect
-56.  bt_test_ble_stop
-57.  bt_test_ble_get_status
-58.  bt_test_ble_client_open
-59.  bt_test_ble_client_close
-60.  bt_test_ble_client_connect
-61.  bt_test_ble_client_disconnect
-62.  bt_test_ble_client_get_status
-63.  bt_test_ble_client_get_service_info
-64.  bt_test_ble_client_read
-65.  bt_test_ble_client_write
-66.  bt_test_ble_client_is_notify
-67.  bt_test_ble_client_notify_on
-68.  bt_test_ble_client_notify_off
-69.  bt_test_ble_client_get_eir_data
-70.  bt_test_spp_open
-71.  bt_test_spp_write
-72.  bt_test_spp_close
-73.  bt_test_spp_status
-74.  bt_test_hfp_sink_open
-75.  bt_test_hfp_hp_open
-76.  bt_test_hfp_hp_accept
-77.  bt_test_hfp_hp_hungup
-78.  bt_test_hfp_hp_redail
-79.  bt_test_hfp_hp_dial_number
-80.  bt_test_hfp_hp_report_battery
-81.  bt_test_hfp_hp_set_volume
-82.  bt_test_hfp_hp_close
-83.  bt_test_hfp_hp_disconnect
-84.  bt_test_obex_init
-85.  bt_test_obex_pbap_init
-86.  bt_test_obex_pbap_connect
-87.  bt_test_obex_pbap_get_pb_vcf
-88.  bt_test_obex_pbap_get_ich_vcf
-89.  bt_test_obex_pbap_get_och_vcf
-90.  bt_test_obex_pbap_get_mch_vcf
-91.  bt_test_obex_pbap_disconnect
-92.  bt_test_obex_pbap_deinit
-93.  bt_test_obex_deinit
-94.  bt_server_close
+11.  bt_test_start_discovery_pan
+12.  bt_test_cancel_discovery
+13.  bt_test_is_discovering
+14.  bt_test_display_devices
+15.  bt_test_read_remote_device_name
+16.  bt_test_get_scaned_devices
+17.  bt_test_display_paired_devices
+18.  bt_test_get_paired_devices
+19.  bt_test_free_paired_devices
+20.  bt_test_pair_by_addr
+21.  bt_test_unpair_by_addr
+22.  bt_test_get_connected_properties
+23.  bt_test_source_auto_start
+24.  bt_test_source_connect_status
+25.  bt_test_source_auto_stop
+26.  bt_test_source_open
+27.  bt_test_source_close
+28.  bt_test_source_connect_by_addr
+29.  bt_test_source_disconnect
+30.  bt_test_source_disconnect_by_addr
+31.  bt_test_source_remove_by_addr
+32.  bt_test_sink_open
+33.  bt_test_sink_visibility00
+34.  bt_test_sink_visibility01
+35.  bt_test_sink_visibility10
+36.  bt_test_sink_visibility11
+37.  bt_test_ble_visibility00
+38.  bt_test_ble_visibility11
+39.  bt_test_sink_status
+40.  bt_test_sink_music_play
+41.  bt_test_sink_music_pause
+42.  bt_test_sink_music_next
+43.  bt_test_sink_music_previous
+44.  bt_test_sink_music_stop
+45.  bt_test_sink_set_volume
+46.  bt_test_sink_connect_by_addr
+47.  bt_test_sink_disconnect_by_addr
+48.  bt_test_sink_get_play_status
+49.  bt_test_sink_get_poschange
+50.  bt_test_sink_disconnect
+51.  bt_test_sink_close
+52.  bt_test_ble_start
+53.  bt_test_ble_set_address
+54.  bt_test_ble_set_adv_interval
+55.  bt_test_ble_write
+56.  bt_test_ble_disconnect
+57.  bt_test_ble_stop
+58.  bt_test_ble_get_status
+59.  bt_test_ble_client_open
+60.  bt_test_ble_client_close
+61.  bt_test_ble_client_connect
+62.  bt_test_ble_client_disconnect
+63.  bt_test_ble_client_get_status
+64.  bt_test_ble_client_get_service_info
+65.  bt_test_ble_client_read
+66.  bt_test_ble_client_write
+67.  bt_test_ble_client_is_notify
+68.  bt_test_ble_client_notify_on
+69.  bt_test_ble_client_notify_off
+70.  bt_test_ble_client_get_eir_data
+71.  bt_test_spp_open
+72.  bt_test_spp_write
+73.  bt_test_spp_close
+74.  bt_test_spp_status
+75.  bt_test_hfp_sink_open
+76.  bt_test_hfp_hp_open
+77.  bt_test_hfp_hp_accept
+78.  bt_test_hfp_hp_hungup
+79.  bt_test_hfp_hp_redail
+80.  bt_test_hfp_hp_dial_number
+81.  bt_test_hfp_hp_report_battery
+82.  bt_test_hfp_hp_set_volume
+83.  bt_test_hfp_hp_close
+84.  bt_test_hfp_hp_disconnect
+85.  bt_test_obex_init
+86.  bt_test_obex_pbap_init
+87.  bt_test_obex_pbap_connect
+88.  bt_test_obex_pbap_get_pb_vcf
+89.  bt_test_obex_pbap_get_ich_vcf
+90.  bt_test_obex_pbap_get_och_vcf
+91.  bt_test_obex_pbap_get_mch_vcf
+92.  bt_test_obex_pbap_get_spd_vcf
+93.  bt_test_obex_pbap_get_fav_vcf
+94.  bt_test_obex_pbap_disconnect
+95.  bt_test_obex_pbap_deinit
+96.  bt_test_obex_deinit
+97.  bt_test_pan_init
+98.  bt_test_pan_deinit
+99.  bt_test_pan_connect
+100.  bt_test_pan_disconnect
+101.  bt_server_close
 Which would you like:
 ```
 
@@ -1563,18 +1653,18 @@ Which would you like:
 ```
 Which would you like:01
 #注：等待执行结束，进入下一轮选择界面。
-Which would you like:25
+Which would you like:26
 #注：打开source功能
 Which would you like:8 input 15000
 #注：开始扫描周围的蓝牙设备，扫描时间15s
-Which would you like:27 input xx:xx:xx:xx:xx:xx
+Which would you like:28 input xx:xx:xx:xx:xx:xx
 #注： 开始和地址为xx:xx:xx:xx:xx:xx 的设备进行连接
 ```
 
 3. 需要传输地址或其他参数的测试程序，输入：编号（空格）input（空格）参数，比如要和指定地址的设备进行配对
 
 ```
-Which would you like:19 input 94:87:E0:B6:6D:AE
+Which would you like:20 input 94:87:E0:B6:6D:AE
 #注：开始和地址为 94:87:E0:B6:6D:AE 的设备进行配对
 ```
 
