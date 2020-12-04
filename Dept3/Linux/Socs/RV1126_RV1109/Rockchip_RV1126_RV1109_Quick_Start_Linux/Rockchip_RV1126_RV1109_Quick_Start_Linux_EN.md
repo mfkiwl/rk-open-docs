@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.2
+Release Version: V1.9.3
 
-Release Date: 2020-12-02
+Release Date: 2020-12-04
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -79,6 +79,7 @@ This document (this guide) is mainly intended for:
 | V1.9.0 | CWW | 2020-11-14 | 1. Update spi nand/slc nand BoardConfig and Document<br>2. Update requirement version for windows and Linux tool |
 | V1.9.1 | CWW | 2020-11-22 | Add spi nor BoardConfig |
 | V1.9.2 | CWW | 2020-12-02 | 1. Add AB system boot-up board config reference <br>2. introduced to U-Boot's tftp |
+| V1.9.3 | CWW | 2020-12-04 | 1. Add GPIO Precaution<br>2. Add introduction to starting face recognition function |
 
 ---
 
@@ -747,7 +748,13 @@ Or in root directory, run the following command on your device to upgrade in MAS
 ./rkflash.sh
 ```
 
-## EVB Function Introduction
+## EVB Function Introduction and Precaution
+
+### The precaution of GPIO power design
+
+![](resources/NOTICE-GPIO-EN.png)
+
+### How to Access 3 RTSP and 1 RTMP Network Stream
 
 The EVB supports the following functions:
 
@@ -756,8 +763,6 @@ The EVB supports the following functions:
 - Support to save the main stream to the device
 - Support access device from web
 - Support face recognition
-
-### How to Access 3 RTSP and 1 RTMP Network Stream
 
 Connect a network cable to the network port of the EVB, power on and start. It will obtain the IP address automatically by default.
 
@@ -830,6 +835,7 @@ For detailed operation instructions on the web, please refer to the documents un
 
 Use a player to access RTSP main stream: rtsp://**IP address of the device**/live/mainstream.
 
+Face Recognition is closed by default. We can visit on `http://IP address of the device` and "Config" --> "INTELLIGENCE ANALYSIS" to enable face recognition.
 The default authorization test time of the SDK's face recognition function is 30 ~ 60 minutes. When the authorization is invalid, the main stream preview will prompt "gace algorithm software is not authorized", and you have to restart to test again.
 
 ### How to Debug With EVB via Network

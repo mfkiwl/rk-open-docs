@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-359
 
-Release Version: V1.1.1
+Release Version: V1.2.0
 
-Release Date: 2020-07-11
+Release Date: 2020-12-04
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -56,6 +56,7 @@ This document (this guide) is mainly intended for:
 | 2020-06-16 | V1.0.0 | CWW | Update official version |
 | 2020-06-19 | V1.1.0 | CW | Update for Smart USB Camera SDK |
 | 2020-07-11 | V1.1.1 | CWW | Update 2.1 chapter |
+| 2020-07-11 | V1.2.0 | CWW | Add GPIO Precaution |
 
 ---
 
@@ -141,6 +142,10 @@ Please refer to user guides in the project directory for hardware development:
 ```shell
 <SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
 ```
+
+## The precaution of GPIO power design
+
+![](resources/NOTICE-GPIO-EN.png)
 
 ## SSH Public Key Operation Introduction
 

@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-359
 
-发布版本：V1.1.1
+发布版本：V1.2.0
 
-日期：2020-07-11
+日期：2020-12-04
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -63,6 +63,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-06-16 | V1.0.0 | CWW | 更新正式版本 |
 | 2020-06-19 | V1.1.0 | CW | 增加智能USB Camera下载说明 |
 | 2020-07-11 | V1.1.1 | CWW | 更新2.1节 |
+| 2020-12-04 | V1.2.0 | CWW | 增加GPIO使用注意事项 |
 
 ---
 
@@ -146,6 +147,10 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://g
 ```shell
 <SDK>/docs/RV1126_RV1109/Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf
 ```
+
+## GPIO电源设计注意事项
+
+![](resources/NOTICE-GPIO-CN.png)
 
 ## SSH 公钥操作说明
 
