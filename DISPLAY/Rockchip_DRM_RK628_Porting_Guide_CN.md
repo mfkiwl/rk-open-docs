@@ -2,9 +2,9 @@
 
 文件标识：RK-YH-YF-276
 
-发布版本：V1.1.0
+发布版本：V1.4.0
 
-日期：2020-12-01
+日期：2020-12-04
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -60,6 +60,7 @@ Rockchip Electronics Co., Ltd.
 | V1.1.0     | 陈顺庆   | 2020-12-02   | 补充Post-Process和HDMITX |
 | V1.2.0     | 黄国椿   | 2020-12-02   | 补充rk628_bt1120_rx      |
 | V1.3.0     | 操瑞杰   | 2020-12-02   | 补充 HDMIRX              |
+| V1.4.0     | 黄家钗   | 2020-12-04   | 补充 GVI                 |
 
 ---
 
@@ -244,6 +245,26 @@ DTS 配置如下,以 HDMI2GVI 为例：
 			hdmi_out_hdmirx: endpoint {
 				remote-endpoint = <&hdmirx_in_hdmi>;
 			};
+		};
+	};
+};
+
+&panel {
+	compatible = "simple-panel";
+	……
+	status = "okay";
+
+	display-timings {
+		native-mode = <&timing>;
+
+		timing: timing {
+		……
+		};
+	};
+
+	port {
+		panel_in_gvi: endpoint {
+			remote-endpoint = <&gvi_out_panel>;
 		};
 	};
 };
@@ -1132,7 +1153,7 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
    @@ -204,6 +204,11 @@ PNAME(mux_hsadcout_p)      = { "hsadc_src", "ext_hsadc" };
     PNAME(mux_edp_24m_p)   = { "ext_edp_24m", "xin24m" };
     PNAME(mux_tspout_p)    = { "cpll", "gpll", "npll", "xin27m" };
-    
+
    +PNAME(mux_testout_src_p) = { "aclk_peri", "clk_core", "aclk_vio0", "ddrphy",
    +                            "aclk_vcodec", "aclk_gpu", "rga_core", "aclk_cpu",
    +                            "xin24m", "xin27m", "xin32k", "clk_wifi",
@@ -1144,7 +1165,7 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
    @@ -560,6 +565,12 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
                            RK3288_CLKSEL_CON(2), 0, 6, DFLAGS,
                            RK3288_CLKGATE_CON(2), 7, GFLAGS),
-    
+
    +       MUX(SCLK_TESTOUT_SRC, "sclk_testout_src", mux_testout_src_p, 0,
    +           RK3288_MISC_CON, 8, 4, MFLAGS),
    +       COMPOSITE_NOMUX(SCLK_TESTOUT, "sclk_testout", "sclk_testout_src", 0,
@@ -1164,7 +1185,7 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
     #define SCLK_MACREF_OUT                152
    +#define SCLK_TESTOUT_SRC       153
    +#define SCLK_TESTOUT           154
-    
+
     #define DCLK_VOP0              190
     #define DCLK_VOP1              191
    ```
@@ -1177,7 +1198,7 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
    @@ -39,6 +39,20 @@
            status = "okay";
     };
-    
+
    +&xin_osc0_func {
    +       compatible = "fixed-factor-clock";
    +       clocks = <&cru SCLK_TESTOUT>;
@@ -1191,10 +1212,10 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
    +       assigned-clocks = <&cru SCLK_TESTOUT_SRC>;
    +       assigned-clock-parents = <&xin24m>;
    +};
-   +
+
     &rk628_hdmi {
            status = "okay";
-    
+
    @@ -114,3 +128,11 @@
            connect = <&vopl_out_rgb>;
            status = "disabled";
@@ -1208,6 +1229,40 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
    +       };
    +};
    ```
+
+### GVI
+
+#### GVI 说明
+
+GVI (General Video Interface) 是一种用于视频信号高速传输的通用接口，采用 8B/10B 编码技术和 CDR 架构，支持 one-setcion/non-division、 two-secion/2 division 模式，传输带宽为 3.75Gbps/lane，最大可以支持 8lane 3840x2160P60 输出。
+
+#### 配置说明
+
+1. divison 模式配置
+
+- GVI 默认为 one section 模式，对于 two section 模式的屏可以通过在 dts 中加入如下属性打开
+
+```c
+&rk628_gvi {
+
+    rockchip,division-mode;
+
+}
+```
+
+- 不同模式数据传输方式
+
+![RK628-GVI-division-pixel-data](Rockchip_DRM_RK628_Porting_Guide/RK628-GVI-division-pixel-data.png)
+
+2. DTS 通路配置demo
+
+- RGB2GVI
+
+  可以参考 dts demo：arch/arm/boot/dts/rk3288-evb-rk628-rgb2gvi-avb.dts
+
+- HDMI2GVI
+
+  可以参考 dts demo：arch/arm/boot/dts/rk3288-evb-rk628-hdmi2gvi-avb.dts
 
 ## DEBUG
 
@@ -1313,21 +1368,25 @@ vendor.hwc.device.primary=DSI
 
 ### 自测模式
 
-#### HDMITX Color Bar
+在调试过程中，可以通过以下命令测试输出模块的控制器、对应的phy、屏端这条链路是否正常工作，如果 color bar 能正常显示，请检查主控输出、RK628 input、RK628 Process 的配置，反之请检查对应输出接口和屏端的配置：
 
-下面两个命令分别输出两种模式的Color Bar，在调试过程中可以方便验证HDMITX模块是否工作正常：
+#### HDMITX color bar
 
 ```
 echo 0x70324 0x00 > /d/regmap/1-0050-hdmi/registers
 echo 0x70324 0x40 > /d/regmap/1-0050-hdmi/registers
 ```
 
-#### DSITX
-
-如下命令输出DSITX的Color Bar，在调试过程中可以方便验证DSITX模块是否工作正常：
+#### DSI color bar
 
 ```
 echo 0x50038 0x13f02 > /d/regmap/1-0050-dsi0/registers
+```
+
+#### GVI color bar
+
+```
+echo  0x80060 0x1 > /d/regmap/1-0050-gvi/registers
 ```
 
 ### 行场解析
