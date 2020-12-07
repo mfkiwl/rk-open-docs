@@ -2,9 +2,9 @@
 
 ID: RK-CS-YF-375
 
-Release Version: V1.0.0
+Release Version: V1.1.0
 
-Release Date: 2020-08-05
+Release Date: 2021-04-01
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -63,6 +63,7 @@ Software development engineers
 | **Date**   | **Version** | **Author**  | **Revision History** |
 | ---------- | :---------- | :---------- | :------------------- |
 | 2020-08-05 | V1.0.0      | Caesar Wang | Initial  version     |
+| 2021-04-01 | V1.1.0      | Caesar Wang  | Add RK3566、RK3568 KPI |
 
 ---
 
@@ -78,19 +79,19 @@ Software development engineers
 
 The scores of Glmark2's fullscreen and offscreen mode of each chip are shown in the table below:
 
-| **Item**    | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** |
-| ----------- | :-------------- | :------------- | :---------- |
-|Full Screen	|	56	|	37	|	30	|
-|Off Screen	|	823	|	544	|	301	|
-|GPU Type	|	Mali-T864	|	Mali-T764	|	Mali-G31MP2	|
+| **Item**    | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** | **RK3566/RK3568** |
+| ----------- | :------------------- | :--------- | :-------------- | :---------------- |
+| Full Screen | 56                   | 37         | 30              | 183               |
+| Off Screen  | 823                  | 544        | 301             | 687               |
+| GPU Type    | Mali-T864            | Mali-T764  | Mali-G31MP2     | Mali-G52          |
 
 The resolution of test screen on different chip platforms is as follows:
 
-| **Item**          | **RK3399/RK3399Pro** | **RK3288**       | **RK3326/PX30**   |
-| ----------------- | :------------------- | :--------------- | :---------------- |
-| Screen resolution | EDP:1536x2048p60     | EDP:1536x2048p60 | HDMI:1920x1080p60 |
+| **Item**          | **RK3399/RK3399Pro** | **RK3288**       | **RK3326/PX30**   | **RK3568**/RK3566 |
+| ----------------- | :------------------- | :--------------- | :---------------- | :---------------- |
+| Screen resolution | EDP:1536x2048p60     | EDP:1536x2048p60 | HDMI:1920x1080p60 | MIPI:1920x1080p60 |
 
-The performance of fullscreen mode is related to the screen, so the actual performance can refer to the score of off screen mode.
+The performance of fullscreen mode is related to the screen resolution or ddr type etc. , so the actual performance can refer to the score of off screen mode.
 
 ## UnixBench
 
@@ -147,39 +148,39 @@ The reference scores of test items for each chip are as follows:
 
 - the performance of your system when running a single task
 
-| **Item**                              | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** |
-| ------------------------------------- | :------------------- | :--------- | :-------------- |
-| Dhrystone 2 using register variables  | 19191210.4           | 10626086.6 | 5704897.1       |
-| Double-Precision Whetstone            | 3303.5               | 1718.9     | 1565.2          |
-| Execl Throughput                      | 2730.8               | 1538.1     | 787.9           |
-| File Copy 1024 bufsize 2000 maxblocks | 263262.3             | 163001.5   | 125333.2        |
-| File Copy 256 bufsize 500 maxblocks   | 98335.8              | 50635.1    | 37871.9         |
-| File Copy 4096 bufsize 8000 maxblocks | 677993.2             | 384632.9   | 321189.7        |
-| Pipe Throughput                       | 775302.3             | 357578.5   | 300305.5        |
-| Pipe-based Context Switching          | 87345.3              | 54247.5    | 37434.5         |
-| Process Creation                      | 4274.2               | 3512.1     | 2086.0          |
-| Shell Scripts (1 concurrent)          | 2944.0               | 2973.3     | 1474.2          |
-| Shell Scripts (8 concurrent)          | 832.4                | 703.2      | 431.7           |
-| System Call Overhead                  | 721899.8             | 624614.1   | 568868.6        |
-| System Benchmarks Index Score         | 654.7                | 421.7      | 290.6           |
+| **Item**                              | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** | **RK3566** | **RK3568** |
+| ------------------------------------- | :------------------- | :--------- | :-------------- | :--------- | :--------- |
+| Dhrystone 2 using register variables  | 19191210.4           | 10626086.6 | 5704897.1       | 12332588.0 | 13176039.3 |
+| Double-Precision Whetstone            | 3303.5               | 1718.9     | 1565.2          | 2965.9     | 3164.5     |
+| Execl Throughput                      | 2730.8               | 1538.1     | 787.9           | 1483.6     | 1703.0     |
+| File Copy 1024 bufsize 2000 maxblocks | 263262.3             | 163001.5   | 125333.2        | 166135.4   | 175490.6   |
+| File Copy 256 bufsize 500 maxblocks   | 98335.8              | 50635.1    | 37871.9         | 48956.5    | 51574.7    |
+| File Copy 4096 bufsize 8000 maxblocks | 677993.2             | 384632.9   | 321189.7        | 440209.9   | 461129.3   |
+| Pipe Throughput                       | 775302.3             | 357578.5   | 300305.5        | 521804.1   | 557997.0   |
+| Pipe-based Context Switching          | 87345.3              | 54247.5    | 37434.5         | 51766.2    | 53873.8    |
+| Process Creation                      | 4274.2               | 3512.1     | 2086.0          | 3782.4     | 4041.7     |
+| Shell Scripts (1 concurrent)          | 2944.0               | 2973.3     | 1474.2          | 2352.0     | 2817.2     |
+| Shell Scripts (8 concurrent)          | 832.4                | 703.2      | 431.7           | 567.3      | 675.6      |
+| System Call Overhead                  | 721899.8             | 624614.1   | 568868.6        | 783414.7   | 836985.7   |
+| System Benchmarks Index Score         | 654.7                | 421.7      | 290.6           | 456.9      | 497.3      |
 
 - the performance of your system when running multiple tasks
 
-| **Item**                              | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** |
-| ------------------------------------- | :------------------- | :--------- | :-------------- |
-| Dhrystone 2 using register variables  | 61892645.4           | 41527276.3 | 22821903.2      |
-| Double-Precision Whetstone            | 13192.2              | 6870.1     | 6265.7          |
-| Execl Throughput                      | 6638.9               | 4127.0     | 2449.4          |
-| File Copy 1024 bufsize 2000 maxblocks | 253903.6             | 265838.2   | 194293.5        |
-| File Copy 256 bufsize 500 maxblocks   | 74647.0              | 74156.4    | 54107.4         |
-| File Copy 4096 bufsize 8000 maxblocks | 715699.5             | 709343.4   | 565091.8        |
-| Pipe Throughput                       | 3159789.0            | 1323176.0  | 1191104.7       |
-| Pipe-based Context Switching          | 298324.6             | 134686.9   | 154652.2        |
-| Process Creation                      | 11834.7              | 7412.8     | 5183.1          |
-| Shell Scripts (1 concurrent)          | 7420.0               | 5710.9     | 3587.9          |
-| Shell Scripts (8 concurrent)          | 952.5                | 744.6      | 477.4           |
-| System Call Overhead                  | 2514699.7            | 2392234.7  | 2206337.3       |
-| System Benchmarks Index Score         | 1402.8               | 989.5      | 746.4           |
+| **Item**                              | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** | **RK3566** | **RK3568** |
+| ------------------------------------- | :------------------- | :--------- | :-------------- | :--------- | ---------- |
+| Dhrystone 2 using register variables  | 61892645.4           | 41527276.3 | 22821903.2      | 47931915.4 | 51737187.8 |
+| Double-Precision Whetstone            | 13192.2              | 6870.1     | 6265.7          | 11545.6    | 12431.5    |
+| Execl Throughput                      | 6638.9               | 4127.0     | 2449.4          | 3272.1     | 3951.1     |
+| File Copy 1024 bufsize 2000 maxblocks | 253903.6             | 265838.2   | 194293.5        | 236042.5   | 246968.0   |
+| File Copy 256 bufsize 500 maxblocks   | 74647.0              | 74156.4    | 54107.4         | 65182.9    | 67873.4    |
+| File Copy 4096 bufsize 8000 maxblocks | 715699.5             | 709343.4   | 565091.8        | 639035.4   | 700693.2   |
+| Pipe Throughput                       | 3159789.0            | 1323176.0  | 1191104.7       | 2031168.7  | 2191846.5  |
+| Pipe-based Context Switching          | 298324.6             | 134686.9   | 154652.2        | 202912.5   | 212649.7   |
+| Process Creation                      | 11834.7              | 7412.8     | 5183.1          | 7036.5     | 7932.7     |
+| Shell Scripts (1 concurrent)          | 7420.0               | 5710.9     | 3587.9          | 4613.8     | 5473.0     |
+| Shell Scripts (8 concurrent)          | 952.5                | 744.6      | 477.4           | 593.1      | 707.7      |
+| System Call Overhead                  | 2514699.7            | 2392234.7  | 2206337.3       | 2815382.8  | 3028273.6  |
+| System Benchmarks Index Score         | 1402.8               | 989.5      | 746.4           | 1039.1     | 1146.5     |
 
 ## LMbench
 
@@ -209,28 +210,28 @@ Things need to focus on LMbench include the following:
 
 - the performance of your system when running latency benchmarks. (microseconds)
 
-| **Item**                    | **RK3399/RK3399Pro** | **RK3288**       | **RK3326/PX30**  |
-| --------------------------- | :------------------- | :--------------- | :--------------- |
-| Simple syscall              | 0.2228               | 0.2126           | 0.2176           |
-| Simple read                 | 0.3385               | 0.5989           | 0.6965           |
-| Simple write                | 0.2828               | 0.3777           | 0.5637           |
-| Simple stat                 | 1.3041               | 2.9836           | 4.1538           |
-| Simple fstat                | 0.3456               | 0.6527           | 0.6581           |
-| Simple open/close           | 3.0633               | 5.2514           | 7.7892           |
-| Signal handler installation | 0.4103               | 0.6593           | 0.6882           |
-| Signal handler overhead     | 1.9096               | 4.3894           | 4.5098           |
-| Pipe latency                | 14.3626              | 23.8091          | 36.1158          |
-| AF_UNIX sock stream latency | 19.0106              | 21.9593          | 50.0182          |
-| Process fork+exit           | 254.8182             | 390.5714         | 668.1250         |
-| Process fork+execve         | 281.0526             | 417.2308         | 754.7143         |
-| UDP latency                 | 28.8465              | 53.3952          | 64.4354          |
-| TCP latency                 | 36.1384              | 65.4973          | 77.5462          |
-| STREAM2 sum latency         | 1.89 nanoseconds     | 3.35 nanoseconds | 5.96 nanoseconds |
+| **Item**                          | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** | **RK3566** | **RK3568** |
+| --------------------------------- | :------------------- | :--------- | :-------------- | :--------- | :--------- |
+| Simple syscall                    | 0.2228               | 0.2126     | 0.2176          | 0.1798     | 0.1681     |
+| Simple read                       | 0.3385               | 0.5989     | 0.6965          | 0.4748     | 0.4453     |
+| Simple write                      | 0.2828               | 0.3777     | 0.5637          | 0.3397     | 0.3255     |
+| Simple stat                       | 1.3041               | 2.9836     | 4.1538          | 2.2721     | 2.1151     |
+| Simple fstat                      | 0.3456               | 0.6527     | 0.6581          | 0.5040     | 0.4721     |
+| Simple open/close                 | 3.0633               | 5.2514     | 7.7892          | 6.3818     | 5.7568     |
+| Signal handler installation       | 0.4103               | 0.6593     | 0.6882          | 0.4384     | 0.4116     |
+| Signal handler overhead           | 1.9096               | 4.3894     | 4.5098          | 4.1982     | 3.9874     |
+| Pipe latency                      | 14.3626              | 23.8091    | 36.1158         | 28.3653    | 26.4768    |
+| AF_UNIX sock stream latency       | 19.0106              | 21.9593    | 50.0182         | 48.2105    | 36.8146    |
+| Process fork+exit                 | 254.8182             | 390.5714   | 668.1250        | 693.1111   | 632.1250   |
+| Process fork+execve               | 281.0526             | 417.2308   | 754.7143        | 752.3750   | 448.5833   |
+| UDP latency                       | 28.8465              | 53.3952    | 64.4354         | 45.6886    | 68.6856    |
+| TCP latency                       | 36.1384              | 65.4973    | 77.5462         | 57.7789    | 88.9926    |
+| STREAM2 sum latency (nanoseconds) | 1.89                 | 3.35       | 5.96            | 2.41       | 2.23       |
 
 - the performance of your system when running bandwidth benchmarks. (MB/sec)
 
-| **Item**                      | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** |
-| ----------------------------- | :------------------- | :--------- | :-------------- |
-| AF_UNIX sock stream bandwidth | 3751.28              | 2545.44    | 1181.90         |
-| Pipe bandwidth                | 1390.20              | 804.06     | 805.99          |
-| STREAM2 sum bandwidth         | 4237.37              | 2385.57    | 1342.32         |
+| **Item**                      | **RK3399/RK3399Pro** | **RK3288** | **RK3326/PX30** | **RK3566** | **RK3568** |
+| ----------------------------- | :------------------- | :--------- | :-------------- | :--------- | :--------- |
+| AF_UNIX sock stream bandwidth | 3751.28              | 2545.44    | 1181.90         | 2178.34    | 1759.47    |
+| Pipe bandwidth                | 1390.20              | 804.06     | 805.99          | 894.72     | 1041.33    |
+| STREAM2 sum bandwidth         | 4237.37              | 2385.57    | 1342.32         | 3320.23    | 3595.10    |
