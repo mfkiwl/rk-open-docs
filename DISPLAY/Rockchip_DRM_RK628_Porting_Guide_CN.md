@@ -76,8 +76,6 @@ Rockchip Electronics Co., Ltd.
 
 ![RK628-architecture](Rockchip_DRM_RK628_Porting_Guide/RK628-architecture.png)
 
-​                                                                          图 1-1
-
 配置项：
 
 ```
@@ -97,19 +95,23 @@ drivers/gpu/drm/rockchip/rk628/*
 设备树：
 
 ```
-arch/arm/boot/dts/rk628.dtsi
 arch/arm/boot/dts/rk3288-evb-rk628.dtsi
+arch/arm/boot/dts/rk3288-evb-rk628-hdmi2gvi-avb.dtb
+arch/arm/boot/dts/rk3288-evb-rk628-hdmi2gvi-avb.dts
+arch/arm/boot/dts/rk3288-evb-rk628-rgb2dsi-avb.dtb
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2dsi-avb.dts
+arch/arm/boot/dts/rk3288-evb-rk628-rgb2gvi-avb.dts
+arch/arm/boot/dts/rk3288-evb-rk628-rgb2hdmi-avb.dtb
+arch/arm/boot/dts/rk3288-evb-rk628-rgb2hdmi-avb.dts
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-dual-avb.dts
-arch/arm/boot/dts/rk3288-evb-rk628-rgb2hdmi-avb.dts
 ```
 
 ## Core
 
-1. arch/arm/boot/dts/rk628.dtsi包含RK628相关模块的基础配置，一般不需要更改，只需要在板级dts中包含该dtsi。
+1. arch/arm/boot/dts/rk628.dtsi 包含 RK628 相关模块的基础配置，一般不需要更改，只需要在板级 dts 中包含该 dtsi。
 
-2. arch/arm/boot/dts/rk3288-evb-rk628.dtsi包含特定板级配置，需要根据硬件设计配置RK628相关控制IO，并且包含rk628.dtsi。
+2. arch/arm/boot/dts/rk3288-evb-rk628.dtsi 包含特定板级配置，需要根据硬件设计配置 RK628 相关控制 IO，并且包含 rk628.dtsi。
 
    ```
    &i2c1 {
@@ -222,13 +224,6 @@ HDMIRX 目前支持以下输入源格式：
 - 720X480-60Hz(RGB-8BIT)
 
 #### HDMIRX 板级直连模式
-
-代码路径为：
-
-```
-drivers/gpu/drm/rockchip/rk628/rk628_hdmirx.c
-drivers/gpu/drm/rockchip/rk628/rk628_combrxphy.c
-```
 
 DTS 配置如下,以 HDMI2GVI 为例：
 
@@ -367,7 +362,7 @@ DTS 配置如下,以 HDMI2GVI 为例：
 
 **注意事项**
 
-由于 HDMIRX 最大值支持 4K-60Hz-YUV420，所以当需要输出 4K-60Hz 分辨率时，需要强制限制输入源为YUV420 颜色格式。必须在输出端限制输入源最大的 TMDS CLK 以及允许 YUV420 格式输出。
+由于 HDMIRX 最大值支持 4K-60Hz-YUV420，所以当需要输出 4K-60Hz 分辨率时，需要强制限制输入源为 YUV420 颜色格式。必须在输出端限制输入源最大的 TMDS CLK 以及允许 YUV420 格式输出。
 
 以 HDMI2GVI 为例，需要以下修改：
 
@@ -387,9 +382,9 @@ DTS 配置如下,以 HDMI2GVI 为例：
 
 ### Post-Process
 
-如图 1-1所示，输入数据需要经过Post Process做缩放或是bypass，然后送到各显示接口，所以dts必须要配置rk628_post_process桥接RGB或是HDMIRX。
+如图 1-1所示，输入数据需要经过 Post Process 做缩放或是bypass，然后送到各显示接口，所以 dts 必须要配置 rk628_post_process 桥接 RGB 或是 HDMIRX。
 
-以RGB为例：
+以 RGB 为例：
 
 ```
 &rgb {
@@ -428,9 +423,9 @@ DTS 配置如下,以 HDMI2GVI 为例：
 
 #### Scaler
 
-以RGB(1080p)-> GVI(4K)为例，因为RGB无法输出4K，所以只能经过Scaler做缩放。
+以 RGB(1080p)-> GVI(4K) 为例，因为 RGB 无法输出4K，所以只能经过 Scaler 做缩放。
 
-因为GVI只添加了4K的分辨率，在上层modes列表中会有4K分辨率，但是希望上层设置1080P(源分辨率)下来，在Post Process再放大到4K(目标分辨率)，所以需要在Post Process添加一个源分辨率，配置如下：
+因为 GVI 只添加了 4K 的分辨率，在上层 modes 列表中会有 4K 分辨率，但是希望上层设置 1080P(源分辨率) 下来，在 Post Process 再放大到 4K(目标分辨率)，所以需要在 Post Process 添加一个源分辨率，配置如下：
 
 ```diff
 &rk628_post_process {
@@ -513,7 +508,7 @@ DTS 配置如下,以 HDMI2GVI 为例：
 };
 ```
 
-mode-sync-pol做为一种规避方法而添加的属性，一般情况不需要配置，只有像RK3568 RGB和LVDS同时输出的时候，极性没有办法配置，只能输出DRM_MODE_FLAG_NHSYNC/DRM_MODE_FLAG_NVSYNC的情况下，通过配置Post Process的mode-sync-pol为0，来适配前级的极性。
+mode-sync-pol 做为一种规避方法而添加的属性，一般情况不需要配置，只有像 RK3568 RGB 和 LVDS 同时输出的时候，极性没有办法配置，只能输出 DRM_MODE_FLAG_NHSYNC/DRM_MODE_FLAG_NVSYNC 的情况下，通过配置 Post Process 的 mode-sync-pol 为 0，来适配前级的极性。
 
 ### LVDS
 
@@ -691,7 +686,7 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
 
 | Property           | Value                                                        | Comment                                                      |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| rockchip,link-type | dual-link-odd-even-pixels<br />dual-link-even-odd-pixels<br />dual-link-left-right-pixels<br />dual-link-right-left-pixels | 双通道LVDS需要配置该属性，支持奇偶像<br />素模式和左右像素模式，并且支持数据通道<br />互换。对于左右像素模式，需要在CH0和CH1<br />上分别接上相同的屏，在配置timing时，只需<br />要在单屏timing的基础上，将clock-frequency,<br />hactive, hback-porch, hfront-porch, hsync-len<br />的值分别x2。 |
+| rockchip,link-type | dual-link-odd-even-pixels<br />dual-link-even-odd-pixels<br />dual-link-left-right-pixels<br />dual-link-right-left-pixels | 双通道 LVDS 需要配置该属性，支持奇偶像<br />素模式和左右像素模式，并且支持数据通道<br />互换。对于左右像素模式，需要在CH0和CH1<br />上分别接上相同的屏，在配置 timing 时，只需<br />要在单屏 timing 的基础上，将 clock-frequency,<br />hactive, hback-porch, hfront-porch, hsync-len<br />的值分别x2。 |
 
 ```
 
@@ -1043,7 +1038,9 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2hdmi-avb.dts
 
 #### BT1120->HDMI
 
-rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to-hdmi.dts
+![rk628-bt1120-2-hdmi](Rockchip_DRM_RK628_Porting_Guide/rk628-bt1120-2-hdmi.png)
+
+rk3568 平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to-hdmi.dts
 
 ```
 #include <arm/rk628.dtsi>
@@ -1141,9 +1138,9 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
 
 **注意事项**
 
-1. HDMITX最大分辨率支持1080P60。
+1. HDMITX 最大分辨率支持 1080P60。
 
-2. HDMITX需要测试时钟同源的问题，即需要与主控的RGB同时钟源，不然会有相位差，导致兼容性问题，比如黑屏/显示黑边等。以RK3288+RK628为例，硬件上RK628的24M时钟需要由RK3288的PIN-M23提供 ，软件补丁如下：
+2. HDMITX 需要测试时钟同源的问题，即需要与主控的 RGB 同时钟源，不然会有相位差，导致兼容性问题，比如黑屏/显示黑边等。以 RK3288+RK628 为例，硬件上 RK628 的 24M 时钟需要由 RK3288 的 PIN-M23 sclk_testout 提供 ，软件补丁如下：
 
    ```diff
    diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
@@ -1230,6 +1227,8 @@ rk3568平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-to
    +};
    ```
 
+如果是 RK3399+RK628 平台，硬件上 RK628 的 24M 时钟需要由 RK3399 的 PIN-U28 clk_testout2 提供，软件补丁参考 HDMI2GVI 章节。
+
 ### GVI
 
 #### GVI 说明
@@ -1258,13 +1257,241 @@ GVI (General Video Interface) 是一种用于视频信号高速传输的通用�
 
 - RGB2GVI
 
+  ![rk628-rgb-2-gvi](Rockchip_DRM_RK628_Porting_Guide/rk628-rgb-2-gvi.png)
+
   可以参考 dts demo：arch/arm/boot/dts/rk3288-evb-rk628-rgb2gvi-avb.dts
 
 - HDMI2GVI
 
+  ![rk628-HDMI2GVI](Rockchip_DRM_RK628_Porting_Guide/rk628-HDMI2GVI.png)
+
   可以参考 dts demo：arch/arm/boot/dts/rk3288-evb-rk628-hdmi2gvi-avb.dts
 
+  如下是 rk3399 平台 HDMI2GVI 软件修改补丁：
+
+```diff
+/ {
++       panel_gvi {
++               compatible = "simple-panel";
++               //backlight = <&backlight>;
++               power-supply = <&vcc_lcd>;
++               prepare-delay-ms = <20>;
++               //enable-gpios = <&gpio7 21 GPIO_ACTIVE_HIGH>;
++               enable-delay-ms = <200>;
++               disable-delay-ms = <20>;
++               unprepare-delay-ms = <20>;
++               bus-format = <MEDIA_BUS_FMT_RGB888_1X24>;
++               width-mm = <136>;
++               height-mm = <217>;
++               status = "okay";
++
++               display-timings {
++                       native-mode = <&timing>;
++
++                       timing: timing {
++                               clock-frequency = <594000000>;
++                               hactive = <3840>;
++                               vactive = <2160>;
++                               hback-porch = <296>;
++                               hfront-porch = <176>;
++                               vback-porch = <72>;
++                               vfront-porch = <8>;
++                               hsync-len = <88>;
++                               vsync-len = <10>;
++                               hsync-active = <1>;
++                               vsync-active = <1>;
++                               de-active = <0>;
++                               pixelclk-active = <0>;
++                       };
++               };
++
++               port {
++                       panel_in_gvi: endpoint {
++                               remote-endpoint = <&gvi_out_panel>;
++                       };
++               };
++       };
+};
+
++&i2c7 {
++	clock-frequency = <400000>;
++	status = "okay";
++
++	rk628: rk628@50 {
++		reg = <0x50>;
++		interrupt-parent = <&gpio2>;
++		interrupts = <RK_PA0 IRQ_TYPE_LEVEL_HIGH>;
++		//enable-gpios = <&gpio0 RK_PC5 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio3 RK_PC0 GPIO_ACTIVE_LOW>;
++		pinctrl-0 = <&rk628_rst>;
++		pinctrl-names = "default";
++		status = "okay";
++	};
++};
++
++#include <arm/rk628.dtsi>
++
+
++&hdmi {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		port@1 {
++			reg = <1>;
++
++			hdmi_out_hdmirx: endpoint {
++				remote-endpoint = <&hdmirx_in_hdmi>;
++			};
++		};
++	};
++};
++
++&rk628_gvi {
++	pinctrl-names = "default";
++	pinctrl-0 = <&gvi_hpd_pins>, <&gvi_lock_pins>;
++	status = "okay";
++	rockchip,lane-num = <8>;
++	/* rockchip,division-mode; */
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++
++			gvi_in_post_process: endpoint {
++				remote-endpoint = <&post_process_out_gvi>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++
++			gvi_out_panel: endpoint {
++				remote-endpoint = <&panel_in_gvi>;
++			};
++		};
++	};
++};
++
++&rk628_combtxphy {
++	status = "okay";
++};
++
++&rk628_post_process {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++
++			post_process_in_hdmirx: endpoint {
++				remote-endpoint = <&hdmirx_out_post_process>;
++			};
++		};
++
++
++		port@1 {
++			reg = <1>;
++
++			post_process_out_gvi: endpoint {
++				remote-endpoint = <&gvi_in_post_process>;
++			};
++		};
++	};
++};
++
++&rk628_combrxphy {
++	status = "okay";
++};
++
++&rk628_hdmirx {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++
++			hdmirx_in_hdmi: endpoint {
++				remote-endpoint = <&hdmi_out_hdmirx>;
++			};
++		};
++		port@1 {
++			reg = <1>;
++
++			hdmirx_out_post_process: endpoint {
++				remote-endpoint = <&post_process_in_hdmirx>;
++			};
++		};
++	};
++};
+
+&pinctrl {
++	rk628_gpio {
++		rk628_rst: rk628_rst {
++			rockchip,pins = <3 16 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	test {
++		clk_testout2: clk_testout2 {
++			rockchip,pins = <0 8 RK_FUNC_3 &pcfg_pull_none>;
++		};
++	};
+};
+
+/* rk3399 控制器提供的 24MHz 同源修改如下 */
++&xin_osc0_func {
++       compatible = "fixed-factor-clock";
++       clocks = <&cru SCLK_TESTCLKOUT2>;
++       clock-mult = <1>;
++       clock-div = <1>;
++};
++
+
++&rk628: rk628@50 {
++	pinctrl-0 = <&rk628_rst>, <&clk_testout2>;
++	pinctrl-names = "default";
++	assigned-clocks = <&cru SCLK_TESTCLKOUT2>;
++	assigned-clock-rates = <24000000>;
++};
++
+```
+
 ## DEBUG
+
+### I2c通信异常
+
+如下log表示rk628的i2c通信异常导致rk628的各个模块注册不上，需要检查rk628的时序以及24MHz的基准时钟,
+以及相关pin的iomux。
+
+```
+...
+[    0.960609] rk628 1-0050: failed to access register: -6
+...
+[    1.137516] [drm] Rockchip DRM driver version: v1.0.1
+[    1.137982] rockchip-drm display-subsystem: devfreq is not set
+[    1.139225] rockchip-drm display-subsystem: bound ff930000.vop (ops vop_component_ops)
+[    1.140167] rockchip-drm display-subsystem: bound ff940000.vop (ops vop_component_ops)
+[    1.140707] dwhdmi-rockchip ff980000.hdmi: registered DesignWare HDMI I2C bus driver
+[    1.140838] dwhdmi-rockchip ff980000.hdmi: Detected HDMI TX controller v2.01a with HDCP (DWC HDMI
+2.0 TX PHY)
+[    1.141198] dwhdmi-rockchip ff980000.hdmi: can't find next bridge
+[    1.141563] rockchip-drm display-subsystem: failed to bind ff980000.hdmi (ops
+dw_hdmi_rockchip_ops): -517
+[    1.141942] rockchip-drm display-subsystem: master bind failed: -517
+[    1.142933] rockchip-dmc dmc: Get drm_device fail
+
+```
 
 ### 寄存器读写
 
@@ -1353,7 +1580,7 @@ post CSC: r2y[0] y2r[0] CSC mode[1]
 
 ### 主副屏属性配置
 
-以RGB2DSI为例，DPI表示输入为RGB，DSI表示输出为DSI。当需要配置主副屏属性时，应根据输出的对应类型进行配置。
+以 RGB2DSI 为例，DPI 表示输入为 RGB，DSI 表示输出为 DSI。当需要配置主副屏属性时，应根据输出的对应类型进行配置。
 
 ```
 console:/ # ls /sys/class/drm/
@@ -1363,12 +1590,18 @@ card0 card0-DSI-1 controlD64 renderD128 version
 属性配置如下：
 
 ```
+sys.hwc.device.primary=DSI
+```
+
+Android9.0 以上：
+
+```
 vendor.hwc.device.primary=DSI
 ```
 
 ### 自测模式
 
-在调试过程中，可以通过以下命令测试输出模块的控制器、对应的phy、屏端这条链路是否正常工作，如果 color bar 能正常显示，请检查主控输出、RK628 input、RK628 Process 的配置，反之请检查对应输出接口和屏端的配置：
+在调试过程中，可以通过以下命令测试输出模块的控制器、对应的 phy、屏端这条链路是否正常工作，如果 color bar 能正常显示，请检查主控输出、RK628 input、RK628 Process 的配置，反之请检查对应输出接口和屏端的配置：
 
 #### HDMITX color bar
 
