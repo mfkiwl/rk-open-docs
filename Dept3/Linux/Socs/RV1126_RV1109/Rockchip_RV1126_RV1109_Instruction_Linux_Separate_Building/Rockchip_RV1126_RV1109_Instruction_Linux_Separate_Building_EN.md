@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-386
 
-Release Version: V1.5.0
+Release Version: V1.5.1
 
-Release Date: 2020-09-27
+Release Date: 2020-12-08
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -67,6 +67,7 @@ This document (this guide) is mainly intended for:
 | 2020-09-10 | V1.3.0 | CWW  | 1. Add Debug info chapter                           |
 | 2020-09-15 | V1.4.0 | CWW  | 1. Support AB system compilation                           |
 | 2020-09-27 | V1.5.0 | CWW  | 1. Fix BSP library build<br>2. Add print cif info |
+| 2020-12-08 | V1.5.1 | CWW  | 1. Fix insmod driver module |
 
 [TOC]
 
@@ -192,6 +193,9 @@ rm -f drivers-ko/lib/modules/4.19.111/build drivers-ko/lib/modules/4.19.111/sour
 ### Instructions to drivers insmod (only for building without peripheral drivers into kernel)
 
 ``` shell
+# stop udevd before insmod driver modules
+udevadm control --stop-exec-queue
+
 # insmod videobuf2
 insmod kernel/drivers/media/common/videobuf2/videobuf2-memops.ko
 insmod kernel/drivers/media/common/videobuf2/videobuf2-dma-contig.ko
@@ -257,6 +261,9 @@ insmod kernel/drivers/rtc/rtc-pcf8563.ko
 
 # pwm fill light
 insmod kernel/drivers/leds/leds-pwm.ko
+
+# restart udevd after insmod driver modules
+udevadm control --start-exec-queue
 ```
 
 ## Root filesystem compilation
