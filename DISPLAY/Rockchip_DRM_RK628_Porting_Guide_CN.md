@@ -2,9 +2,9 @@
 
 文件标识：RK-YH-YF-276
 
-发布版本：V1.4.0
+发布版本：V1.5.0
 
-日期：2020-12-04
+日期：2020-12-09
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -61,6 +61,7 @@ Rockchip Electronics Co., Ltd.
 | V1.2.0     | 黄国椿   | 2020-12-02   | 补充rk628_bt1120_rx      |
 | V1.3.0     | 操瑞杰   | 2020-12-02   | 补充 HDMIRX              |
 | V1.4.0     | 黄家钗   | 2020-12-04   | 补充 GVI                 |
+| V1.5.0     | 温定贤   | 2020-12-09   | 补充 HDMI to MIPI CSI应用场景说明 |
 
 ---
 
@@ -81,6 +82,7 @@ Rockchip Electronics Co., Ltd.
 ```
 CONFIG_MFD_RK628=y
 CONFIG_DRM_ROCKCHIP_RK628=y
+CONFIG_VIDEO_RK628CSI=y
 ```
 
 驱动：
@@ -90,6 +92,7 @@ drivers/mfd/rk628.c
 drivers/clk/rockchip/regmap/clk-rk628.c
 drivers/pinctrl/pinctrl-rk628.c
 drivers/gpu/drm/rockchip/rk628/*
+drivers/media/i2c/rk628_csi.c
 ```
 
 设备树：
@@ -105,6 +108,7 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2hdmi-avb.dtb
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2hdmi-avb.dts
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-dual-avb.dts
+arch/arm/boot/dts/rk3288-evb-rk628-hdmi2csi-avb.dts
 ```
 
 ## Core
@@ -225,7 +229,7 @@ HDMIRX 目前支持以下输入源格式：
 
 #### HDMIRX 板级直连模式
 
-DTS 配置如下,以 HDMI2GVI 为例：
+DTS 配置如下，以 HDMI2GVI 为例：
 
 ```
 &hdmi {
@@ -377,6 +381,22 @@ DTS 配置如下,以 HDMI2GVI 为例：
 +       info->max_tmds_clock = 300000;
 +       connector->ycbcr_420_allowed = true;
 ```
+
+#### HDMIRX线缆连接模式
+
+HDMIRX线缆连接模式用于HDMIRX to MIPI CSI接口转换，适用于HDMI IN应用场景，支持热拔插、动态分辨率切换等功能。
+
+目前支持以下分辨率，可根据具体项目需求在驱动中继续增加：
+
+- 3840X2160-30Hz(RGB-8BIT/YUV422-8BIT)
+
+- 1920X1080-60Hz(RGB-8BIT/YUV422-8BIT)
+
+- 1280X720-60Hz(RGB-8BIT/YUV422-8BIT)
+
+- 720X576-50Hz(RGB-8BIT/YUV422-8BIT)
+
+- 720X480-60Hz(RGB-8BIT/YUV422-8BIT)
 
 ## Output
 
@@ -1140,7 +1160,7 @@ rk3568 平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-t
 
 1. HDMITX 最大分辨率支持 1080P60。
 
-2. HDMITX 需要测试时钟同源的问题，即需要与主控的 RGB 同时钟源，不然会有相位差，导致兼容性问题，比如黑屏/显示黑边等。以 RK3288+RK628 为例，硬件上 RK628 的 24M 时钟需要由 RK3288 的 PIN-M23 sclk_testout 提供 ，软件补丁如下：
+2. HDMITX 需要测试时钟同源的问题，即需要与主控的 RGB 同时钟源，不然会有相位差，导致兼容性问题，比如黑屏/显示黑边等。以 RK3288+RK628 为例，硬件上 RK628 的 24M 时钟需要由 RK3288 的 PIN-M23 sclk_testout 提供，软件补丁如下：
 
    ```diff
    diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
@@ -1233,7 +1253,7 @@ rk3568 平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-t
 
 #### GVI 说明
 
-GVI (General Video Interface) 是一种用于视频信号高速传输的通用接口，采用 8B/10B 编码技术和 CDR 架构，支持 one-setcion/non-division、 two-secion/2 division 模式，传输带宽为 3.75Gbps/lane，最大可以支持 8lane 3840x2160P60 输出。
+GVI (General Video Interface) 是一种用于视频信号高速传输的通用接口，采用 8B/10B 编码技术和 CDR 架构，支持 one-setcion/non-division、two-secion/2 division 模式，传输带宽为 3.75Gbps/lane，最大可以支持 8lane 3840x2160P60 输出。
 
 #### 配置说明
 
@@ -1467,12 +1487,121 @@ GVI (General Video Interface) 是一种用于视频信号高速传输的通用�
 +
 ```
 
+### MIPI CSI
+
+MIPI CSI用于HDMIRX to MIPI CSI接口转换，适用于HDMI IN应用场景。
+
+#### dts配置
+
+dts配置参考如下，涉及到相关硬件连接，请根据项目实际修改：
+
+1. plugin-det-gpios 用于检测5V状态，即检测HDMI线缆是否插入。
+
+2. power-gpios 用于RK AP端（如RK3288/RK3399）的MIPI CSI接口电源域供电控制。
+
+```
+&rk628_combrxphy {
+	status = "okay";
+};
+
+&rk628_combtxphy {
+	status = "okay";
+};
+
+&rk628_csi {
+	status = "okay";
+	plugin-det-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
+	power-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+	rockchip,camera-module-index = <0>;
+	rockchip,camera-module-facing = "back";
+	rockchip,camera-module-name = "RK628-CSI";
+	rockchip,camera-module-lens-name = "NC";
+
+	port {
+		hdmiin_out0: endpoint {
+			remote-endpoint = <&mipi_in>;
+			data-lanes = <1 2 3 4>;
+		};
+	};
+};
+
+&mipi_phy_rx0 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&hdmiin_out0>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dphy_rx_out: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&isp_mipi_in>;
+			};
+		};
+	};
+};
+
+&rkisp1 {
+	status = "okay";
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		isp_mipi_in: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&dphy_rx_out>;
+		};
+	};
+};
+```
+
+#### 注意事项
+
+1. RK AP端对MIPI CSI数据接收部分，类似于camera sensor v4l2驱动，可使用media-ctl、v4l2-ctl工具来调试。
+2. HDMI IN应用场景，接收3840X2160-30Hz时，MIPI速率较高，ISP频率需要达到625MHz或以上，部分芯片平台（如RK3399）需要修改时钟树配置，使ISP能够获取到需要的频点，同时ISP驱动中需要增加配置对应的频点。以RK3288/RK3399为例，ISP驱动相关代码在：
+
+```
+drivers/media/platform/rockchip/isp1/dev.c
+```
+
+3. 当HDMI IN为3840X2160-30Hz时，根据实际系统负载，可能会存在带宽不足导致丢帧或MIPI接收异常等问题，此时需要提高DDR频率，若仍无改善，可给ISP预留使用CMA内存，以解决此问题。
+
+- 在rockchip_defconfig配置预留CMA内存128MB
+
+```
+CONFIG_CMA=y
+CONFIG_CMA_SIZE_MBYTES=128
+```
+
+- 在dts配置ISP关闭IOMMU，使用CMA内存
+
+```
+&isp_mmu {
+        status = "disabled";
+};
+```
+
 ## DEBUG
 
-### I2c通信异常
+### I2C通信异常
 
-如下log表示rk628的i2c通信异常导致rk628的各个模块注册不上，需要检查rk628的时序以及24MHz的基准时钟,
-以及相关pin的iomux。
+如下log表示RK628的I2C通信异常导致RK628的各个模块注册不上，需要检查RK628的时序以及24MHz的基准时钟，以及相关pin的iomux。
 
 ```
 ...
@@ -1523,7 +1652,7 @@ index 3f0a7e262d69..b819645edd84 100644
   * This can be dangerous especially when we have clients such as
 ```
 
-1. 读寄存器：
+1. 读寄存器
 
    ```
    console:/ # cat /d/regmap/1-0050-grf/registers
