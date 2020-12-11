@@ -70,6 +70,7 @@ Rockchip Electronics Co., Ltd.
 | V2.1.0 | 林鼎强 | 2020-02-13 | 修改 SPI slave 配置 |
 | V2.2.0 | 林鼎强 | 2020-07-14 | 修订 Linux 4.19 DTS 相关配置，优化文档排版结构 |
 | V2.3.0 | 林鼎强 | 2020-11-02 | 新增 spi-bus cs-gpios 属性的支持说明 |
+| V2.3.1 | 林鼎强 | 2020-12-11 | 修订 Linux4.4 SPI slave 说明 |
 
 ---
 
@@ -106,44 +107,6 @@ Documentation/spi/spidev_test.c  用户态spi测试工具
 ```
 
 ### SPI 设备配置 —— RK 芯片做 Master 端
-
-#### Linux 4.4 配置
-
-**内核配置**
-
-```
-Device Drivers  --->
-	[*] SPI support  --->
-		<*>   Rockchip SPI controller driver
-```
-
-**DTS 节点配置**
-
-```
-&spi1 {                                             //引用spi 控制器节点
-    status = "okay";
-    max-freq = <48000000>;                          //spi内部工作时钟
-    dma-names = "tx","rx";                          //使能DMA模式，一般通讯字节少于32字节的不建议用;
-    spi_test@10 {
-        compatible ="rockchip,spi_test_bus1_cs0";   //与驱动对应的名字
-        reg = <0>;                                  //片选0或者1
-        spi-cpha;                                   //设置 CPHA = 1，不配置则为 0
-        spi-cpol;                                   //设置 CPOL = 1，不配置则为 0
-        spi-max-frequency = <24000000>;             //spi clk输出的时钟频率，不超过50M
-        status = "okay";                            //使能设备节点
-    };
-};
-```
-
-max-freq 和 spi-max-frequency 的配置说明：
-
-* spi-max-frequency 是 SPI 的输出时钟，由 SPI 工作时钟 max-freq 内部分频后输出，由于内部至少 2 分频，所以关系是 max-freq >= 2*spi-max-frequency；
-
-* 假定需要 50MHz 的 SPI IO 速率，可以考虑配置（记住内部分频为偶数分频），max-freq = <100000000>，spi-max-frequency = <50000000>，即工作时钟 100 MHz（PLL 分频到一个不大于 100MHz 但最接近的值），然后内部二分频最终 IO 接近 50 MHz；
-* max-freq 不要低于 24M，否则可能有问题；
-* 如果需要配置 spi-cpha 的话， 要求 max-freq <= 6M,  1M <= spi-max-frequency  >= 3M。
-
-#### Linux 4.19 配置
 
 **内核配置**
 
@@ -244,7 +207,8 @@ index cce80e6..ce2cec6 100644
 
 ```
 &spi0 {
-    max-freq = <48000000>;   //spi internal clk, don't modify
+    assigned-clocks = <&pmucru CLK_SPI0>;           //指定 SPI sclk，可以通过查看 dtsi 中命名为 spiclk 的时钟
+    assigned-clock-rates = <200000000>;             //相应 clock 在解析 dts 时完成赋值
     spi_test@01 {
         compatible = "rockchip,spi_test_bus0_cs1";
         id = <1>;
@@ -255,7 +219,18 @@ index cce80e6..ce2cec6 100644
 };
 ```
 
-注意：max-freq 必须是 master clk 的 6 倍以上，比如 max-freq = <48000000>; master 给过来的时钟必须小于 8M。
+注意：
+
+1. The working clock must be more than 6 times of the IO clock sent by the master. For example, if the assigned clock rates are < 48000000 >, then the clock sent by the master must be less than 8m
+   报错 笔记
+   双语对照
+2. 内核 4.4 框架并未对 SPI slave 做特殊优化，所以传输存在以下两种状态：
+   1. DMA 传输：传输发起后流程进入等待 completion 的超时机制，可以通过 dts 调整 “ dma-names;” 来关闭 DMA 传输 dma-names
+   2. CPU 传输：while 在底层驱动等待传输完成，CPU 忙等
+3. 使用 RK SPI 作为 slave，可以考虑以下几种场景：
+   1. 关闭 DMA，仅使用 CPU 阻塞传输
+   2. 传输均设置大于 32 byte，走 DMA 传输，传输等待 completion 超时机制
+   3. 主从之间增加一个 gpio，主设备输出来通知从设备 transfer ready 来减少 CPU 忙等时间
 
 #### Linux 4.19 配置
 
@@ -285,7 +260,10 @@ Device Drivers  --->
 };
 ```
 
-注意：spi_clk assigned-clock-rates 必须是 master spi-max-frequency clk 的 6 倍以上，比如 spi_clk assigned-clock-rates  = <48000000>，master 给过来的时钟必须小于 8M。
+注意：
+
+* spi_clk assigned-clock-rates 必须是 master spi-max-frequency clk 的 6 倍以上，比如 spi_clk assigned-clock-rates  = <48000000>，master 给过来的时钟必须小于 8M。
+* 实际使用场景可以考虑主从之间增加一个 gpio，主设备输出来通知从设备 transfer ready 来减少 CPU 忙等时间
 
 #### SPI Slave 测试须知
 
@@ -293,7 +271,7 @@ spi 做 slave，要先启动 slave read，再启动 master write，不然会导�
 
 slave write，master read 也是需要先启动 slave write，因为只有 master 送出 clk 后，slave 才会工作，同时 master 会立即发送或接收数据。
 
-在第三章节的基础上：
+例如：在第三章节的基础上：
 
 先 slave : `echo write 0 1 16 > /dev/spi_misc_test`
 

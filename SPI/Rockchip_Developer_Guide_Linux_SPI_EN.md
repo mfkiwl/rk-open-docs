@@ -65,6 +65,7 @@ Software development engineers
 | V2.1.0      | Dingqiang Lin | 2020-02-13 | Adjust SPI slave configuration                               |
 | V2.2.0      | Dingqiang Lin | 2020-07-14 | Linux 4.19 DTS configuration change, Optimize document layout |
 | V2.3.0      | Dingqiang Lin | 2020-11-02 | Add comment for supporting spi-bus cs-gpios property         |
+| V2.3.1      | Dingqiang Lin | 2020-12-11 | Update Linux 4.4 SPI slave description                       |
 
 ---
 
@@ -102,8 +103,6 @@ Documentation/spi/spidev_test.c /* SPI test tool in user state */
 
 ### SPI Device Configuration: RK SPI As  Master Port
 
-#### Linux 4.4 Configuration
-
 **Kernel Configuration**
 
 ```
@@ -117,42 +116,8 @@ Device Drivers  --->
 ```
 &spi1 {                                  //Quote SPI controller node
     status = "okay";
-    max-freq = <48000000>;               //SPI internal clock
-    dma-names = "tx","rx";               //Enable DMA mode, it is not recommended if the general communication byte is less than 32 bytes
-    spi_test@10 {
-        compatible ="rockchip,spi_test_bus1_cs0"; //The name corresponding to the driver
-        reg = <0>;                       //Chip select 0 or 1
-        spi-max-frequency = <24000000>;  //This is clock frequency of spi clk output,witch does not exceed 50M.
-        spi-cpha;                        //If configure it, cpha is 1
-        spi-cpol;                        //If configure it,cpol is 1, the clk pin remains high level.
-        status = "okay";                 //Enable device node
-    };
-};
-```
-
-Configuration instructions for max-freq and spi-max-frequency:
-
-- spi-max-frequency is the output clock of the SPI, which is output after max-freq was divided, and the relationship between them is max-freq >= 2*spi-max-frequency.
-- Assume that  we want 50MHz SPI IO rate，the configuration can be set as: max-freq = <100000000>，spi-max-frequency = <50000000>.
-- max-freq should not be lower than 24M, otherwise there may be problems.
-- If you need to configure spi-cpha, max-freq <= 6M, 1M <= spi-max-frequency >= 3M.
-
-#### Linux 4.19 Configuration
-
-**Kernel Configuration**
-
-```
-Device Drivers  --->
-	[*] SPI support  --->
-		<*>   Rockchip SPI controller driver
-```
-
-**DTS Node Configuration**
-
-```
-&spi1 {                                  //Quote SPI controller node
-    status = "okay";
-    max-freq = <48000000>;               //SPI internal clock, find the clock witch is named spiclk in dtsi
+    assigned-clocks = <&pmucru CLK_SPI0>;           //To specify SPI SCLK, you can view the clock named spiclk in dtsi
+    assigned-clock-rates = <200000000>;             //The corresponding clock completes the assignment when parsing DTS
     dma-names = "tx","rx";               //Enable DMA mode, it is not recommended if the general communication byte is less than 32 bytes
     spi_test@10 {
         compatible ="rockchip,spi_test_bus1_cs0";	//The name corresponding to the driver
@@ -168,7 +133,7 @@ Device Drivers  --->
 
 Configuration instructions for spiclk assigned-clock-rates and spi-max-frequency:
 
-- spi-max-frequency is the output clock of the SPI, which is output after spiclk assigned-clock-rates was divided, and the relationship between them is spiclk assigned-clock-rates >= 2*spi-max-frequency.
+- spi-max-frequency is the output clock of SPI. spi-max-frequency is output after internal frequency division of SPI working clock spiclk in assigned-clock-rates. Since there are at least 2 internal frequency divisions, the relationship is that SPI assigned clock rates > = 2 * SPI Max frequency;
 - Assume that  we want 50MHz SPI IO rate，the configuration can be set as: spiclk assigned-clock-rates = <100000000>，spi-max-frequency = <50000000>.
 - spiclk assigned-clock-rates should not be lower than 24M, otherwise there may be problems.
 - If you need to configure spi-cpha, spiclk assigned-clock-rates <= 6M, 1M <= spi-max-frequency >= 3M.
@@ -237,7 +202,8 @@ DTS configuration：
 
 ```
 &spi0 {
-    max-freq = <48000000>;   //spi internal clk, don't modify
+    assigned-clocks = <&pmucru CLK_SPI0>;           //To specify SPI SCLK, you can view the clock named spiclk in dtsi
+    assigned-clock-rates = <200000000>;             //The corresponding clock completes the assignment when parsing DTS
     spi_test@01 {
         compatible = "rockchip,spi_test_bus0_cs1";
         id = <1>;
@@ -248,7 +214,16 @@ DTS configuration：
 };
 ```
 
-Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
+Note:
+
+1. The working clock must be more than 6 times of the IO clock sent by the master. For example, if the assigned-clock-rates are < 48000000 >, then the clock sent by the master must be less than 8MHz
+2. The Linux 4.4 framework does not make special optimization for SPI slave, so there are two kinds of transmission states:
+   1. DMA transmission: after transmission initiation, the process enters the  timeout mechanism of waiting for completion, and the DMA names of DMA  transmission can be closed by adjusting "DMA names;" by DTS
+   2. CPU transmission: while waits for the transmission to complete in the underlying driver, and CPU is busy
+3. Using RK SPI as a slave, you can consider the following scenarios:
+   1. Turn off DMA and block transmission only with CPU
+   2. If the transmission is set to be greater than 32 bytes, DMA transmission is used, and the transmission waiting for completion timeout mechanism
+   3. A GPIO is added between the master and slave devices, and the master device outputs the message to the slave device to transfer ready to reduce the CPU busy waiting time
 
 #### Linux 4.19 configuration
 
@@ -278,7 +253,10 @@ Device Drivers  --->
 };
 ```
 
-Note: max-freq must be more than 6 times larger than master clk, such as max-freq = <48000000>; the clock given by master must be less than 8M.
+Note:
+
+1. The working clock must be more than 6 times of the IO clock sent by the master. For example, if the assigned-clock-rates are < 48000000 >, then the clock sent by the master must be less than 8MHz
+2. In the actual use scenario, we can consider adding a GPIO between the master and the slave, and the master device outputs to notify the slave device to transfer ready to reduce the CPU busy waiting time
 
 #### Tips for SPI slave test
 
