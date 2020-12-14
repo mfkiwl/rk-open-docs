@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-314
 
-Release Version: V2.0.0
+Release Version: V2.0.1
 
-Release Date: 2020-10-19
+Release Date: 2020-11-27
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
