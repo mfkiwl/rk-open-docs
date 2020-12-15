@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-096
 
-发布版本：V1.3.1
+发布版本：V1.4.0
 
-日期：2020-02-20
+日期：2020-12-16
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -52,7 +52,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **芯片名称**                                                 |     **内核版本**      |
 | :----------------------------------------------------------- | :-------------------: |
-| RK3399Pro、RK3399、RK3368、RK3366、RK3328、RK3288、RK3228、RK312X、RK3188、RK30XX、RK3308、RK3326、RK1808、RK1108、PX30 | Linux-4.4、Linux-4.19 |
+| RK3399Pro、RK3399、RK3368、RK3366、RK3328、RK3288、RK3228、RK312X、RK3188、RK30XX、RK3308、RK3326、RK1808、RK1108、PX30、RV1109、RV1126、RK3566、RK3568 | Linux-4.4、Linux-4.19 |
 
 **读者对象**
 
@@ -75,6 +75,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2019-11-12 | V1.2.2   | 吴良峰         | 修改文档名称，支持Linux-4.19                                 |
 | 2020-02-19 | V1.3     | 吴良峰         | 修正大部分章节的内容，提高可读性<br />增加新的章节《USB 常用调试方法和调试命令》<br />增加常见问题分析 |
 | 2020-02-20 | V1.3.1   | 吴良峰         | 增加新的章节《Linux USB 驱动架构》<br />修正第五章的章节编号 |
+| 2020-12-16 | V1.4.0   | 吴良峰         | 修正超链接问题<br />增加 RV1109/RV1126 的切换命令<br />增加 RV1109/RV1126/RK3566/RK3568 控制器支持列表 |
 
 **目录**
 
@@ -107,12 +108,17 @@ Rockchip SOC 通常内置多个 USB 控制器，不同控制器互相独立，�
 |     RK1808     |              1               |          0          |                1                |           0            |
 |     RK1108     |              1               |          0          |                0                |           1            |
 |      PX30      |              1               |          0          |                0                |           1            |
+|     RV1109     |              1               |          0          |           1 (OTG 2.0)           |           0            |
+|     RV1126     |              1               |          0          |           1 (OTG 2.0)           |           0            |
+|     RK3566     |              2               |          0          |     2 (OTG 2.0 + Host 3.0)      |           0            |
+|     RK3568     |              2               |          0          |      2 (OTG 3.0+ Host 3.0)      |           0            |
 
 **Note：**
 
 1. 表格中，数字 N 表示支持 N 个独立的 USB 控制器；
 2. 表格中，“EHCI/OHCI” 表示该 USB 控制器集成了 EHCI 控制器和 OHCI 控制器；“DWC3/xHCI” 表示该 USB 控制器集成了 DWC3 控制器和 xHCI 控制器；
 3. RK3288 支持两个独立的 DWC2 控制器，其中一个 DWC2 支持 OTG 功能，另外一个 DWC2 只支持 Host 功能；
+4. RV1109/RV1126/RK3566 的 DWC3 OTG 控制器只支持 OTG 2.0，不支持 OTG 3.0，也即最高只能支持 USB 2.0 480Mbps 传输；
 
 ### USB 2.0 Host
 
@@ -223,7 +229,7 @@ USB 2.0 PHY 支持 1 个 port  和 2 个 port 两种设计，如下图 1-4 是�
 
 USB 2.0 Host 硬件电路有两种：USB 2.0 Host 和  USB 2.0 HSIC。虽然 USB 2.0 Host 和 HSIC 都使用 EHCI 控制器，但使用的 USB 2.0 PHY 不同，所以对应的硬件电路也不同。
 
-#### USB 2.0 Host 硬件电路
+#### USB 2.0 Host EHCI & OHCI 硬件电路
 
 USB 2.0 的工作时钟高达 480MHz，所以 layout 时需要特别注意，USB 走线宽度为 7-8MIL，做 90Ω阻抗差分走线，最好在表层走线并有包地，边上无干扰源，正对的上下层不能有其他信号走线。
 
@@ -245,7 +251,7 @@ USB 2.0 的工作时钟高达 480MHz，所以 layout 时需要特别注意，USB
 
 图 2‑3 USB 2.0 Host VBUS GPIO 控制脚
 
-#### USB 2.0 HSIC 硬件电路
+#### USB 2.0 Host HSIC 硬件电路
 
 USB 2.0 HSIC (High Speed Inter Chip) 是具有与 USB 2.0 相同的带宽（480Mbps）的芯片间互连接口，使用 240 MHz DDR 信号，典型的走线阻抗为 50Ω，建议最大走线长度不要超过 10cm。如图 2-4 所示，USIC_STROBE 为 240MHz DDR 信号线，USIC_DATA 为数据线，供电电压为 0.9V 和 1.2V， 信号传输的标准电压为 1.2V，降低了系统的功耗，最大的走线长度为 10cm（4 英寸）。
 
@@ -395,7 +401,7 @@ Device Drivers  --->
 
 如果需要支持 USB Host，首先需要选上 **<*>Supportfor Host-side USB** 项，然后会现如下的 Host 相关的配置，其中，USB Host 1.1 选择 OHCI Driver 配置，USB Host 2.0 选择 EHCI Driver 配置，USB Host 3.0 选择 xHCI Driver 配置。
 
-需要注意的是 RK3308 的 default config （rk3308_linux_defconfig）为了裁剪内核，默认是 disable USB Host，如果要支持 USB 2.0 Host 和相关 USB 外设，需要先手动 enable  EHCI Driver 配置，然后参考 [3.5 USB 其它模块配置](#3.5 USB 其它模块配置)，使能对应的 USB 外设驱动。
+需要注意的是 RK3308 的 default config （rk3308_linux_defconfig）为了裁剪内核，默认是 disable USB Host，如果要支持 USB 2.0 Host 和相关 USB 外设，需要先手动 enable  EHCI Driver 配置，然后参考 [USB 外设 CONFIG](#USB 外设 CONFIG)，使能对应的 USB 外设驱动。
 
 ### USB OTG CONFIG
 
@@ -993,7 +999,7 @@ USB 3.0 Host 控制器为 xHCI，集成于 DWC3 OTG IP 中，所以不用单独�
 
 1. **USB 3.0 OTG 控制器 DTS 配置文档**
 
-USB 3.0 OTG 使用 DWC3 控制器，因为 Linux-4.19 USB DWC3 控制器驱动相比 Linux-4.4 进行了较大的升级 (具体的差异点，请参考 [5.3.1 USB 3.0 OTG 控制器驱动开发](#5.3.1 USB 3.0 OTG 控制器驱动开发))，所以 Linux-4.4 和 Linux-4.19 及更新的内核版本的 USB 3.0 OTG DTS 配置不同。
+USB 3.0 OTG 使用 DWC3 控制器，因为 Linux-4.19 USB DWC3 控制器驱动相比 Linux-4.4 进行了较大的升级 (具体的差异点，请参考 [USB 3.0 OTG 控制器驱动开发](#USB 3.0 OTG 控制器驱动开发)，所以 Linux-4.4 和 Linux-4.19 及更新的内核版本的 USB 3.0 OTG DTS 配置不同。
 
 Linux-4.4 USB 3.0 OTG 控制器 DTS 配置文档
 
@@ -1257,8 +1263,6 @@ driver_override modalias otg_mode power uevent
 
 ```
 
-Note：USB 2.0 PHY 完整路径中 [u2phy dev name] 需要修改为芯片对应的具体 PHY 节点名称。
-
 "**otg_mode**" 节点用于软件强制切换 OTG Device/Host 模式，并且不受 OTG ID 电平状态的影响。
 
 举例：
@@ -1289,6 +1293,30 @@ Note：USB 2.0 PHY 完整路径中 [u2phy dev name] 需要修改为芯片对应�
 
   `echo 0 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
+Note：
+
+1. USB 2.0 PHY 完整路径中 [u2phy dev name] 需要修改为芯片对应的具体 PHY 节点名称。
+
+2. RV1126/RV1109 USB OTG 建议按照如下方法切换模式，可以提高各种应用场景（如：保持 USB 连接到 PC，然后使用命令交替切换Host/Device模式）的切换稳定性。
+
+   RV1126/RV1109 USB OTG 强制切换为 Host 模式：
+
+   `echo disconnect > /sys/class/udc/ffd00000.dwc3/soft_connect` （断开 usb device 的连接）
+
+   `echo host > /sys/devices/platform/ff4c0000.usb2-phy/otg_mode`
+
+   RV1126/RV1109 USB OTG 强制切换为 Device 模式：
+
+   `echo peripheral > /sys/devices/platform/ff4c0000.usb2-phy/otg_mode`
+
+   `echo connect > /sys/class/udc/ffd00000.dwc3/soft_connect` （使能 usb device 的连接）
+
+   RV1126/RV1109 USB OTG 强制切换为 OTG 模式：
+
+   `echo otg > /sys/devices/platform/ff4c0000.usb2-phy/otg_mode`
+
+   `echo connect > /sys/class/udc/ffd00000.dwc3/soft_connect` （使能 usb device 的连接）
+
 #### USB 3.0 PHY 驱动开发
 
 Rockchip 系列芯片，主要使用三种 USB 3.0 PHY IP：Type-C PHY IP，Innosilicon USB 3.0 PHY IP 和  Innosilicon USB 3.0 CombPhy IP。这三种 IP 的硬件设计不同，所以需要独立的 USB PHY 驱动。
@@ -1307,7 +1335,7 @@ Rockchip 系列芯片，主要使用三种 USB 3.0 PHY IP：Type-C PHY IP，Inno
 
 以 RK3399 Type-C PHY 为例。
 
-RK3399 Type-C PHY 是一个CombPhy，包含一个 USB 3.0  SuperSpeed PHY 和一个 DisplayPort Transmit PHY。Type-C PHY 的特性，请参考[1.6 USB 3.0 Type-C PHY](#1.6 USB 3.0 Type-C PHY)
+RK3399 Type-C PHY 是一个CombPhy，包含一个 USB 3.0  SuperSpeed PHY 和一个 DisplayPort Transmit PHY。Type-C PHY 的特性，请参考[USB 3.0 Type-C PHY](#USB 3.0 Type-C PHY)
 
 在 Type-C PHY 驱动的 probe 函数中，会分别创建 “dp-port” 的 rockchip_dp_phy_ops 和 “usb3-port” 的 rockchip_usb3_phy_ops，也即 USB 3.0 PHY 和 DP PHY 的操作函数 (如：power_on 和 power_off) 是独立的，互不影响。
 
@@ -2260,7 +2288,7 @@ f_audio_source f_midi power state subsystem uevent
 
   `/sys/kernel/debug/usb/uvcvideo`  (UVC设备调试接口)
 
-- Debugfs for controllers：参考 [5.3.1.3 USB 2.0 OTG 调试接口](#5.3.1.3 USB 2.0 OTG 调试接口)，[5.3.2.3 USB 2.0 Host 调试接口](#5.3.2.3 USB 2.0 Host 调试接口)，[5.3.3.3 USB 3.0 OTG 调试接口](#5.3.3.3 USB 3.0 OTG 调试接口)
+- Debugfs for controllers：参考 [USB 2.0 OTG 调试接口](#USB 2.0 OTG 调试接口)，[USB 2.0 Host 调试接口](#USB 2.0 Host 调试接口)，[USB 3.0 OTG 调试接口](#USB 3.0 OTG 调试接口)
 
 - trace for usb gadget/dwc3/xHCI：
 
@@ -2282,19 +2310,19 @@ f_audio_source f_midi power state subsystem uevent
 
   作用：通过软件方法，强制设置 USB 2.0 OTG 切换到 Host mode 或者 Device mode，而不受 USB 硬件电路的 OTG ID 电平影响。
 
-  USB 2.0 OTG 切换命令请参考 [5.2.1 USB 2.0 PHY 驱动开发](#5.2.1 USB 2.0 PHY 驱动开发) 中的 USB 2.0 PHY 调试接口说明。
+  USB 2.0 OTG 切换命令请参考 [USB 2.0 PHY 驱动开发](#USB 2.0 PHY 驱动开发) 中的 USB 2.0 PHY 调试接口说明。
 
 - USB 3.0 OTG 切换命令
 
   作用：通过软件方法，强制设置 USB 3.0 OTG 切换到 Host mode 或者 Device mode，而不受 USB 硬件电路的 OTG ID 电平或者 Type-C 接口的影响。
 
-  USB 3.0 OTG 切换命令请参考 [5.3.3.3 USB 3.0 OTG 调试接口](#5.3.3.3 USB 3.0 OTG 调试接口) 中的 USB 3.0 OTG 切换命令说明。
+  USB 3.0 OTG 切换命令请参考 [USB 3.0 OTG 调试接口](#USB 3.0 OTG 调试接口) 中的 USB 3.0 OTG 切换命令说明。
 
 - USB 3.0 force USB 2.0 only 命令
 
   作用：强制 USB 3.0 Host 控制器和 PHY 工作于 USB 2.0 only 的模式。
 
-  USB 3.0 force USB 2.0 only 命令请参考 [5.2.2 USB 3.0 PHY 驱动开发](#5.2.2 USB 3.0 PHY 驱动开发)
+  USB 3.0 force USB 2.0 only 命令请参考 [USB 3.0 PHY 驱动开发](#USB 3.0 PHY 驱动开发)
 
 - USB 眼图测试命令
 
@@ -2462,7 +2490,7 @@ f_audio_source f_midi power state subsystem uevent
 
 USB Device 正常连接至 PC 的现象主要有：
 
-1. 串口输出正常 log，见[7.1.2 USB 2.0 Device 连接](#7.1.2 USB 2.0 Device 连接)；
+1. 串口输出正常 log，见[USB 2.0 Device 连接](#USB 2.0 Device 连接)；
 2. PC 出现盘符，但默认不能访问；(Windows 7 和 MAC OS 可能只出现在设备管理器)；
 3. 设备 UI 状态栏出现”USB 已连接”标识；
 4. 打开 USB 已连接的提示窗口，默认为 charger only 模式，选择“MTP”或者“PTP”后，PC 可以访问盘符。
@@ -2512,7 +2540,7 @@ USB Device 正常连接至 PC 的现象主要有：
 USB Host 正常工作情况如下：
 
 1. 首先 Host 电路提供 5V，至少 500mA 的供电；
-2. 如果有 USB 设备连接进来，串口首先会打印 Host 枚举 USB 设备的 log(见[7.1.4](#_6.1.4_USB 2.0_LS 设备)至[7.1.7](#_USB 2.0_Host-LS/FS/HS 设备断开 log))，表明 USB 设备已经通过 Host 的标准设备枚举；
+2. 如果有 USB 设备连接进来，串口首先会打印 Host 枚举 USB 设备的 log(参考[USB 2.0 Host-LS 设备](#USB 2.0 Host-LS 设备)，[USB 2.0 Host-FS 设备](#USB 2.0 Host-FS 设备)，[USB 2.0 Host-HS 设备](#USB 2.0 Host-HS 设备)），表明 USB 设备已经通过 Host 的标准设备枚举；
 
 **USB Host 异常现象的排查方法：**
 
