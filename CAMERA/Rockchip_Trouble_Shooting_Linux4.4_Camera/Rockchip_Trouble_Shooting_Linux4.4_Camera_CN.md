@@ -1,18 +1,16 @@
-# Rockchip Linux4.4 Camera Trouble Shooting CN
+# Rockchip Linux4.4 Camera Trouble Shooting
 
 文件标识：RK-PC-YF-331
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2020-02-04
+日期：2020-11-13
 
 文件密级：公开资料
 
----
-
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,11 +20,11 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2020福州瑞芯微电子股份有限公司**
+**版权所有© 2020 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
 Fuzhou Rockchip Electronics Co., Ltd.
 
@@ -42,7 +40,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ---
 
-## 前言
+**前言**
 
 **概述**
 
@@ -59,20 +57,22 @@ Fuzhou Rockchip Electronics Co., Ltd.
 本文档（本指南）主要适用于以下工程师：
 
 技术支持工程师
-软件开发工程师
 
----
+软件开发工程师
 
 **修订记录**
 
-|     日期         |  作者       |     版本         |              主要内容                 |
-| :--------------: | :---------: | :--------------: | :------------------------------------ |
-|  2020.02.03      |  ZhengSQ    |     V1.0.0       | 初始版本                              |
-
-## 目录
+|    日期    |    作者    |  版本  | 主要内容               |
+| :--------: | :--------: | :----: | :--------------------- |
+| 2020-02-03 |  ZhengSQ   | V1.0.0 | 初始版本               |
+| 2020-11-13 | Ruby Zhang | V1.0.1 | 更新公司名称及文档格式 |
 
 ---
+
+**目录**
+
 [TOC]
+
 ---
 
 ## Sensor点亮相关
@@ -192,7 +192,7 @@ link_freq * 2 * lanes / bits_per_pixel
 
 ### Sensor AVL列表
 
-RGB Sensor AVL 位于[https://redmine.rockchip.com.cn/projects/rockchip_camera_module_support_list/camera](https://redmine.rockchip.com.cn/projects/rockchip_camera_module_support_list/camera)。支持列表中显示了sensor模组的详细信息。
+RGB Sensor AVL 位于<https://redmine.rockchip.com.cn/projects/rockchip_camera_module_support_list/camera>支持列表中显示了sensor模组的详细信息。
 
 如果是其它非RGB Sensor，如YUV Sensor，可以直接查看kernel源码的drivers/media/i2c/目录，其中驱动作者是Rockchip的，驱动都是有调试过的。
 
@@ -326,25 +326,26 @@ Picture size error是ISP级的错误，它提示未接收到预期的行数，�
 
 - DDR频率是否太小。当DDR频率太低时，响应速度不够时，也会出现该错误。尝试将DDR定频到最高频率看还会不会出错:
   `echo performance > /sys/class/devfreq/dmc/governor`
+
 - 整个ISP链路中，有没有出现后级比前级的分辨率还大的情况。可以用`media-ctl -p -d /dev/media0`去查看拓扑结构。
   分辨率应该要满足Sensor == MIPI_DPHY >= isp_sd input >= isp_sd output。如果您没有手动修改过，默认应该是满足这个条件的。
 - Sensor的输出分辨率大小是否正确。尝试在驱动代码中将分辨率强制改小。比如ov7251.c中默认分辨率是640x480，
 
-  ```c
+```c
   static const struct ov7251_mode supported_modes[] = {
           {
                   .width = 640,
                   .height = 480,
-  ```
+```
 
-  将width, height都改小些，比如320x240，寄存器的配置不用改。这是为了确认Sensor的配置大小会不会超过实际输出的大小。
+将width, height都改小些，比如320x240，寄存器的配置不用改。这是为了确认Sensor的配置大小会不会超过实际输出的大小。
 
-  ```c
+```c
   static const struct ov7251_mode supported_modes[] = {
           {
                   .width = 320,
                   .height = 240,
-  ```
+```
 
 ## 获取图像相关
 
@@ -363,24 +364,24 @@ RKISP及RKCIF驱动支持v4l2接口，获取图像可以使用：
 - 使用gstreamer的v4l2src plugin可以从/dev/video设备中获取图像并**显示在屏幕**上
   RK提供的Linux SDK会在目录/rockchip_test/camera/下包含一些脚本，请先参考。
   **特别需要注意:** RK先后提供过多个版本的gstreamer isp plugin，如rkisp, rkv4l2src，都已经**<font color=red>不再继续支持</font>**。请直接使用gstreamer自带的**<font color=red>v4l2src </font>** plugin。主要有两点原因：
-  - 3A不再需要在rkisp或rkv4l2src中调整。3A部分请直接参考[4 3A相关](## 4 3A相关)
-  - rkisp驱动的v4l2接口更加标准化
+  1. 3A不再需要在rkisp或rkv4l2src中调整。3A部分请直接参考[4 3A相关](## 4 3A相关)
+  2. rkisp驱动的v4l2接口更加标准化
 - Debian系统中使用如vlc等开源工具
   通过apt 安装vlc后，可以使用如下命令显示Camera图像于屏幕上：
 
-  ```shell
+```shell
   vlc v4l2:///dev/video1:width=640:height=480
-  ```
+```
 
-  注意，需要video用户组的权限，或者root超级用户权限。
+注意，需要video用户组的权限，或者root超级用户权限。
 
 ### 抓到的图颜色不对，亮度也明显偏暗或偏亮
 
 需要根据Sensor分情况：
 
-- Sensor是RAW RGB的输出，如RGGB、BGGR等，需要3A正常跑起来。可以参考[4 3A相关](## 4 3A相关)
+1. Sensor是RAW RGB的输出，如RGGB、BGGR等，需要3A正常跑起来。可以参考[4 3A相关](## 4 3A相关)
   3A 确认正常在跑时，请再次检查解析/显示图像时使用的格式是否正确，uv分量有没有弄反。
-- Sensor是yuv输出，或RGB如RGB565、RGB888，此时ISP处于bypass状态，
+2. Sensor是yuv输出，或RGB如RGB565、RGB888，此时ISP处于bypass状态，
   - 如果颜色不对，请确认sensor的输出格式有没有配置错误，uv分量有没有弄反。确认无误时，建议联系Sensor原厂
   - 如果亮度明显不对，请联系Sensor原厂
 
@@ -480,18 +481,18 @@ SDK中external/uvc_app/目录提供了将板卡模拟成uvc camera的功能，�
 
 - 从源码中查看
 
-  ```shell
+```shell
   # grep CONFIG_CAM_ENGINE_LIB_VERSION interface/rkisp_dev_manager.h
   define CONFIG_CAM_ENGINE_LIB_VERSION "v2.2.0"           # 输出的v2.2.0是librkisp.so的版本号
-  ```
+```
 
 - 从运行时log看
 
-  ```shell
+```shell
   # persist_camera_engine_log=0x4000 rkisp_3A_server --mmedia=/dev/media1 | grep "CAM ENGINE LIB VERSION"
         CAM ENGINE LIB VERSION IS v2.2.0                # 输出的v2.2.0是librkisp.so的版本号
 
-  ```
+```
 
 **如果版本号低于v2.2.0，请考虑升级到v2.2.0甚至更新的版本**
 
@@ -501,18 +502,18 @@ camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足�
 
 - 从kernel源码中查看ISP驱动版本
 
-  ```shell
+```shell
   # grep RKISP1_DRIVER_VERSION drivers/media/platform/rockchip/isp1/version.h
   define RKISP1_DRIVER_VERSION KERNEL_VERSION(0, 1, 0x5) # 输出的v0.1.5是rkisp驱动的版本号
-  ```
+```
 
 - 从kernel log中查看ISP驱动版本
 
-  ```shell
+```shell
   # dmesg  | grep "rkisp1 driver version"
   [    0.867864] rkisp1 ff4a0000.rkisp1: rkisp1 driver version: v00.01.05
 
-  ```
+```
 
 ### 如何升级camera_engine_rkisp
 
@@ -523,7 +524,7 @@ camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足�
 2. kernel根据camera_engine_rkisp的需要相应升级
    在external/camera_engine_rkisp目录下通过查看`git log`，可以找到它所需要的kernel rkisp驱动的版本号。例如：
 
-   ```shell
+```shell
    # git log
    commit e456a50a5524792d64dac384604d4136a697deac
    Author: ZhongYichong <zyc@rock-chips.com>
@@ -546,7 +547,7 @@ camera_engine_rkisp对kernel驱动版本有要求，需要保证rkisp驱动足�
        Change-Id: I3d2adb949dadec259b9ba587a3e3b2770a1c155d
        Signed-off-by: ZhongYichong <zyc@rock-chips.com>
        Signed-off-by: Shunqian Zheng <zhengsq@rock-chips.com>
-   ```
+```
 
 3. buildroot中camera_engine_rkisp的编译脚本
 
