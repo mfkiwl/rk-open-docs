@@ -1,28 +1,26 @@
-# Rockchip Linux  Upgrade Solution Introduction
+# Rockchip Linux Upgrade Solution Introduction
 
 ID: RK-KF-YF-348
 
-Release version: V1.0.1
+Release version: V1.0.2
 
-Release Date: 2020-03-31
+Release Date: 2020-12-14
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
------------
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -34,9 +32,9 @@ Customer service Fax:  +86-591-83951833
 
 Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
------------
+---
 
-## Preface
+**Preface**
 
 **Overview**
 
@@ -58,18 +56,19 @@ Software development engineers
 
 **Revision History**
 
-| **Date**   | **Version** | **Author** | **Revision Description**          |
-| :--------- | :---------- | :--------- | :-------------------------------- |
-| 2019-06-05 | V1.0.0      | HKH/MLC    | Initial version                   |
-| 2020-03-31 | V1.0.1      | Ruby       | Update the format of the document |
+| **Date**   | **Version** | **Author** | **Revision Description**                    |
+| :--------- | :---------- | :--------- | :------------------------------------------ |
+| 2019-06-05 | V1.0.0      | HKH/MLC    | Initial version                             |
+| 2020-03-31 | V1.0.1      | Ruby Zhang | Update the format of the document           |
+| 2020-12-14 | V1.0.2      | Ruby Zhang | Update the company name and document format |
 
------------
+---
 
-## Contents
+**Contents**
 
 [TOC]
 
------------
+---
 
 ## Overview
 
