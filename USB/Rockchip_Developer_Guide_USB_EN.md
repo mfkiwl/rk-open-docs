@@ -4,7 +4,7 @@ ID: RK-KF-YF-097
 
 Release Version: V1.4.0
 
-Release Date: 2020-06-11
+Release Date: 2020-12-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -44,7 +44,7 @@ The purpose of this manual is to show you the hardware circuits of USB, how to c
 
 | Chipset name                                                 |    Kernel version     |
 | :----------------------------------------------------------- | :-------------------: |
-| RK3399Pro、RK3399、RK3368、RK3366、RK3328、RK3288、RK3228、RK312X、RK3188、RK30XX、RK3308、RK3326、RK1808、RK1108、PX30 | Linux-4.4、Linux-4.19 |
+| RK3399Pro、RK3399、RK3368、RK3366、RK3328、RK3288、RK3228、RK312X、RK3188、RK30XX、RK3308、RK3326、RK1808、RK1108、PX30、RV1109、RV1126、RK3566、RK3568 | Linux-4.4、Linux-4.19 |
 
 **Intended Audience**
 
@@ -63,7 +63,8 @@ Hardware development engineers
 | 2019-03-11 | v1.2    | william.wu             | Fix style issues by markdownlint                             |
 | 2019-11-12 | v1.2.1  | william.wu             | Modify document name，support Linux-4.19                     |
 | 2020-02-19 | v1.2.2  | william.wu             | Add DISCLAIMER，Trademark Statement, etc.                    |
-| 2020-05-13 | v1.4.0  | jianing.ren            | Correct the content of most chapters to improve readability<br />Add new chapters "5.1 Linux USB Driver Framework" and "7 USB Common Debug Methods And Commands"<br /> Add analysis of common problems |
+| 2020-05-13 | v1.3.0  | jianing.ren            | Correct the content of most chapters to improve readability<br />Add new chapters "5.1 Linux USB Driver Framework" and "7 USB Common Debug Methods And Commands"<br /> Add analysis of common problems |
+| 2020-12-16 | v1.4.0  | william.wu             | 1. Fix hyperlinks error<br />2. Add support for RV1109/RV1126/RK3566/RK3568;<br />3. Add force mode method for RV1109/RV1126; |
 
 ---
 [TOC]
@@ -93,12 +94,17 @@ Table 1‑1 USB Controllers List
 |  RK1808  |              1               |          0           |                1                 |            0            |
 |  RK1108  |              1               |          0           |                0                 |            1            |
 |   PX30   |              1               |          0           |                0                 |            1            |
+| RV1109 | 1 | 0 | 1 (OTG 2.0) | 0 |
+| RV1126 | 1 | 0 | 1 (OTG 2.0) | 0 |
+| RK3566 | 2 | 0 | 2 (OTG 2.0 + Host 3.0) | 0 |
+| RK3568 | 2 | 0 | 2 (OTG 3.0+ Host 3.0) | 0 |
 
 **Note：**
 
 1. In the table, the number N indicates that it supports N independent USB controllers.
 2. In the table, "EHCI/OHCI" indicates that the USB controller integrates the EHCI controller and OHCI controller. "DWC3/xHCI" indicates that the USB controller integrates the DWC3 controller and xHCI controller.
 3. RK3288 supports two independent DWC2 controllers. One DWC2 supports OTG function and the other DWC2 only supports Host function.
+4. RV1109/RV1126/RK3566 DWC3 controller only supports OTG 2.0, no support OTG 3.0, the maximal transfer rate is 480 Mb/s (High speed).
 
 ### USB 2.0 Host
 
@@ -258,7 +264,7 @@ Figure 1‑5 TypeC PHY Block Diagram
 
 This chapter introduces the hardware circuit design and signal of USB 2.0 HOST. According to the type of USB 2.0 PHY used, it can be divided into common USB 2.0 HOST hardware circuit and USB 2.0 HSIC hardware circuit.
 
-#### Common USB 2.0 Host Hardware Circuit
+#### USB 2.0 Host Common Hardware Circuit
 
 USB 2.0 works at 480MHz clock, it is suggested that the width of USB 2.0 DP/DM lines should be 7-8 MIL and 90 Ω impedance differential. It is better to layout on the surface layer and cover the ground, and no interference source on the edge and no other signal line on the right upper and lower layers.
 
@@ -1043,7 +1049,7 @@ USB 3.0 Host controller is xHCI, integrated in DWC3 OTG IP, so it is not necessa
 
 1. **USB 3.0 OTG Controller DTS Configuration Document**
 
-The USB 3.0 OTG uses a DWC3 controller. Linux-4.4 and Linux-4.19 or later kernel versions have different USB 3.0 OTG DTS configurations because Linux-4.19 USB DWC3 controller driver has been upgraded significantly compared to Linux-4.4 (for specific differences, please refer to [5.3.1 USB 3.0 OTG Controller Driver Development](# 5.3.1 USB 3.0 OTG Controller Driver Development))
+The USB 3.0 OTG uses a DWC3 controller. Linux-4.4 and Linux-4.19 or later kernel versions have different USB 3.0 OTG DTS configurations because Linux-4.19 USB DWC3 controller driver has been upgraded significantly compared to Linux-4.4 (for specific differences, please refer to [USB 3.0 OTG Driver](#USB 3.0 OTG Driver))
 
 Linux-4.4 USB 3.0 OTG controller DTS configuration document
 
@@ -1304,8 +1310,6 @@ driver_override modalias otg_mode power uevent
 
 ```
 
-Note：[U2phy dev name] in the USB 2.0 PHY full path needs to be modified to the specific PHY node name corresponding to the SoC.
-
 The "**otg_mode**" node is used to switch the OTG Device/Host mode by software, and it is not affected by the OTG ID level status.
 
 For example：
@@ -1336,6 +1340,30 @@ At the same time, the node is still compatible with the old order of Linux-3.10 
 
   `echo 0 > /sys/devices/platform/[u2phy dev name]/otg_mode`
 
+Note:
+
+1. [U2phy dev name] in the USB 2.0 PHY full path needs to be modified to the specific PHY node name corresponding to the SoC.
+
+2. RV1126/RV1109 USB OTG needs additional operations for force mode.
+
+   RV1126/RV1109 USB OTG force Host mode
+
+   `echo disconnect > /sys/class/udc/ffd00000.dwc3/soft_connect` （disconnect usb device）
+
+   `echo host > /sys/devices/platform/ff4c0000.usb2-phy/otg_mode`
+
+   RV1126/RV1109 USB OTG force Device mode
+
+   `echo peripheral > /sys/devices/platform/ff4c0000.usb2-phy/otg_mode`
+
+   `echo connect > /sys/class/udc/ffd00000.dwc3/soft_connect` （connect usb device）
+
+   RV1126/RV1109 USB OTG force OTG mode
+
+   `echo otg > /sys/devices/platform/ff4c0000.usb2-phy/otg_mode`
+
+   `echo connect > /sys/class/udc/ffd00000.dwc3/soft_connect` （connect usb device）
+
 #### USB 3.0 PHY Drivers
 
 Rockchip SoCs mainly use three types of USB 3.0 PHY IP: Type-C PHY IP, Innosilicon USB 3.0 PHY IP and Innosilicon USB 3.0 CombPhy IP. These three IPs have different hardware designs, so they need separate USB PHY drivers.
@@ -1354,7 +1382,7 @@ The three different USB 3.0 PHY IP drivers are briefly described below.
 
 Example (RK3399 Type-C PHY)
 
-Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY. Please refer to [1.6 USB 3.0 Type-C PHY](#1.6 USB 3.0 Type-C PHY) to learn about Type-C PHY's features.
+Type-C PHY is a combination of USB 3.0 SuperSpeed PHY and DisplayPort Transmit PHY. Please refer to [Type-C USB 3.0 PHY](#Type-C USB 3.0 PHY) to learn about Type-C PHY's features.
 
 In the probe function of Type-C PHY driver, rockchip_dp_phy_ops of "dp-port" and rockchip_usb3_phy_ops of "usb3-port" are created respectively, that is, the operation functions of USB 3.0 PHY and DP PHY such as power_on and power_off are independent and do not affect each other.
 
@@ -2403,7 +2431,7 @@ For more information, please refer to the documentation:
 
   `/sys/kernel/debug/usb/uvcvideo` (UVC device debug interface)
 
-- Debugfs for controllers: refer to [5.2.1.3 USB 2.0 OTG Debug Interface](# 5.2.1.3 USB 2.0 OTG Debug Interface), [5.2.2.3 USB 2.0 Host Debug Interface](# 5.2.2.3 USB 2.0 Host debug interface), [5.3.1.3 USB 3.0 OTG Debug Interface](# 5.3.1.3 USB 3.0 OTG Debug Interface)
+- Debugfs for controllers: refer to [USB 2.0 OTG Debug Interface](#USB 2.0 OTG Debug Interface), [USB 2.0 Host Debug Interface](# USB 2.0 Host debug interface), [USB 3.0 OTG Debug Interface](# USB 3.0 OTG Debug Interface)
 
 - trace for usb gadget/dwc3/xHCI:
 
@@ -2425,19 +2453,19 @@ This chapter mainly describes the specific commands for Rockchip USB driver USB,
 
   Function: Through software method, force USB 2.0 OTG to Host mode or Device mode without being affected by OTG ID level.
 
-  For the USB 2.0 OTG switch command, please refer to the description of the USB 2.0 PHY debug interface in [5.1.1 USB 2.0 PHY Driver Development](# 5.1.1 USB 2.0 PHY Driver Development).
+  For the USB 2.0 OTG switch command, please refer to the description of the USB 2.0 PHY debug interface in [USB 2.0 PHY Driver](# USB 2.0 PHY Driver).
 
 - USB 3.0 OTG switch command
 
   Function: Through software method, force USB 3.0 OTG to Host mode or Device mode without being affected by OTG ID level or Type-C interface.
 
-  For the USB 3.0 OTG switch command, please refer to the USB 3.0 OTG switch command description in [5.3.1.3 USB 3.0 OTG Debug Interface](# 5.3.1.3 USB 3.0 OTG Debug Interface).
+  For the USB 3.0 OTG switch command, please refer to the USB 3.0 OTG switch command description in [USB 3.0 OTG Debug Interface](# USB 3.0 OTG Debug Interface).
 
 - USB 3.0 force USB 2.0 only command
 
   Function: Force USB 3.0 Host controller and PHY to work in USB 2.0 only mode.
 
-  For USB 3.0 force USB 2.0 only command, please refer to [5.1.2 USB 3.0 PHY driver development](# 5.1.2 USB 3.0 PHY driver development)
+  For USB 3.0 force USB 2.0 only command, please refer to [USB 3.0 PHY drivers](# USB 3.0 PHY drivers).
 
 - USB eye diagram test command
 
@@ -2598,7 +2626,7 @@ Default mode is device when booting without USB cable.
 
 The phenomenon that the USB Device is normally connected to the PC mainly includes:
 
-1. The serial port output normal log, see [8.1.2 USB 2.0 Device Normol Connection Log](#8.1.2 USB 2.0 Device Normal Connection Log);
+1. The serial port output normal log, see [USB 2.0 Device Normol Connection Log](#USB 2.0 Device Normal Connection Log);
 2. The drive letter appears on the PC, but it cannot be accessed by default; (Windows 7 and MAC OS may only appear in the device manager);
 3. "USB connected" logo appears in the status bar of the device UI;
 4. Open the prompt window of USB connected. The default is charger only mode. After selecting "MTP" or "PTP", the PC can access the drive letter.
@@ -2641,7 +2669,7 @@ This issue is always caused by USB_DET voltage abnormality. Use multimeter to me
 
 **Issue-1：**No USB enumeration log when USB device plug into the USB Host port.
 
-First, use multimeter to measure the voltage of VBUS, normally, the voltage of VBUS must be 5V. Second, check if the Kernel USB driver has support USB Host driver and the USB Class driver. Refer to [3 Kernel USB CONFIG](#3 Kernel USB CONFIG)
+First, use multimeter to measure the voltage of VBUS, normally, the voltage of VBUS must be 5V. Second, check if the Kernel USB driver has support USB Host driver and the USB Class driver. Refer to [Kernel USB CONFIG](#Kernel USB CONFIG)
 
 **Issue-2：**USB Disk cannot be mounted
 
