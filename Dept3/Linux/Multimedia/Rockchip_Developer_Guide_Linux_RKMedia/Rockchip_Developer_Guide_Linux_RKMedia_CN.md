@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.1.1
+发布版本：V1.2.0
 
-日期：2020-12-08
+日期：2020-12-17
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -68,6 +68,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0 | 林刘迪铭 | 2020-09-03 | 增加数据类型和错误码，关联链接 |
 | V1.1.0 | 范立创 /陈茂森 | 2020-11-18 | 1.增加API说明：<br />（1）[RK_MPI_MB_CreateBuffer](#RK_MPI_MB_CreateBuffer)<br />（2）[RK_MPI_MB_CreateImageBuffer](#RK_MPI_MB_CreateImageBuffer)<br />（3）[RK_MPI_MB_CreateAudioBuffer](#RK_MPI_MB_CreateAudioBuffer)<br />（4）[RK_MPI_MB_ConvertToImgBuffer](#RK_MPI_MB_ConvertToImgBuffer)<br />（5）[RK_MPI_MB_ConvertToAudBuffer](#RK_MPI_MB_ConvertToAudBuffer)<br />（6）[RK_MPI_MB_SetSzie](#RK_MPI_MB_SetSzie)<br />（7）[RK_MPI_MB_SetTimestamp](#RK_MPI_MB_SetTimestamp)<br />（8）[RK_MPI_MB_GetFlag](#RK_MPI_MB_GetFlag)<br />（9）[RK_MPI_MB_GetTsvcLevel](#RK_MPI_MB_GetTsvcLevel)<br />（10）[RK_MPI_MB_IsViFrame](#RK_MPI_MB_IsViFrame)<br />（11）[RK_MPI_MB_GetImageInfo](#RK_MPI_MB_GetImageInfo)<br />（12）[RK_MPI_MB_BeginCPUAccess](#RK_MPI_MB_BeginCPUAccess)<br />（13）[RK_MPI_MB_EndCPUAccess](#RK_MPI_MB_EndCPUAccess)<br />（14）[RK_MPI_VI_StartRegionLuma](#RK_MPI_VI_StartRegionLuma)<br />（15）[RK_MPI_VI_StopRegionLuma](#RK_MPI_VI_StopRegionLuma)<br />（16）[RK_MPI_VENC_GetVencChnAttr](#RK_MPI_VENC_GetVencChnAttr)<br />（17）[RK_MPI_VENC_SetVencChnAttr](#RK_MPI_VENC_SetVencChnAttr)<br />（18）[RK_MPI_VENC_CreateJpegLightChn](#RK_MPI_VENC_CreateJpegLightChn)<br />（19）[RK_MPI_VENC_GetRcParam](#RK_MPI_VENC_GetRcParam)<br />（20）[RK_MPI_VENC_SetResolution](#RK_MPI_VENC_SetResolution)<br />（21）[RK_MPI_VENC_GetRoiAttr](#RK_MPI_VENC_GetRoiAttr)<br />（22）[RK_MPI_VENC_RGN_SetPaletteId](#RK_MPI_VENC_RGN_SetPaletteId)<br />（23）[RK_MPI_VENC_GetFd](#RK_MPI_VENC_GetFd)<br />（24）[RK_MPI_VENC_QueryStatus](#RK_MPI_VENC_QueryStatus)<br />（25）[RK_MPI_ALGO_MD_EnableSwitch](#RK_MPI_ALGO_MD_EnableSwitch)<br />（26）[RK_MPI_ALGO_OD_EnableSwitch](#RK_MPI_ALGO_OD_EnableSwitch)<br />（27）[RK_MPI_VO_SetChnAttr](#RK_MPI_VO_SetChnAttr)<br />（28）[RK_MPI_AI_StartStream](#RK_MPI_AI_StartStream)<br />（29）[RK_MPI_AO_QueryChnStat](#RK_MPI_AO_QueryChnStat)<br />（30）[RK_MPI_AO_ClearChnBuf](#RK_MPI_AO_ClearChnBuf)<br />（31）[RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)<br />（32）[RK_MPI_SYS_StopGetMediaBuffer](#RK_MPI_SYS_StopGetMediaBuffer)<br />（33）[RK_MPI_VDEC_CreateChn](#RK_MPI_VDEC_CreateChn)<br />（34）[RK_MPI_VDEC_DestroyChn](#RK_MPI_VDEC_DestroyChn)<br />2.修改API：[RK_MPI_VO_CreateChn](#RK_MPI_VO_CreateChn)<br />3.[新增示例说明板块](#示例) |
 | V1.1.1 | 陈茂森 | 2020-12-08 | 修正VI工作模式个数错误 |
+| V1.2.0 | 陈茂森/林刘迪铭 | 2020-12-17 | 1.优化语言描述<br />2.增加[编译说明](#编译说明)<br />3.增加API说明：<br />（1）[RK_MPI_LOG_SetLevelConf](#RK_MPI_LOG_SetLevelConf)<br />（2）[RK_MPI_LOG_GetLevelConf](#RK_MPI_LOG_GetLevelConf) |
 
 ---
 
@@ -91,7 +92,7 @@ Rockchip Electronics Co., Ltd.
 
 | 模块名称 | 通道数量 |
 | -------- | -------- |
-| VI       | 4        |
+| VI       | 8        |
 | VENC     | 16       |
 | VDEC     | 16       |
 | AI       | 1        |
@@ -521,11 +522,11 @@ RK_S32 RK_MPI_SYS_StartGetMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32C
 
 【参数】
 
-| 参数名称    | 描述           | 输入/输出 |
-| ----------- | -------------- | --------- |
-| enModID     | 模块号。       | 输入      |
-| s32ChnID    | 通道号。       | 输入      |
-| s32MilliSec | 阻塞等待时间。 | 输入      |
+| 参数名称    | 描述                          | 输入/输出 |
+| ----------- | ----------------------------- | --------- |
+| enModID     | 模块号。                      | 输入      |
+| s32ChnID    | 通道号。                      | 输入      |
+| s32MilliSec | -1：阻塞，>=0：阻塞等待时间。 | 输入      |
 
 【返回值】
 
@@ -1377,6 +1378,90 @@ RK_S32 RK_MPI_MB_BeginCPUAccess([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_BOOL bReado
 
 无。
 
+#### RK_MPI_LOG_SetLevelConf
+
+【描述】
+
+设置日志等级。
+
+【语法】
+
+RK_S32 RK_MPI_LOG_SetLevelConf([LOG_LEVEL_CONF_S](#LOG_LEVEL_CONF_S) *pstConf);
+
+【参数】
+
+| 参数名称 | 描述                 | 输入/输出 |
+| -------- | -------------------- | --------- |
+| pstConf  | 日志等级信息结构体。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                    |
+| ------ | --------------------------------------- |
+| 0      | 成功。                                  |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+当pstConf中的成员cModName设置为字符串“all”时，将设置全部模块的日志等级。否则，只设定enModId指定的模块的日志等级。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_LOG_GetLevelConf](#RK_MPI_LOG_GetLevelConf)。
+
+#### RK_MPI_LOG_GetLevelConf
+
+【描述】
+
+获取日志等级。
+
+【语法】
+
+RK_S32 RK_MPI_LOG_GetLevelConf([LOG_LEVEL_CONF_S](#LOG_LEVEL_CONF_S) *pstConf);
+
+【参数】
+
+| 参数名称           | 描述                       | 输入/输出 |
+| ------------------ | -------------------------- | --------- |
+| pstConf-> enModId  | 需要获取日志等级的模块ID。 | 输入      |
+| pstConf-> s32Level | 获取到日志等级。           | 输出      |
+| pstConf-> cModName | 模块的名字。               | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                    |
+| ------ | --------------------------------------- |
+| 0      | 成功。                                  |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_LOG_SetLevelConf](#RK_MPI_LOG_SetLevelConf)。
+
 ### 数据类型
 
 #### 基本数据类型
@@ -1744,6 +1829,34 @@ typedef struct rkMB_IMAGE_INFO {
 【相关数据类型及接口】
 
 [IMAGE_TYPE_E](#IMAGE_TYPE_E)
+
+##### LOG_LEVEL_CONF_S
+
+【说明】
+
+定义日志等级信息结构体。
+
+【定义】
+
+```c
+typedef struct rkLOG_LEVEL_CONF_S {
+  MOD_ID_E enModId;
+  RK_S32 s32Level;
+  RK_CHAR cModName[16];
+} LOG_LEVEL_CONF_S;
+```
+
+【成员】
+
+| 成员名称 | 描述         |
+| -------- | ------------ |
+| enModId  | 模块的ID。   |
+| s32Level | 日志等级。   |
+| cModName | 模块的名字。 |
+
+【相关数据类型及接口】
+
+无。
 
 ### 错误码
 
@@ -7845,7 +7958,7 @@ external/rkmedia/examples/rkmedia_audio_test.c
 
 【说明】
 
-设备输入保存至文件。演示VI没有Bind时如何取视频流。
+获取VI通道数据。演示VI没有Bind时如何取视频流。
 
 【代码路径】
 
@@ -8681,3 +8794,50 @@ external/rkmedia/examples/rkmedia_vi_rockx_venc_rtsp_test.c
 【注意】
 
 默认RTSP地址：rtsp://\<ip\>/live/main_stream。
+
+## 编译说明
+
+### 如何编辑RKMedia编译选项
+
+```shell
+# SDK根目录，选择环境
+source envsetup.sh
+# SDK根目录下使用下列指令，可进入控制台，编辑RKMedia的编译选项
+make menuconfig
+# 使用 / 进入检索模式，检索 BR2_PACKAGE_RKMEDIA，使用对应数字编号选择BR2_PACKAGE_RKMEDIA，使用Select 进入RKMedia编译选项选择界面
+```
+
+### 编译选项功能说明
+
+| 选项                                               | 描述                                                         |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| camera capture                                     | VI功能开关。                                                 |
+| camera capture with rkaiq api                      | 开启camera capture后可见此选项。<br />VI数据流经由AIQ获取时，需开启此宏。 |
+| drm output                                         | VO功能开关。                                                 |
+| rk mpp wrapper                                     | MPP编解码开关，开启后可选择MPP编解码功能。                   |
+| rk mpp encoder                                     | MPP编码开关，对应VENC功能。                                  |
+| rk mpp decoder                                     | MPP解码开关，对应VDEC功能。                                  |
+| audio capture and playback                         | 音频获取、播放功能开关。                                     |
+| alsa playback                                      | ALSA播放开关，对应AO功能。                                   |
+| alsa capture                                       | ALSA获取开关，对应AI功能。                                   |
+| audio algorithm                                    | 音频算法开关。                                               |
+| audio encoder and decoder                          | 音频编解码总开关。                                           |
+| audio encoder                                      | 音频编码开关，对应AENC功能。                                 |
+| audio decoder                                      | 音频解码开关，对应ADEC功能。                                 |
+| rkrga                                              | 内置RGA功能开关，对应OSD，隐私遮盖，图形叠加功能。           |
+| rknn                                               | RKNN人脸功能开关，对应[rkmedia_vi_rknn_venc_rtsp_test](#rkmedia_vi_rknn_venc_rtsp_test)，<br />主要客户人脸模型使用。 |
+| rockface                                           | ROCKFACE人脸检测功能开关，对应MediaServer中人脸应用。        |
+| enable face recognize                              | 开启rockface后可见，人脸识别功能开关，对应MediaServer中人脸应用。 |
+| rockx                                              | ROCKX人脸功能开关，对应[rkmedia_vi_rockx_venc_rtsp_test](#rkmedia_vi_rockx_venc_rtsp_test)中人脸功能。 |
+| rk movedetection wrapper                           | 移动侦测功能开关。                                           |
+| rk occlusion detection wrapper                     | 遮挡检测功能开关。                                           |
+| enable rkmedia examples                            | 示例编译开关。                                               |
+| utils for debug rkmedia                            | DEBUG功能开关。                                              |
+| enable rkmedia sanitizer tools with dynamic linker | sanitizer工具动态库编译开关。                                |
+| enable rkmedia sanitizer tools with static linker  | sanitizer工具静态编译开关。                                  |
+| Output log by minilogger                           | minilogger开关。开启后将使用minilogger输出log。              |
+| live555                                            | live555总开关，对应MediaServer中的直播功能。                 |
+| rtsp server                                        | 开启live555后可见。rtsp总开关，对应MediaServer中的rstp直播功能。 |
+| rtsp server h264 session                           | 开启rstp后可见，rstp播放H264开关。                           |
+| rtsp server h265 session                           | 开启rstp后可见，rstp播放H265开关。                           |
+
