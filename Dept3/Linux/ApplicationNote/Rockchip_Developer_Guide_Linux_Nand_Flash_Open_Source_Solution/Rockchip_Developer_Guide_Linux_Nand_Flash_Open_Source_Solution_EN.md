@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-314
 
-Release Version: V2.0.1
+Release Version: V2.1.0
 
-Release Date: 2020-11-27
+Release Date: 2021-01-27
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -65,6 +65,7 @@ Software development engineers
 | V1.1.0      | Jair Wu    | 2020-07-10 | Add u-boot compile introduction                    |
 | V2.0.0      | Jon Lin    | 2020-10-19 | Improve the driver configuration and other details |
 | V2.0.1 | Jon Lin | 2020-11-27 | Add UBIFS multi volume support, increase or decrease ubiattach parameter description |
+| V2.1.0 | Jon Lin | 2021-01-27 | Add more UBIFS support |
 
 ---
 
@@ -475,7 +476,7 @@ First of all, if the image in the MTD partition uses the UBIFS file system,  ref
 
 nand info：
 
-```
+```shell
 nand info
 ```
 
@@ -490,7 +491,7 @@ nand erase off size
 
 nand write：
 
-```
+```shell
 nand write - addr off|partition size
 ```
 
@@ -500,7 +501,7 @@ nand write - addr off|partition size
 
 nand read：
 
-```
+```shell
 nand read - addr off|partition size
 ```
 
@@ -510,7 +511,7 @@ nand read - addr off|partition size
 
 For instance:
 
-```
+```shell
 tftp 0x4000000 rootfs.img
 nand erase 0x600000 0x200000						/* Erase the whole partion before write */
 nand write 0x4000000 0x600000 0x200000
@@ -522,7 +523,7 @@ SPI Nand unable to support nand command,  cmd/mtd.c is available.
 
 mtd erase:
 
-```
+```shell
 mtd erase <name> <off> <size>
 ```
 
@@ -533,7 +534,7 @@ mtd erase <name> <off> <size>
 
 mtd write:
 
-```
+```shell
 mtd write <name> <addr> <off> <size>
 ```
 
@@ -545,7 +546,7 @@ mtd write <name> <addr> <off> <size>
 
 mtd read:
 
-```
+```shell
 mtd read <name> <addr> <off> <size>
 ```
 
@@ -557,7 +558,7 @@ mtd read <name> <addr> <off> <size>
 
 For instance:
 
-```
+```shell
 tftp 0x4000000 rootfs.img
 mtd erase spi-nand0 0x600000 0x200000						/* Erase the whole partion before write */
 mtd write spi-nand0 0x4000000 0x600000 0x200000
@@ -567,13 +568,13 @@ mtd write spi-nand0 0x4000000 0x600000 0x200000
 
 flash_eraseall：
 
-```
-flash_eraseall
+```bash
+flash_erase       /* for example: flash_erase /dev/mtd1 0 0 */
 ```
 
 nanddump：
 
-```
+```shell
 nanddump --bb=skipbad /dev/mtd3
 ```
 
@@ -584,14 +585,14 @@ nanddump --bb=skipbad /dev/mtd3
 
 nandwrite：
 
-```
+```shell
 nandwrite -p /dev/mtd3 /rockchip_test/rockchip_test.sh
 ```
 
 Take /dev/mtd4 for instance:
 
-```
-flash_eraseall /dev/mtd4                                       /* Erase the whole partion before write */
+```shell
+flash_erase /dev/mtd4 0 0                                     /* Erase the whole partion before write */
 nandwrite -p /dev/mtd3 /userdata/boot.img
 sync
 nanddump --bb=skipbad /userdata/boot_read.img
@@ -608,7 +609,11 @@ First of all, if the image in the MTD partition uses the UBIFS file system,  ref
 
 **u-boot**
 
-Consult to drivers/mtd/nand/nand_util.c, Using those APIs with bad block management.
+* Consult to drivers/mtd/nand/nand_util.c, Using those APIs with bad block management.
+
+* For a complete write with less data (it is recommended to write less than 2KB data on each power on), you can consider using the corresponding interface of MTD to block device in RK SDK, source code drivers/mtd/mtd_blk.c, the block abstract interface has the following characteristics:
+
+  Regardless of the amount of data in a single write request, the flash block corresponding to the data will be erased. Therefore, for fragmented and frequent write behavior, calling this interface will affect the life of flash.
 
 **kernel**
 
@@ -635,7 +640,9 @@ CONFIG_UBIFS_FS_ADVANCED_COMPR=y
 CONFIG_UBIFS_FS_LZO=y /* Using lzo */
 ```
 
-### Making Images
+### Image Making And Mounting
+
+#### Image Making
 
 **Introduction For Commands**
 
@@ -773,7 +780,14 @@ mount -t ubifs /dev/ubi4_0 /oem
 mount -t ubifs /dev/ubi4_1 /uesrdata
 ```
 
-### Mount UBIFS
+#### Image Making Of Empty Partition
+
+```
+ubiformat -y /dev/mtd4
+ubimkvol /dev/mtd4 -N userdata -m /* -N specifies the volume name, - M dynamically adjusts the partition device autorisize to the maximum */
+```
+
+#### UBIFS Partition Command Mount
 
 ```shell
 ubiattach /dev/ubi_ctrl -m 4 -d 4
@@ -782,14 +796,63 @@ ubiattach /dev/ubi_ctrl -m 4 -d 4
 * -m：mtd num
 * -d：ubi binding device
 * -b, --max-beb-per1024：maximum expected bad block number per 1024 eraseblock, note that：
-  1. 20 in default；
-  2. If the redundant space is larger than the value in the first scan, the block of the value is reserved as the bad block replacement area, which is not available to users. If the redundant space is less than the value, the redundant space is used as the bad block reserve except for other necessary reserved space;
-  3. The default value of SDK should be set to 10 (this value may not be set in the old version of SDK);
-  4. If you need to optimize the space, please set the value flexibly: 4 + the number of blocks occupied by the partition * 1%, for example: flash block size 128KB, OEM space size 16MB, accounting for 128 flash blocks, you can consider filling in the value of 5;
+  1. 20 in default
+  2. Partition image pre production: partition redundancy flash block < --max-beb-per1024 actual value < --max-beb-per1024 set value, that is, the actual value may be smaller than the set value
+  3. Command to make empty partition as UBI image: - - max-beb-per1024, the actual value is equal to the set value
+  4. The default value of SDK can be set to 10 (this value may not be set in the old version of SDK)
+  5. If you need to optimize the space, please set the value flexibly: 4 + the number of blocks occupied by the partition * 1%, for example: flash block size 128KB, OEM space size 16MB, accounting for 128 flash blocks, you can consider filling in the value of 5;
 
 ```shell
 mount -t ubifs /dev/ubi4_0 /oem
 ```
+
+#### UBI Image Partition Overhead
+
+After the UBI image is mounted on the file system, the effective space is less than the partition size. There are mainly UBIFS redundant information and the loss of reserved blocks for bad block replacement.
+
+**Accurate calculation**
+
+```
+UBI overhead = (B + 4) * SP + 0 * (P - B - 4) /* the space cannot be obtained by users */
+
+P - The total number of physical blocks removed on the MTD device
+SP - physical erase block size, typically 128KB or 256Kb
+SL - logical erase block, i.e. mkfs - e parameter value, usually block_ size - 2 * page_ size
+B - F1ash blocks reserved for bad block replacement, related to the ubiattach - b parameter
+O - overhead associated with storing EC and vid file headers in bytes, i.e. 0 = SP - sl
+```
+
+**General case 1**
+
+Flash block size 128KB, page size 2KB, 128 MB size, ubiattach - b is reserved by default of 20;
+
+```
+SP = block size = 128KB
+SL = 128kb - 2 * 2KB = 124KB
+B = --max-beb-per1024 * n_ 1024 = 20 * 1 = 20
+O = 128KB -124KB = 4KB
+
+UBI overhead = (20 + 4) * 128KB + 4KB * (P - 20 - 4) = 2976KB + 4KB * P
+```
+
+If the corresponding partition is 32MB, that is, P = 256, then the final UBI overhead = 2976kb + 4KB * 256 = 4000kb
+
+**General case 2**
+
+Flash block size 128KB, page size 2KB, 256 MB size, ubiattach - B reserved default 20;
+
+```
+SP = block size = 128KB
+SL = 128kb - 2 * 2KB = 124KB
+B = --max-beb-per1024 * n_ 1024 = 20 * 2 = 40
+O = 128KB -124KB = 4KB
+
+UBI overhead = (40 + 4) * 128KB + 4KB * (P - 40 - 4) = 5456KB + 4KB * P
+```
+
+If the corresponding partition is 32MB, that is, P = 256, then the final UBI overhead = 5456kb + 4KB * 256 = 6456kb
+
+Detailed reference: flash space overhead chapter <http://www.linux-mtd.infradead.org/doc/ubi.html#L_overhead>
 
 ### Support SquashFS In UBI Block
 
@@ -866,13 +929,45 @@ ubiblock -c /dev/ubi4_0              /* Extending UBI block support on UBI devic
 mount -t squashfs /dev/ubiblock4_0 /oem
 ```
 
+### Optimization Of UBIFS Space Size
+
+As can be seen from the above description, the mirror free space can be optimized through the following three points:
+
+1. Select the appropriate -- max-beb-per1024 parameter, and refer to point 5 of the "- b parameter details" section of "Image making of empty partition"
+
+2. Use UBI multi volume technology to share part of UBIFS redundant overhead. Refer to the description of multi volume production in "Image making"
+
+3. Use the SquashFS supported by UBI block. Refer to the chapter "Support SquashFS In UBI Block"
+
+UBIFS minimum partition:
+
+```
+Minimum block num = 4 (fixed reservation) + B + 17 / * B - F1ash blocks reserved for bad block replacement, related to ubiattach - b parameter*/
+```
+
+It can be judged by printing log when ubiattach, for example:
+
+```
+ubi4: available PEBs: 7, total reserved PEBs: 24, PEBs reserved for bad PEB handling: 20 /* B = 20 */
+```
+
+If the partition available PEBS + total reserved PEBS < minimum block num, an error will be reported when mounting:
+
+```
+mount: mounting /dev/ubi4_ 0 on userdata failed: Invalid argument
+```
+
 ### UBIFS OTA
 
 To upgrade partitions using UBIFS, use the ubiupdatevol tool, the command is as follows:
 
 ```shell
-ubiupdatevol /dev/ubi1_0 rootfs.ubiimg
+ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 ```
+
+Note：
+
+* rootfs.ubifs is made by mkfs.ubifs tool
 
 ## PC Tools For Downloading
 

@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-314
 
-发布版本：V2.0.1
+发布版本：V2.1.0
 
-日期：2020-11-27
+日期：2021-01-27
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -71,6 +71,7 @@ Rockchip SDK默认采用闭源的miniloader 加载 trust 和 u-boot，所有存�
 | V1.1.0   | Jair Wu    | 2020-07-10 | 新增u-boot编译说明     |
 | V2.0.0   | Jon Lin    | 2020-10-19 | 完善驱动配置等详细信息 |
 | V2.0.1 | Jon Lin | 2020-11-27 | 增加 UBIFS 多卷支持、增减 ubiattach 参数说明 |
+| V2.1.0 | Jon Lin | 2021-01-27 | 添加更多 UBIFS 支持说明 |
 
 ---
 
@@ -474,7 +475,7 @@ ubi0:rootfs on / type ubifs (rw,relatime)
 
 nand info：
 
-```
+```shell
 nand info
 ```
 
@@ -489,7 +490,7 @@ nand erase off size
 
 nand write：
 
-```
+```shell
 nand write - addr off|partition size
 ```
 
@@ -499,7 +500,7 @@ nand write - addr off|partition size
 
 nand read：
 
-```
+```shell
 nand read - addr off|partition size
 ```
 
@@ -509,7 +510,7 @@ nand read - addr off|partition size
 
 针对一个分区的升级，建议操作顺序：
 
-```
+```shell
 tftp 0x4000000 rootfs.img
 nand erase 0x600000 0x200000						/* 升级分区时先擦除整个分区 */
 nand write 0x4000000 0x600000 0x200000
@@ -521,7 +522,7 @@ SPI Nand 无法支持 nand cmd 命令，可选用 cmd/mtd.c 接口，依旧能�
 
 mtd erase:
 
-```
+```shell
 mtd erase <name> <off> <size>
 ```
 
@@ -532,7 +533,7 @@ mtd erase <name> <off> <size>
 
 mtd write:
 
-```
+```shell
 mtd write <name> <addr> <off> <size>
 ```
 
@@ -544,7 +545,7 @@ mtd write <name> <addr> <off> <size>
 
 mtd read:
 
-```
+```shell
 mtd read <name> <addr> <off> <size>
 ```
 
@@ -556,7 +557,7 @@ mtd read <name> <addr> <off> <size>
 
 针对一个分区的升级，建议操作顺序：
 
-```
+```shell
 tftp 0x4000000 rootfs.img
 mtd erase spi-nand0 0x600000 0x200000						/* 升级分区时先擦除整个分区 */
 mtd write spi-nand0 0x4000000 0x600000 0x200000
@@ -564,10 +565,10 @@ mtd write spi-nand0 0x4000000 0x600000 0x200000
 
 kernel
 
-flash_eraseall：
+flash_erase：
 
 ```shell
-flash_eraseall
+flash_erase       /* 例如: flash_erase /dev/mtd1 0 0 */
 ```
 
 nanddump：
@@ -589,12 +590,12 @@ nandwrite -p /dev/mtd3 /rockchip_test/rockchip_test.sh
 
 针对一个分区的升级，建议操作顺序：
 
-```
-flash_eraseall /dev/mtd4						/* 升级分区时先擦除整个分区 */
+```shell
+flash_erase /dev/mtd4 0 0                       /* 升级分区时先擦除整个分区 */
 nandwrite -p /dev/mtd3 /userdata/boot.img
 sync
 nanddump --bb=skipbad /userdata/boot_read.img
-md5sum /userdata/boot_read.img ...				/* 建议添加校验 */
+md5sum /userdata/boot_read.img ...              /* 建议添加校验 */
 ```
 
 ### Shell 命令升级 UBIFS 镜像分区
@@ -607,7 +608,10 @@ md5sum /userdata/boot_read.img ...				/* 建议添加校验 */
 
 u-boot
 
-建议参考 drivers/mtd/nand/nand_util.c，使用有坏块识别的读写擦除接口。
+* 建议参考 drivers/mtd/nand/nand_util.c，使用有坏块识别的读写擦除接口。
+* 对于数据量较少的一次完整写行为（建议每次上电写数据量少于 2KB），可以考虑使用 RK  SDK 中 mtd 转 block 设备相应的接口，源码 drivers/mtd/mtd_blk.c，该 block 抽象接口有以下特点：
+
+  无论单次写请求的数据量多大，都会擦除数据对应的 flash block，所以对于零碎且频繁的写行为如果调用该接口将会影响 flash 的寿命。
 
 kernel
 
@@ -636,7 +640,9 @@ CONFIG_UBIFS_FS_ADVANCED_COMPR=y
 CONFIG_UBIFS_FS_LZO=y /* 建议选用 lzo 压缩 */
 ```
 
-### 镜像制作
+### 镜像制作及挂载
+
+#### 预制作镜像
 
 **命令详细说明**
 
@@ -774,33 +780,20 @@ mount -t ubifs /dev/ubi4_0 /oem
 mount -t ubifs /dev/ubi4_1 /uesrdata
 ```
 
-**镜像大小与分区空间**
+注意：
 
-精确计算：
+* 多卷中的独立分区无法单独简单升级，即 flash 读写接口直接升级多卷中特定卷，所以多卷内的分区 OTA 需求和频率应该相近
 
-假定已知制作后镜像为 B 个 flash block，则分区应预留：
-
-```
- (B + 4) * block_size + 2 * page_size * (B - 4)
-```
-
-e.g：block size 128KB，page size 2KB，B = 32：
+#### 空分区镜像制作
 
 ```
- (32 + 4) * 128KB + 2 * 2KB * (32 - 4) = 4720 KB
+ubiformat -y /dev/mtd4
+ubimkvol /dev/mtd4 -N userdata -m /* -N 指定卷名，-m 将分区设备 autorisize 可动态调整到最大 */
 ```
 
- 对齐到 flash block size，则最终应预留 38 blocks。
+#### UBIFS 分区命令挂载
 
-估算建议：
-
-预留空间：制作后的 UBIFS 镜像 4% 大小 + 4 block size，并向上取整对齐到 block size 。
-
-详细参考：
-
-[Flash space overhead 章节]: http://www.linux-mtd.infradead.org/doc/ubi.html#L_overhead
-
-### 命令手动挂载 UBIFS 分区
+将 MTD 设备连接到 UBI 设备：
 
 ```shell
 ubiattach /dev/ubi_ctrl -m 4 -d 4
@@ -809,14 +802,60 @@ ubiattach /dev/ubi_ctrl -m 4 -d 4
 * -m：指定 mtd 分区序号
 * -d：绑定后的 ubi 设备编号，建议与 mtd 分区序号一致
 * -b, --max-beb-per1024：每1024个eraseblock预期的最大坏块数，注意：
-  1. 不带参数，默认为 20；
-  2. 如果第一次扫描，冗余空间大于该值，则预留该数值的 block 作为坏块替换区，该区域用户不可获取，如冗余空间小于该值，则冗余空间除了其他必要保留空间外都作为坏块保留区；
-  3. SDK 默认值应设定为 10（可能旧版本 SDK 该值未设定）；
-  4. 如需优化空间，请灵活设定该值：4 + 分区所占 block 数 * 1%，例如：flash block size 128KB，oem 空间大小 16MB，占 128 flash block，可以考虑填值 5；
+  1. 不带参数，默认为 20
+  2. 分区镜像预制作：分区冗余 flash block < --max-beb-per1024 实际值 <  --max-beb-per1024 设定值，即实际值可能比设定值小
+  3. 命令制作空分区为 UBI 镜像：--max-beb-per1024 实际值等于设定值
+  4. SDK 默认值可设定为 10（可能旧版本 SDK 该值未设定）
+  5. 如需优化空间，请灵活设定该值：4 + 分区所占 block 数 * 1%，例如：flash block size 128KB，oem 空间大小 16MB，占 128 flash block，可以考虑填值 5
 
 ```shell
 mount -t ubifs /dev/ubi4_0 /oem
 ```
+
+#### UBI 镜像分区损耗
+
+UBI 镜像挂载文件系统后有效空间小于分区大小，主要存在 UBIFS 冗余信息和坏块替换所需的预留块的损耗。
+
+**精确计算**
+
+```
+UBI overhead = (B + 4) * SP + 0 * (P - B - 4) /* 该空间用户无法获取 */
+P - MTD 设备上物理除块的总数
+SP - 物理擦除块大小,通常为 128KB 或 256KB
+SL - 逻辑擦除块，即 mkfs 时 -e 参数值,通常为 block_size - 2 * page_size
+B - 为坏块替换预留的 f1ash blocks,与 ubiattach- b参数相关
+O - 与以字节为单位存储 EC 和 VID 文件头有关的开销, i.e. 0 = SP - SL
+```
+
+**通用案例1**
+
+flash block size 128KB, page size 2KB，128 MB size, ubiattach -b 预留默认 20；
+
+```
+SP = block size = 128KB
+SL = 128kb - 2 * 2KB = 124KB
+B = --max-beb-per1024 * n_1024 = 20 * 1 = 20
+O = 128KB -124KB = 4KB
+UBI overhead = (20 + 4) * 128KB + 4KB * (P - 20 - 4) = 2976KB + 4KB * P
+```
+
+以对应分区为 32MB 为例，即 P = 256，那么最终损耗为 UBI overhead = 2976KB + 4KB * 256 = 4000KB
+
+**通用案例2**
+
+flash block size 128KB, page size 2KB，256 MB size, ubiattach -b 预留默认 20；
+
+```
+SP = block size = 128KB
+SL = 128kb - 2 * 2KB = 124KB
+B = --max-beb-per1024 * n_1024 = 20 * 2 = 40
+O = 128KB -124KB = 4KB
+UBI overhead = (40 + 4) * 128KB + 4KB * (P - 40 - 4) = 5456KB + 4KB * P
+```
+
+以对应分区为 32MB 为例，即 P = 256，那么最终损耗为 UBI overhead = 5456KB + 4KB * 256 = 6456KB
+
+详细参考：Flash space overhead 章节 <http://www.linux-mtd.infradead.org/doc/ubi.html#L_overhead>
 
 ### UBI Block 支持 SquashFS
 
@@ -895,13 +934,43 @@ ubiblock -c /dev/ubi4_0             /* UBI 设备上扩展 UBI block 支持 */
 mount -t squashfs /dev/ubiblock4_0 /oem
 ```
 
+### 镜像空间大小优化
+
+通过以上描述可知，主要通过以下三点来优化镜像可用空间：
+
+1. 选择合适的 --max-beb-per1024 参数，参考 “命令制作空分区 UBI 镜像及镜像挂载” 章节的 “-b 参数详述” 第 5 点
+2. 使用 UBI 多卷技术来共享部分 UBIFS 冗余开销，参考 “镜像制作” 中多卷制作说明
+3. 使用 UBI block 支持下的 SquashFS，参考 “UBI Block 支持 SquashFS” 章节
+
+UBIFS 最小分区:
+
+```
+Minimum block num = 4（固定预留） + B + 17  /* B - 为坏块替换预留的 f1ash blocks,与 ubiattach - b 参数相关，UBIFS_MIN_LEB_CNT 等于 17 */
+```
+
+可通过 ubiattach 时打印 log 来判断，例如：
+
+```
+ubi4: available PEBs: 7, total reserved PEBs: 24, PEBs reserved for bad PEB handling: 20   /* B = 20 */
+```
+
+如果分区 available PEBs + total reserved PEBs < Minimum block num，则挂载时会报错：
+
+```
+mount: mounting /dev/ubi4_0 on userdata failed: Invalid argument
+```
+
 ### UBIFS OTA
 
 升级使用 UBIFS 的分区应使用 ubiupdatevol 工具，参考，命令：
 
+```shell
+ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 ```
-ubiupdatevol /dev/ubi1_0 rootfs.ubiimg
-```
+
+注意：
+
+* rootfs.ubifs 为 mkfs.ubifs 命令所制作的镜像，非 ubinize 制作的最终烧录镜像
 
 ## PC 工具烧录
 
