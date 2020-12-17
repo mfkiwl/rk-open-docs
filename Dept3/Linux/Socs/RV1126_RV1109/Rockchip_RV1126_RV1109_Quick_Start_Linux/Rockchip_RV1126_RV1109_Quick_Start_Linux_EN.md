@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.3
+Release Version: V1.9.4
 
-Release Date: 2020-12-04
+Release Date: 2020-12-17
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -80,6 +80,7 @@ This document (this guide) is mainly intended for:
 | V1.9.1 | CWW | 2020-11-22 | Add spi nor BoardConfig |
 | V1.9.2 | CWW | 2020-12-02 | 1. Add AB system boot-up board config reference <br>2. introduced to U-Boot's tftp |
 | V1.9.3 | CWW | 2020-12-04 | 1. Add GPIO Precaution<br>2. Add introduction to starting face recognition function |
+| V1.9.4 | CWW | 2020-12-17 | 1. Add AB system for SPI NAND with 38 board config<br>2. Add introduction to flash SPI NOR Firmware.img |
 
 ---
 
@@ -400,6 +401,7 @@ Starting default: 100% (71/71), done.
 | ----------------------------- | ------------------------------------------- | -------------- | --------------------------------------------------- |
 | BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
 | BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
+| BoardConfig-38x38-spi-nand-ab.mk | General IPC (Discrete power supply), Boot-up with AB system | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-robot.mk          | Robot Sweeper IPC                           | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-tb-v12.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-tb-v13.mk         | Door lock or doorbell products with battery | eMMC           | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
@@ -708,6 +710,10 @@ The method to flash update.img:
 
 ![](resources/window-flash-firmware-update-img.jpg)
 
+The method to flash SPI NOR Firmware.img:
+
+![](resources/window-flash-spi-nor-firmeare.png)
+
 Note:
 
 1. In addition to MiniLoader All.bin and parameter.txt, the actual partition to be burned is based on rockdev / parameter.txt configuration.
@@ -740,6 +746,14 @@ Or upgrade the whole update.img firmware after packaging:
 
 ```shell
 sudo ./upgrade_tool uf rockdev/update.img
+```
+
+Upgrade the whole Firmware.img for SPI NOR:
+
+```shell
+sudo ./upgrade_tool db rockdev/MiniLoaderAll.bin
+sudo ./upgrade_tool wl 0x0 rockdev/Firmware.img
+sudo ./upgrade_tool rd
 ```
 
 Or in root directory, run the following command on your device to upgrade in MASKROM state:

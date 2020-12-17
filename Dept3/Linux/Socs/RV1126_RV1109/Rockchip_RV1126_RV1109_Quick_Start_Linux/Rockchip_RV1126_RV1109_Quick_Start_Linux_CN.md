@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.3
+发布版本：V1.9.4
 
-日期：2020-12-04
+日期：2020-12-17
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -85,6 +85,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.1 | CWW | 2020-11-22 | 增加spi nor板级配置 |
 | V1.9.2 | CWW | 2020-12-02 | 1. 增加AB系统板级配置参考<br>2. 增加U-Boot使用tftp使用说明 |
 | V1.9.3 | CWW | 2020-12-04 | 1. 增加GPIO使用注意事项<br>2. 增加开启人脸识别功能说明 |
+| V1.9.4 | CWW | 2020-12-17 | 1. 增加38板SPI NAND AB系统板级参考<br>2. 增加SPI NOR烧录Firmware.img说明 |
 
 ---
 
@@ -356,7 +357,11 @@ SDK的编译有2种方法：
 #### SDK下载地址
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
+    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -b linux -m rv1126_rv1109_linux_release.xml
+
+.repo/repo/repo sync -c -j4
 ```
 
 #### SDK软件同步命令以及log
@@ -403,6 +408,7 @@ Starting default: 100% (71/71), done.
 | ----------------------------- | --------------------------   | -------- | --------------------------------------------------- |
 | BoardConfig-38x38-spi-nand.mk | 通用IPC（产品是分立电源方案）| SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
 | BoardConfig-38x38-spi-nand.mk | 通用IPC（产品是分立电源方案）| SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
+| BoardConfig-38x38-spi-nand-ab.mk | 通用IPC（产品是分立电源方案），启动方式是AB系统| SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
 | BoardConfig-robot.mk          | 扫地机类IPC                  | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
 | BoardConfig-tb-v12.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V12_20200515KYY       |
 | BoardConfig-tb-v13.mk         | 门锁、门铃、猫眼等带电池产品 | eMMC     | RV1126_RV1109_EVB_DDR3P216SD6_V13_20200630LXF       |
@@ -707,6 +713,10 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 
 ![](resources/window-flash-firmware-update-img.jpg)
 
+SPI NOR的Firmware.img烧录方法：
+
+![](resources/window-flash-spi-nor-firmeare.png)
+
 注：
 
 1. 除了MiniLoaderAll.bin和parameter.txt，实际需要烧录的分区根据rockdev/parameter.txt配置为准。
@@ -739,6 +749,14 @@ sudo ./upgrade_tool rd
 
 ```shell
 sudo ./upgrade_tool uf rockdev/update.img
+```
+
+SPI NOR升级整个 firmware 的 Firmware.img 固件：
+
+```shell
+sudo ./upgrade_tool db rockdev/MiniLoaderAll.bin
+sudo ./upgrade_tool wl 0x0 rockdev/Firmware.img
+sudo ./upgrade_tool rd
 ```
 
 或在根目录，机器在 MASKROM 状态运行如下升级：
@@ -1069,7 +1087,9 @@ Bytes transferred = 2228224 (220000 hex)
 SDK下载地址：
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
+    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
 ```
 
 | 芯片   | 板级配置 (目录device/rockchip/rv1126_rv1109) | 存储介质 | EVB板                                                |

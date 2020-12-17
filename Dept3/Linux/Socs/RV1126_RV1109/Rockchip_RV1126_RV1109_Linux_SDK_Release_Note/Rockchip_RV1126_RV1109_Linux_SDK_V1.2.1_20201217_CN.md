@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-359
 
-发布版本：V1.2.0
+发布版本：V1.2.1
 
-日期：2020-12-04
+日期：2020-12-17
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -64,6 +64,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-06-19 | V1.1.0 | CW | 增加智能USB Camera下载说明 |
 | 2020-07-11 | V1.1.1 | CWW | 更新2.1节 |
 | 2020-12-04 | V1.2.0 | CWW | 增加GPIO使用注意事项 |
+| 2020-12-17 | V1.2.1 | CWW | 更新repo int命令转成pdf格式复制问题 |
 
 ---
 
@@ -92,7 +93,11 @@ SDK通过瑞芯微代码服务器对外发布获取。其编译开发环境，�
 RV1126_RV1109_Linux_SDK 下载命令如下：
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
+    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -b linux -m rv1126_rv1109_linux_release.xml
+
+.repo/repo/repo sync -c -j4
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -122,7 +127,11 @@ cd rv1126_rv1109
 智能USB Camera SDK 下载命令如下：
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
+    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+
+.repo/repo/repo sync -c
 ```
 
 如果已经下载了RV1126/RV1109 Linux 通用软件包（rv1126_rv1109_linux_sdk_vX.X.X_2020XXXX.tar.bz2），可以通过以下方式切换到智能USB Camera 软件包
