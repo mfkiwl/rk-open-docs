@@ -2,9 +2,9 @@
 
 文档标识：RK-SM-YF-352
 
-发布版本：V1.1.2
+发布版本：V1.1.3
 
-日期：2020-08-02
+日期：2020-12-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -72,6 +72,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2020-03-24 | V1.1.0 | CQ	| 更新测试项 |
 | 2020-03-30 | V1.1.1 | Caesar Wang	| 修改格式 |
 | 2020-08-02 | V1.1.2 | Ruby Zhang	| 格式修正 |
+| 2020-12-18 | V1.1.3 | Ruby Zhang	| 语句修正 |
 
 ---
 
@@ -118,10 +119,7 @@ rkisp_demo --device=/dev/video1 --output=/tmp/isp.yuv --iqfile=/etc/iqfiles/OV56
 
 播放录像：
 
-将/tmp/cif.yuv下的文件pull到电脑端： `adb pull /tmp/cif.yuv /tmp/cif.yuv`，通过 YUVPlayer.exe 工具播放。
-YUVPlayer.exe 工具播放 YUV 录像文件时的设置如下：
-
-![camera](resources/camera.png)
+将/tmp/cif.yuv下的文件pull到电脑端： `adb pull /tmp/cif.yuv /tmp/cif.yuv`，通过 YUV 工具播放。
 
 #### 录音
 

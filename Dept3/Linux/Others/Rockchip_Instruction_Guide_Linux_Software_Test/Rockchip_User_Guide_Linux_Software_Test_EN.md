@@ -2,9 +2,9 @@
 
 ID:RK-SM-YF-352
 
-Release Version:V1.1.2
+Release Version:V1.1.3
 
-Release Date: 2020-08-02
+Release Date: 2020-12-18
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -66,6 +66,7 @@ Software development engineers
 | 2020-03-24 | V1.1.0 | CQ | Update test items |
 | 2020-03-30 | V1.1.1 | Caesar Wang	| Update the format |
 | 2020-08-02 | V1.1.2 | Ruby Zhang	| Update the format |
+| 2020-12-18 | V1.1.3 | Ruby Zhang	| Update some contents |
 
 ---
 
@@ -113,9 +114,7 @@ rkisp_demo --device=/dev/video1 --output=/tmp/isp.yuv --iqfile=/etc/iqfiles/OV56
 
 Play video:
 
-Pull the file in the /tmp/cif.yuv directory to PC: `adb pull /tmp/cif.yuv /tmp/cif.yuv`, and play it through the tool YUVPlayer.exe. The settings of YUVPlayer.exe tool when playing YUV video files are as follows:
-
-![camera](resources/camera.png)
+Pull the file in the /tmp/cif.yuv directory to PC: `adb pull /tmp/cif.yuv /tmp/cif.yuv`, and play it through a YUV tool.
 
 #### Recording
 
