@@ -111,11 +111,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rk3326_linux_sdk_release_v1.4.0_20201203.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take RK3326_LINUX_SDK_V1.4_20201203.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk3326
-tar xvf rk3326_linux_sdk_release_v1.4.0_20201203.tgz -C rk3326
+tar xvf RK3326_LINUX_SDK_V1.4_20201203.tgz -C rk3326
 cd rk3326
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -200,8 +200,8 @@ Enter the project  <SDK>/device/rockchip/rk3326 directory:
 
 | Board level configuration | Note                                            |
 | ----------------------------- | --------------------------------------------------- |
-| BoardConfig-rk3326-evb-lp3-v10-32bit.mk | Suitable for RK3326 EVB V10 development board  |
-| BoardConfig-rk3326-evb-lp3-v10.mk  | Suitable for RK3326 EVB V10 development board with 32bit system |
+| BoardConfig-rk3326-evb-lp3-v10.mk | Suitable for RK3326 EVB V10 development board  |
+| BoardConfig-rk3326-evb-lp3-v10-32bit.mk | Suitable for RK3326 EVB V10 development board with 32bit system |
 | BoardConfig-rk3326-robot64.mk | Suitable for RK3326 robot mini rootfs  |
 |  BoardConfig-rk3326-robot64_no_gpu.mk  |  Suitable for RK3326 robot mini rootfs without gpu  |
 

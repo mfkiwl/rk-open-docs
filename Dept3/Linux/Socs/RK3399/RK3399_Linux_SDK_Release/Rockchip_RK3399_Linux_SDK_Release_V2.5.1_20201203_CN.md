@@ -126,11 +126,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 rk3399_linux_sdk_release_v2.5.1_20201203.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 RK3399_LINUX_SDK_V2.5_20201203.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk3399
-tar xvf rk3399_linux_sdk_release_v2.5.1_20201203.tgz -C rk3399
+tar xvf RK3399_LINUX_SDK_V2.5_20201203.tgz -C rk3399
 cd rk3399
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags

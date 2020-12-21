@@ -114,11 +114,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take rk3288_linux_sdk_release_v2.3.0_20201203.tgz as an example. After getting an initialization package, you can get the source code by the following command:
+Take RK3288_LINUX_SDK_V2.3_20201203.tgz as an example. After getting an initialization package, you can get the source code by the following command:
 
 ```shell
 mkdir rk3288
-tar xvf rk3288_linux_sdk_release_v2.3.0_20201203.tgz -C rk3288
+tar xvf RK3288_LINUX_SDK_V2.3_20201203.tgz -C rk3288
 cd rk3288
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
