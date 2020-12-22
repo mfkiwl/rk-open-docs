@@ -54,6 +54,7 @@ Rockchip Electronics Co., Ltd.
 | RK3308       | 4.4 & 4.19   |
 | RV1126       | 4.4 & 4.19   |
 | PX30         | 4.4 & 4.19   |
+| RK356X       | 4.4 & 4.19   |
 
 **读者对象**
 
@@ -69,6 +70,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | -------- | -------- | ---------------- |
 | 2019-03-25 | V1.0.0   | Elaine   | 第一次版本发布   |
 | 2020-07-25 | V1.1.0   | Elaine   | 增加更多芯片支持 |
+| 2020-12-22 | V1.2.0   | Elaine   | 增加更多芯片支持 |
 ---
 
 [TOC]
@@ -154,57 +156,66 @@ RK3399配置向量表：
 1. RK3399，GPLL展频
 
 ```shell
-io -4 0xff76008c 0x00080000 # 打开小数模式
-io -4 0xff760090 0x00070000 # 打开展频功能
 io -4 0xff760094 0x00010001 # 选择外部表，这样才能控制MAX_ADDR
 io -4 0xff760090 0x1f000100 # 调节档位 [0, 1f]
 io -4 0xff760090 0x00f000f0 # 调节周期 [0, f]
 io -4 0xff760094 0xff00ff00 # 调节MAX_ADDR [0, ff]
+io -4 0xff76008c 0x00080000 # 打开小数模式
+io -4 0xff760090 0x00070000 # 打开展频功能
 ```
 
 2. RK3328，CPLL展频
 
 ```shell
-io -4 0xff44004c 0x00080000
-io -4 0xff440050 0x00070000
 io -4 0xff44004c 0x1f000800 # 设置幅度，其中8可取0–1f，n为0.n%
 io -4 0xff44004c 0x00f00060 # 设置速率30khz，其中的6可取0-f，n就为1/(n+1)
+io -4 0xff44004c 0x00080000
+io -4 0xff440050 0x00070000
 ```
 
 3. PX30，GPLL展频
 
 ```shell
-io -4 0xff2bc004 0x10000000 # 打开小数模式
-io -4 0xff2bc00c 0x00070000 # 打开展频功能
 io -4 0xff2bc00c 0x1f000800 # 设置幅度，其中8可取0–1f，n为0.n%
 io -4 0xff2bc00c 0x00f00060 # 设置速率30khz，其中的6可取0-f，n就为1/(n+1)
+io -4 0xff2bc004 0x10000000 # 打开小数模式
+io -4 0xff2bc00c 0x00070000 # 打开展频功能
 ```
 
 4. RK3308，VPLL0展频
 
 ```shell
-io -4 0xff500044 0x10000000 # 打开小数模式
-io -4 0xff50004c 0x00070000 # 打开展频功能
 io -4 0xff50004c 0x1f000800 # 设置幅度，其中8可取0–1f，n为0.n%
 io -4 0xff50004c 0x00f00060 # 设置速率30khz，其中的6可取0-f，n就为1/(n+1)
+io -4 0xff500044 0x10000000 # 打开小数模式
+io -4 0xff50004c 0x00070000 # 打开展频功能
 ```
 
-5. RV1126，VPLL展频
+5. RV1126，HPLL展频
 
 ```shell
-io -4 0xff490064 0x10000000 # 打开小数模式
-io -4 0xff49006c 0x00070000 # 打开展频功能
 io -4 0xff49006c 0x1f000800 # 设置幅度，其中8可取0–1f，n为0.n%
 io -4 0xff49006c 0x00f00060 # 设置速率30khz，其中的6可取0-f，n就为1/(n+1)
+io -4 0xff490064 0x10000000 # 打开小数模式
+io -4 0xff49006c 0x00070000 # 打开展频功能
 ```
 
 6. RK1808，GPLL展频
 
 ```shell
-io -4 0xff350064 0x10000000 # 打开小数模式
-io -4 0xff35006c 0x00070000 # 打开展频功能
 io -4 0xff35006c 0x1f000800 # 设置幅度，其中8可取0–1f，n为0.n%
 io -4 0xff35006c 0x00f00060 # 设置速率30khz，其中的6可取0-f，n就为1/(n+1)
+io -4 0xff350064 0x10000000 # 打开小数模式
+io -4 0xff35006c 0x00070000 # 打开展频功能
+```
+
+7. RK356X，GPLL展频
+
+```shell
+io -4 0xfdd2004c 0x1f000800 # 设置幅度，其中8可取0–1f，n为0.n%
+io -4 0xfdd2004c 0x00f00060 # 设置速率30khz，其中的6可取0-f，n就为1/(n+1)
+io -4 0xfdd20044 0x10000000 # 打开小数模式
+io -4 0xfdd2004c 0x00070000 # 打开展频功能
 ```
 
 注意：
@@ -225,14 +236,14 @@ diff --git a/drivers/clk/rockchip/clk_rk3399.c b/drivers/clk/rockchip/clk_rk3399
 @@ -1479,6 +1479,15 @@ static int rk3399_clk_probe(struct udevice *dev)
  {
  	struct rk3399_clk_priv *priv = dev_get_priv(dev);
-+	writel(0x00080000, &priv->cru->dpll_con[3]);
-+	writel(0x00070000, &priv->cru->dpll_con[4]);
-+	writel(0x00010001, &priv->cru->dpll_con[5]);
 +	/* 展频幅度 */
 +	writel(0x1f001f00, &priv->cru->dpll_con[4]);
 +	/* 展频周期 */
 +	writel(0x00f00060, &priv->cru->dpll_con[4]);
 +	writel(0x7f002700, &priv->cru->dpll_con[5]);
++	writel(0x00080000, &priv->cru->dpll_con[3]);
++	writel(0x00070000, &priv->cru->dpll_con[4]);
++	writel(0x00010001, &priv->cru->dpll_con[5]);
 +
  #if CONFIG_IS_ENABLED(OF_PLATDATA)
  	struct rk3399_clk_plat *plat = dev_get_platdata(dev);
