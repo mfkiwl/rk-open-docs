@@ -485,6 +485,8 @@ cjh@ubuntu:~/uboot-nextdev$ fdtdump u-boot.dtb | less
     };
 ```
 
+spl 同时支持烧写 key hash 的功能，u-boot-spl.dtb 的 key-dev 会多出“burn-key-hash = <0x00000001>;”。
+
 #### key使用
 
 从Maskrom到kernel为止的安全启动，统一使用一把RSA公钥完成安全校验：
@@ -562,7 +564,7 @@ mkdir -p keys
 // 2. 使用RK的"SecureBootTool"工具生成RSA2048的私钥，存放为：keys/dev.key
 ...
 
-// 使用-x509和私钥生成一个自签名证书：keys/dev.crt （实际等同于公钥）
+// 3. 使用-x509和私钥生成一个自签名证书：keys/dev.crt （实际等同于公钥）
 openssl req -batch -new -x509 -key keys/dev.key -out keys/dev.crt
 ```
 
@@ -596,6 +598,22 @@ CONFIG_SPL_FIT_ROLLBACK_PROTECT=y   // uboot.img防回滚
 把SDK工程下生成的boot.img复制一份到U-Boot根目录下。
 
 ### 编译打包
+
+#### 公钥烧写
+
+编译命令：
+
+```c
+./make.sh rv1126 --spl-new --boot_img boot.img --burn-key-hash
+```
+
+使用 RK 的"SecureBootTool"工具对生成的 loader 进行签名。
+
+固件下载到设备，如果key 烧写成功，会输出：
+
+```
+RSA: Write key hash successfully
+```
 
 #### 不防回滚
 
