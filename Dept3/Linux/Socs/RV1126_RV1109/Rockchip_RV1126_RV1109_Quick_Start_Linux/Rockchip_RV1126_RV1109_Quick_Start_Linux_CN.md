@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.4
+发布版本：V1.9.5
 
-日期：2020-12-17
+日期：2020-12-29
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -86,6 +86,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.2 | CWW | 2020-12-02 | 1. 增加AB系统板级配置参考<br>2. 增加U-Boot使用tftp使用说明 |
 | V1.9.3 | CWW | 2020-12-04 | 1. 增加GPIO使用注意事项<br>2. 增加开启人脸识别功能说明 |
 | V1.9.4 | CWW | 2020-12-17 | 1. 增加38板SPI NAND AB系统板级参考<br>2. 增加SPI NOR烧录Firmware.img说明 |
+| V1.9.5 | CWW | 2020-12-29 | 1. 优化排版<br>2. 删除一些不用的工程 |
 
 ---
 
@@ -101,7 +102,13 @@ Ubuntu 16.04系统：
 编译环境搭建所依赖的软件包以及安装命令如下：
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
+sudo apt-get install repo device-tree-compiler git-core u-boot-tools mtools \
+parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools \
+autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils \
+build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync \
+file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git \
+mercurial openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib \
+libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
 ```
 
 Ubuntu 17.04系统：
@@ -135,7 +142,6 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 | ---------------------------- | ---------------------------------- |
 | external/recovery            | recovery                           |
 | external/rkwifibt            | Wi-Fi和BT                          |
-| external/libdrm              | DRM接口                            |
 | external/rk_pcba_test        | PCBA测试代码                       |
 | external/isp2-ipc            | 图像信号处理服务端                 |
 | external/mpp                 | 编解码代码                         |
@@ -322,7 +328,7 @@ SecureBootTool        | 固件签名工具
 efuseTool             | efuse烧写工具
 RKDevInfoWriteTool    | 写号工具
 SDDiskTool            | SD卡镜像制作
-SpiImageTools         | 烧录器升级工具
+SpiImageTools         | eMMC烧录器固件制作工具（文档在FactoryTool工具里）
 DriverAssitant        | 驱动安装工具
 RKImageMaker          | 打包工具(打包成updata.img)
 SpeakerPCBATool       | 音箱PCBA测试工具
@@ -460,20 +466,17 @@ Lunch menu...pick a combo:
 2. BoardConfig-ab-v13.mk
 3. BoardConfig-battery-ipc.mk
 4. BoardConfig-facial_gate.mk
-5. BoardConfig-ramboot-uvc.mk
-6. BoardConfig-robot.mk
-7. BoardConfig-sl.mk
-8. BoardConfig-slc-nand-v12.mk
-9. BoardConfig-spi-nand.mk
-10. BoardConfig-spi-nor-tb-v13.mk
-11. BoardConfig-spi-nor-v12.mk
-12. BoardConfig-tb-v12.mk
-13. BoardConfig-tb-v13.mk
-14. BoardConfig-uvcc-spi-nand.mk
-15. BoardConfig-uvcc.mk
-16. BoardConfig-v10-v11.mk
-17. BoardConfig-v12.mk
-18. BoardConfig.mk
+5. BoardConfig-robot.mk
+6. BoardConfig-sl.mk
+7. BoardConfig-slc-nand-v12.mk
+8. BoardConfig-spi-nand.mk
+9. BoardConfig-spi-nor-tb-v13.mk
+10. BoardConfig-spi-nor-v12.mk
+11. BoardConfig-tb-v12.mk
+12. BoardConfig-tb-v13.mk
+13. BoardConfig-v10-v11.mk
+14. BoardConfig-v12.mk
+15. BoardConfig.mk
 Which would you like? [0]:
 switching to board: /home/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```

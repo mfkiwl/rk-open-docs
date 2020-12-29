@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.4
+Release Version: V1.9.5
 
-Release Date: 2020-12-17
+Release Date: 2020-12-29
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -81,6 +81,7 @@ This document (this guide) is mainly intended for:
 | V1.9.2 | CWW | 2020-12-02 | 1. Add AB system boot-up board config reference <br>2. introduced to U-Boot's tftp |
 | V1.9.3 | CWW | 2020-12-04 | 1. Add GPIO Precaution<br>2. Add introduction to starting face recognition function |
 | V1.9.4 | CWW | 2020-12-17 | 1. Add AB system for SPI NAND with 38 board config<br>2. Add introduction to flash SPI NOR Firmware.img |
+| V1.9.5 | CWW | 2020-12-29 | 1. Optimize typo<br>2. Remove some unused project |
 
 ---
 
@@ -96,7 +97,13 @@ This document (this guide) is mainly intended for:
 Please install software packages with below commands to set up a building environment:
 
 ```shell
-sudo apt-get install repo git-core gitk git-gui gcc-arm-linux-gnueabihf u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
+sudo apt-get install repo device-tree-compiler git-core u-boot-tools mtools \
+parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools \
+autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils \
+build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync \
+file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git \
+mercurial openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib \
+libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
 ```
 
 **Ubuntu 17.04 or later version system:**
@@ -131,7 +138,6 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 | ------------------------------ | --------------------------------------------------------                       |
 | external/recovery              | recovery                                                                       |
 | external/rkwifibt              | Wi-Fi and BT                                                                   |
-| external/libdrm                | DRM interface                                                                  |
 | external/rk_pcba_test          | PCBA test code                                                                 |
 | external/isp2-ipc              | Image signal processing server                                                 |
 | external/mpp                   | encoding and decoding                                                          |
@@ -319,7 +325,7 @@ SecureBootTool        | firmware signing tool
 efuseTool             | efuse flash tool
 RKDevInfoWriteTool    | serial number burning tool
 SDDiskTool            | sd card firmware create tool
-SpiImageTools         | burner upgrade tool
+SpiImageTools         | burner upgrade tool for eMMC (The document is in the package of FactoryTool)
 DriverAssitant        | rockchip pc driver for upgrade tool
 RKImageMaker          | firmware package tool (generate update.img)
 SpeakerPCBATool       | soundbox PCBA test tool
@@ -453,20 +459,17 @@ Lunch menu...pick a combo:
 2. BoardConfig-ab-v13.mk
 3. BoardConfig-battery-ipc.mk
 4. BoardConfig-facial_gate.mk
-5. BoardConfig-ramboot-uvc.mk
-6. BoardConfig-robot.mk
-7. BoardConfig-sl.mk
-8. BoardConfig-slc-nand-v12.mk
-9. BoardConfig-spi-nand.mk
-10. BoardConfig-spi-nor-tb-v13.mk
-11. BoardConfig-spi-nor-v12.mk
-12. BoardConfig-tb-v12.mk
-13. BoardConfig-tb-v13.mk
-14. BoardConfig-uvcc-spi-nand.mk
-15. BoardConfig-uvcc.mk
-16. BoardConfig-v10-v11.mk
-17. BoardConfig-v12.mk
-18. BoardConfig.mk
+5. BoardConfig-robot.mk
+6. BoardConfig-sl.mk
+7. BoardConfig-slc-nand-v12.mk
+8. BoardConfig-spi-nand.mk
+9. BoardConfig-spi-nor-tb-v13.mk
+10. BoardConfig-spi-nor-v12.mk
+11. BoardConfig-tb-v12.mk
+12. BoardConfig-tb-v13.mk
+13. BoardConfig-v10-v11.mk
+14. BoardConfig-v12.mk
+15. BoardConfig.mk
 Which would you like? [0]:
 switching to board: /home/rv1109/device/rockchip/rv1126_rv1109/BoardConfig.mk
 ```
