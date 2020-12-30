@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-362
 
-Release Version: V1.2.0
+Release Version: V1.3.0
 
-Release Date: 2020-06-11
+Release Date: 2020-12-30
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -58,11 +58,12 @@ Software development engineers
 
 **Revision History**
 
-| **Date**   | **Version** | **Author**  | **Revision History**        |
-| ---------- | ----------- | ----------- | --------------------------- |
-| 2019-02-20 | V1.0.0      | Cliff Chen  | Initial version             |
-| 2020-05-14 | V1.1.0      | Chris Zhong | Delete unnecessary chapters |
-| 2020-06-11 | V1.2.0      | Ruby Zhang  | Update the company name     |
+| **Date**   | **Version** | **Author**  | **Revision History**              |
+| ---------- | ----------- | ----------- | --------------------------------- |
+| 2019-02-20 | V1.0.0      | Cliff Chen  | Initial version                   |
+| 2020-05-14 | V1.1.0      | Chris Zhong | Delete unnecessary chapters       |
+| 2020-06-11 | V1.2.0      | Ruby Zhang  | Update the company name           |
+| 2020-12-30 | V1.3.0      | Jair Wu     | Add rootfs packaging instructions |
 
 ---
 
@@ -231,6 +232,10 @@ scons -h
 
 The purpose of firmware packaging is to package various firmwares required by the system, such as partition table, loader, OS and root file system. The firmware packaging script of RK2108 is: bsp/rockchip/rk2108/mkimage.sh. The current building script will automatically trigger the firmware packaging after building is completed, so you only need to execute the `./build.sh` command once to complete the building and packaging.
 
+### Rootfs Package
+
+The rootfs packaging script is: bsp/rockchip/rk2108/mkroot.sh, enter the directory bsp/rockchip/rk2108, excute `./mkroot.sh resource/userdata/normal board/common/setting.ini`, the root.img will be generated in Image/. The script will make the file or directory in the specified directory into a Fat format file system, the size of root.img is determined by the PartSize of root partition in setting.ini.
+
 ## Firmware Flash
 
 Before flashing the firmware, the board should be in upgrade mode. RK2108 supports two upgrade modes: Loader mode and MaskRom mode. The following are the ways to enter these 2 modes:
@@ -268,6 +273,10 @@ The first item“LoaderToDDR” select  bsp/rockchip/rk2108/Image/rk2108_db_load
 
 The second item “Firmware” select  bsp/rockchip/rk2108/Image/Firmware.img.
 
+![windows_upgrade_withroot](./resources/windows_upgrade_withroot_EN.png)
+
+If rootfs is needed, right-click the blank of the tool, add item, the Name is "rootfs", the Path is bsp/rockchip/rk2108/Image/root.img, the Address is the PartOffset of root partition in setting.ini under the board directory which you use (if the file not exist, the default choice is board/common/setting.ini), take board/common/setting.ini as example, the Address should be 0x1100.
+
 ### Linux Upgrade Tool and Command
 
 The following script can be used to complete the firmware flashing under the Linux system:
@@ -284,6 +293,18 @@ Actually, it called the following command to complete the flashing:
 ../tools/upgrade_tool wl 0 Image/Firmware.img
 ../tools/upgrade_tool rd
 ```
+
+If rootfs is needed, refer to these commands as follows:
+
+```shell
+#!/bin/sh
+../tools/upgrade_tool db Image/rk2108_db_loader.bin
+../tools/upgrade_tool wl 0 Image/Firmware.img
+../tools/upgrade_tool wl 0x1100 Image/root.img
+../tools/upgrade_tool rd
+```
+
+Please refer to [Windows Upgrade Tool](# Windows Upgrade Tool) for the description of the address.
 
 ## Run and Debug
 

@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-362
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-06-11
+日期：2020-12-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -64,11 +64,12 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者**    | **修改说明** |
-| ---------- | -------- | ----------- | ------------ |
-| 2019-02-20 | V1.0.0   | Cliff Chen  | 初始版本     |
-| 2020-05-14 | V1.1.0   | Chris Zhong | 删除冗余章节 |
-| 2020-06-11 | V1.2.0   | Ruby Zhang  | 更新公司名称 |
+| **日期**   | **版本** | **作者**    | **修改说明**         |
+| ---------- | -------- | ----------- | -------------------- |
+| 2019-02-20 | V1.0.0   | Cliff Chen  | 初始版本             |
+| 2020-05-14 | V1.1.0   | Chris Zhong | 删除冗余章节         |
+| 2020-06-11 | V1.2.0   | Ruby Zhang  | 更新公司名称         |
+| 2020-12-30 | V1.3.0   | Jair Wu     | 新增文件系统打包说明 |
 
 ---
 
@@ -237,6 +238,10 @@ scons -h
 
    固件打包是为了把系统需要的各种固件打包在一起，如分区表、loader、OS和根文件系统，RK2108 的固件打包脚本是：bsp/rockchip/rk2108/mkimage.sh 。目前的编译脚本在编译完成后会自动触发固件打包，因此只需执行一次 ./build.sh 命令即可完成编译和打包。
 
+### 文件系统打包
+
+文件系统打包脚本是：bsp/rockchip/rk2108/mkroot.sh，进入bsp/rockchip/rk2108目录下，执行`./mkroot.sh resource/userdata/normal board/common/setting.ini`，即会在Image目录下生成root.img文件。该脚本将指定目录下的文件或目录制作成Fat格式的文件系统，大小为setting.ini中设定的root分区PartSize的值。
+
 ## 固件烧录
 
    在烧录固件前，需要让板子进入到升级模式，RK2108 支持两种升级模式：Loader 模式和 MaskRom 模式。下面是进入到2种模式的方法：
@@ -268,11 +273,15 @@ scons -h
 
    打开 bsp/rockchip/tools 目录下的 Rockchip_Develop_Tool_v2.63，如首次使用此工具，需要安装它目录下的驱动：DriverAssitant_v4.91。打开升级工具：
 
-![windows_upgrade](./resources/windows_upgrade.png)
+![windows_upgrade](./resources/windows_upgradeCN.png)
 
 第1项“LoaderToDDR”选择 bsp/rockchip/rk2108/Image/rk2108_db_loader.bin。
 
 第2项“Firmware”选择 bsp/rockchip/rk2108/Image/Firmware.img。
+
+![windows_upgrade_withroot_CN](./resources/windows_upgrade_withroot_CN.png)
+
+若有烧录文件系统的需要，可在工具空白处右键，添加项，名字为“rootfs”，路径为bsp/rockchip/rk2108/Image/root.img，地址为所使用的board目录下setting.ini中root分区的PartOffset（若文件不存在则默认为board/common/setting.ini），以board/common/setting.ini为例，烧录地址为0x1100。
 
 ### Linux版烧录工具及命令
 
@@ -290,6 +299,18 @@ bsp/rockchip/rk2108/update_fimeware.sh
 ../tools/upgrade_tool wl 0 Image/Firmware.img
 ../tools/upgrade_tool rd
 ```
+
+若有烧录文件系统的需要，参考如下命令：
+
+```shell
+#!/bin/sh
+../tools/upgrade_tool db Image/rk2108_db_loader.bin
+../tools/upgrade_tool wl 0 Image/Firmware.img
+../tools/upgrade_tool wl 0x1100 Image/root.img
+../tools/upgrade_tool rd
+```
+
+烧录地址说明见 [Windows版升级工具](# Windows版升级工具)。
 
 ## 运行调试
 
