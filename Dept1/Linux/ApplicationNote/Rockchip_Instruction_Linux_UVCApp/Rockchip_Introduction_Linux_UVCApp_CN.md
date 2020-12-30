@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-520
 
-发布版本：V1.4.0
+发布版本：V1.5.0
 
-日期：2020-11-04
+日期：2020-12-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -72,6 +72,7 @@ Rockchip Electronics Co., Ltd.
 | V1.2.0     | 林其浩/黄建财 | 2020-07-13   | 添加扩展功能和h265支持章节 |
 | V1.3.0     | 黄建财   | 2020-10-01   | 添加UVC PTZ/H265等接口说明 |
 | V1.4.0 | 黄建财 | 2020-11-04 | FAQ添加MAC OS低版本兼容性处理 |
+| V1.5.0 | 黄建财、李鑫煌 | 2020-12-30 | 1.添加OSD功能说明 <br />2.修改部分描述 <br />3.FAQ添加RK工具识别支持方法 <br />4.添加新的调试方法 |
 | | | | |
 
 ---
@@ -197,19 +198,20 @@ uvc_app实现了完整的UVC device的功能，包括配置、预览、切换、
 
 ## 流程框图
 
-![uvc](resource/uvc.png)
+![uvc](./resources/uvc.png)
 
 ## 扩展功能
 
 ### RV1126/RV1109 UVC XU扩展协议
 
-rv1126/1109 camera实现了UVC标准扩展单元请求控制，可进行host端与camera端的自定义XU命令控制。目前已预置的控制请求包括以下类型，其中CMD_GET_CAMERA_VERSION、CMD_SET_CAMERA_IP、CMD_SET_EPTZ有进行相关处理，其余指令预留，客户可根据需求进行开发。
+rv1126/1109 camera实现了UVC标准扩展单元请求控制，可进行host端与camera端的自定义XU命令控制。目前已预置的控制请求包括以下类型，其中CMD_TOOLS_CTRL_1、CMD_GET_CAMERA_VERSION、CMD_SET_CAMERA_IP、CMD_SET_EPTZ有进行相关处理，其余指令预留，客户可根据需求进行开发。
 
 ```
 enum XuCmd {
-    CMD_GET_CAMERA_VERSION = 0x01,  //获取摄像头版本
+    CMD_TOOLS_CTRL_1 = 0x01,  //RK工具通信指令，如loader切换功能
+    CMD_GET_CAMERA_VERSION ,  //获取摄像头版本
     CMD_SET_CAMERA_IP,              //获取网络IP
-    CMD_START_CAMERA,               //启动摄像头
+    //CMD_START_CAMERA,               //启动摄像头
     CMD_SHUTDOWN_CAMERA,            //关闭摄像头
     CMD_RESET_CAMERA,               //重启摄像头
     CMD_SET_MOTOR_RATE = 0x06,      //摄像头舵机/电机控制预留接口
@@ -217,7 +219,8 @@ enum XuCmd {
     CMD_SET_MOTOR_BY_USER = 0x08,   //摄像头舵机/电机控制预留接口
     CMD_STOP_MOTOR_BY_USER = 0x09,  //摄像头舵机/电机控制预留接口
     CMD_SET_EPTZ = 0x0a,            //EPTZ功能使能控制
-    CMD_MAX_NUM = CMD_SET_EPTZ,
+    CMD_SET_H265 = 0x0b,            //H265切换
+    CMD_MAX_NUM = CMD_SET_H265,
 };
 ```
 
@@ -259,7 +262,7 @@ bmControls               : 0x07
 
 AUTO EPTZ是指通过软件手段，结合智能识别技术实现预览界面的“数字平移 - 倾斜 - 缩放/变焦”功能。RV1126/RV1109 UVC Camera方案，该功能默认已支持，其实现流程框图大致如下：
 
-![uvc](resource/eptz.png)
+![eptz](./resources/eptz.png)
 
 其最终的显示效果，遵循以下策略：
 
@@ -358,7 +361,110 @@ EPTZ是在上述PTZ接口中通过软件来处理，达到类似电机控制画�
 
 windows pc上amcap软件中调试窗口显示如图
 
-![1600823441510](resource\ptz.png)
+![ptz](./resources/ptz.png)
+
+### UVC OSD接口说明
+
+V1.28版本以上已实现预览OSD功能，目前支持水印功能，暂只支持32bit ARGB bmp图片水印：
+
+![osd](./resources/uvc_osd.jpg)
+
+目前支持MJPEG/H264/H265格式下水印功能，其中MJPEG使用RGA接口处理叠加，其它两种格式直接调用编码库接口实现，另外YUV格式默认不支持，客户有需要自行参考MJPEG中实现移植添加支持。
+
+1.打开OSD方法：需要将代码跟conf使能都打开。
+
+```c
+代码使能：uvc/mpp_osd.h中使能MPP_ENC_OSD_ENABLE
+        #define MPP_ENC_OSD_ENABLE 1
+conf使能:mpp_enc_cfg.conf中以下内容，enable的off改为on即可。
+        "osd" : {
+            "enable": "off",
+            ...
+        }
+```
+
+2.水印conf说明:
+
+```json
+"osd" : {
+            "enable": "off", //水印使能
+            "count": 2, //水印个数,最多支持8个
+            "plt_user": 1,//是否使用用户自定义画板，代码中可以增加画板定义
+            "osd_0": { //水印1参数
+                "type" :"picture",//水印1类型
+                "enable" : "on",//水印1默认是否打开
+                "1280*720": {//水印1 预览分辨率1280*720时参数
+                    "path" : "/data/osd_0.bmp",//水印1 1280*720时图片路径,长度不要超过32字节，图片宽高需要16位对齐
+                    "start_x": 0.65,//水印1 1280*720时起始位置x（0-1），1280*x，会自动16位对齐
+                    "start_y": 0.85//水印1 1280*720时起始位置y（0-1），720*y，会自动16位对齐
+                },
+                "1920*1080": {//水印1 预览分辨率1920*1080时参数
+                    "path" : "/data/osd_0.bmp",
+                    "start_x": 0.75,
+                    "start_y": 0.9
+                },
+                "3840*2160": {//水印1 预览分辨率3840*2160时参数
+                    "path" : "/data/osd_0.bmp",
+                    "start_x": 0.8,
+                    "start_y": 0.8
+                },
+                //可以随意增加其他分辨率如“640*480” “320*240”
+                "common": {//水印1预览分辨率其他分辨率时参数
+                    "path" : "/data/osd_0.bmp",
+                    "start_x": 0.8,
+                    "start_y": 0.8
+                }
+            },
+            "osd_1": {//水印2参数，具体同水印1。
+                "type" :"picture",
+                "enable" : "on",
+                "1280*720": {
+                    "path" : "/data/osd_1.bmp",
+                    "start_x": 0.0,
+                    "start_y": 0.0
+                },
+                "1920*1080": {
+                    "path" : "/data/osd_1.bmp",
+                    "start_x": 0.0,
+                    "start_y": 0.0
+                },
+                "3840*2160": {
+                    "path" : "/data/osd_1.bmp",
+                    "start_x": 0.0,
+                    "start_y": 0.0
+                },
+                "common": {
+                    "path" : "/data/osd_1.bmp",
+                    "start_x": 0.0,
+                    "start_y": 0.0
+                }
+            }
+```
+
+**注意：**osd图片目前仅支持32bit透明背景bmp图片，需要客户自行转换好bmp素材，配置好conf
+
+3.mpp osd接口使能控制伪代码 ，具体使用代码见mpp_osd.c
+
+```c
+获取水印总使能状态x：
+x=mpp_osd_enable_get(p);
+设置水印总使能状态x：
+mpp_osd_enable_set(p, x);
+获取水印x(0-7)使能状态y：
+y=mpp_osd_region_id_enable_get(p, x);
+设置水印x(0-7)使能状态y：
+mpp_osd_region_id_enable_set(p, x, y);
+```
+
+4.mpp osd接口画板使用
+
+```wiki
+1、plt_user为0时为默认画板，使用mpp_osd.c中u32DftARGB8888ColorTbl，无需修改
+2、plt_user为1时为用户自定义画板，使用mpp_osd.c中u32DftARGB8888ColorTblUser。
+修改方式：
+从argb图像中获取水印的各颜色分量数值，如透明色a:0x00 r:0xff g:0xff b:0xff
+则可以将u32DftARGB8888ColorTblUser数组的一个数值修改为0x00ffffff；其他颜色同这个方式进行修改即可。比如水印只有3个颜色，只需要修改前面三个数值。
+```
 
 ## 调试方法介绍
 
@@ -394,7 +500,7 @@ rm /tmp/uvc_enc_out
 
 录制的数据会保存在data/uvc_enc_out.bin,可pull出来用对应解码软件查看数据。
 
-### 全通路Quantization确认
+### full/limit range调试
 
 下面debug方法可用来测试host端通路是full range还是limit range，对于isp效果调试比较重要：
 
@@ -405,6 +511,51 @@ rm /tmp/uvc_enc_out
 2.打开camera 1080p分辨率可以看到host端显示特殊的灰阶图；
 
 3.观察0和1如果颜色一致则是limit，颜色有区别则为full。
+
+### uvc+aiserver帧率
+
+打开查看命令：
+
+```shell
+touch /tmp/uvc_ipc_fps
+```
+
+关闭查看命令 :
+
+```shell
+rm /tmp/uvc_ipc_fps
+```
+
+### uvc+aiserver通信状态查看
+
+打开查看命令：
+
+```shell
+touch /tmp/uvc_ipc_state
+```
+
+如下log：
+ send state:4, recv state:4
+如果两者一直都是状态4，说明aiserver没有送图给uvc。
+关闭查看命令 :
+
+```shell
+rm /tmp/uvc_ipc_state
+```
+
+### uvc日志打印等级调整
+
+修改环境变量：
+
+```shell
+export uvc_app_log_level=x
+
+x=0 mean err
+x=1 mean warn
+x=2 mean info
+x=3 mean debug
+recommended setting x=2
+```
 
 ## FAQ
 
@@ -579,7 +730,7 @@ index 05dea30..4cc783c 100755
 
 ### 如何修改 XU指令支持16个
 
-SDK默认XU扩展指令只支持3条，但EPTZ控制指令为0x0a,因此若使用SDK默认指令定义，需修改kernel进行适配。
+SDK默认XU扩展指令只开启3条，支持8个扩展指令，若产品要求支持更多指令如16个，可以参考下面补丁修改kernel进行适配。
 
 ```diff
 --- a/drivers/usb/gadget/function/f_uvc.c
@@ -618,7 +769,8 @@ SDK默认XU扩展指令只支持3条，但EPTZ控制指令为0x0a,因此若使�
         ed->guidExtensionCode[13] = 0xff;
         ed->guidExtensionCode[14] = 0x00;
         ed->guidExtensionCode[15] = 0x3b;
-        ed->bNumControls = 3;
+-       ed->bNumControls = 3;
++       ed->bNumControls = 0x10;      //和下面bmControls数组匹配，开启16个指令功能，uvc app中有实现几个指令功能就开启几个，没实现的指令位置建议关闭，避免兼容问题
         ed->bNrInPins = 1;
         ed->baSourceID[0] = 2;
 -       ed->bControlSize = 1;
@@ -889,3 +1041,21 @@ index 8d0af97..efcc181 100755
    #echo 1 > /sys/kernel/config/usb_gadget/rockchip/functions/uvc.gs6/streaming_bulk
 ```
 
+### 如何支持RKDevTool识别UVC点击切换到loader
+
+最新版本已默认适配RKDevTool XU扩展指令功能，支持RKDevTool识别到UVC设备，并支持点击工具上切换按钮自动切换到loader烧录模式，方便客户烧写。
+
+RKDevTool 默认代码中预置的UVC设备pid为0x0016，vid为0x2207，若客户机器有修改默认的pid和vid，需要添加到RKDevTool 工具目录下的config.ini中，修改保存后重新打开工具：
+
+```ini
+[System]
+#自定义Msc VID和PID,值十六进制,例:MSC_VID=0x0BB4,MSC_PID=0x0C01
+MSC_VID=
+MSC_PID=
+ADB_VID=0x2207
+ADB_PID=0x0046
+MTP_VID=
+MTP_PID=
+UVC_VID=0x2207
+UVC_PID=0x0020
+```
