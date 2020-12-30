@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-388
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2020-09-23
+日期：2020-12-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -62,9 +62,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本号** | **作者** | **修改日期** | **修改说明** |
-| ---------- | -------- | :----------- | ------------ |
-| V1.0.0     | 陈茂森   | 2020-09-23   | 初始版本     |
+| **版本号** | **作者** | **修改日期** | **修改说明**     |
+| ---------- | -------- | :----------- | ---------------- |
+| V1.0.0     | 陈茂森   | 2020-09-23   | 初始版本         |
+| V1.1.0     | 陈茂森   | 2020-12-30   | 增加常用修改示例 |
 
 ---
 
@@ -74,16 +75,15 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 编译
+## 工具路径及使用环境
 
-说明：如下演示不使用buildroot编译dbtool方法。
+【路径】
 
-```shell
-# 在dbtool目录下
-mkdir build && cd build # 新建目录管理build文件
-cmake .. # cmake
-make # 在build目录生成dbtool工具
-```
+工具位于app/dbserver/dbtool 目录下。
+
+【使用环境】
+
+工具仅支持Ubuntu下使用。
 
 ## 命令介绍
 
@@ -143,7 +143,7 @@ json文件规范化：--mode js2js / -m js2js。
 
 在DBTool运行模式设置为db文件转json文件或时json文件规范化时，增加 --string | -s可进入字符模式。
 
-## 使用实例
+## 使用示例
 
 以下实例均为在linux环境下使用，DBTool 文件名为dbtool。
 
@@ -1208,6 +1208,79 @@ item：可选项，子单元；
     }
 }
 ```
+
+## 常用修改
+
+### db文件SDK路径
+
+| **产品**           | **路径**                                         |
+| ------------------ | ------------------------------------------------ |
+| 闸机               | device/rockchip/oem/oem_facial_gate/sysconfig.db |
+| 2K分辨率IPC产品    | device/rockchip/oem/oem_ipc/sysconfig-2K.db      |
+| 4K分辨率IPC产品    | device/rockchip/oem/oem_ipc/sysconfig-4K.db      |
+| 1080P分辨率IPC产品 | device/rockchip/oem/oem_ipc/sysconfig-1080P.db   |
+
+### 修改方法
+
+使用[json转db](#json转db)， 生成db文件对应json，修改所需修改参数，使用[db转json](#db转json)，换原有db，并通过下列方法重新编译。
+
+```shell
+# 在SDK根目录，执行下列命令，重编oem，重新烧入oem以及userdata
+make rk_oem-dirclean && make rk_oem target-finalize
+./mkfirmware.sh
+```
+
+**注意：需重新烧写userdata分区，否则新数据库将不会生效。**
+
+### Wi-Fi默认启用
+
+【修改表名】
+
+NetworkPower。
+
+【参数修改】
+
+修改Wi-Fi对应数据单元中的iPower为1。
+
+【能力集修改】
+
+无能力集。
+
+### 分辨率修改
+
+【修改表名】
+
+video。
+
+【参数修改】
+
+由sStreamType确定修改的码流，sResolution为默认分辨率。
+
+【能力集修改】
+
+修改[能力集表](#能力集简介)中，video/dynamic/sStreamType/<对应码流>/sResolution/options。
+
+### ISP参数修改
+
+【修改表名】
+
+| **表名**               | **Web对应功能**        |
+| ---------------------- | ---------------------- |
+| image_adjustment       | 配置/显示设置/图像调节 |
+| image_exposure         | 配置/显示设置/曝光     |
+| image_night_to_day     | 配置/显示设置/日夜转换 |
+| image_blc              | 配置/显示设置/背光     |
+| image_white_blance     | 配置/显示设置/白平衡   |
+| image_enhancement      | 配置/显示设置/图像增强 |
+| image_video_adjustment | 配置/显示设置/视频调整 |
+
+【参数修改】
+
+参考web界面修改对应属性。
+
+【能力集修改】
+
+不推荐修改。
 
 ## 命名规范
 
