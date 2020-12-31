@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.5
+Release Version: V1.9.6
 
-Release Date: 2020-12-29
+Release Date: 2020-12-31
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -82,6 +82,7 @@ This document (this guide) is mainly intended for:
 | V1.9.3 | CWW | 2020-12-04 | 1. Add GPIO Precaution<br>2. Add introduction to starting face recognition function |
 | V1.9.4 | CWW | 2020-12-17 | 1. Add AB system for SPI NAND with 38 board config<br>2. Add introduction to flash SPI NOR Firmware.img |
 | V1.9.5 | CWW | 2020-12-29 | 1. Optimize typo<br>2. Remove some unused project |
+| V1.9.6 | CWW | 2020-12-31 | 1. Add uboot use tftp to upgrage loader partition |
 
 ---
 
@@ -1066,6 +1067,16 @@ done
 Bytes transferred = 2228224 (220000 hex)
 =>
 ```
+
+##### Upgrede loader with tftp for eMMC storage
+
+![](resources/tftp-eMMC-download-loader.png)
+
+##### Upgrede loader with tftp for SPI NAND storage
+
+![](resources/tftp-SPI-NAND-download-loader.png)
+
+NOTICE: SLC NAND is not support tftp download idblock.bin to upgrade loader temporarily.
 
 ## Smart USB Camera Product
 

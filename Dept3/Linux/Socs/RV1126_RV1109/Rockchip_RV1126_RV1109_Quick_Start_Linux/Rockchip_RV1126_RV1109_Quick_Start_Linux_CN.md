@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.5
+发布版本：V1.9.6
 
-日期：2020-12-29
+日期：2020-12-31
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -87,6 +87,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.3 | CWW | 2020-12-04 | 1. 增加GPIO使用注意事项<br>2. 增加开启人脸识别功能说明 |
 | V1.9.4 | CWW | 2020-12-17 | 1. 增加38板SPI NAND AB系统板级参考<br>2. 增加SPI NOR烧录Firmware.img说明 |
 | V1.9.5 | CWW | 2020-12-29 | 1. 优化排版<br>2. 删除一些不用的工程 |
+| V1.9.6 | CWW | 2020-12-31 | 1. 增加uboot使用tftp更新loader分区 |
 
 ---
 
@@ -1069,6 +1070,16 @@ done
 Bytes transferred = 2228224 (220000 hex)
 =>
 ```
+
+##### eMMC通过tftp烧录loader的方法
+
+![](resources/tftp-eMMC-download-loader.png)
+
+##### SPI NAND通过tftp烧录loader的方法
+
+![](resources/tftp-SPI-NAND-download-loader.png)
+
+注：SLC NAND暂时不支持使用tftp下载idblock.bin的方式升级。
 
 ## 智能USB Camera产品配置
 
