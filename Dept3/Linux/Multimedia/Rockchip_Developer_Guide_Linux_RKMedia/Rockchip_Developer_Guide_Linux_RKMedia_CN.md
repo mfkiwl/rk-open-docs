@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.2.0
+发布版本：V1.2.1
 
-日期：2020-12-17
+日期：2021-01-05
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ Rockchip Electronics Co., Ltd.
 | V1.1.0 | 范立创 /陈茂森 | 2020-11-18 | 1.增加API说明：<br />（1）[RK_MPI_MB_CreateBuffer](#RK_MPI_MB_CreateBuffer)<br />（2）[RK_MPI_MB_CreateImageBuffer](#RK_MPI_MB_CreateImageBuffer)<br />（3）[RK_MPI_MB_CreateAudioBuffer](#RK_MPI_MB_CreateAudioBuffer)<br />（4）[RK_MPI_MB_ConvertToImgBuffer](#RK_MPI_MB_ConvertToImgBuffer)<br />（5）[RK_MPI_MB_ConvertToAudBuffer](#RK_MPI_MB_ConvertToAudBuffer)<br />（6）[RK_MPI_MB_SetSzie](#RK_MPI_MB_SetSzie)<br />（7）[RK_MPI_MB_SetTimestamp](#RK_MPI_MB_SetTimestamp)<br />（8）[RK_MPI_MB_GetFlag](#RK_MPI_MB_GetFlag)<br />（9）[RK_MPI_MB_GetTsvcLevel](#RK_MPI_MB_GetTsvcLevel)<br />（10）[RK_MPI_MB_IsViFrame](#RK_MPI_MB_IsViFrame)<br />（11）[RK_MPI_MB_GetImageInfo](#RK_MPI_MB_GetImageInfo)<br />（12）[RK_MPI_MB_BeginCPUAccess](#RK_MPI_MB_BeginCPUAccess)<br />（13）[RK_MPI_MB_EndCPUAccess](#RK_MPI_MB_EndCPUAccess)<br />（14）[RK_MPI_VI_StartRegionLuma](#RK_MPI_VI_StartRegionLuma)<br />（15）[RK_MPI_VI_StopRegionLuma](#RK_MPI_VI_StopRegionLuma)<br />（16）[RK_MPI_VENC_GetVencChnAttr](#RK_MPI_VENC_GetVencChnAttr)<br />（17）[RK_MPI_VENC_SetVencChnAttr](#RK_MPI_VENC_SetVencChnAttr)<br />（18）[RK_MPI_VENC_CreateJpegLightChn](#RK_MPI_VENC_CreateJpegLightChn)<br />（19）[RK_MPI_VENC_GetRcParam](#RK_MPI_VENC_GetRcParam)<br />（20）[RK_MPI_VENC_SetResolution](#RK_MPI_VENC_SetResolution)<br />（21）[RK_MPI_VENC_GetRoiAttr](#RK_MPI_VENC_GetRoiAttr)<br />（22）[RK_MPI_VENC_RGN_SetPaletteId](#RK_MPI_VENC_RGN_SetPaletteId)<br />（23）[RK_MPI_VENC_GetFd](#RK_MPI_VENC_GetFd)<br />（24）[RK_MPI_VENC_QueryStatus](#RK_MPI_VENC_QueryStatus)<br />（25）[RK_MPI_ALGO_MD_EnableSwitch](#RK_MPI_ALGO_MD_EnableSwitch)<br />（26）[RK_MPI_ALGO_OD_EnableSwitch](#RK_MPI_ALGO_OD_EnableSwitch)<br />（27）[RK_MPI_VO_SetChnAttr](#RK_MPI_VO_SetChnAttr)<br />（28）[RK_MPI_AI_StartStream](#RK_MPI_AI_StartStream)<br />（29）[RK_MPI_AO_QueryChnStat](#RK_MPI_AO_QueryChnStat)<br />（30）[RK_MPI_AO_ClearChnBuf](#RK_MPI_AO_ClearChnBuf)<br />（31）[RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)<br />（32）[RK_MPI_SYS_StopGetMediaBuffer](#RK_MPI_SYS_StopGetMediaBuffer)<br />（33）[RK_MPI_VDEC_CreateChn](#RK_MPI_VDEC_CreateChn)<br />（34）[RK_MPI_VDEC_DestroyChn](#RK_MPI_VDEC_DestroyChn)<br />2.修改API：[RK_MPI_VO_CreateChn](#RK_MPI_VO_CreateChn)<br />3.[新增示例说明板块](#示例) |
 | V1.1.1 | 陈茂森 | 2020-12-08 | 修正VI工作模式个数错误 |
 | V1.2.0 | 陈茂森/林刘迪铭 | 2020-12-17 | 1.优化语言描述<br />2.增加[编译说明](#编译说明)<br />3.增加API说明：<br />（1）[RK_MPI_LOG_SetLevelConf](#RK_MPI_LOG_SetLevelConf)<br />（2）[RK_MPI_LOG_GetLevelConf](#RK_MPI_LOG_GetLevelConf) |
+| V1.2.1 | 范立创/张伦霞 | 2021-01-05 | 1.修复错误代码<br />2.修复示例描述错误<br />3.更新示例参数说明 |
 
 ---
 
@@ -1166,7 +1167,7 @@ RK_S32 RK_MPI_MB_GetFlag([MEDIA_BUFFER](#MEDIA_BUFFER) mb);
 
 【描述】
 
-从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取TSVC等级。TSVC表示时间维度上的SVC，启用TSVC功能后，码流将分三个Level：L0、L1、L2。高等级的编码帧需要依赖低等级编码帧才能解码（如L2依赖L1、L0；L1依赖L0），而低等级的变编码帧可独立解码（L0可独立解码，L1、L0可独立于L2进行解码）。比如60fps的视频，如果只解码L1、L0，则会获得一个30fps的视频，如果只解码L0，则获得一个15fps的视频。
+从指定的[MEDIA_BUFFER](#MEDIA_BUFFER)中获取TSVC等级。TSVC表示时间维度上的SVC，启用TSVC功能后，码流将分三个Level：L0、L1、L2。高等级的编码帧需要依赖低等级编码帧才能解码（如L2依赖L1、L0；L1依赖L0），而低等级的编码帧可独立解码（L0可独立解码，L1、L0可独立于L2进行解码）。比如60fps的视频，如果只解码L1、L0，则会获得一个30fps的视频，如果只解码L0，则获得一个15fps的视频。
 
 【语法】
 
@@ -3837,7 +3838,7 @@ typedef struct rkVENC_ATTR_S {
 【定义】
 
 ```c
-typedef struct hiVENC_MJPEG_CBR_S {
+typedef struct rkVENC_MJPEG_CBR_S {
   RK_U32 u32SrcFrameRateNum;
   RK_U32 u32SrcFrameRateDen;
   RK_FR32 fr32DstFrameRateNum;
@@ -3865,7 +3866,7 @@ typedef struct hiVENC_MJPEG_CBR_S {
 【定义】
 
 ```c
-typedef struct hiVENC_MJPEG_VBR_S {
+typedef struct rkVENC_MJPEG_VBR_S {
   RK_U32 u32SrcFrameRateNum;
   RK_U32 u32SrcFrameRateDen;
   RK_FR32 fr32DstFrameRateNum;
@@ -4286,7 +4287,7 @@ ROI 区域参数。
 【定义】
 
 ```c
-typedef struct hiVENC_ROI_ATTR_S {
+typedef struct rkVENC_ROI_ATTR_S {
   RK_U32 u32Index; // RW; Range:[0, 7]; Index of an ROI. The system supports
                    // indexes ranging from 0 to 7
   RK_BOOL bEnable; // RW; Range:[0, 1]; Whether to enable this ROI
@@ -5646,7 +5647,7 @@ RK_S32 RK_MPI_AI_EnableChn([AI_CHN](#AI_CHN) AiChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -5687,7 +5688,7 @@ RK_S32 RK_MPI_AI_DisableChn([AI_CHN](#AI_CHN) AiChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -5728,7 +5729,7 @@ RK_S32 RK_MPI_AI_SetChnAttr([AI_CHN](#AI_CHN) AiChn, const [AI_CHN_ATTR_S](#AI_C
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | pstAttr  | AI 通道属性指针。                                            | 输入      |
 
 【返回值】
@@ -5770,7 +5771,7 @@ RK_S32 RK_MPI_AI_SetVolume([AI_CHN](#AI_CHN) AiChn, RK_S32 s32Volume);
 
 | 参数名称  | 描述                                                         | 输入/输出 |
 | --------- | ------------------------------------------------------------ | --------- |
-| AiChn     | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn     | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | s32Volume | 音频输入通道音量大小。取值范围：[0, 100]。                   | 输入      |
 
 【返回值】
@@ -5812,7 +5813,7 @@ RK_S32 RK_MPI_AI_GetVolume([AI_CHN](#AI_CHN) AiChn, RK_S32 *ps32Volume);
 
 | 参数名称   | 描述                                                         | 输入/输出 |
 | ---------- | ------------------------------------------------------------ | --------- |
-| AiChn      | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn      | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | ps32Volume | 音频输入通道音量大小。                                       | 输出      |
 
 【返回值】
@@ -5854,7 +5855,7 @@ RK_S32 RK_MPI_AI_SetTalkVqeAttr([AI_CHN](#AI_CHN) AiChn, [AI_TALKVQE_CONFIG_S](#
 
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
-| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | pstVqeConfig | 音频输入声音质量增强配置结构体指针。                         | 输入      |
 
 【返回值】
@@ -5896,7 +5897,7 @@ RK_S32 RK_MPI_AI_GetTalkVqeAttr([AI_CHN](#AI_CHN) AiChn, [AI_TALKVQE_CONFIG_S](#
 
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
-| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | pstVqeConfig | 音频输入声音质量增强配置结构体指针。                         | 输出      |
 
 【返回值】
@@ -5938,7 +5939,7 @@ RK_S32 RK_MPI_AI_SetRecordVqeAttr([AI_CHN](#AI_CHN) AiChn, [AI_RECORDVQE_CONFIG_
 
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
-| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | pstVqeConfig | 音频输入声音质量增强配置结构体指针。                         | 输入      |
 
 【返回值】
@@ -5980,7 +5981,7 @@ RK_S32 RK_MPI_AI_GetRecordVqeAttr([AI_CHN](#AI_CHN) AiChn, [AI_RECORDVQE_CONFIG_
 
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
-| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn        | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 | pstVqeConfig | 音频输入声音质量增强配置结构体指针。                         | 输出      |
 
 【返回值】
@@ -6022,7 +6023,7 @@ RK_S32 RK_MPI_AI_EnableVqe([AI_CHN](#AI_CHN) AiChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6063,7 +6064,7 @@ RK_S32 RK_MPI_AI_DisableVqe([AI_CHN](#AI_CHN) AiChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6104,7 +6105,7 @@ RK_S32 RK_MPI_AI_StartStream([AI_CHN](#AI_CHN) AiChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM))。 | 输入      |
+| AiChn    | 音频输入通道号。取值范围：[0, [AI_MAX_CHN_NUM](#AI_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6147,7 +6148,7 @@ RK_S32 RK_MPI_AO_EnableChn([AO_CHN](#AO_CHN) AoChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6188,7 +6189,7 @@ RK_S32 RK_MPI_AO_DisableChn([AO_CHN](#AO_CHN) AoChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6229,7 +6230,7 @@ RK_S32 RK_MPI_AO_SetChnAttr([AO_CHN](#AO_CHN) AoChn, const [AO_CHN_ATTR_S](#AO_C
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 | pstAttr  | 音频输出通道属性指针。                                       | 输入      |
 
 【返回值】
@@ -6271,7 +6272,7 @@ RK_S32 RK_MPI_AO_SetVolume([AO_CHN](#AO_CHN) AoChn, RK_S32 s32Volume);
 
 | 参数名称  | 描述                                                         | 输入/输出 |
 | --------- | ------------------------------------------------------------ | --------- |
-| AoChn     | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn     | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 | s32Volume | 音频输出通道音量大小。取值范围：[0, 100]。                   | 输入      |
 
 【返回值】
@@ -6313,7 +6314,7 @@ RK_S32 RK_MPI_AO_GetVolume([AO_CHN](#AO_CHN) AoChn, RK_S32 *ps32Volume);
 
 | 参数名称   | 描述                                                         | 输入/输出 |
 | ---------- | ------------------------------------------------------------ | --------- |
-| AoChn      | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn      | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 | ps32Volume | 音频输出通道音量大小。                                       | 输出      |
 
 【返回值】
@@ -6355,7 +6356,7 @@ RK_S32 RK_MPI_AO_SetVqeAttr([AO_CHN](#AO_CHN) AoChn, [AO_VQE_CONFIG_S](#AO_VQE_C
 
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
-| AoChn        | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn        | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 | pstVqeConfig | 音频输出声音质量增强配置结构体指针。                         | 输入      |
 
 【返回值】
@@ -6397,7 +6398,7 @@ RK_S32 RK_MPI_AO_GetVqeAttr([AO_CHN](#AO_CHN) AoChn, [AO_VQE_CONFIG_S](#AO_VQE_C
 
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
-| AoChn        | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn        | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 | pstVqeConfig | 音频输出声音质量增强配置结构体指针。                         | 输出      |
 
 【返回值】
@@ -6439,7 +6440,7 @@ RK_S32 RK_MPI_AO_EnableVqe([AO_CHN](#AO_CHN) AoChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6480,7 +6481,7 @@ RK_S32 RK_MPI_AO_DisableVqe([AO_CHN](#AO_CHN) AoChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -6521,7 +6522,7 @@ RK_S32 RK_MPI_AO_QueryChnStat([AO_CHN](#AO_CHN) AoChn, [AO_CHN_STATE_S](#AO_CHN_
 
 | 参数名称  | 描述                                                         | 输入/输出 |
 | --------- | ------------------------------------------------------------ | --------- |
-| AoChn     | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn     | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 | pstStatus | 状态信息结构体指针。                                         | 输出      |
 
 【返回值】
@@ -6563,7 +6564,7 @@ RK_S32 RK_MPI_AO_ClearChnBuf([AO_CHN](#AO_CHN) AoChn);
 
 | 参数名称 | 描述                                                         | 输入/输出 |
 | -------- | ------------------------------------------------------------ | --------- |
-| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM))。 | 输入      |
+| AoChn    | 音频输出通道号。取值范围：[0, [AO_MAX_CHN_NUM](#AO_MAX_CHN_NUM)]。 | 输入      |
 
 【返回值】
 
@@ -7793,11 +7794,11 @@ cat /proc/mpp_service/session_summary
 以下提供功能示例，使用注意事项如下：
 
 1. 运行示例前需保证无其他应用占用示例所用节点，如mediaserver。
-2. 运行ISP相关示例时，需保证无其他ISP应用运行，如ispserver。
+2. 若后台运行了ispserver，则不能使用-a参数；若后台无ispserver则必须使用-a参数。
+3. 运行ISP相关示例时，需保证无其他ISP应用运行，如ispserver。
+4. 示例默认参数适配我司EVB，硬件不同时示例可能需要显式指定参数或调整代码。
 
-### 音频类示例
-
-#### rkmedia_ai_test
+### rkmedia_ai_test
 
 【说明】
 
@@ -7826,7 +7827,7 @@ external/rkmedia/examples/rkmedia_ai_test.c
 
 示例仅支持保存至pcm文件。格式为s16_le。
 
-#### rkmedia_ai_aenc_test
+### rkmedia_ai_aenc_test
 
 【说明】
 
@@ -7855,7 +7856,7 @@ external/rkmedia/examples/rkmedia_ai_aenc_test.c
 
 格式为s16_le。
 
-#### rkmedia_ao_test
+### rkmedia_ao_test
 
 【说明】
 
@@ -7885,7 +7886,7 @@ external/rkmedia/examples/rkmedia_ao_test.c
 
 示例仅支持保存至pcm文件。格式为s16_le。
 
-#### rkmedia_adec_ao_test
+### rkmedia_adec_ao_test
 
 【说明】
 
@@ -7914,7 +7915,7 @@ external/rkmedia/examples/rkmedia_adec_ao_test.c
 
 该示例固定编码格式为aac。输出格式为s16_le。
 
-#### rkmedia_audio_test
+### rkmedia_audio_test
 
 【说明】
 
@@ -7952,13 +7953,11 @@ external/rkmedia/examples/rkmedia_audio_test.c
 
 该示例固定编码格式为aac。输出格式为s16_le。
 
-### 基础视频类示例
-
-#### rkmedia_vi_get_frame_test
+### rkmedia_vi_get_frame_test
 
 【说明】
 
-获取VI通道数据。演示VI没有Bind时如何取视频流。
+获取VI通道数据。演示VI没有Bind时如何取视频流。该示例常被用于验证Camera是否正常工作。
 
 【代码路径】
 
@@ -7986,11 +7985,11 @@ external/rkmedia/examples/rkmedia_vi_get_frame_test.c
 
 输出格式为nv12。
 
-#### rkmedia_vi_luma_only_mode_test
+### rkmedia_vi_luma_only_mode_test
 
 【说明】
 
-VI亮度统计示例。演示VI在没Bind时如何启用亮度模式。
+VI亮度统计模式示例。
 
 【代码路径】
 
@@ -8013,7 +8012,7 @@ external/rkmedia/examples/rkmedia_vi_luma_only_mode_test.c
 
 无。
 
-#### rkmedia_vi_multi_bind_test
+### rkmedia_vi_multi_bind_test
 
 【说明】
 
@@ -8040,11 +8039,11 @@ external/rkmedia/examples/rrkmedia_vi_multi_bind_test.c
 
 无。
 
-#### rkmedia_vi_venc_test
+### rkmedia_vi_venc_test
 
 【说明】
 
-设备输入编码后保存至文件。
+编码通道使用示例。
 
 【代码路径】
 
@@ -8065,15 +8064,15 @@ external/rkmedia/examples/rkmedia_vi_venc_test.c
 | -w \| --width       | 分辨率宽。                                                   | 1920                  |
 | -d \| --device_name | 设备节点。                                                   | rkispp_scale0         |
 | -o \| --output | 输出文件路径。                                               | /tmp/venc_output.h264 |
-| -c \| --frame_cnt   | 输出帧数。                                                   | 150                   |
-| -e \| --encode      | 编码格式，<br />0制定H264编码，<br />1制定H265编码             | 0                     |
+| -c \| --frame_cnt   | 输出帧数。                                                   | -1 (无穷)     |
+| -e \| --encode      | 编码格式：h264/h265/mjpeg             | h264                    |
 | -? \| --help | 显示帮助选项。                        | 无。       |
 
 【注意】
 
 无。
 
-#### rkmedia_vi_vo_test
+### rkmedia_vi_vo_test
 
 【说明】
 
@@ -8100,7 +8099,7 @@ external/rkmedia/examples/rkmedia_vi_vo_test.c
 
 无。
 
-#### rkmedia_venc_avbr_test
+### rkmedia_venc_avbr_test
 
 【说明】
 
@@ -8128,34 +8127,7 @@ external/rkmedia/examples/rkmedia_venc_avbr_test.c
 
 输出格式为H265。
 
-#### rkmedia_venc_jpeg_light_test
-
-【说明】
-
-jpeg_light通道使用演示示例。启动后输入回车实时进行jpeg截图保存至tmp目录下，输入quit退出。
-
-【代码路径】
-
-external/rkmedia/examples/rkmedia_venc_jpeg_light_test.c
-
-【快速使用】
-
-```shell
-./rkmedia_venc_jpeg_light_test
-```
-
-【选项】
-
-| 选项         | 描述                                                         | 默认值            |
-| ------------ | ------------------------------------------------------------ | ----------------- |
-| -a \| --aiq  | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
-| -? \| --help | 显示帮助选项。                                               | 无。              |
-
-【注意】
-
-无。
-
-#### rkmedia_venc_jpeg_test
+### rkmedia_venc_jpeg_test
 
 【说明】
 
@@ -8187,7 +8159,7 @@ external/rkmedia/examples/rkmedia_venc_jpeg_test.c
 
 输出分辨率不可超过4096*4096。
 
-#### rkmedia_venc_local_file_test
+### rkmedia_venc_local_file_test
 
 【说明】
 
@@ -8215,7 +8187,7 @@ external/rkmedia/examples/rkmedia_venc_local_file_test.c
 
 无。
 
-#### rkmedia_venc_smartp_test
+### rkmedia_venc_smartp_test
 
 【说明】
 
@@ -8243,11 +8215,11 @@ external/rkmedia/examples/rkmedia_venc_smartp_test.c
 
 输出格式h264。
 
-#### rkmedia_main_stream_with_jpeg_test
+### rkmedia_main_stream_with_jpeg_test
 
 【说明】
 
-bypass节点经VI，VENC输出h265文件。输入回车可进行实时抓拍。
+主码流编码加上抓拍示例。输入回车可进行实时抓拍。
 
 【代码路径】
 
@@ -8271,11 +8243,11 @@ external/rkmedia/examples/rkmedia_main_stream_with_jpeg_test.c
 
 无。
 
-#### rkmedia_vdec_test
+### rkmedia_vdec_test
 
 【说明】
 
-输入文件解码后输出。
+输入文件解码并显示。
 
 【代码路径】
 
@@ -8284,7 +8256,7 @@ external/rkmedia/examples/rkmedia_vdec_test.c
 【快速使用】
 
 ```shell
-./rkmedia_vdec_test -w 720 -h 480 -p /userdata/out.jpeg -f 0 -t JPEG
+./rkmedia_vdec_test -w 720 -h 480 -i /userdata/out.jpeg -f 0 -t JPEG
 ```
 
 【选项】
@@ -8293,18 +8265,17 @@ external/rkmedia/examples/rkmedia_vdec_test.c
 | -------------- | ------------------------------------------------------------ | ----------------- |
 | -w  | 输入文件分辨率宽                                 | 1280             |
 | -h  | 输入文件分辨率高                                 | 720             |
-| -p  | 输入文件路径                                 | 无             |
-| -o | 输出文件夹路径，<br />未指定此参数时，将输出至显示屏，<br />指定后将输出至文件               | 无             |
+| -i | 输入文件路径                                 | 无             |
 | -f  | 解码方式，0：软件解码，1：硬件解码                                 | 1             |
-| -t  | 输入文件编码格式，支持JPEG，MJPEG，H264，H265                                 | 无             |
-| -c  | 输出帧数，设置-1取消限制                                 | -1             |
-| -? \| --help   | 显示帮助选项。                                               | 无。              |
+| -t  | 输入文件编码格式，支持JPEG，H264，H265                                 | 无             |
+| -l | 循环播放开关，0：关闭，1：开启           | 0            |
+| -?   | 显示帮助选项。                                               | 无。              |
 
 【注意】
 
 无。
 
-#### rkmedia_vo_display_test
+### rkmedia_vo_display_test
 
 【说明】
 
@@ -8339,11 +8310,11 @@ external/rkmedia/examples/rkmedia_vo_display_test.c
 
 无。
 
-#### rkmedia_vo_scale_test
+### rkmedia_vo_scale_test
 
 【说明】
 
-VI输入，VO输出示例。
+VO缩放示例。
 
 【代码路径】
 
@@ -8366,13 +8337,11 @@ external/rkmedia/examples/rkmedia_vo_scale_test.c
 
 无。
 
-### RGA&OSD相关示例
-
-#### rkmedia_venc_cover_test
+### rkmedia_venc_cover_test
 
 【说明】
 
-RKMedia内置RGA API隐私遮盖示例。
+VENC隐私遮挡示例。
 
 【代码路径】
 
@@ -8396,11 +8365,11 @@ external/rkmedia/examples/rkmedia_venc_cover_test.c
 
 输出格式为H264。
 
-#### rkmedia_venc_mjpeg_test
+### rkmedia_venc_mjpeg_test
 
 【说明】
 
-VI输入，经RKMedia内置RGA API设置位图遮盖，再经由VENC编码mjpeg后输出文件。
+mjpeg编码示例。
 
 【代码路径】
 
@@ -8425,11 +8394,11 @@ external/rkmedia/examples/rkmedia_venc_mjpeg_test.c
 
 无。
 
-#### rkmedia_venc_osd_test
+### rkmedia_venc_osd_test
 
 【说明】
 
-VI输入，经RKMedia内置RGA API设置随机OSD位图遮盖，再经由VENC编码mjpeg后输出文件。
+VENC osd叠加示例。
 
 【代码路径】
 
@@ -8453,11 +8422,11 @@ external/rkmedia/examples/rkmedia_venc_osd_test.c
 
 输出格式h264。
 
-#### rkmedia_venc_roi_osd_test
+### rkmedia_venc_roi_osd_test
 
 【说明】
 
-三路设置不同大小ROI以及OSD叠加，并输出文件。
+VENC ROI& OSD示例。
 
 【代码路径】
 
@@ -8481,7 +8450,7 @@ external/rkmedia/examples/rkmedia_venc_roi_osd_test.c
 
 输出格式h264。
 
-#### rkmedia_rga_api_test
+### rkmedia_rga_api_test
 
 【说明】
 
@@ -8515,7 +8484,7 @@ external/rkmedia/examples/rkmedia_rga_api_test.c
 
 未分配/dev/dri/card0节点设备无法使用。
 
-#### rkmedia_rga_crop_venc_test
+### rkmedia_rga_crop_venc_test
 
 【说明】
 
@@ -8550,11 +8519,11 @@ external/rkmedia/examples/rkmedia_rga_crop_venc_test.c
 
 直播网址rtsp://\<ip\>/live/main_stream。
 
-#### rkmedia_rga_osd_test
+### rkmedia_rga_osd_test
 
 【说明】
 
-VI输入，经外部RGA添加OSD叠加，VENC编码，jpeg输出示例。使用透明OSD层与非透明混用可实现OSD文字。
+使用rga做osd叠加示例。
 
 【代码路径】
 
@@ -8581,9 +8550,7 @@ external/rkmedia/examples/rkmedia_rga_osd_test.c
 
 无。
 
-### ISP示例
-
-#### rkmedia_isp_test
+### rkmedia_isp_test
 
 【说明】
 
@@ -8610,7 +8577,7 @@ external/rkmedia/examples/rkmedia_isp_test.c
 
 此示例运行时需保证未开启ispserver。
 
-#### rkmedia_vi_double_cameras_test
+### rkmedia_vi_double_cameras_test
 
 【说明】
 
@@ -8641,7 +8608,7 @@ external/rkmedia/examples/rkmedia_vi_double_cameras_test.c
 
 无。
 
-#### rkmedia_vi_double_cameras_switch_test
+### rkmedia_vi_double_cameras_switch_test
 
 【说明】
 
@@ -8673,9 +8640,7 @@ external/rkmedia/examples/rkmedia_vi_double_cameras_switch_test.c
 
 此示例运行时需保证未开启ispserver。
 
-### 智能分析使用示例
-
-#### rkmedia_vi_md_test
+### rkmedia_vi_md_test
 
 【说明】
 
@@ -8702,7 +8667,7 @@ external/rkmedia/examples/rkmedia_vi_md_test.c
 
 无。
 
-#### rkmedia_vi_od_test
+### rkmedia_vi_od_test
 
 【说明】
 
@@ -8729,7 +8694,7 @@ external/rkmedia/examples/rkmedia_vi_od_test.c
 
 无。
 
-#### rkmedia_vi_rknn_venc_rtsp_test
+### rkmedia_vi_rknn_venc_rtsp_test
 
 【说明】
 
@@ -8760,7 +8725,7 @@ external/rkmedia/examples/rkmedia_vi_rknn_venc_rtsp_test.c
 
 默认RTSP地址：rtsp://\<ip\>/live/main_stream。
 
-#### rkmedia_vi_rockx_venc_rtsp_test
+### rkmedia_vi_rockx_venc_rtsp_test
 
 【说明】
 
