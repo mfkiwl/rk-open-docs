@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.6
+Release Version: V1.9.7
 
-Release Date: 2020-12-31
+Release Date: 2021-01-08
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -83,6 +83,7 @@ This document (this guide) is mainly intended for:
 | V1.9.4 | CWW | 2020-12-17 | 1. Add AB system for SPI NAND with 38 board config<br>2. Add introduction to flash SPI NOR Firmware.img |
 | V1.9.5 | CWW | 2020-12-29 | 1. Optimize typo<br>2. Remove some unused project |
 | V1.9.6 | CWW | 2020-12-31 | 1. Add uboot use tftp to upgrage loader partition |
+| V1.9.7 | CWW | 2021-01-08 | 1. Update the way to build UBI filesystem image |
 
 ---
 
@@ -909,18 +910,29 @@ adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
 #### Introduction to ubi filesystem of rootfs
 
 The rootfs of Nand Flash is ubifs, SDK default configure Nand Flash information is Page Size 2KB and Block Size 128KB.
-To modify buildroot defconfig "buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig".
-Steps are as follows:
+To modify board config: `device/rockchip/rv1126_rv1109/BoardConfig***.mk`.
 
 ```shell
-source envsetup.sh rockchip_rv1126_rv1109_spi_nand
-make menuconfig
-# configure these: BR2_TARGET_ROOTFS_UBI_PEBSIZE/BR2_TARGET_ROOTFS_UBI_SUBSIZE/BR2_TARGET_ROOTFS_UBIFS_LEBSIZE/BR2_TARGET_ROOTFS_UBIFS_MINIOSIZE/BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT
-# detail to see document of SPI NAND/SLC NAND
-make savedefconfig
+# Set ubifs page size, 2048(2KB) or 4096(4KB)
+# Option.
+export RK_UBI_PAGE_SIZE=2048
+
+# Set ubifs block size, 0x20000(128KB) or 0x40000(256KB)
+# Option.
+export RK_UBI_BLOCK_SIZE=0x20000
+
+# Set userdata partition size (byte) if define RK_USERDATA_DIR
+# MUST, if userdata partition is grow partition.
+export RK_USERDATA_PARTITION_SIZE=0x02760000
+
+# Set oem partition size (byte)
+# Option. if not set, it will get from parameter auto.
+export RK_OEM_PARTITION_SIZE=0x6400000
 ```
 
-The rootfs is ubifs default, if want to use squashfs, then configure buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
+The rootfs is ubifs default, if want to use squashfs, steps are as follows:
+
+- Configure buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
 
 ```diff
 diff --git a/configs/rockchip_rv1126_rv1109_spi_nand_defconfig b/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
@@ -944,6 +956,12 @@ index 5da9b25935..8af9226920 100644
  BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT=4096
 ```
 
+- Config the bootargs paramerter in kernel dts as follows:
+
+`ubi.mtd=3 ubi.block=0,rootfs root=/dev/ubiblock0_0 rootfstype=squashfs    /* mount SquashFS on UBI block */`
+
+NOTICE: ubi.mtd=3 (3 is the number of rootfs in the partition and the first partition number is 0)
+
 #### Introduction to oem and userdata partition used in ubifs
 
 The SDK default OEM is packaged in Buildroot as a UBI image.
@@ -952,6 +970,8 @@ The userdata partition default is not packaged, when system boot up userdata wil
 If configure RK_OEM_DIR (RK_OEM_BUILDIN_BUILDROOT is not defined) or RK_USERDATA_DIRi in the BoardConfig.mk, then use `./mkfirmware.sh` which in the root directory of SDK.
 RK_OEM_DIR define as the directory which in the device/rockchip/oem/.
 RK_USERDATA_DIR define as the directory which in the device/rockchip/userdata/.
+
+The detailed UBI filesystem image document: <SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_Nand_Flash_Open_Source_Solution_EN.pdf
 
 ### Introduced to the usage of U-Boot's tftp
 

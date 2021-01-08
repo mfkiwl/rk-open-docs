@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.6
+发布版本：V1.9.7
 
-日期：2020-12-31
+日期：2021-01-08
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -88,6 +88,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.4 | CWW | 2020-12-17 | 1. 增加38板SPI NAND AB系统板级参考<br>2. 增加SPI NOR烧录Firmware.img说明 |
 | V1.9.5 | CWW | 2020-12-29 | 1. 优化排版<br>2. 删除一些不用的工程 |
 | V1.9.6 | CWW | 2020-12-31 | 1. 增加uboot使用tftp更新loader分区 |
+| V1.9.7 | CWW | 2021-01-08 | 1. 更新UBI文件系统镜像制作 |
 
 ---
 
@@ -911,18 +912,29 @@ adb -s 192.168.1.159:5555 pull /userdata/test-file test-file
 #### 根文件系统打包说明
 
 Nand Flash的文件系统使用的是ubifs，SDK默认的配置是Page Size 2KB，Block Size 128KB的Nand Flash。
-通过修改buildroot对应的defconfig配置buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
-步骤如下：
+可以通过修改对应的板级配置: `device/rockchip/rv1126_rv1109/BoardConfig***.mk`
 
 ```shell
-source envsetup.sh rockchip_rv1126_rv1109_spi_nand
-make menuconfig
-# 然后配置BR2_TARGET_ROOTFS_UBI_PEBSIZE/BR2_TARGET_ROOTFS_UBI_SUBSIZE/BR2_TARGET_ROOTFS_UBIFS_LEBSIZE/BR2_TARGET_ROOTFS_UBIFS_MINIOSIZE/BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT
-# 详细的配置说明可以参考SPI NAND/SLC NAND文档
-make savedefconfig
+# Set ubifs page size, 2048(2KB) or 4096(4KB)
+# Option.
+export RK_UBI_PAGE_SIZE=2048
+
+# Set ubifs block size, 0x20000(128KB) or 0x40000(256KB)
+# Option.
+export RK_UBI_BLOCK_SIZE=0x20000
+
+# Set userdata partition size (byte) if define RK_USERDATA_DIR
+# MUST, if userdata partition is grow partition.
+export RK_USERDATA_PARTITION_SIZE=0x02760000
+
+# Set oem partition size (byte)
+# Option. if not set, it will get from parameter auto.
+export RK_OEM_PARTITION_SIZE=0x6400000
 ```
 
-默认文件系统是用ubifs，如果要改成squashfs，那在buildroot对buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig打上如下补丁
+默认文件系统是用ubifs，如果要改成squashfs，步骤如下：
+
+- buildroot对buildroot/configs/rockchip_rv1126_rv1109_spi_nand_defconfig打上如下补丁
 
 ```diff
 diff --git a/configs/rockchip_rv1126_rv1109_spi_nand_defconfig b/configs/rockchip_rv1126_rv1109_spi_nand_defconfig
@@ -946,6 +958,12 @@ index 5da9b25935..8af9226920 100644
  BR2_TARGET_ROOTFS_UBIFS_MAXLEBCNT=4096
 ```
 
+- kernel dts的bootargs参数改成如下：
+
+`ubi.mtd=3 ubi.block=0,rootfs root=/dev/ubiblock0_0 rootfstype=squashfs    /* UBI block 上挂载 SquashFS 文件系统 */`
+
+注：ubi.mtd=3 （3是rootfs在分区表的位置，第一个分区是0）。
+
 #### oem和userdata分区的ubifs打包说明
 
 SDK默认oem是在buildroot里打包成ubi镜像。
@@ -954,6 +972,8 @@ userdata分区默认不打包成镜像，系统启动后会自动格式化成ubi
 如果在对应的BoardConfig.mk里配置RK_OEM_DIR（RK_OEM_BUILDIN_BUILDROOT不配置）或RK_USERDATA_DIR，那可以使用SDK根目录下`./mkfirmware.sh`进行打包。
 RK_OEM_DIR是对应device/rockchip/oem/目录下自定义的目录。
 RK_USERDATA_DIR则是对应device/rockchip/userdata/目录下自定义的目录。
+
+详细的UBI文件系统镜像制作文档：<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_Nand_Flash_Open_Source_Solution_CN.pdf
 
 ### U-Boot终端下tftp使用说明
 
