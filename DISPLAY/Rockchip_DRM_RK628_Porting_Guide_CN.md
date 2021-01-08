@@ -137,6 +137,10 @@ arch/arm/boot/dts/rk3288-evb-rk628-hdmi2csi-avb.dts
 
 ### RGB
 
+注意：rk3288-android7.1 和 rk3288-android8.1 对应的内核基线 RGB 功能在 dts 中是以 lvds 的节点来描述，
+在这两个 SDK kernel 中没有关于 rk628 应用方案的配置 dts，可以参考如下相关 dts 配置：
+RKDocs/PATCHES/patch_rk628_dts_for_rk3288_android8.0.tar.gz
+
 ```
 &rgb {
         status = "okay";
