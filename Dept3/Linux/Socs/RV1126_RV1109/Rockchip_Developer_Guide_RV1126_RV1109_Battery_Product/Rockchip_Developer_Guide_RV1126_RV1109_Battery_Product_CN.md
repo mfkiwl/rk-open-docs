@@ -1,6 +1,6 @@
 # RV1126/RV1109 低功耗/快速启动产品开发指南
 
-文档标识：RK-JC-YF-***
+文档标识：RK-KF-YF-397
 
 发布版本：V1.0.0
 
@@ -81,7 +81,7 @@ Rockchip Electronics Co., Ltd.
 
 ​    为了延长电池使用时间，在做这类产品的时候我们就要求，设备不工作时SoC必须处于关机状态，DDR也完全掉电。当外部条件（比如PIR或者Wi-Fi远程唤醒）触发的时候，通过快速冷启动的方式，快速进入到工作模式。所以冷启动时间也成为了这种产品非常关键的指标。
 
-​    RV1126/RV1109芯片采用14nm工艺，运行电压0.8V，功耗和温升相比前一代的芯片都有极大的提升。另外，RV1126/RV1109内部有专门针对快速启动做了硬件优化设计，可以极大得降低快速启动时间，比如RV1126/RV1109芯片内置硬件解压缩模块，可以快速解压rootfs和kernel。
+​    RV1126/RV1109芯片采用14nm工艺，运行电压0.8V，功耗和温升相比前一代的芯片都有极大的提升。另外，RV1126/RV1109内部有专门针对快速启动做了硬件优化设计，可以极大地降低快速启动时间，比如RV1126/RV1109芯片内置硬件解压缩模块，可以快速解压rootfs和kernel。
 
 ### RV1126/RV1109开发低功耗产品方案的优势
 
@@ -105,45 +105,329 @@ Rockchip Electronics Co., Ltd.
 
 #### 基础板级配置介绍
 
-TBD
+RV1126/RV1109 SDK中目前和快速启动的相关配置如下：
+
+| 配置名                        | 说明                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| BoardConfig-tb-v12.mk         | 用来编译RV1126 DDR3 EVB V12板子的板级配置，存储使用eMMC      |
+| BoardConfig-tb-v13.mk         | 用来编译RV1126 DDR3 EVB V13板子的板级配置，存储使用eMMC      |
+| BoardConfig-spi-nor-tb-v13.mk | 用来编译RV1126 DDR3 EVB V13板子的板级配置，存储使用SPI Nor   |
+| BoardConfig-dualcam-tb-v13.mk | 用来编译RV1126 DDR3 EVB V13板子的板级配置，存储使用eMMC，支持双目 |
+| BoardConfig-battery-ipc.mk    | 用来编译电池IPC LPDDR3 Demo Board的板级配置，存储使用eMMC           |
+
+客户可以根据自己的产品需求，基于上述配置进行开发。
 
 #### 镜像分区说明
 
-ramboot打包方式说明，TBD
+快速启动固件镜像分区和常规IPC固件不一样，分区配置可以参考SDK中device/rockchip/rv1126_rv1109目录下的文件：
+
+```
+parameter-tb.txt                                            // eMMC快速启动镜像分区配置
+parameter-spi-nor-tb-32M.txt                 // SPI Nor 32MB快速启动镜像分区配置
+```
+
+快速启动一般创建了如下几个分区：
+
+- uboot
+
+说明：uboot分区实际打包了MCU镜像和Trust镜像，他们会被SPL加载；
+
+配置文件路径：`rkbin/RKTRUST/RV1126TOS_TB.ini`
+
+- boot
+
+说明：采用fit格式打包，其中包含了dtb、内核镜像和rootfs镜像，rootfs镜像一般采用ramdisk，它们被SPL预加载，并采用decom硬件解压缩。
+
+配置文件路径：`device/rockchip/rv1126_rv1109/boot-tb.its`
+
+- userdata(oem)
+
+说明：根据需要，客户可以单独开一个可读写的分区。
 
 ## 快速启动
 
-   RV1126/RV1109系列芯片内置硬件解压缩模块，可以极大得提升系统启动速度。另外，RV1126/RV1109内置一个MCU，MCU在SoC上电后就会快速启动，迅速初始化Camera和ISP，然后尽可能快得把前几帧图像保存下来。本章主要介绍了RV1126/RV1109快速启动的优化方法和注意事项。
+RV1126/RV1109系列芯片内置硬件解压缩模块 -- decom，可以极大得提升系统启动速度。另外，RV1126/RV1109内置一个MCU，MCU在SoC上电后就会快速启动，迅速初始化Camera和ISP，然后尽可能快得把前几帧图像保存下来。本章主要介绍了RV1126/RV1109快速启动的优化方法和注意事项。
+
+快速启动目前支持如下存储介质：
+
+- eMMC
+- SPI Nor Flash
+
+不同存储介质对内核和rootfs镜像的读取速度不一样，下面是不同存储介质典型的读取速度，因此我们不推荐使用SPI Nand Flash作为快速启动的存储介质：
+
+| 存储介质类型   | 读取速度    | 是否支持快速启动 | 参考板级配置                  |
+| -------------- | ----------- | ---------------- | ----------------------------- |
+| eMMC           | 120MB/S     | 是               | BoardConfig-tb-v13.mk         |
+| SPI Nor Flash  | 48MB/S(TBD) | 是               | BoardConfig-spi-nor-tb-v13.mk |
+| SPI Nand Flash | 18MB/S(TBD) | 否               | 不支持                        |
 
 ### 快速启动基本流程
 
-TBD
+RV1126/RV1109快速启动的基本流程如下图所示：
 
-​    从图中的基本流程可以看到，快速启动版本的启动流程是没有跑uboot的，kernel、rootfs以及MCU的系统均通过SPL加载。其中kernel的配置的经过极大的裁剪，rootfs也是经过精简的。
+![fastboot-diagram](resources/fastboot-diagram.png)
 
-### SPL快速启动流程介绍（底层同事）
+从图中的基本流程可以看到，快速启动版本的启动流程正常情况下是没有跑uboot的，kernel、rootfs以及MCU的系统均通过SPL加载。其中kernel和rootfs的配置都是经过极大的精简的。
 
-TBD
+RV1126/RV1109使用了很多方法进行快速启动的优化，典型的优化方法如下：
 
-### 硬件解压缩机制（底层同事）
+- 内核和rootfs通过SPL加载，裁剪掉uboot；
+- 内核和rootfs通过硬件解压缩；
+- MCU协助初始化ISP/Camera；
+- 驱动并行初始化；
+- 内核裁剪；
+- rootfs裁剪；
+- 算法模型预加载；
+- 用户态主进程并行初始化；
+- Wi-Fi网络连接优化；
 
-TBD
+接下来会对以上优化方法做更多深入的介绍。
 
-### 驱动并行加载机制（底层同事）
+### BootRom对快速启动的支持
 
-TBD
+目前 bootrom 的 SPI Nor驱动支持四线DMA模式加载下级固件，这项支持已直接在USBPlug烧写固件时做了配置，客户无需再配置。eMMC目前无此优化。
 
-### kernel裁剪
+### SPL快速启动机制介绍
 
-   快速启动的kernel是通过kernel的config fragment机制来裁剪的。
+U-Boot SPL 下支持 fit 格式的快速开机，同时支持按键进入loader模式和低电检测。
 
-### rootfs裁剪
+配置：
 
-TBD
+```c
+CONFIG_SPL_KERNEL_BOOT=y                           // 开启快速开机功能
+CONFIG_SPL_BLK_READ_PREPARE=y              // 开启预加载功能
+CONFIG_SPL_MISC_DECOMPRESS=y                // 开启解压功能
+CONFIG_SPL_ROCKCHIP_HW_DECOMPRESS=y
+```
+
+U-Boot SPL 支持预加载功能，使能预加载功能后，可以在执行其他程序的同时加载固件。目前主要用来预加载ramdisk。
+
+例如预加载经过 gzip 压缩过的 ramdisk，压缩命令：
+
+```shell
+cat ramdisk | gzip -n -f -9 > ramdisk.gz
+```
+
+its文件的配置如下：
+
+```c
+ramdisk {
+	data = /incbin/("./images-tb/ramdisk.gz");
+	compression = "gzip";      // 压缩格式
+	type = "ramdisk";
+	arch = "arm";
+	os = "linux";
+	preload = <1>;             // 预加载标志
+	comp = <0x5800000>;        // 加载地址
+	load = <0x2800000>;        // 解压地址
+	decomp-async;              // 异步解压
+	hash {
+		algo = "sha256";
+		uboot-ignore = <1>;    // 不做hash校验
+	};
+};
+```
+
+编译固件，比如编译rv1126 eMMC固件：
+
+```c
+./make.sh rv1126-emmc-tb && ./make.sh --spl
+```
+
+### 内核快速启动机制介绍
+
+配置：
+
+```c
+CONFIG_ROCKCHIP_THUNDER_BOOT=y                   // 开启快速开机功能
+CONFIG_ROCKCHIP_THUNDER_BOOT_MMC=y               // 开启支持eMMC快速开机优化功能
+CONFIG_ROCKCHIP_THUNDER_BOOT_SFC=y               // 开启支持SPI Nor快速开机优化功能
+CONFIG_VIDEO_ROCKCHIP_THUNDER_BOOT_ISP=y         // 开启支持ISP快速开机优化功能
+```
+
+为了快速开机，SPL不会依据实际的硬件参数修改kernel dtb的参数，所以有些参数需要用户自己配置，具体需要配置的参数有：
+
+- Memory
+- ramdisk解压前后大小
+
+详见：`kernel/arch/arm/boot/dts/rv1126-thunder-boot.dtsi`
+
+```c
+memory: memory {
+	device_type = "memory";
+	reg = <0x00000000 0x20000000>;       // 离线帧预留内存，给MCU抓拍使用，根据需要分配，不需要MCU快速抓拍功能，建议删除
+};
+
+reserved-memory {
+	trust@0 {
+		reg = <0x00000000 0x00200000>;   // trust 空间
+		no-map;
+	};
+
+	trust@200000 {
+		reg = <0x00200000 0x00008000>;
+	};
+
+	ramoops@210000 {
+		compatible = "ramoops";
+		reg = <0x00210000 0x000f0000>;
+		record-size = <0x20000>;
+		console-size = <0x20000>;
+		ftrace-size = <0x00000>;
+		pmsg-size = <0x50000>;
+	};
+
+	rtos@300000 {
+		reg = <0x00300000 0x00100000>;        // 预留给用户端使用，没有使用可以删掉
+		no-map;
+	};
+
+	ramdisk_r: ramdisk@2800000 {
+		reg = <0x02800000 (48 * 0x00100000)>; // 解压源地址和大小，可以依据实际大小进行更改
+	};
+
+	ramdisk_c: ramdisk@5800000 {
+		reg = <0x05800000 (20 * 0x00100000)>; // 压缩源地址和大小，可以依据实际大小进行更改
+	};
+};
+```
+
+针对eMMC的配置：
+
+```c
+/ {
+        reserved-memory {
+                mmc_ecsd: mmc@20f000 {
+                        reg = <0x0020f000 0x00001000>;   // SPL 给kernel上传ecsd区域
+                };
+
+                mmc_idmac: mmc@500000 {
+                        reg = <0x00500000 0x00100000>;   // 预加载ramdisk时，预留的idmac的内存区域，预加载完成，该区域内存释放掉
+                };
+        };
+
+        thunder_boot_mmc: thunder-boot-mmc {
+                compatible = "rockchip,thunder-boot-mmc";
+                reg = <0xffc50000 0x4000>;
+                memory-region-src = <&ramdisk_c>;
+                memory-region-dst = <&ramdisk_r>;
+                memory-region-idmac = <&mmc_idmac>;
+        };
+};
+```
+
+针对SPI Nor的配置：
+
+```c
+/ {
+        thunder_boot_spi_nor: thunder-boot-spi-nor {
+                compatible = "rockchip,thunder-boot-sfc";
+                reg = <0xffc90000 0x4000>;
+                memory-region-src = <&ramdisk_c>;
+                memory-region-dst = <&ramdisk_r>;
+        };
+};
+```
+
+### 驱动并行加载机制
+
+快速开机的内核启动过程，为了充分利用多核优势，并行运行相同 level 的 initcall。
+
+功能需要 `CONFIG_INITCALL_ASYNC=y`，在 `arch/arm/configs/rv1126-tb.config` 中已经默认开启。
+
+内核参数 `initcall_nr_threads` 控制并行的线程。`initcall_nr_threads < 0` 表示使用算法默认线程数；`initcall_nr_threads == 0` 表示关闭此功能；`initcall_nr_threads > 0`，表示使用指定的线程数。
+
+内核默认的 `initcall_debug` 这个 bool 参数控制是否打印 initcall 的调试信息。具体参考 `Documentation/admin-guide/kernel-parameters.txt`。
+
+通过这两个参数，可以观察 initcall 的调用顺序、耗时等信息。默认提供的 dts 中，这两个参数设置为 `initcall_nr_threads=-1 initcall_debug=0`，即使用算法默认线程数，关闭调试信息打印。
+
+使用此功能可能需要的修改：
+
+1. 两个驱动 A 和 B，如果实际上有依赖关系（比如 B 的初始化过程需要 A 的某个变量初始化完成），但 initcall 在相同级别，就会出现 B 早于 A 初始化。由于访问了未初始化的变量，而出现**内核崩溃**。这个时候，就需要手动调整两者的 initcall level，确保 A 的 level 早于 B。之前不出现问题的原因在于，虽然代码写错了，但编译器将 A 的初始化函数放到 B 的前面，事实上保证了顺序。具体的 level 级别参考 `include/linux/init.h`，pure_initcall 最早，late_initcall_sync 最迟。
+
+2. regulator 驱动需要在 subsys_initcall_sync 之前完成驱动注册，这样其它需要 regulator 的驱动不会因为获取不到 regulator 而 probe 失败。可以参考
+
+```
+drivers/regulator/rk808-regulator.c:subsys_initcall(rk808_regulator_driver_init);
+drivers/regulator/pwm-regulator.c:subsys_initcall_sync(pwm_regulator_driver_init);
+```
+
+3. camera 驱动需要提前到 device_initcall（一般通过 module_i2c_driver 注册），而不要使用 device_initcall_sync。因为没有其它驱动在 device_initcall_sync 这个时刻初始化，无法并行。可以参考
+
+```
+drivers/media/i2c/ov02k10.c:module_i2c_driver(ov02k10_i2c_driver);
+drivers/media/i2c/sc2232.c:module_i2c_driver(sc2232_i2c_driver);
+drivers/media/i2c/sc4238.c:module_i2c_driver(sc4238_i2c_driver);
+drivers/media/i2c/sc2310.c:module_i2c_driver(sc2310_i2c_driver);
+drivers/media/i2c/ov02b10.c:module_i2c_driver(ov02b10_i2c_driver);
+drivers/media/i2c/os05a20.c:module_i2c_driver(os05a20_i2c_driver);
+drivers/media/i2c/os04a10.c:module_i2c_driver(os04a10_i2c_driver);
+drivers/media/i2c/ov12d2q.c:module_i2c_driver(ov12d2q_i2c_driver);
+```
+
+### 精简版kernel介绍
+
+快速启动的kernel是通过kernel的config fragment机制来裁剪的。config fragment会覆盖defconfig配置中的同名配置。快速启动的config fragment的路径如下：
+
+```shell
+kernel/arch/arm/configs/rv1126-tb.config
+```
+
+假设目前正在使用的产品内核配置名称为：rv1126_ipc_defconfig，使用config fragment编译内核的命令如下：
+
+```shell
+make rv1126_ipc_defconfig rv1126-tb.config
+```
+
+通过上面的命令，就会生成精简内核的配置.config。我们可以从rv1126-tb.config文件中看到，大部分不需要的内核功能都被设置为关闭，大部分所需要的驱动，被配置成m，即rootfs加载后使用模块加载，这样可以加快启动速度。
+
+### 精简版rootfs介绍
+
+rootfs的大小会极大的影像启动时候读取rootfs镜像以及解压缩的速度。在快速启动中，我们的rootfs采用ramdisk文件系统，我们建议尽量控制ramdisk的文件大小。一些可以延迟加载的驱动ko、可执行程序和库需要放到其他分区中。
+
+快速启动参考的rootfs配置在如下路径：
+
+```shell
+buildroot/configs/rockchip_rv1126_evb_tb_defconfig
+```
+
+从中可以看到，快速启动的rootfs配置是经过极大的精简的，关闭了很多非必须的功能。客户可以根据自身的需求调整rootfs相关配置。
+
+需要说明的是busybox命令也根据快速启动的需求进行了一定裁剪，快速启动使用的busybox配置如下：
+
+```shell
+buildroot/board/rockchip/common/tinyrootfs/busybox.config
+```
+
+目前SDK rootfs压缩后最大支持的大小20MB，解压后的大小为48MB，客户可以根据实际产品需要参考之前的介绍修改此内存大小，避免DDR浪费或者分配的内存不够用：
+
+```c
+vim kernel/arch/arm/boot/dts/rv1126-thunder-boot.dtsi
+```
+
+```c
+ramdisk_r: ramdisk@2800000 {
+	reg = <0x02800000 (48 * 0x00100000)>;    // 解压源地址和大小，可以依据实际大小进行更改
+};
+
+ramdisk_c: ramdisk@5800000 {
+	reg = <0x05800000 (20 * 0x00100000)>;        // 压缩源地址和大小，可以依据实际大小进行更改
+};
+```
+
+如果不确定自己rootfs镜像大小的情况，可以通过如下命令来查看：
+
+```shell
+me@my-ubuntu:~/rv1126/sdk$ ls -al buildroot/output/rockchip_rv1126_evb_tb/images/
+-rw-r--r-- 1 me me 10777600 1月  14 19:31 ramboot.img
+-rw-r--r-- 1 me me 16209920 1月  14 19:31 rootfs.romfs                                 // 压缩前的大小
+-rw-r--r-- 1 me me  6634740 1月  14 19:31 rootfs.romfs.gz                              // 压缩后的大小
+-rw-r--r-- 1 me me 16465920 1月  14 19:31 rootfs.tar
+```
 
 ### 快速抓拍
 
-​    设备上电后，MCU会立即对Camera进行采集前几帧的数据进DDR中。设备系统启动完成后，可由应用主动送该数据到ISP+ISPP进行处理。ISP/ISPP从DDR读取RKRAW数据进行处理的机制，我们称之为离线帧处理。
+设备上电后，MCU会立即对Camera进行采集前几帧的数据进DDR中。设备系统启动完成后，可由应用主动送该数据到ISP+ISPP进行处理。ISP/ISPP从DDR读取RKRAW数据进行处理的机制，我们称之为离线帧处理。
 
 #### MCU启动机制
 
@@ -155,49 +439,134 @@ MCU各阶段耗时如下：
 
 | 测试条件                                                     | 系统复位到SENSOR出图耗时 | 出10帧图像耗时 |
 | ------------------------------------------------------------ | ------------------------ | -------------- |
-| LP3 924M<br />RISCV无IRCUT和补光<br />系统在正常运行的过程中直接复位触发示波器抓时序<br />存储介质为EMMC | 174ms                    | 340ms          |
+| LP3 924M<br />MCU无IRCUT和补光<br />系统在正常运行的过程中直接复位触发示波器抓时序<br />存储介质为eMMC | 174ms                    | 340ms          |
 
-以下更改会影响抓拍的速度：
+以下更改会影响MCU快速抓图的速度：
 
 1，更改DDR频率
 
-2，增加RISCV的功能
+2，增加MCU系统的功能
 
 3，更换SENSOR
 
 4，更换存储介质
 
-#### 离线帧处理（池琳）
+#### 离线帧处理说明
 
-TBD
+设备上电后，MCU会立即对Camera进行采集10帧的RAW数据进DDR中。设备系统启动完成后，可以由应用从DDR中读取之前保存的RAW图像送给ISP、ISPP进行处理并输出YUV图像。离线帧处理的数据格式必须为RKRAW格式文件。其基本流程如下：
 
-### 快速启动硬件设计注意事项
+```txt
+DDR -> RKRAW -> ISP -> ISPP -> YUV
+```
 
-​    不同的Flash对启动速度有比较明显的影响，因为Flash的读取速度直接影响到rootfs镜像以及算法模型的读取时间。这里列出每一种Flash读取速度，以及参考启动时间，客户在进行产品设计的时候需要综合考虑成本，存储大小，启动速度等因素进行谨慎选择：
+**buildroot配置**
 
-| 存储类型                 | 读取速度 | 参考启动时间 | 参考板级配置          |
-| ------------------------ | -------- | ------------ | --------------------- |
-| eMMC                     | 120MB/S  | TBD          | BoardConfig-tb-v13.mk |
-| SPI Nor Flash（4线模式） | TBD      | TBD          | TBD                   |
-| SPI Nand Flash           | TBD      | TBD          | TBD                   |
+在处理离线帧之前需要配置离线帧的IQ文件，可以修改buildroot配置：在buildroot/configs/rockchip_rv1126_rv1109_defconfig 添加：
+
+```c
+BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_FAKE_CAMERA_IQFILE="sc210iot_YT-SC210-V2_M12-30IRC-2MP-F18.xml"
+```
+
+**离线帧Demo测试程序**
+
+代码位于：`external/rkmedia/examples/rkmedia_fake_vi_test.c`
+
+**离线帧测试命令**
+
+```c
+rkmedia_fake_vi_test -a /etc/iqfiles -d /dev/video38 -s /dev/v4l-subdev6 -w 1920 -h 1080 -v 1
+```
+
+**测试命令参数介绍**
+  -a ：指定iq文件FakeCamera.xml的路径
+  -d ：FakeCamera的rkispp_m_bypass/rkispp_scale0/rkispp_scale1/rkispp_scale2节点
+  -s ：存放reserve mem的 rkisp-isp-subdev
+  -w ：FakeCamera的宽
+  -h ：FakeCamera的高
+  -j ：保存数据类型。 当值为1，保存JPEG数据
+  -y ：保存数据类型。当值为1，保存YUV数据
+  -v ：保存数据类型。当值为1，本地显示
+
+### 快速启动优化达成情况
+
+通过上述方法优化后，目前快速启动能否达到以下指标：
+
+| 启动阶段        | 指标达成情况 |
+| --------------- | ------------ |
+| 快速抓拍        | 210ms        |
+| Camera出流      | 600ms        |
+| Wi-Fi联网获取IP | 1S           |
+| Wi-Fi极速推流   | 2S           |
+
+注意：由于不同的产品配置不同，做出来的快速启动指标和上述指标会有差异，瑞芯微并不保证任何产品类型都能达到上述优化指标。
 
 ## 功耗优化
 
-​    我们在设计低功耗电池产品方案的时候，功耗是一个非常重要的指标。本章节会重点介绍，在功耗优化面，我们有哪些方法和注意事项。
+我们在设计低功耗电池产品方案的时候，功耗是一个非常重要的指标。本章节会重点介绍，在功耗优化面，我们有哪些方法和注意事项。
 
 ### 功耗优化方法介绍
 
-TBD
+​    关于功耗优化，目前我们总结出了如下的方法：
 
-### 系统带宽评估
+- 根据产品需求，降低部分模块实际运行的电压和频率，如CPU、DDR、VEPU和NPU；
+- 遍历所有Clock和Power，关闭不需要的模块，同时PLL只保留3个；
+- DDR带宽深度优化，减少内存拷贝，关闭不需要的功能；
+- 软件Application优化，减少CPU使用率
+- 硬件设计上针对功耗进行优化；
 
-TBD
+### 频率电压表优化
+
+和传统产品方案不同，低功耗带电池产品频率不是跑得越高越好，而是需要根据产品使用场景来限制其频率和电压，满足“频率电压够用就好”的原则。因此我们根据电池IPC产品实际的场景，重新摸底了一遍频率电压表，各模块的频率和电压都有一定程度的降低。
+
+下面的表格是频率电压表优化后的前后对比：
+
+- 优化后的频率
+
+| CPU    | DDR    | Encoder | ISP         | ISPP        |
+| ------ | ------ | ------- | ----------- | ----------- |
+| 600MHz | 528MHz | 297MHz  | 396MHz(Max) | 396MHz(Max) |
+
+- 优化后的电压
+
+| VDD_ARM | VDD_LOGIC | VCC_DDR |
+| ------- | --------- | ------- |
+| 0.724V  | 0.769V    | 1.232V  |
+
+### 系统带宽优化方法
+
+在优化低功耗产品方案的过程中，我们发现带宽对功耗的影响非常大。根据电池IPC产品的功耗要求，我们需要尽可能得降低带宽使用。目前我们采用了以下方法优化DDR带宽：
+
+- 3DNR中TNR采用2帧模式；
+- 关闭HDR采用线性模式；
+- 关闭ISPP Dehaze模块；
+- Camera帧率从30fps降低到25fps；
+- Camera数据由RAW12改为RAW10；
+- 视频帧尽量采用FBC格式压缩；
+- Camera MIPI数据采集由ISP切换到VICAP；
+
+通过上述方法优化后，200M Wi-Fi推流的带宽明显下降，以下是优化后的带宽数据（Sensor：200M@25FPS）：
+
+| 优化前带宽 | 优化后带宽 |
+| ---------- | ---------- |
+| 1368MB/S   | 870MB/S    |
+
+带宽的测试需要借助特殊的工具，该工具可以找瑞芯微FAE申请。
 
 ### 功耗优化硬件设计注意事项
 
+#### 分立电源设计
+
+分立电源设计相比使用PMU（例如：RK809）在以下几个方面更有优势：
+
+- 可以选择电源效率更高的DCDC或者LDO，更灵活的优化功耗；
+- 节省RK809默认500ms的防抖时间，加快启动速度；
+- 成本更容易控制；
+
+因此低功耗电池产品瑞芯微发布的参考设计电源设计方案为分立电源。
+
 #### 硬件选型指引
 
-​    开发低功耗产品的时候，外设功耗也是需要我们重点评估的，为了帮助客户整体方案上能够快速达到低功耗的效果，我们提供了目前我们认为功耗比较低的器件列表，客户可以根据自身产品情况来选择（其他没有在这里列出的外设，不代表我们不支持，只是它们的功耗属于正常水平，不需要额外列出）：
+开发低功耗产品的时候，外设功耗也是需要我们重点评估的，为了帮助客户整体方案上能够快速达到低功耗的效果，我们提供了目前我们认为功耗比较低的器件列表，客户可以根据自身产品情况来选择（其他没有在这里列出的外设，不代表我们不支持，只是它们的功耗属于正常水平，不需要额外列出）：
 
 **Camera选型列表**
 
@@ -205,96 +574,170 @@ TBD
 | ---------- | ------ | -------- |
 | SC210IoT   | 200M   | 63mW     |
 | GC2053     | 200M   | 93mW     |
-|            |        |          |
+| OS04C10    | 400M   | 148mW    |
 
 **Wi-Fi选型列表**
 
 | Wi-Fi型号 | 低功耗保活功耗 | Wi-Fi推流功耗 |
 | --------- | -------------- | ------------- |
-| CYW43438  | TBD            | TBD           |
-| AP6203    | TBD            | TBD           |
+| CYW43438  | 350uA          | TBD           |
+| AP6203    | 350uA          | TBD           |
 | Hi3861    | TBD            | TBD           |
-| ABTM6441  | TBD            | TBD           |
-| T2        | TBD            | TBD           |
+| ABTM6441  | 270uA          | TBD           |
+| T2        | 80uA           | TBD           |
 
-​    注意：以上Wi-Fi低功耗保活功耗都是在屏蔽房，DTIM=10的情况下测试，在正常环境下测试功耗会更高。
+注意：以上Wi-Fi低功耗保活功耗都是在屏蔽房，DTIM=10的情况下测试，在正常环境下测试功耗会更高。
+
+**DDR选型**
+
+DDR方面，我们参考设计上选择的是LPDDR3和LPDDR4，他们的功耗相比DDR3会更小。DDR功耗对比如下：
+
+| DDR3   | LPDDR3 |
+| ------ | ------ |
+| 2101mW | 1809mW |
+
+测试场景：基于RV1126 EVB V13测试，不带显示，HDR开，NR开，NPU 关，VEPU 396MHz，DDR带宽3100±50MB/S。
+
+### RV1126/RV1109功耗优化达成情况
+
+通过前面所述方法优化后，目前产品方案能达到的功耗数据如下（基于瑞芯微电池IPC原型机测试）：
+
+| 功耗场景              | **功耗达成情况**（整机功耗） |
+| --------------------- | ---------------------------- |
+| Wi-Fi低功耗保活       | 1.5mW                        |
+| 1080P@25fps Wi-Fi推流 | 720mW                        |
+| 2K@25fps Wi-Fi推流    | TBD                          |
+| 4K@15fps Wi-Fi推流    | 1.4W                         |
+
+注意：由于不同的产品配置不同，做出来的功耗指标和上述指标会有差异，瑞芯微并不保证任何产品类型都能达到上述优化指标。
 
 ## 快速启动功能扩展
 
-​    快速启动的配置都是经过极大精简的，客户在调试的时候难免会遇到各种问题，比如一些库或者工具没有。调试的便利性和rootfs镜像大小是矛盾的关系，想要达到最快的启动速度，肯定会增加产品调试和开发的难度。因此，本章就需要着重介绍，一些客户常用的功能如何使能和配置。
+快速启动的配置都是经过极大精简的，客户在调试的时候难免会遇到各种问题，比如一些库或者工具没有。调试的便利性和rootfs镜像大小是矛盾的关系，想要达到最快的启动速度，肯定会增加产品调试和开发的难度。因此，本章就需要着重介绍，一些客户常用的功能如何使能和配置。
 
 ### 快速启动增加MiniGUI支持
 
 TBD
 
-### 快速启动增加双目Camera支持（王智华）
+### 快速启动双目Camera支持
 
-TBD
+目前SDK中已经支持快速启动+双目Camera的配置，客户可以基于这个配置开发智能门锁等需要双目摄像头的产品，配置文件如下：
 
-### busybox定制化配置（许自缘）
-
-TBD
+```shell
+BoardConfig-dualcam-tb-v13.mk
+```
 
 ### 常用调试方法使能
 
-#### adb使能（王增征）
+#### adb使能
 
-TBD
+adb功能的开启需要在buildroot使能如下配置：
 
-#### iperf使能（许自缘）
+```shell
+BR2_PACKAGE_THUNDERBOOT=y
+BR2_THUNDERBOOT_USB_ADBD=y
+```
 
-TBD
+#### iperf使能
 
-#### gdb使能（许自缘）
+iperf3功能的开启需要在buildroot使能如下配置：
 
-TBD
+```shell
+BR2_PACKAGE_IPERF3=y
+```
+
+#### gdb使能
+
+iperf3功能的开启需要在buildroot配置文件中打开gdb的功能
+
+```shell
++#include "gdb.config"
+```
 
 ## Wi-Fi低功耗保活和远程唤醒
 
-​    低功耗电池产品，非常注重产品的便携性。因此这类产品往往使用Wi-Fi来传输控制命令或者视频流数据。设备在不工作的时候，SoC处于掉电关机状态，此时为了让设备处于在线状态，Wi-Fi必须处于低功耗保活模式。Wi-Fi在低功耗保活模式下会定时唤醒接收来自云端的唤醒包。当用户需要通过手机查看设备端视频的时候，云端会发送唤醒包给Wi-Fi，Wi-Fi收到唤醒包之后，会通过GPIO给SoC上电，然后SoC快速启动把视频流推送给用户。
+低功耗电池产品，非常注重产品的便携性。因此这类产品往往使用Wi-Fi来传输控制命令或者视频流数据。设备在不工作的时候，SoC处于掉电关机状态，此时为了让设备处于在线状态，Wi-Fi必须处于低功耗保活模式。Wi-Fi在低功耗保活模式下会定时唤醒接收来自云端的唤醒包。当用户需要通过手机查看设备端视频的时候，云端会发送唤醒包给Wi-Fi，Wi-Fi收到唤醒包之后，会通过GPIO给SoC上电，然后SoC快速启动把视频流推送给用户。
 
-   Wi-Fi低功耗保活和远程唤醒的基本流程如下：
+Wi-Fi低功耗保活和远程唤醒的基本流程如下：
 
-   TBD
+![fastboot-diagram](resources/lowpower-wifi-diagram.png)
 
-   本章会着重介绍低功耗电池产品Wi-Fi开发相关内容。
+本章会着重介绍低功耗电池产品Wi-Fi开发相关内容。
 
 ### Wi-Fi配网
 
-​    目前RV1126/RV1109实现了以下几种配网方式：
+目前RV1126/RV1109实现了以下几种配网方式：
 
 - 命令行配网；
 - 二维码配网；
 
-#### 命令行配网（肖垚）
+#### 命令行配网
 
 #### 二维码配网
 
 **1. 二维码的使用**
 
-请详见[Rockchip_Instruction_Linux_Battery_IPC_CN](../RV1126_RV1109/Rockchip_Instruction_Linux_Battery_IPC)。
+请详见 docs/RV1126_RV1109/Rockchip_Instruction_Linux_Battery_IPC_CN.pdf。
 
 **2. 二维码扫描设备端接口介绍**
 
-请详见[Rockchip_Instruction_Qrcode_CN](../Rockchip_RV1126_RV1109_Qrcode/Rockchip_Instruction_Qrcode_CN.md)
+请详见 docs/RV1126_RV1109/ApplicationNote/Rockchip_Instructions_Qrcode_CN.pdf。
 
-### Wi-Fi低功耗保活（肖垚）
+### Wi-Fi低功耗保活
 
 TBD
 
-### Wi-Fi远程唤醒（肖垚）
+### Wi-Fi远程唤醒
 
 TBD
 
 ## 云平台对接
 
-​    目前瑞芯微的低功耗产品方案对接了两种云平台：阿里云、涂鸦。本章节的内容旨在给客户提供一个指引，帮助客户快速上手对接云平台。
+目前瑞芯微的低功耗产品方案对接了两种云平台：阿里云、涂鸦。本章节的内容旨在给客户提供一个指引，帮助客户快速上手对接云平台。
 
 ### 阿里云对接说明
 
 请参考[Link Visual设备端开发-Linux SDK](#https://help.aliyun.com/document_detail/131156.html?spm=a2c4g.11186623.6.697.11e73a09g9L0XO)。
 
+### 涂鸦云对接说明
+
+请参考[涂鸦IPC嵌入式SDK开发指南](#https://developer.tuya.com/cn/docs/iot/smart-product-solution/product-solution-ipc/ipc-sdk-solution/sdk?id=K95019g5w3eiq)。
+
+### Vendor分区
+
+Vendor分区是指在 Flash 上划分出来用于存放Vendor数据的区域。开发者通过相关写号PC工具可以给该分区写入相关的Vendor数据，重启后或者掉电该分区数据不会丢失。可以通过相关接口读取该分区的数据用来做显示或者其他用途。如果整片擦除flash将会清除该分区中所写入的Vendor数据。
+
+目前Vendor分区主要用作两个用途，存放设备证书和wifi信息。
+
+**注意事项：目前每台设备需要先烧录证书，才能成功连云。使用工具为SDK根目录下的tools\windows\RKDevInfoWriteTool，需要保证每台设备的证书唯一且已在云端添加。**
+
+Vendor分区ID为255，用于保存阿里云认证所需的四元组证书。样例如下：
+
+`{"product_key":"a139oQFoEu6","product_secret":"LKDLOI0nJmp8m7aH","device_name":"rk10","device_secret":"77d2838182fbb2f32acc4e9298612989"}`
+
+Vendor分区ID为254，用于保存涂鸦云认证所需的三元组证书。样例如下：
+
+`{"pid":"4wrrx6gmxh1czhcv","uuid":"tuya16c71f6e48e7a4a7","authkey":"zkjwo2tNj199MCCgdGMLEKhsu1jeHAJ8"}`
+
+Vendor分区ID为30，用于保存wifi信息，加快联网速度。样例如下：
+
+`1,fanxing,12345678,192.168.1.122,255.255.255.0,192.168.1.1,192.168.1.1`
+
+除了RKDevInfoWriteTool工具批量烧录外，也可以通过串口，在设备端写入证书信息，但需要注意转义和ID的换算。以阿里云为例：
+
+`vendor_storage -w VENDOR_CUSTON_ID_FF -t string -i {\"product_key\":\"a139oQFoEu6\",\"product_secret\":\"LKDLOI0nJmp8m7aH\",\"device_name\":\"rk10\",\"device_secret\":\"77d2838182fbb2f32acc4e9298612989\"}`
+
 ## 误唤醒优化方法
+
+使用PIR很容易产生误触发问题。误触发太多，没有过滤的话，一方面对功耗影响很大，另外一方面会导致频繁给用户报警，让用户觉得反感。
+
+目前的方案中有几种过滤误触发的方式：
+
+- 限制PIR的触发次数，随机丢掉一定比例的触发事件；
+- 使用视频移动侦测算法，检测到画面变化才判定为有效触发；
+- 在云端采用深度学习算法来检测物体，从而判定是否是有效触发；
+
+第一种方法可以一定程度上降低误触发的次数，但是也存在漏报的可能；第二种方法会出现经常误报的情况，画面一些简单的亮度变化都会导致移动侦测算法误报；第三种方法需要将每次触发后的视频数据传送到云端，导致带宽的负担增加。
 
 ### PIR性能优化
 
@@ -302,9 +745,13 @@ TBD
 
 ### 通过AI过滤误唤醒
 
+RV1126/RV1109中内置NPU，我们可以在设备端加一些简单的检测算法，对触发事件进行过滤。当画面中检测到感兴趣的物体时，才向用户发送报警。其简单流程图如下：
+
+![fastboot-diagram](resources/invalid-trigger-diagram.png)
+
 #### AI算法适配
 
-目前支持人形检测和人脸检测，已经集成在mediaserver中，在mediaserver的conf中配置相应的flow即可使用。
+目前支持人形检测和人脸检测，已经集成在mediaserver中，在mediaserver的conf中配置相应的Flow即可使用。
 
 人形的例子：
 
@@ -357,27 +804,7 @@ TBD
     }
 ```
 
-#### Vendor分区
-
-Vendor分区是指在 Flash 上划分出来用于存放Vendor数据的区域。开发者通过相关写号PC工具可以给该分区写入相关的Vendor数据，重启后或者掉电该分区数据不会丢失。可以通过相关接口读取该分区的数据用来做显示或者其他用途。如果整片擦除flash将会清除该分区中所写入的Vendor数据。
-
-目前Vendor分区主要用作两个用途，存放设备四元组证书和wifi信息。
-
-**注意事项：目前每台设备需要先烧录四元组证书，才能成功连云。使用工具为SDK根目录下的tools\windows\RKDevInfoWriteTool，需要保证每台设备的四元组唯一且已在云端添加。**
-
-Vendor分区ID 255，用于保存阿里云认证所需的四元组。样例如下：
-
-`{"product_key":"a139oQFoEu6","product_secret":"LKDLOI0nJmp8m7aH","device_name":"rk10","device_secret":"77d2838182fbb2f32acc4e9298612989"}`
-
-Vendor分区ID 30，用于保存wifi信息，加快联网速度。样例如下：
-
-`1,fanxing,12345678,192.168.1.122,255.255.255.0,192.168.1.1,192.168.1.1`
-
-### 开机自启脚本
-
-### OEM、Data分区打包
-
-## 软件功能接口（林刘迪铭）
+## 软件功能接口
 
 ### ISP
 
@@ -601,6 +1028,3 @@ RK_MPI_AO_DisableChn(mpp_chn_ao.s32ChnId);
 绑定使用RK_MPI_SYS_Bind(&mpp_chn_adec, &mpp_chn_ao)即可。
 
 反初始化时，需要先RK_MPI_SYS_UnBind(&mpp_chn_adec, &mpp_chn_ao)。
-
-
-
