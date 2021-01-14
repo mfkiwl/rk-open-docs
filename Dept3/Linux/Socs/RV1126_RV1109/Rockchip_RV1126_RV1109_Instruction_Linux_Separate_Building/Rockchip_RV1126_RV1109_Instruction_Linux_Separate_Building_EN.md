@@ -1,10 +1,10 @@
-# Instructions to separate the build system image from the SDK
+# Instructions to Build System Images Separately
 
 ID: RK-SM-YF-386
 
-Release Version: V1.5.1
+Release Version: V1.6.0
 
-Release Date: 2020-12-08
+Release Date: 2021-01-14
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -38,9 +38,9 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 **Overview**
 
-The document presents the separate compiling kernel U-Boot or Rootfs of Rockchip RV1126/RV1109 Linux SDK, aiming to help engineers get started with RV1126/RV1109 Linux SDK faster.
+The document presents how to build kernel, U-Boot or Rootfs of Rockchip RV1126/RV1109 Linux SDK separately, aiming to help engineers get started with RV1126/RV1109 Linux SDK faster.
 
-**[NOTICE]: Please update SDK version to V1.3.0 or the latest**
+**[NOTICE]: Please update SDK version to V1.3.0 or the latest version**
 
 Get the version of SDK: `realpath .repo/manifests/rv1126_rv1109_linux_release.xml`
 
@@ -55,11 +55,12 @@ Get the version of SDK: `realpath .repo/manifests/rv1126_rv1109_linux_release.xm
 This document (this guide) is mainly intended for:
 
 - Technical support engineers
+
 - Software development engineers
 
 **Revision History**
 
-| **Version** | **Author** | **Date** | Revision History |
+| **Version** | **Author** | **Date** | **Revision History** |
 | ---------- | --------| :--------- | ------------ |
 | 2020-08-10 | V1.0.0 | CWW  |   alpha                                                      |
 | 2020-08-12 | V1.1.0 | CWW  | 1. Add idblock.bin compile instructions<br>2. Add drivers insmod|
@@ -68,22 +69,27 @@ This document (this guide) is mainly intended for:
 | 2020-09-15 | V1.4.0 | CWW  | 1. Support AB system compilation                           |
 | 2020-09-27 | V1.5.0 | CWW  | 1. Fix BSP library build<br>2. Add print cif info |
 | 2020-12-08 | V1.5.1 | CWW  | 1. Fix insmod driver module |
+| 2021-01-14 | V1.6.0 | CWW  | 1. Update manufacture programmer firmware image |
+
+---
 
 [TOC]
 
-## U-Boot compilation
+---
 
-### Get U-Boot code from SDK
+## U-Boot Compilation
+
+### Get U-Boot Code from SDK
 
 Get thses directories from root directory of SDK:
 
-| Directory or File | Instructions                      |
+| Directory or File | Description                      |
 | ----------------- | --------------------------------- |
 | rkbin             | about DDR and prebuilt loader bin |
 | u-boot            | U-Boot code                       |
 | prebuilts         | cross-compile tool                |
 
-### For SPI NOR U-Boot compilation
+### For SPI NOR U-Boot Compilation
 
 ``` shell
 cd u-boot
@@ -92,9 +98,9 @@ cd u-boot
 ./make.sh --idblock --spl
 ```
 
-### For eMMC U-Boot compilation
+### For eMMC U-Boot Compilation
 
-#### Non-support AB system
+#### AB System Is Not Supported
 
 ``` shell
 cd u-boot
@@ -104,7 +110,7 @@ cd u-boot
 # mtdparts=rk29xxnand:0x00002000@0x00004000(uboot),0x00010000@0x00006000(boot),0x00010000@0x00016000(rootfs),-@0x00026000(data:grow)
 ```
 
-#### Support AB system
+#### AB System Is Supported
 
 ``` shell
 cd u-boot
@@ -114,26 +120,26 @@ cd u-boot
 # mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00001000@0x00008000(misc),0x00010000@0x00009000(boot_a),0x00010000@0x00019000(boot_b),0x00020000@0x00029000(system_a),0x00020000@0x00049000(system_b),-@0x00069000(data:grow)
 ```
 
-### Instructions to U-Boot images
+### Instructions to U-Boot Images
 
-| the name of image         | comment                                             |
+| The name of image         | Description                                             |
 | ------------------------- | --------------------------------------------        |
 | rv1126_spl_loader_***.bin | loader file                                         |
 | uboot.img                 | U-Boot image                                        |
 | idblock.bin               | the IDBlock partition file for firmware_merger tool |
 
-## Linux kernel compilation
+## Linux Kernel Compilation
 
-### Get linux kernel code from SDK
+### Get Linux Kernel Code from SDK
 
 Get thses directories from root directory of SDK:
 
-| Directory or File | Instructions       |
+| Directory or File | Description       |
 | ----------------- | ------------------ |
 | kernel            | linux kernel code  |
 | prebuilts         | cross-compile tool |
 
-### Build command explanation
+### Build Command Introduction
 
 Build command format:
 
@@ -152,30 +158,30 @@ make menuconfig # this step is optinal
 make ARCH=args1 args2.img -j12
 ```
 
-### For SPI NOR linux kernel compilation
+### For SPI NOR Linux Kernel Compilation
 
 ``` shell
 make ARCH=arm rv1126_defconfig rv1126-spi-nor.config
 make ARCH=arm rv1126-38x38-v10-spi-nor.img -j12
 ```
 
-### For eMMC linux kernel compilation
+### For eMMC Linux Kernel Compilation
 
-#### Build eMMC kernel without peripheral drivers
+#### Build eMMC Kernel Without Peripheral Drivers
 
 ``` shell
 make ARCH=arm rv1126_defconfig rv1126-emmc-drivers-modules.config
 make ARCH=arm rv1126-38x38-v10-emmc.img -j12
 ```
 
-#### Build eMMC kernel with peripheral drivers
+#### Build eMMC Kernel with Peripheral Drivers
 
 ``` shell
 make ARCH=arm rv1126_defconfig rv1126-emmc-drivers-builtin.config
 make ARCH=arm rv1126-38x38-v10-emmc.img -j12
 ```
 
-### Package drivers (only for building without peripheral drivers into kernel)
+### Package Drivers (only for building without peripheral drivers into kernel)
 
 ```shell
 make modules_install ARCH=arm INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=./drivers-ko
@@ -183,14 +189,14 @@ make modules_install ARCH=arm INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=./drivers-ko
 rm -f drivers-ko/lib/modules/4.19.111/build drivers-ko/lib/modules/4.19.111/source
 ```
 
-### Instructions to linux kernel image
+### Instructions to Linux Kernel Image
 
-| the name of image | comment                               |
+| The name of image | Description                               |
 | ---------         | ---------------------                 |
 | zboot.img         | linux kernel image                    |
 | drivers-ko        | the directory of linux kernel drivers |
 
-### Instructions to drivers insmod (only for building without peripheral drivers into kernel)
+### Instructions to Drivers insmod (only for building without peripheral drivers into kernel)
 
 ``` shell
 # stop udevd before insmod driver modules
@@ -230,7 +236,6 @@ insmod kernel/drivers/media/platform/rockchip/cif/video_rkcif.ko
 insmod kernel/drivers/media/platform/rockchip/isp/video_rkisp.ko
 insmod kernel/drivers/media/platform/rockchip/ispp/video_rkispp.ko
 echo 1 > /sys/module/video_rkisp/parameters/clr_unready_dev
-echo 1 > /sys/module/video_rkispp/parameters/mode
 
 # insmod vcodec
 insmod kernel/drivers/video/rockchip/mpp/rk_vcodec.ko
@@ -266,9 +271,9 @@ insmod kernel/drivers/leds/leds-pwm.ko
 udevadm control --start-exec-queue
 ```
 
-## Root filesystem compilation
+## Root Filesystem Compilation
 
-### Get tarball of build-busybox and compile
+### Get tarball of build-busybox and Compile
 
 Get busybox tarball from path: `device/rockchip/rv1126_rv1109/prebuilt-packages/build-busybox`
 
@@ -308,7 +313,7 @@ tar xjf tools.tar.bz2
 
 **NOTICE: The library named /usr/lib/libv4l/plugins/libv4l-mplane.so MUST be placed in the rootfs.**
 
-### Instructions to auto mount partition
+### Instructions to Auto Mount Partition
 
 target-emmc-v1.0.0.tar.bz2 support auto mount the partitions which config in the file of /etc/fstab.
 Auto mount script: target/etc/init.d/S21mountall.sh
@@ -329,41 +334,38 @@ debug           /sys/kernel/debug  debugfs  defaults   0       0
 /dev/block/by-name/userdata     /userdata  ext2  defaults   0       2
 ```
 
-## Manufacture programmer firmware image for SPI NOR
+## Manufacture Programmer Firmware Image
 
-Get firmware_merger from path: `device/rockchip/rv1126_rv1109/prebuilt-packages/firmware_merger`
+### Building for SPI NOR and eMMC
 
-``` shell
-# Instructions to the tool of firmware_merger
-# -P : assign the config of partition and input image
-# ./ : config output file Firmware.img
-./firmware_merger -P setting.ini ./
+- Build udpate.img
 
-# Instructions to the directory of firmware_merger
-firmware_merger
-├── Firmware.img                     # Generate firmware image
-├── firmware_merger                  # Execute binary
-├── Readme.txt                       #
-├── RKDevTool_Release_v2.74          # Download program
-│   ├── RKDevTool.exe                #
-│   ├── RKDevTool_manual_v1.2_cn.pdf #
-│   └── RKDevTool_manual_v1.2_en.pdf #
-├── rockdev                          # Images for package
-│   ├── idblock.bin                  # Get from SDK's u-boot directory
-│   ├── rootfs.squashfs              #
-│   ├── rv1126_spl_loader_***.bin    # Get from SDK's u-boot directory
-│   ├── uboot.img                    # Get from SDK's u-boot directory
-│   └── zboot.img                    # Get from SDK's kernel directory
-├── setting.ini                      #
-├── user_manual.txt                  #
-└── burn-screenshot.png              #
+```shell
+# e.g. select eMMC reference BoardConfig for building eMMC update.img
+./build.sh device/rockchip/rv1126_rv1109/BoardConfig.mk
+# or select SPI NOR reference BoardConfig for building SPI NOR update.img
+# ./build.sh device/rockchip/rv1126_rv1109/BoardConfig-spi-nor-v12.mk
+./build.sh all
+./mkfirmware.sh
+./build.sh updateimg
+ls rockdev/update.img
 ```
 
-## Instructions to compile the libraries of BSP
+- Convert update.img to Manufacture programmer firmware (date.bin)
+
+Get tool from `<SDK>/tools/windows/SpiImageTools_***.zip`.
+
+![](resources/SPI-IMAGE-TOOLS.png)
+
+### Building for SPI NAND and SLC NAND
+
+See the document: `<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_Nand_Flash_Open_Source_Solution_CN.pdf`.
+
+## Instructions to Build BSP Libraries
 
 Get thses directories from root directory of SDK:
 
-| Directory or File | Instructions                        |
+| Directory or File | Description                       |
 | ----------------- | ----------------------------------- |
 | buildroot         | buildroot's source                  |
 | external          | rockchip BSP codes                  |
@@ -371,7 +373,7 @@ Get thses directories from root directory of SDK:
 | envsetup.sh       | link to buildroot/build/envsetup.sh |
 | Makefile          | link to buildroot/build/Makefile    |
 
-### Command to build BSP's libraries
+### Command to Build BSP Libraries
 
 ```shell
 source envsetup.sh rockchip_rv1126_rv1109_libs
@@ -379,7 +381,7 @@ source envsetup.sh rockchip_rv1126_rv1109_libs
 make -j12
 ```
 
-### BSP's files
+### BSP Files
 
 ```shell
 tree buildroot/output/rockchip_rv1126_rv1109_libs/BSP/
@@ -927,13 +929,13 @@ buildroot/output/rockchip_rv1126_rv1109_libs/BSP/
     └── libv4lconvert.so.0.0.0
 ```
 
-## Debug info
+## Debug Info
 
-### CPU debug info
+### CPU Debug Info
 
-#### CPU frequency debug
+#### CPU Frequency Debug
 
-##### Print CPU frequency
+##### Print CPU Frequency
 
 ```shell
 # print current cpu frequency
@@ -945,7 +947,7 @@ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies
 408000 600000 816000 1008000 1200000 1296000
 ```
 
-##### Set CPU fixed frequency
+##### Fix the Frequency of CPU
 
 ```shell
 # set CPU 600MHz fixed frequency
@@ -953,11 +955,11 @@ echo userspace > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 echo 600000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed
 ```
 
-#### Print CPU thermal
+#### Print CPU Thermal
 
 `cat /sys/class/thermal/thermal_zone0/temp`
 
-#### Disable CPU thermal control
+#### Disable CPU Thermal Control
 
 ```shell
 # diable thermal control
@@ -967,9 +969,9 @@ echo 0 > /sys/class/thermal/thermal_zone0/cdev0/cur_state
 echo 0 > /sys/class/thermal/thermal_zone0/cdev1/cur_state
 ```
 
-### Encode debug info
+### Encode Debug Info
 
-#### Print encode frame rate
+#### Print Encode Frame Rate
 
 ```shell
 # enable print fps log
@@ -979,7 +981,7 @@ echo 0x100 > /sys/module/rk_vcodec/parameters/mpp_dev_debug
 echo 0 > /sys/module/rk_vcodec/parameters/mpp_dev_debug
 ```
 
-### Print CIF info
+### Print CIF Info
 
 `cat /proc/rkcif_mipi_lvds`
 
@@ -1010,7 +1012,7 @@ Output Info:
                         frame dma end:158
 ```
 
-### Print ISPP info
+### Print ISPP Info
 
 `cat /proc/rkispp0`
 
@@ -1033,7 +1035,7 @@ aclk_ispp  500000000
 hclk_ispp  250000000
 ```
 
-### Print ISP info
+### Print ISP Info
 
 `cat /proc/rkisp0`
 
