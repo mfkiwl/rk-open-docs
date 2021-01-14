@@ -1,10 +1,10 @@
-# MCU Developer Guide
+# RK3399 MCU Developer Guide
 
 ID: RK-KF-YF-123
 
-Release Version: V1.2.0
+Release Version: V1.3.0
 
-Release Date: 2020-08-17
+Release Date: 2021-01-14
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -55,9 +55,10 @@ Software Engineer
 
 | **Revision Date** | **Version** | **Author** | **Revision Description** |
 | ----------------- | ----------- | ---------- | ------------------------ |
-| 2017-09-20        | V1.0        | Frank.Wang | Initial version          |
-| 2017-12-27        | V1.1        | Frank.Wang | Modify format          |
-| 2020-08-17 | V1.2.0 | Frank.Wang | Modify format and amend the source codes repository |
+| 2017-09-20        | V1.0.0        | Frank.Wang | Initial version        |
+| 2017-12-27        | V1.1.0        | Frank.Wang | Modify format          |
+| 2020-08-17        | V1.2.0        | Frank.Wang | Modify format and amend the source codes repository |
+| 2021-01-14        | V1.3.0        | Frank.Wang | Rename doc's name and fix the demo show and etc. |
 
 [TOC]
 
@@ -65,10 +66,9 @@ Software Engineer
 
 ARM® Cortex®-M processor family provide some benefits to developers, including: simple, easy-to-use, highly efficient, ultra-low power operation.
 
-At the same time, the Cortex-M processor provides developers more functions at a lower cost, which has significant advantages in code reuse and development efficiency. For this advantage, it is widely used in the field of embedded devices. The simply introduction of Cortex-M0 and Cortex-M3 is as follows:
+At the same time, the Cortex-M processor provides developers more functions at a lower cost, which has significant advantages in code reuse and development efficiency. For this advantage, it is widely used in the field of embedded devices. The simply introduction of Cortex-M0 is as follows:
 
 - The Cortex-M0 processor uses the ARMv6-M architecture  based on a highly integrated, low-power 32-bit processor core; it uses the von Neumann architecture and base on the 16-bit Thumb instruction set included Thumb-2 technology.
-- The Cortex-M3 is a 32-bit processor core used the ARMv7-M architecture. It uses Harvard architecture, which has an independent instruction bus and data bus, which allows the fetch and data access to be parallel.
 
 Based on the above advantages of ARM® Cortex®-M, the MCUs currently integrated on the Rockchip SoC are described below:
 
@@ -248,10 +248,10 @@ RK3399M0.bin  RK3399M0.dump  RK3399M0.elf  RK3399M0.map
 main.o  startup.o
 
 ./include:
-mcu.h  remotectl_pwm.h  rk3399.h
+mcu.h rk3399.h
 
 ./src:
-main.c  main.c.bk  remotectl_pwm.c  startup.c
+main.c startup.c
 ```
 
 - build：Use to store the compiled "obj" file and "bin" file.
@@ -358,6 +358,4 @@ This section lists relevant documents published by third parties:
 
 [Cortex-M0 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0497a/index.html)  
 [Cortex-M0 Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.ddi0432c/index.html)  
-[ARM Cortex-M3 Processor Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.100165_0201_00_en/index.html)  
-[Cortex-M3 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0552a/index.html)  
 Rockchip RK3399 TRM V1.4  

@@ -1,10 +1,10 @@
-# MCU 开发指南
+# RK3399 MCU 开发指南
 
 文件标识：RK-KF-YF-124
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-08-17
+日期：2021-01-14
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -22,7 +22,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2020瑞芯微电子股份有限公司**
+**版权所有© 2021瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -66,9 +66,10 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 | **日期**     | **版本** | **作者** | **修改说明** |
 | ---------- | ------ | ------ | -------- |
-| 2017-09-20 | V1.0   | 王明成    | 初始版本     |
-| 2017-12-27 | V1.1   | 王明成    | 修订文档格式   |
+| 2017-09-20 | V1.0.0   | 王明成    | 初始版本     |
+| 2017-12-27 | V1.1.0   | 王明成    | 修订文档格式   |
 | 2020-08-17 | V1.2.0   | 王明成    | 修订文档格式，修正代码下载路径等   |
+| 2021-01-14 | V1.3.0   | 王明成    | 文档重命名，修正demo目录显示等   |
 
 ---
 
@@ -78,11 +79,9 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 ## Rockchip MCU简介
 
-ARM® Cortex®-M处理器系列具有灵活性、易用性、高性能、低功耗等特点。同时，Cortex-M处理器能够帮助开发者以更低的成本提供更多的功能，其在代码重用和提高开发效率方面有显著优势，所以在嵌入式设备领域的应用非常广泛。如下为Cortex-M0和Cortex-M3的基本简介。
+ARM® Cortex®-M处理器系列具有灵活性、易用性、高性能、低功耗等特点。同时，Cortex-M处理器能够帮助开发者以更低的成本提供更多的功能，其在代码重用和提高开发效率方面有显著优势，所以在嵌入式设备领域的应用非常广泛。如下为Cortex-M0基本简介。
 
 - Cortex-M0采用ARMv6-M结构，基于一个高集成度、低功耗的32位处理器内核；它采用冯·诺伊曼结构，基于16位的Thumb指令集，并包含Thumb-2技术。
-
-- Cortex-M3采用ARMv7-M结构，为32位处理器内核。它采用哈佛结构，拥有独立的指令总线和数据总线，可以让取指与数据访问并行不悖。
 
 基于以上ARM® Cortex®-M优点，目前，Rockchip SoC上集成的MCU说明如下：
 
@@ -265,10 +264,10 @@ RK3399M0.bin  RK3399M0.dump  RK3399M0.elf  RK3399M0.map
 main.o  startup.o
 
 ./include:
-mcu.h  remotectl_pwm.h  rk3399.h
+mcu.h rk3399.h
 
 ./src:
-main.c  main.c.bk  remotectl_pwm.c  startup.c
+main.c startup.c
 ```
 
 - build：用于存放编译生成的obj文件和bin文件。
@@ -372,6 +371,4 @@ RK3399 Perilp M0支持的外部中断请参阅RK3399 TRM 2.4 System Interrupt Co
 
 [Cortex-M0 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0497a/index.html)  
 [Cortex-M0 Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.ddi0432c/index.html)  
-[ARM Cortex-M3 Processor Technical Reference Manual](http://infocenter.arm.com/help/topic/com.arm.doc.100165_0201_00_en/index.html)  
-[Cortex-M3 Devices Generic User Guide](http://infocenter.arm.com/help/topic/com.arm.doc.dui0552a/index.html)  
 Rockchip RK3399 TRM V1.4  
