@@ -77,11 +77,17 @@ Rockchip Electronics Co., Ltd.
 
 ### 低功耗产品方案介绍
 
-​    低功耗带电池产品都有一个共同特点就是在用电池的情况下，需要使用的时间长达半年甚至一年的时间。目前已经有很多非常类似的产品，比如：电池IPC、智能猫眼、智能门铃、人脸门锁等等。
+低功耗带电池产品都有一个共同特点就是在用电池的情况下，需要使用的时间长达半年甚至一年的时间。目前已经有很多非常类似的产品，比如：电池IPC、智能猫眼、智能门铃、人脸门锁等等。
 
-​    为了延长电池使用时间，在做这类产品的时候我们就要求，设备不工作时SoC必须处于关机状态，DDR也完全掉电。当外部条件（比如PIR或者Wi-Fi远程唤醒）触发的时候，通过快速冷启动的方式，快速进入到工作模式。所以冷启动时间也成为了这种产品非常关键的指标。
+为了延长电池使用时间，在做这类产品的时候我们就要求，设备不工作时SoC必须处于关机状态，DDR也完全掉电。当外部条件（比如PIR或者Wi-Fi远程唤醒）触发的时候，通过快速冷启动的方式，快速进入到工作模式。所以冷启动时间也成为了这种产品非常关键的指标。
 
-​    RV1126/RV1109芯片采用14nm工艺，运行电压0.8V，功耗和温升相比前一代的芯片都有极大的提升。另外，RV1126/RV1109内部有专门针对快速启动做了硬件优化设计，可以极大地降低快速启动时间，比如RV1126/RV1109芯片内置硬件解压缩模块，可以快速解压rootfs和kernel。
+RV1126/RV1109芯片采用14nm工艺，运行电压0.8V，功耗和温升相比前一代的芯片都有极大的提升。另外，RV1126/RV1109内部有专门针对快速启动做了硬件优化设计，可以极大地降低快速启动时间，比如RV1126/RV1109芯片内置硬件解压缩模块，可以快速解压rootfs和kernel。
+
+目前我们电池IPC样机支持的唤醒方式有：
+
+- 按键唤醒
+- PIR唤醒
+- Wi-Fi远程唤醒
 
 ### RV1126/RV1109开发低功耗产品方案的优势
 
@@ -95,9 +101,19 @@ Rockchip Electronics Co., Ltd.
 
 ### 电池IPC产品框图
 
-​    基于目前RV1126/RV1109芯片，开发电池IPC产品的框图如下：
+基于目前RV1126/RV1109芯片，开发电池IPC产品的框图如下：
 
 ![](./resources/battery-ipc-diagram.png)
+
+方案框图中，T2 Wi-Fi是一颗低功耗Wi-Fi芯片，里面集成了一颗低功耗MCU，这样我们就能省掉一个外置的低功耗的MCU。一般情况下，外置低功耗MCU上需要执行一些低功耗的逻辑，这样可以不要给主控上电就可以进行一些低功耗逻辑的处理，例如：
+
+- 充电电流的控制；
+- 唤醒源判断；
+- 电量读取；
+- PIR使能控制；
+- PIR唤醒多次过滤；
+
+如果客户选择其他低功耗Wi-Fi，并且不带MCU功能的话，我们建议方案设计上需要考虑外置一颗低功耗MCU。
 
 ## RV1126/RV1109快速启动SDK介绍
 
@@ -115,6 +131,12 @@ RV1126/RV1109 SDK中目前和快速启动的相关配置如下：
 | BoardConfig-dualcam-tb-v13.mk | 用来编译RV1126 DDR3 EVB V13板子的板级配置，存储使用eMMC，支持双目 |
 | BoardConfig-battery-ipc.mk    | 用来编译电池IPC LPDDR3 Demo Board的板级配置，存储使用eMMC           |
 
+RV1126/RV1109默认使用BoardConfig.mk配置，编译上述配置时需要先切换板级配置再进行编译，参考命令如下：
+
+```shell
+./build.sh BoardConfig-tb-v13.mk && ./build.sh
+```
+
 客户可以根据自己的产品需求，基于上述配置进行开发。
 
 #### 镜像分区说明
@@ -122,7 +144,7 @@ RV1126/RV1109 SDK中目前和快速启动的相关配置如下：
 快速启动固件镜像分区和常规IPC固件不一样，分区配置可以参考SDK中device/rockchip/rv1126_rv1109目录下的文件：
 
 ```
-parameter-tb.txt                                            // eMMC快速启动镜像分区配置
+parameter-tb.txt                              // eMMC快速启动镜像分区配置
 parameter-spi-nor-tb-32M.txt                 // SPI Nor 32MB快速启动镜像分区配置
 ```
 
@@ -144,6 +166,26 @@ parameter-spi-nor-tb-32M.txt                 // SPI Nor 32MB快速启动镜像�
 
 说明：根据需要，客户可以单独开一个可读写的分区。
 
+#### 快速启动固件烧写
+
+Linux环境下可以用下面的命令烧写整体固件：
+
+```shell
+upgrade_tool uf rockdev/update.img
+```
+
+Windows环境下，需要导入快速启动烧写配置，再进行分区烧写，Windows工具快速启动烧写配置文件如下：
+
+```
+rv1126_rv1109_tb-config.cfg
+```
+
+导入配置后界面显示如下，我们一般只要烧写uboot和boot即可：
+
+![windows-upgrade](resources/windows-upgrade.png)
+
+关于固件烧写更细节的说明，请参考文档：docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf
+
 ## 快速启动
 
 RV1126/RV1109系列芯片内置硬件解压缩模块 -- decom，可以极大得提升系统启动速度。另外，RV1126/RV1109内置一个MCU，MCU在SoC上电后就会快速启动，迅速初始化Camera和ISP，然后尽可能快得把前几帧图像保存下来。本章主要介绍了RV1126/RV1109快速启动的优化方法和注意事项。
@@ -155,11 +197,11 @@ RV1126/RV1109系列芯片内置硬件解压缩模块 -- decom，可以极大得�
 
 不同存储介质对内核和rootfs镜像的读取速度不一样，下面是不同存储介质典型的读取速度，因此我们不推荐使用SPI Nand Flash作为快速启动的存储介质：
 
-| 存储介质类型   | 读取速度    | 是否支持快速启动 | 参考板级配置                  |
-| -------------- | ----------- | ---------------- | ----------------------------- |
-| eMMC           | 120MB/S     | 是               | BoardConfig-tb-v13.mk         |
-| SPI Nor Flash  | 48MB/S(TBD) | 是               | BoardConfig-spi-nor-tb-v13.mk |
-| SPI Nand Flash | 18MB/S(TBD) | 否               | 不支持                        |
+| 存储介质类型   | 读取速度 | 是否支持快速启动 | 参考板级配置                  |
+| -------------- | -------- | ---------------- | ----------------------------- |
+| eMMC           | 120MB/S  | 是               | BoardConfig-tb-v13.mk         |
+| SPI Nor Flash  | 30MB/S   | 是               | BoardConfig-spi-nor-tb-v13.mk |
+| SPI Nand Flash | 10.8MB/S | 否               | 不支持                        |
 
 ### 快速启动基本流程
 
@@ -194,9 +236,9 @@ U-Boot SPL 下支持 fit 格式的快速开机，同时支持按键进入loader�
 配置：
 
 ```c
-CONFIG_SPL_KERNEL_BOOT=y                           // 开启快速开机功能
-CONFIG_SPL_BLK_READ_PREPARE=y              // 开启预加载功能
-CONFIG_SPL_MISC_DECOMPRESS=y                // 开启解压功能
+CONFIG_SPL_KERNEL_BOOT=y                  // 开启快速开机功能
+CONFIG_SPL_BLK_READ_PREPARE=y             // 开启预加载功能
+CONFIG_SPL_MISC_DECOMPRESS=y              // 开启解压功能
 CONFIG_SPL_ROCKCHIP_HW_DECOMPRESS=y
 ```
 
@@ -212,23 +254,23 @@ its文件的配置如下：
 
 ```c
 ramdisk {
-	data = /incbin/("./images-tb/ramdisk.gz");
-	compression = "gzip";      // 压缩格式
-	type = "ramdisk";
-	arch = "arm";
-	os = "linux";
-	preload = <1>;             // 预加载标志
-	comp = <0x5800000>;        // 加载地址
-	load = <0x2800000>;        // 解压地址
-	decomp-async;              // 异步解压
-	hash {
-		algo = "sha256";
-		uboot-ignore = <1>;    // 不做hash校验
-	};
+        data = /incbin/("./images-tb/ramdisk.gz");
+        compression = "gzip";      // 压缩格式
+        type = "ramdisk";
+        arch = "arm";
+        os = "linux";
+        preload = <1>;             // 预加载标志
+        comp = <0x5800000>;        // 加载地址
+        load = <0x2800000>;        // 解压地址
+        decomp-async;              // 异步解压
+        hash {
+                algo = "sha256";
+                uboot-ignore = <1>;    // 不做hash校验
+        };
 };
 ```
 
-编译固件，比如编译rv1126 eMMC固件：
+编译固件，比如编译RV1126 eMMC固件：
 
 ```c
 ./make.sh rv1126-emmc-tb && ./make.sh --spl
@@ -254,41 +296,41 @@ CONFIG_VIDEO_ROCKCHIP_THUNDER_BOOT_ISP=y         // 开启支持ISP快速开机�
 
 ```c
 memory: memory {
-	device_type = "memory";
-	reg = <0x00000000 0x20000000>;       // 离线帧预留内存，给MCU抓拍使用，根据需要分配，不需要MCU快速抓拍功能，建议删除
+        device_type = "memory";
+        reg = <0x00000000 0x20000000>;       // 离线帧预留内存，给MCU抓拍使用，根据需要分配，不需要MCU快速抓拍功能，建议删除
 };
 
 reserved-memory {
-	trust@0 {
-		reg = <0x00000000 0x00200000>;   // trust 空间
-		no-map;
-	};
+        trust@0 {
+                reg = <0x00000000 0x00200000>;   // trust 空间
+                no-map;
+        };
 
-	trust@200000 {
-		reg = <0x00200000 0x00008000>;
-	};
+        trust@200000 {
+                reg = <0x00200000 0x00008000>;
+        };
 
-	ramoops@210000 {
-		compatible = "ramoops";
-		reg = <0x00210000 0x000f0000>;
-		record-size = <0x20000>;
-		console-size = <0x20000>;
-		ftrace-size = <0x00000>;
-		pmsg-size = <0x50000>;
-	};
+        ramoops@210000 {
+                compatible = "ramoops";
+                reg = <0x00210000 0x000f0000>;
+                record-size = <0x20000>;
+                console-size = <0x20000>;
+                ftrace-size = <0x00000>;
+                pmsg-size = <0x50000>;
+        };
 
-	rtos@300000 {
-		reg = <0x00300000 0x00100000>;        // 预留给用户端使用，没有使用可以删掉
-		no-map;
-	};
+        rtos@300000 {
+                reg = <0x00300000 0x00100000>;        // 预留给用户端使用，没有使用可以删掉
+                no-map;
+        };
 
-	ramdisk_r: ramdisk@2800000 {
-		reg = <0x02800000 (48 * 0x00100000)>; // 解压源地址和大小，可以依据实际大小进行更改
-	};
+        ramdisk_r: ramdisk@2800000 {
+                reg = <0x02800000 (48 * 0x00100000)>; // 解压源地址和大小，可以依据实际大小进行更改
+        };
 
-	ramdisk_c: ramdisk@5800000 {
-		reg = <0x05800000 (20 * 0x00100000)>; // 压缩源地址和大小，可以依据实际大小进行更改
-	};
+        ramdisk_c: ramdisk@5800000 {
+                reg = <0x05800000 (20 * 0x00100000)>; // 压缩源地址和大小，可以依据实际大小进行更改
+        };
 };
 ```
 
@@ -407,11 +449,11 @@ vim kernel/arch/arm/boot/dts/rv1126-thunder-boot.dtsi
 
 ```c
 ramdisk_r: ramdisk@2800000 {
-	reg = <0x02800000 (48 * 0x00100000)>;    // 解压源地址和大小，可以依据实际大小进行更改
+        reg = <0x02800000 (48 * 0x00100000)>;        // 解压源地址和大小，可以依据实际大小进行更改
 };
 
 ramdisk_c: ramdisk@5800000 {
-	reg = <0x05800000 (20 * 0x00100000)>;        // 压缩源地址和大小，可以依据实际大小进行更改
+        reg = <0x05800000 (20 * 0x00100000)>;        // 压缩源地址和大小，可以依据实际大小进行更改
 };
 ```
 
@@ -431,9 +473,9 @@ me@my-ubuntu:~/rv1126/sdk$ ls -al buildroot/output/rockchip_rv1126_evb_tb/images
 
 #### MCU启动机制
 
-芯片上电时，MCU处在复位状态，需要A7为其加载固件，然后撤销复位信号，MCU上电执行，同时A7启动LINUX.
+芯片上电时，MCU处在复位状态，需要ARM为其加载固件，然后撤销复位信号，MCU上电执行，同时ARM启动Linux。
 
-MCU的固件路径为rkbin\bin\rv11\rv1126_riscv_sc210iot_1920_1080_SBGGR10_compact.bin, 编译之前将rv1126_riscv_v1.02.bin删除，rv1126_riscv_sc210iot_1920_1080_SBGGR10_compact.bin改名为rv1126_riscv_v1.02.bin， 目前固件仅支持SC210IOT 1080P 30fps, 如需要支持其他SENSOR，请联系FAE。
+MCU的固件路径为rkbin\bin\rv11\rv1126_riscv_sc210iot_1920_1080_SBGGR10_compact.bin, 编译之前将rv1126_riscv_v1.02.bin删除，rv1126_riscv_sc210iot_1920_1080_SBGGR10_compact.bin改名为rv1126_riscv_v1.02.bin， 目前固件仅支持SC210IOT 1080P 30fps，如需要支持其他Sensor，请联系FAE。
 
 MCU各阶段耗时如下：
 
@@ -447,7 +489,7 @@ MCU各阶段耗时如下：
 
 2，增加MCU系统的功能
 
-3，更换SENSOR
+3，更换Sensor
 
 4，更换存储介质
 
@@ -491,12 +533,23 @@ rkmedia_fake_vi_test -a /etc/iqfiles -d /dev/video38 -s /dev/v4l-subdev6 -w 1920
 
 通过上述方法优化后，目前快速启动能否达到以下指标：
 
+- 使用eMMC存储，快速启动指标如下：
+
 | 启动阶段        | 指标达成情况 |
 | --------------- | ------------ |
 | 快速抓拍        | 210ms        |
 | Camera出流      | 600ms        |
 | Wi-Fi联网获取IP | 1S           |
 | Wi-Fi极速推流   | 2S           |
+
+- 使用SPI Nor存储，快速启动指标如下：
+
+| 启动阶段        | 指标达成情况 |
+| --------------- | ------------ |
+| 快速抓拍        | TBD          |
+| Camera出流      | 950ms        |
+| Wi-Fi联网获取IP | 1.3S         |
+| Wi-Fi极速推流   | 2.5S         |
 
 注意：由于不同的产品配置不同，做出来的快速启动指标和上述指标会有差异，瑞芯微并不保证任何产品类型都能达到上述优化指标。
 
@@ -582,9 +635,6 @@ rkmedia_fake_vi_test -a /etc/iqfiles -d /dev/video38 -s /dev/v4l-subdev6 -w 1920
 | --------- | -------------- | ------------- |
 | CYW43438  | 350uA          | TBD           |
 | AP6203    | 350uA          | TBD           |
-| Hi3861    | TBD            | TBD           |
-| ABTM6441  | 270uA          | TBD           |
-| T2        | 80uA           | TBD           |
 
 注意：以上Wi-Fi低功耗保活功耗都是在屏蔽房，DTIM=10的情况下测试，在正常环境下测试功耗会更高。
 
@@ -611,15 +661,15 @@ DDR方面，我们参考设计上选择的是LPDDR3和LPDDR4，他们的功耗�
 
 注意：由于不同的产品配置不同，做出来的功耗指标和上述指标会有差异，瑞芯微并不保证任何产品类型都能达到上述优化指标。
 
-## 快速启动功能扩展
+## 常用功能配置
 
 快速启动的配置都是经过极大精简的，客户在调试的时候难免会遇到各种问题，比如一些库或者工具没有。调试的便利性和rootfs镜像大小是矛盾的关系，想要达到最快的启动速度，肯定会增加产品调试和开发的难度。因此，本章就需要着重介绍，一些客户常用的功能如何使能和配置。
 
-### 快速启动增加MiniGUI支持
+### 增加MiniGUI支持
 
 TBD
 
-### 快速启动双目Camera支持
+### 双目Camera支持
 
 目前SDK中已经支持快速启动+双目Camera的配置，客户可以基于这个配置开发智能门锁等需要双目摄像头的产品，配置文件如下：
 
@@ -654,7 +704,7 @@ iperf3功能的开启需要在buildroot配置文件中打开gdb的功能
 +#include "gdb.config"
 ```
 
-## Wi-Fi低功耗保活和远程唤醒
+## Wi-Fi保活和远程唤醒介绍
 
 低功耗电池产品，非常注重产品的便携性。因此这类产品往往使用Wi-Fi来传输控制命令或者视频流数据。设备在不工作的时候，SoC处于掉电关机状态，此时为了让设备处于在线状态，Wi-Fi必须处于低功耗保活模式。Wi-Fi在低功耗保活模式下会定时唤醒接收来自云端的唤醒包。当用户需要通过手机查看设备端视频的时候，云端会发送唤醒包给Wi-Fi，Wi-Fi收到唤醒包之后，会通过GPIO给SoC上电，然后SoC快速启动把视频流推送给用户。
 
@@ -675,7 +725,7 @@ Wi-Fi低功耗保活和远程唤醒的基本流程如下：
 
 #### 二维码配网
 
-**1. 二维码的使用**
+**1. 二维码的使用lieb**
 
 请详见 docs/RV1126_RV1109/Rockchip_Instruction_Linux_Battery_IPC_CN.pdf。
 
@@ -685,11 +735,323 @@ Wi-Fi低功耗保活和远程唤醒的基本流程如下：
 
 ### Wi-Fi低功耗保活
 
-TBD
+Wi-Fi低功耗保活方案流程如下
 
-### Wi-Fi远程唤醒
+1. 正常状态：RV1126 IPC设备首先与云端建立一个视频推流连接，当推完录像流，或云端主动断开直播流后，设备将建立一个与云端的TCP保活连接，并定期发送心跳包。**（内容为自定义的字符串，例如“heartbeat”）**给云端，保证云端一直知道设备端在线；
 
-TBD
+2. 触发休眠：由IPC摄像头设备物理按键、摄像头程序逻辑(检测空闲时)等⽅式触发休眠；
+
+3. 进入休眠前：通过一条WCM API把第1步的**“最新的TCP保活的连接参数转交”**给WiFi，由WiFi继续维持这个保活TCP连接，并定期发送心跳包（“heartbeat”）；参数包括（举个例子）：
+
+   ```c
+   struct tcp_keepalive_conn {
+       struct ether_addr dst_mac;   /* Destinition Mac */
+       struct ipv4_addr  src_ip;    /* Sorce IP */
+       struct ipv4_addr  dst_ip;    /* Destinition IP */
+       uint16 ipid;                 /* Ip Identification */
+       uint16 srcport;              /* Source Port Address */
+       uint16 dstport;              /* Destination Port Address */
+       uint32 seq;                  /* TCP Sequence Number */
+       uint32 ack;                  /* TCP Ack Number */
+       uint16 tcpwin;               /* TCP window */
+       uint32 tsval;                /* Timestamp Value */
+       uint32 tsecr;                /* Timestamp Echo Reply */
+       uint32 len;                  /* last packet payload len */
+       uint32 ka_payload_len;       /* keep alive payload length  eg: sizeof(heartbeat)*/
+       uint8  ka_payload[1];        /* keep alive payload eg: heartbeat*/
+   } tcpka_conn_t;
+   //特定TCP连接参数的获取：可以在linux tcp/ip协议栈加跟踪函数获取特定tcp连接的参数，类似tcpdump.
+   ```
+
+     再通过另一个WCM API函数设置唤醒包内容（例如“WakeUp”，当WiFi收到跟“WakeUp”一致的内容后，通过GPIO的方式唤醒RV1126设备）
+
+4. 设备休眠：RV1126 IPC摄像头设备关机，仅WiFi芯片在运行并维持和云端的TCP⼼跳；
+
+5. 唤醒设备：云端通过TCP保活连接发送唤醒包“WakeUp”给WiFi，WiFi通过GPIO的方式唤醒RV1126设备；
+
+6. 退出休眠：RV1126 IPC设备被触发开机，重新建立跟云端视频推流连接，回到第1步的正常状态；
+
+### 低功耗Wi-Fi支持列表
+
+目前SDK支持的低功耗Wi-Fi如下：
+
+| Wi-Fi型号 | 低功耗保活功耗 | Wi-Fi推流功耗 |
+| --------- | -------------- | ------------- |
+| CYW43438  | 350uA          | TBD           |
+| AP6203    | 350uA          | TBD           |
+
+### Cypress Wi-Fi方案介绍
+
+#### Cypress Wi-Fi配置
+
+```diff
+##驱动代码：
+kernel/drivers/net/wireless/rockchip_wlan/cywdhd/bcmdhd
+
+#buildroot配置
+BR2_PACKAGE_RKWIFIBT_AP6203BM = y
+
+#选择对应驱动：
+--- a/arch/arm/configs/rv1126-battery.config
++++ b/arch/arm/configs/rv1126-battery.config
+@@ -1,5 +1,7 @@
+ # CONFIG_AP6XXX is not set
+ CONFIG_AP6XXX_INDEP_POWER=m
++CONFIG_CYW_BCMDHD=m
++CONFIG_SDIO_CIS_CYW43438=y
+ CONFIG_BATTERY_CW2015=yba
+ CONFIG_CHARGER_GPIO=y
+ CONFIG_LEDS_PWM=y
+```
+
+#### 保活应用流程介绍
+
+Cypress有提供完整的API来完成Wi-Fi设置，参考代码：
+
+```
+external/rkwifibt/src/CY_WL_API/
+```
+
+**API介绍**
+
+```c
+int WIFI_Init(void) // WiFi初始化
+void WIFI_Deinit(void) // WiFi反初始化
+int WIFI_Connect(char* ssid_name, char* password, int useip) //WiFi连接 userip参数暂时不用
+int WIFI_GetStatus(void) //获取连接状态
+int WIFI_GetWakupReason(void) //获取WiFi唤醒reason
+int WIFI_ClientScan(char *ssid) //扫描WiFi
+int WIFI_Suspend(int sock) //休眠
+int WIFI_Resume(void) //唤醒
+```
+
+**保活流程介绍**
+
+```c
+/* 配置 */
+/* wifi.h */
+#define TCPKA_INTERVAL                180  //设置发包间隔,可修改
+
+/* wifi.c */
+const char tcpka_payload[] = "helloworld"; //设置保活包的内容
+const char wowl_pattern[] = "123";         //设置唤醒包的内容
+
+/* 节选main.c函数 */
+        main()
+        if (WIFI_GetStatus()) //假设WiFi是从休眠中被唤醒的，则WiFi已经连接
+        {
+                pr_info("Already joined AP.\n");
+                wifi_get_wakeup(); //获取WiFi唤醒原因
+
+                ret = WIFI_Resume(); //恢复WiFi状态，删除上一次的保活配置
+                if (ret)
+                {
+                        pr_info("resume_enter, err = %d\n", ret);
+                        goto exit;
+                }
+                rk_obtain_ip_from_vendor(ifname); //从vendor获取IP地址
+        }
+        else
+        {
+                ret = WIFI_Connect(ssid, password, 0); //连接WiFi
+
+                if (ret < 0)
+                {
+                        goto exit;
+                }
+
+                ret = rk_obtain_ip_from_udhcpc(ifname); //用udhcpc获取IP地址
+                if (ret)
+                {
+                        pr_info("obtain_ip, err = %d\n", ret);
+                        goto exit;
+                }
+        }
+        sock = connect_server(ip, port); //连接远端server的保活连接
+        if (sock < 0)
+        {
+                goto exit;
+        }
+
+        ret = send(sock, tcpka_payload, strlen(tcpka_payload), 0); //发送初始自定义数据
+        if (ret < 0)
+        {
+                pr_info("send err = %d\n", ret);
+                goto exit;
+        }
+
+        ret = WIFI_Suspend(sock);  //WiFi休眠
+
+        //关机操作
+        system("tb_poweroff &");
+```
+
+### 正基Wi-Fi方案介绍
+
+#### 正基Wi-Fi基础配置
+
+```diff
+#驱动代码：
+kernel/drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd_indep_power
+
+#buildroot配置
+BR2_PACKAGE_RKWIFIBT_AWNB197 = y
+
+#内核配置
+--- a/arch/arm/configs/rv1126-battery.config
++++ b/arch/arm/configs/rv1126-battery.config
+@@ -1,5 +1,7 @@
+ # CONFIG_AP6XXX is not set
++CONFIG_AP6XXX_INDEP_POWER=m
+ CONFIG_BATTERY_CW2015=y
+ CONFIG_CHARGER_GPIO=y
+ CONFIG_LEDS_PWM=y
+```
+
+**内核修改预置心跳包的内容**
+
+```c
+//保活连接的参数，需要说明的是最后两个参数：2 和 0xc000, 2表示保活包的内容长度，0xc000表示保活包的内容，按实际需求修改。对应到应用层的"/proc/tcp_params"节点
+//kernel/drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd_indep_power/dhd_linux.c
+static int tcp_param_show(struct seq_file *s, void *data)
+{
+        seq_printf(s, "dhd_priv wl tcpka_conn_add 1 %s %s %s 1 %d %d 1 1 1 1 1 2 0xc000\n", deabuf, sabuf, dabuf, source, dest);
+
+        return 0;
+}
+
+//保活连接的端口号，按实际修改；驱动通过端口号来截获保活连接的socket参数
+#define KP_PORT 5150
+```
+
+**设置唤醒包**
+
+```shell
+external/rkwifibt/firmware/broadcom/AP6203BM/wifi/config.txt
+pkt_filter_add=142 0 0 77 0xffffffffffffffffffffffffffffff 0x2F6465766963652F77616B6575702F
+# 77：是唤醒内容的在网络包中的偏移值，可以抓取网络包通过wireshark分析
+# 0xff.... : 是网络包的掩码
+# 0x2f.... : 是自定义的网络包内容
+#注意：如果不懂如何设置，可以抓取您服务端发送的唤醒包发给RK技术人员协助设置；
+```
+
+#### 保活应用流程示例介绍
+
+```c
+//参考external/rkwifibt/src/tcp_client_keepalive.c
+//创建保活socket：
+sockfd = socket(AF_INET, SOCK_STREAM, 0)
+
+servaddr.sin_family = AF_INET;
+//设置服务端保活连接的端口号
+servaddr.sin_port = htons(5150);
+//argv[1]是server端的IP地址
+if ( inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
+    printf("inet_pton error for %s\n",argv[1]);
+    return 0;
+}
+//发起连接
+if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+    printf("connect error: %s (errno: %d)\n",strerror(errno),errno);
+    return 0;
+}
+
+//获取保活连接的初始参数，对应上面的内核截取参数
+open("/proc/tcp_params", O_RDONLY);
+system(buf);
+usleep(300 * 100);
+system("dhd_priv wl tcpka_conn_sess_info 1");
+usleep(300 * 100);
+system("dhd_priv wl tcpka_conn_dump 1");
+
+//发送初始自定义的数据,tcp的参数发生变化
+send(sockfd, "hello", 5, 0);
+
+//获取最新保活连接的参数并设置给WiFi
+system("dhd_priv wl tcpka_conn_sess_info 1");
+usleep(100 * 100);
+system("dhd_priv wl tcpka_conn_dump 0");
+usleep(100 * 100);
+system("dhd_priv wl tcpka_conn_enable 1 1 30 3 8"); // 30为保活包间隔时间，单位为秒
+usleep(100 * 100);
+
+//WiFi休眠
+system("dhd_priv setsuspendmode 1");
+
+//关机操作
+system("tb_poweroff &"); // tb_poweroff为关机脚本，主要做umount和下电操作
+
+```
+
+**联网脚本**
+
+```shell
+external/rkwifibt/tb_start_wifi.sh
+tb_start_wifi.sh ssid password #联网,每次开机执行
+```
+
+### Wi-Fi启动脚本流程说明
+
+快速启动SDK，Wi-Fi是通过tb_start_wifi.sh脚本进行启动的，接下来对该脚本进行详细说明：
+
+```shell
+... ...
+# 唤醒流程：唤醒时需要删除上一次的保活配置
+function tcpka_del() {
+        echo "tcpka_del ..."
+        while true
+        do
+                IPID=`dhd_priv wl tcpka_conn_sess_info 1 | grep ipid`
+                if [ "$IPID" != "" ]; then
+                        sleep 0.05
+                        dhd_priv wl tcpka_conn_enable 1 0 0 0 0
+                        sleep 0.05
+                        dhd_priv wl tcpka_conn_del 1
+                        sleep 0.05
+                else
+                        break
+                fi
+
+                let tcpka_cnt++
+                if [ "$tcpka_cnt" -gt 3 ]; then
+                        echo "tcpka_conn_del failed"
+                        exit
+                fi
+
+        done
+}
+... ...
+
+check_wlan0                # 检查ko是否加载
+wlan_up                    # 检查wlan0是否up
+check_wakeup_cause         # 获取WiFi唤醒原因
+tcpka_del                  # 删除上一次保活配置
+connect_wifi               # 连接WiFi，如果已经连接，则仅获取IP地址
+udhcpcd                    # 获取IP地址，如果第一次连接用udhcpc获取，如果已经连接，则从vendor分区读取配置：
+```
+
+### Wi-Fi常用调试方法介绍
+
+**编译相关**
+
+```shell
+make menuconfig                #选择对应的WiFi配置
+make savedefconfig             #保存配置
+make rkwifibt-dirclean         #清除
+make rkwifibt                  #编译
+```
+
+**确认对应驱动ko**
+
+```shell
+#在开机后命令可以看到
+ls /vendor/lib/modules/cywdhd.ko(bcmdhd_indep_power.ko)
+#如果没有请检查编译环节
+```
+
+**服务端程序**：需要你们根据实际情况选择对应的方案；
+
+**唤醒相关**：首先确保硬件是按照我们的硬件设计，二是要详细了解服务器端保活的流程；如都确认设置正确，可以把你们自己合并的代码发给我们确认，包括用wireshark抓取的服务端的保活内容；
 
 ## 云平台对接
 
@@ -697,11 +1059,11 @@ TBD
 
 ### 阿里云对接说明
 
-请参考[Link Visual设备端开发-Linux SDK](#https://help.aliyun.com/document_detail/131156.html?spm=a2c4g.11186623.6.697.11e73a09g9L0XO)。
+请参考[Link Visual设备端开发-Linux SDK](https://help.aliyun.com/document_detail/131156.html?spm=a2c4g.11186623.6.697.11e73a09g9L0XO)。
 
 ### 涂鸦云对接说明
 
-请参考[涂鸦IPC嵌入式SDK开发指南](#https://developer.tuya.com/cn/docs/iot/smart-product-solution/product-solution-ipc/ipc-sdk-solution/sdk?id=K95019g5w3eiq)。
+请参考[涂鸦IPC嵌入式SDK开发指南](https://developer.tuya.com/cn/docs/iot/smart-product-solution/product-solution-ipc/ipc-sdk-solution/sdk?id=K95019g5w3eiq)。
 
 ### Vendor分区
 
@@ -993,7 +1355,7 @@ mpp_chn_adec.s32ChnId = 0;
 ADEC_CHN_ATTR_S stAdecAttr;
 stAdecAttr.enCodecType = RK_CODEC_TYPE_AAC;
 if (stAdecAttr.enCodecType == G711A) {
-	stAdecAttr.stAdecG711A.u32Channels = 1;
+    stAdecAttr.stAdecG711A.u32Channels = 1;
     stAdecAttr.stAdecG711A.u32SampleRate = 16000;
 }
 // ADEC init
