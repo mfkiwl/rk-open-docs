@@ -1,4 +1,4 @@
-# Rockchip Instructions Qrcode 使用说明
+# Rockchip Qrcode 使用说明
 
 文件标识：RK-SM-YF-396
 
