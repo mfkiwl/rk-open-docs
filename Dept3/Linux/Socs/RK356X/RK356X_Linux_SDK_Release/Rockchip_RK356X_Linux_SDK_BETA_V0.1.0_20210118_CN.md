@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-392
 
-发布版本：V0.0.1
+发布版本：V0.1.0
 
-日期：2020-12-11
+日期：2021-01-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2020 瑞芯微电子股份有限公司**
+**版权所有© 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-12-11 | V0.0.1 | Caesar Wang | 初始版本。 |
+| 2021-01-18 | V0.1.0 | Caesar Wang | 更新BETA版本。 |
 
 ---
 
@@ -77,7 +78,7 @@ Rockchip Electronics Co., Ltd.
 
 ## 概述
 
-本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto Thud 3.0 和 Debian 10 上开发，内核基于 Kernel 4.19，引导基于 U-boot v2017.09，适用于 RK3566/RK3568 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
+本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto 3.2 和 Debian 10 上开发，内核基于 Kernel 4.19，引导基于 U-boot v2017.09，适用于 RK3566/RK3568 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
 本 SDK 支持  VPU 硬解码、GPU 3D、Wayland/X11 显示、NPU、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
 ## 主要支持功能
@@ -114,11 +115,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 RK356X_LINUX_SDK_V0.0.1_20201211.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 RK356X_LINUX_SDK_V0.1.0_20210118.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V0.0.1_20201211.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V0.1.0_20210118.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -187,7 +188,7 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 - rockdev：存放编译输出固件。
 - tools：存放 Linux 和 Window 操作系统下常用工具。
 - u-boot：存放基于 v2017.09 版本进行开发的 U-Boot 代码。
-- yocto：存放基于 Yocto Thud 3.0 开发的根文件系统。
+- yocto：存放基于 Yocto 3.2 开发的根文件系统。
 
 ## SDK 编译说明
 
@@ -214,7 +215,9 @@ device-tree-compiler python-pip ncurses-dev pyelftools \
 | 板级配置                       | 说明                                               |
 | ----------------------------- | --------------------------------------------------- |
 | BoardConfig-rk3566-evb2-lp4x-v10.mk  |   适用于 RK3566 EVB 搭配 LPDDR4 开发板  |
+| BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk |  适用于 RK3568 EVB 搭配 DDR4/SPI NOR 开发板  |
 | BoardConfig-rk3568-evb1-ddr4-v10.mk  |  适用于 RK3568 EVB 搭配 DDR4 开发板  |
+| BoardConfig-rk3568-nvr-spi-nand.mk  |  适用于 RK3568 NVR 搭配SPI NAND 开发板 |
 | BoardConfig-rk3568-nvr.mk  |  适用于 RK3568 NVR 开发板 |
 | BoardConfig.mk  |  默认配置 |
 
@@ -227,10 +230,22 @@ device-tree-compiler python-pip ncurses-dev pyelftools \
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10.mk
 ```
 
+选择**RK3568 EVB 搭配 DDR4/SPI NOR 开发板**的板级配置：
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+```
+
 选择**RK3568 EVB 搭配 DDR4 开发板**的板级配置：
 
 ```shell
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk
+```
+
+选择**RK3568 NVR 搭配SPI NAND 开发板**的板级配置：
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr-spi-nand.mk
 ```
 
 选择**RK3568 NVR 开发板**的板级配置：
@@ -250,9 +265,11 @@ Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
 1. BoardConfig-rk3566-evb2-lp4x-v10.mk
-2. BoardConfig-rk3568-evb1-ddr4-v10.mk
-3. BoardConfig-rk3568-nvr.mk
-4. BoardConfig.mk
+2. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+3. BoardConfig-rk3568-evb1-ddr4-v10.mk
+4. BoardConfig-rk3568-nvr-spi-nand.mk
+5. BoardConfig-rk3568-nvr.mk
+6. BoardConfig.mk
 Which would you like? [0]:
 ```
 
@@ -278,7 +295,6 @@ ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
 debian             -build debian10 buster/x11 rootfs
-distro             -build debian10 buster/wayland rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image

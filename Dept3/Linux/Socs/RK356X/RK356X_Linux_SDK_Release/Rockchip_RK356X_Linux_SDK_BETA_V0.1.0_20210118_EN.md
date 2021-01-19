@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-392
 
-Release Version: V0.0.1
+Release Version: V0.1.0
 
-Release Date: 2020-12-11
+Release Date: 2021-01-18
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -61,7 +61,8 @@ Software development engineers
 
 | **Date** | **Version** | **Author** | **Revision History** |
 | -----------| :-------------- | :------------- | :---------- |
-| 2010-12-11 | V0.0.1 | Caesar Wang | Initial version |
+| 2020-12-11 | V0.0.1 | Caesar Wang | Initial version |
+| 2021-01-18 | V0.1.0 | Caesar Wang | Beta version |
 
 ---
 
@@ -73,7 +74,7 @@ Software development engineers
 
 ## Overview
 
-This SDK is based on Buildroot 2018.02-rc3, Yocto Thud 3.0, and Debian 10 or later version with kernel 4.19 and U-boot v2017.09. It is suitable for RK3566/RK3568 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, NPU, QT and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
+This SDK is based on Buildroot 2018.02-rc3, Yocto 3.2, and Debian 10 or later version with kernel 4.19 and U-boot v2017.09. It is suitable for RK3566/RK3568 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, NPU, QT and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
 
 ## Main Functions
 
@@ -109,11 +110,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take RK356X_LINUX_SDK_V0.0.1_20201211.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take RK356X_LINUX_SDK_V0.1.0_20210118.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V0.0.1_20201211.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V0.1.0_20210118.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -182,7 +183,7 @@ There are buildroot, debian, recovery, app, kernel, u-boot, device, docs, extern
 - rockdev: stores building output firmware.
 - tools: stores some commonly used tools under Linux and Windows system.
 - u-boot: store U-Boot code developed based on v2017.09 version.
-- yocto: stores the root file system developed based on Yocto Thud 3.0.
+- yocto: stores the root file system developed based on Yocto 3.2.
 
 ## SDK Building Introduction
 
@@ -211,7 +212,9 @@ Enter the project  SDK/device/rockchip/rk356x directory:
 | Board level configuration | Note                                            |
 | ----------------------------- | --------------------------------------------------- |
 | BoardConfig-rk3566-evb2-lp4x-v10.mk  | Suitable for RK3566 EVB development board with LPDDR4  |
+| BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk    | Suitable for RK3568 development boards with DDR4 and SPI NOR |
 | BoardConfig-rk3568-evb1-ddr4-v10.mk    | Suitable for RK3568 development boards with DDR4 |
+| BoardConfig-rk3568-nvr-spi-nand.mk  | Suitable for RK3568 NVR with SPI NAND development board |
 | BoardConfig-rk3568-nvr.mk  | Suitable for RK3568 NVR development board |
 | BoardConfig.mk   | Default |
 
@@ -225,10 +228,22 @@ Select the board configuration of  **RK3566 EVB development board**:
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10.mk
 ```
 
+Select the board configuration of the **RK3568 EVB  with SPI NOR development board**:
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+```
+
 Select the board configuration of the **RK3568 EVB development board**:
 
 ```shell
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk
+```
+
+Select the board-level configuration of the **RK3568 NVR with SPI NAND development board**:
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr-spi-nand.mk
 ```
 
 Select the board-level configuration of the **RK3568 NVR development board**:
@@ -248,9 +263,11 @@ Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
 1. BoardConfig-rk3566-evb2-lp4x-v10.mk
-2. BoardConfig-rk3568-evb1-ddr4-v10.mk
-3. BoardConfig-rk3568-nvr.mk
-4. BoardConfig.mk
+2. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+3. BoardConfig-rk3568-evb1-ddr4-v10.mk
+4. BoardConfig-rk3568-nvr-spi-nand.mk
+5. BoardConfig-rk3568-nvr.mk
+6. BoardConfig.mk
 Which would you like? [0]:
 ```
 
@@ -276,7 +293,6 @@ ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
 debian             -build debian10 buster/x11 rootfs
-distro             -build debian10 buster/wayland rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
