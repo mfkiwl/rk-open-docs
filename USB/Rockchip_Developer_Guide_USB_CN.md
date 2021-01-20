@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-096
 
-发布版本：V1.4.0
+发布版本：V1.5.0
 
-日期：2020-12-16
+日期：2021-01-20
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -12,7 +12,7 @@
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +22,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2019福州瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -76,6 +76,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | 2020-02-19 | V1.3     | 吴良峰         | 修正大部分章节的内容，提高可读性<br />增加新的章节《USB 常用调试方法和调试命令》<br />增加常见问题分析 |
 | 2020-02-20 | V1.3.1   | 吴良峰         | 增加新的章节《Linux USB 驱动架构》<br />修正第五章的章节编号 |
 | 2020-12-16 | V1.4.0   | 吴良峰         | 修正超链接问题<br />增加 RV1109/RV1126 的切换命令<br />增加 RV1109/RV1126/RK3566/RK3568 控制器支持列表 |
+| 2021-01-20 | V1.5.0   | 吴良峰         | 完善 USB 常用调试方法和命令                                  |
 
 **目录**
 
@@ -2261,46 +2262,139 @@ f_audio_source f_midi power state subsystem uevent
 1. **常用的 USB 调试仪器和软件工具**
 
 - 万用表：用于简单的电压测试，如：USB VBUS，OTG_ID，USB PHY 供电
+
 - 高带宽的示波器：用于测量 USB 眼图信号质量、USB 充电检测和握手信号、USB VBUS 电压塌陷等
+
 - USB 协议分析仪：分析 USB 通信协议流程，定位是 Host 问题还是 Device 问题
+
 - Windows 工具：BusHound 软件用于抓取 USB 总线数据包的工具；Usbview 软件用于查看 USB 设备的详细描述符信息
+
 - Linux 工具：usbmon 用于抓取 USB 总线数据包的工具；vusb-analyzer 图形化工具用于解析 usbmon 所抓取的数据；lsusb 命令用于查看USB设备的详细描述符信息
 
-更多的信息，请参考文档：
+  usbmon的使用方法，请参考如下文档：
 
- `Documentation/usb/usbmon.txt`
+  内核文档：`Documentation/usb/usbmon.txt`
 
-[《USB Debugging and Profiling Techniques》](https://elinux.org/images/1/17/USB_Debugging_and_Profiling_Techniques.pdf)
+  TI 技术文档：[《USB Debugging and Profiling Techniques》](https://elinux.org/images/1/17/USB_Debugging_and_Profiling_Techniques.pdf)
 
 2. **常用的内核 USB 调试接口**
 
-- Sysfs entry in host：`/sys/bus/usb/*` (查看系统已支持的USB设备和驱动)
+- Sysfs entry in USB Host：
 
-- Debugfs entry in host：
+  查看系统已支持的 USB 设备和驱动的调试接口
 
-  `/sys/kernel/debug/usb/devices` (查看USB总线上的所有USB设备信息)
+  `/sys/bus/usb/*`
 
-  `/sys/kernel/debug/*.dwc3` (DWC3控制器调试接口)
+- Debugfs entry in USB Host：
 
-  `/sys/kernel/debug/usb/usbmon` (USBMon抓包工具)
+  查看 USB 总线上的所有 USB 设备信息
 
-  `/sys/kernel/debug/usb/xhci` (xHCI控制器调试接口)
+  `/sys/kernel/debug/usb/devices`
 
-  `/sys/kernel/debug/usb/uvcvideo`  (UVC设备调试接口)
+  DWC3 控制器的调试接口
 
-- Debugfs for controllers：参考 [USB 2.0 OTG 调试接口](#USB 2.0 OTG 调试接口)，[USB 2.0 Host 调试接口](#USB 2.0 Host 调试接口)，[USB 3.0 OTG 调试接口](#USB 3.0 OTG 调试接口)
+  `/sys/kernel/debug/*.dwc3`
 
-- trace for usb gadget/dwc3/xHCI：
+  usbmon 抓包工具的调试接口
 
-  `/sys/kernel/debug/tracing/events/gadget` (trace Gadget Driver与 Device Controller Driver交互数据)
+  `/sys/kernel/debug/usb/usbmon`
 
-    `/sys/kernel/debug/tracing/events/dwc3` (trace DWC3 控制器传输流程)
+  xHCI 控制器的调试接口
 
-    `/sys/kernel/debug/tracing/events/xhci-hcd` (trace xHCI 控制器传输流程)
+  `/sys/kernel/debug/usb/xhci`
 
-- 打印 usb host uvc log：`echo 0xffff > /sys/module/uvcvideo/parameters/trace`
+  UVC 外设的调试接口
 
-- 打印 usb devio 驱动 log：`echo 1 > /sys/module/usbcore/parameters/usbfs_snoop`
+  `/sys/kernel/debug/usb/uvcvideo`
+
+- Debugfs for USB Controllers：
+
+  参考 [USB 2.0 OTG 调试接口](#USB 2.0 OTG 调试接口)，[USB 2.0 Host 调试接口](#USB 2.0 Host 调试接口)，[USB 3.0 OTG 调试接口](#USB 3.0 OTG 调试接口)
+
+- Trace for USB Gadget/DWC3/xHCI：
+
+  Trace USB Gadget Driver 与 USB Device Controller Driver 交互数据的调试接口
+
+  `/sys/kernel/debug/tracing/events/gadget`
+
+  Trace DWC3 控制器传输流程的调试接口
+
+   `/sys/kernel/debug/tracing/events/dwc3`
+
+  Trace  xHCI 控制器传输流程
+
+   `/sys/kernel/debug/tracing/events/xhci-hcd`
+
+- 使能 USB Host UVC 驱动 log 打印 的调试接口
+
+  `echo 0xffff > /sys/module/uvcvideo/parameters/trace`
+
+- 使能 USB devio 驱动 log 打印的调试接口
+
+  `echo 1 > /sys/module/usbcore/parameters/usbfs_snoop`
+
+- USB Gadget 动态断开重连的调试接口
+
+  `/sys/class/udc/[usb controller name]/soft_connect`
+
+  断开连接的命令：
+
+  `echo disconnect > /sys/class/udc/[usb controller name]/soft_connect`
+
+  使能连接的命令：
+
+  `echo connect > /sys/class/udc/[usb controller name]/soft_connect`
+
+  Note：命令中 '[usb controller name]' 需要修改为芯片对应的 USB Device 控制器的名称。
+
+- USB Gadget 查询连接状态的调试接口
+
+  USB Gadget 查询当前的枚举速率
+
+  `/sys/class/udc/[usb controller name]/current_speed`
+
+  USB Gadget 查询当前的枚举状态（如：not attached/configured）
+
+  `/sys/class/udc/[usb controller name]/state`
+
+  Note：命令中 '[usb controller name]' 需要修改为芯片对应的 USB Device 控制器的名称。
+
+- USB Host 控制器动态初始化的调试接口
+
+  `/sys/bus/usb/drivers/usb/bind, unbind`
+
+  使用方法：
+
+  /sys/bus/usb/drivers/usb 路径下的每个 'usb*' 节点，分别对应一个 USB Host 控制器，比如要重新初始化 USB Host 控制器 'usb2'，则执行如下命令：
+
+  ```shell
+  echo usb2 > /sys/bus/usb/drivers/usb/unbind
+  echo usb2 > /sys/bus/usb/drivers/usb/bind
+  ```
+
+  执行上述命令后，就会重新初始化对应的 'usb2' 控制器，并重新枚举该控制器连接的 USB 外设。
+
+- USB Gadget 控制器动态初始化的调试接口
+
+  `/sys/bus/platform/drivers/[usb controller name]/bind, unbind`
+
+  Note：命令中 '[usb controller name]' 需要修改为芯片对应的 USB Device 控制器的名称。
+
+  使用方法：
+
+  以 RV1126 UVC SDK 平台为例，USB Gadget UVC 异常恢复的流程如下：
+
+  ```shell
+  1. kill uvc_app /* 杀掉 uvc 应用*/
+  2. rm -rf /sys/kernel/config/usb_gadget/rockchip/configs/b.1/f* /* 移除已绑定的 usb function */
+  3. echo ffd00000.dwc3  > /sys/bus/platform/drivers/dwc3/unbind /* remove usb 控制器 */
+  4. echo ffd00000.dwc3  > /sys/bus/platform/drivers/dwc3/bind /* probe usb 控制器 */
+  5. cd /sys/kernel/config/usb_gadget/rockchip/configs/b.1 /* 绑定 usb function */
+     ln -s ../../functions/rndis.gs0 f1
+     ln -s ../../functions/uvc.gs6/ f2
+  6. echo ffd00000.dwc3 > /sys/kernel/config/usb_gadget/rockchip/UDC /* 使能 usb 控制器连接 */
+  7. restart uvc_app /* 启动 uvc 应用 */
+  ```
 
 ### USB 常用命令
 
