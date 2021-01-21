@@ -2,9 +2,9 @@
 
 ID: RK-XX-XX-nnn
 
-Release Version: V1.0.4
+Release Version: V1.1.0
 
-Release Date: 2020-06-08
+Release Date: 2021-01-21
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -42,9 +42,9 @@ This is a template. You can edit your document based on this template.
 
 **Product Version**
 
-| **Chipset**| **Kernel Version** |
-| -----------| ------------------ |
-| RK2206     | FreeRTOS V10.0.1   |
+| **Chipset** | **Kernel Version** |
+| ----------- | ------------------ |
+| RK2206      | FreeRTOS V10.0.1   |
 
 **Intended Audience**
 
@@ -58,10 +58,11 @@ Software development engineers
 
 **Revision History**
 
-| **Version** | **Author** | **Date** | **Change Description** |
-| --------- | ---------- | :-------- | ------------ |
-| V1.0.0    | Karen Huang | 2019-11-29 | Initial version |
-| V1.0.4 | Ruby Zhang | 2020-06-08 | Update the format and company name |
+| **Version** | **Author**  | **Date**   | **Change Description**             |
+| ----------- | ----------- | :--------- | ---------------------------------- |
+| V1.0.0      | Karen Huang | 2019-11-29 | Initial version                    |
+| V1.0.4      | Ruby Zhang  | 2020-06-08 | Update the format and company name |
+| V1.1.0      | Karen Huang | 2021-01-21 | Modify year of copyright           |
 
 ---
 
