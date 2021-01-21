@@ -1,14 +1,46 @@
-# **DDR 开发指南**
+# DDR 开发指南
 
-发布版本：1.2
+文件标识：RK-KF-YF-39
 
-作者邮箱：hcy@rock-chips.com
+发布版本：V1.3.0
 
-日期：2019.1.29
+日期：2021.1.21
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
----------
+---
+
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有© 2020瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
 
 **前言**
 适用于所有平台的开发指南
@@ -33,13 +65,18 @@
 
 | **日期**   | **版本** | **作者** | **修改说明**                       |
 | ---------- | -------- | -------- | ---------------------------------- |
-| 2017.12.21 | V1.0     | 何灿阳   |                                    |
-| 2018.3.30  | V1.1     | 何灿阳   | 增加对 kernel 4.4 DDR 频率相关的描述 |
-| 2019.1.29  | V1.2     | 何智欢   | 增加调整 loader 的 de-skew 说明        |
+| 2017.12.21 | V1.0.0   | 何灿阳   |                                    |
+| 2018.3.30  | V1.1.0   | 何灿阳   | 增加对 kernel 4.4 DDR 频率相关的描述 |
+| 2019.1.29  | V1.2.0 | 何智欢   | 增加调整 loader 的 de-skew 说明        |
+| 2021.1.21 | V1.3.0 | 汤云平 | 增加RK356x/RV1109/RV1126说明 |
 
----------
+---
+
+**目录**
+
 [TOC]
-------
+
+---
 
 ## 如何看懂 DDR 打印信息
 
@@ -255,8 +292,6 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
   	value = clk_set_rate(clk, clk_get_rate(clk));
   ```
 
-  ​
-
   芯片：RV1108
 
   代码位置：arch/arm/mach-rockchip/ddr_rv1108.c 的 ddr_init()函数
@@ -269,8 +304,6 @@ static struct cpufreq_frequency_table dvfs_ddr_table[] = {
   else
   	_ddr_change_freq(freq);
   ```
-
-  ​
 
   除了上述几个特殊的芯片，剩下芯片，以及 3126B/3126c 带 trust.img 固件的，只需要按上一个标题讲的“如何 enable/disable kernel 中的 DDR 变频功能”做，就一次 DDR 变频都不会运行了。
 
@@ -356,7 +389,7 @@ OUT
 
 ## 如何修改 DDR 频率
 
-kernel 中改变 DDR 频率的，有 2 种情况，一种是场景变频，一种是负载变频。对于这 2 种变频策略，kernel 4.4 和 kernel 3.10 的实现有些不同。
+kernel 中改变 DDR 频率的，有 2 种情况，一种是场景变频，一种是变频。对于这 2 种变频策略，kernel 4.4 和 kernel 3.10 的实现有些不同。
 
 kernel 4.4：
 
@@ -952,3 +985,13 @@ deskew 自动扫描工具，3308_deskew.exe，RK3308_DDRXPXXXXXX_Template_VXX_de
 根据发布的“deskew 自动扫描工具”扫出来的结果，选择 mid 值，修改到 RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt 对应定义中。使用 3308_deskew.exe 将 RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt 定义的 de-skew 修改到 rk3308_ddr_XXXMHz_uartX_mX_vX.XX.bin 中。
 
 “deskew 自动扫描工具”的使用请按照《deskew 自动扫描工具使用说明.pdf》来做。
+
+## RV1109/RV1126/RK356x DDR频率选择
+
+对于RV1109/RV1126/RK356x平台loader有变4次频率，保存着相应频率的training结果。kernel中dmc所配的4个频率点需要与loader的频率点保持一致。RV1126/RV1109 loader中默认的频率点其中三个是328M，528M，784M，最高的那个频率点在ddr bin名称中体现，如rv1126_ddr_924MHz_v1.05.bin，最后一个频点则是924M。RK356x loader中默认的频率点其中三个是324M，528M，780M，最高那个频率点一样在ddr bin名称中体现，如rk3568_ddr_1560MHz_v1.04.bin，最后一个频率点则是1560M。另外loader中的频率点也可通过串口log查看，串口log中有重复4次change to：xxxMHz字样代表着包含的4个频率点信息。loader的频率点也可通过rkbin目录下tools/ddrbin_tool来修改，具体使用规则可参考tools/ddrbin_tool_user_guide.txt。
+
+例如RK3568，如果最高频率需要改成1332M，需要在rkbin工程目录下将RKBOOT/RK3568MINIALL.ini中的Path1和FlashData指向的ddr bin改为1332M，并且dts中的频率点也对应的改成324M,528M,780M,1332M。实际运行的频率点只能是这4个中的一个。
+
+## RK3568 ECC的使能
+
+RK3568支持ECC，如果DDR ECC DQ0-7有接颗粒的话loader会自动enable ECC功能。 需要注意的是ECC byte上所贴的颗粒需要与DQ0-31上所贴的颗粒具有一样的row/bank/col。
