@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-381
 
-发布版本：V6.0.1
+发布版本：V6.0.2
 
-日期：2020-08-25
+日期：2021-01-15
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有 © 2020 瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -64,7 +64,8 @@ Rockchip Linux平台 Wi-Fi/BT 开发移植调试
 
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | :----------- |
-| V6.0.1   | xy | 2020-08-25 | 增加新模组移植说明、编译说明、RF测试示例、<br/>P2P桥接功能、更详细的排查说明等 |
+| V6.0.1   | xy | 2020-08-25 | 增加新模组移植说明、编译说明、<br/>RF测试示例、P2P桥接功能、更详细的排查说明等 |
+| V6.0.2 | Ruby Zhang | 2021-01-15 | 完善部分语言描述 |
 
 ---
 
@@ -170,13 +171,13 @@ wireless-bluetooth {
 
 #### IO电源域的配置
 
-**说明：外部电源比如VCCIO_SDIO（3.3/1.8v）会同时给芯片的IO和Wi-Fi模组的IO供电，以保证它们之间的电压匹配，而主芯片的IO需要设置电源域寄存器以匹配外部的供电电压，所以dts里面需要特定配置告诉驱动支持SDIO3.0的模组IO一定要接1.8v， SDIO2.0 3.3v/1.8v都可以，但切记要匹配，不能出现供电1.8而配置3.3或者反之。**
+**说明：外部电源比如VCCIO_SDIO（3.3/1.8v）会同时给芯片的IO和Wi-Fi模组的IO供电，以保证它们之间的电压匹配，而主芯片的IO需要设置电源域寄存器以匹配外部的供电电压，所以dts里面需要特定配置告诉驱动支持SDIO3.0的模组IO一定要接1.8v，SDIO2.0 3.3v/1.8v都可以，但切记要匹配，不能出现供电1.8而配置3.3或者反之。**
 
 ![](Resources/io-domain.png)
 
 ![](Resources/io-domain1.png)
 
-查看上面原理图，找到Wi-Fi对应的sdio接口部分，图中有标注VCCIOX（**有些芯片组名字为：APIOX或者其它**），比如这个是VCCIO1，则给VCCIO1供电的是VCCIO_SDIO，查找VCCIO_SDIO连接i的网络是**3.3v**还是**1.8v**, 可以看到上图的VCCIO_SDIO是vcc_1v8供电的，则对应dts/dtsi配置如下：
+查看上面原理图，找到Wi-Fi对应的sdio接口部分，图中有标注VCCIOX（**有些芯片组名字为：APIOX或者其它**），比如这个是VCCIO1，则给VCCIO1供电的是VCCIO_SDIO，查找VCCIO_SDIO连接的网络是**3.3v**还是**1.8v**, 可以看到上图的VCCIO_SDIO是vcc_1v8供电的，则对应dts/dtsi配置如下：
 
 ```c
 &io_domains {
@@ -197,7 +198,7 @@ vccio_sdio: vcc_1v8: vcc-1v8 {
 };
 ```
 
-以上配置要一一对应，如果硬件是3.3v，按照对应关系进行修改，切记不能出现不匹配的问题；
+以上配置要一一对应，如果硬件是3.3v，按照对应关系进行修改，切记不能出现不匹配的问题。
 
 #### 32.768K的配置
 
@@ -205,7 +206,7 @@ vccio_sdio: vcc_1v8: vcc-1v8 {
 
 如果Wi-Fi模组需要外部供这个频率，则有两种情况：
 
-1. 从原理图可以看到RK8XX型号的PMU会给Wi-Fi的供32k，一般PMU默认打开32k，如果没有打开则需要添加如下配置：
+1. 从原理图可以看到RK8XX型号的PMU会给Wi-Fi供32k，一般PMU默认打开32k，如果没有打开则需要添加如下配置：
 
 ```c
 wireless-wlan {
@@ -217,7 +218,7 @@ wireless-wlan {
 };
 ```
 
-注意：如果用的不是RK的pmu，则不能这样配置；看下原理图的32k是如何供的，然后根据实际情况打开32k。
+注意：如果用的不是RK的PMU，则不能这样配置；看下原理图的32k是如何供的，然后根据实际情况打开32k。
 
 2. 如果需要CPU去供32K，则dts需要添加如下配置（不建议使用这种方式）：
 
@@ -291,7 +292,7 @@ Wi-Fi 驱动可编译到内核或者ko方式：
 [*]   Wifi load driver when kernel bootup
 ```
 
-- **buildin只能选择一个型号，realtek模组和ap6xxx模组不能同时选择为y，且realtek的也只能选择其中一个；**
+- **buildin只能选择一个型号，Realtek模组和ap6xxx模组不能同时选择为y，且Realtek的也只能选择其中一个；**
 - ap6xxx 和 cypress 也是互斥的，只能选择一个且如果选择ap6xxx，cypress的配置自动消失，去掉ap配置，cypress自动出现；
 - ko方式则可以选择多个Wi-Fi。
 
@@ -372,7 +373,7 @@ Realtek模组，以RTL8723DS为例：
 /lib/firmware/rtlbt/mp_rtl8723d_fw
 ```
 
-下面列出了realtek部分芯片所对应的文件及所在目录，注意USB接口的比较特殊，firmware文件时放在/lib/firmware/目录：
+下面列出了Realtek部分芯片所对应的文件及所在目录，注意USB接口的比较特殊，firmware文件时放在/lib/firmware/目录：
 
 |   Chip    | I/F for BT driver | FW/Config Path       | FW Filename  | Config Filename  |
 | :-------: | :---------------: | -------------------- | ------------ | ---------------- |
@@ -403,7 +404,7 @@ rkwifibt.mk：下面是3个关键规则，所有的改法都是围绕它们进�
 ```makefile
 # 指定rkwifibt的源码目录
 RKWIFIBT_SITE = $(TOPDIR)/../external/rkwifibt
-#是构建过程函数，给源代码传递编译和链接选项，调用源代码的Makefile执行编译
+# 是构建过程函数，给源代码传递编译和链接选项，调用源代码的Makefile执行编译
 RKWIFIBT_BUILD_CMDS
 # 编译完之后，自动执行安装，让Buildroot把编译出来库和bin文件安装到指定的目录
 RKWIFIBT_INSTALL_TARGET_CMDS
@@ -474,7 +475,7 @@ wlan0     Link encap:Ethernet  HWaddr F0:85:C1:0F:9C:02
           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
 ```
 
-**然后查看Wi-Fi的服务进程启动： ps看下是否有 wpa_supplicant进程, 如果没启动可以手动开启**：
+**然后查看Wi-Fi的服务进程启动：确认是否有 wpa_supplicant进程, 如果没启动可以手动开启**：
 
 `wpa_supplicant -B -i wlan0 -c /data/cfg/wpa_supplicant.conf`
 
@@ -493,7 +494,7 @@ wlan0     Link encap:Ethernet  HWaddr F0:85:C1:0F:9C:02
 
 ![](Resources/scan_r.png)
 
-**注意：要看下扫描到的热点的个数是否匹配你周围的路由器大概个数，可以跟你手机扫描的Wi-Fi对比下（如果你的模组不支持5G，只对比2.4G的个数）；还有看下离你最近的路由器的的信号强度，如果路由器离你很近，但信号强度却非常弱（正常情况下：-20到-65；偏弱：-65到-70；差-70到-90），这时就要查下你的Wi-Fi模组是否有接天线，模组的RF指标是否合格等等（参考第5章节Wi-Fi/BT的硬件测试）。**
+**注意：要确认扫描到的热点的个数是否匹配你周围的路由器大概个数，可以跟你手机扫描的Wi-Fi对比下（如果你的模组不支持5G，只对比2.4G的个数）；还有查看离你最近的路由器的的信号强度，如果路由器离你很近，但信号强度却非常弱（正常情况下：-20到-65；偏弱：-65到-70；差-70到-90），这时就要查下你的Wi-Fi模组是否有接天线，模组的RF指标是否合格等等（参考第5章节Wi-Fi/BT的硬件测试）。**
 
 #### 连接路由器
 
@@ -695,7 +696,7 @@ echo 0 > /sys/class/rfkill/rfkill0/state #下电
 sleep 1
 echo 1 > /sys/class/rfkill/rfkill0/state #上电
 sleep 1
-insmod /usr/lib/modules/hci_uart.ko 			# realtek模组需要加载特定驱动
+insmod /usr/lib/modules/hci_uart.ko 			# Realtek模组需要加载特定驱动
 rtk_hciattach -n -s 115200 /dev/ttyS4 rtk_h5 & 	# 蓝色指的是蓝牙使用哪个uart口
 
 #注意：每次启动测试时要先kill掉rtk_hciattach进程
@@ -721,7 +722,7 @@ brcm_patchram_plus1 --bd_addr_rand --enable_hci --no2bytes --use_baudrate_for_do
 
 **bcm43438a1.hcd表示BT 对应型号Firmware文件，/dev/ttyS4是蓝牙使用哪个UART口。**
 
-注意：`rtk_hciattach 、hci_uart.ko、bcm43438a1.hcd`等文件都是第1章节Buildroot配置选择正确的WiFiBT模组的前提下才会生成，如果没有这些文件请检查上述配置(参考1.4章节的编译配置文件)。
+注意：`rtk_hciattach 、hci_uart.ko、bcm43438a1.hcd`等文件都是第1章节Buildroot配置选择正确的Wi-Fi/BT模组的前提下才会生成，如果没有这些文件请检查上述配置(参考1.4章节的编译配置文件)。
 
 执行该脚本后，执行: **(注意：如果没有hciconfig命令，请在Buildroot配置选择BR2_PACKAGE_BLUEZ5_UTILS 编译并更新测试)**
 
@@ -771,7 +772,7 @@ dhd_priv setsuspendmode 1  # 仅针对正基海华模组，Realtek无需此命�
 echo mem > /sys/power/state
 ```
 
-此时同一局域网内的设备可以ping此设备，正常情况下可以看到系统被唤醒，注意系统唤醒后需要恢复WiFi正常的工作状态：
+此时同一局域网内的设备可以ping此设备，正常情况下可以看到系统被唤醒，注意系统唤醒后需要恢复Wi-Fi正常的工作状态：
 
 ```powershell
 dhd_priv setsuspendmode 0 # 仅针对正基海华模组，Realtek无需此命令
@@ -908,7 +909,7 @@ echo "1" > /proc/sys/net/ipv4/ip_forward
 
 #### Realtek 测试
 
-一般分为两种COB和模组，模组一般都是经过模组厂严格测试并出厂默认烧录校准好的数据到内部efuse，客户只需测试验证指标是否合格；而COB则自行设计WiFi外围电路及添加器件，所以需要跟realtek合作进行完整的RF校准测试，并集成校准好的数据到芯片的Efuse里面或由驱动进行加载，具体请直接咨询模组厂。
+一般分为两种COB和模组，模组一般都是经过模组厂严格测试并出厂默认烧录校准好的数据到内部efuse，客户只需测试验证指标是否合格；而COB则自行设计Wi-Fi外围电路及添加器件，所以需要跟Realtek合作进行完整的RF校准测试，并集成校准好的数据到芯片的efuse里面或由驱动进行加载，具体请直接咨询模组厂。
 
 **Wi-Fi测试：**
 
@@ -941,7 +942,7 @@ echo 1 > sys/class/rfkill/rfkill0/state
 >> > enable[Success:0]
 ```
 
-**当使用Realtek的cob方案时，如果需要把测试得到的校准数据map文件集成到驱动里面时，方法如下：**
+**当使用Realtek的COB方案时，如果需要把测试得到的校准数据map文件集成到驱动里面时，方法如下：**
 
 ```c
 drivers/net/wireless/rockchip_wlan/rtl8xxx/core/efuse/rtw_efuse.c
@@ -1029,7 +1030,7 @@ echo "wl ver"
 wl ver
 ```
 
-旧sdk没有内置测试firmware，下面以AP6236为例说明下：
+旧SDK没有内置测试firmware，下面以AP6236为例说明下：
 
 ```shell
 # 把fw_bcm43436b0_mfg.bin push到data或其他可写分区，然后执行如下命令：(注意下面的路径)
@@ -1039,7 +1040,7 @@ ifconfig wlan0 up
 wl ver
 ```
 
-正常的话执行wl ver会打印一串字符，里面有WL_TEST字样，表示进入测试模式，具体的测试参考：
+正常的话执行`wl ver`会打印一串字符，里面有WL_TEST字样，表示进入测试模式，具体的测试参考：
 
 ```
 Wi-Fi RF Test Commands for Linux-v03.pdf
@@ -1117,7 +1118,7 @@ BT RF Test Commands for Linux-v05.pdf #文档里面测试1/2步都在脚本里�
 
 ![](Resources/wifibt_hw.png)
 
-1. WL_REG_ON：DTS配置错误，导致不可控，**可用示波器测试波形，看下是否有被拉低拉高，电压幅值是否符合要求；**
+1. WL_REG_ON：DTS配置错误，导致不可控，**可用示波器测试波形，查看是否有被拉低拉高，电压幅值是否符合要求；**
 
 2. WIFI_WAKE_HOST： **PIN脚**配置错误或**电平状态**配置错误；
 
@@ -1240,7 +1241,7 @@ BT RF Test Commands for Linux-v05.pdf #文档里面测试1/2步都在脚本里�
 8. 有时配置用户错误的ssid名字错误导致连不上，请检查下wpa_supplicant.conf的配置的ssid是否正确；
 
 9. 如果上述排查都正常：
-    - 直接找-模组厂或Wi-Fi原厂协助，他们有专业的抓包仪器抓空中包，能快速定位问题；
+    - 直接找模组厂或Wi-Fi原厂协助，他们有专业的抓包仪器抓空中包，能快速定位问题；
     - 或寄一台有问题的板子给我们确认；
 
 #### 联网慢或获取IP地址慢
@@ -1328,7 +1329,7 @@ index 2046eff..6626752 100644
 
 #### 双Wi-Fi_AP+RTL 异常
 
-接两个Wi-Fi，一个是sdio接口的AP6xxx，另一个是USB接口的RTL8xxxu；kernel启动后，两个初始化都正常，但操作RTLxxxbu做接口down的时候，kernel挂掉。
+接两个Wi-Fi，一个是sdio接口的AP6xxx，另一个是USB接口的RTL8xxxu；kernel启动后，两个初始化都正常，当执行RTLxxx模块接口的down操作时，kernel挂掉。
 
 ```diff
 diff --git a/drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/wl_cfg80211.c b/drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/wl_cfg80211.c
@@ -1379,7 +1380,7 @@ index f4838a8..ceb2a00 100644
  	host cts - controller rts
 ```
 
-3. firmware文件不对或根本没有相应问题，跟上面的类似也是编译配置问题导致，下面是一些型号所对应的firmware名称和路径，注意USB即可的蓝牙的firmware路径比较特殊。
+3. firmware文件不对或根本没有相应文件，跟上面的类似也是编译配置问题导致，下面是一些型号所对应的firmware名称和路径，注意USB即可的蓝牙的firmware路径比较特殊。
 
 |   Chip    | I/F for BT driver | FW/Config Path       | FW Filename  | Config Filename  |
 | :-------: | :---------------: | -------------------- | ------------ | ---------------- |
@@ -1786,7 +1787,7 @@ conmand //它使用dbus跟wpa_supplicant进行通信
 wpa_supplicant -u //打开支持dbus通信
 ```
 
-标准使用方法：通过1109的web界面进行Wi-Fi操作，参考1109/1126平台的相关文档；
+标准使用方法：通过RV1109的web界面进行Wi-Fi操作，参考RV1109/RV1126平台的相关文档；
 
 终端简单测试方法如下：
 
@@ -1850,7 +1851,7 @@ define IFUPDOWN_SCRIPTS_LOCALHOST
 endef
 //编译升级：make ifupdown-scripts-dirclean && make ifupdown-scripts-rebuild
 
-//对于默认dns的修改，buildroot系统没有预编译配置，在没有运行DHCP进程的情况下，只能手动去添加：
+//对于默认dns的修改，Buildroot系统没有预编译配置，在没有运行DHCP进程的情况下，只能手动去添加：
 echo 'nameserver 114.114.114.114' >> /etc/resolv.conf // 添加定制的dns配置
 
 //动态设置
@@ -1967,7 +1968,7 @@ static int dhd_wlan_get_mac_addr(unsigned char *buf)
 
 **Realtek 模组**
 
-realtek驱动加载时也会从我们的vendor storage分区读取自定义MAC地址，代码可以参考7.1章节的自定义MAC。
+Realtek驱动加载时也会从我们的vendor storage分区读取自定义MAC地址，代码可以参考7.1章节的自定义MAC。
 
 ### 正基模组兼容版本(Debian/Ubuntu)
 
@@ -2019,7 +2020,7 @@ external/rkwifibt/src/rk_wifi_init.c
 1. 透过proc方式`echo X > /proc/net/rtlxxx/wlan0/country_code`, 如：
    `echo CN > /proc/net/rtlxxx/wlan0/country_code`
 2. wpa_supplicant.conf 配置参数country=X ，如果是softap，则hostapd.conf配置参数country_code=X；
-   注：如何确认country code X 可通过网址查询，比如[https://countrycode.org/](https://countrycode.org/ ) 看ISO CODES 两位大写字母组合。
+   注：如何确认country code X 可通过网址查询，比如<https://countrycode.org/> 看ISO CODES 两位大写字母组合。
 
 ### Wi-Fi KO模式
 
@@ -2084,9 +2085,9 @@ index 8730e2e..04b9cb8 100644
 		}
 ```
 
-### DEBUG选项
+### Debug选项
 
-#### Wi-Fi 驱动DEBUG
+#### Wi-Fi 驱动Debug
 
 有时需要更加详细的log来debug问题，Realtek芯片请打开如下选项使内核打印更加完整的驱动log：
 
@@ -2097,7 +2098,7 @@ Makefile
 +CONFIG_RTW_DEBUG = y
 +CONFIG_RTW_LOG_LEVEL = 2 #默认为2，debug时改为4可以打印更完整的log信息
 
-有些旧的驱动没有这个配置，使能如下配置：
+#有些旧的驱动没有这个配置，使能如下配置：
 include/autoconf.h
 +#define CONFIG_DEBUG /* DBG_871X, etc... */
 ```
@@ -2222,7 +2223,7 @@ Realtek蓝牙使用Linux标准的bluez协议栈： `buildroot/packages/bluez5_ut
 - 特别注意：在正基/海华蓝牙RF测试时，会用到bluez的hcitool/hciconfig工具，可以暂时把bluez手动配上去；
 - 对外最新release的版本，Buildroot rkwifibt 选择相应的模组型号后，会自动配置对应协议；
 
-1. 选择realtek模块（例如RTL8723DS）会自动打开bluez5协议栈 和 bluez-alsa(HFP/A2DP音频管理组件)：
+1. 选择Realtek模块（例如RTL8723DS）会自动打开bluez5协议栈 和 bluez-alsa(HFP/A2DP音频管理组件)：
 
    ```diff
    +BR2_PACKAGE_RKWIFIBT_RTL8723DS
