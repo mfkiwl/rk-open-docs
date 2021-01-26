@@ -2,7 +2,7 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.0.0
+发布版本：V1.2.0
 
 日期：2021-01-15
 
@@ -64,6 +64,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | -------- | -------- | ------------------------------------ |
 | 2021-01-15 | V1.0.0   | 林涛     | 初始版本                             |
 | 2021-01-22 | V1.1.0   | 林涛     | 增加PCIe 3.0控制器异常情况的检查信息 |
+| 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息   |
 
 ---
 
@@ -315,7 +316,7 @@ cat /proc/interrups | grep pcie
 
 ## 异常排查
 
-1. trainning 失败
+1. **trainning 失败**
 
 ```
 PCIe Link Fail的log如下一致重复，LTSSM状态机可能不同
@@ -332,7 +333,7 @@ rk-pcie 3c0000000.pcie: PCIe Linking... LTSSM is 0x0
 
 另外还建议客户打开pcie-dw-rockchip.c中的RK_PCIE_DBG，抓一份log以便分析。请阅读者注意，如果有多个控制器同时使用，抓log前请先把不使用或者没问题的设备对应的控制器disable掉，这样log会好分析一点。
 
-2. PCIe3.0控制器初始化设备系统异常
+2. **PCIe3.0控制器初始化设备系统异常**
 
 ```
 [   21.523506] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
@@ -369,3 +370,44 @@ rk-pcie 3c0000000.pcie: PCIe Linking... LTSSM is 0x0
 
 - 外部晶振芯片的时钟输入是否异常，如果无时钟或者幅度异常，将导致phy无法锁定。
 - 检查 PCIE30_AVDD_0V9 和PCIE30_AVDD_1V8电压是否满足要求。
+
+3. **PCIe2.0控制器初始化设备系统异常**
+
+```
+[   21.523870] rcu:     (detected by 2, t=6302 jiffies, g=-1183, q=1)
+[   21.523887] Task dump for CPU 1:
+[   21.523898] rk-pcie         R  running task        0    55      2 0x0000002a
+[   21.523915] Call trace:
+[   21.523931]  __switch_to+0xe0/0x128
+[   21.523944]  0x43752cfcfe820900
+[   21.523955] Task dump for CPU 3:
+[   21.523965] kworker/u8:0    R  running task        0     7      2 0x0000002a
+[   21.523990] Workqueue: events_unbound enable_ptr_key_workfn
+[   21.524004] Call trace:
+```
+
+异常原因：如果系统卡住此log附近，则表明PCIe2.0的PHY工作异常。请依次检查
+
+- 检查 PCIE30_AVDD_0V9 和PCIE30_AVDD_1V8电压是否满足要求。
+- 修改combphy2_psq的驱动phy-rockchip-naneng-combphy.c，在rockchip_combphy_init函数的末尾增加如下代码，检查PHY内部的一些配置：
+
+```c
+val = readl(priv->mmio + (0x27 << 2));
+dev_err(priv->dev, "TXPLL_LOCK is 0x%x PWON_PLL is 0x%x\n",
+val & BIT(0), val & BIT(1));
+val = readl(priv->mmio + (0x28 << 2));
+dev_err(priv->dev, "PWON_IREF is 0x%x\n", val & BIT(7));
+```
+
+首先查看TXPLL_LOCK是否为1，如果不是，表明PHY没有lock完成。其次查看PWON_IREF是否为1，如果不为1，则表明PHY时钟异常。此时尝试切换combophy的时钟频率，修改rk3568.dtsi中的combphy2_psq的assigned-clock-rates，依次调整为25M或者100M进行尝试。
+
+- 如果调整以上步骤均无效，请将PHY内部的时钟bypass到refclk差分信号脚上，进行测量。bypass加在rockchip_combphy_pcie_init函数的末尾，设置如下代码所示
+
+```c
+u32 val;
+val = readl(priv->mmio + (0xd << 2));
+val |= BIT(5);
+writel(val,priv->mmio + (0xd << 2));
+```
+
+设置完成后，请依次配置combphy2_psq的时钟频率为24M,25M以及100M，用示波器从PCIe的refclk差分信号脚上测量时钟情况，检查频率和幅值、抖动是否满足要求。
