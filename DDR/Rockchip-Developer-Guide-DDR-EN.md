@@ -1,14 +1,38 @@
-# **DDR Develop Guide**
+# DDR Develop Guide
 
-Release Version：1.2
+ID: RK-KF-YF-40
 
-E-mail：hcy@rock-chips.com
+Release Version: V1.3.0
 
-Release Date：2019.1.29
+Release Date: 2021-01-21
 
-Classifed Level：Publicity
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----------
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
 
 **Preface**
 
@@ -22,25 +46,32 @@ This document introduces the double data rate(DDR) SDRAM develop work, which  is
 | ---------------- | ------------------ |
 | All chipset      | All kernel version |
 
-**Application Object**
+**Intended Audience**
 
-This document (this guide) is intended primarily for the following readers:
+This document (this guide) is mainly intended for:
 
-Field Application Engineer
+Technical support engineers
 
-Software Development Engineer
+Software development engineers
+
+---
 
 **Revision History**
 
-| **Date**   | **Revision No.** | **Author** | **History**                                                |
-| ---------- | ---------------- | ---------- | ---------------------------------------------------------- |
-| 2017.12.21 | V1.0             | CanYang He |                                                            |
-| 2018.3.30  | V1.1             | CanYang He | Added the related description of  Kernel 4.4 DDR frequency |
-| 2019.1.29  | V1.2             | Zhihuan He | Added the statement  on adjusting the de-skew in loader    |
+| **Date**   | **Revision No.** | **Author**   | **History**                                                |
+| ---------- | ---------------- | ------------ | ---------------------------------------------------------- |
+| 2017.12.21 | V1.0.0           | CanYang He   |                                                            |
+| 2018.3.30  | V1.1.0           | CanYang He   | Added the related description of  Kernel 4.4 DDR frequency |
+| 2019.1.29  | V1.2.0           | Zhihuan He   | Added the statement  on adjusting the de-skew in loader    |
+| 2021.1.21  | V1.3.0           | YunPing Tang | Added the statement for RV1126/RV1109/RK356x               |
 
----------
+---
+
+**Contents**
+
 [TOC]
-------
+
+---
 
 ## What the  Meaning of DDR log
 
@@ -262,7 +293,7 @@ The previous topic just talk about how to enable or disable DDR scaling function
 
   Chip type : **RV1108**
 
-​  Code Location: ddr_init() function in the file `arch/arm/mach-rockchip/ddr_rv1108.c`
+  Code Location: ddr_init() function in the file `arch/arm/mach-rockchip/ddr_rv1108.c`
 
   Method: comment out the following lines in `ddr_init()`function code :
 
@@ -961,3 +992,13 @@ Modify method:
 According to the results of the released tool "deskew automatic scanning tool", select the `"mid"` value and add it to the corresponding definition in RK3308_DDRXPXXXXXX_Template_VXX_de-skew.txt. Using 3308_deskew.exe, change the definition of de-skew on rk3308_ddrxpxxxxxx_template_vxx_de-skew.txt to rk3308_ddr_xxxmhz_uartx_mx_vx.xx.bin.
 
 Please according to "deskew automatic scanning tool instruction. pdf" to use "deskew automatic scanning tool".
+
+## Selection of RV1109/RV1126/RK356x DDR Frequency
+
+For the RV1109/RV1126/RK356x platform loader, the frequency is changed 4 times, and the training result of the corresponding frequency is saved. The 4 frequency value allocated by the DMC in the kernel need to be consistent with the frequency pin the loader. Three of the default frequency in the RV1126/RV1109 loader are 328M, 528M, and 784M. The highest frequency point is reflected in the DDR bin name, such as rv1126_ddr_924MHz_v1.05.bin, and the last frequency point is 924M. Three of the default frequency points in RK356x loader are 324M, 528M, and 780M. The highest frequency point is also reflected in the ddr bin name, such as rk3568_ddr_1560MHz_v1.04.bin, and the last frequency point is 1560M. In addition, the frequency points in the loader can also be viewed through the serial port log. In the serial port log, the change to: xxxMHz is repeated 4 times, which represents the information of the 4 frequency points included. The frequency of the loader can also be modified through tools/ddrbin_tool in the rkbin directory. For specific usage rules, please refer to tools/ddrbin_tool_user_guide.txt.
+
+For example, RK3568, if the highest frequency needs to be changed to 1332M, you need to change the ddr bin pointed to by Path1 and FlashData in RKBOOT/RK3568MINIALL.ini to 1332M in the rkbin project directory, and the frequency point in dts should be  changed to 324M. 528M, 780M, 1332M, which matched your require. The actual operating frequency can only be one of these four.
+
+## Enable RK3568 ECC
+
+RK3568 supports ECC, if DDR ECC DQ0-7 has connected component, the loader will automatically enable ECC function. It should be noted that the DRAM on the ECC byte need to have the same row/bank/col as the component on the DQ0-31.
