@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-102
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-06-11
+日期：2021-01-29
 
 文件密级：□绝密   □秘密   ■内部资料   □公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有 © 2020 瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -64,7 +64,8 @@ Rockchip Electronics Co., Ltd.
 | 2018-05-21 | V1.0     | 吴良峰             | 初始版本                                           |
 | 2019-01-09 | V1.1     | 吴良峰             | 使用 markdownlint 修订格式                         |
 | 2020-02-19 | V1.11    | 吴良峰             | 增加免责声明，商标声明，以及版权声明，修改文档规范 |
-| 2020-06-10 | V1.2.0   | 任家宁<br />吴良峰 | 增加2.3章节 NaNeng USB2.0 PHY                      |
+| 2020-06-10 | V1.2.0   | 任家宁<br />吴良峰 | 增加章节 NaNeng USB 2.0 PHY                        |
+| 2021-01-29 | V1.3.0   | 吴良峰             | 修正 NaNeng USB 2.0 PHY 的寄存器说明               |
 
 ---
 [TOC]
@@ -463,9 +464,9 @@ USB IO 收发器包括 HS 收发器和 FS 收发器，用于根据实际应用�
 |  FC_REG00[5]  |    cfg_hs_strg     |    1'b1     | HS TX strong power mode<br/>正常使用时，该 bit 必须置 1。<br />特殊用法：在 chirp K 阶段设置该 bit 为 0，大约可以提高 chirp K 幅值 10mV |
 |  FC_REG00[6]  |  cfg_sel_strength  |    1'b0     | HS TX stronger edge driver enable signal<br/>**该寄存器用于 HS 眼图的 Slew rate 调整**<br />置 1 可以改善眼图的 Slew rate，但无法提高幅值。 |
 |  FC_REG00[7]  |     cfg_sel_pw     |    1’b0     | HS TX edge delay select signal<br/>Bypass signal of VDDA detect function:  <br/>0: normal mode<br/>1: bypass mode, VDDA detect function is disable<br/>**该寄存器用于 HS 眼图的 Slew rate 调整**<br />置1 可以改善眼图的 Slew rate，但可能会导致眼图过冲。所以使用时，请务必测试眼图确认效果。 |
-|  FC_REG02[2]  | cfg_rcal_sel_voff  |    1'b1     | Calibration code select signal, default value: 4’b1<br/> 0: select calibration code<br/> 1: select cfg_rcal_voff[3:0]<br/>如果设置为 0 就会触发一次电阻校准<br />RV1126/RV1109 PHY 驱动在初始化阶段会触发一次电阻校准功能，并把校准值 rcal_out[3:0] 写入 cfg_rcal_voff[3:0] ，然后关闭电阻校准功能。 |
 | FC_REG02[4:3] |   cfg_rref[1:0]    |    2'b00    | Reference resister select signal<br/> 00: 200 ohm<br/> 01: 390 ohm<br/> 10: 1K ohm<br/> 11: 2Kohm<br />默认使用 200 ohm 外部参考电阻 |
-| FC_REG04[6:3] | cfg_rcal_voff[3:0] |   4'b0111   | Register code for termination resister<br/>**该寄存器用于 HS 眼图的幅值调整**<br />该寄存器只有在 FC_REG02[2] 为 1 时生效<br /> 理论上，cfg_rcal_voff 值越大，对应的内部 45Ω 电阻越小，对应的眼图幅值越大<br />设置为 4'b1111，内部 45Ω 电阻最小，对应眼图幅值最大<br />设置为 4'b0001，内部 45Ω 电阻最大，对应眼图幅值最小<br />设置为 4‘b0000，无效 |
+|  FC_REG04[2]  | cfg_rcal_sel_voff  |    1'b1     | Calibration code select signal, default value: 4’b1<br/> 0: select calibration code<br/> 1: select cfg_rcal_voff[3:0]<br/>如果设置为 0 就会触发一次电阻自校准<br />RV1126/RV1109 PHY 驱动在初始化阶段会触发一次电阻自校准功能，并把校准值 rcal_out[3:0] 写入 cfg_rcal_voff[3:0] ，然后关闭电阻校准功能。 |
+| FC_REG04[6:3] | cfg_rcal_voff[3:0] |   4'b0111   | Register code for termination resister<br/>**该寄存器用于 HS 眼图的幅值调整**<br />该寄存器只有在 FC_REG04[2] 为 1 时生效<br /> 理论上，cfg_rcal_voff 值越大，对应的内部 45Ω 电阻越小，对应的眼图幅值越大<br />设置为 4'b1111，内部 45Ω 电阻最小，对应眼图幅值最大<br />设置为 4'b0001，内部 45Ω 电阻最大，对应眼图幅值最小<br />设置为 4‘b0000，无效 |
 |  FC_REG06[0]  |     LS_PAR_EN      |    1'b1     | LS mode with parallel enable<br/>作 Host 时，为了识别低速设备必须将该 bit 位置 1 |
 |  FC_REG08[4]  |   cfg_swcal_byps   |    1'b0     | Bypass signal of TX swing calibration function<br/> 0: normal mode<br/> 1: bypass mode<br/>当PHY的供电电压不是标准的 0.8V，1.8V 和 3.3V时，触发电压自校准<br />电压校准只有在 chirp K 的前 500us 生效；如果已做过一次电压校准，即使 bypass tx 电压校准，校准过的电流源仍然会保持住；从 bypass 切换到 normal，可以强制触发一次电压校准，但最好是在 chirpk 前 500us 让 phy 自己去判断校准 |
 |  FC_REG08[5]  |  cfg_byps_charge   |    1'b0     | Bypass signal of charge detection <br/> 0: normal mode<br/> 1: bypass mode<br/>在系统进入待机时，通过 bypass 充电检测功能可以降低 phy 的休眠功耗 |
