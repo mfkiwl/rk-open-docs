@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.2.1
+发布版本：V1.3.0
 
-日期：2021-01-05
+日期：2021-02-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有 © 2020 瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -70,6 +70,8 @@ Rockchip Electronics Co., Ltd.
 | V1.1.1 | 陈茂森 | 2020-12-08 | 修正VI工作模式个数错误 |
 | V1.2.0 | 陈茂森/林刘迪铭 | 2020-12-17 | 1.优化语言描述<br />2.增加[编译说明](#编译说明)<br />3.增加API说明：<br />（1）[RK_MPI_LOG_SetLevelConf](#RK_MPI_LOG_SetLevelConf)<br />（2）[RK_MPI_LOG_GetLevelConf](#RK_MPI_LOG_GetLevelConf) |
 | V1.2.1 | 范立创/张伦霞 | 2021-01-05 | 1.修复错误代码<br />2.修复示例描述错误<br />3.更新示例参数说明 |
+| V1.2.2 | 范立创 | 2021-01-15 | 1.补充接口说明 |
+| V1.3.0 | 范立创/王智华 | 2021-02-03 | 1.增加API说明：<br />（1）[RK_MPI_SYS_SetFrameRate](#RK_MPI_SYS_SetFrameRate)<br />（2）[RK_MPI_MB_POOL_Create](#RK_MPI_MB_POOL_Create)<br />（3）[RK_MPI_MB_POOL_Destroy](#RK_MPI_MB_POOL_Destroy)<br />（4）[RK_MPI_MB_POOL_GetBuffer](#RK_MPI_MB_POOL_GetBuffer)<br />（5）[RK_MPI_MB_Copy](#RK_MPI_MB_Copy)<br />（6）[RK_MPI_VI_SetUserPic](#RK_MPI_VI_SetUserPic)<br />（7）[RK_MPI_VI_EnableUserPic](#RK_MPI_VI_EnableUserPic)<br />（8）[RK_MPI_VI_DisableUserPic](#RK_MPI_VI_DisableUserPic)<br />（9）[RK_MPI_VI_RGN_SetCover](#RK_MPI_VI_RGN_SetCover)<br />（10）[RK_MPI_VENC_RGN_SetCoverEx](#RK_MPI_VENC_RGN_SetCoverEx)<br />（11）[RK_MPI_RGA_RGN_SetBitMap](#RK_MPI_RGA_RGN_SetBitMap)<br />（12）[RK_MPI_RGA_GetChnRegionLuma](#RK_MPI_RGA_GetChnRegionLuma)<br />（13）[RK_MPI_RGA_RGN_SetCover](#RK_MPI_RGA_RGN_SetCover)<br />（14）[RK_MPI_VMIX_CreateDev](#RK_MPI_VMIX_CreateDev)<br />（15）[RK_MPI_VMIX_DestroyDev](#RK_MPI_VMIX_DestroyDev)<br />（16）[RK_MPI_VMIX_EnableChn](#RK_MPI_VMIX_EnableChn)<br />（17）[RK_MPI_VMIX_DisableChn](#RK_MPI_VMIX_DisableChn)<br />（18）[RK_MPI_VMIX_SetLineInfo](#RK_MPI_VMIX_SetLineInfo)<br />（19）[RK_MPI_VMIX_ShowChn](#RK_MPI_VMIX_ShowChn)<br />（20）[RK_MPI_VMIX_HideChn](#RK_MPI_VMIX_HideChn)<br />（21）[RK_MPI_VMIX_RGN_SetBitMap](#RK_MPI_VMIX_RGN_SetBitMap)<br />（22）[RK_MPI_VMIX_GetRegionLuma](#RK_MPI_VMIX_GetRegionLuma)<br />（23）[RK_MPI_VMIX_GetChnRegionLuma](#RK_MPI_VMIX_GetChnRegionLuma)<br />（24）[RK_MPI_VMIX_RGN_SetCover](#RK_MPI_VMIX_RGN_SetCover)<br />（25）[RK_MPI_MUXER_EnableChn](#RK_MPI_MUXER_EnableChn)<br />（26）[RK_MPI_MUXER_DisableChn](#RK_MPI_MUXER_DisableChn)<br />（27）[RK_MPI_MUXER_Bind](#RK_MPI_MUXER_Bind)<br />（28）[RK_MPI_MUXER_StreamStart](#RK_MPI_MUXER_StreamStart)<br />（29）[RK_MPI_MUXER_StreamStop](#RK_MPI_MUXER_StreamStop)<br />（30）[RK_MPI_SYS_DevSendMediaBuffer](#RK_MPI_SYS_DevSendMediaBuffer)<br />2.AI/AO支持多通道同时打开。<br />3.JPEG支持±90度旋转。<br />4.优化Cover内存占用以及效率<br />5.新增uvc、多路音频的示例。<br/>5.Event接口增加用户私有数据指针<br />6.RGA支持镜像<br />7.删除JPEG Light接口说明 |
 
 ---
 
@@ -83,7 +85,7 @@ Rockchip Electronics Co., Ltd.
 
 ### 概述
 
- RKMedia提供了一种媒体处理方案，可支持应用软件快速开发。RKMedia在各模块基础API上做进一步封装，简化了应用开发难度。该平台支持以下功能：VI(输入视频捕获)、VENC(H.265/H.264/JPEG/MJPEG 编码)、VDEC(H.265/H.264/JPEG、MJPEG 解码)、VO(视频输出显示)、RGA视频处理（包括旋转、缩放、裁剪）、AI(音频采集）、AO（音频输出）、AENC（音频编码）、ADEC（音频解码）、MD（移动侦测）、OD（遮挡侦测）。
+ RKMedia提供了一种媒体处理方案，可支持应用软件快速开发。RKMedia在各模块基础API上做进一步封装，简化了应用开发难度。该平台支持以下功能：VI(输入视频捕获)、VENC(H.265/H.264/JPEG/MJPEG 编码)、VDEC(H.265/H.264/JPEG、MJPEG 解码)、VO(视频输出显示)、RGA视频处理（包括旋转、缩放、裁剪）、AI(音频采集）、AO（音频输出）、AENC（音频编码）、ADEC（音频解码）、MD（移动侦测）、OD（遮挡侦测）、VMIX（视频合成）、MUXER（视频封装）。
 
 ### 系统架构
 
@@ -96,14 +98,16 @@ Rockchip Electronics Co., Ltd.
 | VI       | 8        |
 | VENC     | 16       |
 | VDEC     | 16       |
-| AI       | 1        |
-| AO       | 1        |
+| AI       | 16       |
+| AO       | 16       |
 | AENC     | 16       |
 | ADEC     | 16       |
 | MD       | 4        |
 | OD       | 4        |
 | RGA      | 16       |
 | VO       | 2        |
+| VMIX     | 16       |
+| MUXER    | 16       |
 
 ## 系统控制
 
@@ -423,6 +427,50 @@ RK_S32 RK_MPI_SYS_SendMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32ChnID
 
 [RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
 
+#### RK_MPI_SYS_DevSendMediaBuffer
+
+【描述】
+
+向指定设备指定通道输入数据，比如将本地yuv文件送入VMIX。
+
+【语法】
+
+RK_S32 RK_MPI_SYS_DevSendMediaBuffer(MOD_ID_E enModID, RK_S32 s32DevId, RK_S32 s32ChnID, MEDIA_BUFFER buffer);
+
+【参数】
+
+| 参数名称 | 描述     | 输入/输出 |
+| -------- | -------- | --------- |
+| enModID  | 模块号。 | 输入      |
+| s32DevId | 设备号。 | 输入      |
+| s32ChnID | 通道号。 | 输入      |
+| buffer   | 缓冲区。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                    |
+| ------ | --------------------------------------- |
+| 0      | 成功。                                  |
+| 非0    | 失败，其值参见[错误码](#common-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+[RK_MPI_SYS_GetMediaBuffer](#RK_MPI_SYS_GetMediaBuffer)
+
 #### RK_MPI_SYS_StartGetMediaBuffer
 
 【描述】
@@ -554,6 +602,41 @@ RK_S32 RK_MPI_SYS_StartGetMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32C
 [RK_MPI_SYS_StartGetMediaBuffer](#RK_MPI_SYS_StartGetMediaBuffer)
 
 [RK_MPI_SYS_StopGetMediaBuffer](#RK_MPI_SYS_StopGetMediaBuffer)
+
+#### RK_MPI_SYS_SetFrameRate
+
+【描述】
+
+设置通道输入帧率。
+
+【语法】
+
+RK_S32 RK_MPI_SYS_SetFrameRate(MOD_ID_E enModID, RK_S32 s32ChnID, [MPP_FPS_ATTR_S](#MPP_FPS_ATTR_S ) *pstFpsAttr);
+
+【参数】
+
+| 参数名称   | 描述       | 输入/输出 |
+| ---------- | ---------- | --------- |
+| enModID    | 模块ID     | 输入      |
+| s32ChnID   | 通道ID。   | 输入      |
+| pstFpsAttr | 帧率属性。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                              |
+| ------ | --------------------------------- |
+| 0      | 成功。                            |
+| 非0    | 失败，其值参见[错误码](#错误码)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
 
 #### RK_MPI_MB_CreateBuffer
 
@@ -742,6 +825,45 @@ RK_S32 RK_MPI_SYS_StartGetMediaBuffer([MOD_ID_E](#MOD_ID_E) enModID, RK_S32 s32C
 【注意】
 
 无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_MB_Copy
+
+【描述】
+
+MediaBuff“零拷贝”接口。
+
+【语法】
+
+[MEDIA_BUFFER](#MEDIA_BUFFER) RK_MPI_MB_Copy([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_BOOL bZeroCopy);
+
+| 参数名称  | 描述             | 输入/输出 |
+| --------- | ---------------- | --------- |
+| mb        | 普通缓冲区指针。 | 输入      |
+| bZeroCopy | “零拷贝”使能。   | 输入      |
+
+【返回值】
+
+| 返回值类型                    | 描述         |
+| ----------------------------- | ------------ |
+| [MEDIA_BUFFER](#MEDIA_BUFFER) | 缓冲区指针。 |
+
+【需求】
+
+头文件：rkmedia_buffer.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+当前仅支持“零拷贝”（bZeroCopy=RK_TRUE）标志，“深度拷贝”（bZeroCopy=RK_FALSE）尚不支持。
 
 【举例】
 
@@ -1379,6 +1501,106 @@ RK_S32 RK_MPI_MB_BeginCPUAccess([MEDIA_BUFFER](#MEDIA_BUFFER) mb, RK_BOOL bReado
 
 无。
 
+#### RK_MPI_MB_POOL_Create
+
+【描述】
+
+创建BufferPool。
+
+【语法】
+
+MEDIA_BUFFER_POOL RK_MPI_MB_POOL_Create([MB_POOL_PARAM_S](#MB_POOL_PARAM_S ) *pstPoolParam);
+
+【参数】
+
+| 参数名称     | 描述           | 输入/输出 |
+| ------------ | -------------- | --------- |
+| pstPoolParam | BufferPool属性 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述   |
+| ------ | ------ |
+| NULL   | 失败。 |
+| 非NULL | 成功。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+#### RK_MPI_MB_POOL_Destroy
+
+【描述】
+
+销毁BufferPool。
+
+【语法】
+
+RK_S32 RK_MPI_MB_POOL_Destroy(MEDIA_BUFFER_POOL MBPHandle);
+
+【参数】
+
+| 参数名称  | 描述                        | 输入/输出 |
+| --------- | --------------------------- | --------- |
+| MBPHandle | 待销毁的MediaBufferPool对象 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                              |
+| ------ | --------------------------------- |
+| 0      | 成功。                            |
+| 非0    | 失败，其值参见[错误码](#错误码)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+#### RK_MPI_MB_POOL_GetBuffer
+
+【描述】
+
+从BufferPool中获取MediaBuff。
+
+【语法】
+
+MEDIA_BUFFER RK_MPI_MB_POOL_GetBuffer(MEDIA_BUFFER_POOL MBPHandle, RK_BOOL bIsBlock);
+
+【参数】
+
+| 参数名称  | 描述                | 输入/输出 |
+| --------- | ------------------- | --------- |
+| MBPHandle | MediaBufferPool对象 | 输入      |
+| bIsBlock  | 是否阻塞            | 输入      |
+
+【返回值】
+
+| 返回值 | 描述   |
+| ------ | ------ |
+| 非NULL | 成功。 |
+| NULL   | 失败。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
 #### RK_MPI_LOG_SetLevelConf
 
 【描述】
@@ -1859,6 +2081,86 @@ typedef struct rkLOG_LEVEL_CONF_S {
 
 无。
 
+##### MPP_FPS_ATTR_S
+
+【说明】
+
+通道输入帧率属性。
+
+【定义】
+
+```c
+typedef struct rkMPP_FPS_ATTR_S {
+  RK_S32 s32FpsInNum;
+  RK_S32 s32FpsInDen;
+  RK_S32 s32FpsOutNum;
+  RK_S32 s32FpsOutDen;
+} MPP_FPS_ATTR_S;
+```
+
+【成员】
+
+| 成员名称     | 描述           |
+| ------------ | -------------- |
+| s32FpsInNum  | 输入帧率分子。 |
+| s32FpsInDen  | 输入帧率分母。 |
+| s32FpsOutNum | 输出帧率分子。 |
+| s32FpsOutDen | 输出帧率分母。 |
+
+【相关数据类型及接口】
+
+无。
+
+##### MB_POOL_PARAM_S
+
+【说明】
+
+Media BufferPool 属性结构体。
+
+【定义】
+
+```c
+typedef enum rkMB_TYPE {
+  MB_TYPE_COMMON = 0,
+  // Original image, such as NV12, RGB
+  MB_TYPE_IMAGE = MB_TYPE_IMAGE_MASK | 0x0000,
+  // Encoded video data. Treat JPEG as a video data.
+  MB_TYPE_VIDEO = MB_TYPE_VIDEO_MASK | 0x0000,
+  MB_TYPE_H264 = MB_TYPE_VIDEO_MASK | 0x0001,
+  MB_TYPE_H265 = MB_TYPE_VIDEO_MASK | 0x0002,
+  MB_TYPE_JPEG = MB_TYPE_VIDEO_MASK | 0x0003,
+  MB_TYPE_MJPEG = MB_TYPE_VIDEO_MASK | 0x0004,
+  // Audio data
+  MB_TYPE_AUDIO = MB_TYPE_AUDIO_MASK | 0x0000,
+} MB_TYPE_E;
+
+typedef struct rkMB_POOL_PARAM_S {
+  MB_TYPE_E enMediaType;
+  RK_U32 u32Cnt;
+  RK_U32 u32Size;
+  RK_BOOL bHardWare;
+  RK_U16 u16Flag;
+  union {
+    MB_IMAGE_INFO_S stImageInfo;
+  };
+} MB_POOL_PARAM_S;
+```
+
+【成员】
+
+| 成员名称    | 描述                                                         |
+| ----------- | ------------------------------------------------------------ |
+| enMediaType | 媒体类型。                                                   |
+| u32Cnt      | BufferPool的Buffer个数。                                     |
+| u32Size     | 每个Buffer的内存大小。                                       |
+| bHardWare   | 是否分配硬件类型Buffer。                                     |
+| u16Flag     | 内存分配标志，用于选择硬件Buffer的类型。                     |
+| stImageInfo | 图形Buffer的属性信息，参见[MB_IMAGE_INFO_S](#MB_IMAGE_INFO_S) |
+
+【相关数据类型及接口】
+
+无。
+
 ### 错误码
 
 系统控制错误码如[表2-2](#common-error)所示：
@@ -2234,6 +2536,142 @@ RK_S32 RK_MPI_VI_StartStream([VI_PIPE](#VI_PIPE) ViPipe, [VI_CHN](#VI_CHN) ViChn
 
 无。
 
+#### RK_MPI_VI_SetUserPic
+
+【描述】
+
+插入用户图片。
+
+【语法】
+
+RK_S32 RK_MPI_VI_SetUserPic(VI_CHN ViChn, VI_USERPIC_ATTR_S *pstUsrPicAttr);
+
+【参数】
+
+| 参数名称      | 描述         | 输入/输出 |
+| ------------- | ------------ | --------- |
+| ViPipe        | VI 管道号。  | 输入      |
+| pstUsrPicAttr | 用户图片信息 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vi-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+插入后需要主动调用[RK_MPI_VI_EnableUserPic](#RK_MPI_VI_EnableUserPic)此时VI会按照设定帧率输出用户插入图片。
+
+#### RK_MPI_VI_EnableUserPic
+
+【描述】
+
+使能用户插入图片。
+
+【语法】
+
+RK_S32 RK_MPI_VI_EnableUserPic(VI_CHN ViChn);
+
+【参数】
+
+| 参数名称 | 描述        | 输入/输出 |
+| -------- | ----------- | --------- |
+| ViPipe   | VI 管道号。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vi-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+#### RK_MPI_VI_DisableUserPic
+
+【描述】
+
+禁用用户插入图片。
+
+【语法】
+
+RK_S32 RK_MPI_VI_DisableUserPic(VI_CHN ViChn);
+
+【参数】
+
+| 参数名称 | 描述        | 输入/输出 |
+| -------- | ----------- | --------- |
+| ViPipe   | VI 管道号。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vi-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+#### RK_MPI_VI_RGN_SetCover
+
+【描述】
+
+VI设置遮挡。
+
+【语法】
+
+RK_S32 RK_MPI_VI_RGN_SetCover(VI_PIPE ViPipe, VI_CHN ViChn, const OSD_REGION_INFO_S *pstRgnInfo, const COVER_INFO_S *pstCoverInfo);
+
+【参数】
+
+| 参数名称     | 描述         | 输入/输出 |
+| ------------ | ------------ | --------- |
+| ViPipe       | VI 管道号。  | 输入      |
+| ViChn        | VI通道号。   | 输入      |
+| pstRgnInfo   | 画布信息。   | 输入      |
+| pstCoverInfo | 遮挡颜色信息 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vi-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
 ### 数据类型
 
 视频输入相关数据类型定义如下：
@@ -2370,6 +2808,38 @@ typedef struct rkVIDEO_REGION_INFO_S {
 
 [RK_MPI_VI_GetChnRegionLuma](#RK_MPI_VI_GetChnRegionLuma)
 
+#### VI_USERPIC_ATTR_S
+
+【说明】
+
+用户插图属性信息。
+
+【定义】
+
+```c
+typedef struct rkVI_USERPIC_ATTR_S {
+  IMAGE_TYPE_E enPixFmt;
+  RK_U32 u32Width;
+  RK_U32 u32Height;
+  RK_VOID *pvPicPtr;
+} VI_USERPIC_ATTR_S;
+```
+
+【成员】
+
+| 成员名称  | 描述       |
+| --------- | ---------- |
+| enPixFmt  | 插图格式。 |
+| u32Width  | 插图宽度。 |
+| u32Height | 插图高度。 |
+| pvPicPtr  | 插图数据。 |
+
+【相关数据类型及接口】
+
+[RECT_S](#RECT_S)
+
+[RK_MPI_VI_GetChnRegionLuma](#RK_MPI_VI_GetChnRegionLuma)
+
 ### 错误码
 
 视频输入 API 错误码如[表3-2](#vi-error)所示：
@@ -2474,7 +2944,15 @@ RK_S32 RK_MPI_VENC_CreateChn([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S](#VEN
 
 【注意】
 
-与[RK_MPI_VENC_CreateJpegLightChn](#RK_MPI_VENC_CreateJpegLightChn)创建的JPEG/MJPEG  Light相比，该接口创建的JPEG/MJPEG 支持FBC格式、支持OSD、支持旋转、缩放；但不支持分辨率动态切换。
+JPEG/MJPEG编码器限制：
+
+1、如果有FBC格式 或 启用了缩放功能，此时创建的编码器通道不支持动态分辨率切换。
+
+2、仅支持90度、180度旋转。
+
+3、OSD会改变输入JPEG/MJPEG的原始Buffer内容。在如下场景下可能会存在问题：
+
+VI[0]同时绑定VENC[H264]、VENC[JPEG]，并且JPEG配置有OSD。此时JPEG会直接在VI输出的原图上打上OSD，因此H264编码器的输入数据也会**概率**带有这个OSD效果。此时可通过在VENC[JPEG]之前添加RGA类型的通道来避免直接在VI输出原图打OSD。
 
 【举例】
 
@@ -2565,48 +3043,6 @@ RK_S32 RK_MPI_VENC_SetVencChnAttr([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S]
 【举例】
 
 无。
-
-【相关主题】
-
-无。
-
-#### RK_MPI_VENC_CreateJpegLightChn
-
-【描述】
-
-创建轻量级的JPEG编码通道。
-
-【语法】
-
-RK_S32 RK_MPI_VENC_CreateJpegLightChn([VENC_CHN](#VENC_CHN) VeChn,[VENC_CHN_ATTR_S](#VENC_CHN_ATTR_S) *stVencChnAttr);
-
-【参数】
-
-| 参数名称      | 描述                                                         | 输入/输出 |
-| ------------- | ------------------------------------------------------------ | --------- |
-| VeChn         | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
-| stVencChnAttr | 编码通道属性指针。                                           | 输入      |
-
-【返回值】
-
-| 返回值 | 描述                                  |
-| ------ | ------------------------------------- |
-| 0      | 成功。                                |
-| 非0    | 失败，其值参见[错误码](#venc-error)。 |
-
-【需求】
-
-头文件：rkmedia_api.h
-
-库文件：libeasymedia.so
-
-【注意】
-
-与[RK_MPI_VENC_CreateChn](#RK_MPI_VENC_CreateChn)创建的JPEG/MJPEG相比，经过该接口创建的JPEG/MJPEG  Light效率更高，支持分辨率动态切换；但不支持FBC格式、不支持OSD、不支持缩放。如果使用JPEG/MJPEG Light，可配合RGA做OSD和缩放功能。
-
-【举例】
-
-[rkmedia_venc_jpeg_light_test](#rkmedia_venc_jpeg_light_test)。
 
 【相关主题】
 
@@ -3254,7 +3690,7 @@ RK_S32 RK_MPI_VENC_SetGopMode([VENC_CHN](#VENC_CHN) VeChn, [VENC_GOP_ATTR_S](#VE
 
 【描述】
 
-初始化OSD。每个编码器Channel，在使用OSD模块前都需调用此函数进行初始化。
+初始化VENC RGN模块。每个VENC_CHN，在使用VENC RGN接口前都需调用此函数进行初始化。
 
 【语法】
 
@@ -3352,7 +3788,7 @@ RK_S32 RK_MPI_VENC_RGN_SetCover([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGION_I
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
 | VeChn        | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
-| pstRgnInfo   | OSD区域信息。                                                | 输入      |
+| pstRgnInfo   | RGN区域信息。                                                | 输入      |
 | pstCoverInfo | 隐私遮挡信息。                                               | 输入      |
 
 【返回值】
@@ -3397,7 +3833,7 @@ RK_S32 RK_MPI_VENC_RGN_SetPaletteId([VENC_CHN](#VENC_CHN) VeChn, const [OSD_REGI
 | 参数名称     | 描述                                                         | 输入/输出 |
 | ------------ | ------------------------------------------------------------ | --------- |
 | VeChn        | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
-| pstRgnInfo   | OSD区域信息。                                                | 输入      |
+| pstRgnInfo   | RGN区域信息。                                                | 输入      |
 | pstColPalBuf | 调色板索引构建的OSD Buffer。                                 | 输入      |
 
 【返回值】
@@ -4361,16 +4797,20 @@ typedef struct rkOSD_REGION_INFO_S {
 | 成员名称   | 描述                            |
 | ---------- | ------------------------------- |
 | enRegionId | OSD区域索引值，取值范围[0, 7]。 |
-| u32PosX    | OSD区域X轴坐标。                |
-| u32PosY    | OSD区域Y轴坐标。                |
-| u32Width   | OSD区域宽度。                   |
-| u32Height  | OSD区域高度。                   |
+| u32PosX    | OSD区域X轴坐标。必须16对齐。    |
+| u32PosY    | OSD区域Y轴坐标。必须16对齐。    |
+| u32Width   | OSD区域宽度。必须16对齐。       |
+| u32Height  | OSD区域高度。必须16对齐。       |
 | u8Inverse  | OSD区域是否反色。               |
 | u8Enable   | OSD区域是否使能。               |
 
 【相关数据类型及接口】
 
 [OSD_REGION_ID_E](#OSD_REGION_ID_E)
+
+【注意】
+
+每个编码器通道（VENC CHN）支持8个Region（索引：0~7）。每个Region均可以配置为BitMap或Cover，但二者互斥。比如Region[0]为BitMap，Region[1]为Cover是合理的；Region[0]无法既配置为BitMap又配置为Cover。
 
 #### OSD_PIXEL_FORMAT_E
 
@@ -7549,6 +7989,136 @@ RK_S32 RK_MPI_RGA_DestroyChn([RGA_CHN](#RGA_CHN) RgaChn);
 
 [RK_MPI_RGA_CreateChn](#RK_MPI_RGA_CreateChn)
 
+#### RK_MPI_RGA_RGN_SetBitMap
+
+【描述】
+
+设置BitMap水印。
+
+【语法】
+
+RK_S32 RK_MPI_RGA_RGN_SetBitMap([RGA_CHN](#RGA_CHN) RgaChn, const [OSD_REGION_INFO_S](#OSD_REGION_INFO_S ) *pstRgnInfo, const [BITMAP_S](#BITMAP_S ) *pstBitmap) ;
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| RgaChn     | RGA通道号。取值范围：[0, [RGA_MAX_CHN_NUM](#RGA_MAX_CHN_NUM))。 | 输入      |
+| pstRgnInfo | OSD区域信息。                                                | 输入      |
+| pstBitmap  | 位图信息和数据。                                             | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                 |
+| ------ | ------------------------------------ |
+| 0      | 成功。                               |
+| 非0    | 失败，其值参见[错误码](#rga-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_RGA_GetChnRegionLuma
+
+【描述】
+
+获取通道区域亮度。
+
+【语法】
+
+RK_S32 RK_MPI_RGA_GetChnRegionLuma([RGA_CHN](#RGA_CHN ) RgaChn, const [VIDEO_REGION_INFO_S](#VIDEO_REGION_INFO_S ) *pstRegionInfo, RK_U64 *pu64LumaData, RK_S32 s32MilliSec) ;
+
+【参数】
+
+| 参数名称      | 描述                                                         | 输入/输出 |
+| ------------- | ------------------------------------------------------------ | --------- |
+| RgaChn        | RGA通道号。取值范围：[0, [RGA_MAX_CHN_NUM](#RGA_MAX_CHN_NUM))。 | 输入      |
+| pstRegionInfo | 区域信息。其中 pstRegionInfo->pstRegion 为统计区域的区域属性，即起始位置、宽、高；pstRegionInfo->u32RegionNum 为统计区域的个数。 | 输入      |
+| pu64LumaData  | 接收区域亮度和统计信息的内存指针，该内存大小应该大于或等于 sizeof(RK_U64)×pstRegionInfo->u32RegionNum。 | 输出      |
+| s32MilliSec   | 超时参数 s32MilliSec： 小于等于0表示阻塞模式；大于0表示超时模式，超时时间的单位为毫秒（ms）。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                 |
+| ------ | ------------------------------------ |
+| 0      | 成功。                               |
+| 非0    | 失败，其值参见[错误码](#rga-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_RGA_RGN_SetCover
+
+【描述】
+
+设置隐私遮挡。
+
+【语法】
+
+RK_S32 RK_MPI_RGA_RGN_SetCover([RGA_CHN](#RGA_CHN ) RgaChn, const [OSD_REGION_INFO_S](#OSD_REGION_INFO_S ) *pstRgnInfo, const [COVER_INFO_S](#COVER_INFO_S ) *pstCoverInfo);
+
+【参数】
+
+| 参数名称     | 描述                                                         | 输入/输出 |
+| ------------ | ------------------------------------------------------------ | --------- |
+| RgaChn       | RGA通道号。取值范围：[0, [RGA_MAX_CHN_NUM](#RGA_MAX_CHN_NUM))。 | 输入      |
+| pstRgnInfo   | RGN区域信息。                                                | 输入      |
+| pstCoverInfo | 隐私遮挡信息。                                               | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                 |
+| ------ | ------------------------------------ |
+| 0      | 成功。                               |
+| 非0    | 失败，其值参见[错误码](#rga-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
 ### 数据类型
 
 RGA相关数据类型定义如下：
@@ -7637,18 +8207,20 @@ typedef struct rkRGA_ATTR_S {
   RK_U16 u16Rotaion;   // support 0/90/180/270.
   RK_BOOL bEnBufPool;
   RK_U16 u16BufPoolCnt;
+  RGA_FLIP_E enFlip;
 } RGA_ATTR_S;
 ```
 
 【成员】
 
-| 成员名称      | 描述                                  |
-| ------------- | ------------------------------------- |
-| stImgIn       | 输入图像信息。                        |
-| stImgOut      | 输出图像信息。                        |
-| u16Rotaion    | 旋转角度。取值范围：0，90，180，270。 |
-| bEnBufPool    | 使能缓冲池。                          |
-| u16BufPoolCnt | 缓冲池计数。                          |
+| 成员名称      | 描述                                             |
+| ------------- | ------------------------------------------------ |
+| stImgIn       | 输入图像信息。                                   |
+| stImgOut      | 输出图像信息。                                   |
+| u16Rotaion    | 旋转角度。取值范围：0，90，180，270。            |
+| bEnBufPool    | 使能缓冲池。                                     |
+| u16BufPoolCnt | 缓冲池计数。                                     |
+| enFlip        | 镜像控制。支持水平镜像、垂直镜像、水平垂直镜像。 |
 
 【相关数据类型及接口】
 
@@ -7667,6 +8239,1095 @@ RGA API 错误码如[表8-1](#rga-error)所示：
 | 92       | RK_ERR_RGA_EXIST         | 试图申请或者创建已经存在的设备、通道或者资源 |
 | 93       | RK_ERR_RGA_NOT_CONFIG    | 使用前未配置                                 |
 | 94       | RK_ERR_RGA_ILLEGAL_PARAM | 非法参数                                     |
+
+## 视频合成
+
+### 概述
+
+视频合成VMIX模块使用RGA对多路视频进行合成拼接，可以把拼接后的视频绑定VO显示，实现多路视频合成显示。
+
+### 功能描述
+
+视频合成VMIX模块支持视频合成、区域画线画框、敏感区域设置、通道显示、通道隐藏、通道区域亮度获取等功能。
+
+### API参考
+
+#### RK_MPI_VMIX_CreateDev
+
+【描述】
+
+创建VMIX设备
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_CreateDev([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_DEV_INFO_S](#VMIX_DEV_INFO_S) *pstDevInfo);
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| VmDev      | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| pstDevInfo | VMIX设备属性指针。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+[RK_MPI_VMIX_DestroyDev](#RK_MPI_VMIX_DestroyDev)
+
+#### RK_MPI_VMIX_DestroyDev
+
+【描述】
+
+销毁VMIX设备
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_DestroyDev([VMIX_DEV](#VMIX_DEV) VmDev);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmDev    | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+[RK_MPI_VMIX_CreateDev](#RK_MPI_VMIX_CreateDev)
+
+#### RK_MPI_VMIX_EnableChn
+
+【描述】
+
+使能VMIX设备的通道
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_EnableChn([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmDev    | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn    | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+[RK_MPI_VMIX_DisableChn](#RK_MPI_VMIX_DisableChn)
+
+#### RK_MPI_VMIX_DisableChn
+
+【描述】
+
+禁用VMIX设备的通道
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_DisableChn([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmDev    | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn    | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+[RK_MPI_VMIX_EnableChn](#RK_MPI_VMIX_EnableChn)
+
+#### RK_MPI_VMIX_SetLineInfo
+
+【描述】
+
+设置VMIX画框画线信息
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_SetLineInfo([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_DEV) VmChn, [VMIX_LINE_INFO_S](#VMIX_LINE_INFO_S) VmLine);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmDev    | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn    | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+| VmLine   | VMIX画框画线信息。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_VMIX_ShowChn
+
+【描述】
+
+显示VMIX设备的通道。
+
+【语法】
+
+RK_MPI_VMIX_ShowChn([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmDev    | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn    | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+[RK_MPI_VMIX_HideChn](#RK_MPI_VMIX_HideChn)
+
+#### RK_MPI_VMIX_HideChn
+
+【描述】
+
+隐藏VMIX设备的通道。
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_HideChn([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmDev    | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn    | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_test](#rkmedia_vmix_vo_test)
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+[RK_MPI_VMIX_ShowChn](#RK_MPI_VMIX_ShowChn)
+
+#### RK_MPI_VMIX_RGN_SetBitMap
+
+【描述】
+
+设置BitMap水印。
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_RGN_SetBitMap([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn, const [OSD_REGION_INFO_S](#OSD_REGION_INFO_S) *pstRgnInfo, const [BITMAP_S](#BITMAP_S) *pstBitmap);
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| VmDev      | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn      | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+| pstRgnInfo | OSD区域信息。                                                | 输入      |
+| pstBitmap  | 位图信息和数据。                                             | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+无
+
+【相关主题】
+
+无
+
+#### RK_MPI_VMIX_GetRegionLuma
+
+【描述】
+
+获取VMIX设备区域曝光
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_GetRegionLuma([VMIX_DEV](#VMIX_DEV) VmDev, const [VIDEO_REGION_INFO_S](#VIDEO_REGION_INFO_S) *pstRegionInfo, RK_U64 *pu64LumaData, RK_S32 s32MilliSec);
+
+【参数】
+
+| 参数名称      | 描述                                                         | 输入/输出 |
+| ------------- | ------------------------------------------------------------ | --------- |
+| VmDev         | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| pstRegionInfo | 区域信息。其中 pstRegionInfo->pstRegion 为统计区域的区域属性，即起始位置、宽、高；pstRegionInfo->u32RegionNum 为统计区域的个数。 | 输入      |
+| pu64LumaData  | 接收区域亮度和统计信息的内存指针，该内存大小应该大于或等于 sizeof(RK_U64)×pstRegionInfo->u32RegionNum。 | 输出      |
+| s32MilliSec   | 超时参数 s32MilliSec： 小于等于0表示阻塞模式；大于0表示超时模式，超时时间的单位为毫秒（ms）。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+无
+
+【相关主题】
+
+无
+
+#### RK_MPI_VMIX_GetChnRegionLuma
+
+【描述】
+
+获取VMIX设备的通道区域曝光
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_GetChnRegionLuma([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn, const [VIDEO_REGION_INFO_S](#VIDEO_REGION_INFO_S) *pstRegionInfo, RK_U64 *pu64LumaData, RK_S32 s32MilliSec);
+
+【参数】
+
+| 参数名称      | 描述                                                         | 输入/输出 |
+| ------------- | ------------------------------------------------------------ | --------- |
+| VmDev         | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn         | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+| pstRegionInfo | 区域信息。其中 pstRegionInfo->pstRegion 为统计区域的区域属性，即起始位置、宽、高；pstRegionInfo->u32RegionNum 为统计区域的个数。 | 输入      |
+| pu64LumaData  | 接收区域亮度和统计信息的内存指针，该内存大小应该大于或等于 sizeof(RK_U64)×pstRegionInfo->u32RegionNum。 | 输出      |
+| s32MilliSec   | 超时参数 s32MilliSec： 小于等于0表示阻塞模式；大于0表示超时模式，超时时间的单位为毫秒（ms）。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_VMIX_RGN_SetCover
+
+【描述】
+
+隐私遮挡。
+
+【语法】
+
+RK_S32 RK_MPI_VMIX_RGN_SetCover([VMIX_DEV](#VMIX_DEV) VmDev, [VMIX_CHN](#VMIX_CHN) VmChn, const [OSD_REGION_INFO_S](#OSD_REGION_INFO_S ) *pstRgnInfo, const [COVER_INFO_S](#COVER_INFO_S) *pstCoverInfo);
+
+【参数】
+
+| 参数名称     | 描述                                                         | 输入/输出 |
+| ------------ | ------------------------------------------------------------ | --------- |
+| VmDev        | VMIX设备号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| VmChn        | VMIX设备通道号。取值范围：[0,[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM))。 | 输入      |
+| pstRgnInfo   | RGN区域信息。                                                | 输入      |
+| pstCoverInfo | 隐私遮挡信息。                                               | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#vmix-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vmix_vo_dvr_test](#rkmedia_vmix_vo_dvr_test)
+
+【相关主题】
+
+无
+
+### 数据类型
+
+VMIX相关数据类型定义如下：
+
+[VMIX_DEV](#VMIX_DEV)：VMIX设备号
+
+[VMIX_CHN](#VMIX_CHN)：VMIX设备的通道号
+
+[VMIX_DEV_INFO_S](#VMIX_DEV_INFO_S)：VMIX设备信息结构体
+
+[VMIX_CHN_INFO_S](#VMIX_CHN_INFO_S)：VMIX设备通道信息结构体
+
+[VMIX_LINE_INFO_S](#VMIX_LINE_INFO_S)：VMIX画框画线结构体
+
+[VMIX_MAX_CHN_NUM](#VMIX_MAX_CHN_NUM)：VMIX设备的通道最大值
+
+[VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM)：VMIX设备的最大值
+
+[VMIX_MAX_LINE_NUM](#VMIX_MAX_LINE_NUM)：VMIX设备的通道框线最大值
+
+#### VMIX_DEV
+
+【说明】
+
+VMIX设备号。
+
+【定义】
+
+```c
+typedef RK_S32 VMIX_DEV;
+```
+
+#### VMIX_CHN
+
+【说明】
+
+VMIX设备的通道号。
+
+【定义】
+
+```c
+typedef RK_S32 VMIX_CHN;
+```
+
+#### VMIX_DEV_INFO_S
+
+【说明】
+
+VMIX设备信息结构体
+
+【定义】
+
+```c
+typedef struct rkVMIX_DEV_INFO_S {
+  RK_U16 u16ChnCnt;
+  RK_U16 u16Fps;
+  RK_U32 u32ImgWidth;
+  RK_U32 u32ImgHeight;
+  IMAGE_TYPE_E enImgType;
+  VMIX_CHN_INFO_S stChnInfo[VMIX_MAX_CHN_NUM];
+} VMIX_DEV_INFO_S;
+```
+
+【成员】
+
+| 成员名称     | 描述         |
+| ------------ | ------------ |
+| u16ChnCnt    | 通道数量     |
+| u16Fps       | 帧率         |
+| u32ImgWidth  | 合成图像宽度 |
+| u32ImgHeight | 合成图像高度 |
+| enImgType    | 图像格式类型 |
+| stChnInfo    | 通道信息     |
+
+【相关数据类型及接口】
+
+[IMAGE_TYPE_E](#IMAGE_TYPE_E)
+
+[VMIX_CHN_INFO_S](#VMIX_CHN_INFO_S)
+
+#### VMIX_CHN_INFO_S
+
+【说明】
+
+VMIX设备通道信息结构体
+
+【定义】
+
+```c
+typedef struct rkVMIX_CHN_INFO_S {
+  IMAGE_TYPE_E enImgInType;
+  IMAGE_TYPE_E enImgOutType;
+  RECT_S stInRect;
+  RECT_S stOutRect;
+} VMIX_CHN_INFO_S;
+```
+
+【成员】
+
+| 成员名称     | 描述             |
+| ------------ | ---------------- |
+| enImgInType  | 输入图像格式类型 |
+| enImgOutType | 输出图像格式类型 |
+| stInRect     | 输入图像区域     |
+| stOutRect    | 输出图像区域     |
+
+【相关数据类型及接口】
+
+[IMAGE_TYPE_E](#IMAGE_TYPE_E)
+
+[RECT_S](#RECT_S)
+
+#### VMIX_LINE_INFO_S
+
+【说明】
+
+VMIX画框画线结构体
+
+【定义】
+
+```c
+typedef struct rkVMIX_LINE_INFO_S {
+  RK_U32 u32LineCnt;
+  RK_U32 u32Color;
+  RECT_S stLines[VMIX_MAX_LINE_NUM];
+} VMIX_LINE_INFO_S;
+```
+
+【成员】
+
+| 成员名称   | 描述     |
+| ---------- | -------- |
+| u32LineCnt | 框线数量 |
+| u32Color   | 框线颜色 |
+| stLines    | 框线区域 |
+
+【相关数据类型及接口】
+
+[RECT_S](#RECT_S)
+
+#### VMIX_MAX_CHN_NUM
+
+【说明】
+
+VMIX设备的通道最大值
+
+【定义】
+
+```c
+#define VMIX_MAX_CHN_NUM 16
+```
+
+#### VMIX_MAX_DEV_NUM
+
+【说明】
+
+VMIX设备的最大值
+
+【定义】
+
+```c
+#define VMIX_MAX_DEV_NUM 16
+```
+
+#### VMIX_MAX_LINE_NUM
+
+【说明】
+
+VMIX设备的通道框线最大值
+
+【定义】
+
+```c
+#define VMIX_MAX_LINE_NUM 64
+```
+
+### 错误码
+
+VMIX API 错误码如[表11-1](#vmix-error)所示：
+
+<a name = "vmix-error">表11-1 VMIX API 错误码</a>
+
+| 错误代码 | 宏定义                    | 描述                                         |
+| -------- | ------------------------- | -------------------------------------------- |
+| 130      | RK_ERR_VMIX_INVALID_DEVID | VMIX输入设备号无效                           |
+| 131      | RK_ERR_VMIX_INVALID_CHNID | VMIX输入设备通道号无效                       |
+| 132      | RK_ERR_VMIX_BUSY          | VMIX系统忙                                   |
+| 133      | RK_ERR_VMIX_EXIST         | 试图申请或者创建已经存在的设备、通道或者资源 |
+| 134      | RK_ERR_VMIX_ILLEGAL_PARAM | 非法参数                                     |
+| 135      | RK_ERR_VMIX_NOTREADY      | VMIX设备未就绪                               |
+| 136      | RK_ERR_VMIX_NOTOPEN       | VMIX设备的通道未打开                         |
+
+## 视频封装
+
+### 概述
+
+视频封装模块用于将前级输入的视频码流（H264/H265/MJPEG等）、音频码流（AAC、MP2、G711等）封装为MP4/TS等类型媒体文件。
+
+### 功能描述
+
+支持MP4/TS两种格式的封装；支持自动文件命名、回调函数文件命名方式；支持事件管理；支持状态管理。
+
+### API说明
+
+#### RK_MPI_MUXER_EnableChn
+
+【描述】
+
+使能封装器通道。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_EnableChn([MUXER_CHN](#MUXER_CHN) VmChn, [MUXER_CHN_ATTR_S](#MUXER_CHN_ATTR_S ) *pstAttr);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmChn    | MUXER通道号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+| pstAttr  | 封装器属性配置。                                             | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_MUXER_DisableChn
+
+【描述】
+
+禁用封装器通道。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_DisableChn([MUXER_CHN](#MUXER_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmChn    | MUXER通道号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_MUXER_DisableChn
+
+【描述】
+
+禁用封装器通道。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_DisableChn([MUXER_CHN](#MUXER_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VmChn    | MUXER通道号。取值范围：[0, [VMIX_MAX_DEV_NUM](#VMIX_MAX_DEV_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_MUXER_Bind
+
+【描述】
+
+封装器通道绑定专用接口。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_Bind(const MPP_CHN_S *pstSrcChn, const  [MUXER_CHN_S](#MUXER_CHN_S) *pstDestChn);
+
+【参数】
+
+| 参数名称   | 描述          | 输入/输出 |
+| ---------- | ------------- | --------- |
+| pstSrcChn  | 源通道信息    | 输入      |
+| pstDestChn | Muxer通道信息 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_MUXER_UnBind
+
+【描述】
+
+封装器通道解除绑定专用接口。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_UnBind(const MPP_CHN_S *pstSrcChn, const [MUXER_CHN_S](#MUXER_CHN_S) *pstDestChn);
+
+【参数】
+
+| 参数名称   | 描述          | 输入/输出 |
+| ---------- | ------------- | --------- |
+| pstSrcChn  | 源通道信息    | 输入      |
+| pstDestChn | Muxer通道信息 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_MUXER_StreamStart
+
+【描述】
+
+封装器开始接收流，并封装为对应媒体文件。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_StreamStart([MUXER_CHN](#MUXER_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述        | 输入/输出 |
+| -------- | ----------- | --------- |
+| VmChn    | MUXER通道号 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+#### RK_MPI_MUXER_StreamStop
+
+【描述】
+
+封装器停止接收流，当前流立即封装为完整的媒体文件（时长 <= 预设时长）。
+
+【语法】
+
+RK_S32 RK_MPI_MUXER_StreamStop([MUXER_CHN](#MUXER_CHN) VmChn);
+
+【参数】
+
+| 参数名称 | 描述        | 输入/输出 |
+| -------- | ----------- | --------- |
+| VmChn    | MUXER通道号 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                   |
+| ------ | -------------------------------------- |
+| 0      | 成功。                                 |
+| 非0    | 失败，其值参见[错误码](#muxer-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_muxer_test](#rkmedia_muxer_test)
+
+【相关主题】
+
+无
+
+### 数据类型
+
+#### MUXER_CHN
+
+【说明】
+
+MUXER通道号。
+
+【定义】
+
+```c
+typedef RK_S32 MUXER_CHN;
+```
+
+#### MUXER_MAX_CHN_NUM
+
+【说明】
+
+MUXER通道个数上限。
+
+【定义】
+
+```c
+#define MUXER_MAX_CHN_NUM 16
+```
+
+#### MUXER_CHN_S
+
+【说明】
+
+MUXER通道绑定参数。
+
+【定义】
+
+```c
+typedef struct rkMUXER_CHN_S {
+  MOD_ID_E enModId;
+  MUXER_CHN_TYPE_E enChnType;
+  RK_S32 s32ChnId;
+} MUXER_CHN_S;
+```
+
+【成员】
+
+| 成员名称  | 描述                            |
+| --------- | ------------------------------- |
+| enModId   | 封装器模块ID                    |
+| enChnType | 通道类型，用于区分“音频”/“视频” |
+| s32ChnId  | 封装器通道ID                    |
+
+#### MUXER_CHN_ATTR_S
+
+【说明】
+
+MUXER通道属性配置。
+
+【定义】
+
+```c
+typedef struct rkMUXER_CHN_ATTR_S {
+  MUXER_MODE_E enMode;
+  MUXER_TYPE_E enType;
+  union {
+    RK_CHAR *pcOutputFile;
+    MUXER_SPLIT_ATTR_S stSplitAttr;
+  };
+
+  // video stream params
+  MUXER_VIDEO_STREAM_PARAM_S stVideoStreamParam;
+  // audio stream params
+  MUXER_AUDIO_STREAM_PARAM_S stAudioStreamParam;
+} MUXER_CHN_ATTR_S;
+```
+
+【成员】
+
+| 成员名称           | 描述                                |
+| ------------------ | ----------------------------------- |
+| enMode             | 封装模式：自动切分模式/单一视频模式 |
+| enType             | 封装类型：MP4/TS                    |
+| pcOutputFile       | 单一视频模式下视频的输出路径        |
+| stSplitAttr        | 自动切分模式的文件命名配置          |
+| stVideoStreamParam | 视频码流属性信息                    |
+| stAudioStreamParam | 音频码流属性信息                    |
+
+### 错误码
+
+<a name = "muxer-error">表12-1 MUXER API 错误码</a>
+
+| 错误代码 | 宏定义                     | 描述                |
+| -------- | -------------------------- | ------------------- |
+| 140      | RK_ERR_MUXER_INVALID_CHNID | MUXER输入通道号无效 |
+| 141      | RK_ERR_MUXER_BUSY          | 设备被占用          |
+| 142      | RK_ERR_MUXER_EXIST         | MUXER通道已经被打开 |
+| 143      | RK_ERR_MUXER_ILLEGAL_PARAM | 非法参数            |
+| 144      | RK_ERR_MUXER_NOTREADY      | MUXER通道尚未打开   |
+| 145      | RK_ERR_MUXER_NOTSUPPORT    | 操作不允许          |
 
 ## 注意事项
 
@@ -8760,13 +10421,187 @@ external/rkmedia/examples/rkmedia_vi_rockx_venc_rtsp_test.c
 
 默认RTSP地址：rtsp://\<ip\>/live/main_stream。
 
+### rkmedia_vmix_vo_test
+
+【说明】
+
+rkmedia_vmix_vo_test主要实现8路视频采集，8路视频合成显示，支持区域画框。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vmix_vo_test.c
+
+【快速使用】
+
+```c
+./rkmedia_vmix_vo_test
+```
+
+【选项】
+
+| 选项             | 描述                                                         | 默认值            |
+| ---------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq      | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -I \| --camid    | 摄像头id                                                     | 0                 |
+| -M \| --multictx | 多路摄像头使能                                               | 0                 |
+
+【注意】
+
+无
+
+### rkmedia_vmix_vo_dvr_test
+
+【说明】
+
+rkmedia_vmix_vo_dvr_test主要实现8路视频采集、编码，8路视频合成显示，支持8路视频切换为前4路、后4路显示，支持区域画框，支持RGN Cover，支持屏幕OSD，支持通道显示、隐藏，支持通道的区域亮度获取。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vmix_vo_dvr_test.c
+
+【快速使用】
+
+```c
+rkmedia_vmix_vo_dvr_test
+```
+
+【选项】
+
+无
+
+【注意】
+
+无
+
+### rkmedia_vi_uvc_test
+
+【说明】
+
+uvc使用示例。该示例展示rkmedia接口如何与uvc_app接口进行关联。uvc相关接口说明请参照external/uvc_app/doc/zh-cn/Rockchip_Introduction_Linux_UVCApp_CN.pdf
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_uvc_test.c
+
+【快速使用】
+
+```c
+rkmedia_vi_uvc_test
+```
+
+【选项】
+
+无
+
+【注意】
+
+无
+
+### rkmedia_multi_ao_test
+
+【说明】
+
+多路音频放音示例。示例中两路音频分别对应两个扬声器。该示例多用于DVR场景。
+
+【代码路径】
+
+external/rkmedia/examples/multi_audio_test/rkmedia_multi_ao_test.c
+
+【快速使用】
+
+```c
+rkmedia_multi_ao_test
+```
+
+【选项】
+
+无
+
+【注意】
+
+1.该示例的运行依赖相应的asound.conf。请参照external/rkmedia/examples/multi_audio_test/ReadMe.txt进行配置。
+
+2.在官方evb板上运行，只会听到某一路声道有声音。这是由于evb板只有一个扬声器导致，属于正常现象。
+
+### rkmedia_multi_ai_test
+
+【说明】
+
+多路音频采集示例。分别采集两个声道的音频数据并保存成pcm文件。该示例多用于DVR场景。
+
+【代码路径】
+
+external/rkmedia/examples/multi_audio_test/rkmedia_multi_ai_test.c
+
+【快速使用】
+
+```c
+rkmedia_multi_ai_test
+```
+
+【选项】
+
+无
+
+【注意】
+
+该示例的运行依赖相应的asound.conf。请参照external/rkmedia/examples/multi_audio_test/ReadMe.txt进行配置。
+
+### rkmedia_muxer_test
+
+【说明】
+
+该示例演示如何将音频与视频码流封装为MP4文件。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_muxer_test.c
+
+【快速使用】
+
+```c
+rkmedia_muxer_test
+```
+
+【选项】
+
+无
+
+【注意】
+
+无
+
+### rkmedia_vi_electrostatic_protection
+
+【说明】
+
+摄像头静电保护示例程序。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_electrostatic_protection.c
+
+【快速使用】
+
+```c
+rkmedia_vi_electrostatic_protection
+```
+
+【选项】
+
+无
+
+【注意】
+
+无
+
 ## 编译说明
 
-### 如何编辑RKMedia编译选项
+### 配置RKMedia编译选项
 
 ```shell
 # SDK根目录，选择环境
-source envsetup.sh
+source envsetup.sh rockchip_rv1126_rv1109
 # SDK根目录下使用下列指令，可进入控制台，编辑RKMedia的编译选项
 make menuconfig
 # 使用 / 进入检索模式，检索 BR2_PACKAGE_RKMEDIA，使用对应数字编号选择BR2_PACKAGE_RKMEDIA，使用Select 进入RKMedia编译选项选择界面
@@ -8797,6 +10632,7 @@ make menuconfig
 | rk movedetection wrapper                           | 移动侦测功能开关。                                           |
 | rk occlusion detection wrapper                     | 遮挡检测功能开关。                                           |
 | enable rkmedia examples                            | 示例编译开关。                                               |
+| enable rkmedia uvc demo                            | uvc示例开关。                                                |
 | utils for debug rkmedia                            | DEBUG功能开关。                                              |
 | enable rkmedia sanitizer tools with dynamic linker | sanitizer工具动态库编译开关。                                |
 | enable rkmedia sanitizer tools with static linker  | sanitizer工具静态编译开关。                                  |
@@ -8805,4 +10641,18 @@ make menuconfig
 | rtsp server                                        | 开启live555后可见。rtsp总开关，对应MediaServer中的rstp直播功能。 |
 | rtsp server h264 session                           | 开启rstp后可见，rstp播放H264开关。                           |
 | rtsp server h265 session                           | 开启rstp后可见，rstp播放H265开关。                           |
+
+### RKMedia编译指令
+
+```shell
+# SDK根目录，选择环境
+source envsetup.sh rockchip_rv1126_rv1109
+# 重编rkmedia源码
+make rkmedia-dirclean && make rkmedia
+# rkmedia库/程序打包到文件系统（oem.img）
+./build.sh rootfs
+# 重新烧写oem.img，若有其他基础包配置更新（如ffmpeg），则需要重烧rootfs.img
+```
+
+
 
