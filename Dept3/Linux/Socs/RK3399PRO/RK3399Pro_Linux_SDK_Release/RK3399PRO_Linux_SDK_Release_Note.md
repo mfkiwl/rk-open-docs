@@ -8,6 +8,40 @@
 
 ---
 
+---
+## rk3399pro_linux_release_v1.4.2_20210202.xml Release Note
+
+**Buildroot (2018.02-rc3)**:
+
+```
+- Upgrade npu_fw to v1.6.0
+```
+
+**Debian10 (buster)**:
+
+```
+- Update Xserver
+- Update chromium to 87.0.4280.141
+- Update mpp/mpv for video decode/encode
+- Upgrade npu_fw to v1.6.0
+```
+
+**Kernel (4.4)**:
+
+```
+- update rga2 to fix some bugs
+```
+
+**docs/tools**:
+
+```
+- Update Kernel/Linux/AVL documents
+- Update SecureBootTool to v1.99
+- Update factorytool to V1.71.200
+- Update upgrade_tool to V1.59
+- Update V2.79 to support new loader format
+```
+
 ## rk3399pro_linux_release_v1.4.1_20201203.xml Release Note
 
 **Buildroot (2018.02-rc3)**:

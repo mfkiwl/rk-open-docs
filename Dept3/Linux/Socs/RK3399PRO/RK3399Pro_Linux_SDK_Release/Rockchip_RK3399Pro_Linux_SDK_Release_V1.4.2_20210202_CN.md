@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-CS-009
 
-发布版本：V1.4.1
+发布版本：V1.4.2
 
-日期：2020-12-03
+日期：2021-02-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2020 瑞芯微电子股份有限公司**
+**版权所有© 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -77,6 +77,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-08-13 | V1.3.3   | Caesar Wang | rknpu版本更新搭配1.3.4，目录结构调整和固件升级               |
 | 2020-10-10 | V1.4.0   | Caesar Wang | rknpu版本更新搭配1.4.0，目录结构调整                         |
 | 2020-12-03 | V1.4.1   | Caesar Wang | Debian9/10合并成Debian |
+| 2021-02-02 | V1.4.2   | Caesar Wang | rknpu版本更新到1.6.0 |
 
 ---
 
@@ -151,19 +152,20 @@ docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN.pdf。
 开发工具在 external/rknn-toolkit 目录下，主要用来实现模型转换，模型推理，模型性能评估功能等，具体使用说明请参考当前 doc/ 的目录文档：
 
 ```
-├── changelog.txt
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_CN.pdf
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_EN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_CN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_EN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_CN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_CN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_CN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_CN.pdf
-└── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_EN.pdf
+├── RKNN_OP_Support_V1.6.0.md
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.6.0_CN.pdf
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.6.0_EN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.6.0_CN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.6.0_EN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.6.0_CN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.6.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.6.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.6.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.6.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.6.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.6.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.6.0_EN.pdf
+└── changelog.txt
 ```
 
 **RKNN-DRIVER**：
@@ -823,11 +825,11 @@ sudo ./upgrade_tool uf rockdev/update.img
 ### RKNN_DEMO 测试
 
 首先插入 usb camera，
-然后在 Buildroot 系统中运行 rknn_demo 或 Debian 系统中运行 test_rknn_demo.sh。
-具体参考工程文档<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN/EN.pdf。在 Buildroot中运行结果如下：
+然后在 Buildroot 系统中运行 `/rockchip_test/npu/ rknn_demo.sh` 或 Debian 系统中运行 `test_rknn_demo.sh`。
+具体参考工程文档<SDK>/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN.pdf。在 Buildroot中运行结果如下：
 
 ```shell
-[root@rk3399pro:/]# rknn_demo
+[root@rk3399pro:/]#/rockchip_test/npu/ rknn_demo.sh
 librga:RGA_GET_VERSION:3.02,3.020000
 ctx=0x2a64ac20,ctx->rgaFd=3
 Rga built version:version:+2017-09-28 10:12:42
@@ -840,11 +842,10 @@ size = 12582988, cur_bo->size = 6635520
 ...
 get device /dev/video10
 Please configure uvc...
-read model:/usr/share/rknn_demo/mobilenet_ssd.rknn, len:32002449
-set plane zpos = 3 (0~3)D RKNNAPI: ==============================================
+D RKNNAPI: ==============================================
 D RKNNAPI: RKNN VERSION:
-D RKNNAPI:   API: 1.3.3 (f20f0bd build: 2020-05-14 14:14:51)
-D RKNNAPI:   DRV: 1.3.4 (399a00a build: 2020-07-24 14:09:19)
+D RKNNAPI:   API: 1.6.0 (159d2d3 build: 2021-01-22 11:15:34)
+D RKNNAPI:   DRV: 1.6.0 (159d2d3 build: 2021-01-12 15:23:09)
 D RKNNAPI: ==============================================
 ```
 

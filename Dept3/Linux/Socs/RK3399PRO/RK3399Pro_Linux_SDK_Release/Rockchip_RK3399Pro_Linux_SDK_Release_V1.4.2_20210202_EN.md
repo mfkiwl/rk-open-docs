@@ -2,9 +2,9 @@
 
 ID: RK-FB-CS-009
 
-Release Version: V1.4.1
+Release Version: V1.4.2
 
-Release Date: 2020-12-03
+Release Date: 2021-02-02
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -68,7 +68,9 @@ Software development engineers
 | 2020-08-06 | V1.3.2      | Caesar Wang | Support Debian 10                                            |
 | 2020-08-13 | V1.3.3      | Caesar Wang | Upgrade rknpu to 1.3.4, and update the directory <br/>structure and Firmware upgrade |
 | 2020-10-10 | V1.4.0      | Caesar Wang | Upgrade rknpu to 1.4.0, <br/>and update the directory structure |
-| 2020-10-10 | V1.4.0      | Caesar Wang | debian9/10 merge to debian |
+| 2020-12-03 | V1.4.1      | Caesar Wang | debian9/10 merge to debian |
+| 2021-02-02 | V1.4.2      | Caesar Wang | Upgrade rknpu to 1.6.0 |
+
 ---
 
 **Contents**
@@ -135,25 +137,26 @@ Developers can update via `.repo/repo/repo sync -c --no-tags` command according 
 The SDK NPU development tool includes following items:
 
 **RKNN_DEMO (MobileNet SSD)** ：
-Please refer to the directory “external/rknn_demo/” for RKNN Demo, and refer to the document in the project directory docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN.pdf for detailed operation introduction.
+Please refer to the directory “external/rknn_demo/” for RKNN Demo, and refer to the document in the project directory docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_EN.pdf for detailed operation introduction.
 
 **RKNN-TOOLKIT** ：
 Development tools are in project directory “external/rknn-toolkit”. Which is used for model conversion, model reasoning, model performance evaluation functions, etc. Please refer to documents in the docs/ directory for details.
 
 ```
-├── changelog.txt
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_CN.pdf
-├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.4.0_EN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_CN.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit_V1.4.0_EN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_CN.pdf
-├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.4.0_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_CN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.4.0_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_CN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_V1.4.0_EN.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_CN.pdf
-└── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.4.0_EN.pdf
+├── RKNN_OP_Support_V1.6.0.md
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.6.0_CN.pdf
+├── Rockchip_Developer_Guide_RKNN_Toolkit_Custom_OP_V1.6.0_EN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.6.0_CN.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit_V1.6.0_EN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.6.0_CN.pdf
+├── Rockchip_Trouble_Shooting_RKNN_Toolkit_V1.6.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.6.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Lite_V1.6.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.6.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_V1.6.0_EN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.6.0_CN.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit_Visualization_V1.6.0_EN.pdf
+└── changelog.txt
 ```
 
 **RKNN-DRIVER**:
@@ -738,7 +741,7 @@ Note：Before upgrade, please install the latest USB driver, which is in the bel
 
 ### Linux Upgrade Instruction
 
-The Linux upgrade tool (Linux_Upgrade_Tool should be v1.57 or later versions) is located in “tools/linux” directory. Please make sure your board is connected to MASKROM/loader rockusb, if the compiled firmware is in rockdev directory, upgrade commands are as below:
+The Linux upgrade tool (Linux_Upgrade_Tool should be v1.59 or later versions) is located in “tools/linux” directory. Please make sure your board is connected to MASKROM/loader rockusb, if the compiled firmware is in rockdev directory, upgrade commands are as below:
 
 ```shell
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
@@ -814,11 +817,11 @@ Default partition (below is RK3399Pro EVB reference partition) is showed as foll
 
 ### RKNN_DEMO Test
 
-Firstly, insert usb camera, run  rknn_demo in Buildroot system or run test_rknn_demo.sh in Debian system.
-Please refer to the project document: SDK/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_CN/EN.pdf for details, the results of running in Buildroot are as follows:
+Firstly, insert usb camera, run  `/rockchip_test/npu/rknn_demo.sh` in Buildroot system or run `test_rknn_demo.sh`in Debian system.
+Please refer to the project document: SDK/docs/Linux/ApplicationNote/Rockchip_Developer_Guide_Linux_RKNN_Demo_EN.pdf for details, the results of running in Buildroot are as follows:
 
 ```shell
-[root@rk3399pro:/]# rknn_demo
+[root@rk3399pro:/]#/rockchip_test/npu/rknn_demo.sh
 librga:RGA_GET_VERSION:3.02,3.020000
 ctx=0x2a64ac20,ctx->rgaFd=3
 Rga built version:version:+2017-09-28 10:12:42
@@ -831,11 +834,10 @@ size = 12582988, cur_bo->size = 6635520
 ...
 get device /dev/video10
 Please configure uvc...
-read model:/usr/share/rknn_demo/mobilenet_ssd.rknn, len:32002449
-set plane zpos = 3 (0~3)D RKNNAPI: ==============================================
+D RKNNAPI: ==============================================
 D RKNNAPI: RKNN VERSION:
-D RKNNAPI:   API: 1.3.3 (f20f0bd build: 2020-05-14 14:14:51)
-D RKNNAPI:   DRV: 1.3.4 (399a00a build: 2020-07-24 14:09:19)
+D RKNNAPI:   API: 1.6.0 (159d2d3 build: 2021-01-22 11:15:34)
+D RKNNAPI:   DRV: 1.6.0 (159d2d3 build: 2021-01-12 15:23:09)
 D RKNNAPI: ==============================================
 ```
 
