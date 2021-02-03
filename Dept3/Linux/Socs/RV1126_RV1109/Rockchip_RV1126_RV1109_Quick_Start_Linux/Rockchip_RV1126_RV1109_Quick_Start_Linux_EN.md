@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V1.9.7
+Release Version: V1.9.8
 
-Release Date: 2021-01-08
+Release Date: 2021-02-03
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -51,6 +51,7 @@ The document presents the basic usage of  Rockchip RV1126/RV1109 Linux SDK, aimi
 This document (this guide) is mainly intended for:
 
 - Technical support engineers
+
 - Software development engineers
 
 **Revision History**
@@ -84,6 +85,7 @@ This document (this guide) is mainly intended for:
 | V1.9.5 | CWW | 2020-12-29 | 1. Optimize typo<br>2. Remove some unused project |
 | V1.9.6 | CWW | 2020-12-31 | 1. Add uboot use tftp to upgrage loader partition |
 | V1.9.7 | CWW | 2021-01-08 | 1. Update the way to build UBI filesystem image |
+| V1.9.8 | XZY | 2021-02-03 | Add minigui_demo instruction |
 
 ---
 
@@ -136,30 +138,31 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 
 ### RV1109/RV1126 Modules Dirctory Introduction
 
-| some of modules directory path | modules introduction                                                           |
-| ------------------------------ | --------------------------------------------------------                       |
-| external/recovery              | recovery                                                                       |
-| external/rkwifibt              | Wi-Fi and BT                                                                   |
-| external/rk_pcba_test          | PCBA test code                                                                 |
-| external/isp2-ipc              | Image signal processing server                                                 |
-| external/mpp                   | encoding and decoding                                                          |
-| external/rkmedia               | Rockchip Multimedia interface                                                  |
-| external/rkupdate              | Rockchip upgrade code                                                          |
-| external/camera_engine_rkaiq   | Image processing algorithm module                                              |
-| external/rknpu                 | NPU driver                                                                     |
-| external/rockface              | Face recognition code                                                          |
-| external/CallFunIpc            | Application interprocess communication code                                    |
-| external/common_algorithm      | Audio and video general algorithm library                                      |
+| some of modules directory path | modules introduction                                         |
+| ------------------------------ | ------------------------------------------------------------ |
+| external/recovery              | recovery                                                     |
+| external/rkwifibt              | Wi-Fi and BT                                                 |
+| external/rk_pcba_test          | PCBA test code                                               |
+| external/isp2-ipc              | Image signal processing server                               |
+| external/mpp                   | encoding and decoding                                        |
+| external/rkmedia               | Rockchip Multimedia interface                                |
+| external/rkupdate              | Rockchip upgrade code                                        |
+| external/camera_engine_rkaiq   | Image processing algorithm module                            |
+| external/rknpu                 | NPU driver                                                   |
+| external/rockface              | Face recognition code                                        |
+| external/CallFunIpc            | Application interprocess communication code                  |
+| external/common_algorithm      | Audio and video general algorithm library                    |
 | external/rknn-toolkit          | Development kit for model transformation, reasoning and performance evaluation |
 | app/libIPCProtocol             | Based on dbus, provides a functional interface for inter-process communication |
-| app/mediaserver                | Main application providing multimedia services                                 |
-| app/ipc-daemon                 | System guard service                                                           |
-| app/dbserver                   | Database service                                                               |
-| app/netserver                  | Network services                                                               |
-| app/storage_manager            | Storage management service                                                     |
-| app/ipcweb-backend             | web backend                                                                    |
-| app/librkdb                    | Database interface                                                             |
-| app/ipcweb-ng                  | Web front end, using Angular 8 framework                                       |
+| app/mediaserver                | Main application providing multimedia services               |
+| app/ipc-daemon                 | System guard service                                         |
+| app/dbserver                   | Database service                                             |
+| app/netserver                  | Network services                                             |
+| app/storage_manager            | Storage management service                                   |
+| app/ipcweb-backend             | web backend                                                  |
+| app/librkdb                    | Database interface                                           |
+| app/ipcweb-ng                  | Web front end, using Angular 8 framework                     |
+| app/minigui_demo               | A simple GUI demo that is implemented on MiniGUI             |
 
 ### RV1109/RV1126 Develop Document
 
@@ -1274,6 +1277,26 @@ The building command of the intelligent Facial Gate product is the same as that 
 ### **QFacialGate** **Application**
 
 QFacialGate is the main application of facial gate product, Which runs automatically by default when power on. and QT is used for UI.and RK's own algorithm Rockface is called through Rkfacial library to realize face detection, face feature point extraction, face recognition and live detection.
+
+The following functions are included:
+
+- RGB camera image data was obtained for face recognition, and IR camera image data was obtained for live detection
+- SQLITE3 is used as a database to store face feature values and user names
+- User register and delete, face tracking, user name display and other operations
+- ALSA interface is used to realize the voice broadcast function of each process
+
+### **minigui_demo** **Application**
+
+MiniGUI is a mature and proven cross-platform GUI system for embedded and smart IoT devices, and it's fit for small capacity Flash or qucik boot products. The minigui_demo is implemented on MiniGUI, that show how to bring up MiniGUI features.
+
+```
+#Enable BR2_PACKAGE_MINIGUI_DEMO option on buildroot, it'll select the dependent libraries automatically.
+BR2_PACKAGE_LIBPNG12
+BR2_PACKAGE_MINIGUI_ENABLE_RGA
+BR2_PACKAGE_MINIGUI_ENABLE_FREETYPE
+BR2_PACKAGE_MINIGUI_ENABLE_PNG
+After the building, launch the minigui_demo manually.
+```
 
 The following functions are included:
 

@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.7
+发布版本：V1.9.8
 
-日期：2021-01-08
+日期：2021-02-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有 © 2020 瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -57,6 +57,7 @@ Rockchip Electronics Co., Ltd.
 本文档（本指南）主要适用于以下工程师：
 
 - 技术支持工程师
+
 - 软件开发工程师
 
 **修订记录**
@@ -89,6 +90,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.5 | CWW | 2020-12-29 | 1. 优化排版<br>2. 删除一些不用的工程 |
 | V1.9.6 | CWW | 2020-12-31 | 1. 增加uboot使用tftp更新loader分区 |
 | V1.9.7 | CWW | 2021-01-08 | 1. 更新UBI文件系统镜像制作 |
+| V1.9.8 | XZY | 2021-02-03 | 新增app/minigui_demo说明 |
 
 ---
 
@@ -164,6 +166,7 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 | app/ipcweb-backend           | web后端                            |
 | app/librkdb                  | 数据库接口                         |
 | app/ipcweb-ng                | web前端，采用Angular 8框架         |
+| app/minigui_demo             | 基于MiniGUI实现一个简单画图demo    |
 
 ### RV1109/RV1126 开发相关文档
 
@@ -1283,6 +1286,19 @@ QFacialGate 是闸机和门禁类产品主应用，默认开机自动运行，�
 - 实现用户注册，删除注册数据，人脸框跟踪及用户名显示等操作。
 
 - 利用ALSA接口实现各流程语音播报功能。
+
+### minigui_demo应用
+
+MiniGUI是一个轻量级GUI，适合Flash容量小、快速启动的产品。minigui_demo是基于MiniGUI实现的一个简单示例程序，实现透明显示部分区域功能。
+
+```
+buildroot使能BR2_PACKAGE_MINIGUI_DEMO选项，会自动选择MiniGUI应用的依赖库
+BR2_PACKAGE_LIBPNG12
+BR2_PACKAGE_MINIGUI_ENABLE_RGA
+BR2_PACKAGE_MINIGUI_ENABLE_FREETYPE
+BR2_PACKAGE_MINIGUI_ENABLE_PNG
+编译后，板端执行需要手动执行minigui_demo
+```
 
 ### 其它说明
 
