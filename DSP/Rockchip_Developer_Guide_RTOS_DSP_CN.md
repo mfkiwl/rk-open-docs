@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-302
 
-发布版本：V1.9.0
+发布版本：V2.1.0
 
-日期：2020-09-18
+日期：2021-02-03
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **瑞芯微电子股份有限公司**
+**版权所有** **© 2021** **瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -76,6 +76,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-06-18 | V1.7.0 | 吴佳健 | 更新打包工具说明 |
 | 2020-08-06 | V1.8.0 | 吴佳健 | 新增Vendor Key校验说明 |
 | 2020-09-18 | V1.9.0 | 吴佳健 | 更新Map配置信息修改方式和XIP模式说明 |
+| 2021-02-03 | V2.1.0 | 吴佳健 | 更新软件环境搭建说明，新增算法库相关说明 |
 
 ---
 
@@ -99,179 +100,33 @@ DSP 即数字信号处理技术。DSP 作为数字信号处理器将模拟信号
 
 ## HIFI3 软件环境搭建
 
-### License 安装
-
-License是和MAC地址绑定的。如果需要多台机器使用，那么需要搭建License服务器，但是同时只能一台机器访问License服务器。服务器搭建步骤参考2.2章的内容。
-
-如果是单台机器使用，那么直接使用本地目录的License文件，不需要搭建服务器。打开 Xplorer 工具，打开 “help” --  “Xplorer License Keys” ，点击 ”Install License Keys”，输入文件路径名。完成后，点击 ”License Options” 或 ”Check Xtensa Tools Keys” 确认 License 状态。需要注意mac地址要和liscense中的host id一致。
-
-![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_File_Config.png)
-
-### Floating License Server 搭建
-
-- 将相关文件放置到服务器
-
-```txt
-/usr/local/flexlm
-├── licenses
-│   ├── license.dat
-│   └── license.data
-├── lmgrd
-├── lmutil
-├── logs
-│   └── lmgrd.log
-├── softwareserver_2018-12-13.lic # license文件
-├── xtensad
-└── xtensa_lic_test.linux
-```
-
-- 安装依赖文件
-
-依赖 lsb-core, CentOS/RedHat 发行版默认自带，Ubuntu 18.04 安装方法如下：
-
-```console
-sudo apt install lsb-core
-```
-
-其他发行版或 Ubuntu <= 16.04 的安装包名、方法不同，自行 Google.
-
-- License 文件修改
-
-License 文件格式如下，根据服务器 MAC 生成，将 Host 改为服务器的主机名，MAC 改为服务器的网卡 MAC 地址，格式为“AABBCCDDEEFF”，将端口改为需要开放的端口号，如 27000 。
-
-```txt
-SERVER <host> <mac> <port>
-VENDOR xtensad <path_to_xtensad>
-USE_SERVER
-
-PACKAGE
-...
-```
-
-- 配置 flexlm 服务
-
-在 /etc/init.d/ 目录下，新增 flexlm 文件，内容如下：
-
-```sh
-#!/bin/sh
-
-### BEGIN INIT INFO
-# Provides:          flexlm
-# Required-Start:    $local_fs $syslog
-# Required-Stop:     $local_fs $syslog
-# Should-Start:      autofs $network $named
-# Should-Stop:       autofs $network $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: lmgrd init script
-# Description:       Cadence Flexlm license manager daemon
-### END INIT INFO
-
-# Author: Cody Xie <cody.xie@rock-chips.com>
-
-. /lib/lsb/init-functions
-
-PATH=/usr/local/flexlm:/bin:/usr/bin:/sbin:/usr/sbin
-NAME=flexlm
-DESC="The Cadence flexlm license daemon lmgrd"
-DAEMON=/usr/local/flexlm/lmgrd
-LIC=/usr/local/flexlm/softwareserver_2018-12-13.lic
-LOG=/usr/local/flexlm/logs/lmgrd.log
-LMGRD_OPTS="-c $LIC -l $LOG"
-PIDFILE=/run/$NAME.pid
-
-[ -x "$DAEMON" ] || exit 0
-
-lmgrd_start () {
-    log_daemon_msg "Starting $DESC" "$NAME"
-    start-stop-daemon --start --quiet --oknodo --pidfile "$PIDFILE" \
-        --exec "$DAEMON" -- $LMGRD_OPTS
-    log_end_msg $?
-}
-
-lmgrd_stop () {
-    log_daemon_msg "Stopping $DESC" "$NAME"
-    start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile "$PIDFILE" \
-        --exec $DAEMON
-    log_end_msg $?
-}
-
-case "$1" in
-    start)
-        lmgrd_start
-        ;;
-    stop)
-        lmgrd_stop
-        ;;
-    status)
-    	status_of_proc -p $PIDFILE $DAEMON $NAME
-	;;
-    restart|force-reload)
-        lmgrd_stop
-        lmgrd_start
-        ;;
-    force-start)
-        lmgrd_start
-        ;;
-    force-restart)
-        lmgrd_stop
-        lmgrd_start
-        ;;
-    force-reload)
-	lmgrd_stop
-	lmgrd_start
-	;;
-    *)
-        echo "Usage: $0 {start|stop|restart|force-reload}"
-        exit 2
-        ;;
-esac
-```
-
-安装 flexlm 服务并开机自动启动
-
-```console
-sudo cd /etc/init.d
-sudo chmod +x flexlm
-sudo update-rc.d flexlm defaults
-sudo update-rc.d flexlm enable
-```
-
-- 确认 License 服务器工作正常
-
-打开 Xplorer 工具，打开 “help” --> “Xplorer License Keys” ，点击”Install License Keys” ，输入 “27000@host”，其中 host 为 服务器主机名或 IP 地址，完成后，点击 ” License Options”  或 ”Check Xtensa Tools Keys”  确认 License 状态。
-
-![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_Keys.png)
-
-![Xplorer_License_Config](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_Config.png)
-
-![Xplorer_License_Config](Rockchip_Developer_Guide_RTOS_DSP/Success_Install_Key_1.png)
-
 ### Xplorer 工具安装
 
 #### Windows环境
 
-Cadence 开发工具全称为“RUN Xplorer 8.0.8”，下载工具需要到  [Cadence 官方网站申请](https://ip.cadence.com/support/sdk-evaluation-request)，License 需要联系 Cadence 获取，我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“。
+HiFi3开发工具全称为“Xtensa Xplorer 8.0.8”，License 需要联系 Cadence 获取。我们当前使用的工具安装包为”Xplorer-8.0.8-windows-installer.exe“，配置包为“HiFi3Dev181203_win32.tgz”，配置包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
 
-工具安装好后，需要先安装数据包“HiFi3Dev181203_win32.tgz”，数据包基于 RG-2018.9 的基础工具安装包“XtensaTools_RG_2018_9_win32.tgz”。相关安装包都需要找开发人员获取。
+先安装Xplorer-8.0.8-windows-installer.exe，按照提示即可完成安装。
 
-安装方法是在 Xplorer 中，”File” --> ”New” --> ”Xtensa Configuration”，找到下图的配置页面并点击 Install 选项：
+安装完成后，需要安装工具包，在 Xplorer 中，”File” --> ”New” --> ”Xtensa Configuration”，找到下图的配置页面并点击 Install 选项，然后点击Next：
 
 ![Xtensa_Configuration](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Configuration.png)
+
+先点击Manege Xtensa Tools，在弹出的窗口点击Install from Distribution，选择XtensaTools_RG_2018_9_win32.tgz工具包路径，按提示安装。
 
 ![Xtensa_Install_config_1](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Install_config_1.png)
 
 ![Xtensa_Install_config_2](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Install_config_2.png)
 
+安装完工具包后，返回下图界面，点击Browse选择HiFi3Dev181203_win32.tgz配置包，再点击Add Build添加配置包，待下方窗口显示出对应包名后，点击Finish完成安装。
+
 ![Xtensa_Install_config_3](Rockchip_Developer_Guide_RTOS_DSP/Xtensa_Install_config_3.png)
 
-点击 Next 并且选择文件“HiFi3Dev181203_win32.tgz”后，会提示安装 RG-2018.9，这时候点击“Manage Xtensa Tools”安装“XtensaTools_RG_2018_9_win32.tgz”，安装完成后，点击“Add Build”，就可以进行数据包的安装操作。
-
-数据包安装完成后，会在工具栏看到"C:(Active configuration)"栏目中看到 HiFi3Dev181203，点击并选中：
+数据包安装完成后，会在工具栏看到"C:(Active configuration)"，点击箭头出现下拉框，可在栏目中看到 HiFi3Dev181203，点击并选中：
 
 ![HiFi3Dev181304](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304.png)
 
-这时候软件左下角的 System Overivew 就会看到相关 HiFi3Dev181304 的配置文件，点击相关文件，会看到当前 Core 的配置信息。可以看到对应的 ITCM、DTCM、中断号等。连接外部 INTC 的中断为 INterrupt0.
+这时候软件左下角的 System Overview 就会看到相关 HiFi3Dev181304 的配置文件，点击相关文件，会看到当前 Core 的配置信息。可以看到对应的 ITCM、DTCM、中断号等。连接外部 INTC 的中断为 INterrupt0.
 
 ![HiFi3Dev181304_Detail](Rockchip_Developer_Guide_RTOS_DSP/HiFi3Dev181304_Detail.png)
 
@@ -302,13 +157,43 @@ sudo apt-get install ncurses-libs.i686 -y
 sudo apt-get install redhat-lsb.i686 -y
 ```
 
-### DSP 代码下载及编译
+### License 安装
 
-工程目录在根目录的 Projects 下，存放不同工程的配置文件和工程文件。
+打开 Xplorer 工具，打开 “Help” --  “Xplorer License Keys” ，点击 ”Install License Keys”，输入文件路径名。完成后，点击 ”License Options” 或 ”Check Xtensa Tools Keys” 确认 License 状态。需要注意mac地址要和liscense中的host id一致。
 
-通过 ”File” -->  ”Import” -->  ”Genaral” -->  ”Existing Projects into Workspace”导入工程代码，不同项目对应不同的工程名称，RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 RK2206。
+![Xplorer_License_Keys](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_License_File_Config.png)
 
-在工具栏选择编译的优化等级，分为 Debug、Release 和 ReleaseSize。不同优化等级对代码有不同程度的优化，具体的优化内容可以进入配置选项查看。点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
+### 工程导入及编译
+
+#### 工程导入
+
+工程目录在根目录的 Projects 下，路径为hifi3/rkdsp/projects，存放不同工程的配置文件和工程文件。
+
+通过 ”File” -->  ”Import” -->  ”Genaral” -->  ”Existing Projects into Workspace”，点击Browse，找到projects目录，按需要导入工程代码，不同项目对应不同的工程名称，如RK2108 对应工程名是 RK2108 ，RK2206 对应工程名是 RK2206。
+
+导入工程后，可在工具栏No Active Project标签处，点击右侧箭头，下拉选择目标工程，如P:RK2108。
+
+#### 编译选项说明
+
+在工具栏选择编译的Target，分为 Debug、Release 和 ReleaseSize。不同Target设置了不同的优化等级，对代码有不同程度的优化，具体的优化内容可以进入Target修改界面查看和修改，或根据需要自行构建Target。各配置可点击菜单栏T:Debug右侧下拉箭头进行切换。点击其中的Modify可以进入Target修改界面。
+
+Target修改界面常用标签栏有：
+
+Symbols：添加宏定义。
+
+Optimization：修改编译选项。
+
+Linker：选择MAP目录，即链接脚本目录。
+
+Libraries：管理库文件路径。
+
+Addl Linker：添加链接库或编译选项。
+
+并可在窗口下方的All Options确认编译选项是否与预期一致。
+
+#### 编译
+
+目标工程、配置包、Target都选择完毕后，点击工具栏的“Build Active”即可正常进行编译，编译结果存放在工程目录的 bin 目录下。
 
 ### DSP 固件生成
 
@@ -669,6 +554,58 @@ config end
 [A.DspTe][000024.61]work result:0x00000000
 [A.DspTe][000024.61]work result:0x00000000
 ```
+
+## 算法库创建及使用
+
+### 工程创建
+
+点击File->New->Xtensa C/C++ Project，在接下来的界面中填入工程相关信息。Location也就是工程目录，可以用默认的，也可以自己选择。点击Finish后，在“Project Explorer”栏目中可以看到新建的工程“libasr”。
+
+![New Project](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_New_Project.png)
+
+相关的头文件和库文件可以直接放到工程目录下，也可以右击工程，点击File->Import->General->File System，在Browse中选取代码文件或者目录，在Into folder选择导入的位置。“Create links in workspace”表示只创建文件的链接，文件本身不会拷贝到工程目录下，这样方便维系代码路径结构。我司提供的工程也是采用这种文件形式。
+
+![Import File Sytem](Rockchip_Developer_Guide_RTOS_DSP/Xplorer_Import_File_System.png)
+
+### 库文件生成
+
+参考[编译选项说明](#编译选项说明)，对编译选项进行修改，确认后，可点击Build Active开始编译。编译完成后，将在project/bin/HiFi3Dev181203/<Target>/中生成libasr.a文件。Target指的是[编译选项说明](#编译选项说明)中提到的Debug、Release、ReleaseSize等。接下来把库文件和需要的头文件放到新建目录libasr，供给应用工程使用。
+
+### 算法库导入
+
+将生成的libasr.a放入hifi3/rkdsp/library/libasr中，然后通过点击File->Import->File System导入工程。然后进入Target修改界面，在Addl linker标签页中添加“-lasr”。在Librarys标签页中添加路径“${xt_project_loc}\\..\\..\library\libasr”。在Linker标签页中的选取合适的map。
+
+接下来进行接口适配，一般会在libasr文件夹中添加一个适配文件libasr.cpp和libasr.h，并导入工程，具体接口参考工程示例。然后在algorithm_handler.cpp添加调用接口。
+
+### 常见编译报错
+
+1. 找不到库文件
+
+   确认Librarys标签页中路径是否正确，libxxx.a文件是否命名正确(必须为libxxx.a的形式，且中间的xxx为库名，添加链接时使用-lxxx)，且放在正确的路径，并且导入工程成功。
+
+2. 找不到函数定义
+
+   先与问题1一样，排查库导入是否正确。再确认.a对应的.h文件中，接口函数声明处是否有使用extern “C”声明，形式如下：
+
+   ```c
+   #ifndef __LIBXXX_H__
+   #define __LIBXXX_H__
+
+   #ifdef __cplusplus
+   extern "C" {
+   #endif
+
+   int libxxx_init(int arg);
+   int libxxx_deinit(int arg);
+
+   #ifdef __cplusplus
+   }
+   #endif
+
+   #endif // __LIBXXX_H__
+   ```
+
+   或将接口文件如libasr.cpp改为libasr.c重新编译。
 
 ## XIP模式
 
