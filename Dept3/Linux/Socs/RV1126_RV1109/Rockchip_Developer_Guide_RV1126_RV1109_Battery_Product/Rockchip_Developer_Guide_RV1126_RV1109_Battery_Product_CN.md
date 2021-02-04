@@ -2,7 +2,7 @@
 
 文档标识：RK-KF-YF-397
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
 日期：2020-12-12
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有 © 2020 瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -64,6 +64,7 @@ Rockchip Electronics Co., Ltd.
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0 | Zhichao Yu, Ziyuan Xu, Hans Yang, Tao Huang | 2020-12-22 | 初始版本     |
+| V1.1.0 | Zhihua Wang | 2021-02-02 | 增加双目使用说明 |
 
 ---
 
@@ -676,6 +677,16 @@ TBD
 ```shell
 BoardConfig-dualcam-tb-v13.mk
 ```
+
+编译完成后，可以使用rkmedia_vi_double_cameras_test进行预览。
+
+使用方法：
+
+```shell
+rkmedia_vi_double_cameras_test -a /etc/iqfiles/ -u 0
+```
+
+rkmedia_vi_double_cameras_test具体介绍可以参考文档《Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf》。
 
 ### 常用调试方法使能
 
