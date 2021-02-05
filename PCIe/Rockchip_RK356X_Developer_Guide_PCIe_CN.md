@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.3.0
+发布版本：V1.4.0
 
-日期：2021-02-04
+日期：2021-02-05
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-01-22 | V1.1.0   | 林涛     | 增加PCIe 3.0控制器异常情况的检查信息 |
 | 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息   |
 | 2021-02-04 | V1.3.0   | 林涛     | 增加MSI和MSI-X支持数量的问题描述     |
+| 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                 |
 
 ---
 
@@ -415,3 +416,19 @@ writel(val,priv->mmio + (0xd << 2));
 ```
 
 设置完成后，请依次配置combphy2_psq的时钟频率为24M,25M以及100M，用示波器从PCIe的refclk差分信号脚上测量时钟情况，检查频率和幅值、抖动是否满足要求。
+
+4. **PCIe外设资源分配异常**
+
+```
+3.286864] pci 0002:20:00.0: bridge configuration invalid ([bus 01-ff]), reconfiguring
+3.286886] scanning [bus 00-00] behind bridge, pass 1
+3.288165] pci 0002:21 :00.0: supports D1 D2
+3.288170] pci 0002:21 :00.0: PME# supported from DO D1 D3hot
+3.298238] pci bus 0002:21: busn res: [bus 21-2f] end is updated to 21
+3.298441] pci 0002:21:00.0: BAR 1: no space for [mem size 0xe0000000 ]
+3.298456] pci 0002:21:00.0: BAR 1: failed to assign [mem size 0xe0000000 ]
+3.298473] pci 0002:21:00.0: BAR 2: assigned [mem 0x380900000- 0x38090ffff pref ]
+3.298488] pci 0002:21:00.0: PCI bridge to [bus 21]
+```
+
+如常用应用问题Q4所述，RK356X的PCIe地址空间有限制。此log表明21号总线外设向RK356X申请3GB的64bit memory空间，超出了限制导致无法分配资源。若为市售设备，将不受RK356X芯片支持；若为定制设备，请联系设备vendor确认是否可以修改其BAR空间容量编码。
