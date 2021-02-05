@@ -502,6 +502,20 @@ MCU各阶段耗时如下：
 DDR -> RKRAW -> ISP -> ISPP -> YUV
 ```
 
+**dts配置**
+
+要添加新的rkisp、rksipp虚拟节点:
+
+```c
+&rkisp_vir1 {
+       status = "okay";
+};
+
+&rkispp_vir1 {
+       status = "okay";
+};
+```
+
 **buildroot配置**
 
 在处理离线帧之前需要配置离线帧的IQ文件，可以修改buildroot配置：在buildroot/configs/rockchip_rv1126_rv1109_defconfig 添加：
