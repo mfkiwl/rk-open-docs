@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.4.0
+发布版本：V1.5.0
 
-日期：2021-02-05
+日期：2021-02-06
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息   |
 | 2021-02-04 | V1.3.0   | 林涛     | 增加MSI和MSI-X支持数量的问题描述     |
 | 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                 |
+| 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明          |
 
 ---
 
@@ -143,11 +144,15 @@ pcie3x1和pcie3x2控制器节点和pcie30phy都使能，并且pcie3x2和pcie3x1�
 
 **特殊调试配置**：首先请注意此配置仅仅针对PCIe2x1控制器所对应combphy2_psq。默认combphy2_psq使用SoC内部时钟方案，可参阅rk3568.dtsi节点，默认使用24MHz时钟源。除了24MHz时钟源，还支持25M和100M，仅需要调整assigned-clock-rates = <24000000>数值为所需频率即可。内部时钟源方案成本最优，所以作为SDK默认方案，但combphy2_psq仍然预留了外部晶振芯片的时钟源输入选择。如果PCIe2x1确实需要使用外部时钟晶振芯片提供时钟的方案，请在板级的dts的combphy2_psq中加入rockchip,ext-refclk，且需要注意在节点中加入assigned-clock-rates = <时钟频率> 来指定外部时钟芯片输入的频率，仍然只支持24M,25M,100M三档。
 
-9. `rockchip,lpbk-master`
+9. `rockchip,enable-ssc`
+
+**特殊调试配置**：首先请注意此配置仅仅针对PCIe2x1控制器所对应combphy2_psq。默认情况下，PCIe2x1的PHY输出时钟不开启展频。如果用户需要规避一些EMI问题，可尝试combphy2_psq节点加入此配置项，开启SSC。
+
+10. `rockchip,lpbk-master`
 
 **特殊调试配置**：此配置是针对loopback信号测试，使用PCIe控制器构造模拟loopback master环境，让待测试对端设备进入slave模型，非模拟验证实验室的RX环路需求请勿配置。另注意，Gen3控制器可能需要配置compliance模式，才可以loopback slave模式。如果阅读者不理解什么是loopback测试，说明这不是你要找的配置，请勿针对此配置提问。
 
-10. `rockchip,compliance-mode`
+11. `rockchip,compliance-mode`
 
 **特殊调试配置**：此配置是针对compliance信号测试，使用PCIe控制器强制进入compliance测试模式。默认TX测试应该使用测试SMA夹具进入compliance, 而不需要强制进入。预留此配置是为了测试Gen3模式的loopback slave, 因为实验室测试可能Gen3的loopback测试需要进compliance模式。如果阅读者不理解什么是compliance测试，说明这不是你要找的配置，请勿针对此配置提问。
 
