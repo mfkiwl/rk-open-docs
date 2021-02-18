@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V1.9.8
+发布版本：V2.0.0
 
-日期：2021-02-03
+日期：2021-02-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -91,6 +91,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.6 | CWW | 2020-12-31 | 1. 增加uboot使用tftp更新loader分区 |
 | V1.9.7 | CWW | 2021-01-08 | 1. 更新UBI文件系统镜像制作 |
 | V1.9.8 | XZY | 2021-02-03 | 新增app/minigui_demo说明 |
+| V2.0.0 | CWW | 2021-02-18 | 1. 增加Linux工具programmer_image_tool<br>2. 更新Rootfs配置说明<br>3. 更新app和external的编译方法<br>4. 增加SDK的BSP包编译说明 |
 
 ---
 
@@ -144,13 +145,12 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 
 | 部分模块代码目录路径         | 模块功能描述                       |
 | ---------------------------- | ---------------------------------- |
-| external/recovery            | recovery                           |
+| external/recovery            | recovery和Rockchip升级代码         |
 | external/rkwifibt            | Wi-Fi和BT                          |
 | external/rk_pcba_test        | PCBA测试代码                       |
 | external/isp2-ipc            | 图像信号处理服务端                 |
 | external/mpp                 | 编解码代码                         |
 | external/rkmedia             | Rockchip 多媒体封装接口            |
-| external/rkupdate            | Rockchip升级代码                   |
 | external/camera_engine_rkaiq | 图像处理算法模块                   |
 | external/rknpu               | NPU驱动                            |
 | external/rockface            | 人脸识别代码                       |
@@ -351,6 +351,7 @@ Linux_Pack_Firmware    | 固件打包工具(打包成updata.img)
 Linux_Upgrade_Tool     | 烧录固件工具
 Linux_SecureBoot       | 固件签名工具
 Firmware_Merger        | SPI NOR固件打包工具(生成的固件可以用于烧录器)
+programmer_image_tool  | 打包SPI NOR/SPI NAND/SLC NAND/eMMC的烧录器固件
 
 ### SDK 配置框架图
 
@@ -626,14 +627,14 @@ make savedefconfig
 ### 查看Rootfs详细编译命令
 ./build.sh -h rootfs
 
-### Rootfs编译命令
+### Rootfs编译和打包命令
 ./build.sh rootfs
 ```
 
-#### 目录app和external里的工程编译方法以及Rootfs配置说明
+#### Rootfs配置说明
 
 ```shell
-### 1. 先SDK根目录查看Board Config对应的rootfs是哪个配置
+### 1. 先在SDK根目录查看Board Config对应的rootfs是哪个配置
 ./build.sh -h rootfs
 #   ###Current SDK Default [ rootfs ] Build Command###
 #   source envsetup.sh rockchip_rv1126_rv1109
@@ -643,20 +644,67 @@ make savedefconfig
 source envsetup.sh rockchip_rv1126_rv1109
 
 ### 3. 使用menuconfig配置文件系统，选择需要的模块，最后保存退出。
-### 例如：ipc-daemon的配置是BR2_PACKAGE_IPC_DAEMON (查看buildroot/package/rockchip/ipc-daemon/Config.in)
+### 例如：要配置app/ipc-daemon这个工程
+###      a. 找到app/ipc-daemon对应的配置文件
+###         grep -lr "app/ipc-daemon" buildroot/package
+###         buildroot/package/rockchip/ipc-daemon/ipc-daemon.mk
+###         对应的配置文件：buildroot/package/rockchip/ipc-daemon/Config.in
+###
+###      b. 获取配置名称BR2_PACKAGE_IPC_DAEMON
+###         查看buildroot/package/rockchip/ipc-daemon/Config.in
 make menuconfig  # 进入menuconfig后，按“/"进入查找模式，输入BR2_PACKAGE_IPC_DAEMON
 
 ### 4. 保存到rootfs配置文件
 ###    ./buildroot/configs/rockchip_rv1126_rv1109_defconfig
 make savedefconfig
+```
 
-### 5. 查看对应模块的makefile文件名
-### 例如：buildroot/package/rockchip/ipc-daemon/ipc-daemon.mk
-make ipc-daemon-dirclean
-make ipc-daemon-rebuild
+#### 目录app和external里的工程编译方法
+
+```shell
+# SDK版本更新到V1.8.0
+# 命令格式：./build.sh app/<pkg1> app/<pkg2> external/<pkg3> ...
+#           <pkg1>,<pkg2>,<pkg3> 是app和external目录里的工程
+# 例如编译external/mpp 和 app/mediaserver
+./build.sh external/mpp app/mediaserver
 ```
 
 注：SDK根目录app和external下的工程都是buildroot的package包，编译方法相同。
+
+### 编译BSP包
+
+SDK的BSP包只包含音视频编解码库、NPU库以及头文件。
+注：BSP包不包含文件系统。
+
+```shell
+source envsetup.sh rockchip_rv1126_rv1109_libs
+
+make -j12
+```
+
+编译BSP生成的目录`buildroot/output/rockchip_rv1126_rv1109_libs/BSP`
+
+```shell
+tree buildroot/output/rockchip_rv1126_rv1109_libs/BSP/
+buildroot/output/rockchip_rv1126_rv1109_libs/BSP/
+├── example
+│   ├── common
+│   ├── iqfiles
+│   ├── librtsp
+│   ├── multi_audio_test
+│   ├── rknn_model
+│   ├── stressTest
+│   └── vqefiles
+├── include
+│   ├── rga
+│   ├── rkaiq
+│   └── rkmedia
+├── lib
+└── npu
+    ├── include
+    ├── ko
+    └── lib
+```
 
 ### 固件打包
 
