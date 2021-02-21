@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-348
 
-Release version: V1.0.2
+Release version: V1.1.0
 
-Release Date: 2020-12-14
+Release Date: 2021-02-18
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -53,6 +53,7 @@ Software development engineers
 | **Chipset** | **Kernel version** |
 | :---------- | :----------------- |
 | RK3308      | 4.4                |
+| RV1126/RV1109   | Linux 4.19 |
 
 **Revision History**
 
@@ -61,6 +62,7 @@ Software development engineers
 | 2019-06-05 | V1.0.0      | HKH/MLC    | Initial version                             |
 | 2020-03-31 | V1.0.1      | Ruby Zhang | Update the format of the document           |
 | 2020-12-14 | V1.0.2      | Ruby Zhang | Update the company name and document format |
+| 2021-02-18 | V1.1.0   | CWW        | 1. Update supports SD card boot to upgrade firmware<br>2. Update support AB system upgrade |
 
 ---
 
@@ -70,14 +72,25 @@ Software development engineers
 
 ---
 
-## Overview
+## Overview and Codes
 
-Rockchip Linux platform supports two upgrade modes: recovery mode and Linux A/B mode:
+### Overview
+
+Rockchip Linux platform supports two boot-up modes: recovery mode and Linux A/B mode:
 
 1. Recovery mode: there is a separate partition (recovery.img) on the device for upgrade.
 2. Linux A/B mode: there are two firmware on the device that can be switched.
 
 Users can choose one according to their requirements for both the modes with their advantages and disadvantages.
+
+### Codes
+
+Rockchip Linux platform supports two upgrade modes.
+
+| Upgrade Mode |  path of codes | Recovery mode | Linux A/B mode | Description |
+| --------     | -----------------                                    | -------- | ------ | ---------------------        |
+| updateEngine | external/recovery/update_engine<br>external/recovery | Support  | Support | Default use in RV1126/RV1109 |
+| rkupdate     | external/rkupdate                                    | Support  | Nonsupport | Other platroms, This document does not introduce |
 
 ## Recovery  Mode
 
@@ -100,7 +113,7 @@ There will be a recovery partition on the device, which is consists of kernel+re
 | -------------- | ----------------- | ---------------------------------------- |
 | loader         | MiniLoaderAll.bin | First level loader                       |
 | u-boot         | uboot.img         | Second level loader                      |
-| trust          | trust.img         | Secure environment, like OP-TEE, ATF     |
+| trust          | trust.img         | Secure environment, like OP-TEE, ATF(Some platforms will merge trust and uboot)     |
 | misc           | misc.img          | Boot parameter partition                 |
 | recovery       | recovery.img      | Root file system consisting of kernel+dtb+ramdisk |
 | boot           | boot.img          | kernel+dtb                               |
@@ -119,6 +132,7 @@ BR2_PACKAGE_RECOVERY=y	#turn on upgrade related functions
 BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE=y	#use the new upgrade program, if not configured, the original upgrade process will be used by default.
 BR2_PACKAGE_RECOVERY_RECOVERYBIN=y	#turn on recovery bin file
 BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y #compile the new upgrade program
+BR2_PACKAGE_RECOVERY_NO_UI=y # disable UI
 ```
 
 Buildroot: the rootfs configuration files are selected as follows (make menuconfig):
@@ -127,6 +141,7 @@ Buildroot: the rootfs configuration files are selected as follows (make menuconf
 BR2_PACKAGE_RECOVERY=y #turn on upgrade related functions
 BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE=y #use the new upgrade program
 BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y	#compile the new upgrade program
+BR2_PACKAGE_RECOVERY_NO_UI=y # disable UI
 ```
 
 **With and Without Display**
@@ -139,27 +154,25 @@ TARGET_MAKE_ENV += RecoveryNoUi=true
 
 The SDK will enable the above configuration by default, so users do not need to configure it again. The source code is in "external/recovery/" directory, if you need to do some modifications, compile as follows:
 
-Step1: run the following command:
-
 ```shell
+# Step1: run the following command:
 source envsetup.sh
-```
-
-Step2: choose the rootfs configuration of a platform,and then run the following command:
-
-```shell
+# Step2: choose the rootfs configuration of a platform,and then run the following command:
 make recovery-dirclean
 source envsetup.sh
-```
-
-Step3: choose the recovery configuration of a platform, and then run the following command:
-
-```shell
+# Step3: choose the recovery configuration of a platform, and then run the following command:
 make recovery-dirclean
 ./build.sh
+# Step4: flashing the firmware again.
 ```
 
-Step4: flashing the firmware again.
+If the SDK version is relatively new, you can try to compile as follows:
+
+```shell
+./build.sh external/recovery
+./build.sh
+# flashing the firmware again.
+```
 
 <div style="page-break-after: always;"></div>
 
@@ -170,14 +183,16 @@ The upgrade supports network upgrade and local upgrade, and you can specify the 
 Network upgrade：
 
 ```shell
-# updateEngine --misc=update --image_url=firmware address --partition=0x3F00 --version_url=version file address --savepath=/userdata/update.img --reboot
-updateEngine --image_url=http://172.16.21.110:8080/recovery/update.img --misc=update --savepath=/userdata/update.img --reboot &
+# updateEngine --misc=update --image_url=firmware address --partition=0x3FFC00 --version_url=version file address --savepath=/userdata/update.img --reboot
+updateEngine --image_url=http://172.16.21.110:8080/recovery/update.img \
+    --misc=update --savepath=/userdata/update.img --reboot &
 ```
 
 Local upgrade：
 
 ```
-updateEngine --image_url=/userdata/update.img --misc=update --savepath=/userdata/update.img --reboot &
+updateEngine --image_url=/userdata/update.img --misc=update \
+    --savepath=/userdata/update.img --reboot &
 ```
 
 Process introduction：
@@ -193,36 +208,14 @@ Optional parameters:
 
 1. --version_url: remote address or local address. If this parameter is not set, versions comparison will not do .
 2. --savepath: firmware saves path, it is "/tmp/update.img" by default. It is recommended to set to "/userdata/update.img".
-3. --partition: set the partition to be upgraded. It is recommended to set it to 0x3F00. **It is not supported to upgrade the parameter and loader partitions**. See the [Chapter 5.1 Parameters Introduction](### 5.1. Parameters ) for details.
+3. --partition: set the partition to be upgraded. It is recommended to set it to 0x3FFC00. **It is not supported to upgrade the parameter and loader partitions**. See the [Chapter of Parameters Introduction](# Parameters ) for details.
 4. --reboot: after upgrading the recovery partition, reboot into the recovery mode.
-
-### Create an Upgrade Disk
-
-Creating an upgrade disk refers to inserting the SD card created by the SDDiskTool card-making tool to
-the machine to upgrade, this section will introduce how to create a upgrade disk and some upgrade issues
-in details.
-
-**Create an Upgrade Disk**
-
-As shown in the figure below, use the tool in the project directory "tools\windows\SDDiskTool" to
-create a upgrade disk.
-
-![](Resources/1560391545045.png)
-
-Choose the packaged update.img file by the "Firmware" button.
-
-After that, click the "Create" button. If the creation is successful, a prompt will appear.
-
-At this point, there will be two files in the root directory of the SD card, and the upgraded firmware
-update.img will be named sdupdate.img.
-
-After all the preparations are completed, insert the SD card into the device and power on.
 
 ### Log Checking
 
 1. Check log by serial port
 
-In the "buildroot/output/rockchip_rk3308_recovery/target" directory:
+In the "buildroot/output/rockchip_***/target" directory:
 
 ```shell
 touch .rkdebug
@@ -261,14 +254,16 @@ Since there are already multiple backups of miniloader, trust, and uboot on the 
 | Partition | Image          | Description                              |
 | --------- | -------------- | ---------------------------------------- |
 | loader    | Miniloader.bin | First level loader, there are 4 backups in the device |
-| uboot     | uboot.img      | Second level loader, there are 2 backups in the device，the backups number can be changed by modifying the "u-boot/make.sh" |
-| trust     | trust.img      | Related to secure, there are 2 backups in the device，the backups number can be changed by modifying the "u-boot/ make.sh" |
+| uboot_a   | uboot.img      | Second level loader, there are 2 backups in the device，the backups number can be changed by modifying the "u-boot/make.sh" |
+| uboot_b   | uboot.img      | backup of uboot_a |
+| trust     | trust.img      | Related to secure, there are 2 backups in the device，the backups number can be changed by modifying the "u-boot/make.sh" (Some platforms will merge trust and uboot) |
 | misc      | misc.img       | Boot parameter partition                 |
 | boot_a    | boot.img       | kernel+dtb, boot system_a                |
 | boot_b    | boot.img       | kernel+dtb, boot system_b                |
 | system_a  | rootfs.img     | Root file system                         |
 | system_b  | rootfs.img     | Root file system                         |
-| userdata  | userdata.img   | No backup                                |
+| oem       | oem.img        | Manufacturer prefabricated, read and write, No backup  |
+| userdata  | userdata.img   | For data, readable and writable, No backup  |
 
 <div style="page-break-after: always;"></div>
 
@@ -303,20 +298,20 @@ AvbABData: slot_a and slot_b  boot information
 
 <div style="page-break-after: always;"></div>
 
-#### Boot Process
+#### Two boot modes
 
 According to the configuration method of the upper bootcontrol program, there are two boot modes: successful_boot and reset retry. The difference of the two modes is as follows:
 
 | Mode                  | Advantage                                                    | Disadvantage                                                 | parameters need to set when successfully boot(A boot)        | parameters need to set when upgrade(A boot, B upgrade) |
 | --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------ |
-| Successful<br />_boot | As long as the system is booted normally, it will not go back to the old version of firmware. | After the device is working for a long time, if some memory are stored abnormally, the system will always restart. | tries_remaining=0<br />successful_boot=1<br /><br />last_boot=0 | A:priority=14<br />B:priority=15                       |
-| Reset retry           | Always maintain the retry mechanism can fix storage issues   | 1. The machine will go back to the old version which may not be controlled.<br />2.If the retry try many times for users misoperation, it will be misidentified that the current partition is bootable. | tries_remaining=7<br />last_boot=0                           | A:priority=14<br />B:priority=15                       |
+| Successful boot | As long as the system is booted normally, it will not go back to the old version of firmware. | After the device is working for a long time, if some memory are stored abnormally, the system will always restart. | tries_remaining=0<br>successful_boot=1<br>last_boot=0 | A:priority=14<br>B:priority=15                       |
+| Reset retry           | Always maintain the retry mechanism can fix storage issues   | 1. The machine will go back to the old version which may not be controlled.<br>2.If the retry try many times for users misoperation, it will be misidentified that the current partition is bootable. | tries_remaining=7<br>last_boot=0                           | A:priority=14<br>B:priority=15                       |
 
 <div style="page-break-after: always;"></div>
 
-#### Boot Process
+#### Boot Process Flow Chart
 
-![](Resources/upgrade process.png)
+![](Resources/Guide_flow_chart_en.png)
 
 ### Compilation Configuration
 
@@ -345,6 +340,7 @@ BR2_PACKAGE_RECOVERY_RETRY=y
 #The boot mode is retry mode. it is successful_boot mode by default when not configured.
 BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE=y	 #Use the new upgrade program
 BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y
+BR2_PACKAGE_RECOVERY_NO_UI=y # disable UI
 #compile the new upgrade program
 ```
 
@@ -354,6 +350,14 @@ BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y
 make recovery-dirclean
 make recovery
 ./build.sh
+```
+
+If the SDK version is relatively new, you can try to compile as follows:
+
+```shell
+./build.sh external/recovery
+./build.sh
+# flashing the firmware again.
 ```
 
 #### Partition Table
@@ -372,17 +376,16 @@ export RK_PARAMETER=parameter-ab-64bit.txt
 
 #### Firmware output
 
-Enable Linux A / B automatic compilation system of corresponding  BoardConfig.mk as follows:
+Select the corresponding board configuration (such as BoardConfig***-ab. mk). If you want to use SD card boot disk to upgrade AB system mode, the method is as follows:
 
 ```shell
-#choose enable Linux A/B
-export RK_LINUX_AB_ENABLE=true
+# enable build update_sdcard.img
+export RK_UPDATE_SDCARD_ENABLE_FOR_AB=true
 ```
 
 Run the following command after finishing the above setting :
 
 ```shell
-source envsetup.sh
 ./build.sh
 ```
 
@@ -393,49 +396,71 @@ The following firmwares will be generated：
 ```
 tree rockdev/
 rockdev/
-├ ── boot.img
-├ ── MiniLoaderAll.bin
-├ ── misc.img
-├ ── oem.img
-├ ── parameter.txt
-├ ── recovery.img
-├ ── rootfs.img
-├ ── trust.img
-├ ── uboot.img
-├ ── update_ab.img
-├ ── update.img
-├ ── update_ota.img
+├── boot.img
+├── MiniLoaderAll.bin
+├── misc.img
+├── oem.img
+├── parameter.txt
+├── rootfs.img
+├── uboot.img
+├── update_ab.img
+├── update_sdcard.img
+├── update_ota.img
 └── userdata.img
-
-0 directories, 13 files
 ```
 
 **Firmware Upgrade**
 
-In the rockdev and IMAGE directories, there will be update_ota.img for OTA upgrades. The IMAGE package includes boot.img and rootfs.img. The "tools/linux/Linux_Pack_Firmware/rockdev/rk3308-package-file-ota" file can be modified according to actual cause. As shown below:
+In the rockdev and IMAGE directories, there will be update_ota.img for OTA upgrades. The IMAGE package includes boot.img and rootfs.img. The `tools/linux/Linux_Pack_Firmware/rockdev/rv1126_rv1109-package-file-2-ota` file can be modified according to actual cause. As shown below:
 
-![](Resources/1560409885960.png)
+```ini
+# NAME        Relative path
+#
+#HWDEF        HWDEF
+package-file  package-file
+bootloader    Image/MiniLoaderAll.bin
+parameter     Image/parameter.txt
+uboot_a       Image/uboot.img
+boot_a        Image/boot.img
+system_a      Image/rootfs.img
+oem           Image/oem.img
+```
 
-**Firmware flashing
+**Firmware flashing**
 
-The update_ab.img is generated in both rockdev and IMAGE directories, which is used for flashing. Modify the file "tools/linux/Linux_Pack_Firmware/rockdev/rk3308-package-file-ab" file as needed. As shown below:
+The update_ab.img is generated in both rockdev and IMAGE directories, which is used for flashing. Modify the file `tools/linux/Linux_Pack_Firmware/rockdev/rv1126_rv1109-package-file-2-ab` file as needed. As shown below:
 
-![](Resources/1560409929891.png)
+```ini
+# NAME          Relative path
+#
+#HWDEF          HWDEF
+package-file    package-file
+bootloader      Image/MiniLoaderAll.bin
+parameter       Image/parameter.txt
+misc            Image/misc.img
+uboot_a         Image/uboot.img
+uboot_b         Image/uboot.img
+boot_a          Image/boot.img
+boot_b          Image/boot.img
+system_a        Image/rootfs.img
+system_b        Image/rootfs.img
+oem             Image/oem.img
+```
 
 ### OTA Upgrade
 
 Upgrade online：
 
 ```shell
-# updateEngine --update --image_url=firmware address --partition=0x3F00 --version_url=version file address --savepath=save the firmware address --reboot
-updateEngine --image_url=http://172.16.21.110:8080/linuxab/update.img --update --reboot
+# updateEngine --update --image_url=firmware address --partition=0x3FFC00 --version_url=version file address --savepath=save the firmware address --reboot
+updateEngine --image_url=http://172.16.21.110:8080/linuxab/update_ota.img --update --reboot
 ```
 
 Upgrade locally：
 
 ```shell
-# updateEngine --update --image_url=firmware address --partition=0x3F00 --version_url=version file address --savepath=save the firmware address --reboot
-updateEngine --image_url=/userdata/update.img --update --reboot
+# updateEngine --update --image_url=firmware address(update_ab.img or update_ota.img) --partition=0x3FFC00 --version_url=version file address --savepath=save the firmware address --reboot
+updateEngine --image_url=/userdata/update_ota.img --update --reboot
 ```
 
 Process introduction：
@@ -449,7 +474,7 @@ Process introduction：
 
 Optional parameters:
 
-1. --partition: set the partition to be upgraded. In Linux A/B mode, it is recommended to upgrade only boot and system, that is setting it to 0x0A00. **It is not supported to upgrade the parameter and loader partitions**. See parameter instruction for details.
+1. --partition: set the partition to be upgraded. In Linux A/B mode, it is recommended to upgrade only uboot_a/uboot_b boot_a/boot_b and system_a/system_b, that is setting it to 0xFC00. **It is not supported to upgrade the parameter and loader partitions**. See parameter instruction for details.
 2. --version: if this parameter is not set, there will be no versions comparison.
 3. --savepath: firmware save path. It is "/tmp/update.img" by default. and it is recommended to use the default value.
 4. --reboot: reboot after upgrade
@@ -494,6 +519,52 @@ Optional parameter：
 
 **Note:** the updateEngine program is automatically set after OTA upgrade is completed, no need to repeat the settings.
 
+## Create a SD card Upgrade Disk
+
+Creating an upgrade disk refers to inserting the SD card created by the SDDiskTool card-making tool to
+the machine to upgrade, this section will introduce how to create a upgrade disk and some upgrade issues
+in details.
+
+**Create an Upgrade Disk**
+
+As shown in the figure below, use the tool in the project directory "tools\windows\SDDiskTool" to
+create a upgrade disk.
+
+![](Resources/SDDiskTool_en.png)
+
+Choose the packaged update.img file by the "Firmware" button.
+
+After that, click the "Create" button. If the creation is successful, a prompt will appear.
+
+At this point, there will be two files in the root directory of the SD card, and the upgraded firmware
+update.img will be named sdupdate.img.
+
+After all the preparations are completed, insert the SD card into the device and power on.
+
+### Instructions for making SD card boot disk in Recovery system mode
+
+To make SD card boot disk in Recovery system mode, just use SDDiskTool to make update.img directly into sdupdate.img.
+
+### Instructions for making SD card boot disk in AB system mode
+
+When the SDK compiles the AB system mode, the `./build.sh updateimg` command will package 3 update.img, as follows:
+
+- update_ab.img: Contains a complete AB system partition, which can be used for complete burning
+
+- update_ota.img: Only include A slot partition system or B slot partition system
+
+- update_sdcard.img: Can only be used to make a SD card boot disk in AB system mode
+
+When making an SD card boot disk in AB system mode, use SDDiskTool to load update_sdcard.img. After making the SD card boot disk, copy update_ab.img or update_ota.img to the SD card boot disk.
+
+```shell
+rksdfw.tag
+sd_boot_config.config
+sdupdate.img
+update_ab.img  # first priority
+update_ota.img # second priority
+```
+
 ## Restore the Factory Settings
 
 The configuration files that can be read and written were stored in the userdata partition. The factory firmware will set some configuration parameters by default. After using a period of time, the configuration file will be generated or modified. Sometimes users need to clear the data, at this time, they need to restore the factory configuration.
@@ -528,20 +599,37 @@ Optional parameter:
 The updateEngine mainly includes upgrading partition and writing the Misc configuration function, command parameters are as follows:
 
 ```shell
-updateEngine --help
-*** update_engine: Version V1.0.1 ***.
---misc=now           Linux A/B mode: Setting the current partition to bootable.
---misc=other         Linux A/B mode: Setting another partition to bootable.
---misc=update        Recovery mode: Setting the partition to be upgraded.
---misc=wipe_userdata Format data partition.
---update             Upgrade mode.
---partition=0xFF00   Set the partition to be upgraded.
-                     0xFF00: 1111 1111 1000 0000.
-                     111111111: loader parameter uboot trust boot recovery rootfs oem misc.
---reboot             Restart the machine at the end of the program.
---version_url=url    The path to the file of version.
---image_url=url      Path to upgrade firmware.
---savepath=url       save the update.img to url.
+*** update_engine: Version V1.1.0 ***.
+--misc=now             Linux A/B mode: Setting the current partition to bootable.
+--misc=other           Linux A/B mode: Setting another partition to bootable.
+--misc=update          Recovery mode: Setting the partition to be upgraded.
+--misc=wipe_userdata   Format data partition.
+--update               Upgrade mode.
+--partition=0x3FFC00   Set the partition to be upgraded.(NOTICE: OTA not support upgrade loader and parameter)
+                       0x3FFC00: 0011 1111 1111 1100 0000 0000.
+                                 uboot trust boot recovery rootfs oem
+                                 uboot_a uboot_b boot_a boot_b system_a system_b.
+                       000000000000000000000000: reserved
+                       100000000000000000000000: Upgrade loader
+                       010000000000000000000000: Upgrade parameter
+                       001000000000000000000000: Upgrade uboot
+                       000100000000000000000000: Upgrade trust
+                       000010000000000000000000: Upgrade boot
+                       000001000000000000000000: Upgrade recovery
+                       000000100000000000000000: Upgrade rootfs
+                       000000010000000000000000: Upgrade oem
+                       000000001000000000000000: Upgrade uboot_a
+                       000000000100000000000000: Upgrade uboot_b
+                       000000000010000000000000: Upgrade boot_a
+                       000000000001000000000000: Upgrade boot_b
+                       000000000000100000000000: Upgrade system_a
+                       000000000000010000000000: Upgrade system_b
+                       000000000000001000000000: Upgrade misc
+                       000000000000000100000000: Upgrade userdata
+--reboot               Restart the machine at the end of the program.
+--version_url=url      The path to the file of version.
+--image_url=url        Path to upgrade firmware.
+--savepath=url         save the update.img to url.
 ```
 
 --misc
@@ -570,13 +658,13 @@ Without parameters: mainly used in Linux A/B mode, directly upgrade in the curre
 
 --partition=0x0000
 
-Set the partition to be upgraded, the default value is 0x3F00, upgrade uboot, trust, boot, recovery, rootfs, oem partitions. The higher 9 bits are already used, and the lower 7 bits are reserved bits which can be extended.
+Set the partition to be upgraded, the default value is 0x3FFC00, upgrade uboot，trust，boot，recovery，rootfs，oem，uboot_a，uboot_b，boot_a，boot_b，system_a，system_b partitions. The higher 16bits are already used, and the lower 8 bits are reserved bits which can be extended.
 
 1: upgrade, 0: not upgraded
 
-| bits      | 16     | 15        | 14    | 13    | 12   | 11       | 10     | 9    | 8    | 7~1      |
-| --------- | ------ | --------- | ----- | ----- | ---- | -------- | ------ | ---- | ---- | -------- |
-| partition | loader | parameter | uboot | trust | boot | recovery | rootfs | oem  | misc | reserved |
+| bits | 23     | 22        | 21    | 20    | 19   | 18       | 17     | 16   | 15      | 14      | 13     | 12       | 11       | 10       | 9    | 8        | 7~0  |
+| ---- | ------ | --------- | ----- | ----- | ---- | -------- | ------ | ---- | -----   | -----   | ----   | -------- | ------   | ----     | ---- | ----     | ---- |
+| partition | loader | parameter | uboot | trust | boot | recovery | rootfs | oem  | uboot_a | uboot_b | boot_a | boot_b   | system_a | system_b | misc | userdata | reserved |
 
 --reboot
 
@@ -623,16 +711,22 @@ external/recovery/update_engine/update.cpp
 
 ```c
 UPDATE_CMD update_cmd[] = {
-{"bootloader", false, false, 0, 0, 0, "", flash_bootloader},
-{"parameter", false, false, 0, 0, 0,"", flash_parameter},
-{"uboot", false, false, 0, 0, 0,"", flash_normal},
-{"trust", false, false, 0, 0, 0,"", flash_normal},
-{"boot", false, true, 0, 0, 0,"", flash_normal},
-{"recovery", false, false, 0, 0, 0, "", flash_normal},
-{"rootfs", false, true, 0, 0, 0, "", flash_normal},
-{"oem", false, false, 0, 0, 0, "", flash_normal},
-{"misc", false, false, 0, 0, 0, "", flash_normal},
-};
+           {"bootloader" , false , false , 0 , 0 , 0 , "" , flash_bootloader} ,
+           {"parameter"  , false , false , 0 , 0 , 0 , "" , flash_parameter}  ,
+           {"uboot"      , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"trust"      , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"boot"       , false , true  , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"recovery"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"rootfs"     , false , true  , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"oem"        , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"uboot_a"    , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"uboot_b"    , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"boot_a"     , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"boot_b"     , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"system_a"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"system_b"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"misc"       , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"userdata"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
 ```
 
 ## Appendix

@@ -1,10 +1,10 @@
-# Rockchip Linux 升级方案介绍
+# Rockchip Linux updateEngine升级方案介绍
 
 文件标识：RK-KF-YF-348
 
-发布版本：V1.0.3
+发布版本：V1.1.0
 
-日期：2020-12-14
+日期：2021-02-18
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2020 瑞芯微电子股份有限公司**
+**版权所有© 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -59,6 +59,7 @@ Rockchip Electronics Co., Ltd.
 | **芯片名称** | **内核版本** |
 | -------- | :------- |
 | RK3308   | 4.4      |
+| RV1126/RV1109   | Linux 4.19 |
 
 **修订记录**
 
@@ -67,6 +68,7 @@ Rockchip Electronics Co., Ltd.
 | 2019-06-05 | V1.0.1   | HKH MLC    | 初始版本               |
 | 2020-03-31 | V1.0.2   | Ruby Zhang | 格式修正               |
 | 2020-12-14 | V1.0.3   | Ruby Zhang | 更新公司名称及文档格式 |
+| 2021-02-18 | V1.1.0   | CWW        | 1. 更新支持SD卡启动来升级固件<br>2. 更新支持AB系统升级 |
 
 ---
 
@@ -76,14 +78,25 @@ Rockchip Electronics Co., Ltd.
 
 ---
 
-## 简介
+## 简介以及代码
 
-Rockchip Linux 平台支持两种升级方案，Recovery 模式和Linux A/B 模式：
+### 简介
+
+Rockchip Linux 平台支持两种启动方案，Recovery 模式和Linux A/B 模式：
 
 1. Recovery 模式，设备上有一个单独的分区(recovery)用于升级操作。
 2. Linux A/B 模式，设备上有两套固件，可切换使用。
 
-这两种模式各有优缺点，用户根据需求选择使用。
+这两种启动模式各有优缺点，用户根据需求选择使用。
+
+### 代码
+
+Rockchip Linux 平台有两套升级方案代码。
+
+| 升级方案     | 代码路径                                             | 是否支持Recovery<br>启动模式升级 | 是否支持A/B<br>启动模式升级     | 简介                 |
+| --------     | -----------------                                    | ---------------------------  | --------------------------- | ---------------------        |
+| updateEngine | external/recovery/update_engine<br>external/recovery | 支持                         | 支持                        | RV1126/RV1109平台使用        |
+| rkupdate     | external/rkupdate                                    | 支持                         | 不支持                      | 其它平台使用，本文档不作介绍 |
 
 ## Recovery 模式
 
@@ -106,7 +119,7 @@ Recovery 模式是在设备上多一个Recovery分区，该分区由kernel+resou
 | -------- | ----------------- | --------------------------- |
 | loader   | MiniLoaderAll.bin | 一级loader                    |
 | u-boot   | uboot.img         | 二级loader                    |
-| trust    | trust.img         | 安全环境，如OP-TEE、ATF            |
+| trust    | trust.img         | 安全环境，如OP-TEE、ATF<br>（有些平台上会把trust和uboot合并）|
 | misc     | misc.img          | 引导参数分区                      |
 | recovery | recovery.img      | kernel+dtb+ramdisk 组成的根文件系统 |
 | boot     | boot.img          | kernel+dtb                  |
@@ -123,6 +136,7 @@ BR2_PACKAGE_RECOVERY=y	#开启升级相关功能
 BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE=y	#使用新升级程序，不配置则默认使用原有升级流程
 BR2_PACKAGE_RECOVERY_RECOVERYBIN=y	#开启recovery bin 文件
 BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y #编译新升级程序
+BR2_PACKAGE_RECOVERY_NO_UI=y # 关掉UI
 ```
 
 Buildroot：rootfs 配置文件选择如下(make menuconfig)
@@ -131,6 +145,7 @@ Buildroot：rootfs 配置文件选择如下(make menuconfig)
 BR2_PACKAGE_RECOVERY=y #开启升级相关功能
 BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE=y #使用新升级程序
 BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y	#编译新升级程序
+BR2_PACKAGE_RECOVERY_NO_UI=y # 关掉UI
 ```
 
 **带屏与不带屏**
@@ -156,6 +171,14 @@ SDK默认会开启以上配置，用户无需再次配置。源码目录位于ex
 8. 重新烧写固件
 ```
 
+如果SDK版本比较新，可以尝试如下编译：
+
+```shell
+./build.sh external/recovery
+./build.sh
+# 重新烧写固件
+```
+
 ### OTA升级
 
 升级支持网络下载和本地升级，且可指定要升级的分区，在normal系统运行如下命令：
@@ -163,14 +186,16 @@ SDK默认会开启以上配置，用户无需再次配置。源码目录位于ex
 网络升级：
 
 ```shell
-# updateEngine --misc=update --image_url=固件地址 --partition=0x3F00 --version_url=版本文件地址 --savepath=/userdata/update.img --reboot
-updateEngine --image_url=http://172.16.21.110:8080/recovery/update.img --misc=update --savepath=/userdata/update.img --reboot &
+# updateEngine --misc=update --image_url=固件地址 --partition=0x3FFC00 --version_url=版本文件地址 --savepath=/userdata/update.img --reboot
+updateEngine --image_url=http://172.16.21.110:8080/recovery/update.img \
+    --misc=update --savepath=/userdata/update.img --reboot &
 ```
 
 本地升级：
 
 ```
-updateEngine --image_url=/userdata/update.img --misc=update --savepath=/userdata/update.img --reboot &
+updateEngine --image_url=/userdata/update.img --misc=update \
+    --savepath=/userdata/update.img --reboot &
 ```
 
 流程介绍：
@@ -186,32 +211,14 @@ updateEngine --image_url=/userdata/update.img --misc=update --savepath=/userdata
 
 1. --version_url：远程地址或本地地址，没有设置该参数，则不会进行版本比较
 2. --savepath：固件保存地址，缺省时为/tmp/update.img，建议传入/userdata/update.img
-3. --partition：设置将要升级的分区，建议使用0x3F00，**不支持升级parameter 和loader分区**。详见 [5.1节 参数说明](### 5.1、参数说明 )。
+3. --partition：设置将要升级的分区，建议使用0x3FFC00，**不支持升级parameter 和loader分区**。详见 [参数说明章节](# 参数说明 )。
 4. --reboot：升级recovery 完后，重启进入recovery模式
-
-### SD 卡制作启动盘升级
-
-SD卡启动盘升级指将通过SDDiskTool 制卡工具制作的SD卡插入到机器中进行升级，详细描述 SD 卡启动盘的制作及相关升级的问题。
-
-**制作SD卡启动盘**
-
-如图下图所示，使用工程目录 tools\windows\SDDiskTool 中的 SD 卡启动盘升级制作工具制作 SD 卡启动盘。
-
-![](Resources/1560391545044.png)
-
-选择固件中选择打包好的 update.img 文件。
-
-所有准备工作完成后，点击开始创建按钮，如果创建成功，会弹窗提示。
-
-此时 SD 卡中根目录会存在两个文件，其中选择升级的固件 update.img，会被命名为 sdupdate.img.
-
-所有准备工作做好后，设备中插入 SD 卡，并重新上电。
 
 ### 日志的查看
 
 1. 串口日志查看
 
-buildroot/output/rockchip_rk3308_recovery/target 目录下
+buildroot/output/rockchip_***/target 目录下
 
 ```shell
 touch .rkdebug
@@ -249,19 +256,21 @@ Linux A/B 由于有两个引导 slot，所以具有以下**优点**：
 
 由于 miniloader，trust，uboot，机器上原有已经进行了多备份，所以目前这几个分区暂不支持双分区方案，只对 boot 和 system 进行了双分区。分区表如下：
 
-| 分区名      | 镜像名            | 简介                                       |
-| -------- | -------------- | ---------------------------------------- |
-| loader   | Miniloader.bin | 一级loader，机器备份4份                          |
-| uboot    | uboot.img      | 二级loader，机器备份2份，可修改u-boot/make.sh来修改备份份数 |
-| trust    | trust.img      | 安全相关，机器备份2份，可修改u-boot/make.sh来修改备份份数     |
-| misc     | misc.img       | 引导参数分区                                   |
-| boot_a   | boot.img       | kernel+dtb，引导system_a                    |
-| boot_b   | boot.img       | kernel+dtb，引导system_b                    |
-| system_a | rootfs.img     | 根文件系统                                    |
-| system_b | rootfs.img     | 根文件系统                                    |
-| userdata | userdata.img   | 无备份                                      |
+| 分区名   | 镜像名         | 简介                                                                                         |
+| -------- | -------------- | ----------------------------------------                                                     |
+| loader   | Miniloader.bin | 一级loader，机器备份4份                                                                      |
+| uboot_a  | uboot.img      | 二级loader，机器备份2份，可修改u-boot/make.sh来修改备份份数                                  |
+| uboot_b  | uboot.img      | uboot_a的备份分区                                                                            |
+| trust    | trust.img      | 安全相关，机器备份2份，可修改u-boot/make.sh来修改备份份数<br>（有些平台上会把trust和uboot合并） |
+| misc     | misc.img       | 引导参数分区                                                                                 |
+| boot_a   | boot.img       | kernel+dtb，引导system_a                                                                     |
+| boot_b   | boot.img       | kernel+dtb，引导system_b                                                                     |
+| system_a | rootfs.img     | 根文件系统                                                                                   |
+| system_b | rootfs.img     | 根文件系统                                                                                   |
+| oem      | oem.img        | 厂商预制，可读写                                                                             |
+| userdata | userdata.img   | 用于数据，可读写，无备份                                                                     |
 
-### 引导流程
+### 引导流程以及数据格式
 
 #### 数据格式及存储
 
@@ -293,14 +302,14 @@ AvbABData：slot_a 和 slot_b 的引导信息
 
 根据上层 bootcontrol 程序的设置方式，可分为两种引导方式 successful_boot 和 reset retry。 两种模式的对比如下：
 
-| 模式                    | 优点                       | 缺点                                       | 成功启动设置的数据（A启动）                           | 升级时设置的数据（A启动，B升级）                |
-| --------------------- | ------------------------ | ---------------------------------------- | ---------------------------------------- | -------------------------------- |
-| Successful<br />_boot | 只要正常启动系统，不会回退到旧版本固件      | 设备长时间工作后，如果存储某些颗粒异常，会导致系统一直重启            | tries_remaining=0<br />successful_boot=1<br /><br />last_boot=0 | A:priority=14<br />B:priority=15 |
-| Reset retry           | 始终保持 retry 机制，可以应对存储异常问题 | 1.机器会回到旧的版本上，可能出现版本不可控问题<br />2.如果因为用户误操作，retry尝试次数过了，会误判为当前分区为可启动 | tries_remaining=7<br />last_boot=0       | A:priority=14<br />B:priority=15 |
+| 模式 | 优点 | 缺点 | 成功启动设置的数据（A启动）| 升级时设置的数据（A启动，B升级）|
+| ---- | ---- | ---- | -------------------------- | ------------------------------- |
+| Successful boot | 只要正常启动系统，不会回退到旧版本固件    | 设备长时间工作后，如果存储某些颗粒异常，会导致系统一直重启  | tries_remaining=0<br>successful_boot=1<br>last_boot=0 | A:priority=14<br>B:priority=15 |
+| Reset retry     | 始终保持 retry 机制，可以应对存储异常问题 | 1.机器会回到旧的版本上，可能出现版本不可控问题<br>2.如果因为用户误操作，retry尝试次数过了，会误判为当前分区为可启动 | tries_remaining=7<br>last_boot=0       | A:priority=14<br>B:priority=15 |
 
 #### 引导流程图
 
-![](Resources/1560395624561.png)
+![](Resources/Guide_flow_chart_cn.png)
 
 ### 编译配置
 
@@ -325,6 +334,7 @@ BR2_PACKAGE_RECOVERY_BOOTCONTROL=y	#开启引导控制脚本
 BR2_PACKAGE_RECOVERY_RETRY=y		#引导方式为retry模式，不配置则默认为successful_boot模式
 BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE=y	#使用新升级程序
 BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y	#编译新升级程序
+BR2_PACKAGE_RECOVERY_NO_UI=y # 关掉UI
 ```
 
 注意：设置完成之后，须进行重新编译，如下：
@@ -333,6 +343,14 @@ BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN=y	#编译新升级程序
 make recovery-dirclean
 make recovery
 ./build.sh
+```
+
+如果SDK版本比较新，可以尝试如下编译：
+
+```shell
+./build.sh external/recovery
+./build.sh
+# 重新烧写固件
 ```
 
 #### 分区表
@@ -351,17 +369,16 @@ export RK_PARAMETER=parameter-ab-64bit.txt
 
 #### 固件输出
 
-相应的 BoardConfig.mk，设置开启 Linux A/B 自动编译系统，开启方式如下：
+选择相应的板级配置（如BoardConfig***-ab.mk）。如果要使用SD卡启动盘升级AB系统模式，方式如下：
 
 ```shell
-#choose enable Linux A/B
-export RK_LINUX_AB_ENABLE=true
+# enable build update_sdcard.img
+export RK_UPDATE_SDCARD_ENABLE_FOR_AB=true
 ```
 
 设置完成之后，运行
 
 ```shell
-source envsetup.sh
 ./build.sh
 ```
 
@@ -370,51 +387,71 @@ source envsetup.sh
 ```
 tree rockdev/
 rockdev/
-├ ── boot.img
-├ ── MiniLoaderAll.bin
-├ ── misc.img
-├ ── oem.img
-├ ── parameter.txt
-├ ── recovery.img
-├ ── rootfs.img
-├ ── trust.img
-├ ── uboot.img
-├ ── update_ab.img
-├ ── update.img
-├ ── update_ota.img
+├── boot.img
+├── MiniLoaderAll.bin
+├── misc.img
+├── oem.img
+├── parameter.txt
+├── rootfs.img
+├── uboot.img
+├── update_ab.img
+├── update_sdcard.img
+├── update_ota.img
 └── userdata.img
-
-0 directories, 13 files
 ```
 
 **升级固件**
 
-rockdev 和 IMAGE 目录下，都会有 update_ota.img，用于 OTA 升级，该 IMAGE 包，包含boot.img 和 rootfs.img。可根据实际需求修改
+rockdev 和 IMAGE 目录下，都会有 update_ota.img，用于 OTA 升级，该 IMAGE 包，包含boot.img 和 rootfs.img。可根据实际需求修改`tools/linux/Linux_Pack_Firmware/rockdev/rv1126_rv1109-package-file-2-ota`文件。如下图：
 
-tools/linux/Linux_Pack_Firmware/rockdev/rk3308-package-file-ota 文件。如下图：
-
-![](Resources/1560409885960.png)
+```ini
+# NAME        Relative path
+#
+#HWDEF        HWDEF
+package-file  package-file
+bootloader    Image/MiniLoaderAll.bin
+parameter     Image/parameter.txt
+uboot_a       Image/uboot.img
+boot_a        Image/boot.img
+system_a      Image/rootfs.img
+oem           Image/oem.img
+```
 
 **烧写固件**
 
-rockdev 和 IMAGE 目录下，都会生成 update_ab.img，该固件用于烧写。根据需求修改该文件 tools/linux/Linux_Pack_Firmware/rockdev/rk3308-package-file-ab 文件。如下图：
+rockdev 和 IMAGE 目录下，都会生成 update_ab.img，该固件用于烧写。根据需求修改该文件`tools/linux/Linux_Pack_Firmware/rockdev/rv1126_rv1109-package-file-2-ab`文件。如下图：
 
-![](Resources/1560409929891.png)
+```ini
+# NAME          Relative path
+#
+#HWDEF          HWDEF
+package-file    package-file
+bootloader      Image/MiniLoaderAll.bin
+parameter       Image/parameter.txt
+misc            Image/misc.img
+uboot_a         Image/uboot.img
+uboot_b         Image/uboot.img
+boot_a          Image/boot.img
+boot_b          Image/boot.img
+system_a        Image/rootfs.img
+system_b        Image/rootfs.img
+oem             Image/oem.img
+```
 
 ### OTA升级
 
 网络升级：
 
 ```shell
-# updateEngine --update --image_url=固件地址 --partition=0x3F00 --version_url=版本文件地址 --savepath=保存的固件地址 --reboot
-updateEngine --image_url=http://172.16.21.110:8080/linuxab/update.img --update --reboot
+# updateEngine --update --image_url=固件地址 --partition=0x3FFC00 --version_url=版本文件地址 --savepath=保存的固件地址 --reboot
+updateEngine --image_url=http://172.16.21.110:8080/linuxab/update_ota.img --update --reboot
 ```
 
 本地升级：
 
 ```shell
-# updateEngine --update --image_url=固件地址 --partition=0x3F00 --version_url=版本文件地址 --savepath=保存的固件地址 --reboot
-updateEngine --image_url=/userdata/update.img --update --reboot
+# updateEngine --update --image_url=固件地址(update_ab.img 或 update_ota.img) --partition=0x3FFC00 --version_url=版本文件地址 --savepath=保存的固件地址 --reboot
+updateEngine --image_url=/userdata/update_ota.img --update --reboot
 ```
 
 流程介绍：
@@ -428,7 +465,7 @@ updateEngine --image_url=/userdata/update.img --update --reboot
 
 可缺省参数：
 
-1. --partition：设置将要升级的分区 ，Linux A/B模式下，建议只升级boot和system，即0x0A00，**不支持升级parameter 和loader分区**。详见参数说明
+1. --partition：设置将要升级的分区 ，Linux A/B模式下，建议只升级uboot_a/uboot_b、boot_a/boot_b和system_a/system_b，即0xFC00，**不支持升级parameter 和loader分区**。详见参数说明
 2. --version：没有设置该参数，则不会进行版本比较
 3. --savepath：固件保存地址，缺省时为/tmp/update.img，建议使用默认值
 4. --reboot：升级完后重启
@@ -473,6 +510,48 @@ updateEngine --misc=other --reboot
 
 注意：updateEngine程序在OTA升级结束之后会自动设置，无需重复设置。
 
+## SD 卡制作启动盘升级
+
+SD卡启动盘升级指将通过SDDiskTool 制卡工具制作的SD卡插入到机器中进行升级，详细描述 SD 卡启动盘的制作及相关升级的问题。
+
+### 制作SD卡启动盘
+
+如图所示，使用工程目录 tools\windows\SDDiskTool 中的 SD 卡启动盘升级制作工具制作 SD 卡启动盘。
+
+![](Resources/SDDiskTool_cn.png)
+
+选择固件中选择打包好的 update.img 文件。
+
+所有准备工作完成后，点击开始创建按钮，如果创建成功，会弹窗提示。
+
+此时 SD 卡中根目录会存在两个文件，其中选择升级的固件 update.img，会被命名为 sdupdate.img.
+
+所有准备工作做好后，设备中插入 SD 卡，并重新上电。
+
+### Recovery系统模式的SD卡启动盘制作说明
+
+Recovery系统模式的SD卡启动盘制作只要把update.img用SDDiskTool工具直接制作成sdupdate.img即可。
+
+### AB系统模式的SD卡启动盘制作说明
+
+SDK编译AB系统模式时，`./build.sh updateimg`命令会打包出3个update.img，如下：
+
+- update_ab.img: 包含完整的AB系统分区，可用于完整烧录
+
+- update_ota.img: 只包含A slot分区系统或B slot分区系统
+
+- update_sdcard.img: 只能用于制作AB系统模式SD卡启动盘
+
+制作AB系统模式SD卡启动盘时，使用SDDiskTool工具加载update_sdcard.img，制作好SD卡启动盘后，再将update_ab.img或update_ota.img拷贝到SD卡启动盘上即可。
+
+```shell
+rksdfw.tag
+sd_boot_config.config
+sdupdate.img
+update_ab.img  # first priority
+update_ota.img # second priority
+```
+
 ## 恢复出厂设置
 
 我们把可以读写的配置文件保存在 userdata 分区， 出厂固件会默认一些配置参数， 用户使用一段时间后会生成或修改配置文件， 有时用户需要清除这些数据， 我们就需要恢复到出厂配置。
@@ -507,20 +586,37 @@ updateEngine --misc=wipe_userdata --reboot
 updateEngine主要包含升级分区和写Misc配置功能，支持命令参数如下：
 
 ```shell
-updateEngine --help
-*** update_engine: Version V1.0.1 ***.
---misc=now           Linux A/B mode: Setting the current partition to bootable.
---misc=other         Linux A/B mode: Setting another partition to bootable.
---misc=update        Recovery mode: Setting the partition to be upgraded.
---misc=wipe_userdata Format data partition.
---update             Upgrade mode.
---partition=0xFF00   Set the partition to be upgraded.
-                     0xFF00: 1111 1111 1000 0000.
-                     111111111: loader parameter uboot trust boot recovery rootfs oem misc.
---reboot             Restart the machine at the end of the program.
---version_url=url    The path to the file of version.
---image_url=url      Path to upgrade firmware.
---savepath=url       save the update.img to url.
+*** update_engine: Version V1.1.0 ***.
+--misc=now             Linux A/B mode: Setting the current partition to bootable.
+--misc=other           Linux A/B mode: Setting another partition to bootable.
+--misc=update          Recovery mode: Setting the partition to be upgraded.
+--misc=wipe_userdata   Format data partition.
+--update               Upgrade mode.
+--partition=0x3FFC00   Set the partition to be upgraded.(NOTICE: OTA not support upgrade loader and parameter)
+                       0x3FFC00: 0011 1111 1111 1100 0000 0000.
+                                 uboot trust boot recovery rootfs oem
+                                 uboot_a uboot_b boot_a boot_b system_a system_b.
+                       000000000000000000000000: reserved
+                       100000000000000000000000: Upgrade loader
+                       010000000000000000000000: Upgrade parameter
+                       001000000000000000000000: Upgrade uboot
+                       000100000000000000000000: Upgrade trust
+                       000010000000000000000000: Upgrade boot
+                       000001000000000000000000: Upgrade recovery
+                       000000100000000000000000: Upgrade rootfs
+                       000000010000000000000000: Upgrade oem
+                       000000001000000000000000: Upgrade uboot_a
+                       000000000100000000000000: Upgrade uboot_b
+                       000000000010000000000000: Upgrade boot_a
+                       000000000001000000000000: Upgrade boot_b
+                       000000000000100000000000: Upgrade system_a
+                       000000000000010000000000: Upgrade system_b
+                       000000000000001000000000: Upgrade misc
+                       000000000000000100000000: Upgrade userdata
+--reboot               Restart the machine at the end of the program.
+--version_url=url      The path to the file of version.
+--image_url=url        Path to upgrade firmware.
+--savepath=url         save the update.img to url.
 ```
 
 --misc
@@ -549,13 +645,13 @@ sdboot：走sdboot升级流程，即直接对flash操作，没有分区概念。
 
 --partition=0x0000
 
-设置将要升级的分区，如果缺省，默认值为0x3F00，升级uboot，trust，boot，recovery，rootfs，oem分区。高9位已经使用，低7位为保留位，可扩展使用。
+设置将要升级的分区，如果缺省，默认值为0x3FFC00，升级uboot，trust，boot，recovery，rootfs，oem，uboot_a，uboot_b，boot_a，boot_b，system_a，system_b分区。高16位已经使用，低8位为保留位，可扩展使用。
 
 1：升级，0：不升级
 
-| 位数 | 16     | 15        | 14    | 13    | 12   | 11       | 10     | 9    | 8    | 7~1  |
-| ---- | ------ | --------- | ----- | ----- | ---- | -------- | ------ | ---- | ---- | ---- |
-| 分区 | loader | parameter | uboot | trust | boot | recovery | rootfs | oem  | misc | 保留 |
+| 位数 | 23     | 22        | 21    | 20    | 19   | 18       | 17     | 16   | 15      | 14      | 13     | 12       | 11       | 10       | 9    | 8        | 7~0  |
+| ---- | ------ | --------- | ----- | ----- | ---- | -------- | ------ | ---- | -----   | -----   | ----   | -------- | ------   | ----     | ---- | ----     | ---- |
+| 分区 | loader | parameter | uboot | trust | boot | recovery | rootfs | oem  | uboot_a | uboot_b | boot_a | boot_b   | system_a | system_b | misc | userdata | 保留 |
 
 --reboot
 
@@ -602,15 +698,22 @@ external/recovery/update_engine/update.cpp
 
 ```c
 UPDATE_CMD update_cmd[] = {
-    {"bootloader", false, false, 0, 0, 0, "", flash_bootloader},
-    {"parameter", false, false, 0, 0, 0,"", flash_parameter},
-    {"uboot", false, false, 0, 0, 0,"", flash_normal},
-    {"trust", false, false, 0, 0, 0,"", flash_normal},
-    {"boot", false, true, 0, 0, 0,"", flash_normal},
-    {"recovery", false, false, 0, 0, 0, "", flash_normal},
-    {"rootfs", false, true, 0, 0, 0, "", flash_normal},
-    {"oem", false, false, 0, 0, 0, "", flash_normal},
-    {"misc", false, false, 0, 0, 0, "", flash_normal},
+           {"bootloader" , false , false , 0 , 0 , 0 , "" , flash_bootloader} ,
+           {"parameter"  , false , false , 0 , 0 , 0 , "" , flash_parameter}  ,
+           {"uboot"      , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"trust"      , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"boot"       , false , true  , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"recovery"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"rootfs"     , false , true  , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"oem"        , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"uboot_a"    , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"uboot_b"    , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"boot_a"     , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"boot_b"     , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"system_a"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"system_b"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"misc"       , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
+           {"userdata"   , false , false , 0 , 0 , 0 , "" , flash_normal}     ,
 };
 ```
 
