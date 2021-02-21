@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-357
 
-Release Version: V1.5.0
+Release Version: V1.6.0
 
-Release Date: 2020-08-31
+Release Date: 2021-02-19
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -67,6 +67,7 @@ Software development engineers
 | V1.3.1 | Allen Chen | 2020-07-25 | Correction. |
 | V1.4.0 | Allen Chen | 2020-08-14 | Add introduction on face function changes. |
 | V1.5.0 | Allen Chen | 2020-08-31 | Add introduction about direct connection. |
+| V1.6.0 | Allen Chen | 2021-02-19 | Update introduction about Web player and ISP. |
 
 **Contents**
 
@@ -115,7 +116,7 @@ Auto Login Within One Week: Login without password within 7 days.
 
 Auto Login Within One Month: Login without password within 30 days.
 
-Browser requirements: and_chr 81 / and_ff 68 / and_qq 1.2 / and_uc 12.12 / android 81 / baidu 7.12 / chrome 81 / chrome 80 / chrome 79 / edge 81 / edge 80 / edge 18 / firefox 75 / firefox 74 / firefox 73 / firefox 68 / ios_saf 13.3 / ios_saf 13.2 / ios_saf 12.2-12.4 / kaios 2.5 / op_mini all / op_mob 46 / opera 68 / opera 67 / safari 13 / safari 12.1 / samsung 11.1 / samsung 10.1
+Browser requirements: Chrome 79+，Firefox 68+，Edge 80+，Safari 12.1+.
 
 Remark: using browser that is beyond requirements, part of functions would be disabled.
 
@@ -151,15 +152,21 @@ Use a browser to access the login address, you can see the login address as show
 
 ![preview](resources/preview_en.png)
 
-①Player Menu: Only support playing/pausing/stopping。
+①Switch Stream: Switch stream to play.
 
-②Switch Stream: To be realized.
+②Player menu: Support stop and play.
 
-③Snapshot: Snapshot. Inquire record in review page.
+③Enlarge: Partially enlarge the preview content.
 
-④Recording: Recording switch. When switch on, color of this button would alter to blue. Inquire record in review page.
+④Screenshot: screenshot on web.
 
-⑤PTZ：IPC PTZ. To be realized.
+⑤Snapshot: Snapshot in device. The record can be viewed in the [Snapshot](#Snapshot) (only supported in mainstream).
+
+⑥Recording: Recording switch. When switch on, color of this button would alter to blue. The record can be viewed in the [Video Record](#Video Record) (only supported in mainstream).
+
+⑦PTZ：IPC PTZ. To be realized.
+
+Remark: The player only supports h264 format.
 
 ## Review
 
@@ -465,7 +472,7 @@ The current default encoding is MP2, which only supports input volume adjustment
 
 ②Graphic Options: Set video brightness, contrast, saturation, sharpness.
 
-③Exposure: Currently only supports exposure time and gain adjustment.
+③Exposure: It supports two modes of "Auto Exposure" and "Manual Exposure", and the adjustment of exposure time and gain is supported in manual exposure mode.
 
 ④ICR: Support ICR mode, filter time, adjustment of fill light mode. Sensitivity adjustment has not yet been realized.
 
@@ -475,25 +482,33 @@ Filter Time: It is adjustable from 5 s to 120 s. When the ambient illuminance me
 
 Sensitive: Corresponding night mode to day mode transition threshold. The higher the sensitivity, the easier it is to switch to day mode and the harder it is to switch to night mode; the lower the sensitivity, the easier it is to switch to night mode and the harder it is to switch to day mode.
 
-⑥BLC: Set the white balance mode, support "Manual White Balance", "Auto White Balance 1", "Locking White Balance", "Fluorescent Light", "Incandescent", "Warm Light" and "Natural Light".
+Note: After configuring other modes and then configuring automatic mode, automatic mode cannot be used for automatic switching.
+
+⑤Backlight: Support HDR and HDR level configuration.
+
+HDR: It can better reflect the visual effects in the real environment.
+
+⑥BLC: Set the white balance mode, support "Manual White Balance", "Auto White Balance".
 
 Manual White Balance: Support Red, Blue gain adjustment in this mode.
 
-Locking White Balance: In this mode, the current color correction matrix will be locked.
+⑦Image Enhancement: Set DNR, Dehaze, Gray Range, Correction。
 
-If the actual using scene is a fixed light type, you can choose the last four options according to the actual situation.
-
-⑦Image Enhancement: Set DNR, Dehaze, Gray Range, FEC。
-
-DNR: Reduce image noise. In normal mode, adjust the noise reduction level. In expert mode, time domain and spatial domain noise reduction can be set.
+DNR: Reduce image noise. Support time domain noise reduction, air domain noise reduction and comprehensive noise reduction.
 
 Dehaze: You can choose "On" and "Off". After turning on this function, you can improve the visibility of objects in the water mist weather video screen to a certain extent.
 
 Gray Range: "[0-255]" and "[16-235]" can be selected, and users can select the grayscale range of the video encoding according to actual needs.
 
-FEC: You can choose "on" and "off". After turning on this function, the distortion of the screen edge can be reduced to a certain extent.
+Correction: Support LDCH and FEC correction.
 
-⑧Video Adjustment: Only the Video Standard is currently supported.
+LDCH: Distortion correction in the horizontal direction supports adjustment of the correction level.
+
+FEC: Distortion correction in horizontal and vertical directions, support adjustment of correction level.
+
+⑧Video Adjustment: Support the adjustment of video standard and the configuration of video mirroring mode.
+
+Mirror: Support flip, mirror, center symmetrical mode configuration.
 
 #### OSD
 
@@ -515,11 +530,9 @@ Character overlay currently only supports the setting of two overlay areas, and 
 
 <img src="resources/privacy_en.png" alt="privacy" style="zoom: 50%;" />
 
-Drawing: Draw the occluded area of the video, currently at most 1 area is drawn, and it is planned to draw at most 4 areas.
+Drawing: Draw the occluded area of the video. Currently, only 1 area is supported.
 
 Del: Clear the drawing frame in the current area.
-
-Remark: Currently only the first drawing area takes effect.
 
 #### Picture Mask
 
