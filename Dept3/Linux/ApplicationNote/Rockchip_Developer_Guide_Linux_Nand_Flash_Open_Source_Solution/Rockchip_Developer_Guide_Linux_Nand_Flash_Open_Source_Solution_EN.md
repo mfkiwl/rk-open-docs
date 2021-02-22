@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-314
 
-Release Version: V2.1.0
+Release Version: V2.1.1
 
-Release Date: 2021-01-27
+Release Date: 2021-02-22
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -45,7 +45,7 @@ Rockchip SDKs use closed-source miniloader to load trust and u-boot by default. 
 | **Chipset**     | **Kernel version**   |
 | --------------- | :------------------- |
 | RK3308          | Linux 4.4, Linux4.19 |
-| RK1126 & RK1109 | Linux 4.19           |
+| RV1126 & RV1109 | Linux 4.19           |
 
 **Intended Audience**
 
@@ -66,6 +66,7 @@ Software development engineers
 | V2.0.0      | Jon Lin    | 2020-10-19 | Improve the driver configuration and other details |
 | V2.0.1 | Jon Lin | 2020-11-27 | Add UBIFS multi volume support, increase or decrease ubiattach parameter description |
 | V2.1.0 | Jon Lin | 2021-01-27 | Add more UBIFS support |
+| V2.1.1 | CWW | 2021-02-22 | Update the format of the document |
 
 ---
 
@@ -995,7 +996,7 @@ Note:
 **Input Files：SDK Output Files For PC Tools**
 
 ```shell
-➜  [/IMAGES] tree
+[/IMAGES] tree
 .
 ├── parameter.txt               // generate gpt.img
 ├── MiniLoaderAll.bin           // generate idblock.img
@@ -1028,7 +1029,7 @@ e.g： rv1126 block size 128KB flash:
 **output  files: Using For Flash Programmer **
 
 ```
-➜  [/out] tree
+[/out] tree
 .
 └── 2048B_128KB
     ├── gpt.img
@@ -1082,7 +1083,7 @@ Table Note：
 **Input Files：SDK Output Files For PC Tools**
 
 ```shell
-➜  [/IMAGES] tree
+[/IMAGES] tree
 .
 ├── parameter.txt               // generate gpt.img
 ├── MiniLoaderAll.bin           // generate idblock.img
@@ -1117,7 +1118,7 @@ e.g： rv1126 block size 128KB flash page size 2KB  oob size 64B flash:
 **output  files: Using For Flash Programmer**
 
 ```
-➜  [/out] tree
+[/out] tree
 .
 └── 2048B_128KB
     ├── gpt.img
