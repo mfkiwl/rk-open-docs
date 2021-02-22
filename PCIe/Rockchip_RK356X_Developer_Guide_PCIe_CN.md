@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.5.0
+发布版本：V1.6.0
 
-日期：2021-02-06
+日期：2021-02-23
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -60,14 +60,15 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**                         |
-| ---------- | -------- | -------- | ------------------------------------ |
-| 2021-01-15 | V1.0.0   | 林涛     | 初始版本                             |
-| 2021-01-22 | V1.1.0   | 林涛     | 增加PCIe 3.0控制器异常情况的检查信息 |
-| 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息   |
-| 2021-02-04 | V1.3.0   | 林涛     | 增加MSI和MSI-X支持数量的问题描述     |
-| 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                 |
-| 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明          |
+| **日期**   | **版本** | **作者** | **修改说明**                              |
+| ---------- | -------- | -------- | ----------------------------------------- |
+| 2021-01-15 | V1.0.0   | 林涛     | 初始版本                                  |
+| 2021-01-22 | V1.1.0   | 林涛     | 增加PCIe 3.0控制器异常情况的检查信息      |
+| 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息        |
+| 2021-02-04 | V1.3.0   | 林涛     | 增加MSI和MSI-X支持数量的问题描述          |
+| 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                      |
+| 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明               |
+| 2021-02-23 | V1.6.0   | 林涛     | 增加MSI/MSI-X调试支持和运行态设备异常说明 |
 
 ---
 
@@ -437,3 +438,56 @@ writel(val,priv->mmio + (0xd << 2));
 ```
 
 如常用应用问题Q4所述，RK356X的PCIe地址空间有限制。此log表明21号总线外设向RK356X申请3GB的64bit memory空间，超出了限制导致无法分配资源。若为市售设备，将不受RK356X芯片支持；若为定制设备，请联系设备vendor确认是否可以修改其BAR空间容量编码。
+
+5. **MSI/MSI-X无法使用**
+
+在移植外设驱动的开发过程中(主要指的是WiFi)，认为主机端的function driver因无法使用MSI或者MSI-X中断而导致流程不正常，按如下流程进行排查
+
+- 确认前述menuconfig 中提到的配置，尤其是MSI相关配置是否都有正确勾选
+
+- 确认rk3568.dtsi中，its节点是否被设置为disabled
+
+- 执行lspci -vvv，查看对应设备的MSI或者MSI-X是否有支持并被使能。以此设备为例，其上报的capabilities显示其支持32个64 bit MSI，目前仅使用1个，但是  Enable-表示未使能。若正确使能应该看到Enable+， 且Address应该能看到类似为0x00000000fd4400XX的地址。此情况一般是设备驱动还未加载或者加载时申请MSI或者MSI-X失败导致，请参考其他驱动，使用pci_alloc_irq_vectors等函数进行申请，详情可结合其他成熟的PCIe外设驱动做法以及参考内核中的Documentation/PCI/MSI-HOWTO.txt文档进行编写和排查异常。
+
+```
+Capabilities: [58] MSI: Enable- Count=1/32 Maskable- 64bit+
+                Address: 0000000000000000  Data: 0000
+```
+
+- 如果MSI或者MSI-X有正确申请，可用如下命令导出中断计数，查看是否正常： cat /proc/interrupts 。在其中找到对应驱动申请的ITS-MSI中断(依据最后一列申请者驱动名称，例如此处为xhci_hcd驱动申请了这些MSI中断)。理论上每一笔的通信传输都会增加ITS，如果设备没有通信或者通信不正常，就会看到中断计数为0，或者有数值但发起通信后不再增加中断计数的情况。
+
+```
+229: 0 0 0 0 0 0 ITS-MSI 524288 Edge xhci_hcd
+```
+
+- 如果是概率性事件导致function driver无法收到MSI或者MSI-X中断，可以进行如下尝试。首先执行cat /proc/interrupts 查看相应中断号，以上述229为例，将中断迁移导其他CPU测试。例如切换导CPU2，则使用命令echo 2 > /proc/irq/229/smp_affinity_list 。
+
+- 使用协议分析仪器抓取协议信号，查看流程中外设是否有概率性没有向主机发送MSI或者MSI-X中断，而导致的异常。需注意，目前协议分析仪一般都难以支持焊贴设备的信号采集，需向设备vendor购买金手指的板卡，在我司EVB上进行测试和信号采集。另需注意我司EVB仅支持标准接口的金手指板卡，若待测设备为M.2接口的设备(常见key A, key B, key M三种类型)，请采购使用对应型号的转接板。
+
+6. **外设枚举后通信过程中报错**
+
+以下是NVMe在RK3566-EVB2上进行正常枚举之后，通信过程中突然设备异常报错的log。不论是什么设备，如果可以正常枚举并使能，则可以看到类似nvme 0000:01:00.0: enabling device (0000 -> 0002)的log。此后通信过程中设备报错，需要考虑如下三个方面：
+
+- 利用示波器测量触发外设的电源，排除是否有跌落的情况发生
+- 利用示波器测量触发外设的#PERST信号，排除是否被人误操作导致设备被复位的情况发生
+- 利用示波器测量触发PCIe PHY的0v9和1v8两路电源，排除是否PHY的电源异常
+
+特别提醒：RK EVB有较多的信号复用，利用拨码将PCIe的#PERST控制信号和其他外设的IO进行复用，请配合硬件重点确认。例如目前已知有部分RK3566-EVB2的拨码有异常，需要修正。
+
+```
+[    2.426038] pci 0000:00:00.0:   bridge window [mem 0x300900000-0x3009fffff]
+[    2.426183] pcieport 0000:00:00.0: of_irq_parse_pci: failed with rc=-22
+[    2.427493] pcieport 0000:00:00.0: Signaling PME with IRQ 106
+[    2.427712] pcieport 0000:00:00.0: AER enabled with IRQ 115
+[    2.427899] pcieport 0000:00:00.0: of_irq_parse_pci: failed with rc=-22
+[    2.428202] nvme nvme0: pci function 0000:01:00.0
+[    2.428259] nvme 0000:01:00.0: enabling device (0000 -> 0002)
+[    2.535404] nvme nvme0: missing or invalid SUBNQN field.
+[    2.535522] nvme nvme0: Shutdown timeout set to 8 seconds
+...
+[   48.129408] print_req_error: I/O error, dev nvme0n1, sector 0
+[   48.137197] nvme 0000:01:00.0: enabling device (0000 -> 0002)
+[   48.137299] nvme nvme0: Removing after probe failure status: -19
+[   48.147182] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[   48.162900] nvme nvme0: failed to set APST feature (-19)
+```
