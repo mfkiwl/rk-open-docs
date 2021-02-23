@@ -1,4 +1,4 @@
-# Rockchip DSP 开发指南
+# Rockchip RTOS DSP 开发指南
 
 文件标识：RK-KF-YF-302
 
@@ -139,7 +139,7 @@ Ubuntu 64bit 版本系统，我们推荐的工具安装包为“Xplorer-8.0.8-li
 
 因为配置包为32bit，为了兼容64bit系统，需要执行以下命令：
 
-```
+```shell
 sudo apt-get install libgtk2.0-0:i386 gtk2-engines:i386 libc6:i386 libcanberra-gtk3-0:i386 libxtst6:i386 libncurses5:i386
 sudo dpkg --add-architecture i386
 sudo apt-get update
