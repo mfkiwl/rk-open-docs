@@ -34,6 +34,7 @@ Rockchip PWM 支持三种模式: **Continuous mode**、**One-shot mode** 和 **C
 | ---------- | ------ | ------ | -------- |
 | 2019.01.28 | V1.0   | 吴达超 | 初始发布 |
 | 2019.11.14 | V2.0   | 吴达超 | 支持Linux4.19  |
+| 2021.02.24 | V2.1   | 刘诗舫 | 增加正文对Linux4.19的说明  |
 
 ---
 [TOC]
@@ -45,11 +46,11 @@ Rockchip PWM 支持三种模式: **Continuous mode**、**One-shot mode** 和 **C
 
 驱动文件所在位置：
 drivers/pwm/pwm-rockchip.c
-3.10 和 4.4 版本内核下驱动文件名字是同一个，pwm-rockchip.c 只支持 Continuous mode，但是里面的代码有些差别。4.4 内核版本将 pwm_config()，pwm_enable() 和 pwm_disable() 包装在 pwm_apply_state() 函数里面，这样做的好处是可以一次改变几个 PWM 参数，3.10 内核的 PWM 驱动还是原来的接口。
+3.10 和 4.4 及以上版本内核下驱动文件名字是同一个，pwm-rockchip.c 只支持 Continuous mode，但是里面的代码有些差别。4.4 及以上内核版本将 pwm_config()，pwm_enable() 和 pwm_disable() 包装在 pwm_apply_state() 函数里面，这样做的好处是可以一次改变几个 PWM 参数，3.10 内核的 PWM 驱动还是原来的接口。
 
 ### DTS 节点配置
 
-内核 3.10 版本和 4.4 版本的 DTS 节点，略有不同的地方在配置的参数个数上，内核 3.10 版本配置的参数数目为 2，内核 4.4 版本配置的参数数目为 2 或者 3；参数数目与 PWM 节点中的 “pwm-cells” 对应，如果 “pwm-cells” 配置是 3，则需要配置可选的极性；如果是 2，就不需要配置极性。
+内核 3.10 版本和 4.4 版本的 DTS 节点，略有不同的地方在配置的参数个数上，内核 3.10 版本配置的参数数目为 2，内核 4.4 版本配置的参数数目为 2 或者 3；参数数目与 PWM 节点中的 “pwm-cells” 对应，如果 “pwm-cells” 配置是 3，则需要配置可选的极性；如果是 2，就不需要配置极性。内核4.19版本的DTS节点配置与4.4相同。
 DTS 配置参考文档 Documentation/devicetree/bindings/pwm/pwm.txt，主要几个参数说明下:
 
 - 参数 1，表示 index  (per-chip index of the PWM to request)，一般是 0，因为我们 Rockchip PWM 每个 chip 只有一个。
@@ -65,7 +66,7 @@ DTS 配置参考文档 Documentation/devicetree/bindings/pwm/pwm.txt，主要几
 
 ## PWM 流程
 
-PWM 驱动流程在内核 3.10 版本和内核 4.4 版本两个驱动上大致是一样，上面说了只是接口包装的区别，所以本文只说一个 4.4 的流程。
+PWM 驱动流程在不同内核版本上大致是一样的，以内核 4.4 为例。
 
 ![pwm-flow](Rockchip_Developer_Guide_PWM/pwm-flow.png)
 
