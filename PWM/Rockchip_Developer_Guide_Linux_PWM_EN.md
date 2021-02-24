@@ -1,28 +1,28 @@
-# **PWM Develop Guide**
+# PWM Develop Guide
 
 ID: RK-KF-YF-28
 
-Release Version: V2.0.0
+Release Version: V2.1.0
 
-Release Date: 2019-11-14
+Release Date: 2021-02-24
 
-Security Level: Non-confidential
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
 ---
 
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
-“Rockchip”, “瑞芯微”, “瑞芯” shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -66,6 +66,7 @@ Software development engineers
 | ----------- | ---------- | :--------- | ---------------------- |
 | V1.0.0      | David Wu   | 2019-01-28 | Initial version        |
 | V2.0.0      | David Wu   | 2019-11-14 | Support Linux4.19      |
+| V2.1.0      | Steven Liu | 2021-02-24 | Add description of Linux4.19 |
 
 **Content**
 
@@ -79,11 +80,11 @@ Software development engineers
 
 The driver file is in: `drivers/pwm/pwm-rockchip.c`
 
-The names of the driver files in the 3.10 and 4.4 kernels are the same. `Pwm-rockchip.c` only supports Continuous mode, but the code inside is slightly different. The 4.4 kernel version wraps `pwm_config()`, `pwm_enable()` and `pwm_disable()` in the `pwm_apply_state()` function. The advantage is that several PWM parameters can be changed at a time and the kernel 3.10 PWM driver still keep the original interface.
+The names of the driver files in the 3.10 and 4.4 and above kernels are the same. `Pwm-rockchip.c` only supports Continuous mode, but the code inside is slightly different. The 4.4 kernel version wraps `pwm_config()`, `pwm_enable()` and `pwm_disable()` in the `pwm_apply_state()` function. The advantage is that several PWM parameters can be changed at a time and the kernel 3.10 PWM driver still keep the original interface.
 
 ### DTS Node Configuration
 
-The different  of Kernel 3.10 and 4.4 DTS nodes is the number of parameters, parameter number in kernel 3.10 is 2, while in kernel 4.4 is 3. The number of parameters is the same as that of the PWM node `pwm-cells`, if the `pwm-cells` configuration is 3, you need to configure the optional polarity; if it is 2, you do not need to configure the polarity.
+The different  of Kernel 3.10 and 4.4 DTS nodes is the number of parameters, parameter number in kernel 3.10 is 2, while in kernel 4.4 is 3. The number of parameters is the same as that of the PWM node `pwm-cells`, if the `pwm-cells` configuration is 3, you need to configure the optional polarity; if it is 2, you do not need to configure the polarity. The DTS node configuration of kernel 4.19 is the same as 4.4.
 DTS configuration reference document `Documentation/devicetree/bindings/pwm/pwm.txt`, the main parameters are explained below:
 
 - Parameter 1, which indicates the index (per-chip index of the PWM to request), which is theoretically 0, because each PWM has only one channel.
@@ -99,7 +100,7 @@ DTS configuration reference document `Documentation/devicetree/bindings/pwm/pwm.
 
 ## PWM Flow
 
-The PWM driver process is roughly the same for the two drivers in kernel version 3.10 and kernel version 4.4. The difference is in interface packaging as described above, so here only describes kernel 4.4 process.
+The PWM driver process is roughly the same on different kernel versions, take kernel 4.4 as an example.
 
 ![pwm-flow](Rockchip_Developer_Guide_PWM/pwm-flow.png)
 
