@@ -1,42 +1,76 @@
-# **CPUFreq Developer Guide**
+# CPUFreq Developer Guide
 
-Release version：1.0
+ID: RK-KF-YF-008
 
-E-mail：finley.xiao@rock-chips.com
+Release Version: V1.1.1
 
-Release Date：2019.11.06
+Release Date: 2021-02-25
 
-Classifed Level：Publicity
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
------
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
 
 **Preface**
 
+**Overview**
+
 This document mainly describes the related concepts, configuration methods and user interface of CPUFreq.
 
-**Chipset Version**
+**Product Version**
 
-| Chipset Name | Kernel Version      |
-| ------------ | ------------------- |
-| All chipsets | Linux4.4, Linux4.19 |
+| **Chipset**               | **Kernel Version**  |
+| ------------------------- | ------------------- |
+| All chipsets of  Rockchip | Linux4.4, Linux4.19 |
 
-**Applicable Object**
+**Intended Audience**
 
-Field application engineers
+This document (this guide) is mainly intended for:
+
+Technical support engineers
 
 Software development engineers
 
-**Revision history**
+---
 
-| Realease Date | Verion | Author      | Revision Description |
-| ------------- | ------ | ----------- | -------------------- |
-| 2018-12-04    | V1.0   | Finley Xiao | The initial version  |
+**Revision History**
 
------
+| **Version** | **Author**  | **Date**   | **Change Description**      |
+| ----------- | ----------- | :--------- | --------------------------- |
+| V1.0.0      | Finley Xiao | 2018-12-04 | Initial version             |
+| V1.1.0      | Finley Xiao | 2019-11-14 | Add content about Linux4.19 |
+| V1.1.0      | Karen Huang | 2021-01-21 | Modify format               |
+
+---
+
+**Contents**
 
 [TOC]
 
------
+---
 
 ## Overview
 
@@ -59,8 +93,6 @@ CPUFreq core：Encapsulate and abstract the cpufreq governors, cpufreq drivers a
 CPUFreq driver：Use to initialize the CPU frequency table and set CPU frequency.
 
 CPUFreq stats：Provide statistics about cpufreq.
-
------
 
 ## Code Path
 
@@ -94,8 +126,6 @@ drivers/cpufreq/cpufreq-dt.c                  /* platform driver */
 drivers/cpufreq/rockchip-cpufreq.c            /* platform device */
 drivers/soc/rockchip/rockchip_opp_select.c    /* interface for changing opp */
 ```
-
------
 
 ## Configuration
 
@@ -631,8 +661,6 @@ cpu0_opp_table: opp_table0 {
 }
 ```
 
------
-
 ## User Interface Introduction
 
 Non-big.Little platforms, such as RK3288, RK3326, RK3328, all cores share one clock and have the same user interface "/sys/devices/system/cpu/cpufreq/policy0/ ".
@@ -659,8 +687,6 @@ stats/time_in_state           /* record work time at each frequency, unit is 10m
 stats/total_trans             /* record frequency scaling times */
 stats/trans_table             /* record frequency scaling times of each frequency */
 ```
-
------
 
 ## FAQ
 
@@ -990,7 +1016,7 @@ dmesg | grep leakage
 
 ### How to Check Current Leakage
 
-​ Input command below
+ Input command below
 
 ```c
 dmesg | grep leakage
