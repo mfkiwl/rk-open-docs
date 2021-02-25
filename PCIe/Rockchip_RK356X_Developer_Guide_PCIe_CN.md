@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.6.0
+发布版本：V1.7.0
 
-日期：2021-02-23
+日期：2021-02-26
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -69,6 +69,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                      |
 | 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明               |
 | 2021-02-23 | V1.6.0   | 林涛     | 增加MSI/MSI-X调试支持和运行态设备异常说明 |
+| 2021-02-26 | V1.7.0   | 林涛     | 增加Legacy INT的说明                      |
 
 ---
 
@@ -254,12 +255,37 @@ msi-map = < bus-range中的起始地址 << 16
 依此类推，且一定要保证三个控制器的bus-range和msi-map互不重叠，且bus-range和msi-map相互适配。
 
 **Q7**：如何确定PCIe设备的链路状态？
-A7: 请使用服务器发布的lspci工具，执行lspci -vvv，找到对应设备的linkStat即可查看；其中Speed为速度，
 
-Width即为lane数。如需要解析其他信息，请查找搜索引擎，对照查看。
+A7: 请使用服务器发布的lspci工具，执行lspci -vvv，找到对应设备的linkStat即可查看；其中Speed为速度，Width即为lane数。如需要解析其他信息，请查找搜索引擎，对照查看。
 
 **Q8**：如何确定SoC针对PCIe设备可分配的MSI或者MSI-X数量？
+
 A8: SoC针对每个PCIe设备可分配的数量由中断控制器的资源决定。3566和3568上，针对PCIe2.0和PCIe3.0控制器的下游设备，可分配的MSI或者MSI-X总数均是65535个。
+
+**Q9**：是否支持Legacy INT方式？如何强制使用Legacy INTA ~ INTD的中断？
+
+A9: 支持legacy INT方式。但Linux PCIe协议栈默认的优先级是MSI-X, MSI, Legacy INT，因此常规市售设备不会去申请Legacy INT。若调试测试需要，请参考内核中Documentation/admin-guide/kernel-parameters.txt文档，其中"pci=option[,option...]  [PCI] various PCI subsystem options."描述了可以在cmdline中关闭MSI，则系统默认会强制使用Legacy INT分配机制。以RK356X安卓平台为例，可在arch/arm64/boot/dts/rockchip/rk3568-android.dtsi的cmdline参数中额外添加一项pci=nomsi，注意前后项需空格隔开：
+
+```c
+bootargs = "...... pci=nomsi ......";
+```
+
+如果添加成功，则lspci -vvv可以看到此设备的MSI和MSI-X都是处于关闭状态(Enable-)，而分配了INT A中断，中断号是80。cat /proc/interrupts可查看到80中断的状态。
+
+```
+01:00.0 Class 0108: Device 14a4:22f1 (rev 01) (prog-if 02)
+        Subsystem: Device 1b4b:1093
+...
+        Interrupt: pin A routed to IRQ 80
+...
+        Capabilities: [50] MSI: Enable- Count=1/1 Maskable+ 64bit+
+                Address: 0000000000000000  Data: 0000
+                Masking: 00000000  Pending: 00000000
+...
+        Capabilities: [b0] MSI-X: Enable- Count=19 Masked-
+                Vector table: BAR=0 offset=00002000
+                PBA: BAR=0 offset=00003000
+```
 
 ## 芯片互联功能
 
