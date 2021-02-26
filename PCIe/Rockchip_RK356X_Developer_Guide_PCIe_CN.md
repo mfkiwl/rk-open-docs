@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.7.0
+发布版本：V1.8.0
 
-日期：2021-02-26
+日期：2021-02-27
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -70,6 +70,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明               |
 | 2021-02-23 | V1.6.0   | 林涛     | 增加MSI/MSI-X调试支持和运行态设备异常说明 |
 | 2021-02-26 | V1.7.0   | 林涛     | 增加Legacy INT的说明                      |
+| 2021-02-27 | V1.8.0   | 林涛     | 增加标注EP功能件开发说明                  |
 
 ---
 
@@ -350,6 +351,37 @@ CONFIG_DEBUG_FS=y
 cat /sys/kernel/debug/pcie/pcie_trx
 cat /proc/interrups | grep pcie
 ```
+
+## 标准EP功能件开发
+
+将RK3568 PCIe接口作为EP设备与任意RK芯片互联，推荐使用我司提供的互联模型，性能与稳定性等均可得到有效的保证，详情可查看“芯片互联功能”章节。若熟悉PCIe EP设备驱动开发的技术人员需要使用RK3568对接封闭芯片系统(如x86)，或者希望自行开发标准EP业务流程的，可参考本节内容进行二次开发。
+
+标准EP功能件开发需要三个功能组件：
+
+- RC端运行的针对RK3568 EP设备的function driver, 其功能是负责在RC系统中申请bar空间对应的虚拟内存，管理数据业务，注册处理各类中断，提供更上层业务态的业务接口。
+- EP端(本例指RK3568芯片)运行的firmware driver, 其功能是负责配置bar内存的inbound和outbound，提供DMA完成EP端与RC端内存数据搬移等功能。
+- 快速建立链路的loader: 负责配置class code, ID, 修改bar需求大小以及迅速建立链路连接；因为例如x86的BIOS扫描总线时间较短，需要提前准备链路。
+
+由于开发技术难度较高，我们提供了可运行的全部demo，希望降低阅读者二次开发的难度。此demo可以将RK3568芯片模拟成一个memory controller, 可对接任何芯片平台的linux系统。以x86为例，执行sudo lspci可以看到我司设备：
+
+```
+lt-HP-ProDesk-400-G5 -NT-ID5-APD:~$ sudo lspci
+[sudo] password for lt:
+00:00.0 Hest bridge: Intel Corporaton 8th Gen Core Processor Host Brldge/RAN Regtsters
+00:02.0 VGA compatible controller: Intel Corporation UHD Graphics 630 (Desktop)
+
+...
+
+02:00.0 Memory controller: Fuzhou Rockchip Electronics co. Ltd Device 356a Crev 01)
+```
+
+在RC端加载function driver模块之后，将出现/dev/rk-rmd设备节点，可使用echo/cat访问此节点。访问该节点实际将访问到EP端(本例指RK3568)的内存，而EP端被访问的内存地址在EP端的firmware driver中可配置。利用本demo可以实现最原始的数据交互，为封装更上层业务态提供支持。内部开发工程师如需运行标准EP功能件的程序以及参考代码，可以直接访问<https://redmine.rock-chips.com/issues/281070>。 客户需取得redmine中对应项目的权限后，联系FAE中心获取。
+
+注意事项：
+
+- 对接x86设备时需要注意，由于较多市售x86设备主板的x16的插槽默认不支持低于4-lane的设备，烦请设计成x1的金手指接入其x1的槽。
+- EP端的系统供电通过金手指由RC的PCIe插槽上提供，并将金手指的#PERST接到EP设备主控的PMU复位信号上，使得RC端可以控制它插槽上的#PERST信号，对EP进行芯片级的复位控制。
+- EP端金手指的#PRSENT信号需要正确布置成x1模式。
 
 ## 异常排查
 
