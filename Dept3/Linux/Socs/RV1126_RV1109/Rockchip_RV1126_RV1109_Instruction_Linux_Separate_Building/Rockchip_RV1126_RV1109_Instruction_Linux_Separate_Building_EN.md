@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-386
 
-Release Version: V1.6.1
+Release Version: V1.6.2
 
-Release Date: 2021-02-18
+Release Date: 2021-03-01
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -71,6 +71,7 @@ This document (this guide) is mainly intended for:
 | 2020-12-08 | V1.5.1 | CWW  | 1. Fix insmod driver module |
 | 2021-01-14 | V1.6.0 | CWW  | 1. Update manufacture programmer firmware image |
 | 2021-02-18 | V1.6.1 | CWW  | 1. Update BSP library |
+| 2021-03-01 | V1.6.2 | CWW  | 1. Update CIF driver module to clear unready dev |
 
 ---
 
@@ -237,6 +238,7 @@ insmod kernel/drivers/media/platform/rockchip/cif/video_rkcif.ko
 insmod kernel/drivers/media/platform/rockchip/isp/video_rkisp.ko
 insmod kernel/drivers/media/platform/rockchip/ispp/video_rkispp.ko
 echo 1 > /sys/module/video_rkisp/parameters/clr_unready_dev
+echo 1 > /sys/module/video_rkcif/parameters/clr_unready_dev
 
 # insmod vcodec
 insmod kernel/drivers/video/rockchip/mpp/rk_vcodec.ko
