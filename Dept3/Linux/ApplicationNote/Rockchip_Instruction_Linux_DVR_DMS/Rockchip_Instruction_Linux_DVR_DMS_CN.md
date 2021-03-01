@@ -1,4 +1,4 @@
-# Rockchip DVR&DRM 产品方案使用说明
+# Rockchip DVR&DMS 产品方案使用说明
 
 文件标识：RK-SM-YF-398
 
@@ -44,7 +44,7 @@ Rockchip Electronics Co., Ltd.
 
  **概述**
 
- DVR&DRM 产品方案使用说明。
+ DVR&DMS 产品方案使用说明。
 
 **产品版本**
 
