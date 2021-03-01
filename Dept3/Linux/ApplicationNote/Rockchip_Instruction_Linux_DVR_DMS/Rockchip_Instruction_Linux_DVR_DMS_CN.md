@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-398
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2021-01-30
+日期：2021-03-01
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者**                            | **修改说明** |
 | ---------- | -------- | :---------------------------------- | ------------ |
 | 2021-01-31 | V1.0.0   | Vicent Chi, Zhihua Wang, Zhichao Yu | 初始版本     |
+| 2021-03-01 | V1.0.1   | Vicent Chi | 添加MIPI+DVP方案描述     |
 
 ---
 
@@ -211,19 +212,19 @@ nvp6188_1->csi_dphy1->isp0
 
 ```
 
-**MIPI+DVP方案，开发中...**
+**MIPI+DVP方案**
 
-以双片NVP6188为例：
+以TP9930+TP2855为例：
 
 - VICAP通路0
 
 ```flow
 
-nvp6188_0=>start: nvp6188_0
+tp2855=>start: tp2855
 csi_dphy0=>operation: csi_dphy0
 mipi_csi2=>operation: mipi_csi2
 rkcif_mipi_lvds=>end: rkcif_mipi_lvds
-nvp6188_0->csi_dphy0->mipi_csi2->rkcif_mipi_lvds
+tp2855->csi_dphy0->mipi_csi2->rkcif_mipi_lvds
 
 ```
 
@@ -231,9 +232,9 @@ nvp6188_0->csi_dphy0->mipi_csi2->rkcif_mipi_lvds
 
 ```flow
 
-nvp6188_1=>start: nvp6188_1
+tp9930=>start: tp9930
 rkcif_dvp_multi=>operation: rkcif_dvp_multi
-nvp6188_1->rkcif_dvp_multi
+tp9930->rkcif_dvp_multi
 
 ```
 
