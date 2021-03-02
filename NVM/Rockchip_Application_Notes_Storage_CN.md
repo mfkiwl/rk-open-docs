@@ -2,9 +2,9 @@
 
 文件标识:  RK-SM-YF-017
 
-发布版本：1.0.0
+发布版本：1.1.0
 
-日期：2020-08-25
+日期：2021-03-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -71,9 +71,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本号** | **作者**       | **修改日期** | **修改说明** |
-| ---------- | -------------- | :----------- | ------------ |
-| V1.00      | 赵仪峰、林鼎强 | 2018-08-25   | 初始版本     |
+| **版本号** | **作者**       | **修改日期** | **修改说明**       |
+| ---------- | -------------- | :----------- | ------------------ |
+| V1.00      | 赵仪峰、林鼎强 | 2018-08-25   | 初始版本           |
+| V1.10      | 赵仪峰         | 2021-03-02   | 增加RK3566和RK3568 |
 
 ---
 
@@ -116,6 +117,7 @@ graph LR
 | RK3328        | Y             | N             | Y<sup>*1</sup>    | Y           | Y              |
 | RK3368/PX5    | Y             | Y             | Y<sup>*1</sup>    | Y           | Y<sup>*1</sup> |
 | RK3399        | Y             | N             | Y<sup>*1</sup>    | Y           | Y              |
+| RK3568/RK3566 | Y             | Y             | Y                 | Y           | Y              |
 
 *1： 芯片硬件支持，SDK release 开发包未做支持。
 
@@ -144,6 +146,7 @@ graph LR
 | RKPX30        | 70bits TLC MLC SLC |      |      |      | Boot | SD 3.0 | SDIO 3.0 | HS200       |               |               |
 | RK1608        | -                  | Boot | -    | -    | -    | -      | -        | -           |               |               |
 | RK1808        | -                  |      |      |      | Boot | -      | -        | HS200       |               |               |
+| RK3568 RK3566 | 70bits TLC MLC SLC |      |      |      | Boot | SD 3.0 | SDIO 3.0 | HS200       | 2.0 HOST      | 3.0 OTG HOST  |
 
 备注：表格中SPIx 和 SFC 有 Boot 标识的表示 BOOTROM 可以从对应的 SPI/SFC 接口启动。
 
@@ -201,6 +204,8 @@ graph TB
 | RK1608    | SPI SLAVE     | SPI NOR(SPI2)  | SPI NAND(SPI2) | --             | --   | --   |
 | RK1808    | SPI SLAVE     | SPI NOR(SFC)   | SPI NAND(SFC)  | EMMC           | USB  | --   |
 | RK3399PRO | SPI NOR(SPI2) | SPI NAND(SPI2) | EMMC           | SD0            | USB  | --   |
+| RK3568    | SPI NOR(SFC)  | SPI NAND(SFC)  | NAND           | EMMC           | SD0  | USB  |
+| RK3566    | SPI NOR(SFC)  | SPI NAND(SFC)  | NAND           | EMMC           | SD0  | USB  |
 
 ### Pre Loader 流程
 
