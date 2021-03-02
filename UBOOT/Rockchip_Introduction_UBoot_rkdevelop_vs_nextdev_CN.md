@@ -1,12 +1,42 @@
 # U-Boot next-dev 和 rkdevelop 的差异化
 
-发布版本：1.1
+文件标识：RK-SM-YF-134
 
-作者邮箱：chenjh@rock-chips.com
+发布版本：V1.1.1
 
-日期：2019.11
+日期：2021-03-02
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
+
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有 © 2021 瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -14,13 +44,13 @@
 
 **概述**
 
-​	Rockchip 平台上的 U-Boot 目前存在两个分支版本：rkdevelop（v2014-10）和 next-dev（v2017-09）。本文仅对这两个分支的状况和差异化进行概要说明，意在让读者能了解二者之间的概况。
+Rockchip 平台上的 U-Boot 目前存在两个分支版本：rkdevelop（v2014-10）和 next-dev（v2017-09）。本文仅对这两个分支的状况和差异化进行概要说明，意在让读者能了解二者之间的概况。
 
 **产品版本**
 
-| 芯片名称                                                     | 内核版本  |
-| ------------------------------------------------------------ | --------- |
-| RK3036/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3368/RK3399/PX 系列 | 3.10、4.4 |
+| **芯片名称** | **U-Boot版本** |
+| ------------ | -------------- |
+| 所有芯片 | next-dev/rkdevelop |
 
 **读者对象**
 
@@ -30,16 +60,17 @@
 
 软件开发工程师
 
-**产品版本**
-
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**     |
-| ---------- | -------- | -------- | ---------------- |
-| 2018-02-28 | V1.0     | 陈健洪   | 初始版本         |
-| 2019-11-12 | V1.1     | 陈健洪   | 增加产品版本列表 |
+| **版本号** | **作者** | **修改日期** | **修改说明**                                 |
+| ---------- | -------- | :----------- | ------------- |
+| V1.0.0     | 陈健洪     | 2018-02-28   | 初始版本      |
+| V1.1.0     | 陈健洪     | 2019-11-12   | 增加产品版本列表 |
+| V1.1.1     | 黄莹     | 2021-03-02   | 修改格式        |
 
 ---
+
+**目录**
 
 [TOC]
 
@@ -47,11 +78,11 @@
 
 ## Rockchip U-Boot 概况
 
-​	Rockchip 平台的 U-Boot 目前存在两个版本，旧的版本是 rkdevelop 分支，新的版本是 next-dev 分支。
+Rockchip 平台的 U-Boot 目前存在两个版本，旧的版本是 rkdevelop 分支，新的版本是 next-dev 分支。
 
 ### rkdevelop 概况
 
-​	rkdevelop 是从 U-boot 官方的 v2014.10 的正式版本中切出来进行开发的版本。目前大部分的芯片（2018 年之前）只要有使用 U-Boot，基本都是使用这个版本。目前这个版本支持的芯片包括：RK3036/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3368/RK3399/部分 PX 系列。
+rkdevelop 是从 U-boot 官方的 v2014.10 的正式版本中切出来进行开发的版本。目前大部分的芯片（2018 年之前）只要有使用 U-Boot，基本都是使用这个版本。目前这个版本支持的芯片包括：RK3036/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3368/RK3399/部分 PX 系列。
 
 目前，rkdevelop 支持的功能主要有：
 
@@ -67,25 +98,25 @@
 
 ### next-dev 概况
 
-​	next-dev 是从 U-Boot 官方的 v2017.09 正式版本中切出来进行开发的版本。随着 upstream 的 U-Boot 功能越来越完善，以及我们实际产品上对 U-Boot 的需求更加多样，因此 U-Boot 的版本升级也是势在必行，因此我们进行了 next-dev 开发。next-dev 作为 rkdevelop 的升级版本，目前在该平台上已经支持的芯片包括：RV1108/RK3188/RK3036/RK3066/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3326/RK3368/RK3399/部分 PX 系列。
+next-dev 是从 U-Boot 官方的 v2017.09 正式版本中切出来进行开发的版本。随着 upstream 的 U-Boot 功能越来越完善，以及我们实际产品上对 U-Boot 的需求更加多样，因此 U-Boot 的版本升级也是势在必行，因此我们进行了 next-dev 开发。next-dev 作为 rkdevelop 的升级版本，目前在该平台上已经支持的芯片包括：RV1108/RK3188/RK3036/RK3066/RK312X/RK322X/RK3288/RK3328/RK322XH/RK3326/RK3368/RK3399/部分 PX 系列。
 
-​	简而言之，rkdevelop 上支持的芯片在 next-dev 都同样有支持。在 rkdevelop 上支持的软件功能，在 next-dev 上大部分也同样会支持。
+简而言之，rkdevelop 上支持的芯片在 next-dev 都同样有支持。在 rkdevelop 上支持的软件功能，在 next-dev 上大部分也同样会支持。
 
 ### next-dev 和 rkdevelop 的差异
 
 #### 基础版本差异
 
-​	如上述介绍，rkdevelop 分支基于 v2014.10 版本进行开发，不再更新 upstream 的代码；next-dev 分支基于 v2017.09 的版本进行开发，后续还会持续更新 upstream 的代码。
+如上述介绍，rkdevelop 分支基于 v2014.10 版本进行开发，不再更新 upstream 的代码；next-dev 分支基于 v2017.09 的版本进行开发，后续还会持续更新 upstream 的代码。
 
 #### 代码风格
 
-​	rkdevelop 的整体代码风格偏“定制化”会多一些，coding style 以及功能实现上很多都不够标准化，更多走的是 rockchip 自己的一套流程或者框架。究其原因，主要还是 v2014.10 版本本身的系统框架还不够完善、第一次开发 U-Boot 也存在经验不足、工程师的标准化开发意识不够强、后续的各种产品需求越来越多样。
+rkdevelop 的整体代码风格偏“定制化”会多一些，coding style 以及功能实现上很多都不够标准化，更多走的是 rockchip 自己的一套流程或者框架。究其原因，主要还是 v2014.10 版本本身的系统框架还不够完善、第一次开发 U-Boot 也存在经验不足、工程师的标准化开发意识不够强、后续的各种产品需求越来越多样。
 
-​	经过 rkdevelop 的开发经验积累，我们对 next-dev 有了更好的全局规划和认识，因此 next-dev 分支的代码严格遵循 upstream 的规范进行开发，所有驱动实现都尽量走现有的通用框架流程，方便以后持续更新和扩展功能。
+经过 rkdevelop 的开发经验积累，我们对 next-dev 有了更好的全局规划和认识，因此 next-dev 分支的代码严格遵循 upstream 的规范进行开发，所有驱动实现都尽量走现有的通用框架流程，方便以后持续更新和扩展功能。
 
 #### DM(Driver Model)框架
 
-​	DM 框架是 U-Boot 里现在所有驱动的框架模型统称，它主要包括 uclass、driver、device。U-Boot 的 doc 目录里可以找到官方详细的说明文档：
+DM 框架是 U-Boot 里现在所有驱动的框架模型统称，它主要包括 uclass、driver、device。U-Boot 的 doc 目录里可以找到官方详细的说明文档：
 
 > Uclass - a group of devices which operate in the same way.
 >
@@ -116,7 +147,7 @@
 
 #### 代码开源
 
-​	目前各芯片平台的基础代码都已经合并到官方的分支里，可以满足客户自己下载源代码进行编译下载、开源的需求。我们的工程师还会继续开展各芯片平台的 upstream 工作。
+目前各芯片平台的基础代码都已经合并到官方的分支里，可以满足客户自己下载源代码进行编译下载、开源的需求。我们的工程师还会继续开展各芯片平台的 upstream 工作。
 
 #### Pre-loader 支持
 
@@ -124,12 +155,12 @@
 Maskrom -> Pre-loader -> Trust -> U-Boot -> kernel -> Android
 ```
 
-​	上述是使用 rkdevelop 分支时整个系统的启动流程：Pre-loader 负责加载 Trust 和 U-Boot，然后 U-Boot 负责加载 kernel。我们可以把上述的 Pre-loader 称为为一级 loader，U-Boot 称为二级 loader。在 Rockchip 平台上 Pre-loader 是不开源的，仅提供 bin 文件对外使用。
+上述是使用 rkdevelop 分支时整个系统的启动流程：Pre-loader 负责加载 Trust 和 U-Boot，然后 U-Boot 负责加载 kernel。我们可以把上述的 Pre-loader 称为为一级 loader，U-Boot 称为二级 loader。在 Rockchip 平台上 Pre-loader 是不开源的，仅提供 bin 文件对外使用。
 
-​	如果客户的产品有代码全开源的需求怎么办？next-dev 分支的 U-Boot 支持 SPL/TPL 作为 Pre-loader 引导系统的功能，它可以负载加载 Trust 和 U-Boot。SPL/TPL 本身就是 U-Boot 自身提供的一个功能，只是在 rkdevelop 没有被使用。
+如果客户的产品有代码全开源的需求怎么办？next-dev 分支的 U-Boot 支持 SPL/TPL 作为 Pre-loader 引导系统的功能，它可以负载加载 Trust 和 U-Boot。SPL/TPL 本身就是 U-Boot 自身提供的一个功能，只是在 rkdevelop 没有被使用。
 
 其中 TPL 主要功能是 DDR 初始化, SPL 主要功能是加载和引导 trust/U-Boot 两个模块.rkdevelop 仅支持 Rockchip miniloader 作为 pre-loader；
-​	next-dev 上各芯片平台都支持两种启动方式：SPL/TPL 和 Rockchip miniloader。
+next-dev 上各芯片平台都支持两种启动方式：SPL/TPL 和 Rockchip miniloader。
 
 #### 分区支持
 
