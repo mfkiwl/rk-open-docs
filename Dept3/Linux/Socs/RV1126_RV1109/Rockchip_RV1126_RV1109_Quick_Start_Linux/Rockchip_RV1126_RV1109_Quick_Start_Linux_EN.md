@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V2.0.0
+Release Version: V2.0.1
 
-Release Date: 2021-02-18
+Release Date: 2021-03-02
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -87,6 +87,7 @@ This document (this guide) is mainly intended for:
 | V1.9.7 | CWW | 2021-01-08 | 1. Update the way to build UBI filesystem image |
 | V1.9.8 | XZY | 2021-02-03 | Add minigui_demo instruction |
 | V2.0.0 | CWW | 2021-02-18 | 1. Add Linux Tool programmer_image_tool<br>2. Update introduction to Rootfs configuration<br>3. Update the project compilation method in the app and external directory<br>4. Add introduction to BSP compile |
+| V2.0.1 | CWW | 2021-03-02 | Add the QR code address |
 
 ---
 
@@ -745,7 +746,7 @@ Enter the project root directory and execute the following command to automatica
 
 ![](resources/EVB-Sensor-board.jpg)
 
-**Scan the QR code which on sensor board and get the prebuilt firmware image of EVB.**
+**Scan the QR code which on sensor board or visit `https://eyun.baidu.com/s/3nwlh7iL` to get start with the EVB.**
 
 ![](resources/firmware-lists.png)
 

@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V2.0.0
+发布版本：V2.0.1
 
-日期：2021-02-18
+日期：2021-03-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -92,6 +92,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.7 | CWW | 2021-01-08 | 1. 更新UBI文件系统镜像制作 |
 | V1.9.8 | XZY | 2021-02-03 | 新增app/minigui_demo说明 |
 | V2.0.0 | CWW | 2021-02-18 | 1. 增加Linux工具programmer_image_tool<br>2. 更新Rootfs配置说明<br>3. 更新app和external的编译方法<br>4. 增加SDK的BSP包编译说明 |
+| V2.0.1 | CWW | 2021-03-02 | 增加EVB板二维码的网盘地址 |
 
 ---
 
@@ -742,7 +743,7 @@ buildroot/output/rockchip_rv1126_rv1109_libs/BSP/
 
 ![](resources/EVB-Sensor-board.jpg)
 
-**扫描Sensor板背面的二维码，可以获取到EVB板编译好的固件。**
+**扫描Sensor板背面的二维码或网页登陆地址`https://eyun.baidu.com/s/3nwlh7iL`，获取到EVB板的使用指南。**
 
 ![](resources/firmware-lists.png)
 
