@@ -2,9 +2,9 @@
 
 文件标识：RK-YH-YF-276
 
-发布版本：V1.5.0
+发布版本：V1.6.0
 
-日期：2020-12-09
+日期：2021-03-06
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -62,6 +62,7 @@ Rockchip Electronics Co., Ltd.
 | V1.3.0     | 操瑞杰   | 2020-12-02   | 补充 HDMIRX              |
 | V1.4.0     | 黄家钗   | 2020-12-04   | 补充 GVI                 |
 | V1.5.0     | 温定贤   | 2020-12-09   | 补充 HDMI to MIPI CSI应用场景说明 |
+| V1.6.0     | 黄国椿   | 2021-03-06   | 补充 HDMI to DSI/LVDS 应用场景说明 |
 
 ---
 
@@ -545,66 +546,6 @@ mode-sync-pol 做为一种规避方法而添加的属性，一般情况不需要
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
 
 ```
-&rk628_post_process {
-        pinctrl-names = "default";
-        pinctrl-0 = <&vop_pins>;
-        status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        post_process_in_rgb: endpoint {
-                                remote-endpoint = <&rgb_out_post_process>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        post_process_out_lvds: endpoint {
-                                remote-endpoint = <&lvds_in_post_process>;
-                        };
-                };
-        };
-};
-```
-
-```
-&rk628_lvds {
-        status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        lvds_in_post_process: endpoint {
-                                remote-endpoint = <&post_process_out_lvds>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        lvds_out_panel: endpoint {
-                                remote-endpoint = <&panel_in_lvds>;
-                        };
-                };
-        };
-};
-
-&rk628_combtxphy {
-        status = "okay";
-};
-```
-
-```
 / {
         panel {
                 compatible = "simple-panel";
@@ -643,68 +584,103 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
                 };
         };
 };
+
+&rk628_lvds {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			lvds_in_post_process: endpoint {
+				remote-endpoint = <&post_process_out_lvds>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			lvds_out_panel: endpoint {
+				remote-endpoint = <&panel_in_lvds>;
+			};
+		};
+	};
+};
+
+&rk628_combtxphy {
+	status = "okay";
+};
+
+&rk628_post_process {
+	pinctrl-names = "default";
+	pinctrl-0 = <&vop_pins>;
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			post_process_in_rgb: endpoint {
+				remote-endpoint = <&rgb_out_post_process>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			post_process_out_lvds: endpoint {
+				remote-endpoint = <&lvds_in_post_process>;
+			};
+		};
+	};
+};
+
+&rgb {
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+
+			rgb_out_post_process: endpoint {
+				remote-endpoint = <&post_process_in_rgb>;
+			};
+		};
+	};
+};
+
+&video_phy {
+	status = "okay";
+};
+
+&rgb_in_vopb {
+	status = "disabled";
+};
+
+&rgb_in_vopl {
+	status = "okay";
+};
+
+route_rgb {
+	status = "disabled";
+};
 ```
 
 ##### Dual LVDS
 
-```
-&rk628_post_process {
-        pinctrl-names = "default";
-        pinctrl-0 = <&vop_pins>;
-        status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        post_process_in_rgb: endpoint {
-                                remote-endpoint = <&rgb_out_post_process>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        post_process_out_lvds: endpoint {
-                                remote-endpoint = <&lvds_in_post_process>;
-                        };
-                };
-        };
-};
-```
+双 LVDS 输出配置在单 LVDS 配置基础上添加修改 &rk628_lvds 如下属性：
 
 ```
 &rk628_lvds {
         rockchip,link-type = "dual-link-even-odd-pixels";
         status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        lvds_in_post_process: endpoint {
-                                remote-endpoint = <&post_process_out_lvds>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        lvds_out_panel: endpoint {
-                                remote-endpoint = <&panel_in_lvds>;
-                        };
-                };
-        };
-};
-
-&rk628_combtxphy {
-        status = "okay";
+	...
 };
 ```
 
@@ -712,14 +688,22 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | rockchip,link-type | dual-link-odd-even-pixels<br />dual-link-even-odd-pixels<br />dual-link-left-right-pixels<br />dual-link-right-left-pixels | 双通道 LVDS 需要配置该属性，支持奇偶像<br />素模式和左右像素模式，并且支持数据通道<br />互换。对于左右像素模式，需要在CH0和CH1<br />上分别接上相同的屏，在配置 timing 时，只需<br />要在单屏 timing 的基础上，将 clock-frequency,<br />hactive, hback-porch, hfront-porch, hsync-len<br />的值分别x2。 |
 
-```
+#### HDMI2LVDS
 
+这种场景， LVDS 分辨率需要将 HDMIRX 支持输入源分辨率因素综合考虑进去。
+
+![RK628-hdmi2lvds](Rockchip_DRM_RK628_Porting_Guide/rk628-hdmi2lvds.png)
+
+##### Single LVDS
+
+参考如下配置：
+
+```
 / {
         panel {
                 compatible = "simple-panel";
                 backlight = <&backlight>;
-                power-supply = <&vcc33_lcd>;
-                enable-gpios = <&gpio5 RK_PC1 GPIO_ACTIVE_HIGH>;
+                enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
                 prepare-delay-ms = <20>;
                 enable-delay-ms = <20>;
                 disable-delay-ms = <20>;
@@ -730,15 +714,15 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
                         native-mode = <&timing0>;
 
                         timing0: timing0 {
-                                clock-frequency = <149000000>;
-                                hactive = <1920>;
-                                vactive = <1080>;
-                                hback-porch = <96>;
-                                hfront-porch = <120>;
-                                vback-porch = <8>;
-                                vfront-porch = <33>;
-                                hsync-len = <64>;
-                                vsync-len = <4>;
+                                clock-frequency = <74250000>;
+                                hactive = <1280>;
+                                vactive = <720>;
+                                hback-porch = <220>;
+                                hfront-porch = <110>;
+                                vback-porch = <20>;
+                                vfront-porch = <5>;
+                                hsync-len = <40>;
+                                vsync-len = <5>;
                                 hsync-active = <0>;
                                 vsync-active = <0>;
                                 de-active = <0>;
@@ -753,6 +737,168 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
                 };
         };
 };
+
+&rk628_lvds {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			lvds_in_post_process: endpoint {
+				remote-endpoint = <&post_process_out_lvds>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			lvds_out_panel: endpoint {
+				remote-endpoint = <&panel_in_lvds>;
+			};
+		};
+	};
+};
+
+&rk628_combtxphy {
+	status = "okay";
+};
+
+&rk628_post_process {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			post_process_in_hdmirx: endpoint {
+				remote-endpoint = <&hdmirx_out_post_process>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			post_process_out_lvds: endpoint {
+				remote-endpoint = <&lvds_in_post_process>;
+			};
+		};
+	};
+};
+
+&rk628_combrxphy {
+	status = "okay";
+};
+
+&rk628_hdmirx {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			hdmirx_in_hdmi: endpoint {
+				remote-endpoint = <&hdmi_out_hdmirx>;
+			};
+		};
+		port@1 {
+			reg = <1>;
+
+			hdmirx_out_post_process: endpoint {
+				remote-endpoint = <&post_process_in_hdmirx>;
+			};
+		};
+	};
+};
+
+&hdmi {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@1 {
+			reg = <1>;
+
+			hdmi_out_hdmirx: endpoint {
+				remote-endpoint = <&hdmirx_in_hdmi>;
+			};
+		};
+	};
+};
+
+&hdmi_in_vopl {
+	status = "disabled";
+};
+
+&hdmi_in_vopb {
+	status = "okay";
+};
+
+&route_hdmi {
+	status = "disabled";
+};
+```
+
+##### Dual LVDS
+
+双 LVDS 输出配置在单 LVDS 配置基础上添加修改 panel timing 和 &rk628_lvds 如下属性：
+
+```
+/ {
+        panel {
+                compatible = "simple-panel";
+                backlight = <&backlight>;
+                enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
+                prepare-delay-ms = <20>;
+                enable-delay-ms = <20>;
+                disable-delay-ms = <20>;
+                unprepare-delay-ms = <20>;
+                bus-format = <MEDIA_BUS_FMT_RGB888_1X7X4_SPWG>;
+
+                display-timings {
+                        native-mode = <&timing0>;
+
+                        timing0: timing0 {
+                                clock-frequency = <148500000>;
+                                hactive = <1920>;
+                                vactive = <1080>;
+                                hback-porch = <148>;
+                                hfront-porch = <88>;
+                                vback-porch = <36>;
+                                vfront-porch = <4>;
+                                hsync-len = <44>;
+                                vsync-len = <5>;
+                                hsync-active = <0>;
+                                vsync-active = <0>;
+                                de-active = <0>;
+                                pixelclk-active = <0>;
+                        };
+                };
+
+                port {
+                        panel_in_lvds: endpoint {
+                                remote-endpoint = <&lvds_out_panel>;
+                        };
+                };
+        };
+};
+
+
+&rk628_lvds {
+        rockchip,link-type = "dual-link-even-odd-pixels";
+        status = "okay";
+	...
+};
 ```
 
 ### DSI
@@ -766,182 +912,158 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2lvds-avb.dts
 arch/arm/boot/dts/rk3288-evb-rk628-rgb2dsi-avb.dts
 
 ```
-&rk628_post_process {
-        pinctrl-names = "default";
-        pinctrl-0 = <&vop_pins>;
-        status = "okay";
 
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        post_process_in_rgb: endpoint {
-                                remote-endpoint = <&rgb_out_post_process>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        post_process_out_dsi0: endpoint {
-                                remote-endpoint = <&dsi0_in_post_process>;
-                        };
-                };
-        };
-};
-```
-
-```
 &rk628_dsi0 {
-        status = "okay";
+	status = "okay";
 
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
 
-                port@0 {
-                        reg = <0>;
+		port@0 {
+			reg = <0>;
 
-                        dsi0_in_post_process: endpoint {
-                                remote-endpoint = <&post_process_out_dsi0>;
-                        };
-                };
-        };
+			dsi0_in_post_process: endpoint {
+				remote-endpoint = <&post_process_out_dsi0>;
+			};
+		};
+	};
 
-        panel@0 {
-                compatible = "simple-panel-dsi";
-                reg = <0>;
-                backlight = <&backlight>;
-                enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
-                prepare-delay-ms = <120>;
-                enable-delay-ms = <120>;
-                disable-delay-ms = <120>;
-                unprepare-delay-ms = <120>;
-                init-delay-ms = <120>;
+	panel@0 {
+		compatible = "simple-panel-dsi";
+		reg = <0>;
+		backlight = <&backlight>;
+		enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
+		prepare-delay-ms = <120>;
+		enable-delay-ms = <120>;
+		disable-delay-ms = <120>;
+		unprepare-delay-ms = <120>;
+		init-delay-ms = <120>;
 
-                dsi,flags = <(MIPI_DSI_MODE_VIDEO |
-                              MIPI_DSI_MODE_VIDEO_BURST |
-                              MIPI_DSI_MODE_LPM |
-                              MIPI_DSI_MODE_EOT_PACKET)>;
-                dsi,format = <MIPI_DSI_FMT_RGB888>;
-                dsi,lanes = <4>;
+		dsi,flags = <(MIPI_DSI_MODE_VIDEO |
+			      MIPI_DSI_MODE_VIDEO_BURST |
+			      MIPI_DSI_MODE_LPM |
+			      MIPI_DSI_MODE_EOT_PACKET)>;
+		dsi,format = <MIPI_DSI_FMT_RGB888>;
+		dsi,lanes = <4>;
 
-                panel-init-sequence = [
-                        05 fa 01 11
-                        05 14 01 10
-                ];
+		panel-init-sequence = [
+			39 00 04 ff 98 81 03
+			39 00 02 01 00
+			39 00 02 02 00
+			...
 
-                panel-exit-sequence = [
-                        05 00 01 28
-                        05 00 01 10
-                ];
+			05 fa 01 11
+			05 14 01 29
+		];
 
-                display-timings {
-                        native-mode = <&timing0>;
+		panel-exit-sequence = [
+			05 00 01 28
+			05 00 01 10
+		];
 
-                        timing0: timing0 {
-                                clock-frequency = <64000000>;
-                                hactive = <720>;
-                                vactive = <1280>;
-                                hfront-porch = <40>;
-                                hsync-len = <10>;
-                                hback-porch = <40>;
-                                vfront-porch = <22>;
-                                vsync-len = <4>;
-                                vback-porch = <11>;
-                                hsync-active = <0>;
-                                vsync-active = <0>;
-                                de-active = <0>;
-                                pixelclk-active = <0>;
-                        };
-                };
-        };
+		display-timings {
+			native-mode = <&timing0>;
+
+			timing0: timing0 {
+				clock-frequency = <64000000>;
+				hactive = <720>;
+				vactive = <1280>;
+				hfront-porch = <40>;
+				hsync-len = <10>;
+				hback-porch = <40>;
+				vfront-porch = <22>;
+				vsync-len = <4>;
+				vback-porch = <11>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+			};
+		};
+	};
 };
 
 &rk628_combtxphy {
-        status = "okay";
+	status = "okay";
 };
+
+&rk628_post_process {
+	pinctrl-names = "default";
+	pinctrl-0 = <&vop_pins>;
+
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			post_process_in_rgb: endpoint {
+				remote-endpoint = <&rgb_out_post_process>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			post_process_out_dsi0: endpoint {
+				remote-endpoint = <&dsi0_in_post_process>;
+			};
+		};
+	};
+};
+
+&rgb {
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+
+			rgb_out_post_process: endpoint {
+				remote-endpoint = <&post_process_in_rgb>;
+			};
+		};
+	};
+};
+
+&video_phy {
+	status = "okay";
+};
+
+&rgb_in_vopb {
+	status = "disabled";
+};
+
+&rgb_in_vopl {
+	status = "okay";
+};
+
+&route_rgb {
+	connect = <&vopl_out_rgb>;
+	status = "disabled";
+};
+
 ```
 
 ##### Dual DSI
 
-```
-&rk628_post_process {
-        pinctrl-names = "default";
-        pinctrl-0 = <&vop_pins>;
-        status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        post_process_in_rgb: endpoint {
-                                remote-endpoint = <&rgb_out_post_process>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        post_process_out_dsi0: endpoint {
-                                remote-endpoint = <&dsi0_in_post_process>;
-                        };
-                };
-        };
-};
-```
+在单 Single DSI 的基础上修改如下属性：
 
 ```
 &rk628_dsi0 {
         status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0 {
-                        reg = <0>;
-
-                        dsi0_in_post_process: endpoint {
-                                remote-endpoint = <&post_process_out_dsi0>;
-                        };
-                };
-        };
+	...
 
         panel@0 {
                 compatible = "simple-panel-dsi";
-                reg = <0>;
-                backlight = <&backlight>;
-                enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
-                prepare-delay-ms = <120>;
-                enable-delay-ms = <120>;
-                disable-delay-ms = <120>;
-                unprepare-delay-ms = <120>;
-                init-delay-ms = <120>;
+		...
 
-                dsi,flags = <(MIPI_DSI_MODE_VIDEO |
-                              MIPI_DSI_MODE_VIDEO_BURST |
-                              MIPI_DSI_MODE_LPM |
-                              MIPI_DSI_MODE_EOT_PACKET |
-                              MIPI_DSI_MODE_VIDEO_HBP)>;
-                dsi,format = <MIPI_DSI_FMT_RGB888>;
                 dsi,lanes = <8>;
-
-                panel-init-sequence = [
-                        05 78 01 11
-                        05 32 01 29
-                ];
-
-                panel-exit-sequence = [
-                        05 00 01 28
-                        05 00 01 10
-                ];
+		...
 
                 display-timings {
                         native-mode = <&timing0>;
@@ -968,9 +1090,174 @@ arch/arm/boot/dts/rk3288-evb-rk628-rgb2dsi-avb.dts
 &rk628_dsi1 {
 	status = "okay";
 };
+```
+
+#### HDMI2DSI
+
+这种场景， DSI 分辨率需要将 HDMIRX 支持输入源分辨率因素综合考虑进去。
+
+![RK628-hdmi2dsi](Rockchip_DRM_RK628_Porting_Guide/rk628-hdmi2dsi.png)
+
+##### Single DSI
+
+arch/arm/boot/dts/rk3288-evb-rk628-rgb2dsi-avb.dts
+
+```
+
+&rk628_dsi0 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			dsi0_in_post_process: endpoint {
+				remote-endpoint = <&post_process_out_dsi0>;
+			};
+		};
+	};
+
+	panel@0 {
+		compatible = "simple-panel-dsi";
+		reg = <0>;
+		backlight = <&backlight>;
+		enable-gpios = <&gpio7 RK_PA2 GPIO_ACTIVE_HIGH>;
+		prepare-delay-ms = <120>;
+		enable-delay-ms = <120>;
+		disable-delay-ms = <120>;
+		unprepare-delay-ms = <120>;
+		init-delay-ms = <120>;
+
+		dsi,flags = <(MIPI_DSI_MODE_VIDEO |
+			      MIPI_DSI_MODE_VIDEO_BURST |
+			      MIPI_DSI_MODE_LPM |
+			      MIPI_DSI_MODE_EOT_PACKET)>;
+		dsi,format = <MIPI_DSI_FMT_RGB888>;
+		dsi,lanes = <4>;
+
+		panel-init-sequence = [
+			39 00 04 ff 98 81 03
+			39 00 02 01 00
+			39 00 02 02 00
+			...
+
+			05 fa 01 11
+			05 14 01 29
+		];
+
+		panel-exit-sequence = [
+			05 00 01 28
+			05 00 01 10
+		];
+
+		display-timings {
+			native-mode = <&timing0>;
+
+			timing0: timing0 {
+                                clock-frequency = <74250000>;
+                                hactive = <1280>;
+                                vactive = <720>;
+                                hback-porch = <220>;
+                                hfront-porch = <110>;
+                                vback-porch = <20>;
+                                vfront-porch = <5>;
+                                hsync-len = <40>;
+                                vsync-len = <5>;
+                                hsync-active = <0>;
+                                vsync-active = <0>;
+                                de-active = <0>;
+                                pixelclk-active = <0>;
+			};
+		};
+	};
+};
 
 &rk628_combtxphy {
-        status = "okay";
+	status = "okay";
+};
+
+&rk628_post_process {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			post_process_in_hdmirx: endpoint {
+				remote-endpoint = <&hdmirx_out_post_process>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			post_process_out_dsi0: endpoint {
+				remote-endpoint = <&dsi0_in_post_process>;
+			};
+		};
+	};
+};
+
+&hdmi {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@1 {
+			reg = <1>;
+
+			hdmi_out_hdmirx: endpoint {
+				remote-endpoint = <&hdmirx_in_hdmi>;
+			};
+		};
+	};
+};
+
+&hdmi_in_vopl {
+	status = "disabled";
+};
+
+&hdmi_in_vopb {
+	status = "okay";
+};
+
+&route_hdmi {
+	status = "disabled";
+};
+
+&rk628_combrxphy {
+	status = "okay";
+};
+
+&rk628_hdmirx {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			hdmirx_in_hdmi: endpoint {
+				remote-endpoint = <&hdmi_out_hdmirx>;
+			};
+		};
+		port@1 {
+			reg = <1>;
+
+			hdmirx_out_post_process: endpoint {
+				remote-endpoint = <&post_process_in_hdmirx>;
+			};
+		};
+	};
 };
 ```
 
@@ -1626,6 +1913,19 @@ dw_hdmi_rockchip_ops): -517
 
 ```
 
+### RK628 PLL 锁定异常
+
+如下log表示RK628 的 cpll 处于未 lock 状态， 按如下步骤排查：
+
+1、24MHz 时钟的电压是否符合预期设计；
+2、i2c bus 下面是否有和 rk628 同一设备地址的其他硬件设备，干扰 i2c 的通信；
+
+```
+...
+rk628-cru rk628-cru: rk628_clk_cpll is not lock
+...
+```
+
 ### 寄存器读写
 
 寄存器调试节点：
@@ -1680,6 +1980,8 @@ index 3f0a7e262d69..b819645edd84 100644
 
 ### 输入输出信息
 
+#### cat /d/dri/0/summary
+
 ```
 console:/ # cat /d/dri/0/summary
 VOP [ff930000.vop]: DISABLED
@@ -1709,6 +2011,52 @@ VOP [ff940000.vop]: ACTIVE
     post: sdr2hdr[0] hdr2sdr[0]
     pre : sdr2hdr[0]
 post CSC: r2y[0] y2r[0] CSC mode[1]
+```
+
+#### cat /d/clk/clk_summary
+
+```
+root@rk3288:/ # cat /d/clk/clk_summary | grep rk628
+    rk628_clk_gpio_db3          0           0            24000000
+    rk628_clk_gpio_db2          0           0            24000000
+    rk628_clk_gpio_db1          0           0            24000000
+    rk628_clk_gpio_db0          0           0            24000000
+    rk628_clk_hdmirx_cec        0           0            39331
+    rk628_clk_txesc             0           0            24000000
+    rk628_clk_cfg_dphy1         0           0            24000000
+    rk628_clk_cfg_dphy0         1           1            24000000
+    rk628_clk_gpll              0           0            983039999
+       rk628_clk_gpll_mux       0           0            983039999
+          rk628_clk_i2s_8ch_src 0           0            98304000
+             rk628_mclk_i2s_8ch 0           0            98304000
+             rk628_clk_i2s_8ch_frac 0           0            3736462
+          rk628_clk_hdmirx_aud  0           0            98304000
+    rk628_clk_cpll              1           1            1188000000
+       rk628_clk_cpll_mux       3           3            1188000000
+          rk628_clk_bt1120dec   0           0            148500000
+          rk628_pclk_logic      3           7            99000000
+             rk628_pclk_gpio0   0           1            99000000
+             rk628_pclk_gpio1   0           1            99000000
+             rk628_pclk_gpio2   0           1            99000000
+             rk628_pclk_gpio3   0           1            99000000
+             rk628_pclk_txphy_con 1           1            99000000
+             rk628_pclk_efuse   0           0            99000000
+             rk628_pclk_i2c2apb 0           0            99000000
+             rk628_pclk_cru     0           0            99000000
+             rk628_pclk_adapter 0           0            99000000
+             rk628_pclk_regfile 0           0            99000000
+             rk628_pclk_dsi0    1           1            99000000
+             rk628_pclk_dsi1    0           0            99000000
+             rk628_pclk_csi     0           0            99000000
+             rk628_pclk_hdmitx  0           0            99000000
+             rk628_pclk_rxphy   0           0            99000000
+             rk628_pclk_hdmirx  0           0            99000000
+             rk628_pclk_gvihost 0           0            99000000
+          rk628_sclk_vop        1           1            64000000
+          rk628_clk_rx_read     1           1            64000000
+          rk628_clk_imodet      0           0            49500000
+       rk628_i2s_mclkout        0           0            12000000
+
 ```
 
 ### 主副屏属性配置
