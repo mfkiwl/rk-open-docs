@@ -185,29 +185,31 @@ start.s
 
 ## 内存布局
 
-U-Boot 由前级 Loader 加载到 `CONFIG_SYS_TEXT_BASE` 地址，初始化时会探明当前系统的总内存容量，32位平台上认为最大4GB可用（但是不影响内核对容量的识别），64位平台上认为所有内存都可用。然后通过一系列reserve_xxx() 接口从内存末尾往前预留需要的内存，最后把自己relocate到某段reserve的空间上。内存整体使用布局如下，以ARM64为例：
+U-Boot 由前级 Loader 加载到 `CONFIG_SYS_TEXT_BASE` 地址，初始化时会探明当前系统的总内存容量，32位平台上认为最大4GB可用（但是不影响内核对容量的识别），64位平台上认为所有内存都可用。然后通过一系列reserve_xxx() 接口从内存末尾往前预留需要的内存，最后把自己relocate到某段reserve的空间上。内存整体使用布局如下，以ARM64为例（常规情况）：
 
-| Name      | Start Addr Offset        | Size                     | Usage                |
-| --------- | :----------------------- | :----------------------- | :------------------- |
-| ATF       | 0x00000000               | 1M                       | ARM Trusted Firmware |
-| SHM       | 0x00100000               | 1M                       | SHM, Pstore          |
-| OP-TEE    | 0x08400000               | 2M~30M                   | 参考 TEE 开发手册    |
-| FDT       | fdt_addr_r               | -                        | kernel dtb           |
-| KERNEL    | kernel_addr_r            | -                        | kernel 镜像          |
-| RAMDISK   | ramdisk_addr_r           | -                        | ramdisk 镜像         |
-| ……        | -                        | -                        | -                    |
-| FASTBOOT  | CONFIG_FASTBOOT_BUF_ADDR | CONFIG_FASTBOOT_BUF_SIZE | Fastboot buffer      |
-| ……        | -                        | -                        | -                    |
-| SP        | -                        | -                        | stack                |
-| FDT       | -                        | sizeof(dtb)              | U-Boot dtb           |
-| GD        | -                        | sizeof(gd)               | -                    |
-| Board     | -                        | sizeof(bd_t)             | -                    |
-| MALLOC    | -                        | CONFIG_SYS_MALLOC_LEN    | 系统的堆空间         |
-| U-Boot    | -                        | sizeof(mon)              | u-boot 镜像          |
-| Video FB  | -                        | fb size                  | 32M                  |
-| TLB Table | RAM_TOP-64K              | 32K                      | MMU 页表             |
+| Name      | Start Addr Offset | Size                  | Usage                | Secure |
+| --------- | :---------------- | :-------------------- | :------------------- | ------ |
+| ATF       | 0x00000000        | 1M                    | ARM Trusted Firmware | Yes    |
+| SHM       | 0x00100000        | 1M                    | SHM, Pstore          | No     |
+| OP-TEE    | 0x08400000        | 2M~30M                | 参考 TEE 开发手册    | Yes    |
+| FDT       | fdt_addr_r        | -                     | kernel dtb           | No     |
+| KERNEL    | kernel_addr_r     | -                     | kernel 镜像          | No     |
+| RAMDISK   | ramdisk_addr_r    | -                     | ramdisk 镜像         | No     |
+| ……        | -                 | -                     | -                    | -      |
+| FASTBOOT  | -                 | -                     | Fastboot buffer      | No     |
+| ……        | -                 | -                     | -                    |        |
+| SP        | -                 | -                     | stack                | No     |
+| FDT       | -                 | sizeof(dtb)           | U-Boot dtb           | No     |
+| GD        | -                 | sizeof(gd)            | -                    | No     |
+| Board     | -                 | sizeof(bd_t)          | -                    | No     |
+| MALLOC    | -                 | CONFIG_SYS_MALLOC_LEN | 系统的堆空间         | No     |
+| U-Boot    | -                 | sizeof(mon)           | u-boot 镜像          | No     |
+| Video FB  | -                 | fb size               | 32M                  | No     |
+| TLB Table | RAM_TOP-64K       | 32K                   | MMU 页表             | No     |
 
 > 上表中的`Start Addr Offset` 一栏表示基于 DDR base 的地址偏移；
+>
+> Fastboot地址和大小由配置决定：CONFIG_FASTBOOT_BUF_ADDR，CONFIG_FASTBOOT_BUF_SIZE。
 
 - Video FB/U-Boot/Malloc/Board/Gd/Fdt/Sp 由顶向下根据实际需求大小来分配；
 - 64 位平台：ATF 是 ARMv8 必需的，OP-TEE 是可选项；32 位平台：只有 OP-TEE；
@@ -366,9 +368,63 @@ RK平台的各级固件之间可以通过ATAGS机制传递一些配置信息。
 ./arch/arm/mach-rockchip/rk_atags.c
 ```
 
-## 固件格式
+## U-Boot固件
 
-RK平台的U-Boot支持三种格式的固件引导：
+RK平台的U-Boot和trust有两种固件格式：RK和FIT格式分别由Miniloader和SPL负责引导。目前Rockchip发布的SDK以RV1126为分界点，RV1126开始的平台采用FIT格式，之前的平台采用RK格式。
+
+- RK 格式
+
+  Rockchip自定义的固件格式，U-Boot和trust分别打包为uboot.img和trust.img。如下：
+
+  uboot.img 和32位 trust.img 镜像文件的magic为“LOADER”
+
+  ```c
+  00000000  4c 4f 41 44 45 52 20 20  00 00 00 00 00 00 00 00  |LOADER  ........|
+  00000010  00 00 20 00 78 d0 0f 00  06 99 c2 a8 20 00 00 00  |.. .x....... ...|
+  00000020  09 8a b0 e1 89 7a c2 89  0d e8 da ef 86 3e f2 24  |.....z.......>.$|
+  ```
+
+  64位 trust.img 镜像文件的magic为“BL3X”
+
+  ```c
+  00000000  42 4c 33 58 00 01 00 00  23 00 00 00 f8 00 04 00  |BL3X....#.......|
+  00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+  ```
+
+- FIT 格式
+
+  U-Boot mainline支持的一种灵活性极高的固件格式。U-Boot、trust以及mcu等固件一起打包为 uboot.img。
+
+  uboot.img 的镜像文件的magic 为"d0 0d fe ed"，用命令`fdtdump uboot.img` 可以查看固件头。
+
+  ```c
+  00000000  d0 0d fe ed 00 00 06 00  00 00 00 58 00 00 04 c4  |...........X....|
+  00000010  00 00 00 28 00 00 00 11  00 00 00 10 00 00 00 00  |...(............|
+  ```
+
+  > 更多FIT介绍请参考FIT章节。
+
+- 备份打包
+
+  通常为了应对OTA升级过程断电等可能导致固件损坏的情况，uboot.img和trust.img都做了多备份打包。
+
+  | 固件             | 单份大小 | 打包份数 |
+  | ---------------- | -------- | -------- |
+  | RK uboot.img     | 1MB      | 4        |
+  | RK 32位trust.img | 1MB      | 4        |
+  | RK 64位trust.img | 2MB      | 2        |
+  | FIT uboot.img    | 2MB      | 2        |
+
+  > 从上述表格可知，uboot.img 和 trust.img 的大小默认都是4MB。
+
+  单份大小和份数的修改方法：
+
+  - RK 格式：编译命令追加参数。例如： `--sz-uboot 2048 1` 和 `--sz-trust 4096 1`，表示uboot.img单份2M，打包1份；trust.img单份4M，打包1份。
+  - FIT 格式：更改配置参数：CONFIG_SPL_FIT_IMAGE_KB 和 CONFIG_SPL_FIT_IMAGE_MULTIPLE。分别表示单份大小(单位：KB)和打包份数。
+
+## kernel固件
+
+RK平台的U-Boot支持三种格式的内核固件引导：
 
 - RK格式
 

@@ -37,13 +37,13 @@ ARM architecture ---> (2) UART mux select
 通过CONFIG_ROCKCHIP_TPL_INIT_DRAM_TYPE配置TPL支持的DRAM TYPE。
 
 | **DDR TYPE** | **配置值** |
-| ------------ | --------- |
-| DDR2         | 2         |
-| DDR3         | 3         |
-| DDR4         | 0         |
-| LPDDR2       | 5         |
-| LPDDR3       | 6         |
-| LPDDR4       | 7         |
+| ------------ | ---------- |
+| DDR2         | 2          |
+| DDR3         | 3          |
+| DDR4         | 0          |
+| LPDDR2       | 5          |
+| LPDDR3       | 6          |
+| LPDDR4       | 7          |
 
 Example:
 
