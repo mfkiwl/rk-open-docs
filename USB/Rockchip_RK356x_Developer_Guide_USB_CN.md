@@ -1,10 +1,10 @@
 # Rockchip RK356x USB 开发指南
 
-文件标识：RK-CS-YF-142
+文件标识：RK-SM-YF-142
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2021-01-18
+日期：2021-03-10
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -62,9 +62,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2021-01-18 | V1.0.0   | 吴良峰   | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**                                                 |
+| ---------- | -------- | -------- | ------------------------------------------------------------ |
+| 2021-01-18 | V1.0.0   | 吴良峰   | 初始版本                                                     |
+| 2021-03-10 | V1.1.0   | 吴良峰   | 1. 根据 Rockchip 文档编写规范，修改文件标识<br />2. 修改 USB 2.0 PHYs 功耗优化方法 |
 
 ---
 
@@ -185,27 +186,9 @@ RK356x 包含 2 个 USB 2.0 Combo PHY。其中，USB OTG 和 USB Host_1 使用US
 
 产品只需要支持 USB OTG 功能，不需要 USB 3.0 Host_1/USB 2.0 Host_2/USB 2. 0 Host_3，建议 USB 2.0 PHY 功耗优化如下：
 
-1. 在内核 DTS 中，enable u2phy0_host 节点，并更新如下的补丁；
+1. 在内核 DTS 中，disable u2phy0_host 节点
 
-   目的是，在 PHY 驱动的 probe 流程中，配置 USB 3.0 Host_1 的 USB 2.0 Combo PHY_0 port1 进入suspend mode。
-
-   ```
-   diff --git a/drivers/phy/rockchip/phy-rockchip-inno-usb2.c b/drivers/phy/rockchip/phy-rockchip-inno-usb2.c
-   index 8a61187..552ddf5 100644
-   --- a/drivers/phy/rockchip/phy-rockchip-inno-usb2.c
-   +++ b/drivers/phy/rockchip/phy-rockchip-inno-usb2.c
-   @@ -2883,8 +2883,8 @@ static const struct rockchip_usb2phy_cfg rk3568_phy_cfgs[] = {
-                                   .utmi_ls        = { 0x00c0, 5, 4, 0, 1 },
-                           },
-                           [USB2PHY_PORT_HOST] = {
-   -                               /* Select suspend control from controller */
-   -                               .phy_sus        = { 0x0004, 8, 0, 0x1d2, 0x1d2 },
-   +                               /* Select suspend control from grf */
-   +                               .phy_sus        = { 0x0004, 8, 0, 0x1d2, 0x1d1 },
-                                   .ls_det_en      = { 0x0080, 1, 1, 0, 1 },
-                                   .ls_det_st      = { 0x0084, 1, 1, 0, 1 },
-                                   .ls_det_clr     = { 0x0088, 1, 1, 0, 1 },
-   ```
+   目的是，避免在 PHY 驱动 的 probe 流程中，执行 u2phy0_host 的初始化，导致 u2phy0_host  功耗增加。
 
 2. 断开 USB 2.0 Comb PHY_1 的供电，如下图 5，并 disable 内核 DTS 中的节点 u2phy1_host 和 u2phy1_otg。
 
