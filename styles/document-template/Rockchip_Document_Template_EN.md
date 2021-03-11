@@ -2,9 +2,9 @@
 
 ID: RK-XX-XX-nnn
 
-Release Version: V1.1.0
+Release Version: V1.1.1
 
-Release Date: 2021-01-21
+Release Date: 2021-03-11
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -59,10 +59,11 @@ Software development engineers
 **Revision History**
 
 | **Version** | **Author**  | **Date**   | **Change Description**             |
-| ----------- | ----------- | :--------- | ---------------------------------- |
+| ----------- | ----------- | ---------- | ---------------------------------- |
 | V1.0.0      | Karen Huang | 2019-11-29 | Initial version                    |
 | V1.0.4      | Ruby Zhang  | 2020-06-08 | Update the format and company name |
 | V1.1.0      | Karen Huang | 2021-01-21 | Modify year of copyright           |
+| V1.1.1      | Karen Huang | 2021-03-11 | Delete “：”                        |
 
 ---
 
