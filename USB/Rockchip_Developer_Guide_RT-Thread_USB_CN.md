@@ -1,10 +1,10 @@
-# USB 开发指南
+# Rockchip RT-Thread USB 开发指南
 
-文件标识：RK-GL-YF-106
+文件标识：RK-KF-YF-106
 
-发布版本：V1.0.2
+发布版本：V1.1.0
 
-日期：2020-05-25
+日期：2021-03-12
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -22,7 +22,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2020福州瑞芯微电子股份有限公司**
+**版权所有© 2021福州瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -53,6 +53,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | **芯片名称** | **内核版本**    |
 | ------------ | --------------- |
 | RK2108       | RT-Thread 3.1.x |
+| RK625        | RT-Thread 3.1.x |
 
 **读者对象**
 
@@ -70,6 +71,7 @@ Fuzhou Rockchip Electronics Co., Ltd.
 | V1.0.0    | 吴良峰 | 2019-07-23 | 初始版本     |
 | V1.0.1    | 陈谋春 | 2020-03-17 | 修正链接  |
 | V1.0.2   | 吴良峰 | 2020-05-25 | 修正格式  |
+| V1.1.0 | 王明成 | 2021-03-12 | 新增UVC使用示例 |
 
 **目录**
 
@@ -332,6 +334,77 @@ uart0   Character Device     2
 如 list_device 未发现音频播放和录音设备，请在 menuconfig 中打开相应的 Audio 编译开关。上例中的 es8311p 和 pdmc 也可改成相应类型的其他设备，取决于您的音频硬件连接方式。
 
 注意：UAC 功能开启时，CONFIG_RT_USING_VAD 必须关闭。
+
+#### USB UVC 使用示例
+
+USB UVC (USB Video Class)功能，可以将设备做为USB视频采集设备使用，Rockchip RT-Thread UVC基于UVC 1.1标准协议实现，支持MJPEG和YUYV两种格式视频数据，采用BULK传输方式，目前最多支持三路UVC复合设备。
+
+1. **USB Comosite Device UVC 配置**
+
+~~~c
+   RT-Thread Components  --->
+       Device Drivers  --->
+           Using USB  --->
+               [*] Using USB device
+               (4096) usb thread stack size
+               (0x2207) USB Vendor ID
+               (0x0007) USB Product ID
+               [*]   Enable composite device
+               [*]     Enable to use device as UVC device
+               [*]   Use to UVC device as RGB
+               [ ]   Use to UVC device as DEPTH
+               [ ]   Use to UVC device as IR
+               (10240) uvc device max buffer length
+~~~
+
+其中，RGB，DEPTH，IR需要根据具体SoC的硬件支持情况进行配置。如RK625 SoC可支持RGB UVC，RK625 + RK1608方案可支持三路UVC。UVC max buffer length可支持4K-16K范围配置。
+
+2. **UVC 设计简述**
+
+UVC组件基于RT-Thread USB Framework实现，主要包括UVC线程、UVC驱动、Buffer管理和异常处理等子模块，其系统框图如下所示。
+
+![USB_Device_UVC_Framework](Rockchip_Developer_Guide_RT-Thread_USB/USB_Device_UVC_Framework.png)
+
+UVC Thread主要实现UVC VC/VS请求响应，每路UVC有单独一个处理线程。UVC Driver实现UVC设备描述符定义（包括图像分辨率定义）、UVC Buffer状态管理、UVC视频数据传输调度和异常处理等功能。UVC Thread和UVC Driver通过RT-Thread OS Event通信；UVC Driver和USB Driver通过USB IO 接口通信。
+
+3. **UVC 日志**
+
+将UVC的设备接入上位机，并在上位机上使用视频预览软件打开Camera，Rockchip SoC串口在上电Camera初始化后，将有如下UVC相关Log输出：
+
+~~~c
+[...1...]
+INF: uvc(1) set format fcc 1196444237 width 640 height 480
+VIDEO_OPEN(1)
+INF: uvc(1) open camera device...
+Open camera id width height 1 640 480
+[...2...]
+INF: uvc(1) buffer(0) addr 0x2006787c
+INF: uvc(1) buffer(1) addr 0x2006987c
+INF: uvc(1) buffer(2) addr 0x2006b87c
+INF: uvc(1) buffer(3) addr 0x2006d87c
+INF: uvc(1) mjpeg header addr 0x20087c00
+INF: uvc(1) buffer size 8064
+[...]
+[...3...]
+VIDEO_CLOSE(1)
+INF: uvc(1) close camera device...
+Close camera id 1
+close rgb success
+[...]
+[...4...]
+uvc(1) buffer: (0-1) (1-1) (2-1) (3-2)
+ERR: uvc(1) buffer overflow irq 0x000100f0
+~~~
+
+Log 1 指示被打开Camera的FCC及宽高等信息.
+
+Log 2 指示UVC 环形Buffer的使用个数，地址和每个Buffer的大小；如果是MJPEG格式的数据，还会打印MJPEG Header Buffer信息。
+
+在Log 1和Log 2 成功输出后，如果Sensor有送数据出来，UVC将会调度Buffer管理并传送数据给上位机。
+
+Log 3 指示上位机关闭Camera时的Log。
+
+Log 4 指示诸如AMCAP，GUVCView等常用的视频预览软件在关闭预览或退出时不会发送Close Camera命令，只是向USB发送一条EP Halt命令。EP Halt后，会触发UVC Buffer Overflow，Buffer管理器继而关闭Buffer通道，停止USB数据传输。
 
 ### USB Host 使用示例
 
