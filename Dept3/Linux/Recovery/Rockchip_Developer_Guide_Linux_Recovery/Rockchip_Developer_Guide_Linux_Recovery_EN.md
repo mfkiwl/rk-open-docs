@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-353
 
-Release Version: V1.1.1
+Release Version: V1.2.0
 
-Release Date: 2020-07-13
+Release Date: 2021-03-11
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -68,6 +68,7 @@ Software development engineers
 | V1.0.7      | Chad Ma    | 2019-08-23 | Add chapter 2.3                                              |
 | V1.1.0      | Chad Ma    | 2020-03-31 | Modify 1.3<br />Modify 4.3                                   |
 | V1.1.1      | Ruby Zhang | 2020-07-13 | Update the format of the document                            |
+| V1.2.0      | Chad Ma    | 2021-03-11 | Add Section 4.3.5                                        |
 
 ---
 
@@ -164,7 +165,7 @@ If the error “Error！imageHead.uiTag !=0x57464B52” occurs during upgrading,
 
 ![image error head](resource/image-err-head.png)
 
-#### Upgrading Process
+#### Upgrading
 
 - Put the upgrading firmware update.img in the root directory of the SD card or U disk or in the /userdata directory of the device.
 
@@ -665,3 +666,74 @@ export RK_USERDATA_FS_TYPE=vfat
 The `wipe_all-misc.img` is configured in the BoardConfig.mk , but sometimes users don't want to  format user or custom (userdata or oem) partitions. in this case, the recovery code `external/recovery/reocvery.c` should be modified: the code in the main function as shown below, delete the code in the red box below, rebuild the the recovery partition firmware and flash the firmware.
 
 ![format code](resource/recovery-format-userdata.png "snippet code of format userdata in recovery")
+
+#### SD card upgrade
+
+In the actual project development, SD card is often used to make the startup disk to upgrade the bare chip or upgrade flash firmware. In Chapter 3, we describe the SD card to make the startup disk and can enter recovery mode and upgrade it normally. However, in the actual use, it is often encountered that the SD card upgrade can not be carried out normally and the serial port has no output. This section provides a targeted description of this scenario.
+
+Here, taking rk1808 platform as an example, other RK platform chips (rk3288, rk3399, rk3399pro) are similar. After SD card pins and UART 2 debug serial port IO multiplexing, SD card is used as a solution to upgrade boot card.
+
+1. First, check the hardware original circuit diagram to see whether the GPIO pin of SD card is multiplexed with UART2 serial port pin. If the hardware is multiplexed, adjust the dtsi under uboot, enable SDMMC, and disable UART2 (the system uses UART2 as the debugging serial port by default). If there is no multiplexing, check the power and initialization part of SD card.
+
+2. Modify the loader, reconfigure the print of UART in the loader, and modify SDK / rkbin / tools / ddrbin_ param.txt UART ID. If the serial fly line can be connected to uart1 M0, then UART id = 1; if it flies to uart1 M1, then UART id = 1, UART iomux = 1.
+
+3. Regenerate ddr.bin , execute the following command:
+
+   ```
+   cd SDK/rkbin/tools
+   rkbin/tools$./ddrbin_tool ddrbin_param.txt ../bin/rk1x/rk1808_ddr_933MHz_v1.04.bin
+   ```
+
+   The 1808_ ddr_ 933MHz_ The v1.04.bin file is consistent with the file name in the current `rkbin/bin/rk1x`directory in the SDK.
+
+   Different platform directory may be different, and it is named according to the first two digits of the actual chip platform.
+   `ddrbin_tool` For details of parameters, please refer to the document: ` SDK /rkbin/tools/ddrbin_ tool_user_guide.txt `.
+
+4. Modify the kernel DTS configuration.
+
+   Modify debug serial port, in addition to ddr.bin modification, the kernel needs to be modified.
+
+   ![fiq-debugger](resource/fiq-debuger.png "kernel dts config fiq")
+
+5. Modify the startup parameter cmdline:
+
+    `kernel/arch/arm64/boot/dts/rockchip/rk1808-evb-v10.dts`
+
+    ```
+    chosen {
+    	bootargs = "earlycon=uart8250,mmio32,0xff550000 console=ttyFIQ0 root=PARTUUID=614e0000-0000 rootfstype=ext4 rootwait swiotlb=1 kpti=0 snd_aloop.index=7";
+    };
+    ```
+
+    The address 0xff550000 here is to be modified according to the actual serial port. Different serial addresses can be found in the file `arch/arm64/boot/dts/rockchip/rk1808.dtsi`, similar to other platforms, by searching the device tree file of the corresponding platform.
+
+    For example: RK1808 platform uart2:Serial@ff550000, uart1:Serial@ff540000.
+
+    ![bootargs cmdline](resource/bootarg.png "cmdline change uart address")
+
+6. Compile firmware
+
+    Uboot compilation: `./build.sh uboot`
+
+    or enter the u-boot directory, execute `./make.sh rk1808`
+
+    The generated files after compiling are in the u-boot directory:
+
+    ```
+    u-boot/
+    ├── rk1808_loader_v1.03.104.bin
+    ├── trust.img
+    └── uboot.img
+    ```
+
+    Kenel compilation: `. /build.sh kernel`
+
+    Recoy compilation: `. /build.sh recovery`
+
+    Last `. /build.sh updateimg`.
+
+7. After properly flashing the firmware:
+
+      1. Package generation update.img , use "SDDiskTool_v1.62" or newer version to flash the update.img to the SD card.
+
+      2. Power off the development board, plug in the SD card and power on.At this time, the serial port can print the log from uart1 or other serial port currently specified by flight lines, and analyze the SD card upgrade problem according to the log.

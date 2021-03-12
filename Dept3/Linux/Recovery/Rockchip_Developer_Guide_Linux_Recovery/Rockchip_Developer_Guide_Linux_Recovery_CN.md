@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-353
 
-发布版本：V1.1.1
+发布版本：V1.2.0
 
-日期：2020-07-13
+日期：2021-03-10
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **瑞芯微电子股份有限公司**
+**版权所有** **© 2021** **瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -75,6 +75,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.7     | 马龙昌     | 2019-08-23   | 增加 2.3 小节                                          |
 | V1.1.0     | 马龙昌     | 2020-03-31   | 修改1.3小节<br />重新调整4.3小节                       |
 | V1.1.1     | Ruby Zhang | 2020-07-13   | 格式修订                                               |
+| V1.2.0    | 马龙昌     | 2021-03-10   | 增加4.3.5 小节                                         |
 
 ---
 
@@ -667,3 +668,70 @@ SDK 中默认 userdata 分区为 ext2/ext4 文件系统，若想修改为 vfat32
 BoardConfig.mk 中配置了 `wipe_all-misc.img`，却不希望格式化用户或客制（userdata 或 oem）分区，此时需要修改 recovery 的代码。修改 `external/recovery/reocvery.c`： main 函数中如下图的代码，将下图红框中的代码注释掉后，重新编译 recovery 分区固件，烧写 recovery 分区固件即可。
 
 ![format code](resource/recovery-format-userdata.png "snippet code of format userdata in recovery")
+
+#### SD卡升级问题
+
+在实际项目开发中，经常遇到使用 SD 卡制作启动盘，用以升级裸片或者升级Flash固件。在第3章节，我们阐述了SD 卡制作启动盘并可以正常进入 recovery 模式，进行升级的情况，但实际使用过程中，常遇到 SD 卡升级无法正常进行，串口亦无任何输出的情况。本小节就此情景下做针对性的说明。
+
+此处，以 RK1808 平台为例，其他 RK 平台芯片（RK3288、RK3399、RK3399PRO）类似，给出SD卡 管脚与 UART 2 调试串口 IO复用后，SD卡作为启动卡升级的解决方案。
+
+1. 首先检查硬件原路图，查看 SD 卡 GPIO 管脚是否与 uart2 串口管脚复用，若硬件有复用，需调整 uboot 下的dtsi，打开使能 sdmmc，禁用 uart2 (系统默认使用uart 2 作为调试串口)。若无复用，检查 SD 卡上电与初始化部分。
+
+2. 修改 loader，将 loader 中 uart 的打印重新配置，修改 SDK/rkbin/tools/ddrbin_param.txt 中 uart id 。假如可以将串口飞线连接到 uart1 m0，则 uart id=1；如果飞到 uart1 m1，那么 uart id=1 uart iomux=1。
+
+3. 重新生成 ddr.bin，执行以下命令
+
+   ```
+   cd SDK/rkbin/tools
+   rkbin/tools$./ddrbin_tool ddrbin_param.txt ../bin/rk1x/rk1808_ddr_933MHz_v1.04.bin
+   ```
+
+   此处 rk1808_ddr_933MHz_v1.04.bin 文件，根据 SDK 中当前 `rkbin/bin/rk1x/`目录下的文件名保持一致。
+
+   具体平台目录有差异，根据实际芯片平台的前两个数字命名。
+
+   ddrbin_tool工具参数详细内容，可参考说明文档：`SDK/rkbin/tools/ddrbin_tool_user_guide.txt`。
+
+4. 修改 kernel dts配置。
+
+   修改调试串口，除了 ddr.bin 修改外，内核也需要修改。
+
+   ![fiq-debugger](resource/fiq-debuger.png "kernel dts config fiq")
+
+5. 修改启动参数 cmdline：
+
+   `kernel/arch/arm64/boot/dts/rockchip/rk1808-evb-v10.dts`
+
+   ```
+   chosen {
+   	bootargs = "earlycon=uart8250,mmio32,0xff550000 console=ttyFIQ0 root=PARTUUID=614e0000-0000 rootfstype=ext4 rootwait swiotlb=1 kpti=0 snd_aloop.index=7";
+   };
+   ```
+
+   此处 0xff550000 这个地址要根据实际的串口修改，各个不同串口地址在 `arch/arm64/boot/dts/rockchip/rk1808.dtsi` 这个文件里可以搜索找到，其他平台类似，查找对应平台的设备树文件。
+
+   如：RK1808 平台 uart2: serial@ff550000， uart1: serial@ff540000。
+
+   ![bootargs cmdline](resource/bootarg.png "cmdline change uart address")
+
+6. 编译固件
+
+   uboot编译：`./build.sh uboot` 或者进入u-boot目录中，执行 `./make.sh rk1808`
+
+   编译后生成文件在 u-boot 目录下：
+
+   ```
+   u-boot/
+   ├── rk1808_loader_v1.03.104.bin
+   ├── trust.img
+   └── uboot.img
+   ```
+
+   kernel编译： `./build.sh kernel`
+
+   recovery编译： `./build.sh recovery`
+   最后`./build.sh updateimg`。
+
+7. 正确烧录编译好的固件以后
+  - 打包生成 update.img 升级包， 使用“SDDiskTool_v1.62”或更新版本，烧录 update.img 到SD卡中。
+  - 开发板断电， 插上SD卡，上电。此时串口可以从uart1或其他当前所指定的飞线的串口打印log，观察log，并根据log具体分析SD卡升级问题。
