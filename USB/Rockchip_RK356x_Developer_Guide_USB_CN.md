@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-142
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2021-03-10
+日期：2021-03-15
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | -------- | -------- | ------------------------------------------------------------ |
 | 2021-01-18 | V1.0.0   | 吴良峰   | 初始版本                                                     |
 | 2021-03-10 | V1.1.0   | 吴良峰   | 1. 根据 Rockchip 文档编写规范，修改文件标识<br />2. 修改 USB 2.0 PHYs 功耗优化方法 |
+| 2021-03-15 | V1.2.0   | 吴良峰   | 增加 USB 2.0 PHYs 功耗优化的软件修改说明                     |
 
 ---
 
@@ -190,11 +191,42 @@ RK356x 包含 2 个 USB 2.0 Combo PHY。其中，USB OTG 和 USB Host_1 使用US
 
    目的是，避免在 PHY 驱动 的 probe 流程中，执行 u2phy0_host 的初始化，导致 u2phy0_host  功耗增加。
 
-2. 断开 USB 2.0 Comb PHY_1 的供电，如下图 5，并 disable 内核 DTS 中的节点 u2phy1_host 和 u2phy1_otg。
+2. 断开 USB 2.0 Comb PHY_1 的供电
+
+   如下图 5 的硬件电路所示，将 Comb PHY_1 的三路供电接地。
 
 ![RK356x-USB2.0-HOST-Disable](RK356x-USB/RK356x-USB2.0-HOST-Disable.png)
 
 图 5 USB 2.0 Comb PHY_1 (for Host_2 and Host_3) 断开供电电路
+
+因为 Comb PHY_1 对一个 USB 2.0 Host2 和 USB 2.0 Host3，所以，软件上需要相应修改内核 DTS，必须 disable 内核 DTS 中的 PHY 节点 u2phy1_host 和 u2phy1_otg，以及对应的 USB 控制器节点 usb_host1_ehci 和 usb_host1_ohci，参考方法如下：
+
+```c
+&usb_host1_ehci {
+	status = "disabled";
+};
+
+&usb_host1_ohci {
+	status = "disabled";
+};
+
+&u2phy1_host {
+	status = "disabled";
+};
+
+&u2phy1_otg {
+	status = "disabled";
+};
+```
+
+需要特别注意的是，在 USB PHY 未供电的情况下，如果没有 disable 内核 DTS 中 PHY 对应的 USB 控制器节点，将会导致内核初始化时，卡死在 USB 控制器的初始化，对应的典型 log 如下：
+
+```c
+[    1.240101] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[    1.241896] ohci-platform: OHCI generic platform driver
+[    1.242698] ohci-platform fd8c0000.usb: Generic Platform OHCI controller
+[    1.243686] ohci-platform fd8c0000.usb: new USB bus registered, assigned bus number 3
+```
 
 #### RK356x USB 3.0 PHYs 供电及功耗控制
 
