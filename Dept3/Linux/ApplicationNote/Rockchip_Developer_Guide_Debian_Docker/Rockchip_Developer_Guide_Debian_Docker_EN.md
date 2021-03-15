@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-334
 
-Release Version: V1.0.1
+Release Version: V1.0.2
 
-Release Date: 2020-02-18
+Release Date: 2021-03-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -42,24 +42,25 @@ This document introduces how to build a Docker environment to compile libmali, g
 
 **Product ID**
 
-| **Chipset Name** | **OS  Version**      |
-| ---------------- | -------------------- |
-| All chipset      | Debian 9 |
+| **Chipset** | **Kernel Version** | **OS  Version** |
+| ---------------- | -------------------- | ---------------- |
+| RK3326, PX30, RK3288, RK3328, RK3399, RK3399Pro | Linux 4.4 | Debian 9 |
 
-**Application Object**
+**Intended Audience**
 
-This document (this guide) is intended primarily for the following readers:
+This document (this guide) is mainly intended for:
 
-Field Application Engineer
+Technical support engineers
 
-Software Development Engineer
+Software development engineers
 
 **Revision History**
 
 | **Date** | **Version** | **Author** | **Change Description** |
 | --------- | ---------- | :-------- | ------------ |
 | 2019-08-27 | V1.0.0    | Caesar Wang | Initial version |
-| 2020-02-18 | V1.0.1    | Caesar Wang | sync the style with release |
+| 2020-02-18 | V1.0.1    | Caesar Wang | Sync the style with release |
+| 2021-03-15 | V1.0.2 | Ruby Zhang | Update product version information |
 
 ---
 

@@ -1,10 +1,10 @@
-# Rockchip Buildroot Chromecast Introduciton
+# Rockchip Buildroot Chromecast Introduction
 
 ID: RK-SM-YF-325
 
-Release Version: V1.0.1
+Release Version: V1.0.2
 
-Release Date: 2020-07-22
+Release Date: 2021-03-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -44,7 +44,7 @@ This document presents configuration methods and basic usage of Buildroot SDK Ch
 
 | **Chipset** | **Kernel Version** |
 | ----------- | ------------------ |
-| All chipset | 4.4                |
+| RK3399      | Linux 4.4          |
 
 **Intended Audience**
 
@@ -59,7 +59,8 @@ Software development engineers
 | **Version** | **Author** | **Date** | **Revision History** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0    | Jeff Chen | 2019-11-27 | Initial version |
-| V1.0.1 | Ruby Chen | 2020-07-22 | Update the company name  <br/> and the format of the document |
+| V1.0.1 | Ruby Zhang | 2020-07-22 | Update the company name  <br/> and the format of the document |
+| V1.0.2 | Ruby Zhang | 2021-03-15 | Update product version information |
 
 ---
 

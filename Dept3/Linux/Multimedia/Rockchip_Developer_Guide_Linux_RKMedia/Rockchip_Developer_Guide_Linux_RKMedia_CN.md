@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.3.0
+发布版本：V1.3.1
 
-日期：2021-02-03
+日期：2021-03-15
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -50,7 +50,7 @@ Rockchip Electronics Co., Ltd.
 
 | **芯片名称** | **内核版本** |
 | ------------ | ------------ |
-| RK1126/RK1109| Linux V4.19 |
+| RV1126, RV1109 | Linux 4.19 |
 
 **读者对象**
 
@@ -72,6 +72,7 @@ Rockchip Electronics Co., Ltd.
 | V1.2.1 | 范立创/张伦霞 | 2021-01-05 | 1.修复错误代码<br />2.修复示例描述错误<br />3.更新示例参数说明 |
 | V1.2.2 | 范立创 | 2021-01-15 | 1.补充接口说明 |
 | V1.3.0 | 范立创/王智华 | 2021-02-03 | 1.增加API说明：<br />（1）[RK_MPI_SYS_SetFrameRate](#RK_MPI_SYS_SetFrameRate)<br />（2）[RK_MPI_MB_POOL_Create](#RK_MPI_MB_POOL_Create)<br />（3）[RK_MPI_MB_POOL_Destroy](#RK_MPI_MB_POOL_Destroy)<br />（4）[RK_MPI_MB_POOL_GetBuffer](#RK_MPI_MB_POOL_GetBuffer)<br />（5）[RK_MPI_MB_Copy](#RK_MPI_MB_Copy)<br />（6）[RK_MPI_VI_SetUserPic](#RK_MPI_VI_SetUserPic)<br />（7）[RK_MPI_VI_EnableUserPic](#RK_MPI_VI_EnableUserPic)<br />（8）[RK_MPI_VI_DisableUserPic](#RK_MPI_VI_DisableUserPic)<br />（9）[RK_MPI_VI_RGN_SetCover](#RK_MPI_VI_RGN_SetCover)<br />（10）[RK_MPI_VENC_RGN_SetCoverEx](#RK_MPI_VENC_RGN_SetCoverEx)<br />（11）[RK_MPI_RGA_RGN_SetBitMap](#RK_MPI_RGA_RGN_SetBitMap)<br />（12）[RK_MPI_RGA_GetChnRegionLuma](#RK_MPI_RGA_GetChnRegionLuma)<br />（13）[RK_MPI_RGA_RGN_SetCover](#RK_MPI_RGA_RGN_SetCover)<br />（14）[RK_MPI_VMIX_CreateDev](#RK_MPI_VMIX_CreateDev)<br />（15）[RK_MPI_VMIX_DestroyDev](#RK_MPI_VMIX_DestroyDev)<br />（16）[RK_MPI_VMIX_EnableChn](#RK_MPI_VMIX_EnableChn)<br />（17）[RK_MPI_VMIX_DisableChn](#RK_MPI_VMIX_DisableChn)<br />（18）[RK_MPI_VMIX_SetLineInfo](#RK_MPI_VMIX_SetLineInfo)<br />（19）[RK_MPI_VMIX_ShowChn](#RK_MPI_VMIX_ShowChn)<br />（20）[RK_MPI_VMIX_HideChn](#RK_MPI_VMIX_HideChn)<br />（21）[RK_MPI_VMIX_RGN_SetBitMap](#RK_MPI_VMIX_RGN_SetBitMap)<br />（22）[RK_MPI_VMIX_GetRegionLuma](#RK_MPI_VMIX_GetRegionLuma)<br />（23）[RK_MPI_VMIX_GetChnRegionLuma](#RK_MPI_VMIX_GetChnRegionLuma)<br />（24）[RK_MPI_VMIX_RGN_SetCover](#RK_MPI_VMIX_RGN_SetCover)<br />（25）[RK_MPI_MUXER_EnableChn](#RK_MPI_MUXER_EnableChn)<br />（26）[RK_MPI_MUXER_DisableChn](#RK_MPI_MUXER_DisableChn)<br />（27）[RK_MPI_MUXER_Bind](#RK_MPI_MUXER_Bind)<br />（28）[RK_MPI_MUXER_StreamStart](#RK_MPI_MUXER_StreamStart)<br />（29）[RK_MPI_MUXER_StreamStop](#RK_MPI_MUXER_StreamStop)<br />（30）[RK_MPI_SYS_DevSendMediaBuffer](#RK_MPI_SYS_DevSendMediaBuffer)<br />2.AI/AO支持多通道同时打开。<br />3.JPEG支持±90度旋转。<br />4.优化Cover内存占用以及效率<br />5.新增uvc、多路音频的示例。<br/>5.Event接口增加用户私有数据指针<br />6.RGA支持镜像<br />7.删除JPEG Light接口说明 |
+| V1.3.1 | Ruby Zhang |  | 更新产品版本信息 |
 
 ---
 

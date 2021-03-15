@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-332
 
-Release Version: V1.0.1
+Release Version: V1.0.2
 
-Release Date: 2020-03-27
+Release Date: 2021-03-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -52,20 +52,26 @@ This document will introduce building, configuration, usage, and  key points dur
 This document (this guide) is mainly intended for:
 
 Technical support engineers
+
 Software development engineers
 
----
+**Product Version**
+
+| **Chipset**               | **Kernel Version** |
+| ------------------------- | ------------------ |
+| RK3288, RK3399, RK3399Pro | Linux 4.4          |
 
  **Revision History**
 
-| **Date**   | **Version** | **Date**    | Revision History             |
-| ---------- | ----------- | :---------- | ---------------------------- |
-| 2020-02-06 | V1.0.0      | Nickey Yang | Initial release              |
-| 2020-03-27 | V1.0.1      | Nickey Yang | Update the document's format |
+| **Date**   | **Version** | **Date**    | Revision History                |
+| ---------- | ----------- | :---------- | ------------------------------- |
+| 2020-02-06 | V1.0.0      | Nickey Yang | Initial release                 |
+| 2020-03-27 | V1.0.1      | Nickey Yang | Update the document's format    |
+| 2021-03-15 | V1.0.2      | Ruby Zhang  | Add product version information |
 
 ---
 
-## **Contents**
+**Contents**
 
 [TOC]
 

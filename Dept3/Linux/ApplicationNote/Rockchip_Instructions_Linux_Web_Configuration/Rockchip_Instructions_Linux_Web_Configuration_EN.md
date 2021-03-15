@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-357
 
-Release Version: V1.6.0
+Release Version: V1.6.1
 
-Release Date: 2021-02-19
+Release Date: 2021-03-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -42,9 +42,10 @@ This document is intended to present how to configure the supported network came
 
 **Product Version**
 
-| **Chipset**                    | **Kernel Version** |
-| ------------------------------ | ------------------ |
-| RV1109, RV1126, RK1808, RK1806 | Linux 4.19         |
+| **Chipset**    | **Kernel Version** |      |
+| -------------- | ------------------ | ---- |
+| RV1109, RV1126 | Linux 4.19         |      |
+| RK1808, RK1806 | Linux 4.4          |      |
 
 **Intended Audience**
 
@@ -68,6 +69,7 @@ Software development engineers
 | V1.4.0 | Allen Chen | 2020-08-14 | Add introduction on face function changes. |
 | V1.5.0 | Allen Chen | 2020-08-31 | Add introduction about direct connection. |
 | V1.6.0 | Allen Chen | 2021-02-19 | Update introduction about Web player and ISP. |
+| V1.6.1 | Ruby Zhang | 2021-03-15 | Update product version information |
 
 **Contents**
 

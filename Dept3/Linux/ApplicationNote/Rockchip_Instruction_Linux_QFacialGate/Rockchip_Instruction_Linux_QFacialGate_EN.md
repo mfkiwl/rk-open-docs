@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-374
 
-Release Version: V1.1.0
+Release Version: V1.1.1
 
-Release Date: 2020-08-31
+Release Date: 2021-03-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -42,9 +42,10 @@ This document is intended to introduce the usage of each module of QFicialGate a
 
 **Product Version**
 
-| **Platform** | **Kernel Version** |
-| ------------ | ------------------ |
-| Linux        | 4.4                |
+| **Platform**   | **Kernel Version** |
+| -------------- | ------------------ |
+| RK1808, RK1806 | Linux 4.4          |
+| RV1109, RV1126 | Linux 4.19         |
 
 **Intended Audience**
 
@@ -56,10 +57,11 @@ Software development engineers
 
 **Revision History**
 
-| **Date**   | **Version** | **Author** | **Change Description**            |
-| ---------- | ----------- | :--------- | --------------------------------- |
-| 2020-07-24 | V1.0.0      | ctf        | Initial version                   |
-| 2020-08-31 | V1.1.0      | ctf        | Add Qt configuration introduction |
+| **Date**   | **Version** | **Author** | **Change Description**             |
+| ---------- | ----------- | :--------- | ---------------------------------- |
+| 2020-07-24 | V1.0.0      | CTF        | Initial version                    |
+| 2020-08-31 | V1.1.0      | CTF        | Add Qt configuration introduction  |
+| 2021-03-15 | V1.1.1      | ZLX        | Update product version information |
 
 ---
 

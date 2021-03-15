@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-358
 
-Release Version: V1.3.1
+Release Version: V1.3.2
 
-Release Date: 2020-10-15
+Release Date: 2021-03-15
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -42,10 +42,10 @@ This document presents basic introduction for Linux application development.
 
 **Product Version**
 
-| **Chipset** | **Kernel Version** |
-| ----------- | ------------------ |
-| RV1109      | Linux 4.19         |
-| RK1806      | Linux 4.19         |
+| **Chipset**    | **Kernel Version** |
+| -------------- | ------------------ |
+| RV1126, RV1109 | Linux 4.19         |
+| RK1808, RK1806 | Linux 4.4          |
 
 **Intended Audience**
 
@@ -65,6 +65,7 @@ Software development engineers
 | V1.2.0      | Allen Chen | 2020-08-24 | Update ipcweb-ng                                             |
 | V1.3.0      | Fenrir Lin | 2020-09-16 | Add dbserver external interface,<br/>update onvif_server development environment |
 | V1.3.1      | Fenrir Lin | 2020-10-15 | Update file path                                             |
+| V1.3.2      | Ruby Zhang | 2021-03-15 | Update product version information                           |
 
 ---
 
