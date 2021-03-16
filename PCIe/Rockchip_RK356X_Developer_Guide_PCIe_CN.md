@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.8.0
+发布版本：V1.9.0
 
-日期：2021-02-27
+日期：2021-03-16
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -71,6 +71,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-02-23 | V1.6.0   | 林涛     | 增加MSI/MSI-X调试支持和运行态设备异常说明 |
 | 2021-02-26 | V1.7.0   | 林涛     | 增加Legacy INT的说明                      |
 | 2021-02-27 | V1.8.0   | 林涛     | 增加标注EP功能件开发说明                  |
+| 2021-03-16 | V1.9.0   | 林涛     | 增加FW存在异常设备的说明                  |
 
 ---
 
@@ -548,4 +549,18 @@ Capabilities: [58] MSI: Enable- Count=1/32 Maskable- 64bit+
 [   48.137299] nvme nvme0: Removing after probe failure status: -19
 [   48.147182] Buffer I/O error on dev nvme0n1, logical block 0, async page read
 [   48.162900] nvme nvme0: failed to set APST feature (-19)
+```
+
+7. **外设枚举过程报FW异常**
+
+如设备在枚举过程分配BAR空间报如下错误，一般问题是设备的BAR空间与协议不兼容，需要特殊处理。需要修改drivers/pci/quirks.c中，增加对应quirk处理。具体信息应该咨询设备厂商。
+
+```
+[    2.379768] rk-pcie 3c0000000.pcie: PCIe Link up, LTSSM is 0x30011
+[    2.380155] rk-pcie 3c0000000.pcie: PCI host bridge to bus 0000:00
+[    2.380187] pci_bus 0000:00: root bus resource [bus 00-0f]
+[    2.380204] pci_bus 0000:00: root bus resource [??? 0x300000000-0x3007fffff flags 0x0] (bus address [0x00000000-0x007fffff])
+[    2.380217] pci_bus 0000:00: root bus resource [io  0x0000-0xfffff] (bus address [0x800000-0x8fffff])
+[    2.380230] pci_bus 0000:00: root bus resource [mem 0x300900000-0x33fffffff] (bus address [0x00900000-0x3fffffff])
+[    2.394983] pci 0000:01:00.0: [Firmware Bug] reg 0x10: invalid BAR (can't size)
 ```
