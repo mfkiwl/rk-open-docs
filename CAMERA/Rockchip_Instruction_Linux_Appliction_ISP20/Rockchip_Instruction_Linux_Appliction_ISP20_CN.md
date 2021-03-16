@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-366
 
-发布版本：V1.1.1
+发布版本：V1.1.2
 
-日期：2020-10-14
+日期：2021-03-16
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有 © 2020 瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0    | Zack Zeng | 2020-06-10 | 初始版本     |
 | V1.1.0    | CWW | 2020-10-02 | 修正文档路径 |
 | V1.1.1 | Ruby Zhang | 2020-10-14 | 格式修正 |
+| V1.1.2 | CWW | 2021-03-16 | 更新v4l2-utils获取码流命令 |
 
 ---
 
@@ -290,9 +291,17 @@ v4l2-ctl抓图保存成文件，它不能解析图像并显示出来。如需要
 下面是一个简单的抓图命令：
 
 ```shell
-v4l2-ctl -d /dev/video13 --set-ctrl="exposure=234,analogue_gain=76"  \
---set-selection=target=crop,top=0,left=0,width=2688,height=1520  --set-fmt-video=width=2688,height=1520,pixelformat=NV12 \
---stream-mmap=4 --stream-to=/tmp/output.nv12 --stream-count=1 --stream-poll
+# find the node (e.g. /dev/v4l-subdev3) to set exposure
+for i in `ls /dev/v4l-subdev*`; do v4l2-ctl -l -d $i |grep exposure && echo "Node: $i" ;done
+
+v4l2-ctl -d /dev/v4l-subdev3 --set-ctrl="exposure=234,analogue_gain=76"
+
+# find the video device node name (e.g. /dev/video18) to capture
+for i in `ls /dev/media[0-9]`; do media-ctl -p -d $i |grep rkispp_m_bypass -A 4;done
+
+v4l2-ctl -d /dev/video18 \
+--set-fmt-video=width=2688,height=1520,pixelformat=NV12 \
+--stream-mmap=4 --stream-to=/tmp/output.nv12 --stream-count=100 --stream-poll
 ```
 
 ## RkAiq 3A Server独立进程

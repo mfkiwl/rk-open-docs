@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-366
 
-Release Version: V1.1.1
+Release Version: V1.1.2
 
-Release Date: 2020-10-14
+Release Date: 2021-03-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -61,6 +61,7 @@ Software development engineers
 | V1.0.0    | Zack Zeng | 2020-06-10 | Initial version |
 | V1.1.0 | CWW | 2020-10-02 | Update the document path |
 | V1.1.1 | Ruby Zhang | 2020-10-14 | Update links between chapters |
+| V1.1.2 | CWW | 2021-03-16 | Update command of v4l2-utils to get data stream |
 
 ---
 
@@ -284,9 +285,17 @@ For detailed instructions on v4l2-ctl and mplayer tools, please refer to the doc
 Here is a simple snapshot command:
 
 ```shell
-v4l2-ctl -d /dev/video13 --set-ctrl="exposure=234,analogue_gain=76"  \
---set-selection=target=crop,top=0,left=0,width=2688,height=1520  --set-fmt-video=width=2688,height=1520,pixelformat=NV12 \
---stream-mmap=4 --stream-to=/tmp/output.nv12 --stream-count=1 --stream-poll
+# find the node (e.g. /dev/v4l-subdev3) to set exposure
+for i in `ls /dev/v4l-subdev*`; do v4l2-ctl -l -d $i |grep exposure && echo "Node: $i" ;done
+
+v4l2-ctl -d /dev/v4l-subdev3 --set-ctrl="exposure=234,analogue_gain=76"
+
+# find the video device node name (e.g. /dev/video18) to capture
+for i in `ls /dev/media[0-9]`; do media-ctl -p -d $i |grep rkispp_m_bypass -A 4;done
+
+v4l2-ctl -d /dev/video18 \
+--set-fmt-video=width=2688,height=1520,pixelformat=NV12 \
+--stream-mmap=4 --stream-to=/tmp/output.nv12 --stream-count=100 --stream-poll
 ```
 
 ## RkAiq 3A Server Independent Process
