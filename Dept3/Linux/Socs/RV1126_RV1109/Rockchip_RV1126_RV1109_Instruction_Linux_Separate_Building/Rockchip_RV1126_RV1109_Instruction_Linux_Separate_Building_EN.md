@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-386
 
-Release Version: V1.6.2
+Release Version: V1.6.3
 
-Release Date: 2021-03-01
+Release Date: 2021-03-17
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -72,6 +72,7 @@ This document (this guide) is mainly intended for:
 | 2021-01-14 | V1.6.0 | CWW  | 1. Update manufacture programmer firmware image |
 | 2021-02-18 | V1.6.1 | CWW  | 1. Update BSP library |
 | 2021-03-01 | V1.6.2 | CWW  | 1. Update CIF driver module to clear unready dev |
+| 2021-03-17 | V1.6.3 | CWW  | 1. Add the chapter of instructions to camera-related drivers insmod |
 
 ---
 
@@ -209,6 +210,7 @@ insmod kernel/drivers/media/common/videobuf2/videobuf2-memops.ko
 insmod kernel/drivers/media/common/videobuf2/videobuf2-dma-contig.ko
 insmod kernel/drivers/media/common/videobuf2/videobuf2-common.ko
 insmod kernel/drivers/media/common/videobuf2/videobuf2-v4l2.ko
+insmod kernel/drivers/media/common/videobuf2/videobuf2-dma-sg.ko
 insmod kernel/drivers/media/common/videobuf2/videobuf2-vmalloc.ko
 
 # insmod drm
@@ -271,6 +273,72 @@ insmod kernel/drivers/rtc/rtc-pcf8563.ko
 insmod kernel/drivers/leds/leds-pwm.ko
 
 # restart udevd after insmod driver modules
+udevadm control --start-exec-queue
+```
+
+#### Instructions to Camera-related Drivers insmod
+
+Modify `rv1126-emmc-drivers-modules.config` as follows:
+
+```ini
+CONFIG_PHY_ROCKCHIP_MIPI_RX=m
+# CONFIG_USB_CONFIGFS_F_UAC1 is not set
+# CONFIG_USB_CONFIGFS_F_UAC2 is not set
+# CONFIG_USB_CONFIGFS_F_UVC is not set
+# CONFIG_USB_CONFIGFS_RNDIS is not set
+CONFIG_V4L2_FWNODE=m
+CONFIG_VIDEOBUF2_CORE=m
+CONFIG_VIDEOBUF2_DMA_CONTIG=m
+CONFIG_VIDEOBUF2_MEMOPS=m
+CONFIG_VIDEOBUF2_V4L2=m
+CONFIG_VIDEOBUF2_VMALLOC=m
+### disable others sensor to be built-in kernel
+# CONFIG_VIDEO_GC2053 is not set
+# CONFIG_VIDEO_OV2718 is not set
+# CONFIG_VIDEO_SC2232 is not set
+# CONFIG_VIDEO_SC2310 is not set
+# CONFIG_VIDEO_GC4C33 is not set
+# CONFIG_VIDEO_IMX347 is not set
+# CONFIG_VIDEO_IMX378 is not set
+# CONFIG_VIDEO_OS04A10 is not set
+# CONFIG_VIDEO_OV4689 is not set
+CONFIG_VIDEO_SC200AI=m
+CONFIG_VIDEO_ROCKCHIP_CIF=m
+CONFIG_VIDEO_ROCKCHIP_ISP=m
+CONFIG_VIDEO_ROCKCHIP_ISPP=m
+```
+
+Build kernel (`rv1126-38x38-v10-emmc` is the basename of dts) and install to the dir of drivers-ko.
+
+``` shell
+make ARCH=arm rv1126_defconfig rv1126-emmc-drivers-modules.config
+make ARCH=arm rv1126-38x38-v10-emmc.img -j12
+make modules_install ARCH=arm INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=./drivers-ko
+```
+
+The script of insmod camera-related drivers:
+
+```shell
+#!/bin/sh
+
+udevadm control --stop-exec-queue
+
+insmod kernel/drivers/media/common/videobuf2/videobuf2-common.ko
+insmod kernel/drivers/media/common/videobuf2/videobuf2-v4l2.ko
+insmod kernel/drivers/media/common/videobuf2/videobuf2-memops.ko
+insmod kernel/drivers/media/common/videobuf2/videobuf2-dma-contig.ko
+insmod kernel/drivers/media/common/videobuf2/videobuf2-dma-sg.ko
+insmod kernel/drivers/media/common/videobuf2/videobuf2-vmalloc.ko
+insmod kernel/drivers/media/v4l2-core/v4l2-fwnode.ko
+insmod kernel/drivers/media/i2c/sc200ai.ko
+insmod kernel/drivers/phy/rockchip/phy-rockchip-mipi-rx.ko
+insmod kernel/drivers/media/platform/rockchip/cif/video_rkcif.ko
+insmod kernel/drivers/media/platform/rockchip/isp/video_rkisp.ko
+insmod kernel/drivers/media/platform/rockchip/ispp/video_rkispp.ko
+
+echo 1 > /sys/module/video_rkisp/parameters/clr_unready_dev
+echo 1 > /sys/module/video_rkcif/parameters/clr_unready_dev
+
 udevadm control --start-exec-queue
 ```
 
