@@ -2,9 +2,9 @@
 
 文档标识：RK-KF-YF-397
 
-发布版本：V1.1.0
+发布版本：V1.2.0
 
-日期：2020-12-12
+日期：2020-03-24
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -65,6 +65,7 @@ Rockchip Electronics Co., Ltd.
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0 | Zhichao Yu, Ziyuan Xu, Hans Yang, Tao Huang | 2020-12-22 | 初始版本     |
 | V1.1.0 | Zhihua Wang | 2021-02-02 | 增加双目使用说明 |
+| V1.2.0 | Fenrir Lin | 2021-03-24 | 增加oem分区说明 |
 
 ---
 
@@ -165,7 +166,7 @@ parameter-spi-nor-tb-32M.txt                 // SPI Nor 32MB快速启动镜像�
 
 - userdata(oem)
 
-说明：根据需要，客户可以单独开一个可读写的分区。
+说明：根据需要，客户可以单独开一个可读写的分区。[增加oem分区](#增加oem分区)可用于存放云端固化信息、算法模型库等文件。
 
 #### 快速启动固件烧写
 
@@ -734,6 +735,55 @@ iperf3功能的开启需要在buildroot配置文件中打开gdb的功能
 ```shell
 +#include "gdb.config"
 ```
+
+### 增加oem分区
+
+目前EVB快速启动和电池类IPC的配置，已默认开启oem分区，如果其他配置想开启oem分区，请完成以下步骤。
+
+以下操作以电池类IPC为例，其他配置需修改相同路径下的对应文件。
+
+#### 修改buildroot配置
+
+buildroot/configs/rockchip_rv1126_battery_ipc_defconfig中，增加
+
+```shell
+BR2_PACKAGE_RK_OEM=y
+BR2_PACKAGE_RK_OEM_RESOURCE_DIR="$(TOPDIR)/../device/rockchip/oem/oem_battery_ipc"
+BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE="ext2"
+```
+
+#### 修改BoardConfig
+
+device/rockchip/rv1126_rv1109/BoardConfig-battery-ipc.mk中，增加
+
+```shell
+# Set oem partition type, including ext2 squashfs
+export RK_OEM_FS_TYPE=ext2
+# OEM config
+export RK_OEM_DIR=oem_battery_ipc
+# OEM build on buildroot
+export RK_OEM_BUILDIN_BUILDROOT=YES
+```
+
+#### 修改parameter
+
+device/rockchip/rv1126_rv1109/parameter-tb.txt中，增加oem分区的信息。
+
+```shell
+CMDLINE:mtdparts=rk29xxnand:0x00002000@0x00004000(uboot),0x00010000@0x00006000(boot),0x00020000@0x00016000(oem),-@0x00036000(userdata:grow)
+```
+
+#### 修改package-file
+
+在tools/linux/Linux_Pack_Firmware/rockdev/package-file中，增加
+
+```shell
+oem		Image/oem.img
+```
+
+#### 开机脚本挂载oem分区
+
+可参考buildroot/package/rockchip/thunderboot/S07mountall
 
 ## Wi-Fi保活和远程唤醒介绍
 
