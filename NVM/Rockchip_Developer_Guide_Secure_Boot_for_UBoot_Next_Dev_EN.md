@@ -2,41 +2,39 @@
 
 ID: RK-KF-YF-023
 
-Release version: 1.1
+Release version: 2.2.0
 
-Release Date: 2020-01-15
+Release Date: 2021-03-25
 
-Author email: jason.zhu@rock-chips.com
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
-Security Level: Non-confidential
-
-------
+---
 
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
-“Rockchip”, “瑞芯微”, “瑞芯” shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
-Website：     [www.rock-chips.com](http://www.rock-chips.com)
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
 
-Customer service Tel： +86-4007-700-590
+Customer service Tel:  +86-4007-700-590
 
-Customer service Fax： +86-591-83951833
+Customer service Fax:  +86-591-83951833
 
-Customer service e-Mail： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
-------
+---
 
 **Preface**
 
@@ -53,20 +51,26 @@ This document (this guide) is mainly intended for:
 Technical support engineers
 Software development engineers
 
-------
+---
 
 **Revision History**
 
-| **Date** | **Version** | **Author** | **Revision description** |
+| **Version** | **Author** |  **Date** |**Revision description** |
 | ---------- | -------- | --------- | ------------------ |
-| 2019-12-04 | V1.0     | Jason Zhu & Chen Haiyan | Initial version release |
-| 2020-01-15 | V1.1 | Ken Bian | Add more details for Android SDK |
+| V1.0.0   | Jason Zhu | 2019-01-14 |Initial version release |
+| V1.1.0   | Jason Zhu |2019-06-03 | Correct some inappropriate descriptions |
+| V2.0.0  | Jason Zhu & Chen Haiyan  |2019-09-19 | Version update & Release English version |
+| V2.1.0 | Ken Bian |2020-01-15 | Add more details for Android SDK |
+| V2.2.0 | WuLiangqing |2021-03-25 |  Add AVB Kernel section description |
 
-------
+---
+
+**Contents**
 
 [TOC]
 
-------
+---
+
 ## Reference
 
 《Rockchip-Secure-Boot-Application-Note.md》
@@ -412,6 +416,8 @@ CONFIG_ROCKCHIP_OTP=y
 
 ### Kernel modification
 
+The changes to the kernel are only applicable to Android9.0. There is no need to change the kernel for Android10 and above. You can skip these changes.
+
 System, vendor, oem and other partitions are verified by loading dm-verify module of kernel, so need to enable this module.
 
 Enable AVB requires to configure parameter avb in kernel dts, referring to below:
@@ -482,15 +488,16 @@ These variables mainly include three types:
 
 - The variables which must be defined by `A/B` system
 
-- `AB_OTA_UPDATER := true`
-- `AB_OTA_PARTITIONS := boot system vendor`
-- `BOARD_BUILD_SYSTEM_ROOT_IMAGE := true`
-- `TARGET_NO_RECOVERY := true`
-- `BOARD_USES_RECOVERY_AS_BOOT := true`
-- `PRODUCT_PACKAGES += update_engine update_verifier`
+  - `AB_OTA_UPDATER := true`
+  - `AB_OTA_PARTITIONS := boot system vendor`
+  - `BOARD_BUILD_SYSTEM_ROOT_IMAGE := true`
+  - `TARGET_NO_RECOVERY := true`
+  - `BOARD_USES_RECOVERY_AS_BOOT := true`
+  - `PRODUCT_PACKAGES += update_engine update_verifier`
 
 - The variables which can be defined by `A/B` system
   - `PRODUCT_PACKAGES_DEBUG += update_engine_client`
+
 - The variables which cannot be defined by `A/B` system
   - `BOARD_RECOVERYIMAGE_PARTITION_SIZE`
   - `BOARD_CACHEIMAGE_PARTITION_SIZE`

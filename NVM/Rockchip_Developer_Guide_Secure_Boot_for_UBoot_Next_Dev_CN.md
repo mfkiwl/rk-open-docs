@@ -1,20 +1,54 @@
 # Rockchip Secure Boot
 
-发布版本：2.1
+文件标识：RK-KF-YF-022
 
-作者邮箱：jason.zhu@rock-chips.com
+发布版本：V2.2.0
 
-日期：2020.01.15
+日期：2021-03-25
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
-------
+---
+
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有 © 2021 瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+
+---
 
 **前言**
 
 **概述**
 
 本文档将详细介绍基于 Rockchip U-boot next-dev 的 secure boot 流程。
+
+**产品版本**
 
 **读者对象**
 
@@ -28,18 +62,22 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者**  | **修改说明**       |
+| **版本号**   | **作者** | **修改日期**  | **修改说明**       |
 | ---------- | -------- | --------- | ------------------ |
-| 2019-01-14 | V1.0     | Jason Zhu | 初始版本           |
-| 2019-06-03 | V1.1     | Jason Zhu | 修正一些不恰当描述 |
-| 2019-09-19 | V2.0  | Jason Zhu | 版本更新 |
-| 2020-01-15 | V2.1 | Ken Bian | 添加更多Android SDK中的细节 |
+|  V1.0.0 | Jason Zhu | 2019-01-14 | 初始版本           |
+|  V1.1.0 | Jason Zhu | 2019-06-03 | 修正一些不恰当描述 |
+|  V2.0.0 | Jason Zhu | 2019-09-19 | 版本更新 |
+|  V2.1.0 | Ken Bian  | 2020-01-15 | 添加更多Android SDK中的细节 |
+|  V2.2.0 | WuLiangqing | 2021-03-25 |增加AVB kernel部分修改说明 |
 
-------
+---
+
+**目录**
 
 [TOC]
 
-------
+---
+
 ## 引用参考
 
 《Rockchip-Secure-Boot-Application-Note.md》
@@ -383,6 +421,8 @@ CONFIG_ROCKCHIP_OTP=y
 
 ### kernel 修改
 
+kernel部分修改仅适用于Android9.0版本，Android10及以上版本kernel部分无需修改，可以跳过这部分修改。
+
 system，vendor，oem 等分区的校验由 kernel 的 dm-verify 模块加载校验，所以需要使能该模块。
 
 使能 AVB 需要在 kernel dts 上配置参数 avb，参考如下：
@@ -452,14 +492,17 @@ BOARD_AVB_KEY_PATH := path/to/testkey_psk.pem
 这些变量主要有三类：
 
 - `A/B`系统必须定义的变量
+
   - `AB_OTA_UPDATER := true`
   - `AB_OTA_PARTITIONS := boot system vendor`
   - `BOARD_BUILD_SYSTEM_ROOT_IMAGE := true`
   - `TARGET_NO_RECOVERY := true`
   - `BOARD_USES_RECOVERY_AS_BOOT := true`
   - `PRODUCT_PACKAGES += update_engine update_verifier`
+
 - `A/B`系统可选定义的变量
   - `PRODUCT_PACKAGES_DEBUG += update_engine_client`
+
 - `A/B`系统不能定义的变量
   - `BOARD_RECOVERYIMAGE_PARTITION_SIZE`
   - `BOARD_CACHEIMAGE_PARTITION_SIZE`
@@ -532,6 +575,7 @@ CHECK_MASK: 0x80
 PWR_HLD: 0,0,A,0,1
 TYPE: GPT
 CMDLINE: mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00002000@0x00008000(trust_a),0x00002000@0x0000a000(trust_b),0x00001000@0x0000c000(misc),0x00001000@0x0000d000(vbmeta_a),0x00001000@0x0000e000(vbmeta_b),0x00020000@0x0000e000(boot_a),0x00020000@0x0002e000(boot_b),0x00100000@0x0004e000(system_a),0x00300000@0x0032e000(system_b),0x00100000@0x0062e000(vendor_a),0x00100000@0x0072e000(vendor_b),0x00002000@0x0082e000(oem_a),0x00002000@0x00830000(oem_b),0x0010000@0x00832000(factory),0x00008000@0x842000(factory_bootloader),0x00080000@0x008ca000(oem),-@0x0094a000(userdata)
+
 ```
 
 ## fastboot 命令支持
