@@ -394,14 +394,51 @@ HDMIRX线缆连接模式用于HDMIRX to MIPI CSI接口转换，适用于HDMI IN�
 目前支持以下分辨率，可根据具体项目需求在驱动中继续增加：
 
 - 3840X2160-30Hz(RGB-8BIT/YUV422-8BIT)
-
 - 1920X1080-60Hz(RGB-8BIT/YUV422-8BIT)
-
 - 1280X720-60Hz(RGB-8BIT/YUV422-8BIT)
-
 - 720X576-50Hz(RGB-8BIT/YUV422-8BIT)
-
 - 720X480-60Hz(RGB-8BIT/YUV422-8BIT)
+
+#### HDMIRX AUDIO
+
+音频信号通过RK628 I2S输出（RK628必须是master），可以直接连接DAC芯片，或者与SOC的I2S直接连接
+
+与SOC连接时候，RK628 I2S不需要额外的配置，可以使用dummy_codec创建一个声卡设备，供系统使用：
+
+```dtd
+dummy_codec: dummy-codec {
+        compatible = "rockchip,dummy-codec";
+        #sound-dai-cells = <0>;
+};
+
+hdmiin-sound {
+        compatible = "simple-audio-card";
+        simple-audio-card,format = "i2s";
+        simple-audio-card,name = "rockchip,hdmiin";
+        simple-audio-card,bitclock-master = <&dailink0_master>;
+        simple-audio-card,frame-master = <&dailink0_master>;
+        status = "okay";
+        simple-audio-card,cpu {
+                        sound-dai = <&i2s0>;
+        };
+        dailink0_master: simple-audio-card,codec {
+                        sound-dai = <&dummy_codec>;
+        };
+};
+```
+
+RK3288 EVB使用的是RK3288 I2S与RT5651的I2S2，RK628 I2S与RT5651的I2S2连接。在使用过程中，通过切换RT5651内部的route，达到切换不同通路录音，播放的功能，对应dts配置如下：
+
+```dtd
+hdmiin-sound {
+        compatible = "rockchip,rockchip-rt5651-rk628-sound";
+        rockchip,cpu = <&i2s>;
+        rockchip,codec = <&rt5651>;
+        status = "okay";
+};
+```
+
+注意事项：由于RK628 I2S接口没有提供MCLK，所以如果直接连接DAC的话，最好选择无需MCLK DAC芯片
 
 ## Output
 
@@ -1539,6 +1576,25 @@ rk3568 平台：arch/arm64/boot/dts/rockchip/rk3568-evb6-ddr3-v10-rk628-bt1120-t
    ```
 
 如果是 RK3399+RK628 平台，硬件上 RK628 的 24M 时钟需要由 RK3399 的 PIN-U28 clk_testout2 提供，软件补丁参考 HDMI2GVI 章节。
+
+#### HDMITX Audio
+
+HDMITX 模式下, HDMI音频数据是通过RK628 I2S接收的，需要与SOC的I2S连接，并配置好声卡供系统调用。如下，RK628 I2S与SOC的I2S0连接：
+
+```dtd
+hdmi_sound: hdmi-sound {
+        compatible = "simple-audio-card";
+        simple-audio-card,format = "i2s";
+        simple-audio-card,name = "hdmi-sound";
+        status = "okay";
+        simple-audio-card,cpu {
+                sound-dai = <&i2s0>;
+        };
+        simple-audio-card,codec {
+                sound-dai = <&rk628_hdmi>;
+        };
+};
+```
 
 ### GVI
 
