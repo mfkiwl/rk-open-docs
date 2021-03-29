@@ -202,6 +202,15 @@ itb本质是fdt_blob + images的文件集合，有如下两种打包方式，RK�
 
 ## 平台配置
 
+### 支持列表
+
+目前已经作为正式Feature发布在SDK的平台有：
+
+| 支持平台      |
+| ------------- |
+| RV1126/RV1109 |
+| RK3566/RK356X |
+
 ### 代码配置
 
 代码：
@@ -485,7 +494,7 @@ cjh@ubuntu:~/uboot-nextdev$ fdtdump u-boot.dtb | less
     };
 ```
 
-spl 同时支持烧写 key hash 的功能，u-boot-spl.dtb 的 key-dev 会多出“burn-key-hash = <0x00000001>;”。
+SPL 支持烧写 key hash 的功能，u-boot-spl.dtb 的 key-dev 会多出 `burn-key-hash = <0x00000001>;`。
 
 #### key使用
 
@@ -493,7 +502,9 @@ spl 同时支持烧写 key hash 的功能，u-boot-spl.dtb 的 key-dev 会多出
 
 - Maskrom校验loader。
 
-  RSA公钥需要使用PC工具`SecureBootTool` 写入loader的文件头中；安全启动时Maskrom从loader文件头中拿RSA公钥（会对公钥进行合法性校验）对loader进行安全校验。
+  RSA公钥需要使用PC工具`rk_sign_tool` 写入loader的文件头中。安全启动时，Maskrom首先从loader固件头中获取RSA公钥并校验合法性；然后再使用该公钥校验loader的固件签名。
+
+  > rk_sign_tool 可从 rkbin仓库中获取，U-Boot会自动完成对loader的签名。
 
 - SPL校验U-Boot和trust。
 
@@ -553,29 +564,35 @@ cjh@ubuntu:~/uboot-nextdev$ fdtdump uboot.img | less
 
 ### 前期准备
 
-#### key
+#### Key
 
-U-Boot工程下执行如下三条命令可以生成签名用的RSA密钥对。
+U-Boot工程下执行如下三条命令可以生成签名用的RSA密钥对。通常情况下只需要生成一次，此后都用这对密钥签名和验证固件，请妥善保管。
 
 ```c
 // 1. 放key的目录：keys
 mkdir -p keys
 
-// 2. 使用RK的"SecureBootTool"工具生成RSA2048的私钥，存放为：keys/dev.key
-...
+// 2. 使用RK的"rk_sign_tool"工具生成RSA2048的私钥privateKey.pem和publicKey.pem，分别更名存放为：keys/dev.key和keys/dev.pubkey。命令为：
+../rkbin/tools/rk_sign_tool kk --bits 2048 --out .
 
-// 3. 使用-x509和私钥生成一个自签名证书：keys/dev.crt （实际等同于公钥）
+// 3. 使用-x509和私钥生成一个自签名证书：keys/dev.crt （效果本质等同于公钥）
 openssl req -batch -new -x509 -key keys/dev.key -out keys/dev.crt
 ```
 
-查看结果：
+> 如果报错用户目录下没有.rnd文件：
+>
+> Can't load /home4/cjh//.rnd into RNG
+> 140522933268928:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home4/cjh//.rnd
+>
+> 请先手动创建：touch ~/.rnd
+
+`ls keys/`查看结果：
 
 ```
-cjh@ubuntu:~/uboot-nextdev$ ls keys/
-dev.crt  dev.key
+dev.crt  dev.key  dev.pubkey
 ```
 
-> 注意：上述的"keys"、"dev.key"、"dev.crt" 名字都不可变。因为这些名字已经在its文件中静态定义，如果改变则会打包失败。
+> 注意：上述的"keys"、"dev.key"、"dev.crt" 、"dev.pubkey"名字都不可变。因为这些名字已经在its文件中静态定义，如果改变则会打包失败。
 
 #### 配置
 
@@ -599,28 +616,10 @@ CONFIG_SPL_FIT_ROLLBACK_PROTECT=y   // uboot.img防回滚
 
 ### 编译打包
 
-#### 公钥烧写
-
-编译命令：
+**（1）基础命令（不防回滚）：**
 
 ```c
-./make.sh rv1126 --spl-new --boot_img boot.img --burn-key-hash
-```
-
-使用 RK 的"SecureBootTool"工具对生成的 loader 进行签名。
-
-固件下载到设备，如果key 烧写成功，会输出：
-
-```
-RSA: Write key hash successfully
-```
-
-#### 不防回滚
-
-编译命令：
-
-```c
-./make.sh rv1126 --spl-new --boot_img boot.img
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img
 ```
 
 编译结果：
@@ -628,68 +627,89 @@ RSA: Write key hash successfully
 ```c
 ......
 
-Signature check OK
-out:rv1126_spl_loader_v1.00.100.bin
-fix opt:rv1126_spl_loader_v1.00.100.bin
-merge success(rv1126_spl_loader_v1.00.100.bin)
-/home4/cjh/uboot-nextdev
-pack loader(SPL) okay! Input: /home4/cjh/rkbin/RKBOOT/RV1126MINIALL.ini
-pack loader with new: spl/u-boot-spl.bin
-
 // 编译完成后，生成已签名的uboot.img和boot.img。
-// rv1126_spl_loader_v1.00.100.bin需要用RK的"SecureBootTool"工具单独签名。
-Image(signed):  uboot.img (FIT with uboot, trust) is ready
-Image(signed):  boot.img (FIT with kernel, fdt, resource...) is ready
-Image(no-signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is ready
+start to sign rv1126_spl_loader_v1.00.100.bin
+......
+sign loader ok.
+......
+Image(signed, version=0):  uboot.img (FIT with uboot, trust...) is ready
+Image(signed, version=0):  recovery.img (FIT with kernel, fdt, resource...) is ready
+Image(signed, version=0):  boot.img (FIT with kernel, fdt, resource...) is ready
+Image(signed):  rv1126_spl_loader_v1.05.106.bin (with spl, ddr, usbplug) is ready
+pack uboot.img okay! Input: /home4/cjh/rkbin/RKTRUST/RV1126TOS.ini
 
 Platform RV1126 is build OK, with new .config(make rv1126-secure_defconfig)
 ```
 
-#### 防回滚
+**（2）扩展命令1：**
 
-编译命令：
+如果开启防回滚，必须对上述（1）追加rollback参数。例如：
 
 ```c
 // 指定 uboot.img和boot.img的最小版本号分别为10、12.
-./make.sh rv1126 --spl-new --boot_img boot.img --rollback-index-uboot 10 --rollback-index-boot 12
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 10 --rollback-index-boot 12
 ```
 
 编译结果：
 
 ```c
 ......
-Signature check OK
-out:rv1126_loader_v1.00.100.bin
-fix opt:rv1126_loader_v1.00.100.bin
-merge success(rv1126_loader_v1.00.100.bin)
-/home4/cjh/uboot-nextdev
-pack loader(SPL) okay! Input: /home4/cjh/rkbin/RKBOOT/RV1126MINIALL.ini
-./rv1126_spl_loader_v1.00.100.bin
 
 // 编译完成后，生成已签名的uboot.img和boot.img，且包含防回滚版本号。
-// rv1126_spl_loader_v1.00.100.bin需要用RK的"SecureBootTool"工具单独签名。
+start to sign rv1126_spl_loader_v1.00.100.bin
+......
+sign loader ok.
+......
 Image(signed, version=0, rollback-index=10):  uboot.img (FIT with uboot, trust) is ready
+Image(signed, version=0, rollback-index=12):  recovery.img (FIT with kernel, fdt, resource...) is ready
 Image(signed, version=0, rollback-index=12):  boot.img (FIT with kernel, fdt, resource...) is ready
-Image(no-signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is ready
+Image(signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is ready
 ```
 
-#### 注意事项
+**（3）扩展命令2：**
 
-- rv1126_spl_loader_v1.00.100.bin 由maskrom完成安全校验，所以需要打包成loader后由"SecureBootTool"工具单独签名（增加maskrom可识别的RK签名头）。
+如果要把公钥hash烧写到OTP/eFUSE，必须对上述（1）或（2）追加参数`--burn-key-hash`。例如：
 
-- 必须通过`--boot_img`指定boot.img，目的是让U-Boot重新打包并签名，否则会提示失败：
+```c
+// 指定uboot.img和boot.img的最小版本号分别为10、12.
+// 要求SPL阶段把公钥hash烧写到OTP/eFUSE中。
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 10 --rollback-index-boot 12 --burn-key-hash
+```
 
-  ```c
-  ERROR: No images/rk-kernel.dtb  // 即没有指定 --boot_img参数，也没有在默认目录存放子固件
-  ```
+编译结果：
 
-- 开启防回滚功能后必须指定`--rollback-index-uboot`和`--rollback-index-boot`参数。
+```c
+......
+
+// 使能 burn-key-hash
+## spl/u-boot-spl.dtb: burn-key-hash=1
+
+// 编译完成后，生成已签名的uboot.img和boot.img，且包含防回滚版本号。
+start to sign rv1126_spl_loader_v1.00.100.bin
+......
+sign loader ok.
+......
+Image(signed, version=0, rollback-index=10):  uboot.img (FIT with uboot, trust) is ready
+Image(signed, version=0, rollback-index=12):  recovery.img (FIT with kernel, fdt, resource...) is ready
+Image(signed, version=0, rollback-index=12):  boot.img (FIT with kernel, fdt, resource...) is ready
+Image(signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is ready
+```
+
+> 上电开机时能看到SPL打印：RSA: Write key hash successfully。
+
+**（4）注意事项：**
+
+- `--boot_img`：可选。指定待签名的boot.img。
+
+- `--recovery_img`：可选。指定待签名的recovery.img。
+
+- `--rollback-index-uboot`和`--rollback-index-boot`：可选。指定防回滚版本号。
 
 - `--spl-new`：如果编译命令不带此参数，则默认使用rkbin中的spl文件打包生成loader；否则使用当前编译的spl文件打包loader。
 
   因为u-boot-spl.dtb中需要被打包进RSA公钥（来自于用户），所以RK发布的SDK不会在rkbin仓库提交支持安全启动的spl文件。因此，用户编译时要指定该参数。但是用户也可以把自己的spl版本提交到rkbin工程，此后编译固件时就可以不再指定此参数，每次都使用这个稳定版的spl文件。
 
-- 编译后会生成三个固件：loader、uboot.img、boot.img，只要RSA key 没有更换，就允许单独更新其中的任意固件，而不需要全部更新。
+- 编译后会生成三个固件：loader、uboot.img、boot.img，只要RSA key 没有更换，就允许单独更新其中的任意固件。
 
 ### 启动信息
 
@@ -897,11 +917,11 @@ Starting kernel ...
 
 ### 具体步骤
 
-用于签名固件的RSA密钥对是：dev.key和dev.crt，dev.key作为私钥由远程服务器持有，用户只有公钥dev.crt。
+用于签名固件的RSA密钥对是：dev.key，dev.pubkey和dev.crt，dev.key作为私钥由远程服务器持有，用户只有公钥dev.pubkey和dev.crt。
 
 **步骤1：**
 
-在本地U-Boot工程环境下：用户把dev.crt放到keys目录下，然后用RK的"SecureBootTool"工具随机生成一把临时私钥，命名为dev.key放到keys目录下。参考上面的章节（但是编译参数要追加`--no-check`）生成签名固件uboot.img和boot.img（实际最后不会被使用，用户需要的是中间文件）。
+在本地U-Boot工程环境下：用户把dev.crt放到keys目录下，然后用RK的"rk_sign_tool"工具随机生成一把临时私钥，命名为dev.key放到keys目录下。参考上面的章节（但是编译参数要追加`--no-check`）生成签名固件uboot.img和boot.img（实际最后不会被使用，用户需要的是中间文件）。
 
 注意：**编译命令要指定参数`--no-check`**，否则会因为dev.key和dev.crt不匹配导致打包脚本自校验失败。比如：
 
@@ -941,6 +961,7 @@ openssl dgst -sha256 -sign dev.key -out  uboot.sig  uboot.data2sign
 
 - fit-resign.sh时-f 指定的itb文件，不是img文件。脚本会对itb重签名后生成img文件。
 - 执行fit-resign.sh时用的itb文件必须是步骤1编译生成的，即itb文件和data2sign文件是一对一对应的，因为data2sign信息中包含了生成itb文件的时间戳，即`/timestamp = <...>` 。所以即使当前没有任何代码改动，重新编译获得一个新的uboot.itb，把uboot.sig替换进新的uboot.itb中也会引起安全启动失败！
+- 由于没有私钥，loader需要单独发送到服务器端进行签名。
 
 ### 其它方案
 
