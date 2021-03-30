@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-302
 
-发布版本：V2.1.0
+发布版本：V2.2.0
 
-日期：2021-02-03
+日期：2021-03-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -50,8 +50,8 @@ Rockchip Electronics Co., Ltd.
 
 | **芯片名称** | **版本** |
 | :----------- | ----------------- |
-| RK2108       | RT-THREAD |
-| PISCES     | RT-THREAD |
+| RK2108       |  RT-Thread |
+| PISCES     | RT-Thread |
 | RK2206       | RKOS |
 
 **读者对象**
@@ -77,6 +77,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-08-06 | V1.8.0 | 吴佳健 | 新增Vendor Key校验说明 |
 | 2020-09-18 | V1.9.0 | 吴佳健 | 更新Map配置信息修改方式和XIP模式说明 |
 | 2021-02-03 | V2.1.0 | 吴佳健 | 更新软件环境搭建说明，新增算法库相关说明 |
+| 2021-03-30 | V2.2.0 | 吴佳健 | 新增Cache相关说明 |
 
 ---
 
@@ -396,7 +397,7 @@ RT-Thread bsp drivers  --->
 
 “Config dsp debug uart port”表示设置DSP打印的 UART 端口。如果值是-1那么将不会设置。DSP代码中默认使用UART0。
 
-注[^1]:实际目标文件由menuconfig中RT_DSPFW_FILE_NAME指定。
+[^1]:实际目标文件由menuconfig中RT_DSPFW_FILE_NAME指定。
 
 ### 驱动调用
 
@@ -651,3 +652,61 @@ generate_dsp_fw.bat RK2108 FwConfigXIP.xml
 MCU 和 DSP 通过 Mailbox 进行通信，Mailbox 包含 4 个通道，一个通道传输 32bit 的 CMD 和 Data 数据。每次发送消息，CMD 通道传输命令码，表示这次消息进行哪些操作；Data 通道传输数据，一般为 work 或者 config 的 buffer 指针。命令码存于在 drv_dsp.h 中，DSP_CMD_WORK、DSP_CMD_READY、DSP_CMD_CONFIG 等。
 
 当 DSP 启动后，DSP 会进行自身的初始化等操作。初始化完成后，DSP 会发送 DSP_CMD_READY 命令，MCU 端接收到后，会调用“rk_dsp_config”函数对 DSP 进行 trace 等相关信息的配置。DSP 接收到 DSP_CMD_CONFIG 并且配置完成后，会发送 DSP_CMD_CONFIG_DONE，表示配置已经完成，可以进行算法工作。这三次消息发送相当于一个握手过程，握手完成后就可以进行算法调用。
+
+### Cache说明
+
+在MCU与DSP进行数据交互的过程中，由于双方Cache独立（在DSP上为16k icache和16k dcache），因此存在Cache一致性问题，即双方向某一地址中写入数据时，会先往Cache中写入，在某些条件下（如Cache块替换、显式调用write back或Cache策略为write through等）才会实际往内存中写，这将导致双方获取对方数据时，可能获取的不是最新数据。因此，为避免相关问题，通常建议使用时显式调用invalidate、writeback相关接口，各平台接口如下：
+
+```c
+// RK2108：
+rt_hw_cpu_dcache_ops(RT_HW_CACHE_FLUSH | RT_HW_CACHE_INVALIDATE, (void *)addr, size);
+rt_hw_cpu_dcache_ops(RT_HW_CACHE_FLUSH, (void *)addr, size);
+rt_hw_cpu_dcache_ops(RT_HW_CACHE_INVALIDATE, (void *)addr, size);
+// RK2206：
+rk_dcache_ops(RK_HW_CACHE_CLEAN | RK_HW_CACHE_INVALIDATE, (void *)addr, size);
+rk_dcache_ops(RK_HW_CACHE_CLEAN, (void *)addr, size);
+rk_dcache_ops(RK_HW_CACHE_INVALIDATE, (void *)addr, size);
+// HIFI3 DSP：
+xthal_dcache_region_writeback_inv((void *)addr, size);
+xthal_dcache_region_writeback((void *)addr, size);
+xthal_dcache_region_invalidate((void *)addr, size);
+```
+
+在MCU发送消息给DSP前，通常由MCU输出到DSP的buffer，MCU端需要使用writeback接口，DSP端需要使用invalidate接口，由DSP输出到MCU的buffer，MCU端需要使用invalidate接口[^2]。在DSP处理完发送消息给MCU前，DSP输出的buffer需要使用writeback接口。以RK2108平台接口为例，示例如下：
+
+```c
+char *buf_to_dsp;	// write by MCU, read by DSP
+int buf_len_to_dsp;
+char *buf_to_mcu;	// write by DSP, read by MCU
+int buf_len_to_mcu;
+
+/* MCU side start */
+rt_hw_cpu_dcache_ops(RT_HW_CACHE_FLUSH, buf_to_dsp, buf_len_to_dsp);
+rt_hw_cpu_dcache_ops(RT_HW_CACHE_INVALIDATE, buf_to_mcu, buf_len_to_mcu);
+rt_device_control(dsp_dev, RKDSP_CTL_QUEUE_WORK, work);	// Send message to DSP
+/* MCU side end */
+
+/* DSP side start */
+xthal_dcache_region_invalidate(buf_to_dsp, buf_len_to_dsp);
+/* processing */
+xthal_dcache_region_writeback(buf_to_mcu, buf_len_to_mcu);
+/* DSP side end */
+
+/* MCU side start */
+rt_device_control(dsp_dev, RKDSP_CTL_DEQUEUE_WORK, work);	// Wait message from DSP
+/* MCU side end */
+```
+
+[^2]:建议MCU在发消息前使用invalidate接口，因为MCU为多线程环境，此时申请的Buffer，可能因为其他线程使用过而存在Cache中，并且大概率为“脏”数据，若在DSP执行写回操作后，MCU端Cache出现块替换，可能导致脏数据被写回，从而污染正确数据。
+
+### 开启Cache
+
+ITCM、DTCM、SRAM的Cache通常为开启状态，XIP、PSRAM等地址空间的Cache可能为关闭状态，可以使用以下接口开启Cache：
+
+``` c
+// XCHAL_CA_WRITEBACK仅为其中一种策略，其他策略可跳转定义处查看
+xthal_set_region_attribute((void *)addr_base, size, XCHAL_CA_WRITEBACK, 0);
+```
+
+注意，开启Cache并不一定对性能有提升，还取决于Cache命中率，若命中率较低，可能开启Cache会导致性能下降，因此建议结合实际选择。目前DSP平台没有Cache命中率统计工具，建议结合软件仿真和代码流程分析。
+
