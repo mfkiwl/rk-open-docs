@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-392
 
-Release Version: V0.1.0
+Release Version: V1.0.0
 
-Release Date: 2021-01-18
+Release Date: 2021-04-10
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -63,6 +63,7 @@ Software development engineers
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-12-11 | V0.0.1 | Caesar Wang | Initial version |
 | 2021-01-18 | V0.1.0 | Caesar Wang | Beta version |
+| 2021-04-10 | V1.0.0 | Caesar Wang | Release version |
 
 ---
 
@@ -110,11 +111,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take RK356X_LINUX_SDK_V0.1.0_20210118.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take RK356X_LINUX_SDK_V1.0.0_20210410.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V0.1.0_20210118.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V1.0.0_20210410.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -123,6 +124,35 @@ cd rk356x
 Developers can update via `.repo/repo/repo sync -c --no-tags` command according to update instructions that are regularly released by FAE window.
 
 ## Software Development Guide
+
+### NPU Development Tool
+
+The SDK NPU development tool includes following items:
+
+**RKNN-TOOLKIT2** ：
+Development tools are in project directory “external/rknn-toolkit2”. Which is used for model conversion, model reasoning, model performance evaluation functions, etc. Please refer to documents in the docs/ directory for details.
+
+```
+├── RKNNToolKit2_OP_Support-v0.7.0.md
+├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v0.7.0.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v0.7.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v0.7.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v0.7.0.pdf
+├── changelog-v0.7.0.txt
+└── requirements-v0.7.0.txt
+```
+
+**RKNN-DRIVER**:
+RKNN DRIVER development materials are in the project directory “external/rknpu/rknnrt/lib/linux-aarch64/driver/”.
+
+**RKNN API**:
+RKNN API development materials are in the project directory “external/rknpu2”.
+Please refer to documents in the docs/ directory for details.
+
+```
+├── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_CN.pdf
+└── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_EN.pdf
+```
 
 ### Software Update History
 

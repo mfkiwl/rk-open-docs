@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-392
 
-发布版本：V0.1.0
+发布版本：V1.0.0
 
-日期：2021-01-18
+日期：2021-04-10
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | -----------| :-------------- | :------------- | :---------- |
 | 2020-12-11 | V0.0.1 | Caesar Wang | 初始版本。 |
 | 2021-01-18 | V0.1.0 | Caesar Wang | 更新BETA版本。 |
+| 2021-04-10 | V1.0.0 | Caesar Wang | 正式发布版本。 |
 
 ---
 
@@ -115,11 +116,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 RK356X_LINUX_SDK_V0.1.0_20210118.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 RK356X_LINUX_SDK_V1.0.0_20210410.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V0.1.0_20210118.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V1.0.0_20210410.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -128,6 +129,35 @@ cd rk356x
 后续开发者可根据 FAE 窗口定期发布的更新说明，通过 `.repo/repo/repo sync -c --no-tags` 命令同步更新。
 
 ## 软件开发指南
+
+### NPU 开发工具
+
+本 SDK NPU 开发工具如下：
+
+**RKNN-TOOLKIT2** ：
+开发工具在 external/rknn-toolkit2 目录下，主要用来实现模型转换，模型推理，模型性能评估功能等，具体使用说明请参考当前 doc/ 的目录文档：
+
+```
+├── RKNNToolKit2_OP_Support-v0.7.0.md
+├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v0.7.0.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v0.7.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v0.7.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v0.7.0.pdf
+├── changelog-v0.7.0.txt
+└── requirements-v0.7.0.txt
+```
+
+**RKNN-DRIVER**：
+RKNN DRIVER 开发内容在工程目录 external/rknpu/rknnrt/lib/linux-aarch64/driver/ 下。
+
+**RKNN API**：
+RKNN API的开发使用在工程目录 external/rknpu2下，用于推理RKNN-Toolkit2生成的rknn模型。
+具体使用说明请参考当前 doc/ 的目录文档：
+
+```
+├── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_CN.pdf
+└── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_EN.pdf
+```
 
 ### 软件更新记录
 
