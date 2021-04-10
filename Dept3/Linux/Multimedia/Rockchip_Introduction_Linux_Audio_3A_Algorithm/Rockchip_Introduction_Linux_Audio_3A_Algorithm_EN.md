@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-391
 
-Release Version: V1.0.0
+Release Version: V1.1.0
 
-Release Date: 2020-12-10
+Release Date: 2021-04-06
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -44,7 +44,7 @@ Rockchip Audio Processor (referred to as RKAP) is a set of Rockchip audio proces
 
 | **Name** | Version |
 | ------------ | ------------ |
-| The 3A algorithm of Voice Call | RKAP_3A_V1.0.0 |
+| Introduce of the 3A algorithm | RKAP_3A_V1.2.0 |
 
 **Intended Audience**
 
@@ -59,6 +59,7 @@ Software development engineers
 | **Date**   | **Version** | **Author**  | **Revision History** |
 | ---------- | :---------- | :---------- | :------------------- |
 | V1.0.0 | Cherry.Chen | 2020-12-09 | Initial  version      |
+| V1.1.0 | Cherry.Chen | 2021-04-06 | add AEC ERLE mode and  Hardware test |
 
 ---
 
@@ -170,6 +171,10 @@ typedef struct RKAP_AEC_State_S
 | Return Values   | None                          |
 | Function Description | Print the current algorithm library version    |
 
+### example
+
+external/rkmedia/examples/rkmedia_audio_test.c
+
 ---
 
 ## RKAP_Para.bin Files
@@ -191,6 +196,8 @@ The UI of tool looks as follows:
 
 ### AEC Parameters
 
+#### AEC Basic Parameter
+
 | Parameter Name              | Index | Ranges | Description                      |
 | --------------------- | ----- | -------- | ------------------------------------------------------------ |
 | AEC Enabled           | 10    | 0 or 1     | 0-off, 1-on                                   |
@@ -211,6 +218,15 @@ The UI of tool looks as follows:
 The UI of tool looks as follows:
 
   ![](./resource/aec_param_en.png)
+
+#### AEC ERLE Parameter
+
+| Parameter Name | Index | Range  | Default Value | Description                                           |
+| -------------- | ----- | ------ | ------------- | ----------------------------------------------------- |
+| ERLE Enabled   | 450   | 0 or 1 | 0             | 0-off,1-on                                            |
+| ERLE Smooth    | 451   | 0~1    | 0.92          | ERLE smoothing coefficent                             |
+| ERLE Thd       | 452   | 0~1    | 0.05          | ERLE threshold, repressing when ERLE low than THD     |
+| ERLE Con Thd   | 453   | 1~20   | 1             | ERLE continuation threshold which lower than ERLE THD |
 
 ### ANR Parameters
 
@@ -251,35 +267,83 @@ The UI of tool looks as follows:
 
 ### EQ Parameters
 
+#### PEAK Filter
+
 The EQ (Equalizer) in this algorithm is a simple 3-Bands EQ, which aims at the voice comfort after 3A algorithm processing.
 The specific parameters are as follows:
 
 | Parameter Name | Index | Ranges | Description                      |
 | ------------- | ----- | ------------- | ----------------------- |
 | TX EQ Enabled | 160   | 0 or 1          | 0-off, 1-on  |
-| TX EQ Freq0   | 170   | (0，Fs/2)     | The center frequency of the first band TX EQ       |
+| TX EQ Freq0   | 170   | (0, Fs/2)     | The center frequency of the first band TX EQ       |
 | TX EQ Gain0   | 171   | [-12,12] (dB) | The gain of the first band TX EQ, unit: dB |
 | TX EQ Q0      | 172   | (0,10]        | The quality factor of the first band TX EQ       |
-| TX EQ Freq1   | 180   | (0，Fs/2)     | The center frequency of the second band TX EQ       |
+| TX EQ Freq1   | 180   | (0, Fs/2)     | The center frequency of the second band TX EQ       |
 | TX EQ Gain1   | 181   | [-12,12] (dB) | The gain of the second band TX EQ, unit: dB |
 | TX EQ Q1      | 182   | (0,10]        | The quality factor of the second band TX EQ       |
-| TX EQ Freq2   | 190   | (0，Fs/2)     | The center frequency of the third band TX EQ       |
+| TX EQ Freq2   | 190   | (0, Fs/2)     | The center frequency of the third band TX EQ       |
 | TX EQ Gain2   | 191   | [-12,12] (dB) | The gain of the first band TX EQ, unit: dB |
 | TX EQ Q2      | 192   | (0,10]        | The quality factor of the third band TX EQ       |
 | RX EQ Enabled | 300   | 0或1          | 0-off, 1-on  |
-| RX EQ Freq0   | 310   | (0，Fs/2)     | The center frequency of the first band RX EQ       |
+| RX EQ Freq0   | 310   | (0, Fs/2)     | The center frequency of the first band RX EQ       |
 | RX EQ Gain0   | 311   | [-12,12] (dB) | The gain of the first band RX EQ, unit: dB |
 | RX EQ Q0      | 312   | (0,10]        | The quality factor of the first band RX EQ       |
-| RX EQ Freq1   | 320   | (0，Fs/2)     | The center frequency of the second band RX EQ      |
+| RX EQ Freq1   | 320   | (0, Fs/2)     | The center frequency of the second band RX EQ      |
 | RX EQ Gain1   | 321   | [-12,12] (dB) | The gain of the second band RX EQ, unit: dB |
 | RX EQ Q1      | 322   | (0,10]        | The quality factor of the second band RX EQ       |
-| RX EQ Freq2   | 330   | (0，Fs/2)     | The center frequency of the third band RX EQ       |
+| RX EQ Freq2   | 330   | (0, Fs/2)     | The center frequency of the third band RX EQ       |
 | RX EQ Gain2   | 331   | [-12,12] (dB) | The gain of the third band RX EQ, unit: dB |
 | RX EQ Q2      | 332   | (0,10]        | The quality factor of the third band RX EQ       |
 
 The UI of tool looks as follows:
 
 ![](./resource/eq_param_en.png)
+
+The figure below shows an example of peak filter which Freq = 4000Hz,Gain = 12, Q = 2.5/6:
+
+![image-20210407160918197](./resource/peak_filter.png)
+
+#### High Pass Filter & Low Pass Filter
+
+| Parameter Name | Index | Range  | Description                           |
+| -------------- | ----- | ------ | ------------------------------------- |
+| TX HPF Fc      | 200   | 0~Fs/2 | TX high pass filter cut-off frequency |
+| TX LPF Fc      | 201   | 0~Fs/2 | TX low pass filter cut-off frequency  |
+| RX HPF Fc      | 340   | 0~Fs/2 | RX high pass filter cut-off frequency |
+| RX LPF Fc      | 341   | 0~Fs/2 | RX low pass filter cut-off frequency  |
+
+**Note：**if Fc = 0 or Fc = Fs/2 ,the filter is off.
+
+The figure below shows an example of low-pass filter which Fc = 2000Hz:
+
+![image-20210407160918197](./resource/low_pass_filter.png)
+
+The figure below shows an example of high-pass filter which Fc = 200Hz:
+
+![image-20210407161206545](./resource/high_pass_filter.png)
+
+#### Shelf Filter
+
+| Parameter Name | Index | Range  | Description                            |
+| -------------- | ----- | ------ | -------------------------------------- |
+| TX HSF Fc      | 202   | 0~Fs/2 | TX high shelf filter cut-off frequency |
+| TX HSF Gain    | 203   | -12~12 | TX high shelf filter Gain              |
+| TX LSF Fc      | 204   | 0~Fs/2 | TX low shelf filter  cut-off frequency |
+| TX LSF Gain    | 203   | -12~12 | TX low shelf filter Gain               |
+| RX HSF Fc      | 342   | 0~Fs/2 | RX high shelf filter cut-off frequency |
+| RX HSF Gain    | 343   | -12~12 | RX high shelf filter Gain              |
+| RX LSF Fc      | 344   | 0~Fs/2 | RX low shelf ilter cut-off frequency   |
+| RX LSF Gain    | 345   | -12~12 | RX low shelf filter Gain               |
+
+**Note：**if Fc = 0 or Fc = Fs/2 ,the filter is off.
+
+The figure below shows an example of high-shelf filter which Fc = 300Hz,Gain = ±12 :
+
+![image-20210407163338532](./resource/high_shelf_filter.png)
+
+The figure below shows an example of low-shelf filter which Fc = 1000Hz,Gain = ±12 :
+
+![image-20210407163503228](./resource/low_shelf_filter.png)
 
 ### CNG Parameters
 
@@ -288,3 +352,80 @@ The UI of tool looks as follows:
 | TX CNG Enabled | 440   | 0 or 1     | 0-off, 1-on |
 | TX CNG Ratio   | 441   |          | Applying ratio of TX CNG      |
 | TX CNG Amp     | 442   |          | Applying amplitude of TX CNG      |
+
+---
+
+### Hardware Test
+
+### Audio Precision Test
+
+- Environment:  AP
+
+- Audio Signal:  Sweep Signal
+
+- Purpose: Measure audio quality
+
+- Method: Use AP test microphone signal and reference signal
+
+- Standard: THD+N < 5%
+
+**Special Note:** if you use RK809 or RK817, recommend hpout+PA method. if you need use SPK, please note that:
+
+(1) RK809 adn RK817 codec ClassD designed for 8ohm.
+
+(2) RK809 adn RK817 codec do  not support single-ended to get reference signal.
+
+### Audio Easy Test
+
+- Environment:  protetype
+
+- Audio Signal:  Sweep Signal
+
+- Purpose: Measure audio quality
+
+- Method: use protetype to play sweep signal and record it
+
+```
+arecord -D hw:0,0 -c 2 -f S16_LE -r 16000 /tmp/sweep.wav
+sox -b 16 -r 16000 -c 2 -n -t alsa hw:0,0 synth 20 sine 20:8000 // samplerate = 16k, and sweep signal from 20Hz to 8KHz
+```
+
+or
+
+```
+arecord -D hw:0,0 -c 2 -f S16_LE -r 8000 /tmp/sweep.wav
+sox -b 16 -r 8000 -c 2 -n -t alsa hw:0,0 synth 20 sine 20:4000 samplerate = 8k, and sweep signal from 20Hz to 4KHz
+```
+
+then, observe mic signal and ref signal's SNR and THD of sweep.wav.
+
+The figure below shows an example of bad mic signal and good reference signal:
+
+![image-20210413112338723](./resource/easy_audio_test.png)
+
+**Special Note:** Before use RK809/RK817 Codec to record and play, you should make sure record and play path according to hardware. Play path:
+
+```
+amixer -c 0 sset 'Playback Path' SPK // Open Codec ClassD
+```
+
+or
+
+```
+amixer -c 0 sset 'Playback Path' HP // Open Codec HPOUT
+```
+
+Record Path:
+
+```
+amixer -c 0 sset 'Capture MIC Path' 'Main Mic' // Open codec MIC
+```
+
+### Sealing Test
+
+- Environment:  Anechoic room
+- Audio Signal:  0dBFS White Noise
+- Purpose: Measure seal of  microphone
+- Method: The source audio  is placed 50cm in the normal direction of the mic external plane, the mic inlet holes are blocked with rubber paste or other things in turn, and the white noise signal is played with high fidelity playback equipment with the volume level of 94dBA. The prototype to be tested is recorded, and the RMS size of  mic channel blocked picked-up hole is measured, and the RMS difference between blocked and non-blocked picked-up holes is compared.
+- Standard: RMS difference between blocking and not blocking the sound hole is more than 20dB.
+
