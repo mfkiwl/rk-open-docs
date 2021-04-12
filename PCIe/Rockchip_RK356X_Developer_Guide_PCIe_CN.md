@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V1.9.0
+发布版本：V2.0.0
 
-日期：2021-03-16
+日期：2021-04-12
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -72,6 +72,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-02-26 | V1.7.0   | 林涛     | 增加Legacy INT的说明                      |
 | 2021-02-27 | V1.8.0   | 林涛     | 增加标注EP功能件开发说明                  |
 | 2021-03-16 | V1.9.0   | 林涛     | 增加FW存在异常设备的说明                  |
+| 2021-04-12 | V2.0.0   | 林涛     | 增加用户态访问异常说明                    |
 
 ---
 
@@ -386,7 +387,7 @@ lt-HP-ProDesk-400-G5 -NT-ID5-APD:~$ sudo lspci
 
 ## 异常排查
 
-1. **trainning 失败**
+### trainning 失败
 
 ```
 PCIe Link Fail的log如下一致重复，LTSSM状态机可能不同
@@ -403,7 +404,7 @@ rk-pcie 3c0000000.pcie: PCIe Linking... LTSSM is 0x0
 
 另外还建议客户打开pcie-dw-rockchip.c中的RK_PCIE_DBG，抓一份log以便分析。请阅读者注意，如果有多个控制器同时使用，抓log前请先把不使用或者没问题的设备对应的控制器disable掉，这样log会好分析一点。
 
-2. **PCIe3.0控制器初始化设备系统异常**
+### PCIe3.0控制器初始化设备系统异常
 
 ```
 [   21.523506] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
@@ -441,7 +442,7 @@ rk-pcie 3c0000000.pcie: PCIe Linking... LTSSM is 0x0
 - 外部晶振芯片的时钟输入是否异常，如果无时钟或者幅度异常，将导致phy无法锁定。
 - 检查 PCIE30_AVDD_0V9 和PCIE30_AVDD_1V8电压是否满足要求。
 
-3. **PCIe2.0控制器初始化设备系统异常**
+### PCIe2.0控制器初始化设备系统异常
 
 ```
 [   21.523870] rcu:     (detected by 2, t=6302 jiffies, g=-1183, q=1)
@@ -482,7 +483,7 @@ writel(val,priv->mmio + (0xd << 2));
 
 设置完成后，请依次配置combphy2_psq的时钟频率为24M,25M以及100M，用示波器从PCIe的refclk差分信号脚上测量时钟情况，检查频率和幅值、抖动是否满足要求。
 
-4. **PCIe外设资源分配异常**
+### PCIe外设资源分配异常
 
 ```
 3.286864] pci 0002:20:00.0: bridge configuration invalid ([bus 01-ff]), reconfiguring
@@ -498,7 +499,7 @@ writel(val,priv->mmio + (0xd << 2));
 
 如常用应用问题Q4所述，RK356X的PCIe地址空间有限制。此log表明21号总线外设向RK356X申请3GB的64bit memory空间，超出了限制导致无法分配资源。若为市售设备，将不受RK356X芯片支持；若为定制设备，请联系设备vendor确认是否可以修改其BAR空间容量编码。
 
-5. **MSI/MSI-X无法使用**
+### MSI/MSI-X无法使用
 
 在移植外设驱动的开发过程中(主要指的是WiFi)，认为主机端的function driver因无法使用MSI或者MSI-X中断而导致流程不正常，按如下流程进行排查
 
@@ -523,7 +524,7 @@ Capabilities: [58] MSI: Enable- Count=1/32 Maskable- 64bit+
 
 - 使用协议分析仪器抓取协议信号，查看流程中外设是否有概率性没有向主机发送MSI或者MSI-X中断，而导致的异常。需注意，目前协议分析仪一般都难以支持焊贴设备的信号采集，需向设备vendor购买金手指的板卡，在我司EVB上进行测试和信号采集。另需注意我司EVB仅支持标准接口的金手指板卡，若待测设备为M.2接口的设备(常见key A, key B, key M三种类型)，请采购使用对应型号的转接板。
 
-6. **外设枚举后通信过程中报错**
+### 外设枚举后通信过程中报错
 
 以下是NVMe在RK3566-EVB2上进行正常枚举之后，通信过程中突然设备异常报错的log。不论是什么设备，如果可以正常枚举并使能，则可以看到类似nvme 0000:01:00.0: enabling device (0000 -> 0002)的log。此后通信过程中设备报错，需要考虑如下三个方面：
 
@@ -551,7 +552,7 @@ Capabilities: [58] MSI: Enable- Count=1/32 Maskable- 64bit+
 [   48.162900] nvme nvme0: failed to set APST feature (-19)
 ```
 
-7. **外设枚举过程报FW异常**
+### 外设枚举过程报FW异常
 
 如设备在枚举过程分配BAR空间报如下错误，一般问题是设备的BAR空间与协议不兼容，需要特殊处理。需要修改drivers/pci/quirks.c中，增加对应quirk处理。具体信息应该咨询设备厂商。
 
@@ -564,3 +565,25 @@ Capabilities: [58] MSI: Enable- Count=1/32 Maskable- 64bit+
 [    2.380230] pci_bus 0000:00: root bus resource [mem 0x300900000-0x33fffffff] (bus address [0x00900000-0x3fffffff])
 [    2.394983] pci 0000:01:00.0: [Firmware Bug] reg 0x10: invalid BAR (can't size)
 ```
+
+### 重新映射后访问PCIe设备的BAR地址空间异常
+
+如果内核中利用ioremap将分配给PCIe外设的BAR地址进行映射后，使用memset或者memcpy来读写，会产生alignment fault错误。亦或者利用mmap将分配给PCIe外设的BAR地址映射到用户态进行访问，使用memset或者memcpy来读写，会产生sigbug错误。原因是memcpy或者memset在ARM64上会使用类似DC ZVA等指令，这些指令不支持Device memory type(nGnRE)。
+
+```
+[    69.195811] Unhandled fault: alignment fault (0x96000061) at 0xffffff8009800000
+[    69.195829] Internal error: : 96000061 [#1] PREEMPT SMP
+[    69.363352] Modules linked in:
+[    69.363655] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.172 #691
+[    69.364205] Hardware name: Rockchip rk3568 evb board (DT)
+[    69.364688] task: ffffffc00a300000 task.stack: ffffffc00a2dc000
+[    69.365227] PC is at __memset+0x16c/0x190
+[    69.365593] LR is at snda_alloc_res+0xac/0xfc
+[    69.366054] pc : [<ffffff800839a2ac>] lr : [<ffffff80085055b8>] pstate: 404000c5
+[    69.366713] sp : ffffffc00a2df810
+```
+
+解决办法如下两种：
+
+- 改用memremap(phys_addr, size, MEMREMAP_WC) 这类接口来替换mmap
+- 改用memset_io或者memset_fromio/memset_toio等API
