@@ -1,12 +1,12 @@
 # **DDR Verification Process**
 
-fileid: RK-CS-YF-081
+ID: RK-CS-YF-081
 
-Release version: 1.3.1
+Release version: 1.5.0
 
-Release Date: 2019.11
+Release Date: 2021-04-23
 
-Classifed Level: Publicity
+Security Level: Publicity
 
 ------
 
@@ -18,27 +18,27 @@ THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“
 
 “Rockchip”, “瑞芯微”, “瑞芯” shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
-No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian, PRC
 
-Website：     [www.rock-chips.com](http://www.rock-chips.com)
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
 
-Customer service Tel： +86-4007-700-590
+Customer service Tel: +86-4007-700-590
 
-Customer service Fax： +86-591-83951833
+Customer service Fax: +86-591-83951833
 
-Customer service e-Mail： [fae@rock-chips.com](mailto:fae@rock-chips.com)
+Customer service e-Mail: [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ------
 
 **Preface**
 
-​	This document introduces verification process of the Double Data Rate(DDR) SDRAM for compatibility and stability in all chip platform. It contains the following sections:  Linux 3.10, Linux 4.4, RV1108 and RK3308. Please select the corresponding section for reference according to the actual test platform.
+​	This document introduces verification process of the Double Data Rate(DDR) SDRAM for compatibility and stability in all chip platform. It contains the following sections:  Linux 3.10, Linux 4.xx (Linux 4.4 and Linux 4.19), RV1108 and RK3308. Please select the corresponding section for reference according to the actual test platform.
 
 ------
 **Product ID**
@@ -66,6 +66,8 @@ Software Development Engineer
 | V1.2.0      | 2018.10.11 | Zhihuan He   | Added RK3308 DDR verification process description      |
 | V1.3.0      | 2019.06.03 | Youming Chen | Fix the description error on RebootTest and SleepTest  |
 | V1.3.1      | 2019.11.27 | Zhihuan He   | Modify the document format, sync with Chinese document |
+| V1.4.1      | 2021.04.12 | Wesley Yao   | Add test method for devices NOT running Android        |
+| V1.5.0      | 2021.04.23 | Wesley Yao   | Modify document format                                 |
 
 ------
 [TOC]
@@ -83,16 +85,16 @@ Software Development Engineer
 
 ### Linux 3.10 Compile Test Firmware
 
-​	Please configure the menuconfig of the kernel code, enter the System Type, choose and open DDR Test and pm_tests.
+Please configure the menuconfig of the kernel code, enter the System Type, choose and open DDR Test and pm_tests.
 
-```
+```shell
   menuconfig
   System Type  --->
     [*]   /sys/pm_tests/ support
     [*]   DDR Test
 ```
 
-​	If there is no`[] /sys/pm_tests/ support`option in menuconfig , please refer to the sections "How to Fix DDR Frequency" and "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel" in "Rockchip_Developer_Guide_DDR_EN" to compile fixed or scaled DDR frequency firmware.
+If there is no`[] /sys/pm_tests/ support`option in menuconfig , please refer to the sections "How to Fix DDR Frequency" and "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel" in "Rockchip_Developer_Guide_DDR_EN" to compile fixed or scaled DDR frequency firmware.
 
 ### Linux 3.10 Set Up Test Environment
 
@@ -108,23 +110,23 @@ Before test, you should know the following information:
 
 #### Automatically Set Up Test Environment
 
-​	Enter the "linux3.10_ddr_test_files" directory of DDR test file, double-click push_files.bat directly, select and input 1 or 2 according to the script tips and firmware type. Then waiting the test environment complete  automatically. If there is no error reported, you can skip the section "Manually Set Up Test Environment".
+Enter the "linux3.10_ddr_test_files" directory of DDR test file, double-click push_files.bat directly, select and input 1 or 2 according to the script tips and firmware type. Then waiting the test environment complete  automatically. If there is no error reported, you can skip the section "Manually Set Up Test Environment".
 
 #### Manually Set Up Test Environment
 
-​	If setting up test environment automatically failed, you can do it manually. Please select and install following files in the directory "linux3.10_ddr_test_files".
+If setting up test environment automatically failed, you can do it manually. Please select and install following files in the directory "linux3.10_ddr_test_files".
 
 1. Install fishingjoy.
 
-```
+```shell
 <adb_tool> adb.exe install fishingjoy1.apk
 ```
 
 2. Push google stressapptest.
 
-  Please push the corresponding version of **stressapptest** according to the firmware version.
+Please push the corresponding version of **stressapptest** according to the firmware version.
 
-```
+```shell
 <adb_tool> adb.exe root
 <adb_tool> adb.exe remount
 <adb_tool> adb.exe push libstlport.so /system/lib/libstlport.so
@@ -133,48 +135,51 @@ Before test, you should know the following information:
 
 * If the firmware version is android4.4, please select **stressapptest_android4.4** to push.
 
-```
+```shell
 <adb_tool> adb.exe push stressapptest_android4.4 /data/stressapptest
 <adb_tool> adb.exe shell chmod 0777 /data/stressapptest
 ```
 
 * If the firmware version is not android4.4, please select **stressapptest** to push.
 
-```
+```shell
 <adb_tool> adb.exe push stressapptest /data/stressapptest
 <adb_tool> adb.exe shell chmod 0777 /data/stressapptest
 ```
 
 3. Push memtester.
 
-  Please push the corresponding **memtester** according to the firmware version.
-  Eg：
+Please push the corresponding **memtester** according to the firmware version.
+
+Eg：
+
 * If the firmware of the test machine is Linux 32bit, select **memtester_32bit** to push.
 
-```
+```shell
 <adb_tool> adb.exe push memtester_32bit /data/memtester
 <adb_tool> adb.exe shell chmod 644 /data/memtester
 ```
 
 * If the firmware of the test machine is Linux 64bit, select **memtester_64bit** to push.
 
-```
+```shell
 <adb_tool> adb.exe push memtester_64bit /data/memtester
 <adb_tool> adb.exe shell chmod 644 /data/memtester
 ```
 
 4. Sync
 
-```
+```shell
 <adb_tool> adb.exe shell sync
 ```
 
 ### Linux 3.10 Verify DDR Capacity
 
 Check whether the MemTotal capacity matches the actual capacity of the test machine by`<rkxxxx:/ $>  cat /proc/meminfo`
+
 log eg:
 
-```
+```shell
 <rkxxxx:/ $> cat /proc/meminfo
 MemTotal:        2038904 kB
 ```
@@ -199,19 +204,19 @@ Due to the difference in system memory allocation management, the slight deviati
 
 2. Send  `su` command from the serial console.
 
-```
+```shell
 <rkxxxx:/ $> su
 ```
 
 3. Fix DDR frequency.
 
-   Please set the maximum DDR frequency supported by the test machine.
+Please set the maximum DDR frequency supported by the test machine.
 
-   eg：
+eg：
 
-   If the maximum DDR frequency is 533MHz.
+If the maximum DDR frequency is 533MHz.
 
-```
+```shell
 <rkxxxx:/ #> echo set clk_ddr 533000000 > /sys/pm_tests/clk_rate
 ```
 
@@ -219,65 +224,65 @@ Due to the difference in system memory allocation management, the slight deviati
 
 * If the total capacity is 512MB, apply 64MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 64
 ```
 
 * If the total capacity is 1GB, apply 128MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 128
 ```
 
 * If the total capacity is 2GB, apply 256MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 256
 ```
 
 * If the total capacity is 4MB, apply 512MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 512
 ```
 
 5. Confirm the test result.
 
-  ​	At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally, the result of stressapptest is PASS or FAIL. The stressapptest will print a log every 10 seconds, and the log displays the rest of the test time. After completing, the result will be printed. If pass, it will print **Status: PASS**. If fail, it will print **Status: FAIL**.
+At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally, the result of stressapptest is PASS or FAIL. The stressapptest will print a log every 10 seconds, and the log displays the rest of the test time. After completing, the result will be printed. If pass, it will print **Status: PASS**. If fail, it will print **Status: FAIL**.
 
 6. Do memtester test, the test time is more than 12 hours.
 
 * If the total capacity is 512MB, apply 64MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 64m
 ```
 
 * If the total capacity is 1GB, apply 128MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 128m
 ```
 
 * If the total capacity is 2GB, apply 256MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 256m
 ```
 
 * If the total capacity is 4GB, apply 512MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 512m
 ```
 
 7. Confirm the test result.
 
-  ​	At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally, and whether the memtester reports errors. The memtester in DDR test file has been modified, it will be stopped automatically if any error is found in the test process. If the memtester is running more than 12 hours, it indicating that no error is found in the test process.
+At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally, and whether the memtester reports errors. The memtester in DDR test file has been modified, it will be stopped automatically if any error is found in the test process. If the memtester is running more than 12 hours, it indicating that no error is found in the test process.
 
 * If the memtester finds no error, it will continue to print the following log:
 
-```
+```shell
 Loop 10:
     Stuck Address       : ok
     Random Value        : ok
@@ -299,7 +304,7 @@ Loop 10:
 
 * If any error is found in the memtester, it will automatically stop the test and exit. The log will be printed as follows:
 
-```
+```shell
 FAILURE: 0xffffffff != 0xffffbfff at offset 0x03b7d9e4.
 EXIT_FAIL_OTHERTEST
 ```
@@ -312,7 +317,7 @@ If the machine has done the fixed frequency test before, restart the machine, or
 
 2. Send  `su` command from the serial console.
 
-```
+```shell
 <rkxxxx:/ $> su
 ```
 
@@ -320,35 +325,37 @@ If the machine has done the fixed frequency test before, restart the machine, or
 
 * If the total capacity is 512MB, apply 64MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 64m > /data/_log.txt &
 ```
 
 * If the total capacity is 1GB, apply 128MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 128m > /data/memtester_log.txt &
 ```
 
 * If the total capacity is 2GB, apply 256MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 256m > /data/memtester_log.txt &
 ```
 
 * If the total capacity is 4GB, apply 512MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 512m > /data/memtester_log.txt &
 ```
 
 4. Execute frequency scaling command.
 
-  Setting frequency according to DDR frequency range supported by test machine.
-  Eg：
-  If the test machine supports a range of 200MHZ to 533MHz.
+Setting frequency according to DDR frequency range supported by test machine.
 
-```
+Eg：
+
+If the test machine supports a range of 200MHZ to 533MHz.
+
+```shell
 <rkxxxx:/ #> echo 'a:200M-533M-1000000T' > proc/driver/ddr_ts
 ```
 
@@ -357,26 +364,27 @@ If the machine has done the fixed frequency test before, restart the machine, or
 * Confirming that whether the fishingjoy functions normally and whether the machine runs properly.
 * Confirming that whether the frequency scaling program is running normally and whether the frequency scaling log is printing normally.
 * Confirming that whether the memtester runs properly. Sending `<rkxxxx:/ #> ps | grep memtester`command to confirm whether the memtester is still running .
-  Eg：
 
-```
+Eg：
+
+```shell
 <rkxxxx:/ #>  ps | grep memtester
 root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 ```
 
 ### Linux 3.10 Reboot Test
 
-​	Open the Calculator, enter "83991906=", and click "RebootTest". The test time should be more than 12 hours.
+Open the Calculator, enter "83991906=", and click "RebootTest". The test time should be more than 12 hours.
 
 ------
 
-## Linux 4.4 DDR Verification Process
+## Linux 4.xx DDR Verification Process
 
-### Linux 4.4 Compile Test Firmware
+### Linux 4.xx Compile Test Firmware
 
-​	First, we must enable DDR frequency scaling function. Open the test machine board-level DTS file, find **dfi** and **dmc** nodes and configure status = "okay".
+First, we must enable DDR frequency scaling function. Open the test machine board-level DTS file, find **dfi** and **dmc** nodes and configure status = "okay".
 
-```
+```dts
 &dfi {
     status = "okay";
 };
@@ -387,9 +395,9 @@ root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 };
 ```
 
-​	Here is just a brief introduction for the DDR frequency scaling firmware compiling. If you need more, please refer to the section "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel" in "Rockchip_Developer_Guide_DDR_EN" for details.
+Here is just a brief introduction for the DDR frequency scaling firmware compiling. If you need more, please refer to the section "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel" in "Rockchip_Developer_Guide_DDR_EN" for details.
 
-### Linux 4.4 Set Up Test Environment
+### Linux 4.xx Set Up Test Environment
 
 #### Firmware Download
 
@@ -401,23 +409,27 @@ Before test, you should know the following information:
 
 #### Automatically Set Up Environment
 
-1. Enter the "linux4.4_ddr_test_files" directory of DDR test file, double-click **push_files.bat** file, select and input 1 or 2 according to the script tips and firmware type. Then waiting the test environment complete  automatically.
-  Note: After running the script, you need to check whether everything is executed normally and confirm if there is any error message through the printed log.
+1. Enter the "linux4.xx_ddr_test_files" directory of DDR test file, double-click **push_files.bat** file, select and input 1 or 2 according to the script tips and firmware type. Then waiting the test environment complete  automatically.
+
+Note: After running the script, you need to check whether everything is executed normally and confirm if there is any error message through the printed log.
+
 2. If there is no exception for automatic set up, you can skip the section "Manually Set Up Test Environment".
 
 #### Manually Set Up Environment
 
-If setting up test environment automatically failed,  you can do it manually. Please select and install following files in the directory "linux4.4_ddr_test_files".
+If setting up test environment automatically failed,  you can do it manually. Please select and install following files in the directory "linux4.xx_ddr_test_files".
 
 1. Install fishingjoy.
 
-```
+Note: Please skip this step when the device is NOT running Android.
+
+```shell
 <adb_tool> adb.exe install fishingjoy1.apk
 ```
 
 2. Push google stressapptest.
 
-```
+```shell
 <adb_tool> adb.exe root
 <adb_tool> adb.exe disable-verity
 <adb_tool> adb.exe reboot
@@ -439,63 +451,63 @@ If setting up test environment automatically failed,  you can do it manually. Pl
 
 * If the test firmware is Linux 32bit, select **memtester_32bit** to push.
 
-```
+```shell
 <adb_tool> adb.exe push memtester_32bit /data/memtester
 <adb_tool> adb.exe shell chmod 644 /data/memtester
 ```
 
 * If the test firmware is Linux 64bit, select **memtester_64bit** to push.
 
-```
+```shell
 <adb_tool> adb.exe push memtester_64bit /data/memtester
 <adb_tool> adb.exe shell chmod 644 /data/memtester
 ```
 
 4. Push ddr_freq_scan.sh.
 
-```
+```shell
 <adb_tool> adb.exe push ddr_freq_scan.sh /data/ddr_freq_scan.sh
 <adb_tool> adb.exe shell chmod 0777 /data/ddr_freq_scan.sh
 ```
 
 #### Set Up Test Environment through U Disk and Serial Port
 
-​	If the ADB cannot be connected, the files needed in the test process can be copied to the test board through U disk. And then the test environment can be built through the serial port.
+If the ADB cannot be connected, the files needed in the test process can be copied to the test board through U disk. And then the test environment can be built through the serial port.
 
 1. Preparatory Work.
 
 * After the machine is power on, add **wake_lock** to prevent the machine from entering the system suspend by`echo 1 > /sys/power/wake_lock`, or setting machine by **Setting->Dsiplay->Sleep->Never sleep** to keep awake.
-* The U disk is connected to the computer, then copy "linux4.4_ddr_test_files" to U disk.
+* The U disk is connected to the computer, then copy "linux4.xx_ddr_test_files" to U disk.
 * The `su`command is inputed from the serial console of the test machine.
 
-```
+```shell
 <rk3399:/ $> su
 ```
 
-* The U disk is connected to the test board, then copied the files under "linux4.4_ddr_test_files" directory to the machine `/data` directory. U disk is usually loaded in `/MNT /media_rw/***` directory (*** : the node name of each U disk is different, please use TAB key to fill the rest).
+* The U disk is connected to the test board, then copied the files under "linux4.xx_ddr_test_files" directory to the machine `/data` directory. U disk is usually loaded in `/MNT /media_rw/***` directory (*** : the node name of each U disk is different, please use TAB key to fill the rest).
 
-  Eg:
+Eg:
 
-```
-<rk3399:/ #> cp /mnt/media_rw/B4FE-5315/linux4.4_ddr_test_files/*   /data/
+```shell
+<rk3399:/ #> cp /mnt/media_rw/B4FE-5315/linux4.xx_ddr_test_files/*   /data/
 ```
 
 2. Automatically Set Up Test Environment.
 
-```
+```shell
 <rk3399:/ #> chmod 777 /data/test_files_install.sh
 <rk3399:/ #> /data/test_files_install.sh
 ```
 
-​	If there is no exception for automatic set up, you can skip the section "Manually Set Up Test Environment".
+If there is no exception for automatic set up, you can skip the section "Manually Set Up Test Environment".
 
 3. Manually Set Up Test Environment.
 
-  If setting up test environment automatically failed,  you can do it manually.
+If setting up test environment automatically failed,  you can do it manually.
 
 * Copy **libstlport.so** to the `/system` directory.
 
-```
+```shell
 <rk3399:/ #> mount -o rw,remount /system
 <rk3399:/ #> cp /data/libstlport.so /system/lib/
 <rk3399:/ #> chmod 644 /system/lib/libstlport.so
@@ -503,28 +515,31 @@ If setting up test environment automatically failed,  you can do it manually. Pl
 
 * Change permission.
 
-```
+```shell
 <rk3399:/ #> chmod 777 /data/memtester /data/stressapptest /data/ddr_freq_scan.sh
 ```
 
 * Install fishingjoy.
 
-```
+Note: Please skip this step when the device is NOT running Android.
+
+```shell
 <rk3399:/ #> pm install /data/fishingjoy1.apk
 ```
 
 * Sync
 
-```
+```shell
 <rk3399:/ #> sync
 ```
 
-### Linux 4.4 Verify DDR Capacity
+### Linux 4.xx Verify DDR Capacity
 
 Check whether the MemTotal capacity matches the actual capacity of the test machine by`<rkxxxx:/ #>  cat /proc/meminfo`
+
 log eg:
 
-```
+```shell
 rkxxxx:/ # cat /proc/meminfo
 MemTotal:        2038904 kB
 ```
@@ -543,45 +558,45 @@ MemTotal:        2038904 kB
 
 Due to the difference in system memory allocation management, the slight deviation is normal.
 
-### Linux 4.4 Fix DDR Frequency Test
+### Linux 4.xx Fix DDR Frequency Test
 
-1. Open the fishingjoy.
+1. Open the fishingjoy (Please skip this step when the device is NOT running Android).
 
 2. Send  `su` command from the serial console.
 
-```
+```shell
 <rkxxxx:/ $> su
 ```
 
 3. Fix DDR frequency.
 
-  Please set the maximum DDR frequency supported by the test machine.
+Please set the maximum DDR frequency supported by the test machine.
 
-  Eg：
+Eg：
 
 * If need to run 928MHz.
 
-```
+```shell
 <rkxxxx:/ #> /data/ddr_freq_scan.sh 933000000
 ```
 
 * If need to run 800MHz.
 
-```
+```shell
 <rkxxxx:/ #> /data/ddr_freq_scan.sh 800000000
 ```
 
 * If need to run 600MHz.
 
-```
+```shell
 <rkxxxx:/ #> /data/ddr_freq_scan.sh 600000000
 ```
 
 4. Check the frequency is correct by log.
 
-  log eg:
+log eg:
 
-```
+```shell
 130|rkxxxx:/ # /data/ddr_freq_scan.sh 800000000
 already change to 800000000 done.
 change frequency to available max frequency done.
@@ -591,65 +606,65 @@ change frequency to available max frequency done.
 
 * If the total capacity is 512MB, apply 64MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 64
 ```
 
 * If the total capacity is 1GB, apply 128MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 128
 ```
 
 * If the total capacity is 2GB, apply 256MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 256
 ```
 
 * If the total capacity is 4GB, apply 512MB for stressapptest.
 
-```
+```shell
 <rkxxxx:/ #> /data/stressapptest -s 43200 -i 4 -C 4 -W --stop_on_errors -M 512
 ```
 
 6. Confirm the test result.
 
-  ​	At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally, the result of stressapptest is PASS or FAIL. The stressapptest will print a log every 10 seconds, and the log displays the rest of the test time. After completing, the result will be printed. If pass, it will print **Status: PASS**. If fail, it will print **Status: FAIL**.
+At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally, the result of stressapptest is PASS or FAIL. The stressapptest will print a log every 10 seconds, and the log displays the rest of the test time. After completing, the result will be printed. If pass, it will print **Status: PASS**. If fail, it will print **Status: FAIL**.
 
 7. Do memtester test, the test time is more than 12 hours.
 
 * If the total capacity is 512MB, apply 64MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 64m
 ```
 
 * If the total capacity is 1GB, apply 128MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 128m
 ```
 
 * If the total capacity is 2GB, apply 256MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 256m
 ```
 
 * If the total capacity is 4GB, apply 512MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 512m
 ```
 
 8. Confirm the test result.
 
-  ​	At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally and whether the memtester reports errors. The memtester in DDR test file has been modified, it will be stopped automatically if any error is found. If the memtester is running more than 12 hours, it indicating that no error is found in the test process.
+At the end of testing, please confirm that whether the machine runs properly, whether the fishingjoy functions normally and whether the memtester reports errors. The memtester in DDR test file has been modified, it will be stopped automatically if any error is found. If the memtester is running more than 12 hours, it indicating that no error is found in the test process.
 
 * If the memtester finds no error, it will continue to print the following log:
 
-```
+```shell
 Loop 10:
     Stuck Address       : ok
     Random Value        : ok
@@ -671,18 +686,18 @@ Loop 10:
 
 * If any error is found in the memtester, it will automatically stop the test and exit. The log will be printed as follows:
 
-```
+```shell
 FAILURE: 0xffffffff != 0xffffbfff at offset 0x03b7d9e4.
 EXIT_FAIL_OTHERTEST
 ```
 
-### Linux 4.4 DDR Frequency Scaling
+### Linux 4.xx DDR Frequency Scaling
 
-1. Open the fishingjoy.
+1. Open the fishingjoy (Please skip this step when the device is NOT running Android).
 
 2. Send  `su` command from the serial console.
 
-```
+```shell
 <rkxxxx:/$> su
 ```
 
@@ -690,31 +705,31 @@ EXIT_FAIL_OTHERTEST
 
 * If the total capacity is 512MB, apply 64MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 64m > /data/memtester_log.txt &
 ```
 
 * If the total capacity is 1GB, apply 128MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 128m > /data/memtester_log.txt &
 ```
 
 * If the total capacity is 2GB, apply 256MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 256m > /data/memtester_log.txt &
 ```
 
 * If the total capacity is 4GB, apply 512MB for memtester.
 
-```
+```shell
 <rkxxxx:/ #> /data/memtester 512m > /data/memtester_log.txt &
 ```
 
 4. Execute test scripts.
 
-```
+```shell
 <rkxxxx9:/ #> /data/ddr_freq_scan.sh
 ```
 
@@ -725,18 +740,18 @@ EXIT_FAIL_OTHERTEST
 * Confirming that whether the memtester  runs properly. Sending  `
   <rkxxxx:/ #> ps | grep memtester`command to confirm whether the memtester is still running.
 
-  Eg：
+Eg：
 
-```
+```shell
 <rkxxxx:/ #>  ps | grep memtester
 root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 ```
 
 * Confirming that whether the frequency scaling program is running normally and whether the frequency scaling log is printed normally.
 
-  log eg:
+log eg:
 
-```
+```shell
 DDR freq will change to 600000000 8786
 already change to 600000000 done
 DDR freq will change to 800000000 8787
@@ -745,15 +760,61 @@ DDR freq will change to 200000000 8788
 already change to 200000000 done
 ```
 
-### Linux 4.4 Reboot Test
+### Linux 4.xx Reboot Test
 
-​	==To avoid machine going into sleep, make machine skip the lock screen interface and directly enter the main interface by **setting->security->set screen lock->None**. At the same time, setting machine by  **Setting->Dsiplay->Sleep->Never sleep** to keep awake.==
+#### Reboot test via calculator when running Android
 
-​	Open the Calculator, enter "83991906=", then click "RebootTest". The test time should be more than 12 hours.
+==To avoid machine going into sleep, make machine skip the lock screen interface and directly enter the main interface by **setting->security->set screen lock->None**. At the same time, setting machine by  **Setting->Dsiplay->Sleep->Never sleep** to keep awake.==
 
-### Linux 4.4 Sleep Test
+Open the Calculator, enter "83991906=", then click "RebootTest". The test time should be more than 12 hours.
 
-​	Unplug the USB cable which connected to ADB. Open the Calculator, enter "83991906=", then click "SleepTest". The test time will be more than 12 hours. For 3399 LPDDR4, this test is required. This test is  optional for other DDR types and other platforms.
+#### Reboot test via rockchip_test.sh when NOT running Android
+
+1. Send su command
+
+```shell
+[root@RV1126_RV1109:/]# su
+```
+
+2. Run /rockchip_test/rockchip_test.sh, enter the number corresponding to auto reboot test
+
+```shell
+[root@RV1126_RV1109:/]# /rockchip_test/rockchip_test.sh
+```
+
+![auto_reboot_test](Rockchip-Developer-Guide-DDR-Verification-Process/auto_reboot_test.png)
+
+3. Test at least 12 hours, and check if the device is working properly. Turn off reboot test with command
+
+```shell
+[root@RV1126_RV1109:/]# echo off > /data/cfg/rockchip_test/reboot_cnt
+```
+
+### Linux 4.xx Sleep Test
+
+For RK3399 LPDDR4, this test is required. This test is optional for other DDR types and other platforms.
+
+#### Sleep test via calculator when running Android
+
+Unplug the USB cable which connected to ADB. Open the Calculator, enter "83991906=", then click "SleepTest". The test time will be more than 12 hours.
+
+#### Sleep test via rockchip_test.sh when NOT running Android
+
+1. Send su command
+
+```shell
+[root@RV1126_RV1109:/]# su
+```
+
+2. Run /rockchip_test/rockchip_test.sh, enter the number corresponding to suspend_resume test, then enter the number corresponding to auto suspend (resume by rtc)
+
+```shell
+[root@RV1126_RV1109:/]# /rockchip_test/rockchip_test.sh
+```
+
+![auto_suspend_rtc](Rockchip-Developer-Guide-DDR-Verification-Process/auto_suspend_rtc.png)
+
+3. Test at least 12 hours, and check if the device is working properly
 
 ------
 
@@ -761,20 +822,20 @@ already change to 200000000 done
 
 ### RV1108 Test Firmware Compile
 
-​	Please configure the menuconfig of the kernel code, enter `System Type` and select `DDR Test` and `pm_tests`.
+Please configure the menuconfig of the kernel code, enter `System Type` and select `DDR Test` and `pm_tests`.
 
-```
+```shell
   menuconfig
   System Type  --->
     [*]   /sys/pm_tests/ support
     [*]   DDR Test
 ```
 
-​	If there is no`[] /sys/pm_tests/ support`option in menuconfig, please refer to the sections "How to Fix DDR Frequency" and "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel" in "Rockchip_Developer_Guide_DDR" to compile fixed or scaled DDR frequency firmware.
+If there is no`[] /sys/pm_tests/ support`option in menuconfig, please refer to the sections "How to Fix DDR Frequency" and "How to Enable/Disable the DDR Frequency Scaling Function in the Kernel" in "Rockchip_Developer_Guide_DDR" to compile fixed or scaled DDR frequency firmware.
 
 ### RV1108 Set Up Test Environment
 
-​	Please copy **stressapptest** and **memtester_32bit** from "rv1108_ddr_test_files" directory into SD `root/` directory, and plug the card into test board.
+Please copy **stressapptest** and **memtester_32bit** from "rv1108_ddr_test_files" directory into SD `root/` directory, and plug the card into test board.
 
 ### RV1108 Verify DDR Capacity
 
@@ -782,7 +843,7 @@ Check whether the MemTotal capacity matches the actual capacity of the test mach
 
 log eg:
 
-```
+```shell
 <rv1108:/ #> cat /proc/meminfo
 MemTotal:        133376 kB
 ```
@@ -801,43 +862,43 @@ Due to the difference in system memory allocation management, the slight deviati
 
 1. Fix ddr frequency.
 
-   Please set the maximum DDR frequency supported by the test machine.
+Please set the maximum DDR frequency supported by the test machine.
 
-   Eg：
+Eg：
 
-   If the maximum DDR frequency supported by the test machine is 800MHz.
+If the maximum DDR frequency supported by the test machine is 800MHz.
 
-```
+```shell
 <rv1108:/ #> echo set clk_ddr 800000000 > /sys/pm_tests/clk_rate
 ```
 
 2. Do google stressapptest test, the test time is more than 12 hours.
 
-  If the total capacity is 128MB, apply 16MB for stressapptest. Usually one eighth of the total capacity.
+If the total capacity is 128MB, apply 16MB for stressapptest. Usually one eighth of the total capacity.
 
-```
+```shell
 <rv1108:/ #> /mnt/sdcard/stressapptest -s 500 -i 1 -C 1 -W --stop_on_errors -M 16
 ```
 
 3. Confirm the test result.
 
-   ​	At the end of testing, please confirm that whether the machine runs properly, the result of stressapptest is PASS or FAIL. The stressapptest will print a log every 10 seconds, and the log displays the rest of the test time. After completing, the result will be printed. If pass, it will print **Status: PASS**. If fail, it will print **Status: FAIL**.
+At the end of testing, please confirm that whether the machine runs properly, the result of stressapptest is PASS or FAIL. The stressapptest will print a log every 10 seconds, and the log displays the rest of the test time. After completing, the result will be printed. If pass, it will print **Status: PASS**. If fail, it will print **Status: FAIL**.
 
 4. Do memtester test, the test time is more than 12 hours.
 
-   If the total capacity is 128MB, apply 16MB for stressapptest. Usually one eighth of the total capacity.
+If the total capacity is 128MB, apply 16MB for stressapptest. Usually one eighth of the total capacity.
 
-```
+```shell
 <rv1108:/ #> /mnt/sdcard/memtester_32bit 16m
 ```
 
 5. Confirm the test result.
 
-   ​	At the end of testing, please confirm that whether the machine runs properly and whether the memtester reports errors. The memtester in DDR test file has been modified, it will be stopped automatically if any error is found in the test process. If the memtester is running more than 12 hours, it indicating that no error is found in the test process.
+At the end of testing, please confirm that whether the machine runs properly and whether the memtester reports errors. The memtester in DDR test file has been modified, it will be stopped automatically if any error is found in the test process. If the memtester is running more than 12 hours, it indicating that no error is found in the test process.
 
 * If the memtester finds no error, it will continue to print the following log:
 
-```
+```shell
 Loop 10:
      Stuck Address       : ok
      Random Value        : ok
@@ -859,7 +920,7 @@ Loop 10:
 
 * If any error is found in the memtester, it will automatically stop the test and exit. The log will be printed as follows:
 
-```
+```shell
    FAILURE: 0xffffffff != 0xffffbfff at offset 0x03b7d9e4.
    EXIT_FAIL_OTHERTEST
 ```
@@ -873,16 +934,19 @@ scaling command will not be able to proceed.
 
 If the total capacity is 128MB, apply 16MB for memtester. Usually one eighth of the total capacity.
 
-```
+```shell
 <rv1108:/ #> /mnt/sdcard/memtester_32bit 16m > /data/memtester_log.txt &
 ```
 
 2. Execute frequency scaling command.
-  The frequency range of the test is from 400MHz to maximum frequency of the machine.
-  Eg:
-  If the test machine to run DDR maximum frequency is 800MHz.
 
-```
+The frequency range of the test is from 400MHz to maximum frequency of the machine.
+
+Eg:
+
+If the test machine to run DDR maximum frequency is 800MHz.
+
+```shell
 <rv1108:/ #> echo 'a:400M-800M-1000000T' > proc/driver/ddr_ts
 ```
 
@@ -894,16 +958,16 @@ If the total capacity is 128MB, apply 16MB for memtester. Usually one eighth of 
 
 * Confirming that whether the memtester runs properly. Sending  `<rkxxxx:/ #> ps | grep memtester`command to confirm whether the memtester is still running.
 
-  Eg：
+Eg：
 
-```
+```shell
 <rkxxxx:/ #>  ps | grep memtester
 root      14309 1730  74332  68156          0 5e980bf564 R /data/memtester
 ```
 
 ### RV1108 Reboot Test
 
-​	We can use 1108 own reboot feature: `menu -> debug -> reboot test`
+We can use 1108 own reboot feature: `menu -> debug -> reboot test`
 
 ------
 
@@ -915,11 +979,10 @@ Check whether the MemTotal capacity matches the actual capacity of the test mach
 
 log eg:
 
-```
+```shell
 <rk3308:/ #> cat /proc/meminfo
 MemTotal:         246832 kB
 MemFree:          201800 kB
-
 ```
 
 64MB is approximately equal to 66688kB
@@ -940,14 +1003,14 @@ Since 3308 does not support DDR frequency scaling, the frequency set by the load
 
 First, you need to confirm whether the test file is existed or not:
 
-```
+```shell
 <rk3308:/ #> ls usr/bin/memtester
 usr/bin/memtester
 ```
 
 * If memtester file is existed, the test command is as follows: (If the total capacity is 128MB, apply 16MB for memtester. Usually one eighth of the total capacity.)
 
-```
+```shell
 <rk3308:/ #> memtester 16m > /data/memtester_log.txt &
 ```
 
@@ -955,25 +1018,25 @@ usr/bin/memtester
 
 Linux-32 system command:
 
-```
+```shell
 adb push \*file path*\memtester_32bit.32bit data/memtester
 ```
 
 Linux-64 system command:
 
-```
+```shell
 adb push \*file path*\memtester_64bit.64bit data/memtester
 ```
 
 Change permission:
 
-```
+```shell
 <rk3308:/ #> chmod 777 /data/memtester
 ```
 
-memtester test command as follow: (If the total capacity is 128MB, apply 16MB for memtester. Usually one eighth of the total capacity.)
+Memtester test command as follow: (If the total capacity is 128MB, apply 16MB for memtester. Usually one eighth of the total capacity.)
 
-```
+```shell
 <rk3308:/ #> /data/memtester 16m > /data/memtester_log.txt &
 ```
 
@@ -983,7 +1046,7 @@ memtester test command as follow: (If the total capacity is 128MB, apply 16MB fo
 * Confirming whether the memtester reports errors: (Note that the memtester will  **==not stop==** automatically if error is found and you need to check all of print.)
 * If the memtester finds no error, it will continue to print the following log:
 
-```
+```shell
 Loop 1:
   Stuck Address       : ok
   Random Value        : ok
@@ -1003,12 +1066,11 @@ Loop 1:
   Walking Zeroes      : ok
   8-bit Writes        : ok
   16-bit Writes       : ok
-
 ```
 
 * If error is found in the memtester, it will not stop automatically. The log will be printed as follows:
 
-```
+```shell
 Loop 92:
   Stuck Address       : ok
   Random Value        : FAILURE: 0x37fe0f4190f6b999 != 0x37fe0f4196f6b999 at offset 0x0027a958.
@@ -1028,21 +1090,20 @@ FAILURE: 0x2823d0d6f62a4b01 != 0x2823d0d6f02a4b01 at offset 0x0027a958.
   Walking Zeroes      : ok
   8-bit Writes        : ok
   16-bit Writes       : ok
-
 ```
 
 3. Do google stressapptest test, the test time is more than 12 hours.
 
 First, you need to confirm whether the test file is existed or not:
 
-```
+```shell
 <rk3308:/ #> ls usr/bin/stressapptest
 usr/bin/stressapptest
 ```
 
 * If stressapptest file is existed, the test command is as follows: (If the total capacity is 256MB, apply 32MB for stressapptest. Usually one eighth of the total capacity. The test time is controlled by the parameter after -s whose uint is seconds. The following command is test for 24 hours.)
 
-```
+```shell
 <rk3308:/ #> stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 32
 ```
 
@@ -1050,23 +1111,23 @@ usr/bin/stressapptest
 
 Linux-32 system command:
 
-```
+```shell
 adb push \*file path*\stressapptest_32bit data/stressapptest
 ```
 
 Linux-64 system command:
 
-```
+```shell
 adb push \*file path*\stressapptest_64bit data/stressapptest
 ```
 
 Change permission:
 
-```
+```shell
 <rk3308:/ #> chmod 777 /data/stressapptest
 ```
 
-stressapptest test command as follows: (If the total capacity is 256MB, apply 32MB for stressapptest. Usually one eighth of the total capacity. The following is the command for copying the machine for 24 hours.)
+Stressapptest test command as follows: (If the total capacity is 256MB, apply 32MB for stressapptest. Usually one eighth of the total capacity. The following is the command for copying the machine for 24 hours.)
 
 ```
 <rk3308:/ #> /data/stressapptest -s 86400 -i 4 -C 4 -W --stop_on_errors -M 32
@@ -1081,7 +1142,7 @@ stressapptest test command as follows: (If the total capacity is 256MB, apply 32
 
 The suspend test requires kernel to enable automatic wake-up function. Open "rk3308. dtsi" file and find the node of **rockchip_suspend**, bitwise OR **RKPM_TIMEOUT_WAKEUP_EN** as follows:
 
-```
+```dts
 rockchip_suspend: rockchip-suspend {
 				...
                 rockchip,wakeup-config = <
@@ -1091,30 +1152,28 @@ rockchip_suspend: rockchip-suspend {
                         )
                 >;
         };
-
 ```
 
 After compiling the firmware, it is recommended to use script for the suspend test. First, you need to confirm whether the test file is existed or not:
 
-```
+```shell
 <rk3308:/ #> ls rockchip_test/rockchip_test.sh
 rockchip_test/rockchip_test.sh
 ```
 
 * If test file is existed, the test command is as follows:
 
-```
+```shell
 <rk3308:/ #> /rockchip_test/rockchip_test.sh
 ...
 please input your test moudle: //the serial console first input 8<enter>，then 1<enter>
 8
 1
-
 ```
 
 * If there is no test file, you can directly input a command from the serial console to do suspend test. The command is as follows:
 
-```
+```shell
 <rk3308:/ #> while true; do echo mem >  /sys/power/state; sleep 5; done
 ```
 
@@ -1124,14 +1183,14 @@ The test time is more than 12 hours, then confirm whether the machine runs prope
 
 It is recommended to do reboot test by the 3308 test script. First, you need to confirm whether the test file is existed or not:
 
-```
+```shell
 <rk3308:/ #> ls rockchip_test/rockchip_test.sh
 rockchip_test/rockchip_test.sh
 ```
 
 * If test file is existed, reboot command is as follows:
 
-```
+```shell
 <rk3308:/ #> /rockchip_test/rockchip_test.sh
 ...
 please input your test moudle: //the serial console input 13<enter>
@@ -1140,22 +1199,20 @@ please input your test moudle: //the serial console input 13<enter>
 
 * If there is no test file, push **auto_reboot_test.sh** file to the `/data/` directory:
 
-```
+```shell
 adb push \*file path*\auto_reboot_test.sh data/.
 ```
 
 Change permission:
 
-```
+```shell
 <rk3308:/ #> chmod 777 /data/auto_reboot_test.sh
 ```
 
 The reboot command is as follows:
 
-```
+```shell
 <rk3308:/ #> /data/auto_reboot_test.sh
 ```
 
 The test time is more than 12 hours, then confirm whether the machine runs properly.
-
-.
