@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-314
 
-发布版本：V2.1.1
+发布版本：V2.2.0
 
-日期：2021-02-22
+日期：2021-04-13
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -73,6 +73,7 @@ Rockchip SDK默认采用闭源的miniloader 加载 trust 和 u-boot，所有存�
 | V2.0.1 | Jon Lin | 2020-11-27 | 增加 UBIFS 多卷支持、增减 ubiattach 参数说明 |
 | V2.1.0 | Jon Lin | 2021-01-27 | 添加更多 UBIFS 支持说明 |
 | V2.1.1 | CWW | 2021-02-22 | 格式修订 |
+| V2.2.0 | Jon Lin | 2021-04-13 | u-boot 支持 UBIFS，更改使用 programmer_image_tool 制作烧录器镜像 |
 
 ---
 
@@ -162,7 +163,7 @@ CONFIG_SYS_NAND_U_BOOT_LOCATIONS=y
 CONFIG_SYS_NAND_U_BOOT_OFFS=0x8000
 CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND=0x10000
 
-// rkfw 打包格式指定 uboot trust 地址（fit 格式则无需）
+// rkfw 打包格式指定 u-boot trust 地址（fit 格式则无需）
 CONFIG_RKFW_TRUST_SECTOR=0X3000		#存储设备里面的烧写地址,以sector为单位的,1 sector=512 Bytes,即paramter.txt 里trust的起始地址
 CONFIG_RKFW_U_BOOT_SECTOR=0X2000	#存储设备里面的烧写地址,以sector为单位的,1 sector=512 Bytes,即paramter.txt 里u-boot的起始地址
 ```
@@ -202,7 +203,7 @@ cp ../u-boot-spl.bin spl/
 配置：
 
 ```
-CONFIG_RK_FLASH=n   /* 不兼容 */
+CONFIG_RK_NANDC_NAND=n   /* 不兼容 */
 CONFIG_MTD_NAND_ROCKCHIP_V6=y /* NandC v6 可根据 TRM NANDC->NANDC_NANDC_VER 寄存器确认，0x00000801 */
 # CONFIG_MTD_NAND_ROCKCHIP_V9=y /* NandC v6 可根据 TRM NANDC->NANDC_NANDC_VER 寄存器确认，0x56393030，目前仅 RK3326 可选改方案 */
 CONFIG_MTD_CMDLINE_PARTS=y
@@ -254,7 +255,7 @@ RK 提供的 SDK 支持 u-boot 中解析 GPT 生成 cmdline mtdparts 信息，�
 
 注意：
 
-* SLC Nand 及 SPI Nand 开源方案每个分区应预留出 2~3 个 flash block size 的冗余空间，以便遇到坏块时，有冗余空间可替换，尤其注意 uboot 分区是否做到了空间预留；
+* SLC Nand 及 SPI Nand 开源方案每个分区应预留出 2~3 个 flash block size 的冗余空间，以便遇到坏块时，有冗余空间可替换，尤其注意 u-boot 分区是否做到了空间预留；
 
 * 分区起始地址应做 flash block size 对齐；
 
@@ -973,6 +974,70 @@ ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 
 * rootfs.ubifs 为 mkfs.ubifs 命令所制作的镜像，非 ubinize 制作的最终烧录镜像
 
+### u-boot 下支持 UBIFS
+
+u-boot 下 UBIFS 仅支持文件读操作，不支持文件写或删除操作。
+
+**SLC Nand 补丁参考**
+
+参考 RK3308 支持，补丁如下：
+
+```diff
+CONFIG_CMD_UBI=y
+
+diff --git a/include/configs/rk3308_common.h b/include/configs/rk3308_common.h
+index 1c2b9e4461..bc861acde8 100644
+--- a/include/configs/rk3308_common.h
++++ b/include/configs/rk3308_common.h
+@@ -57,6 +57,9 @@
+ #define CONFIG_USB_FUNCTION_MASS_STORAGE
+ #define CONFIG_ROCKUSB_G_DNL_PID        0x330d
++#define MTDIDS_DEFAULT "nand0=rk-nand"
++#define MTDPARTS_DEFAULT "mtdparts=rk-nand:0x100000@0x400000(uboot),0x100000@0x500000(trust),0x600000@0x600000(boot),0x3000000@0xc00000(rootfs),0x1200000@0x4000000(oem),0x9f60000@0x6000000(userdata)"
++
+ #ifdef CONFIG_ARM64
+ #define ENV_MEM_LAYOUT_SETTINGS \
+        "scriptaddr=0x00500000\0" \
+```
+
+**SPI Nand  补丁参考**
+
+参考 RK3568 支持，补丁如下：
+
+```diff
+diff --git a/include/configs/rk3568_common.h b/include/configs/rk3568_common.h
+index cce44b52a8..eb93455c62 100644
+--- a/include/configs/rk3568_common.h
++++ b/include/configs/rk3568_common.h
+@@ -92,6 +92,9 @@
+        "run distro_bootcmd;"
+ #endif
++#define MTDIDS_DEFAULT "spi-nand0=spi-nand0"
++#define MTDPARTS_DEFAULT "mtdparts=spi-nand0:0x100000@0x400000(vnvm),0x440000@0x500000(uboot),0x1600000@0xa00000(boot),0x4400000@0x2000000(rootfs),0x1b60000@0x6400000(userdata)"
++
+ /* rockchip ohci host driver */
+ #define CONFIG_USB_OHCI_NEW
+ #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS     1
+(END)
+```
+
+**menuconfig 开启宏配置**
+
+```
+#define CONFIG_CMD_UBI = y
+```
+
+**挂载命令**
+
+以 rootfs 分区为例，详细参考 doc/README.ubi。
+
+```shell
+mtdpart
+ubi part rootfs
+ubifsmount ubi0:rootfs
+ubifsls
+```
+
 ## PC 工具烧录
 
 烧写工具支持 UBIFS 镜像烧写，识别到固件为 UBIFS，则先格式化分区，再烧写该分区：
@@ -997,48 +1062,95 @@ ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 ```shell
 [/IMAGES] tree
 .
-├── parameter.txt               // 生成 gpt.img
-├── MiniLoaderAll.bin           // 生成 idblock.img
+├── parameter.txt
+├── MiniLoaderAll.bin
 ├── uboot.img
 ├── boot.img
 ├── rootfs.img
 ├── oem.img
-└── update.img                  // 过滤
+└── update.img                  // 用以制作烧录镜像
 ```
 
 **制作镜像**
 
-工具 burner_image_kits 在 SDK rkbin/ 目录下，制作命令如下：
+工具 programmer_image_tool 在 SDK rkbin/ 目录下，命令说明如下：
 
 ```
-./rkbin/tools/burner_image_kits/make_spi_nand.sh <src_path> <dst_path> <soc> <block_size(KB)>
+./tools/programmer_image_tool  --help
+NAME
+        programmer_image_tool - creating image for programming on flash
+SYNOPSIS
+        programmer_image_tool [-iotbpsvh]
+DESCRIPTION
+        This tool aims to convert firmware into image for programming
+        From now on,it can support slc nand(rk)|spi nand|nor|emmc.
+OPTIONS:
+          -i    input firmware
+          -o    output directory
+          -t    storage type,range in[SLC|SPINAND|SPINOR|EMMC]
+          -b    block size,unit KB
+          -p    page size,unit KB
+          -s    oob size,unit B
+          -2    2k data in one page
+          -l    using page linked l
 ```
 
-* src_path：SDK 输出的用于 PC 工具烧录的镜像路径；
-* dst_path：输出路径；
-* soc：所属芯片（小写），例如：rv1126
-* block_size: flash block size。
+例如： rv1126 block size 128KB page size 2KB flash:
 
-例如： rv1126 block size 128KB flash:
-
-```
-./rkbin/tools/burner_image_kits/make_spi_nand.sh ./IMAGES ./out rv1126 128
+```shell
+./tools/programmer_image_tool  -i update.img -b 128 -p 2 -t spinand -o out
+input firmware is 'update.img'
+block size is '128'
+page size is '2'
+flash type is 'spinand'
+output directory is 'out'
+writing idblock...
+start to write partitions...gpt=1
+preparing gpt saving at out/gpt.img
+writing gpt...OK
+preparing trust saving at out/trust.img
+writing trust...OK
+preparing uboot saving at out/uboot.img
+writing uboot...OK
+preparing boot saving at out/boot.img
+writing boot...OK
+preparing rootfs saving at out/rootfs.img
+writing rootfs...OK
+preparing recovery saving at out/recovery.img
+writing recovery...OK
+preparing oem saving at out/oem.img
+writing oem...OK
+preparing userdata:grow saving at out/userdata:grow.img
+writing userdata:grow...OK
+preparing misc saving at out/misc.img
+writing misc...OK
+creating programming image ok.
 ```
 
 **输出文件：用于烧录器烧的镜像**
 
+```shell
+out
+├── boot.img
+├── gpt.img
+├── idblock.img            // 自行根据需求制作 idblock_mutli_copies.img 的多备份镜像
+├── misc.img
+├── oem.img
+├── recovery.img
+├── rootfs.img
+├── trust.img
+├── uboot.img
+└── userdata.img
 ```
-[/out] tree
-.
-└── 2048B_128KB
-    ├── gpt.img
-    ├── idblock.img.bak     // IDB 固件，不烧录
-    ├── idblocks.img        // idblock.img.bak 的多备份合成镜像，3 个备份，默认要求烧录此镜像
-    ├── uboot.img
-    ├── boot.img
-    ├── rootfs.img
-    └── oem.img
-```
+
+注释：
+
+* IDB 多备份命令参考，通常双备份即可：
+
+  ```shell
+  cat out/idblock.img > out/idblock_mutli_copies.img   // 1 copy
+  cat out/idblock.img >> out/idblock_mutli_copies.img  // 2 copies
+  ```
 
 #### SPI Nand 烧录器烧录
 
@@ -1046,20 +1158,20 @@ ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 
 假定 block size 为 128KB 的 flash，PC 烧录工具及相应烧录器镜像烧录信息对比如下：
 
-| 烧录器镜像源文件：SDK 默认输出镜像 | PC 烧录工具扇区地址 | 烧录器镜像   | 烧录器块起始地址 | 结束地址 | 固件大小 | 备注       |
-| ---------------------------------- | ------------------- | ------------ | ---------------- | -------- | -------- | ---------- |
-| paramter.txt                       | 0                   | gpt.img      | 0x0              | 0x1      | 0x1      | Note 1     |
-| MiniLoaderAll.bin                  | 0                   | idblocks.img | 0x1              | 0x7      | 0x6      | Note 2     |
-| uboot.img                          | 0x2000              | uboot.img    | 0x20             | 0x47     | 0x20     | **Note 3** |
-| boot.img                           | 0x4800              | boot.img     | 0x48             | 0xa0     | 0x50     |            |
-| ...                                | ...                 | ...          | ...              |          |          |            |
-| xxx.img                            | 0x3E000             | xxx.img      | 0x3e0            | 0x3fb    | 0x18     | Note 4     |
+| 烧录器镜像源文件：SDK 默认输出镜像 | PC 烧录工具扇区地址 | 烧录器镜像               | 烧录器块起始地址 | 结束地址 | 固件大小 | 备注       |
+| ---------------------------------- | ------------------- | ------------------------ | ---------------- | -------- | -------- | ---------- |
+| paramter.txt                       | 0                   | gpt.img                  | 0x0              | 0x1      | 0x1      | Note 1     |
+| MiniLoaderAll.bin                  | 0                   | idblock_mutli_copies.img | 0x1              | 0x7      | 0x6      | Note 2     |
+| uboot.img                          | 0x2000              | uboot.img                | 0x20             | 0x47     | 0x20     | **Note 3** |
+| boot.img                           | 0x4800              | boot.img                 | 0x48             | 0xa0     | 0x50     |            |
+| ...                                | ...                 | ...                      | ...              |          |          |            |
+| xxx.img                            | 0x3E000             | xxx.img                  | 0x3e0            | 0x3fb    | 0x18     | Note 4     |
 
 表格注释：
 
 1. gpt.img 固定烧录在 block 0；
 
-2. idblocks.img 固定烧录在 block1，要求结束地址为 block 7；
+2. idblock_mutli_copies.img 固定烧录在 block1，要求结束地址为 block 7，镜像要求小于分区大小（预留一个块做坏块替换）；
 
 3. 除 gpt.img 和 idblocks.img 由特定的烧录地址要求，其他固件按照 parameter.txt 中的地址烧录，sector 单位为 512B/s，所以烧录器块地址 = sectors * 512B / block_size，简化换算：
 
@@ -1086,50 +1198,75 @@ ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 ```shell
 [/IMAGES] tree
 .
-├── parameter.txt               // 生成 gpt.img
-├── MiniLoaderAll.bin           // 生成 idblock.img
+├── parameter.txt
+├── MiniLoaderAll.bin
 ├── uboot.img
 ├── boot.img
 ├── rootfs.img
 ├── oem.img
-└── update.img                  // 过滤
+└── update.img                  // 用以制作烧录镜像
 ```
 
 **制作镜像**
 
-工具 burner_image_kits 在 SDK rkbin/ 目录下，制作命令如下：
+例如： rv1126 block size 128KB page size 2KB oob size 128 flash:
 
-```
-./rkbin/tools/burner_image_kits/make_spi_nand.sh <src_path> <dst_path>  <soc> <block_size(KB)> <page_size(B)> <oob_size(B)>
-```
-
-* src_path：SDK 输出的用于 PC 工具烧录的镜像路径；
-* dst_path：输出路径；
-* soc：所属芯片（小写），例如：rv1126
-* block_size：flash block size；
-* page_size：flash page size。
-* oob_size：flash oob size per page
-
-例如： rv1126，block size 128KB page size 2KB  oob size 64B flash:
-
-```
-./rkbin/tools/burner_image_kits/make_slc_nand.sh ./IMAGES ./out rv1126 128 2048 64
+```shell
+./tools/programmer_image_tool -i update.img -b 128 -p 2 -s 128 -t slc -2 -o out
+input firmware is 'update.img'
+block size is '128'
+page size is '2'
+oob size is '128'
+flash type is 'slc'
+2k data page on.
+output directory is 'out'
+writing idblock...
+start to write partitions...gpt=1
+preparing gpt saving at out/gpt.img
+writing gpt...OK
+preparing trust saving at out/trust.img
+writing trust...OK
+preparing uboot saving at out/uboot.img
+writing uboot...OK
+preparing boot saving at out/boot.img
+writing boot...OK
+preparing rootfs saving at out/rootfs.img
+writing rootfs...OK
+preparing recovery saving at out/recovery.img
+writing recovery...OK
+preparing oem saving at out/oem.img
+writing oem...OK
+preparing userdata:grow saving at out/userdata:grow.img
+writing userdata:grow...OK
+preparing misc saving at out/misc.img
+writing misc...OK
+creating programming image ok.
 ```
 
 **输出文件：用于烧录器烧的镜像**
 
+```shell
+out
+├── boot.img
+├── gpt.img
+├── idblock.img            // 自行根据需求制作 idblock_mutli_copies.img 的多备份镜像
+├── misc.img
+├── oem.img
+├── recovery.img
+├── rootfs.img
+├── trust.img
+├── uboot.img
+└── userdata.img
 ```
-[/out] tree
-.
-└── 2048B_128KB_SLC
-    ├── gpt.img
-    ├── idblock.img.bak     // IDB 镜像，不烧录
-    ├── idblocks.img        // idblock.img.bak 的多备份合成镜像，3 个备份，默认要求烧录此镜像
-    ├── uboot.img
-    ├── boot.img
-    ├── rootfs.img
-    └── oem.img
-```
+
+注释：
+
+* IDB 多备份命令参考，通常备份即可：
+
+  ```shell
+  cat out/idblock.img > out/idblock_mutli_copies.img   // 1 copy
+  cat out/idblock.img >> out/idblock_mutli_copies.img  // 2 copies
+  ```
 
 #### SLC Nand 烧录器烧录
 
@@ -1137,20 +1274,20 @@ ubiupdatevol /dev/ubi1_0 rootfs.ubifs
 
 假定 block size 为 128KB 的 flash，PC 烧录工具及相应烧录器镜像烧录信息对比如下：
 
-| 烧录器镜像源文件：SDK 默认输出镜像 | PC 烧录工具扇区地址 | 烧录器镜像   | 烧录器块起始地址 | 结束地址 | 固件大小 | 备注       |
-| ---------------------------------- | ------------------- | ------------ | ---------------- | -------- | -------- | ---------- |
-| paramter.txt                       | 0                   | gpt.img      | 0x0              | 0x1      | 0x1      | Note 1     |
-| MiniLoaderAll.bin                  | 0                   | idblocks.img | 0x1              | 0x7      | 0x6      | Note 2     |
-| uboot.img                          | 0x2000              | uboot.img    | 0x20             | 0x47     | 0x20     | **Note 3** |
-| boot.img                           | 0x4800              | boot.img     | 0x48             | 0xa0     | 0x50     |            |
-| ...                                | ...                 | ...          | ...              |          |          |            |
-| xxx.img                            | 0x3E000             | xxx.img      | 0x3e0            | 0x3fb    | 0x18     | Note 4     |
+| 烧录器镜像源文件：SDK 默认输出镜像 | PC 烧录工具扇区地址 | 烧录器镜像               | 烧录器块起始地址 | 结束地址 | 固件大小 | 备注       |
+| ---------------------------------- | ------------------- | ------------------------ | ---------------- | -------- | -------- | ---------- |
+| paramter.txt                       | 0                   | gpt.img                  | 0x0              | 0x1      | 0x1      | Note 1     |
+| MiniLoaderAll.bin                  | 0                   | idblock_mutli_copies.img | 0x1              | 0x7      | 0x6      | Note 2     |
+| uboot.img                          | 0x2000              | uboot.img                | 0x20             | 0x47     | 0x20     | **Note 3** |
+| boot.img                           | 0x4800              | boot.img                 | 0x48             | 0xa0     | 0x50     |            |
+| ...                                | ...                 | ...                      | ...              |          |          |            |
+| xxx.img                            | 0x3E000             | xxx.img                  | 0x3e0            | 0x3fb    | 0x18     | Note 4     |
 
 表格注释：
 
 1. gpt.img 固定烧录在 block 0；
 
-2. idblocks.img 固定烧录在 block1，要求结束地址为 block 7；
+2. idblock_mutli_copies.img 固定烧录在 block1，要求结束地址为 block 7，镜像要求小于 7 个 blocks（预留一个块做坏块替换）；
 
 3. 除 gpt.img 和 idblocks.img 由特定的烧录地址要求，其他固件按照 parameter.txt 中的地址烧录，sector 单位为 512B/s，所以烧录器块地址 = sectors * 512B / block_size，简化换算：
 

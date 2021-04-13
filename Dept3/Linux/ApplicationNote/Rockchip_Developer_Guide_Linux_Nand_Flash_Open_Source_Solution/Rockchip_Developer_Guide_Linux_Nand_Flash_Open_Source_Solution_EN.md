@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-314
 
-Release Version: V2.1.1
+Release Version: V2.2.0
 
-Release Date: 2021-02-22
+Release Date: 2021-04-13
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -67,6 +67,7 @@ Software development engineers
 | V2.0.1 | Jon Lin | 2020-11-27 | Add UBIFS multi volume support, increase or decrease ubiattach parameter description |
 | V2.1.0 | Jon Lin | 2021-01-27 | Add more UBIFS support |
 | V2.1.1 | CWW | 2021-02-22 | Update the format of the document |
+| V2.2.0 | Jon Lin | 2021-04-13 | Supports u-boot UBIFS and change to use programmer_image_tool |
 
 ---
 
@@ -201,7 +202,7 @@ These commads will generate rk3308_loader_wo_ftl_v*.bin which you can flash into
 Configuration：
 
 ```
-CONFIG_RK_FLASH=n   /* It's not compatible */
+CONFIG_RK_NANDC_NAND=n   /* It's not compatible */
 CONFIG_MTD_NAND_ROCKCHIP_V6=y /* NandC v6 is depending on TRM NANDC->NANDC_NANDC_VER register, 0x00000801 */
 # CONFIG_MTD_NAND_ROCKCHIP_V9=y /* NandC v9  is depending on TRM NANDC->NANDC_NANDC_VER register, 0x56393030, Currently only RK3326 is relevant */
 CONFIG_MTD_CMDLINE_PARTS=y
@@ -253,7 +254,7 @@ RK SDK support parsing GPT and generate mtdparts to kernel.
 
 Notes：
 
-* Each partition of SLC NAND and SPI NAND open source solution images should reserve 2 ~ 3 redundant flash block sizes, so that when bad blocks are encountered, there is redundant space to replace，especially for uboot partition。
+* Each partition of SLC NAND and SPI NAND open source solution images should reserve 2 ~ 3 redundant flash block sizes, so that when bad blocks are encountered, there is redundant space to replace，especially for u-boot partition。
 
 * Partition should start from address which is flash block size aligned
 
@@ -970,6 +971,70 @@ Note：
 
 * rootfs.ubifs is made by mkfs.ubifs tool
 
+### Support u-boot UBIFS
+
+Under uboot, UBIFS only supports read operation, no write/erase operation.
+
+**SLC Nand Patches**
+
+Refer to RK3308 support, and the patch is as follows:
+
+```diff
+CONFIG_CMD_UBI=y
+
+diff --git a/include/configs/rk3308_common.h b/include/configs/rk3308_common.h
+index 1c2b9e4461..bc861acde8 100644
+--- a/include/configs/rk3308_common.h
++++ b/include/configs/rk3308_common.h
+@@ -57,6 +57,9 @@
+ #define CONFIG_USB_FUNCTION_MASS_STORAGE
+ #define CONFIG_ROCKUSB_G_DNL_PID        0x330d
++#define MTDIDS_DEFAULT "nand0=rk-nand"
++#define MTDPARTS_DEFAULT "mtdparts=rk-nand:0x100000@0x400000(uboot),0x100000@0x500000(trust),0x600000@0x600000(boot),0x3000000@0xc00000(rootfs),0x1200000@0x4000000(oem),0x9f60000@0x6000000(userdata)"
++
+ #ifdef CONFIG_ARM64
+ #define ENV_MEM_LAYOUT_SETTINGS \
+        "scriptaddr=0x00500000\0" \
+```
+
+**SPI Nand Patches**
+
+Refer to RK3568 support, and the patch is as follows:
+
+```diff
+diff --git a/include/configs/rk3568_common.h b/include/configs/rk3568_common.h
+index cce44b52a8..eb93455c62 100644
+--- a/include/configs/rk3568_common.h
++++ b/include/configs/rk3568_common.h
+@@ -92,6 +92,9 @@
+        "run distro_bootcmd;"
+ #endif
++#define MTDIDS_DEFAULT "spi-nand0=spi-nand0"
++#define MTDPARTS_DEFAULT "mtdparts=spi-nand0:0x100000@0x400000(vnvm),0x440000@0x500000(uboot),0x1600000@0xa00000(boot),0x4400000@0x2000000(rootfs),0x1b60000@0x6400000(userdata)"
++
+ /* rockchip ohci host driver */
+ #define CONFIG_USB_OHCI_NEW
+ #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS     1
+(END)
+```
+
+**menuconfig Enable Configuration**
+
+```
+#define CONFIG_CMD_UBI = y
+```
+
+**Mounting**
+
+Take rootfs partition as an example, refer to doc for doc/README.ubi.
+
+```shell
+mtdpart
+ubi part rootfs
+ubifsmount ubi0:rootfs
+ubifsls
+```
+
 ## PC Tools For Downloading
 
 When download UBIFS images, the tools will automatically erase the whole partition, then download the images：
@@ -998,48 +1063,95 @@ Note:
 ```shell
 [/IMAGES] tree
 .
-├── parameter.txt               // generate gpt.img
-├── MiniLoaderAll.bin           // generate idblock.img
+├── parameter.txt
+├── MiniLoaderAll.bin
 ├── uboot.img
 ├── boot.img
 ├── rootfs.img
 ├── oem.img
-└── update.img                  // not care
+└── update.img                  // For make programmer imagers
 ```
 
 **Make Images**
 
-tool burner_image_kits in SDK rkbin/ directory, command：
+tool programmer_image_tool is in SDK rkbin/tools/，command：
 
 ```
-./rkbin/tools/burner_image_kits/make_spi_nand.sh <src_path> <dst_path>  <soc> <block_size(KB)>
+./tools/programmer_image_tool  --help
+NAME
+        programmer_image_tool - creating image for programming on flash
+SYNOPSIS
+        programmer_image_tool [-iotbpsvh]
+DESCRIPTION
+        This tool aims to convert firmware into image for programming
+        From now on,it can support slc nand(rk)|spi nand|nor|emmc.
+OPTIONS:
+          -i    input firmware
+          -o    output directory
+          -t    storage type,range in[SLC|SPINAND|SPINOR|EMMC]
+          -b    block size,unit KB
+          -p    page size,unit KB
+          -s    oob size,unit B
+          -2    2k data in one page
+          -l    using page linked l
 ```
 
-* src_path：SDK Output Files For PC Tools;
-* dst_path：output directory；
-* soc：chip(lowercase), e.g: rv1126
-* block_size：flash block size；
+Assume that: rv1126 block size 128KB page size 2KB flash:
 
-e.g： rv1126 block size 128KB flash:
+```shell
+./tools/programmer_image_tool  -i update.img -b 128 -p 2 -t spinand -o out
+input firmware is 'update.img'
+block size is '128'
+page size is '2'
+flash type is 'spinand'
+output directory is 'out'
+writing idblock...
+start to write partitions...gpt=1
+preparing gpt saving at out/gpt.img
+writing gpt...OK
+preparing trust saving at out/trust.img
+writing trust...OK
+preparing uboot saving at out/uboot.img
+writing uboot...OK
+preparing boot saving at out/boot.img
+writing boot...OK
+preparing rootfs saving at out/rootfs.img
+writing rootfs...OK
+preparing recovery saving at out/recovery.img
+writing recovery...OK
+preparing oem saving at out/oem.img
+writing oem...OK
+preparing userdata:grow saving at out/userdata.img
+writing userdata:grow...OK
+preparing misc saving at out/misc.img
+writing misc...OK
+creating programming image ok.
+```
 
-```
-./rkbin/tools/burner_image_kits/make_spi_nand.sh ./IMAGES ./out rv1126 128
+**output  files: Using For Flash Programmer**
+
+```shell
+out
+├── boot.img
+├── gpt.img
+├── idblock.img            //Making multiple backup images of idblock_mutli_copies.img on demand
+├── misc.img
+├── oem.img
+├── recovery.img
+├── rootfs.img
+├── trust.img
+├── uboot.img
+└── userdata.img
 ```
 
-**output  files: Using For Flash Programmer **
+Note：
 
-```
-[/out] tree
-.
-└── 2048B_128KB
-    ├── gpt.img
-    ├── idblock.img.bak     // IDB image
-    ├── idblocks.img        // idblock.img.bak multy copies in three
-    ├── uboot.img
-    ├── boot.img
-    ├── rootfs.img
-    └── oem.img
-```
+* IDB multi backup command reference, usually double backup can be:
+
+  ```shell
+  cat out/idblock.img > out/idblock_mutli_copies.img   // 1 copy
+  cat out/idblock.img >> out/idblock_mutli_copies.img  // 2 copies
+  ```
 
 #### SPI Nand Flash Programmer Operation
 
@@ -1047,20 +1159,20 @@ e.g： rv1126 block size 128KB flash:
 
 Assume that flash block size is 128KB, AndroidTools and it's corresponding flash programmer  setting could be like this：
 
-| Input File: SDK output | AndroidTools Start(sector) | Flash Programmer Images | Programmer Start(block) | End(block) | Size(block) | Note       |
-| ---------------------- | -------------------------- | ----------------------- | ----------------------- | ---------- | ----------- | ---------- |
-| paramter.txt           | 0                          | gpt.img                 | 0x0                     | 0x1        | 0x1         | Note 1     |
-| MiniLoaderAll.bin      | 0                          | idblocks.img            | 0x1                     | 0x7        | 0x6         | Note 2     |
-| uboot.img              | 0x2000                     | uboot.img               | 0x20                    | 0x47       | 0x20        | **Note 3** |
-| boot.img               | 0x4800                     | boot.img                | 0x48                    | 0xa0       | 0x50        |            |
-| ...                    | ...                        | ...                     | ...                     |            |             |            |
-| xxx.img                | 0x3E000                    | xxx.img                 | 0x3e0                   | 0x3fb      | 0x18        | Note 4     |
+| Input File: SDK output | AndroidTools Start(sector) | Flash Programmer Images  | Programmer Start(block) | End(block) | Size(block) | Note       |
+| ---------------------- | -------------------------- | ------------------------ | ----------------------- | ---------- | ----------- | ---------- |
+| paramter.txt           | 0                          | gpt.img                  | 0x0                     | 0x1        | 0x1         | Note 1     |
+| MiniLoaderAll.bin      | 0                          | idblock_mutli_copies.img | 0x1                     | 0x7        | 0x6         | Note 2     |
+| uboot.img              | 0x2000                     | uboot.img                | 0x20                    | 0x47       | 0x20        | **Note 3** |
+| boot.img               | 0x4800                     | boot.img                 | 0x48                    | 0xa0       | 0x50        |            |
+| ...                    | ...                        | ...                      | ...                     |            |             |            |
+| xxx.img                | 0x3E000                    | xxx.img                  | 0x3e0                   | 0x3fb      | 0x18        | Note 4     |
 
 Table Note：
 
 1. gpt.img should be placed in block 0；
 
-2. idblocks.img should be placed from block 1 to block 7；
+2. idblock_mutli_copies.img should be placed from block 1 to block 7, the image size is limit to 7 blocks；
 
 3. Except gpt.img and idblocks.img, other images should be place in the address based on parameter.txt address, 512B/sector, flash programmer  Start block = sectors * 512B / block_size：
 
@@ -1085,50 +1197,97 @@ Table Note：
 ```shell
 [/IMAGES] tree
 .
-├── parameter.txt               // generate gpt.img
-├── MiniLoaderAll.bin           // generate idblock.img
+├── parameter.txt
+├── MiniLoaderAll.bin
 ├── uboot.img
 ├── boot.img
 ├── rootfs.img
 ├── oem.img
-└── update.img                  // not care
+└── update.img                  // For make programmer imagers
 ```
 
 **Make Images**
 
-tool burner_image_kits in SDK rkbin/ directory, command：
+tool programmer_image_tool is in SDK rkbin/tools/，command：
 
 ```
-./rkbin/tools/burner_image_kits/make_spi_nand.sh <src_path> <dst_path>  <soc> <block_size(KB)> <page_size(B)> <oob_size(B)>
+./tools/programmer_image_tool  --help
+NAME
+        programmer_image_tool - creating image for programming on flash
+SYNOPSIS
+        programmer_image_tool [-iotbpsvh]
+DESCRIPTION
+        This tool aims to convert firmware into image for programming
+        From now on,it can support slc nand(rk)|spi nand|nor|emmc.
+OPTIONS:
+          -i    input firmware
+          -o    output directory
+          -t    storage type,range in[SLC|SPINAND|SPINOR|EMMC]
+          -b    block size,unit KB
+          -p    page size,unit KB
+          -s    oob size,unit B
+          -2    2k data in one page
+          -l    using page linked l
 ```
 
-* src_path：SDK Output Files For PC Tools;
-* dst_path：output directory；
-* soc：chip(lowercase), e.g: rv1126
-* block_size：flash block size；
-* page_size：flash page size。
-* oob_size：flash oob size per page
+Assume that： rv1126 block size 128KB page size 2KB oob size 128 flash:
 
-e.g： rv1126 block size 128KB flash page size 2KB  oob size 64B flash:
-
-```
-./rkbin/tools/burner_image_kits/make_slc_nand.sh ./IMAGES ./out rv1126 128 2048 64
+```shell
+./tools/programmer_image_tool -i update.img -b 128 -p 2 -s 128 -t slc -2 -o out
+input firmware is 'update.img'
+block size is '128'
+page size is '2'
+oob size is '128'
+flash type is 'slc'
+2k data page on.
+output directory is 'out'
+writing idblock...
+start to write partitions...gpt=1
+preparing gpt saving at out/gpt.img
+writing gpt...OK
+preparing trust saving at out/trust.img
+writing trust...OK
+preparing uboot saving at out/uboot.img
+writing uboot...OK
+preparing boot saving at out/boot.img
+writing boot...OK
+preparing rootfs saving at out/rootfs.img
+writing rootfs...OK
+preparing recovery saving at out/recovery.img
+writing recovery...OK
+preparing oem saving at out/oem.img
+writing oem...OK
+preparing userdata:grow saving at out/userdata:grow.img
+writing userdata:grow...OK
+preparing misc saving at out/misc.img
+writing misc...OK
+creating programming image ok.
 ```
 
 **output  files: Using For Flash Programmer**
 
+```shell
+out
+├── boot.img
+├── gpt.img
+├── idblock.img            //Making multiple backup images of idblock_mutli_copies.img on demand
+├── misc.img
+├── oem.img
+├── recovery.img
+├── rootfs.img
+├── trust.img
+├── uboot.img
+└── userdata.img
 ```
-[/out] tree
-.
-└── 2048B_128KB
-    ├── gpt.img
-    ├── idblock.img.bak     // IDB image
-    ├── idblocks.img        // idblock.img.bak multy copies in three
-    ├── uboot.img
-    ├── boot.img
-    ├── rootfs.img
-    └── oem.img
-```
+
+Note：
+
+* IDB multi backup command reference, usually double backup can be:
+
+  ```shell
+  cat out/idblock.img > out/idblock_mutli_copies.img   // 1 copy
+  cat out/idblock.img >> out/idblock_mutli_copies.img  // 2 copies
+  ```
 
 #### SLC Nand Flash Programmer Operation
 
@@ -1136,20 +1295,20 @@ e.g： rv1126 block size 128KB flash page size 2KB  oob size 64B flash:
 
 Assume that flash block size is 128KB, AndroidTools and it's corresponding flash programmer setting could be like this：
 
-| Input File: SDK output | AndroidTools Start(sector) | Flash Programmer Images | Programmer Start(block) | End(block) | Size(block) | Note       |
-| ---------------------- | -------------------------- | ----------------------- | ----------------------- | ---------- | ----------- | ---------- |
-| paramter.txt           | 0                          | gpt.img                 | 0x0                     | 0x1        | 0x1         | Note 1     |
-| MiniLoaderAll.bin      | 0                          | idblocks.img            | 0x1                     | 0x7        | 0x6         | Note 2     |
-| uboot.img              | 0x2000                     | uboot.img               | 0x20                    | 0x47       | 0x20        | **Note 3** |
-| boot.img               | 0x4800                     | boot.img                | 0x48                    | 0xa0       | 0x50        |            |
-| ...                    | ...                        | ...                     | ...                     |            |             |            |
-| xxx.img                | 0x3E000                    | xxx.img                 | 0x3e0                   | 0x3fb      | 0x18        | Note 4     |
+| Input File: SDK output | AndroidTools Start(sector) | Flash Programmer Images  | Programmer Start(block) | End(block) | Size(block) | Note       |
+| ---------------------- | -------------------------- | ------------------------ | ----------------------- | ---------- | ----------- | ---------- |
+| paramter.txt           | 0                          | gpt.img                  | 0x0                     | 0x1        | 0x1         | Note 1     |
+| MiniLoaderAll.bin      | 0                          | idblock_mutli_copies.img | 0x1                     | 0x7        | 0x6         | Note 2     |
+| uboot.img              | 0x2000                     | uboot.img                | 0x20                    | 0x47       | 0x20        | **Note 3** |
+| boot.img               | 0x4800                     | boot.img                 | 0x48                    | 0xa0       | 0x50        |            |
+| ...                    | ...                        | ...                      | ...                     |            |             |            |
+| xxx.img                | 0x3E000                    | xxx.img                  | 0x3e0                   | 0x3fb      | 0x18        | Note 4     |
 
 Table Note：
 
 1. gpt.img should be placed in block 0；
 
-2. idblocks.img should be placed from block 1 to block 7；
+2. idblock_mutli_copies.img should be placed from block 1 to block 7, the image size is limit to 7 blocks；
 
 3. Except gpt.img and idblocks.img, other images should be place in the address based on parameter.txt address, 512B/sector, flash programmer  Start block = sectors * 512B / block_size：
 
