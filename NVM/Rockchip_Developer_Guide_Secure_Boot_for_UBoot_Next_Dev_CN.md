@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-022
 
-发布版本：V2.2.0
+发布版本：V2.3.0
 
-日期：2021-03-25
+日期：2021-04-13
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -46,7 +46,7 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文档将详细介绍基于 Rockchip U-boot next-dev 的 secure boot 流程。
+本文档将详细介绍基于 Rockchip U-Boot next-dev 的 secure boot 流程。
 
 **产品版本**
 
@@ -68,7 +68,8 @@ Rockchip Electronics Co., Ltd.
 |  V1.1.0 | Jason Zhu | 2019-06-03 | 修正一些不恰当描述 |
 |  V2.0.0 | Jason Zhu | 2019-09-19 | 版本更新 |
 |  V2.1.0 | Ken Bian  | 2020-01-15 | 添加更多Android SDK中的细节 |
-|  V2.2.0 | WuLiangqing | 2021-03-25 |增加AVB kernel部分修改说明 |
+| V2.2.0 | WuLiangqing | 2021-03-25 |增加AVB kernel部分修改说明 |
+| V2.3.0 | Jason Zhu | 2021-04-13 |增加pre-loader/spl校验流程说明 |
 
 ---
 
@@ -80,7 +81,7 @@ Rockchip Electronics Co., Ltd.
 
 ## 引用参考
 
-《Rockchip-Secure-Boot-Application-Note.md》
+《Rockchip_Developer_Guide_Secure_Boot_Application_Note_EN.md》
 
 《Android Verified Boot 2.0》
 
@@ -211,6 +212,9 @@ permanent_attributes.bin 是整个系统的安全认证数据，它需要烧写�
 
 | **平台** | **efuse** | **OTP** |
 | -------- | --------- | ------- |
+| rk3568   |           | ✔       |
+| rk3566   |           | ✔       |
+| rk3399   | ✔         |         |
 | rk3399   | ✔         |         |
 | rk3368   | ✔         |         |
 | rk3328   |           | ✔       |
@@ -382,7 +386,7 @@ if __name__ == '__main__':
 	challenge_verify()
 ```
 
-### U-boot 使能
+### U-Boot 使能
 
 开启 avb 需要 trust 支持，需要 U-Boot 在 defconfig 文件中配置：
 
@@ -868,13 +872,40 @@ A/B System 烧写
 
 ![AB-firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/AB-firmware-download.png)
 
-## pre loader verified
+## MaskRom verified
 
-参见《Rockchip-Secure-Boot-Application-Note.md》
+参见《Rockchip_Developer_Guide_Secure_Boot_Application_Note_EN.md》
 
 ![1-3MaskRom-to-loader-sequence](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/1-3MaskRom-to-loader-sequence.png)
 
-## U-boot verified
+## Pre-Loader/SPL verified
+
+Rockchip目前的第一级loader有两种固件，一个是闭源的miniloader，另一个是U-Boot SPL，这两种固件的校验方式不一样。各平台支持情况如下：
+
+| **平台** | **miniloader** | **SPL** |
+| -------- | -------------- | ------- |
+| rk3568   |                | ✔       |
+| rk3566   |                | ✔       |
+| rk3399   | ✔              |         |
+| rk3399   | ✔              |         |
+| rk3368   | ✔              |         |
+| rk3328   | ✔              |         |
+| rk3326   | ✔              |         |
+| rk3308   | ✔              |         |
+| rk3288   | ✔              |         |
+| rk3229   | ✔              |         |
+| rk3126   | ✔              |         |
+| rk3128   | ✔              |         |
+
+具体流程详见《Rockchip_Developer_Guide_Secure_Boot_Application_Note_EN.md》。
+
+![pre-loader-spl-verify-u-boot-flow](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/pre-loader-spl-verify-u-boot-flow.png)
+
+SPL校验流程：
+
+![spl-verify](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/spl-verify.png)
+
+## U-Boot verified
 
 OTP 设备校验流程：
 
@@ -985,6 +1016,8 @@ fastboot oem fuse at-rsa-perm-attr
 10. OTP 平台 loader public key烧写
 
 参考《Rockchip-Secure-Boot-Application-Note.md》
+
+**注意：如果第一级loader是SPL，固件签名及烧写，请参考《Rockchip_Developer_Guide_UBoot_Nextdev_CN.md》的fit章节。**
 
 ### 验证流程
 

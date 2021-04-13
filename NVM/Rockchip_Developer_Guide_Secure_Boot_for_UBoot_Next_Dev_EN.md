@@ -2,9 +2,9 @@
 
 ID: RK-KF-YF-023
 
-Release version: 2.2.0
+Release version: 2.3.0
 
-Release Date: 2021-03-25
+Release Date: 2021-04-13
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -40,7 +40,7 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 **Overview**
 
-This document will describe the secure boot process based on Rockchip U-boot next-dev in details.
+This document will describe the secure boot process based on Rockchip U-Boot next-dev in details.
 
 **Product Version**
 
@@ -62,6 +62,7 @@ Software development engineers
 | V2.0.0  | Jason Zhu & Chen Haiyan  |2019-09-19 | Version update & Release English version |
 | V2.1.0 | Ken Bian |2020-01-15 | Add more details for Android SDK |
 | V2.2.0 | WuLiangqing |2021-03-25 |  Add AVB Kernel section description |
+| V2.3.0 | Jason Zhu |2021-04-13 |  Add pre-loader / SPL verification process description |
 
 ---
 
@@ -73,7 +74,9 @@ Software development engineers
 
 ## Reference
 
-《Rockchip-Secure-Boot-Application-Note.md》
+《Rockchip_Developer_Guide_Secure_Boot_Application_Note_EN.md》
+
+《Android Verified Boot 2.0》
 
 《Rockchip_Developer_Guide_Linux4.4_SecureBoot_CN.pdf》
 
@@ -198,6 +201,8 @@ Support status of efuse and OTP for each platform:
 
 | **Platform** | **efuse** | **OTP** |
 | ------------ | --------- | ------- |
+| rk3568       |           | ✔       |
+| rk3566       |           | ✔       |
 | rk3399       | ✔         |         |
 | rk3368       | ✔         |         |
 | rk3328       |           | ✔       |
@@ -369,7 +374,7 @@ if __name__ == '__main__':
 	challenge_verify()
 ```
 
-### Enable AVB in U-boot
+### Enable AVB in U-Boot
 
 It requires trust support to enable avb. Need to configure U-Boot in defconfig file:
 
@@ -853,13 +858,40 @@ A/B System flashing
 
 ![AB-firmware-download](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/AB-firmware-download.png)
 
-## pre loader verified
+## MaskRom verified
 
-Refer to 《Rockchip-Secure-Boot-Application-Note.md》
+Refer to 《Rockchip_Developer_Guide_Secure_Boot_Application_Note_EN.md》
 
 ![1-3MaskRom-to-loader-sequence](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/1-3MaskRom-to-loader-sequence.png)
 
-## U-boot verified
+## Pre-Loader/SPL verified
+
+There are two kinds of firmware in the first level loader of rockchip, one is miniloader with closed source, the other is u-boot SPL. The verification methods of these two kinds of firmware are different. The support of each platform is as follows：
+
+| **Platform** | **miniloader** | **SPL** |
+| -------- | -------------- | ------- |
+| rk3568   |                | ✔       |
+| rk3566   |                | ✔       |
+| rk3399   | ✔              |         |
+| rk3399   | ✔              |         |
+| rk3368   | ✔              |         |
+| rk3328   | ✔              |         |
+| rk3326   | ✔              |         |
+| rk3308   | ✔              |         |
+| rk3288   | ✔              |         |
+| rk3229   | ✔              |         |
+| rk3126   | ✔              |         |
+| rk3128   | ✔              |         |
+
+Refer to《Rockchip_Developer_Guide_Secure_Boot_Application_Note_EN.md》。
+
+![pre-loader-spl-verify-u-boot-flow](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/pre-loader-spl-verify-u-boot-flow.png)
+
+SPL verification process：
+
+![spl-verify](./Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev/spl-verify.png)
+
+## U-Boot verified
 
 The verification process of OTP device:
 
@@ -971,6 +1003,8 @@ fastboot oem fuse at-rsa-perm-attr
 10. Flash loader public key on OTP platform
 
 Refer to 《Rockchip-Secure-Boot-Application-Note.md》
+
+**Note:  If the first level loader is SPL, please refer to the chapter fit of 《Rockchip_Developer_Guide_UBoot_Nextdev_CN.md》**
 
 ### Verification process
 
