@@ -4,7 +4,7 @@
 
 发布版本：V2.0.0
 
-日期：2021-04-12
+日期：2021-04-21
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -73,6 +73,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-02-27 | V1.8.0   | 林涛     | 增加标注EP功能件开发说明                  |
 | 2021-03-16 | V1.9.0   | 林涛     | 增加FW存在异常设备的说明                  |
 | 2021-04-12 | V2.0.0   | 林涛     | 增加用户态访问异常说明                    |
+| 2021-04-21 | V2.1.0   | 林涛     | 增加PCIe转XHCI芯片异常说明                |
 
 ---
 
@@ -587,3 +588,40 @@ Capabilities: [58] MSI: Enable- Count=1/32 Maskable- 64bit+
 
 - 改用memremap(phys_addr, size, MEMREMAP_WC) 这类接口来替换mmap
 - 改用memset_io或者memset_fromio/memset_toio等API
+
+### PCIe转USB设备驱动(xhci)加载异常
+
+部分市售PCIe转USB芯片，如VL805，在链路建立之后，设备驱动加载异常。主要异常点就是等待xHCI芯片复位没有完成，大概率是转接芯片的固件需要升级。可先对接PC平台测试，若确定需要升级固件可联系供应商。
+
+```
+[ 6.289987] pci 0000:01:00.0: xHCI HW not ready after 5 sec (HC bug?) status = 0x811
+[ 6.531098] xhci_hcd 0000:01:00.0: xHCI Host Controller
+[ 6.531803] xhci_hcd 0000:01:00.0: new USB bus registered, assigned bus number 3
+[ 16.532539] xhci_hcd 0000:01:00.0: can't setup: -110
+[ 16.533033] xhci_hcd 0000:01:00.0: USB bus 3 deregistered
+[ 16.533712] xhci_hcd 0000:01:00.0: init 0000:01:00.0 fail, -110
+[ 16.534281] xhci_hcd: probe of 0000:01:00.0 failed with error -110
+```
+
+若仍无法解决，可以尝试下列补丁drivers/usb/host/pci-quirks.c
+
+```diff
+diff --git a/drivers/usb/host/pci-quirks.c b/drivers/usb/host/pci-quirks.c
+index 3ea435c..cca536d 100644
+--- a/drivers/usb/host/pci-quirks.c
++++ b/drivers/usb/host/pci-quirks.c
+@@ -1085,8 +1085,11 @@ static void quirk_usb_early_handoff(struct pci_dev *pdev)
+	/* Skip Netlogic mips SoC's internal PCI USB controller.
+	 * This device does not need/support EHCI/OHCI handoff
+	 */
+-	if (pdev->vendor == 0x184e)	/* vendor Netlogic */
++	if ((pdev->vendor == 0x184e) ||
++	    (pdev->vendor == PCI_VENDOR_ID_VIA && pdev->device == 0x3483)) {
++		/* 以VL805为例，其他芯片请填写正确的厂商ID和设备ID */
++		dev_warn(&pdev->dev, "bypass xhci quirk for VL805\n");
+		return;
++	}
+	if (pdev->class != PCI_CLASS_SERIAL_USB_UHCI &&
+			pdev->class != PCI_CLASS_SERIAL_USB_OHCI &&
+			pdev->class != PCI_CLASS_SERIAL_USB_EHCI &&
+```
