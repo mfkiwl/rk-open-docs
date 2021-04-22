@@ -4,7 +4,7 @@
 
 发布版本：V2.0.0
 
-日期：2021-04-21
+日期：2021-04-23
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -60,20 +60,21 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明**                              |
-| ---------- | -------- | -------- | ----------------------------------------- |
-| 2021-01-15 | V1.0.0   | 林涛     | 初始版本                                  |
-| 2021-01-22 | V1.1.0   | 林涛     | 增加PCIe 3.0控制器异常情况的检查信息      |
-| 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息        |
-| 2021-02-04 | V1.3.0   | 林涛     | 增加MSI和MSI-X支持数量的问题描述          |
-| 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                      |
-| 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明               |
-| 2021-02-23 | V1.6.0   | 林涛     | 增加MSI/MSI-X调试支持和运行态设备异常说明 |
-| 2021-02-26 | V1.7.0   | 林涛     | 增加Legacy INT的说明                      |
-| 2021-02-27 | V1.8.0   | 林涛     | 增加标注EP功能件开发说明                  |
-| 2021-03-16 | V1.9.0   | 林涛     | 增加FW存在异常设备的说明                  |
-| 2021-04-12 | V2.0.0   | 林涛     | 增加用户态访问异常说明                    |
-| 2021-04-21 | V2.1.0   | 林涛     | 增加PCIe转XHCI芯片异常说明                |
+| **日期**   | **版本** | **作者** | **修改说明**                               |
+| ---------- | -------- | -------- | ------------------------------------------ |
+| 2021-01-15 | V1.0.0   | 林涛     | 初始版本                                   |
+| 2021-01-22 | V1.1.0   | 林涛     | 增加PCIe 3.0控制器异常情况的检查信息       |
+| 2021-01-26 | V1.2.0   | 林涛     | 增加PCIe 2.0 Combo phy异常排除信息         |
+| 2021-02-04 | V1.3.0   | 林涛     | 增加MSI和MSI-X支持数量的问题描述           |
+| 2021-02-05 | V1.4.0   | 林涛     | 增加地址分配异常信息                       |
+| 2021-02-06 | V1.5.0   | 林涛     | 增加PCIe2x1的PHY支持SSC说明                |
+| 2021-02-23 | V1.6.0   | 林涛     | 增加MSI/MSI-X调试支持和运行态设备异常说明  |
+| 2021-02-26 | V1.7.0   | 林涛     | 增加Legacy INT的说明                       |
+| 2021-02-27 | V1.8.0   | 林涛     | 增加标注EP功能件开发说明                   |
+| 2021-03-16 | V1.9.0   | 林涛     | 增加FW存在异常设备的说明                   |
+| 2021-04-12 | V2.0.0   | 林涛     | 增加用户态访问异常说明                     |
+| 2021-04-21 | V2.1.0   | 林涛     | 增加PCIe转XHCI芯片异常说明                 |
+| 2021-04-23 | V2.2.0   | 林涛     | 增加lane拆分复位IO说明以及休眠唤醒异常说明 |
 
 ---
 
@@ -121,7 +122,7 @@ RK3568
 
 2. reset-gpios = <&gpio3 13 GPIO_ACTIVE_HIGH>;`
 
-**必须配置项**：此项是设置 PCIe 接口的 PERST#复位信号；不论是插槽还是焊贴的设备，请在原理图上找到该引脚，并正确配置。否则很有可能将无法稳定完成链路建立。
+**必须配置项**：此项是设置 PCIe 接口的 PERST#复位信号；不论是插槽还是焊贴的设备，请在原理图上找到该引脚，并正确配置。否则很有可能将无法稳定完成链路建立。另需特别提醒，如果将pcie3x2接口拆分为两个1 lane的模式，那么pcie3x2和pcie3x1节点均需配置不同的PERST#信号线。
 
 3. `num-lanes = <4>;`
 
@@ -624,4 +625,44 @@ index 3ea435c..cca536d 100644
 	if (pdev->class != PCI_CLASS_SERIAL_USB_UHCI &&
 			pdev->class != PCI_CLASS_SERIAL_USB_OHCI &&
 			pdev->class != PCI_CLASS_SERIAL_USB_EHCI &&
+```
+
+### PCIe 3.0设备休眠唤醒异常
+
+休眠唤醒测试如见下列log，原因是休眠时候关闭3.3v电源时导致了时钟晶振的电源异常。请从三个方面着手：
+
+- dts中vpcie3v3-supply的电源配置，是否电源的max和min等配置不合理，导致电源操作异常
+- 测量时钟晶振，是否在休眠前提前关闭了，或者休眠失败后就没有再次开启
+- 将3.3v电源和晶振的供电飞线改为外部供电，排除异常
+
+```
+[   17.406781] PM: suspend entry (deep)
+[   17.406839] PM: Syncing filesystems ... done.
+[   17.471710] Freezing user space processes ... (elapsed 0.002 seconds) done.
+[   17.474337] OOM killer disabled.
+[   17.474343] Freezing remaining freezable tasks ... (elapsed 0.001 seconds) done.
+[   17.476200] Suspending console(s) (use no_console_suspend to debug)
+[   17.479152] android_work: sent uevent USB_STATE=DISCONNECTED
+[   17.480290] [WLAN_RFKILL]: Enter rfkill_wlan_suspend
+[   17.501382] rk-pcie 3c0000000.pcie: fail to set vpcie3v3 regulator
+[   17.501406] dpm_run_callback(): genpd_suspend_noirq+0x0/0x18 returns -22
+[   17.501418] PM: Device 3c0000000.pcie failed to suspend noirq: error -22
+[   38.506580] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[   38.506601] rcu:  1-...0: (1 GPs behind) idle=25a/1/0x4000000000000000 softirq=4657/4657 fqs=2100
+[   38.506604] rcu:  (detected by 0, t=6302 jiffies, g=4609, q=17)
+[   38.506613] Task dump for CPU 1:
+[   38.506617] kworker/u8:4    R  running task        0  1380      2 0x0000002a
+[   38.506642] Workqueue: events_unbound async_run_entry_fn
+[   38.506647] Call trace:
+[   38.506657]  __switch_to+0xe4/0x138
+[   38.506667]  pci_pm_resume_noirq+0x0/0x120
+[  101.523233] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  101.523250] rcu:  1-...0: (1 GPs behind) idle=25a/1/0x4000000000000000 softirq=4657/4657 fqs=8402
+[  101.523253] rcu:  (detected by 0, t=25207 jiffies, g=4609, q=17)
+[  101.523260] Task dump for CPU 1:
+[  101.523264] kworker/u8:4    R  running task        0  1380      2 0x0000002a
+[  101.523284] Workqueue: events_unbound async_run_entry_fn
+[  101.523288] Call trace:
+[  101.523297]  __switch_to+0xe4/0x138
+[  101.523307]  pci_pm_resume_noirq+0x0/0x120
 ```
