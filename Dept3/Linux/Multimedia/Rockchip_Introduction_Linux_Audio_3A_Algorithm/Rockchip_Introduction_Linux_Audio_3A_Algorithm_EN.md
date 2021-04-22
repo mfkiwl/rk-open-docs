@@ -355,7 +355,7 @@ The figure below shows an example of low-shelf filter which Fc = 1000Hz,Gain = Â
 
 ---
 
-### Hardware Test
+## Hardware Test
 
 ### Audio Precision Test
 
@@ -420,6 +420,13 @@ Record Path:
 ```
 amixer -c 0 sset 'Capture MIC Path' 'Main Mic' // Open codec MIC
 ```
+
+### Hardware Structure
+
+- The microphone and speakers are unobstructed, and the speakers are not facing objects such as wall or desktop;
+- The microphone and the speaker should not be on the same panel, and the distance should be as far away as possible to avoid resonance;
+
+- The sound pickup hole of the microphone should not be directly facing the speaker, it needs to be separated by materials such as sound insulation cotton.
 
 ### Sealing Test
 
