@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.3.1
+发布版本：V1.3.2
 
-日期：2021-03-15
+日期：2021-04-22
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -73,6 +73,7 @@ Rockchip Electronics Co., Ltd.
 | V1.2.2 | 范立创 | 2021-01-15 | 1.补充接口说明 |
 | V1.3.0 | 范立创/王智华 | 2021-02-03 | 1.增加API说明：<br />（1）[RK_MPI_SYS_SetFrameRate](#RK_MPI_SYS_SetFrameRate)<br />（2）[RK_MPI_MB_POOL_Create](#RK_MPI_MB_POOL_Create)<br />（3）[RK_MPI_MB_POOL_Destroy](#RK_MPI_MB_POOL_Destroy)<br />（4）[RK_MPI_MB_POOL_GetBuffer](#RK_MPI_MB_POOL_GetBuffer)<br />（5）[RK_MPI_MB_Copy](#RK_MPI_MB_Copy)<br />（6）[RK_MPI_VI_SetUserPic](#RK_MPI_VI_SetUserPic)<br />（7）[RK_MPI_VI_EnableUserPic](#RK_MPI_VI_EnableUserPic)<br />（8）[RK_MPI_VI_DisableUserPic](#RK_MPI_VI_DisableUserPic)<br />（9）[RK_MPI_VI_RGN_SetCover](#RK_MPI_VI_RGN_SetCover)<br />（10）[RK_MPI_VENC_RGN_SetCoverEx](#RK_MPI_VENC_RGN_SetCoverEx)<br />（11）[RK_MPI_RGA_RGN_SetBitMap](#RK_MPI_RGA_RGN_SetBitMap)<br />（12）[RK_MPI_RGA_GetChnRegionLuma](#RK_MPI_RGA_GetChnRegionLuma)<br />（13）[RK_MPI_RGA_RGN_SetCover](#RK_MPI_RGA_RGN_SetCover)<br />（14）[RK_MPI_VMIX_CreateDev](#RK_MPI_VMIX_CreateDev)<br />（15）[RK_MPI_VMIX_DestroyDev](#RK_MPI_VMIX_DestroyDev)<br />（16）[RK_MPI_VMIX_EnableChn](#RK_MPI_VMIX_EnableChn)<br />（17）[RK_MPI_VMIX_DisableChn](#RK_MPI_VMIX_DisableChn)<br />（18）[RK_MPI_VMIX_SetLineInfo](#RK_MPI_VMIX_SetLineInfo)<br />（19）[RK_MPI_VMIX_ShowChn](#RK_MPI_VMIX_ShowChn)<br />（20）[RK_MPI_VMIX_HideChn](#RK_MPI_VMIX_HideChn)<br />（21）[RK_MPI_VMIX_RGN_SetBitMap](#RK_MPI_VMIX_RGN_SetBitMap)<br />（22）[RK_MPI_VMIX_GetRegionLuma](#RK_MPI_VMIX_GetRegionLuma)<br />（23）[RK_MPI_VMIX_GetChnRegionLuma](#RK_MPI_VMIX_GetChnRegionLuma)<br />（24）[RK_MPI_VMIX_RGN_SetCover](#RK_MPI_VMIX_RGN_SetCover)<br />（25）[RK_MPI_MUXER_EnableChn](#RK_MPI_MUXER_EnableChn)<br />（26）[RK_MPI_MUXER_DisableChn](#RK_MPI_MUXER_DisableChn)<br />（27）[RK_MPI_MUXER_Bind](#RK_MPI_MUXER_Bind)<br />（28）[RK_MPI_MUXER_StreamStart](#RK_MPI_MUXER_StreamStart)<br />（29）[RK_MPI_MUXER_StreamStop](#RK_MPI_MUXER_StreamStop)<br />（30）[RK_MPI_SYS_DevSendMediaBuffer](#RK_MPI_SYS_DevSendMediaBuffer)<br />2.AI/AO支持多通道同时打开。<br />3.JPEG支持±90度旋转。<br />4.优化Cover内存占用以及效率<br />5.新增uvc、多路音频的示例。<br/>5.Event接口增加用户私有数据指针<br />6.RGA支持镜像<br />7.删除JPEG Light接口说明 |
 | V1.3.1 | Ruby Zhang |  | 更新产品版本信息 |
+| V1.3.2 | Aaran.sun | 2021-04-22 | 增加VENC通道参数配置接口说明 |
 
 ---
 
@@ -3049,6 +3050,92 @@ RK_S32 RK_MPI_VENC_SetVencChnAttr([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_ATTR_S]
 
 无。
 
+#### RK_MPI_VENC_GetVencChnParam
+
+【描述】
+
+获取编码通道参数。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_GetVencChnParam([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_PARAM_S](#VENC_CHN_PARAM_S) *stVencChnParam);
+
+【参数】
+
+| 参数名称       | 描述                                                         | 输入/输出 |
+| -------------- | ------------------------------------------------------------ | --------- |
+| VeChn          | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stVencChnParam | 编码通道属性指针。                                           | 输出      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+该函数仅能获取已创建通道的参数配置。
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
+#### RK_MPI_VENC_SetVencChnParam
+
+【描述】
+
+设置编码通道参数。
+
+【语法】
+
+RK_S32 RK_MPI_VENC_SetVencChnAttr([VENC_CHN](#VENC_CHN) VeChn, [VENC_CHN_PARAM_S](#VENC_CHN_PARAM_S) *stVencChnParam);
+
+【参数】
+
+| 参数名称       | 描述                                                         | 输入/输出 |
+| -------------- | ------------------------------------------------------------ | --------- |
+| VeChn          | 编码通道号。取值范围：[0, [VENC_MAX_CHN_NUM](#VENC_MAX_CHN_NUM))。 | 输入      |
+| stVencChnParam | 编码通道属性指针。                                           | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                  |
+| ------ | ------------------------------------- |
+| 0      | 成功。                                |
+| 非0    | 失败，其值参见[错误码](#venc-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+该函数仅能配置已创建通道的参数。目前支持编码复杂度（仅H264），分辨率，码率，帧率，GOP动态设置。其余配置修改，需销毁后重新创建通道。
+
+分辨率动态配置需要保持编码器输入Buffer的宽高信息与动态配置要一致，否则将引起内存访问越界风险。该接口仅推荐在VENC不使用绑定（Bind）的场景下使用。而且要确保改变分辨率前，VENC Channel的输入buffer已经全部清空（参见[RK_MPI_VENC_QueryStatus](#RK_MPI_VENC_QueryStatus)）
+
+【举例】
+
+无。
+
+【相关主题】
+
+无。
+
 #### RK_MPI_VENC_DestroyChn
 
 【描述】
@@ -4578,6 +4665,89 @@ typedef struct rkVENC_CHN_ATTR_S {
 [VENC_RC_ATTR_S](#VENC_RC_ATTR_S)
 
 [VENC_GOP_ATTR_S](#VENC_GOP_ATTR_S)
+
+#### VENC_CHN_PARAM_S
+
+【说明】
+
+VENC通道参数结构体。
+
+【定义】
+
+```c
+typedef struct rkVENC_CHN_PARAM_S {
+  RK_BOOL bColor2Grey;
+  RK_U32 u32Priority;
+  RK_U32 u32MaxStrmCnt;
+  RK_U32 u32PollWakeUpFrmCnt;
+  VENC_CROP_INFO_S stCropCfg;
+  VENC_FRAME_RATE_S stFrameRate;
+} VENC_CHN_PARAM_S;
+```
+
+【成员】
+
+| 成员名称            | 描述                           |
+| ------------------- | ------------------------------ |
+| bColor2Grey         | 使能彩转灰色                   |
+| u32Priority         | 通道优先级，0 1 2 3， 非抢占   |
+| u32MaxStrmCnt       | 最大码流帧数                   |
+| u32PollWakeUpFrmCnt | 通道获取码流超时阈值，单位帧数 |
+| stCropCfg           | 裁剪参数                       |
+| stFrameRate         | 帧率控制                       |
+
+【相关数据类型及接口】
+
+[VENC_CROP_INFO_S](#VENC_CROP_INFO_S)
+
+[VENC_FRAME_RATE_S](#VENC_FRAME_RATE_S)
+
+#### VENC_CROP_INFO_S
+
+【说明】
+
+VENC裁剪参数结构体
+
+【定义】
+
+```c
+typedef struct rkVENC_CROP_INFO_S {
+    RK_BOOL bEnable;
+    RECT_S stRect;
+} VENC_CROP_INFO_S;
+```
+
+【成员】
+
+| 成员名称 | 描述     |
+| -------- | -------- |
+| bEnable  | 使能裁剪 |
+| stRect   | 矩形框   |
+
+【相关数据类型及接口】
+
+[RECT_S](#RECT_S)
+
+#### VENC_FRAME_RATE_S
+
+【说明】
+
+VENC 帧率信息结构体
+
+【定义】
+
+```c
+typedef struct rkVENC_FRAME_RATE_S {			RK_S32 s32SrcFrmRate;
+	RK_S32 s32DstFrmRate;
+} VENC_FRAME_RATE_S;
+```
+
+【成员】
+
+| 成员名称      | 描述     |
+| ------------- | -------- |
+| s32SrcFrmRate | 源帧率   |
+| s32DstFrmRate | 目标帧率 |
 
 #### VENC_PARAM_MJPEG_S
 
