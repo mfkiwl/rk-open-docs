@@ -1,12 +1,36 @@
 # Trust Developer Guide
 
-Release version：1.1
+ID: RK-KF-YF-007
 
-Author email：chenjh@rock-chips.com
+Release Version: V1.1.1
 
-Date：2019.11
+Release Date: 2021-04-26
 
-Security Class: Public
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
+
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -16,29 +40,36 @@ Security Class: Public
 
 Trust is one of firmware in Rockchip SDK, since it is related to security and confidentiality, the source code is only open to some internal engineers (the basic functions of RK322x/RK3328/RK3368/RK3399/PX30, etc platform have been open source [0]). This document only provides an brief description of Trust (take 64-bit platform as an example), intended to give readers an idea of its role and functions in the overall system architecture. At the same time, it guides readers how to collect and feedback issues when have problems in practice.
 
-**Applicable object**
+**Product Version**
 
-This document or this guide is mainly suitable for the following engineers：
-
-* Field application engineers
-
-* Software development engineers
-
-**Product version**
-
-| **Chipset model**                                            | **Kernel version** |
-| ------------------------------------------------------------ | :----------------- |
+| **Chipset model**            | **Kernel version** |
+| ------------------------------------------------------- | :----------------- |
 | RK3036/RK3126C/RK3288/RK322X/RK3368/RK3328/RK3399/PX30/RK3308 | 3.10、4.4、4.19    |
 
-**Revision history**
+**Intended Audience**
 
-| **Date**   | **Version** | **Author**    | **Revision Description**            |
-| ---------- | ----------- | ------------- | ----------------------------------- |
-| 2017-12-30 | V1.0        | Jianhong Chen | Initial Release                     |
-| 2019-11-11 | V1.1        | Jianhong Chen | Update the chip/kernel support list |
+This document (this guide) is mainly intended for:
+
+Technical support engineers
+
+Software development engineers
 
 ---
+
+**Revision History**
+
+| **Version** | **Author**  | **Date**   | **Change Description**             |
+| ----------- | ----------- | ---------- | -------------------- |
+| V1.0.0      | Jianhong Chen |  | 2017-12-30  | Initial version      |
+| V1.1.0     | Jianhong Chen |  | 2019-11-11  | Update the chip/kernel support list   |
+| V1.1.1   | Karen Huang |  | 2021-04-26  | Add copyright information  |
+
+---
+
+**Contents**
+
 [TOC]
+
 ---
 
 ## ARM TrustZone
@@ -460,13 +491,11 @@ PANIC: tee_pager_handle_fault core/arch/arm/include/mm/tee_pager.h:126
 
 ## Appendix Reference
 
-[0] Open source code download address：
-
-​	ARM Trusted Firmware：<https://github.com/ARM-software/arm-trusted-firmware>
-​	OP-TEE OS：<https://github.com/OP-TEE/optee_os>
-[1] ARM TrustZone：
-
-​	<https://www.arm.com/products/security-on-arm/trustzone>
-​	<https://developer.arm.com/technologies/trustzone>
-[2] op-tee official website：<https://www.op-tee.org/>
+[0] Open source code download address：<br/>
+ARM Trusted Firmware：<https://github.com/ARM-software/arm-trusted-firmware><br/>
+OP-TEE OS：<https://github.com/OP-TEE/optee_os><br/>
+[1] ARM TrustZone：<br/>
+<https://www.arm.com/products/security-on-arm/trustzone><br/>
+<https://developer.arm.com/technologies/trustzone><br/>
+[2] op-tee official website：<https://www.op-tee.org/><br/>
 [3] PSCI：<http://infocenter.arm.com/help/topic/com.arm.doc.den0022c/DEN0022C_Power_State_Coordination_Interface.pdf "Power State Coordination Interface PDD (ARM DEN 0022C)>"
