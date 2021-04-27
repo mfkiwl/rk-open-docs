@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V2.0.1
+发布版本：V2.1.0
 
-日期：2021-03-02
+日期：2021-04-27
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -93,6 +93,7 @@ Rockchip Electronics Co., Ltd.
 | V1.9.8 | XZY | 2021-02-03 | 新增app/minigui_demo说明 |
 | V2.0.0 | CWW | 2021-02-18 | 1. 增加Linux工具programmer_image_tool<br>2. 更新Rootfs配置说明<br>3. 更新app和external的编译方法<br>4. 增加SDK的BSP包编译说明 |
 | V2.0.1 | CWW | 2021-03-02 | 增加EVB板二维码的网盘地址 |
+| V2.1.0 | CWW | 2021-04-27 | 1. 更新docs目录文档<br>2. 增加交叉编译工具说明<br>3. 增加应用开发建议 |
 
 ---
 
@@ -159,7 +160,7 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 | external/common_algorithm    | 音视频通用算法库                   |
 | external/rknn-toolkit        | 模型转换、推理和性能评估的开发套件 |
 | app/libIPCProtocol           | 基于dbus，提供进程间通信的函数接口 |
-| app/mediaserver              | 提供多媒体服务的主应用             |
+| app/mediaserver              | 提供多媒体服务的主应用（用于IPC应用开发参考或简单功能演示） |
 | app/ipc-daemon               | 系统守护服务                       |
 | app/dbserver                 | 数据库服务                         |
 | app/netserver                | 网络服务                           |
@@ -175,75 +176,61 @@ sudo apt-get install lib32gcc-7-dev  g++-7  libstdc++-7-dev
 
 ```shell
 ├── docs
-│   │
-│   ├── Kernel (内核驱动相关文档，RV1126/RV1109平台可以参考)
-│   │
-│   ├── Linux (Rockchip Linux系统通用文档，RV1126/RV1109平台可以参考)
-│   │   │
-│   │   ├── Multimedia
-│   │   │   ├── camera (camera相关文档，RV1126/RV1109平台可以参考)
-│   │   │   ├── Rockchip_Developer_Guide_MPP_CN.pdf (编解码接口开发指南, 适用于RV1126/RV1109平台)
-│   │   │   └── Rockchip_Developer_Guide_MPP_EN.pdf
-│   │   │
-│   │   ├── Recovery (升级相关文档, 适用于RV1126/RV1109平台)
-│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_CN.pdf
-│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_EN.pdf
-│   │   │   ├── Rockchip_Developer_Guide_Linux_Upgrade_CN.pdf
-│   │   │   └── Rockchip_Developer_Guide_Linux_Upgrade_EN.pdf
-│   │   │
-│   │   ├── Security (加密相关文档, 适用于RV1126/RV1109平台)
-│   │   │   └── Rockchip_Developer_Guide_TEE_Secure_SDK_CN.pdf
-│   │   │
-│   │   └── Wifibt (WiFi和蓝牙相关文档, 适用于RV1126/RV1109平台)
-│   │       ├── AP模组RF测试文档
-│   │       │   ├── BT RF Test Commands for Linux-v05.pdf
-│   │       │   └── Wi-Fi RF Test Commands for Linux-v03.pdf
-│   │       ├── REALTEK模组RF测试文档
-│   │       │   ├── 00014010-WS-170731-RTL8723D_COB_MP_FLOW_R04.pdf
-│   │       │   ├── MP tool user guide for linux20180319.pdf
-│   │       │   └── Quick_Start_Guide_V6.txt
-│   │       ├── RK平台_RTL8723DS_AIRKISS配网说明.pdf
-│   │       ├── Rockchip_Developer_Guide_DeviceIo_Bluetooth_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_EN.pdf
-│   │       ├── Rockchip_Developer_Guide_Network_Config_CN.pdf
-│   │       └── WIFI性能测试PC工具
-│   │           └── iperf-2.0.5-2-win32.zip
-│   │
-│   └── RV1126_RV1109
-│       ├── ApplicationNote (Rockchip应用开发框架介绍、网页端开发指南)
-│       │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
-│       │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_EN.pdf
-│       │   ├── Rockchip_Instructions_Linux_CGI_API_CN.pdf
-│       │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
-│       │   ├── Rockchip_Instructions_Linux_MediaServer_EN.pdf
-│       │   ├── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
-│       │   └── Rockchip_Instructions_Linux_Web_Configuration_EN.pdf
-│       │
-│       ├── Camera (ISP开发指南)
-│       │   ├── Camera_External_FAQ_v1.0.pdf
-│       │   ├── Rockchip_Color_Optimization_Guide_ISP2x_V1.1.0.pdf
-│       │   ├── Rockchip_Development_Guide_ISP2x_CN_v1.2.0.pdf
-│       │   ├── Rockchip_Driver_Guide_ISP2x_CN_v0.1.0.pdf
-│       │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
-│       │   ├── Rockchip_IQ_Tools_Guide_ISP2x_CN_v1.0.0.pdf
-│       │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
-│       │   └── Rockchip_Tuning_Guide_ISP2x_CN_v1.0.0.pdf
-│       │
-│       ├── Multimedia
-│       │   ├── Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf
-│       │   └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf (多媒体接口开发指南)
-│       │
-│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (硬件开发指南)
-│       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf (独立编译U-Boot/Kernel/Rootfs说明文档)
-│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.1.1_20200711_CN.pdf (SDK发布说明)
-│       ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.1.1_20200711_EN.pdf
-│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf (快速开发指南)
-│       ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
-│       ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
-│       ├── RV1126 Multimedia Codec Benchmark v1.1.pdf
-│       └── RV1126_RV1109_Release_Note.txt
+│    ├── Common (通用的内核驱动相关文档、DDR/Flash/eMMC/Camera/WiFi/Bluetooth兼容列表)
+│    │
+│    ├── Linux (Rockchip Linux系统通用文档，RV1126/RV1109平台可以参考)
+│    │   ├── ApplicationNote
+│    │   ├── Camera
+│    │   ├── Graphics
+│    │   ├── Multimedia (编解码接口开发指南)
+│    │   ├── Profile
+│    │   ├── Recovery (升级相关文档)
+│    │   │   ├── Rockchip_Developer_Guide_Linux_Upgrade_CN.pdf
+│    │   │   └── Rockchip_Developer_Guide_Linux_Upgrade_EN.pdf
+│    │   │
+│    │   ├── Security (加密相关文档)
+│    │   └── Wifibt   (WiFi和蓝牙相关文档)
+│    │         ├── AP模组RF测试文档
+│    │         ├── REALTEK模组RF测试文档
+│    │         └── WIFI性能测试PC工具
+│    │
+│    ├── Others
+│    │   ├── Rockchip_User_Guide_Bug_System_CN.pdf
+│    │   └── Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf
+│    │
+│    └── RV1126_RV1109
+│        ├── ApplicationNote (Rockchip应用开发框架介绍、网页端开发指南)
+│        │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_CN.pdf
+│        │   ├── Rockchip_Developer_Guide_Linux_Application_Framework_EN.pdf
+│        │   ├── Rockchip_Instructions_Linux_CGI_API_CN.pdf
+│        │   ├── Rockchip_Instructions_Linux_MediaServer_CN.pdf
+│        │   ├── Rockchip_Instructions_Linux_MediaServer_EN.pdf
+│        │   ├── Rockchip_Instructions_Linux_Web_Configuration_CN.pdf
+│        │   └── Rockchip_Instructions_Linux_Web_Configuration_EN.pdf
+│        │
+│        ├── Camera (ISP开发指南)
+│        │   ├── Camera_External_FAQ_v1.0.pdf
+│        │   ├── Rockchip_Color_Optimization_Guide_ISP2x_V1.1.0.pdf
+│        │   ├── Rockchip_Development_Guide_ISP2x_CN_v1.2.0.pdf
+│        │   ├── Rockchip_Driver_Guide_ISP2x_CN_v0.1.0.pdf
+│        │   ├── Rockchip_Instruction_Linux_Appliction_ISP20_CN.pdf
+│        │   ├── Rockchip_IQ_Tools_Guide_ISP2x_CN_v1.0.0.pdf
+│        │   ├── Rockchip_RV1109_RV1126_Developer_Guide_Linux_Ispserver_CN.pdf
+│        │   └── Rockchip_Tuning_Guide_ISP2x_CN_v1.0.0.pdf
+│        │
+│        ├── Multimedia
+│        │   └── Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf (多媒体接口开发指南)
+│        │
+│        ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (硬件开发指南)
+│        ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
+│        ├── Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf (独立编译U-Boot/Kernel/Rootfs说明文档)
+│        ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.1.1_20200711_CN.pdf (SDK发布说明)
+│        ├── Rockchip_RV1126_RV1109_Linux_SDK_V1.1.1_20200711_EN.pdf
+│        ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_CN.pdf (快速开发指南)
+│        ├── Rockchip_RV1126_RV1109_Quick_Start_Linux_EN.pdf
+│        ├── RV1109 Multimedia Codec Benchmark v1.2.pdf
+│        ├── RV1126 Multimedia Codec Benchmark v1.1.pdf
+│        └── RV1126_RV1109_Release_Note.txt
 │
 └── external
     ├── rknn-toolkit (模型转换、推理和性能评估的开发套件文档)
@@ -365,9 +352,7 @@ SDK的编译有2种方法：
 - 一种是依赖整个SDK环境编译（本章节介绍的方法）
 - 另一种是把U-Boot、Linux Kernel、Rootfs以及应用库独立出SDK来编译（具体方法参考文档：**docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf**）
 
-### 选择不同板级配置
-
-#### SDK下载地址
+### SDK下载地址
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
@@ -415,10 +400,26 @@ repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
 Starting default: 100% (71/71), done.
 ```
 
+### 交叉工具链说明
+
+SDK需要用到2个交叉工具链，如下：
+
+| 目录                                                                            | 说明                       |
+| :----                                                                           | ------                     |
+| prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf      | 用于文件系统和上层应用编译 |
+| prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf | 用于U-Boot和Linux内核编译  |
+
+网盘地址：
+链接：`https://eyun.baidu.com/s/3eTwRktG`
+密码：yaCM
+
+### 选择不同板级配置
+
 #### SDK板级配置目录device/rockchip/rv1126_rv1109
 
 | 板级配置                      | 适用产品说明                 | 存储介质 | EVB板                                               |
 | ----------------------------- | --------------------------   | -------- | --------------------------------------------------- |
+| BoardConfig-38x38-emmc.mk     | 通用IPC（产品是分立电源方案）| eMMC     | TBD |
 | BoardConfig-38x38-spi-nand.mk | 通用IPC（产品是分立电源方案）| SPI NAND | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
 | BoardConfig-38x38-spi-nand.mk | 通用IPC（产品是分立电源方案）| SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-38x38-spi-nand-ab.mk | 通用IPC（产品是分立电源方案），启动方式是AB系统| SPI NAND | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX |
@@ -728,6 +729,12 @@ buildroot/output/rockchip_rv1126_rv1109_libs/BSP/
                # 4. 保存各个模块的补丁到IMAGE/***_RELEASE_TEST/PATCHES目录
                # 注：./build.sh 和 ./build.sh allsave 命令一样
 ```
+
+## 应用开发建议
+
+使用SDK开发应用，建议参考`external/rkmedia/examples`例程进行开发。
+
+app/mediaserver只是实现了简单的IPC功能，只作为演示用。
 
 ## 刷机说明
 

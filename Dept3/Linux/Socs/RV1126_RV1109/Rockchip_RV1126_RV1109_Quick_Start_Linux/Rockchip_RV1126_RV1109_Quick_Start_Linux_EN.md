@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V2.0.1
+Release Version: V2.1.0
 
-Release Date: 2021-03-02
+Release Date: 2021-04-27
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -88,6 +88,7 @@ This document (this guide) is mainly intended for:
 | V1.9.8 | XZY | 2021-02-03 | Add minigui_demo instruction |
 | V2.0.0 | CWW | 2021-02-18 | 1. Add Linux Tool programmer_image_tool<br>2. Update introduction to Rootfs configuration<br>3. Update the project compilation method in the app and external directory<br>4. Add introduction to BSP compile |
 | V2.0.1 | CWW | 2021-03-02 | Add the QR code address |
+| V2.1.0 | CWW | 2021-04-27 | 1. Update docs<br>2. Add cross-compile tool<br>3. Add application development suggestions |
 
 ---
 
@@ -155,7 +156,7 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 | external/common_algorithm      | Audio and video general algorithm library                    |
 | external/rknn-toolkit          | Development kit for model transformation, reasoning and performance evaluation |
 | app/libIPCProtocol             | Based on dbus, provides a functional interface for inter-process communication |
-| app/mediaserver                | Main application providing multimedia services               |
+| app/mediaserver                | Main application providing multimedia services (Used for IPC application development reference or simple function demonstration)               |
 | app/ipc-daemon                 | System guard service                                         |
 | app/dbserver                   | Database service                                             |
 | app/netserver                  | Network services                                             |
@@ -171,40 +172,28 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 
 ```shell
 ├── docs
+│   ├── Common (drivers documents of Linux kernel and DDR/Flash/eMMC/Camera/WiFi/Bluetooth AVL)
 │   │
-│   ├── Kernel (drivers documents for Linux kernel, for RV1126/RV1109 reference only)
-│   │
-│   ├── Linux (Rockchip Linux general documents, for RV1126/RV1109 reference only)
-│   │   │
-│   │   ├── Multimedia
-│   │   │   ├── camera (ISP Develop Guide, for RV1126/RV1109 reference only)
-│   │   │   ├── Rockchip_Developer_Guide_MPP_CN.pdf (multimedia encoding and decoding interface develop guide)
-│   │   │   └── Rockchip_Developer_Guide_MPP_EN.pdf
-│   │   │
-│   │   ├── Recovery (upgrade document, apply to RV1126/RV1109)
-│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_CN.pdf
-│   │   │   ├── Rockchip_Developer_Guide_Linux_Recovery_EN.pdf
+│   ├── Linux (Rockchip Linux general documents, for RV1126/RV1109 reference only)
+│   │   ├── ApplicationNote
+│   │   ├── Camera
+│   │   ├── Graphics
+│   │   ├── Multimedia (multimedia encoding and decoding interface develop guide)
+│   │   ├── Profile
+│   │   ├── Recovery (upgrade document)
 │   │   │   ├── Rockchip_Developer_Guide_Linux_Upgrade_CN.pdf
 │   │   │   └── Rockchip_Developer_Guide_Linux_Upgrade_EN.pdf
 │   │   │
-│   │   ├── Security (security document, apply to RV1126/RV1109)
-│   │   │   └── Rockchip_Developer_Guide_TEE_Secure_SDK_CN.pdf
-│   │   │
-│   │   └── Wifibt (WiFi and Bluetooth, apply to RV1126/RV1109)
-│   │       ├── AP模组RF测试文档
-│   │       │   ├── BT RF Test Commands for Linux-v05.pdf
-│   │       │   └── Wi-Fi RF Test Commands for Linux-v03.pdf
-│   │       ├── REALTEK模组RF测试文档
-│   │       │   ├── 00014010-WS-170731-RTL8723D_COB_MP_FLOW_R04.pdf
-│   │       │   ├── MP tool user guide for linux20180319.pdf
-│   │       │   └── Quick_Start_Guide_V6.txt
-│   │       ├── RK平台_RTL8723DS_AIRKISS配网说明.pdf
-│   │       ├── Rockchip_Developer_Guide_DeviceIo_Bluetooth_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_CN.pdf
-│   │       ├── Rockchip_Developer_Guide_Linux_WIFI_BT_EN.pdf
-│   │       ├── Rockchip_Developer_Guide_Network_Config_CN.pdf
-│   │       └── WIFI性能测试PC工具
-│   │           └── iperf-2.0.5-2-win32.zip
+│   │   ├── Security (security document, apply to RV1126/RV1109)
+│   │   └── Wifibt   (WiFi and Bluetooth, apply to RV1126/RV1109)
+│   │         ├── AP模组RF测试文档
+│   │         ├── REALTEK模组RF测试文档
+│   │         └── WIFI性能测试PC工具
+│   │
+│   ├── Others
+│   │   ├── Rockchip_User_Guide_Bug_System_CN.pdf
+│   │   └── Rockchip_User_Guide_SDK_Application_And_Synchronization_CN.pdf
+│   │
 │   │
 │   └── RV1126_RV1109
 │       ├── ApplicationNote (Rockchip Application Framework Develop Introduction and Web Develop Guide)
@@ -227,8 +216,7 @@ There are buildroot, app, kernel, u-boot, device, docs, external and other direc
 │       │   └── Rockchip_Tuning_Guide_ISP2x_CN_v1.0.0.pdf
 │       │
 │       ├── Multimedia
-│       │   ├── Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf
-│       │   └── Rockchip_Instructions_Linux_Rkmedia_CN.pdf (multimedia interface develop guide)
+│       │   └── Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf (multimedia interface develop guide)
 │       │
 │       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_CN.pdf (Hardware Develop Guide)
 │       ├── Rockchip_RV1126_RV1109_EVB_User_Guide_V1.0_EN.pdf
@@ -362,9 +350,7 @@ Description of two methods of compiling SDK:
 - One is to rely on the entire SDK environment to compile (the method introduced in this chapter)
 - The other is to compile U-Boot, Linux Kernel, Rootfs and application libraries independently from the SDK (refer to the document for specific methods: **docs/RV1126_RV1109/Rockchip_RV1126_RV1109_Instruction_Linux_Separate_Building_EN.pdf**）
 
-### To Select Board Configure
-
-#### SDK Download Address
+### SDK Download Address
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
@@ -408,10 +394,26 @@ repo: warning: Python 2 is no longer supported; Please upgrade to Python 3.6+.
 Starting default: 100% (71/71), done.
 ```
 
+### Cross-compile tool Introduction
+
+There are two cross-compile tools in the SDK, as follow:
+
+| Directory                                                                       | Introduction                          |
+| :----                                                                           | ------                                |
+| prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf      | used to build rootfs and app          |
+| prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf | used to build U-Boot and Linux kernel |
+
+Network disk address:
+Link: `https://eyun.baidu.com/s/3eTwRktG`
+Password: yaCM
+
+### To Select Board Configuration
+
 #### The directory of SDK board config (device/rockchip/rv1126_rv1109)
 
 | Board Configuration           | Product Use                                 | Storage Medium | EVB Board name                                      |
 | ----------------------------- | ------------------------------------------- | -------------- | --------------------------------------------------- |
+| BoardConfig-38x38-emmc.mk     | General IPC (Discrete power supply)         | eMMC           | TBD |
 | BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_38X38_SPI_DDR3P216DD6_V10_20200511LXF |
 | BoardConfig-38x38-spi-nand.mk | General IPC (Discrete power supply)         | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
 | BoardConfig-38x38-spi-nand-ab.mk | General IPC (Discrete power supply), Boot-up with AB system | SPI NAND       | RV1126_RV1109_IPC38_DEMO_V1.11_2020724LX            |
@@ -727,6 +729,12 @@ Enter the project root directory and execute the following command to automatica
                # 4. copy the patches of modules to IMAGE/***_RELEASE_TEST/PATCHES
                # NOTE: ./build.sh allsave is the same as ./build.sh
 ```
+
+## Application Development Suggestions
+
+It is recommended to develop applications by reference to the `external/rkmedia/examples`
+
+app/mediaserver is just realized a simple IPC function, only for demonstration.
 
 ## Upgrade Introduction
 
