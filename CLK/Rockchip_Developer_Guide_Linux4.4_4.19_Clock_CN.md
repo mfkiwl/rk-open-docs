@@ -1,8 +1,10 @@
 # Rockchip Clock 开发指南
 
-发布版本：V1.0.0
+文件标识：RK-KF-YF-173
 
-日期：2021-01-18
+发布版本：V1.0.1
+
+日期：2021-04-26
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -70,9 +72,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本号** | **作者** | **修改日期** | **修改说明**       |
-| ---------- | -------- | ------------ | ------------------ |
-| V1.0.0     | Elaine   | 2021.1.18    | 第一次临时版本发布 |
+| **版本号** | **作者** | **修改日期** | **修改说明**           |
+| ---------- | -------- | ------------ | ---------------------- |
+| V1.0.0     | 张晴     | 2021-01-18   | 第一次临时版本发布     |
+| V1.0.1     | 黄莹     | 2021-04-26   | 增加文件标识，修改格式 |
 
 ---
 
@@ -162,16 +165,14 @@ CLOCK 相关的器件包括：用于产生 CLOCK 的 Oscillator（有源振荡�
 
 CLOCK 的软件框架由 CLOCK 的 Device Tree（CLOCK 的寄存器描述、CLOCK 之间的树状关系等）、Device driver 的 CLOCK 配置和 CLOCK API 三部分构成。这三部分的功能、CLOCK 代码路径如表 1-1 所示。
 
-| 项目            | 功能                                   | 路径                                                       |
-| --------------- | ---------------------------------------------------------- | -------------------------------------- |
-| Clk-rk3xxx.c    | .c中主要是CLOCK的寄存器描述、CLOCK之间的树状关系描述等         | Drivers/clk/rockchip/clk-rk3xxx.c      |
-| Rk3xxx-cru.h    | .h中是CLOCK的ID定义，通过ID匹配CLOCK Name。                    | Include/dt-bindings/clock/rk3xxx-cru.h |
-| RK 特别的处理   | 处理 RK 的 PLL 时钟, 处理 RK 的一些特殊时钟如 LCDC、I2S 等 | Drivers/clk/rockchip/clk-xxx.c         |
-| CLK API         | 提供 Linux 环境下供 Driver 调用的接口                      | Drivers/clk/clk-xxx.x                  |
+| 项目          | 功能                                                       | 路径                                   |
+| ------------- | ---------------------------------------------------------- | -------------------------------------- |
+| Clk-rk3xxx.c  | .c中主要是CLOCK的寄存器描述、CLOCK之间的树状关系描述等     | Drivers/clk/rockchip/clk-rk3xxx.c      |
+| Rk3xxx-cru.h  | .h中是CLOCK的ID定义，通过ID匹配CLOCK Name。                | Include/dt-bindings/clock/rk3xxx-cru.h |
+| RK 特别的处理 | 处理 RK 的 PLL 时钟, 处理 RK 的一些特殊时钟如 LCDC、I2S 等 | Drivers/clk/rockchip/clk-xxx.c         |
+| CLK API       | 提供 Linux 环境下供 Driver 调用的接口                      | Drivers/clk/clk-xxx.x                  |
 
 图表 1‑3 CLOCK代码构成
-
----
 
 ## CLOCK 开发指南
 
@@ -566,8 +567,6 @@ Address: Operational Base + offset (0x0334)
 ![clock-gaiting](Rockchip_Developer_Guide_Linux4.4_4.19_Clock/clock-gaiting.png)
 
 图表 2-10 TESTCLOCK_GATE
-
----
 
 ## 常见问题分析
 

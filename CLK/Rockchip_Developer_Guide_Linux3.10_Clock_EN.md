@@ -1,12 +1,36 @@
 # Rockchip Clock Development Guide
 
-Release Version: 1.0
+ID: RK-KF-YF-031
 
-Author email:zhangqing@rock-chips.com
+Release Version: V1.1.1
 
-Date: 2018.6
+Release Date: 2021-04-28
 
-Security Classification: Public
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
+
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -37,12 +61,15 @@ Software Development Engineers
 
 **Revision history**
 
-| **Date**  | **Version** | **Author** | **Revision description**  |
-| --------- | ----------- | ---------- | ------------------------- |
-| 2016.6.6  | 1.0.        | Elaine     | The first version release |
-| 2017.2.10 | 1.1.        | Elaine     | Add soc RK3328            |
+| **Version** | **Author**    | **Date**   | **Change Description**    |
+| ----------- | ------------- | ---------- | ------------------------- |
+| V1.0.0      | Elaine Zhang  | 2016-06-06 | The first version release |
+| V1.1.0      | Elaine Zhang | 2017-02-10 | Add soc RK3328            |
+| V1.1.1      | Karen Huang   | 2021-04-28 | Modify Format             |
 
 ---
+
+**Contents**
 
 [TOC]
 
@@ -120,13 +147,13 @@ Phase locked loop input through 24M crystal and then lock out corresponding freq
 
 Table 2‑1 PLL description
 
-| PLL  | Sub Device | Feature     | Remark                                 |
-| ---- | --------- | ------------- | ---------------------------------------- |
-| APLL | CLK_CORE | CPU clock | Normally only used by CPU, because CPU can change frequency, APLL will change the frequency according to CPU requirement. |
-| DPLL | Clk_DDR  | DDR clock | Normally only used by DDR, because DDR can change frequency, DPLL will change according to DDR requirement |
-| GPLL |           | Provide backup parent clk for bus and peripheral clock | Normally set as 594M or 1200M, to make sure the output for basic 100, 200, 300 400M clock |
-| CPLL |           | Backup for GMAC or other devices | Normally may be 400, 500, 800, 1000M, or exclusively used by lcdc |
-| NPLL |           | Backup for other devices | Normally may be 1188M, or exclusively used by LCDC |
+| PLL  | Sub Device | Feature                                                | Remark                                                       |
+| ---- | ---------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| APLL | CLK_CORE   | CPU clock                                              | Normally only used by CPU, because CPU can change frequency, APLL will change the frequency according to CPU requirement. |
+| DPLL | Clk_DDR    | DDR clock                                              | Normally only used by DDR, because DDR can change frequency, DPLL will change according to DDR requirement |
+| GPLL |            | Provide backup parent clk for bus and peripheral clock | Normally set as 594M or 1200M, to make sure the output for basic 100, 200, 300 400M clock |
+| CPLL |            | Backup for GMAC or other devices                       | Normally may be 400, 500, 800, 1000M, or exclusively used by lcdc |
+| NPLL |            | Backup for other devices                               | Normally may be 1188M, or exclusively used by LCDC           |
 
 Our SOC bus has ACLK_PERI、HCLK_PERI、PCLK_PERI、ACLK_BUS、HCLK_BUS、PCLK_BUS.(ACLK is used for data transmission, PCLK and HCLK are normally used for register read and write)
 
