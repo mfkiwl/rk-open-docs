@@ -2,9 +2,9 @@
 
 文档标识：RK-KF-YF-397
 
-发布版本：V1.2.0
+发布版本：V1.3.0
 
-日期：2020-03-24
+日期：2021-04-28
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -66,6 +66,7 @@ Rockchip Electronics Co., Ltd.
 | V1.0.0 | Zhichao Yu, Ziyuan Xu, Hans Yang, Tao Huang | 2020-12-22 | 初始版本     |
 | V1.1.0 | Zhihua Wang | 2021-02-02 | 增加双目使用说明 |
 | V1.2.0 | Fenrir Lin | 2021-03-24 | 增加oem分区说明 |
+| V1.3.0 | CWW | 2021-04-28 | 增加安全启动 |
 
 ---
 
@@ -575,6 +576,145 @@ MCU采用RK的FAST AE算法，可搭配硬件上的光敏传感器进行亮度�
 
 注意：由于不同的产品配置不同，做出来的快速启动指标和上述指标会有差异，瑞芯微并不保证任何产品类型都能达到上述优化指标。
 
+## 支持安全的快速启动
+
+快速启动的安全校验流程:
+
+- Maskrom 校验 loader（包含SPL, ddr, usbplug）
+- SPL 校验uboot.img（包含trust, U-Boot...）
+- U-Boot校验boot.img（包含kernel, fdt, ramdisk...）
+
+注：烧录过签名的MiniLoaderAll.bin，就会启动安全校验，未签名的固件无法启动。
+
+### 配置
+
+```shell
+# 选择板级配置
+./build.sh BoardConfig-tb-v13.mk
+```
+
+修改文件：device/rockchip/rv1126_rv1109/BoardConfig-tb-v13.mk
+增加如下配置：
+
+```shell
+# Enable secure boot-up, JUST use for ramdisk
+export RK_RAMDISK_SECURITY_BOOTUP=true
+# Set boot.img (kernel + ramdisk) rollback index
+export RK_ROLLBACK_INDEX_BOOT=1
+# Set uboot.img rollback index
+export RK_ROLLBACK_INDEX_UBOOT=1
+```
+
+修改文件：kernel/arch/arm/boot/dts/rv1126-evb-ddr3-v13-tb-emmc.dts
+增加如下配置：
+
+```diff
+diff --git a/arch/arm/boot/dts/rv1126-evb-ddr3-v13-tb-emmc.dts b/arch/arm/boot/dts/rv1126-evb-ddr3-v13-tb-emmc.dts
+index a9aad6045f01..5246d2d21ccc 100644
+--- a/arch/arm/boot/dts/rv1126-evb-ddr3-v13-tb-emmc.dts
++++ b/arch/arm/boot/dts/rv1126-evb-ddr3-v13-tb-emmc.dts
+@@ -17,3 +17,12 @@
+                bootargs = "loglevel=0 initcall_nr_threads=-1 initcall_debug=0 printk.devkmsg=on root=/dev/rd0 console=ttyFIQ0 snd_aloop.index=7 driver_async_probe=dwmmc_rockchip rk.root2nd=/de
+        };
+ };
++
++&power {
++       /delete-node/ pd_crypto@RV1126_PD_CRYPTO;
++};
++
++&crypto {
++       /delete-property/ power-domains;
++       status = "okay";
++};
+````
+
+修改文件：kernel/arch/arm/configs/rv1126-tb.config
+增加如下配置：
+
+```diff
+diff --git a/arch/arm/configs/rv1126-tb.config b/arch/arm/configs/rv1126-tb.config
+index 729df48a8cb0..b7b1b5632727 100644
+--- a/arch/arm/configs/rv1126-tb.config
++++ b/arch/arm/configs/rv1126-tb.config
+@@ -80,3 +80,4 @@ CONFIG_ROMFS_ON_BLOCK=y
+ # CONFIG_USB_KBD is not set
+ # CONFIG_USB_MOUSE is not set
+ CONFIG_VIDEO_ROCKCHIP_THUNDER_BOOT_ISP=y
++CONFIG_ROCKCHIP_THUNDER_BOOT_CRYPTO=y
+```
+
+修改文件：u-boot/configs/rv1126-emmc-tb.config
+增加如下配置：
+
+```diff
+diff --git a/configs/rv1126-emmc-tb.config b/configs/rv1126-emmc-tb.config
+index 967d78e0b8..d1000dae5d 100644
+--- a/configs/rv1126-emmc-tb.config
++++ b/configs/rv1126-emmc-tb.config
+@@ -32,3 +32,9 @@ CONFIG_SPL_POWER_LOW_VOLTAGE_THRESHOLD=3400
+ # CONFIG_SPL_SPI_FLASH_SUPPORT is not set
+ # CONFIG_SPL_SPI_SUPPORT is not set
+ CONFIG_TRUST_INI="RV1126TOS_TB.ini"
++CONFIG_ROCKCHIP_CIPHER=y
++CONFIG_SPL_ROCKCHIP_CIPHER=y
++CONFIG_FIT_SIGNATURE=y
++CONFIG_SPL_FIT_SIGNATURE=y
++CONFIG_FIT_ROLLBACK_PROTECT=y      # 使能boot.img版本回滚保护，可选功能
++CONFIG_SPL_FIT_ROLLBACK_PROTECT=y  # 使能uboot.img版本回滚保护，可选功能
+```
+
+### 生成Key
+
+U-Boot工程下执行如下三条命令可以生成签名用的RSA密钥对。通常情况下只需要生成一次，此后都用这对密钥签名和验证固件，请妥善保管。
+
+```shell
+cd tools/linux/rk_sign_tool
+./rk_sign_tool cc --chip 1126
+rk_sign_tool kk --out .
+
+cd -
+mkdir -p u-boot/keys
+
+cp tools/linux/rk_sign_tool/privateKey.pem u-boot/keys/dev.key
+cp tools/linux/rk_sign_tool/publicKey.pem u-boot/keys/dev.pubkey
+
+# 使用-x509和私钥生成一个自签名证书：keys/dev.crt （效果本质等同于公钥）
+cd u-boot
+openssl req -batch -new -x509 -key keys/dev.key -out keys/dev.crt
+```
+
+```shell
+# 如果报错用户目录下没有.rnd文件：
+Can't load /home/rv1126/.rnd into RNG
+140522933268928:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/rv1126/.rnd
+
+# 请先手动创建：
+touch ~/.rnd
+
+# ls keys/查看结果：
+dev.crt  dev.key  dev.pubkey
+```
+
+> 注意：上述的"keys"、"dev.key"、"dev.crt" 、"dev.pubkey"名字都不可变。因为这些名字已经在its文件中静态定义，如果改变则会打包失败。
+
+### 编译
+
+```shell
+./build.sh ramboot   # 编译kernel和ramdisk，生成未签名的boot.img
+./build.sh uboot     # 编译uboot和loader，并对固件进行签名
+```
+
+或者使用一键编译命令：`./build.sh`
+
+### 生成固件
+
+``` shell
+ls rockdev/
+boot.img  MiniLoaderAll.bin  oem.img  parameter.txt  uboot.img  userdata.img
+```
+
+详细的安全校验功能请参考文档：Rockchip_Developer_Guide_UBoot_Nextdev_CN.pdf 的FIT章节。
+
 ## 功耗优化
 
 我们在设计低功耗电池产品方案的时候，功耗是一个非常重要的指标。本章节会重点介绍，在功耗优化面，我们有哪些方法和注意事项。
@@ -730,7 +870,7 @@ BR2_PACKAGE_IPERF3=y
 
 #### gdb使能
 
-iperf3功能的开启需要在buildroot配置文件中打开gdb的功能
+gdb功能的开启需要在buildroot配置文件中打开gdb的功能
 
 ```shell
 +#include "gdb.config"
