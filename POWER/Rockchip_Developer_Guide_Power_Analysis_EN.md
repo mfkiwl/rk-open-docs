@@ -1,12 +1,36 @@
 # Power consumption analysis and optimization
 
-Release version:1.0
+ID: RK-KF-YF-177
 
-Author e-mail:cl@rock-chips.com
+Release Version: V1.0.1
 
-Date:2019.08.31
+Release Date: 2021-04-29
 
-Security classification: Public
+Security Level: □Top-Secret   □Secret   □Internal   ■Public
+
+**DISCLAIMER**
+
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+
+**Trademark Statement**
+
+"Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
+
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
+
+Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
+
+Rockchip Electronics Co., Ltd.
+
+No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
+
+Website:     [www.rock-chips.com](http://www.rock-chips.com)
+
+Customer service Tel:  +86-4007-700-590
+
+Customer service Fax:  +86-591-83951833
+
+Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -18,9 +42,9 @@ This document mainly describes some basic concepts and optimization methods of p
 
 **Product version**
 
-| **Product name** | **Kernel version** |
-| ------------ | ------------ |
-| All chips    |  All kernel versions |
+| **Product name** | **Kernel version**  |
+| ---------------- | ------------------- |
+| All chips        | All kernel versions |
 
 **Applicable object**
 
@@ -32,11 +56,14 @@ Software development engineers
 
  **Revision history**
 
-| **Date**   | **Version** | **Author** | **Revision description** |
-| ---------- | ------------| -----------| -------- |
-| 2019.08.31 | V1.0        | Chen Liang | Initial version |
+| **Version** | **Author**  | **Date**   | **Change Description**                      |
+| ----------- | ----------- | ---------- | ------------------------------------------- |
+| V1.0.0      | Tim Chen    | 2019-08-31 | Initial version                             |
+| V1.0.1      | Karen Huang | 2021-04-29 | Modify format and add copyright information |
 
 ---
+
+**Contents**
 
 [TOC]
 
@@ -151,32 +178,32 @@ Take RK3326 EVB board as example, the static desktop power consumption is as bel
 
 *Note: Because the test result of each path should be converted to the power consumption of the battery, so it is more convenient to compare the actually measured current of the battery with the theoretical current on battery.*
 
-| Type | power-supply | Voltage(V) | current(mA) | Theoretical current on battery-3.8V(mA) | Remark |
-| -------- | ------- | ------- | ----------- | -------------------- | ---- |
-| DC/DC    | VDD_ARM | 0.96    | 10.20       | 3.23                 | With 80% efficiency, conversion formula:<br>V * I / efficiency / voltage of the battery |
-| DC/DC    | VDD_LOG | 0.96    | 89.30       | 28.20                | eg:<br>Theoretical current of VDD_LOG on battery(3.8V)=<br>0.96 * 89.3 / 0.8 / 3.8 = 28.2 |
-| DC/DC    | VCC_DDR | 1.26    | 38.50       | 15.91                |      |
-| DC/DC    | VCC_IO  | 2.99    | 4.50        | 4.43                 |      |
-| LDO      | VCC_1V8 | 1.81    | 28.80       | 28.80                | Output current of LDO is equal to input current |
-| LDO      | VDD_1V0 | 1.00    | 10.90       | 10.90                |      |
-| LDO      | VCC3V0_PMU | 3.01 | 1.20        | 1.20                 |      |
-| battery  | VBAT    | 3.81    | 94.60       | 92.67                | Theoretical value is similar to actually measured value |
+| Type    | power-supply | Voltage(V) | current(mA) | Theoretical current on battery-3.8V(mA) | Remark                                                       |
+| ------- | ------------ | ---------- | ----------- | --------------------------------------- | ------------------------------------------------------------ |
+| DC/DC   | VDD_ARM      | 0.96       | 10.20       | 3.23                                    | With 80% efficiency, conversion formula:<br>V * I / efficiency / voltage of the battery |
+| DC/DC   | VDD_LOG      | 0.96       | 89.30       | 28.20                                   | eg:<br>Theoretical current of VDD_LOG on battery(3.8V)=<br>0.96 * 89.3 / 0.8 / 3.8 = 28.2 |
+| DC/DC   | VCC_DDR      | 1.26       | 38.50       | 15.91                                   |                                                              |
+| DC/DC   | VCC_IO       | 2.99       | 4.50        | 4.43                                    |                                                              |
+| LDO     | VCC_1V8      | 1.81       | 28.80       | 28.80                                   | Output current of LDO is equal to input current              |
+| LDO     | VDD_1V0      | 1.00       | 10.90       | 10.90                                   |                                                              |
+| LDO     | VCC3V0_PMU   | 3.01       | 1.20        | 1.20                                    |                                                              |
+| battery | VBAT         | 3.81       | 94.60       | 92.67                                   | Theoretical value is similar to actually measured value      |
 
 ### Compare with EVB data
 
 Break down the power consumption data of each path, compare with the data of EVB in the same scenario, and check if there is problem. For example, the following is the comparison of the static desktop power consumption between RK3326 EVB board and customer device, it can be seen that customer board's power consumption of ARM and LOG are abnormal, and need to analyze further.
 
-| Type   | power-supply | EVB      |          | Customer device |  |
-| ---------- | -------- | -------- | -------- | -------- | ------- |
-|            |       | Voltage(V)  | Current(mA) | Voltage(V) | Current(mA) |
-| DC/DC      | VDD_ARM  | 0.96     | 10.20    | 1.10     | 212.50  |
-| DC/DC      | VDD_LOG  | 0.96     | 89.30    | 1.00     | 151.30  |
-| DC/DC      | VCC_DDR  | 1.26     | 38.50    | 1.27     | 40.50   |
-| DC/DC      | VCC_IO   | 2.99     | 4.50     | 2.99     | 4.80    |
-| LDO        | VCC_1V8  | 1.81     | 28.80    | 1.81     | 29.80   |
-| LDO        | VDD_1V0  | 1.00     | 10.90    | 1.00     | 10.20   |
-| LDO      | VCC3V0_PMU | 3.01     | 1.20     | 3.01     | 1.40    |
-| battery    | VBAT     | 3.81     | 94.60    | 3.81     | 191.6   |
+| Type    | power-supply | EVB        |             | Customer device |             |
+| ------- | ------------ | ---------- | ----------- | --------------- | ----------- |
+|         |              | Voltage(V) | Current(mA) | Voltage(V)      | Current(mA) |
+| DC/DC   | VDD_ARM      | 0.96       | 10.20       | 1.10            | 212.50      |
+| DC/DC   | VDD_LOG      | 0.96       | 89.30       | 1.00            | 151.30      |
+| DC/DC   | VCC_DDR      | 1.26       | 38.50       | 1.27            | 40.50       |
+| DC/DC   | VCC_IO       | 2.99       | 4.50        | 2.99            | 4.80        |
+| LDO     | VCC_1V8      | 1.81       | 28.80       | 1.81            | 29.80       |
+| LDO     | VDD_1V0      | 1.00       | 10.90       | 1.00            | 10.20       |
+| LDO     | VCC3V0_PMU   | 3.01       | 1.20        | 3.01            | 1.40        |
+| battery | VBAT         | 3.81       | 94.60       | 3.81            | 191.6       |
 
 ### Data analysis for each path
 
@@ -634,7 +661,7 @@ For example:
 
 Input 3.3V, output 1.0V-50mA
 
-| Power Type | Input Current | Power Consumption |
-|---------------- |---------|------- |
-| LDO             | 50mA    | 165mW  |
-| DCDC(with 80% efficiency) | 18.9mA  | 62.4mW |
+| Power Type                | Input Current | Power Consumption |
+| ------------------------- | ------------- | ----------------- |
+| LDO                       | 50mA          | 165mW             |
+| DCDC(with 80% efficiency) | 18.9mA        | 62.4mW            |

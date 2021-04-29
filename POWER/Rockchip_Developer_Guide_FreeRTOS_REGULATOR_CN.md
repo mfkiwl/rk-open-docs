@@ -1,18 +1,16 @@
 # Rockchip FreeRTOS Regulator Developer Guide
 
-文件标识：RK-GL-YF-060
+文件标识：RK-KF-YF-060
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2019-12-02
+日期：2021-04-29
 
-文件密级：公开资料
-
----
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
 **免责声明**
 
-本文档按“现状”提供，福州瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
 
 由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
 
@@ -22,13 +20,13 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有© 2019福州瑞芯微电子股份有限公司**
+**版权所有 © 2021 瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
-福州瑞芯微电子股份有限公司
+瑞芯微电子股份有限公司
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 地址：     福建省福州市铜盘路软件园A区18号
 
@@ -50,8 +48,8 @@ Fuzhou Rockchip Electronics Co., Ltd.
 
 **产品版本**
 
-| **芯片名称** | **内核版本**    |
-| ------------ | --------------- |
+| **芯片名称** | **内核版本**     |
+| ------------ | ---------------- |
 | RK2206       | FreeRTOS V10.0.1 |
 
 **读者对象**
@@ -61,27 +59,28 @@ Fuzhou Rockchip Electronics Co., Ltd.
 技术支持工程师
 软件开发工程师
 
----
-
 **修订记录**
 
-| **版本号** | **作者** | **修改日期** | **修改说明** |
-| ---------- | --------| :--------- | ------------ |
-| V1.0.0 | 黄小东 | 2019-12-02 | 初始版本     |
+| **版本号** | **作者** | **修改日期** | **修改说明**       |
+| ---------- | -------- | ------------ | ------------------ |
+| V1.0.0     | 黄小东   | 2019-12-02   | 初始版本           |
+| V1.0.1     | 黄莹     | 2021-04-29   | 修改版权信息和格式 |
+
+---
 
 **目录**
 
----
 [TOC]
+
 ---
 
-## **1 Regulator**
+## Regulator
 
-### **1.1 概述**
+### 概述
 
 Regulator译为“稳定器”，有voltage regulator（稳压器）或者current regulator（稳流器），指可以自动维持恒定电压（或电流）的装置，相比较voltage regulator的使用更为常见。从驱动的角度看，regulator的控制主要有输出的enable/disable、输出电压或电流的大小的控制等。
 
-### **1.2 配置**
+### 配置
 
 menuconfig中的配置：
 
@@ -205,7 +204,7 @@ COMMON API void System_Power_Init(void)
 }
 ```
 
-### **1.3 代码和API**
+### 代码和API
 
 - src/driver/regulator/drv_regulator.c
 - include/driver/drv_regulator.h
@@ -239,7 +238,7 @@ void regulator_desc_init(struct regulator_desc *descs, uint32 cnt);
 void regulator_setup(void);
 ```
 
-### **1.4 使用范例**
+### 使用范例
 
 regulator的API由特定模块进行调用，以dvfs为例：
 
@@ -262,13 +261,13 @@ rk_err_t regulator_req_set_voltage(struct req_pwr_desc *req_pwr, uint8_t req_id,
 }
 ```
 
-## **2 PMIC Regulator**
+## PMIC Regulator
 
-### **2.1 概述**
+### 概述
 
 某些类型的regulator的寄存器是通过i2c访问的，PMIC内部集成的regulator通常是此类型，我们统一抽象为pmic regulator。
 
-### **2.2 配置**
+### 配置
 
 menuconfig中的配置：
 
@@ -282,7 +281,7 @@ menuconfig中的配置：
 
 上述配置后pmic regulator驱动既可使用。
 
-### **2.3 代码和API**
+### 代码和API
 
 - src/driver/regulator/drv_pmic_regulator.c
 - include/driver/drv_pmic_regulator.h
@@ -308,7 +307,7 @@ uint32 pmic_is_enabled(struct pwr_i2cbus_desc *desc);
 rk_err_t pmic_check_desc_by_pwrId(struct pwr_i2cbus_desc *pdesc, ePWR_ID pwrId);
 ```
 
-### **2.4 使用范例**
+### 使用范例
 
 pmic regulator的API通常由regulator驱动调用，如下所示：
 
