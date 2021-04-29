@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-399
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2021-03-12
+日期：2021-04-29
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | **日期**   | **版本** | **作者**   | **修改说明** |
 | ---------- | -------- | ---------- | ------------ |
 | 2021-03-12 | V1.0.0   | Tony Zheng | 初始版本     |
+| 2021-04-29 | V1.0.1   | Tony Zheng | 增加模组列表以及UVC配置     |
 
 ---
 
@@ -108,19 +109,19 @@ export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 ├── applications           # Rockchip应用demo源码
 ├── AUTHORS
 ├── bsp                    # 所有芯片相关代码
-│   ├── rockchip
-│   │   ├── common
-│   │   │   ├── drivers    # Rockchip OS适配层通用驱动
-│   │   │   ├── hal        # Rockchip HAL(硬件抽象层)实现
-│   │   │   └── tests      # Rockchip 驱动测试代码
-│   │   ├── swallow        # RK625 主目录
-│   │   │   ├── applications # RK625 应用代码
-│   │   │   ├── board      # 板级配置
-│   │   │   ├── build      # 编译主目录，存放中间文件
-│   │   │   ├── build.sh   # RK625 编译脚本
-│   │   │   ├── drivers    # RK625 私有驱动目录
-│   │   │   └── Image      # 存放固件
-│   │   └── tools          # Rockchip 通用工具
+│   ├── rockchip
+│   │   ├── common
+│   │   │   ├── drivers    # Rockchip OS适配层通用驱动
+│   │   │   ├── hal        # Rockchip HAL(硬件抽象层)实现
+│   │   │   └── tests      # Rockchip 驱动测试代码
+│   │   ├── swallow        # RK625 主目录
+│   │   │   ├── applications # RK625 应用代码
+│   │   │   ├── board      # 板级配置
+│   │   │   ├── build      # 编译主目录，存放中间文件
+│   │   │   ├── build.sh   # RK625 编译脚本
+│   │   │   ├── drivers    # RK625 私有驱动目录
+│   │   │   └── Image      # 存放固件
+│   │   └── tools          # Rockchip 通用工具
 ├── ChangeLog.md
 ├── components             # 系统各个组件，包括文件系统，shell和框架层等驱动
 ├── documentation          # RT-Thread官方文档
@@ -137,11 +138,97 @@ export RTT_EXEC_PATH=/path/to/toolchain/gcc-arm-none-eabi-7-2018-q2-update/bin
 └── tools                 # RT-Thread官方工具目录，包括menuconfig和编译脚本
 ```
 
+## 模组支持列表
+
+RK625已经支持的camera sensor列表如下：
+
+| **模组型号** | **分辨率** | **状态**       |
+| ------------ | ---------- | -------------- |
+| GC2053       | 1920x1080  | 已完成效果调试 |
+| GC20A3       | 1920x1080  | 已完成效果调试 |
+| GC5035       | 2592x1944  | 已完成效果调试 |
+| OV02K10      | 1920x1080  | 已完成效果调试 |
+| OV5695       | 2592x1944  | 已完成效果调试 |
+| F37          | 1920x1080  | 已完成效果调试 |
+
 ## 硬件配置
 
 ### IO配置
 
 不同的硬件开发板，因电路设计区别，需要配置不同的IO接口。用户可通过/bsp/rockchip/swallow/board/usb_camera/目录下的相关文件进行修改配置。
+
+### UVC设备配置
+
+RK625 SDK支持用户修改USB设备描述符以及支持的分辨率，用户可以通过 `/bsp/rockchip/swallow/board/usb_camera/board_uvc.c` 来进行修改。
+
+#### 设备描述符修改
+
+设备描述符定义如下，用户可以修改该数组中的字符串“UVC RGB”来改变设备插入电脑时显示的设备名称。
+
+```c
+static const char *uvc_ustring[] =
+{
+    "Language",
+    "Rockchip",
+    "RK625",
+    "123456789",
+    "Configuration",
+    "UVC RGB",
+    "Video Streaming",
+    USB_STRING_OS
+};
+```
+
+#### 支持分辨率修改
+
+分辨率支持列表定义在数组“uvc_hs_streaming_cls_rgb”中，用户可以添加、删减或修改需要支持的分辨率。
+
+```c
+static const struct uvc_descriptor_header *const uvc_hs_streaming_cls_rgb[] =
+{
+    (const struct uvc_descriptor_header *) &uvc_input_header_rgb,
+
+    (const struct uvc_descriptor_header *) &uvc_format_mjpg_rgb,
+    (const struct uvc_descriptor_header *) &uvc_frame_mjpg_640x480,
+    (const struct uvc_descriptor_header *) &uvc_frame_mjpg_1280x720,
+    (const struct uvc_descriptor_header *) &uvc_frame_mjpg_1920x1080,
+    (const struct uvc_descriptor_header *) &uvc_color_matching,
+
+    (const struct uvc_descriptor_header *) &uvc_format_yuv_rgb,
+    (const struct uvc_descriptor_header *) &uvc_frame_yuv_640x480,
+    (const struct uvc_descriptor_header *) &uvc_color_matching,
+
+    RT_NULL,
+};
+```
+
+用户修改支持的分辨率列表时，需要同时修改相应的头结构体信息。
+
+如在上面的支持列表中，mjpeg格式分别支持的分辨率为640x480、1280x720、1920x1080三种分辨率，则需要修改 `uvc_format_mjpg_rgb` 结构体中的分辨率个数：
+
+```c
+static const struct uvc_format_mjpeg uvc_format_mjpg_rgb =
+{
+    //......
+    3,  /* FrameDescriptor numbers*/
+    //......
+};
+```
+
+而yuv格式分辨率支持为640x480，对应“uvc_format_yuv_rgb”中的相应参数为：
+
+```c
+static const struct uvc_format_mjpeg uvc_format_mjpg_rgb =
+{
+    //......
+    3,  /* FrameDescriptor numbers*/
+    //......
+};
+```
+
+对于不同的sensor，支持最大分辨率不同，用户可参考本文中的模组支持列表查看。完整的分辨率格式定义在 `/components/drivers/usb/usbdevice/class/uvc/uvc_desc.c` 文件中，用户可参考该文件中的定义进行选择。
+
+注意：RK625 SDK YUV格式仅支持640x480。
 
 ### JTAG和UART功能切换
 
