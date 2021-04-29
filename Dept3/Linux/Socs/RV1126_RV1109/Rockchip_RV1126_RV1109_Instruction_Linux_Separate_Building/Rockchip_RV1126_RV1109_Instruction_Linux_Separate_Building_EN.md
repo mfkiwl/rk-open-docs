@@ -2,9 +2,9 @@
 
 ID: RK-SM-YF-386
 
-Release Version: V1.6.3
+Release Version: V1.6.4
 
-Release Date: 2021-03-17
+Release Date: 2021-04-29
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -73,6 +73,7 @@ This document (this guide) is mainly intended for:
 | 2021-02-18 | V1.6.1 | CWW  | 1. Update BSP library |
 | 2021-03-01 | V1.6.2 | CWW  | 1. Update CIF driver module to clear unready dev |
 | 2021-03-17 | V1.6.3 | CWW  | 1. Add the chapter of instructions to camera-related drivers insmod |
+| 2021-04-29 | V1.6.4 | CWW  | 1. Remove ./make.sh spl-s |
 
 ---
 
@@ -97,7 +98,7 @@ Get thses directories from root directory of SDK:
 ``` shell
 cd u-boot
 ./make.sh rv1126-spi-nor-tiny
-./make.sh spl-s # or ./make.sh --spl
+./make.sh --spl
 ./make.sh --idblock --spl
 ```
 
@@ -108,7 +109,7 @@ cd u-boot
 ``` shell
 cd u-boot
 ./make.sh rv1126
-./make.sh spl-s  # or ./make.sh --spl
+./make.sh --spl
 # parameter e.g.
 # mtdparts=rk29xxnand:0x00002000@0x00004000(uboot),0x00010000@0x00006000(boot),0x00010000@0x00016000(rootfs),-@0x00026000(data:grow)
 ```
@@ -118,7 +119,7 @@ cd u-boot
 ``` shell
 cd u-boot
 ./make.sh rv1126-ab
-./make.sh spl-s  # or ./make.sh --spl
+./make.sh --spl
 # parameter e.g.
 # mtdparts=rk29xxnand:0x00002000@0x00004000(uboot_a),0x00002000@0x00006000(uboot_b),0x00001000@0x00008000(misc),0x00010000@0x00009000(boot_a),0x00010000@0x00019000(boot_b),0x00020000@0x00029000(system_a),0x00020000@0x00049000(system_b),-@0x00069000(data:grow)
 ```
