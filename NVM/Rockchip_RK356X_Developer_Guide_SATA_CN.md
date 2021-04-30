@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-148
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2021-02-26
+日期：2021-04-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -60,9 +60,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2021-02-26 | V1.0.0   | 赵仪峰   | 初始版本     |
+| **日期**   | **版本** | **作者** | **修改说明**        |
+| ---------- | -------- | -------- | ------------------- |
+| 2021-02-26 | V1.0.0   | 赵仪峰   | 初始版本            |
+| 2021-04-30 | V1.1.0   | 赵仪峰   | 增加ACT LED配置说明 |
 
 ---
 
@@ -128,9 +129,35 @@ RK3568
 sata_pm_reset: sata-pm-reset {
 	rockchip,pins = <4 RK_PD2 RK_FUNC_GPIO &pcfg_output_high>;
 };
+
+&combphy1_usq {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sata_pm_reset>;
+};
 ```
 
 **可选配置项**：外接PM芯片扩展SATA口时，可能需要一个GPIO来复位PM芯片，具体可以参考“rk3568-nvr-demo-v10.dtsi”里面设置。
+
+6. `pinctrl-0 = <&sata2_pins>;`
+
+```
+&sata0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sata0_pins>;
+};
+
+&sata1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sata1_pins>;
+};
+
+&sata2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sata2_pins>;
+};
+```
+
+**可选配置项**：在对应的sata控制器节点增加pinctrl配置来启用SATA ACT LED功能。
 
 ## menuconfig 配置
 
