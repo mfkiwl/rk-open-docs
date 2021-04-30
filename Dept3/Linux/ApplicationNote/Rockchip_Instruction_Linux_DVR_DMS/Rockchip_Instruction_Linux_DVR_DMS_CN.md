@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-398
 
-发布版本：V1.0.2
+发布版本：V1.1.0
 
-日期：2021-03-15
+日期：2021-04-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -67,6 +67,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-01-31 | V1.0.0   | Vicent Chi, Zhihua Wang, Zhichao Yu | 初始版本     |
 | 2021-03-01 | V1.0.1   | Vicent Chi | 添加MIPI+DVP方案描述     |
 | 2021-03-15 | V1.0.2 | Ruby Zhang | 完善产品版本信息 |
+| 2021-04-30 | V1.1.0 | Zhichao Yu | 修改AD芯片接入方案描述；增加VP介绍 |
 
 ---
 
@@ -103,18 +104,16 @@ RV1126芯片有两路MIPI接口以及一路DVP接口，另外提供强大的编�
 
 ### RV1126 DVR/DMS产品应用框图
 
-由于RV1126芯片限制，如果选择两个MIPI接口RX芯片输入，其中4路的格式会被限制成UYVY格式，这会导致软件处理带宽增加。因此我们推荐客户选择MIPI+DVP的输入方案，这种方案有如下优势：
+RV1126支持不同AD芯片的接入方式，MIPI + MIPI 以及 MIPI+DVP。
 
-- 8路YUV视频可以统一为NV16格式，方便应用层处理；
-- DVP RX芯片相比MIPI接口RX芯片价格更便宜，可以节省方案成本；
+由于RV1126芯片限制，需要限制不同通路图像输出格式：
 
-MIPI+MIPI输入的方案框图如下：
+- **VICAP通路：要统一采用NV16格式；**
+- **ISP通路：要统一采用UYVY格式；**
 
-![MIPI+MIPI](./resources/dvr-2mipi.png)
+Camera输入的参考方案框图如下：
 
-MIPI+DVP输入的方案框图如下：
-
-![MIPI+DVP](./resources/dvr-mipi-dvp.png)
+![MIPI+MIPI](./resources/dvr_flow.png)
 
 ## 模拟高清RX芯片驱动开发说明
 
@@ -608,3 +607,12 @@ graph LR;
 ### 支持通道的区域亮度获取
 
 通过RK_MPI_VMIX_GetChnRegionLuma实现通道的区域亮度获取，每次最多可以获取64个区域亮度，每个通道的区域的坐标都是相对通道的区域起始坐标，不是相对屏幕的起始坐标。可以通过区域亮度实现屏幕OSD反色效果。
+
+## VP模块介绍
+
+在DVR/DMS产品中，RGA的使用非常频繁，为了缓解RGA的压力，我们将RV1126芯片中的ISPP模块缩放功能利用起来。因此我们在rkmedia提供了一个VP模块，通过VP的接口可以使用ISPP的缩放功能。
+
+VP详细使用文档请参考文档：docs/RV1126_RV1109/Multimedia/Rockchip_Developer_Guide_Linux_RKMedia_CN.pdf。
+
+**需要注意的是：ISPP的缩放功能对Buffer的宽度有限制，需要16Byte对齐。**
+
