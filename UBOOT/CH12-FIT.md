@@ -2,6 +2,10 @@
 
 # FIT
 
+## 前言
+
+本章节将介绍FIT格式和基于FIT格式的安全/非安全启动方案细节。本章节为了便于介绍，全文主要以boot.img 为说明和操作对象，但是同样适用于 recovery.img。
+
 ## 简介
 
 ### 基础介绍
@@ -367,13 +371,14 @@ scripts/fit-unpack.sh
 
 - `--spl-new`：传递此参数，表示使用当前编译的spl文件打包loader；否则使用rkbin工程里的spl文件。
 - `--version-uboot [n]`：指定uboot.img的固件版本号，n必须是十进制正整数。
-- `--version-boot [n]`：指定uboot.img的固件版本号，n必须是十进制正整数；
+- `--version-boot [n]`：指定boot.img的固件版本号，n必须是十进制正整数；
+- `--version-recovery [n]`：指定recovery.img的固件版本号，n必须是十进制正整数；
 
 **必选项(启用安全启动的情况)：**
 
 - `--rollback-index-uboot [n]`：指定uboot.img 固件防回滚版本号，n必须是十进制正整数；
 - `--rollback-index-boot [n]`：指定boot.img 固件防回滚版本号，n必须是十进制正整数；
-
+- `--rollback-index-recovery [n]`：指定recovery.img 固件防回滚版本号，n必须是十进制正整数；
 - `--no-check`：打包安全固件时被使用，用于跳过安全固件打包脚本的自校验。
 
 > 说明：
@@ -647,7 +652,7 @@ Platform RV1126 is build OK, with new .config(make rv1126-secure_defconfig)
 
 ```c
 // 指定 uboot.img和boot.img的最小版本号分别为10、12.
-./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 10 --rollback-index-boot 12
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 10 --rollback-index-boot 12 --rollback-index-recovery 12
 ```
 
 编译结果：
@@ -673,7 +678,7 @@ Image(signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is read
 ```c
 // 指定uboot.img和boot.img的最小版本号分别为10、12.
 // 要求SPL阶段把公钥hash烧写到OTP/eFUSE中。
-./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 10 --rollback-index-boot 12 --burn-key-hash
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 10 --rollback-index-boot 12 --rollback-index-recovery 12 --burn-key-hash
 ```
 
 编译结果：
@@ -703,7 +708,7 @@ Image(signed):  rv1126_spl_loader_v1.00.100.bin (with spl, ddr, usbplug) is read
 
 - `--recovery_img`：可选。指定待签名的recovery.img。
 
-- `--rollback-index-uboot`和`--rollback-index-boot`：可选。指定防回滚版本号。
+- `--rollback-index-uboot`、`--rollback-index-boot`、`--rollback-index-recovery`：可选。指定防回滚版本号。
 
 - `--spl-new`：如果编译命令不带此参数，则默认使用rkbin中的spl文件打包生成loader；否则使用当前编译的spl文件打包loader。
 
