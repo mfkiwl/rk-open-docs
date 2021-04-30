@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-382
 
-发布版本：V1.3.2
+发布版本：V1.3.3
 
-日期：2021-04-22
+日期：2021-04-30
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -74,6 +74,7 @@ Rockchip Electronics Co., Ltd.
 | V1.3.0 | 范立创/王智华 | 2021-02-03 | 1.增加API说明：<br />（1）[RK_MPI_SYS_SetFrameRate](#RK_MPI_SYS_SetFrameRate)<br />（2）[RK_MPI_MB_POOL_Create](#RK_MPI_MB_POOL_Create)<br />（3）[RK_MPI_MB_POOL_Destroy](#RK_MPI_MB_POOL_Destroy)<br />（4）[RK_MPI_MB_POOL_GetBuffer](#RK_MPI_MB_POOL_GetBuffer)<br />（5）[RK_MPI_MB_Copy](#RK_MPI_MB_Copy)<br />（6）[RK_MPI_VI_SetUserPic](#RK_MPI_VI_SetUserPic)<br />（7）[RK_MPI_VI_EnableUserPic](#RK_MPI_VI_EnableUserPic)<br />（8）[RK_MPI_VI_DisableUserPic](#RK_MPI_VI_DisableUserPic)<br />（9）[RK_MPI_VI_RGN_SetCover](#RK_MPI_VI_RGN_SetCover)<br />（10）[RK_MPI_VENC_RGN_SetCoverEx](#RK_MPI_VENC_RGN_SetCoverEx)<br />（11）[RK_MPI_RGA_RGN_SetBitMap](#RK_MPI_RGA_RGN_SetBitMap)<br />（12）[RK_MPI_RGA_GetChnRegionLuma](#RK_MPI_RGA_GetChnRegionLuma)<br />（13）[RK_MPI_RGA_RGN_SetCover](#RK_MPI_RGA_RGN_SetCover)<br />（14）[RK_MPI_VMIX_CreateDev](#RK_MPI_VMIX_CreateDev)<br />（15）[RK_MPI_VMIX_DestroyDev](#RK_MPI_VMIX_DestroyDev)<br />（16）[RK_MPI_VMIX_EnableChn](#RK_MPI_VMIX_EnableChn)<br />（17）[RK_MPI_VMIX_DisableChn](#RK_MPI_VMIX_DisableChn)<br />（18）[RK_MPI_VMIX_SetLineInfo](#RK_MPI_VMIX_SetLineInfo)<br />（19）[RK_MPI_VMIX_ShowChn](#RK_MPI_VMIX_ShowChn)<br />（20）[RK_MPI_VMIX_HideChn](#RK_MPI_VMIX_HideChn)<br />（21）[RK_MPI_VMIX_RGN_SetBitMap](#RK_MPI_VMIX_RGN_SetBitMap)<br />（22）[RK_MPI_VMIX_GetRegionLuma](#RK_MPI_VMIX_GetRegionLuma)<br />（23）[RK_MPI_VMIX_GetChnRegionLuma](#RK_MPI_VMIX_GetChnRegionLuma)<br />（24）[RK_MPI_VMIX_RGN_SetCover](#RK_MPI_VMIX_RGN_SetCover)<br />（25）[RK_MPI_MUXER_EnableChn](#RK_MPI_MUXER_EnableChn)<br />（26）[RK_MPI_MUXER_DisableChn](#RK_MPI_MUXER_DisableChn)<br />（27）[RK_MPI_MUXER_Bind](#RK_MPI_MUXER_Bind)<br />（28）[RK_MPI_MUXER_StreamStart](#RK_MPI_MUXER_StreamStart)<br />（29）[RK_MPI_MUXER_StreamStop](#RK_MPI_MUXER_StreamStop)<br />（30）[RK_MPI_SYS_DevSendMediaBuffer](#RK_MPI_SYS_DevSendMediaBuffer)<br />2.AI/AO支持多通道同时打开。<br />3.JPEG支持±90度旋转。<br />4.优化Cover内存占用以及效率<br />5.新增uvc、多路音频的示例。<br/>5.Event接口增加用户私有数据指针<br />6.RGA支持镜像<br />7.删除JPEG Light接口说明 |
 | V1.3.1 | Ruby Zhang |  | 更新产品版本信息 |
 | V1.3.2 | Aaran.sun | 2021-04-22 | 增加VENC通道参数配置接口说明 |
+| V1.3.3 | Zhihua Wang | 2021-04-30 | 增加VP说明 |
 
 ---
 
@@ -87,7 +88,7 @@ Rockchip Electronics Co., Ltd.
 
 ### 概述
 
- RKMedia提供了一种媒体处理方案，可支持应用软件快速开发。RKMedia在各模块基础API上做进一步封装，简化了应用开发难度。该平台支持以下功能：VI(输入视频捕获)、VENC(H.265/H.264/JPEG/MJPEG 编码)、VDEC(H.265/H.264/JPEG、MJPEG 解码)、VO(视频输出显示)、RGA视频处理（包括旋转、缩放、裁剪）、AI(音频采集）、AO（音频输出）、AENC（音频编码）、ADEC（音频解码）、MD（移动侦测）、OD（遮挡侦测）、VMIX（视频合成）、MUXER（视频封装）。
+ RKMedia提供了一种媒体处理方案，可支持应用软件快速开发。RKMedia在各模块基础API上做进一步封装，简化了应用开发难度。该平台支持以下功能：VI(输入视频捕获)、VENC(H.265/H.264/JPEG/MJPEG 编码)、VDEC(H.265/H.264/JPEG、MJPEG 解码)、VO(视频输出显示)、RGA视频处理（包括旋转、缩放、裁剪）、AI(音频采集）、AO（音频输出）、AENC（音频编码）、ADEC（音频解码）、MD（移动侦测）、OD（遮挡侦测）、VMIX（视频合成）、MUXER（视频封装）、VP（视频一入四出）。
 
 ### 系统架构
 
@@ -110,6 +111,7 @@ Rockchip Electronics Co., Ltd.
 | VO       | 2        |
 | VMIX     | 16       |
 | MUXER    | 16       |
+| VP       | 8        |
 
 ## 系统控制
 
@@ -9500,6 +9502,279 @@ typedef struct rkMUXER_CHN_ATTR_S {
 | 144      | RK_ERR_MUXER_NOTREADY      | MUXER通道尚未打开   |
 | 145      | RK_ERR_MUXER_NOTSUPPORT    | 操作不允许          |
 
+## 视频一入四出
+
+### 概述
+
+视频一入四出（VP）使用ISPP模块实现一个视频从rkispp_input_image节点对应video输入，四个视频从rkispp_m_bypass、rkispp_scale0、rkispp_scale1、rkispp_scale2节点对应video输出，节点信息可以通过以下命令查看：
+
+```shell
+media-ctl -p -d /dev/media*
+```
+
+使用VP完成视频从rkispp_input_image节点对应video输入，使用VI完成视频从rkispp_m_bypass、rkispp_scale0、rkispp_scale1、rkispp_scale2节点对应video输出，即可实现视频一入四出。
+
+rkispp_m_bypass、rkispp_scale0、rkispp_scale1、rkispp_scale2使用要求参考：表3-1 ISPP视频节点（RV1126/RV1109芯片），rkispp_scale0、rkispp_scale1、rkispp_scale2可以实现缩放，可以替换RGA的缩放功能，对DVR等相关产品可以缓解RGA硬件处理压力。
+
+使用VP功能需要先配置对应的media节点，例如：
+
+```shell
+media-ctl -d /dev/media5 -l '"rkispp_input_image":0->"rkispp-subdev":0[1]'
+media-ctl -d /dev/media5 --set-v4l2 '"rkispp-subdev":0[fmt:YUYV8_2X8/1920x1080]'
+media-ctl -d /dev/media5 --set-v4l2 '"rkispp-subdev":2[fmt:YUYV8_2X8/1920x1080]'
+```
+
+配置完成后需要先打开4个输出节点（可以打开1个到4个），最后打开输入节点。输入节点的数据可以来自其他VI、RGA等。
+
+### 功能描述
+
+实现视频一入四出。
+
+### API说明
+
+#### RK_MPI_VP_EnableChn
+
+【描述】
+
+启用VP通道。
+
+【语法】
+
+RK_S32 RK_MPI_VP_EnableChn(VP_PIPE VpPipe, VP_CHN VpChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VpPipe   | VP 管道号。                                                  | 输入      |
+| VpChn    | VP 通道号。取值范围：[0, [VP_MAX_CHN_NUM](#VP_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vp-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_vi_vp_vo_test](#rkmedia_vi_vp_vo_test)。
+
+【相关主题】
+
+[RK_MPI_VP_DisableChn](#RK_MPI_VP_DisableChn)
+
+#### RK_MPI_VP_DisableChn
+
+【描述】
+
+关闭VP通道。
+
+【语法】
+
+RK_S32 RK_MPI_VP_DisableChn(VP_PIPE VpPipe, VP_CHN VpChn);
+
+【参数】
+
+| 参数名称 | 描述                                                         | 输入/输出 |
+| -------- | ------------------------------------------------------------ | --------- |
+| VpPipe   | VP 管道号。                                                  | 输入      |
+| VpChn    | VP 通道号。取值范围：[0, [VP_MAX_CHN_NUM](#VP_MAX_CHN_NUM))。 | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vp-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无。
+
+【举例】
+
+[rkmedia_vi_vp_vo_test](#rkmedia_vi_vp_vo_test)。
+
+【相关主题】
+
+[RK_MPI_VP_EnableChn](#RK_MPI_VP_EnableChn)
+
+#### RK_MPI_VP_SetChnAttr
+
+【描述】
+
+设置VP通道属性。
+
+【语法】
+
+RK_S32 RK_MPI_VP_SetChnAttr(VP_PIPE VpPipe, VP_CHN VpChn, const VP_CHN_ATTR_S *pstChnAttr);
+
+【参数】
+
+| 参数名称   | 描述                                                         | 输入/输出 |
+| ---------- | ------------------------------------------------------------ | --------- |
+| VpPipe     | VP 管道号。                                                  | 输入      |
+| VpChn      | VP 通道号。取值范围：[0, [VP_MAX_CHN_NUM](#VP_MAX_CHN_NUM))。 | 输入      |
+| pstChnAttr | VP 通道属性结构体指针。                                      | 输入      |
+
+【返回值】
+
+| 返回值 | 描述                                |
+| ------ | ----------------------------------- |
+| 0      | 成功。                              |
+| 非0    | 失败，其值参见[错误码](#vp-error)。 |
+
+【需求】
+
+头文件：rkmedia_api.h
+
+库文件：libeasymedia.so
+
+【注意】
+
+无
+
+【举例】
+
+[rkmedia_vi_vp_vo_test](#rkmedia_vi_vp_vo_test)。
+
+【相关主题】
+
+无。
+
+### 数据类型
+
+视频输入相关数据类型定义如下：
+
+[VP_MAX_CHN_NUM](#VP_MAX_CHN_NUM)：定义 VP物理通道通道的总个数。
+
+[VP_PIPE](#VP_PIPE)：VP管道号。
+
+[VP_CHN](#VP_CHN)：VP通道号。
+
+[VP_CHN_ATTR_S](#VP_CHN_ATTR_S)：VP 通道属性结构体指针。
+
+#### VP_MAX_CHN_NUM
+
+【说明】
+
+定义 VP 物理通道的总个数。RV1126/RV1109 ISPP最多可配置8个。
+
+【定义】
+
+```c
+RV1109/RV1126:
+#define VP_MAX_CHN_NUM 8
+```
+
+#### VP_PIPE
+
+【说明】
+
+VP管道号，暂无使用。
+
+【定义】
+
+```c
+typedef RK_S32 VP_PIPE;
+```
+
+#### VP_CHN
+
+【说明】
+
+VP通道号。
+
+【定义】
+
+```c
+typedef RK_S32 VP_CHN;
+```
+
+#### VP_CHN_ATTR_S
+
+【说明】
+
+VP 通道属性结构体指针。
+
+【定义】
+
+```c
+typedef enum rkVP_CHN_WORK_MODE {
+  VP_WORK_MODE_NORMAL = 0,
+  VP_WORK_MODE_BUTT
+} VP_CHN_WORK_MODE;
+
+typedef enum rkVP_CHN_BUF_TYPE {
+  VP_CHN_BUF_TYPE_DMA = 0, // Default
+  VP_CHN_BUF_TYPE_MMAP,
+} VP_CHN_BUF_TYPE;
+
+typedef struct rkVP_CHN_ATTR_S {
+  const RK_CHAR *pcVideoNode;
+  RK_U32 u32Width;
+  RK_U32 u32Height;
+  IMAGE_TYPE_E enPixFmt;
+  RK_U32 u32BufCnt;          // VP output video buffer cnt.
+  VP_CHN_BUF_TYPE enBufType; // VP output video buffer type.
+  VP_CHN_WORK_MODE enWorkMode;
+} VP_CHN_ATTR_S;
+```
+
+【成员】
+
+| 成员名称    | 描述                 |
+| ----------- | -------------------- |
+| pcVideoNode | video节点路径。      |
+| u32Width    | video宽度。          |
+| u32Height   | video高度。          |
+| enPixFmt    | video格式。          |
+| u32BufCnt   | VP捕获视频缓冲区计数 |
+| enBufType   | VP视频buffer类型     |
+| enWorkMode  | VP通道工作模式       |
+
+【注意事项】
+
+VI_WORK_MODE_LUMA_ONLY模式，用于VI亮度统计，在此模式下VI没有输出，并且无法从VI获取数据。
+
+【相关数据类型及接口】
+
+[IMAGE_TYPE_E](#IMAGE_TYPE_E)
+
+[RK_MPI_VI_SetChnAttr](#RK_MPI_VI_SetChnAttr)
+
+### 错误码
+
+<a name = "vp-error">表13-1 VP API 错误码</a>
+
+| 错误代码 | 宏定义                  | 描述             |
+| -------- | ----------------------- | ---------------- |
+| 150      | RK_ERR_VP_INVALID_CHNID | VP输入通道号无效 |
+| 151      | RK_ERR_VP_BUSY          | 设备被占用       |
+| 152      | RK_ERR_VP_EXIST         | VP通道已经被打开 |
+| 153      | RK_ERR_VP_NOT_CONFIG    | 参数未配置       |
+| 154      | RK_ERR_VP_TIMEOUT       | 超时             |
+| 155      | RK_ERR_VP_BUF_EMPTY     | 数据空           |
+| 156      | RK_ERR_VP_ILLEGAL_PARAM | 非法参数         |
+| 157      | RK_ERR_VP_NOTREADY      | VP通道尚未打开   |
+
 ## 注意事项
 
 ### 通道析构顺序
@@ -10761,6 +11036,36 @@ rkmedia_vi_electrostatic_protection
 【选项】
 
 无
+
+【注意】
+
+无
+
+### rkmedia_vi_vp_vo_test
+
+【说明】
+
+视频一入四出示例程序。
+
+【代码路径】
+
+external/rkmedia/examples/rkmedia_vi_vp_vo_test.c
+
+【快速使用】
+
+```c
+rkmedia_vi_vp_vo_test -a /etc/iqfiles -i 45 -m 5
+```
+
+【选项】
+
+| 选项             | 描述                                                         | 默认值            |
+| ---------------- | ------------------------------------------------------------ | ----------------- |
+| -a \| --aiq      | 内置ISP功能启用，<br />输入该选项启用内置ISP功能，<br />无参数则使用默认值，<br />参数为aiq文件所在文件夹路径。 | /oem/etc/iqfiles/ |
+| -I \| --camid    | 摄像头id                                                     | 0                 |
+| -M \| --multictx | 多路摄像头使能                                               | 0                 |
+| -i \| --input    | 输入视频video节点号码                                        | 45                |
+| -m \| --media    | meida节点号码                                                | 5                 |
 
 【注意】
 
