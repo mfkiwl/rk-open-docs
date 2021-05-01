@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V2.1.0
+发布版本：V2.2.0
 
-日期：2021-04-27
+日期：2021-05-01
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -94,6 +94,7 @@ Rockchip Electronics Co., Ltd.
 | V2.0.0 | CWW | 2021-02-18 | 1. 增加Linux工具programmer_image_tool<br>2. 更新Rootfs配置说明<br>3. 更新app和external的编译方法<br>4. 增加SDK的BSP包编译说明 |
 | V2.0.1 | CWW | 2021-03-02 | 增加EVB板二维码的网盘地址 |
 | V2.1.0 | CWW | 2021-04-27 | 1. 更新docs目录文档<br>2. 增加交叉编译工具说明<br>3. 增加应用开发建议 |
+| V2.2.0 | CWW | 2021-05-01 | 1. 更新[SDK 下载地址](# SDK下载地址)<br>2. 更新排版 [开发环境搭建](# 开发环境搭建) |
 
 ---
 
@@ -109,13 +110,20 @@ Ubuntu 16.04系统：
 编译环境搭建所依赖的软件包以及安装命令如下：
 
 ```shell
-sudo apt-get install repo device-tree-compiler git-core u-boot-tools mtools \
-parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools \
-autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils \
-build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync \
-file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git \
-mercurial openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib \
-libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
+sudo apt-get install repo device-tree-compiler \
+git-core u-boot-tools mtools \
+parted libudev-dev libusb-1.0-0-dev \
+python-linaro-image-tools linaro-image-tools \
+autoconf autotools-dev libsigsegv2 m4 \
+intltool libdrm-dev curl sed make binutils \
+build-essential gcc g++ bash patch gzip gawk \
+bzip2 perl tar cpio python unzip rsync \
+file bc wget libncurses5 libqt4-dev libglib2.0-dev \
+libgtk2.0-dev libglade2-dev cvs git \
+mercurial openssh-client subversion asciidoc w3m \
+dblatex graphviz python-matplotlib \
+libc6:i386 libssl-dev expect fakeroot cmake flex \
+bison liblz4-tool libtool keychain
 ```
 
 Ubuntu 17.04系统：
@@ -356,7 +364,7 @@ SDK的编译有2种方法：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
-    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
     -b linux -m rv1126_rv1109_linux_release.xml
 
 .repo/repo/repo sync -c -j4

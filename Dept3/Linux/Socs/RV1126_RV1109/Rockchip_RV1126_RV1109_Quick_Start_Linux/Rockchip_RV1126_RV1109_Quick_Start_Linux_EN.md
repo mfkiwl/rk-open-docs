@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V2.1.0
+Release Version: V2.2.0
 
-Release Date: 2021-04-27
+Release Date: 2021-05-01
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -89,6 +89,7 @@ This document (this guide) is mainly intended for:
 | V2.0.0 | CWW | 2021-02-18 | 1. Add Linux Tool programmer_image_tool<br>2. Update introduction to Rootfs configuration<br>3. Update the project compilation method in the app and external directory<br>4. Add introduction to BSP compile |
 | V2.0.1 | CWW | 2021-03-02 | Add the QR code address |
 | V2.1.0 | CWW | 2021-04-27 | 1. Update docs<br>2. Add cross-compile tool<br>3. Add application development suggestions |
+| V2.2.0 | CWW | 2021-05-01 | 1. Update [SDK Download Address](# SDK Download Address)<br>2. Fix typo [Set up an Development Environment](# Set up an Development Environment) |
 
 ---
 
@@ -104,13 +105,20 @@ This document (this guide) is mainly intended for:
 Please install software packages with below commands to set up a building environment:
 
 ```shell
-sudo apt-get install repo device-tree-compiler git-core u-boot-tools mtools \
-parted libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools \
-autoconf autotools-dev libsigsegv2 m4 intltool libdrm-dev curl sed make binutils \
-build-essential gcc g++ bash patch gzip gawk bzip2 perl tar cpio python unzip rsync \
-file bc wget libncurses5 libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git \
-mercurial openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib \
-libc6:i386 libssl-dev expect fakeroot cmake flex bison liblz4-tool libtool keychain
+sudo apt-get install repo device-tree-compiler \
+git-core u-boot-tools mtools \
+parted libudev-dev libusb-1.0-0-dev \
+python-linaro-image-tools linaro-image-tools \
+autoconf autotools-dev libsigsegv2 m4 \
+intltool libdrm-dev curl sed make binutils \
+build-essential gcc g++ bash patch gzip gawk \
+bzip2 perl tar cpio python unzip rsync \
+file bc wget libncurses5 libqt4-dev libglib2.0-dev \
+libgtk2.0-dev libglade2-dev cvs git \
+mercurial openssh-client subversion asciidoc w3m \
+dblatex graphviz python-matplotlib \
+libc6:i386 libssl-dev expect fakeroot cmake flex \
+bison liblz4-tool libtool keychain
 ```
 
 **Ubuntu 17.04 or later version system:**
@@ -353,7 +361,11 @@ Description of two methods of compiling SDK:
 ### SDK Download Address
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
+    -b linux -m rv1126_rv1109_linux_release.xml
+
+.repo/repo/repo sync -c -j4
 ```
 
 #### SDK Sync and log
@@ -1178,7 +1190,9 @@ The compilation and configuration of the smart USB camera product is based on th
 SDK download address ：
 
 ```shell
-repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
+repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
+	-b linux -m rv1126_rv1109_linux_ai_camera_release.xml
 ```
 
 | Board Configuration                               | Comment                       |
