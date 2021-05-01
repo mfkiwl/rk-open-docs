@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-359
 
-Release Version: V1.2.1
+Release Version: V2.0.0
 
-Release Date: 2020-12-17
+Release Date: 2021-05-01
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -16,7 +16,7 @@ THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHI
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2020. Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
@@ -58,6 +58,7 @@ This document (this guide) is mainly intended for:
 | 2020-07-11 | V1.1.1 | CWW | Update 2.1 chapter |
 | 2020-12-04 | V1.2.0 | CWW | Add GPIO Precaution |
 | 2020-12-17 | V1.2.1 | CWW | Update repo init command for pdf document |
+| 2021-05-01 | V2.0.0 | CWW | 1. Update [SDK Download Address](# Getting from Rockchip source code repositories)<br>2. Add [Cross-compile tool Introduction](# Cross-compile tool Introduction) |
 
 ---
 
@@ -89,7 +90,7 @@ The command for downloading RV1126_RV1109_Linux_SDK is as follows:
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
-    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
     -b linux -m rv1126_rv1109_linux_release.xml
 
 .repo/repo/repo sync -c -j4
@@ -123,7 +124,7 @@ Download the Smart USB Camera SDK command as follows:
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
-    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
     -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
 
 .repo/repo/repo sync -c
@@ -135,6 +136,19 @@ If you have got RV1126/RV1109 Linux SDK package(rv1126_rv1109_linux_sdk_vX.X.X_2
 .repo/repo/repo init -m rv1126_rv1109_linux_ai_camera_release.xml
 .repo/repo/repo sync -c
 ```
+
+## Cross-compile tool Introduction
+
+There are two cross-compile tools in the SDK, as follow:
+
+| Directory                                                                       | Introduction                          |
+| :----                                                                           | ------                                |
+| prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf      | used to build rootfs and app          |
+| prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf | used to build U-Boot and Linux kernel |
+
+Network disk address:
+Link: `https://eyun.baidu.com/s/3eTwRktG`
+Password: yaCM
 
 ## Software Development Guide
 

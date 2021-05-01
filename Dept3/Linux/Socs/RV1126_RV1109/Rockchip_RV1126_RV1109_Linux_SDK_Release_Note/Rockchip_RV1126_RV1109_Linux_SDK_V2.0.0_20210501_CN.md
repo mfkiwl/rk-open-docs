@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-359
 
-发布版本：V1.2.1
+发布版本：V2.0.0
 
-日期：2020-12-17
+日期：2021-05-01
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -20,7 +20,7 @@
 
 本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
 
-**版权所有** **© 2020** **瑞芯微电子股份有限公司**
+**版权所有** **© 2021** **瑞芯微电子股份有限公司**
 
 超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
 
@@ -65,6 +65,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-07-11 | V1.1.1 | CWW | 更新2.1节 |
 | 2020-12-04 | V1.2.0 | CWW | 增加GPIO使用注意事项 |
 | 2020-12-17 | V1.2.1 | CWW | 更新repo int命令转成pdf格式复制问题 |
+| 2021-05-01 | V2.0.0 | CWW | 1. 更新[SDK下载地址](# 通过代码服务器下载)<br>2. 增加[交叉工具链说明](# 交叉工具链说明) |
 
 ---
 
@@ -94,7 +95,7 @@ RV1126_RV1109_Linux_SDK 下载命令如下：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
-    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
     -b linux -m rv1126_rv1109_linux_release.xml
 
 .repo/repo/repo sync -c -j4
@@ -128,7 +129,7 @@ cd rv1126_rv1109
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
-    -u ssh://git@www.rockchip.com.cn/linux/rk/platform/manifests \
+    -u ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests \
     -b linux -m rv1126_rv1109_linux_ai_camera_release.xml
 
 .repo/repo/repo sync -c
@@ -140,6 +141,19 @@ repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo \
 .repo/repo/repo init -m rv1126_rv1109_linux_ai_camera_release.xml
 .repo/repo/repo sync -c
 ```
+
+## 交叉工具链说明
+
+SDK需要用到2个交叉工具链，如下：
+
+| 目录                                                                            | 说明                       |
+| :----                                                                           | ------                     |
+| prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf      | 用于文件系统和上层应用编译 |
+| prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf | 用于U-Boot和Linux内核编译  |
+
+网盘地址：
+链接：`https://eyun.baidu.com/s/3eTwRktG`
+密码：yaCM
 
 ## 软件开发指南
 
