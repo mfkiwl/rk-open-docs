@@ -209,7 +209,7 @@ itb本质是fdt_blob + images的文件集合，有如下两种打包方式，RK�
 | 支持平台      |
 | ------------- |
 | RV1126/RV1109 |
-| RK3566/RK356X |
+| RK3566/RK3568 |
 
 ### 代码配置
 
@@ -1013,3 +1013,66 @@ Unpack to directory out/repack/:
 ....
 Image(repack):  uboot.img is ready
 ```
+
+## 安全校验Step-by-Step
+
+1. 进入u-boot目录，打开对应平台的configs/rxxxxx_defconfig，选择如下配置：
+
+```c
+// 必选。
+CONFIG_FIT_SIGNATURE=y
+CONFIG_SPL_FIT_SIGNATURE=y
+
+// 可选。
+CONFIG_FIT_ROLLBACK_PROTECT=y       // boot.img防回滚
+CONFIG_SPL_FIT_ROLLBACK_PROTECT=y   // uboot.img防回滚
+```
+
+2. 执行如下操作生成keys：
+
+```shell
+mkdir -p keys
+../rkbin/tools/rk_sign_tool kk --bits 2048 --out .
+cp privateKey.pem keys/dev.key && cp publicKey.pem keys/dev.pubkey
+openssl req -batch -new -x509 -key keys/dev.key -out keys/dev.crt
+```
+
+**注意：该步骤执行一次即可，然后妥善保存这些keys。**
+
+3. 编译签名，以rv1126为例（如果编译签名其他芯片固件，如rk3566，将下列命令内的rv1126改为rk3566即可）：
+
+```shell
+// Linux：拷贝boot.img，recovery.img到u-boot文件下，执行下列脚本签名loader,uboot,boot,recovery，设置uboot,boot,recovery的防版本回滚号，注意防版本回滚号依据需要配置
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 1 --rollback-index-boot 2
+
+// Android：签名loader,uboot，设置uboot的防版本回滚号，注意防版本回滚号依据需要配置
+./make.sh rv1126 --spl-new --rollback-index-uboot 1
+```
+
+如果编译出现：
+
+```
+Can't load XXXXXX//.rnd into RNG
+```
+
+执行：
+
+```shell
+touch ~/.rnd
+```
+
+4. 公钥hash烧写：
+
+```shell
+// Linux：拷贝boot.img，recovery.img到u-boot文件下，执行下列脚本签名loader,uboot,boot,recovery，设置uboot,boot,recovery的防版本回滚号，注意防版本回滚号依据需要配置，使能烧写key hash
+./make.sh rv1126 --spl-new --boot_img boot.img --recovery_img recovery.img --rollback-index-uboot 1 --rollback-index-boot 2 --burn-key-hash
+
+// Android：签名loader,uboot，设置uboot的防版本回滚号，注意防版本回滚号依据需要配置，使能烧写key hash
+./make.sh rv1126 --spl-new --rollback-index-uboot 1 --burn-key-hash
+```
+
+**注意：该步骤在整个产品开发验证完后再配置`--burn-key-hash`，否则安全开启，产品开发过程中每次只能更新签名过的固件。**
+
+5. Android其他固件签名：
+
+参考《Rockchip_Developer_Guide_Secure_Boot_for_UBoot_Next_Dev_CN.md》
