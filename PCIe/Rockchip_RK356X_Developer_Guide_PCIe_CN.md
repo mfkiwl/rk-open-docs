@@ -2,9 +2,9 @@
 
 文件标识：RK-KF-YF-141
 
-发布版本：V2.0.0
+发布版本：V2.3.0
 
-日期：2021-04-23
+日期：2021-05-12
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -75,6 +75,7 @@ Rockchip Electronics Co., Ltd.
 | 2021-04-12 | V2.0.0   | 林涛     | 增加用户态访问异常说明                     |
 | 2021-04-21 | V2.1.0   | 林涛     | 增加PCIe转XHCI芯片异常说明                 |
 | 2021-04-23 | V2.2.0   | 林涛     | 增加lane拆分复位IO说明以及休眠唤醒异常说明 |
+| 2021-05-12 | V2.3.0   | 林涛     | 增加lane拆分下电源配置说明                 |
 
 ---
 
@@ -146,6 +147,8 @@ RK3568
 pcie3x1和pcie3x2控制器节点和pcie30phy都使能，并且pcie3x2和pcie3x1节点中都添加rockchip,bifurcation属性。可参考rk3568-evb6-ddr3-v10.dtsi。否则默认情况下，pcie3x1控制器无法使用。
 
 此时lane0是由pcie3x2控制器使用，lane1是由pcie3x1控制器使用，硬件布板上严格按照我司原理图。另注意，此模式下两个1-lane的控制器必须同时工作在RC模式下。
+
+另外需要特别注意，PCIe 3.0拆分成2个单lane后接两个不同外设，由于晶振及其电源是同一路控制。此时请不要将vpcie3v3-supply配置给其中某一个控制器，否则会造成获取了3v3电压操作权限的这路控制器干扰另一控制器所接的外设的正常初始化。此时应该将vpcie3v3-supply所对应的regulator配置成 regulator-boot-on和regulator-always-on。
 
 8. `rockchip,ext-refclk`
 
