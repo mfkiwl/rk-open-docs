@@ -2,9 +2,9 @@
 
 文档标识：RK-FB-YF-392
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2021-04-10
+日期：2021-05-20
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -68,6 +68,7 @@ Rockchip Electronics Co., Ltd.
 | 2020-12-11 | V0.0.1 | Caesar Wang | 初始版本。 |
 | 2021-01-18 | V0.1.0 | Caesar Wang | 更新BETA版本。 |
 | 2021-04-10 | V1.0.0 | Caesar Wang | 正式发布版本。 |
+| 2021-05-20 | V1.1.0 | Caesar Wang | 升级RKNN到1.0.0。 <br />开发指南章节增加软件和硬件开发一些说明文档 |
 
 ---
 
@@ -103,7 +104,7 @@ RK356X_Linux_SDK 下载命令如下：
 
 ```
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
-ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b rk356x -m \
+ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \
 rk356x_linux_release.xml
 ```
 
@@ -116,11 +117,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 RK356X_LINUX_SDK_V1.0.0_20210410.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 RK356X_LINUX_SDK_V1.1.0_20210520.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V1.0.0_20210410.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V1.1.0_20210520.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -130,6 +131,14 @@ cd rk356x
 
 ## 软件开发指南
 
+### 开发向导
+
+为帮助开发工程师更快上手熟悉 SDK 的开发调试工作，随 SDK 发布 《Rockchip_Developer_Guide_Linux_Software_CN.pdf》，可在docs/下获取，并会不断完善更新。
+
+### 芯片资料
+
+为帮助开发工程师更快上手熟悉 RK3566、RK3568 的开发调试工作，随 SDK 发布 《Rockchip_RK3566_Datasheet_V1.1_20210305.pdf》和《Rockchip_RK3568_Datasheet_V1.1_20210305.pdf》芯片手册。
+
 ### NPU 开发工具
 
 本 SDK NPU 开发工具如下：
@@ -138,13 +147,13 @@ cd rk356x
 开发工具在 external/rknn-toolkit2 目录下，主要用来实现模型转换，模型推理，模型性能评估功能等，具体使用说明请参考当前 doc/ 的目录文档：
 
 ```
-├── RKNNToolKit2_OP_Support-v0.7.0.md
-├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v0.7.0.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v0.7.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v0.7.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v0.7.0.pdf
-├── changelog-v0.7.0.txt
-└── requirements-v0.7.0.txt
+├── RKNNToolKit2_OP_Support_v1.0.0.md
+├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v1.0.0.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v1.0.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v1.0.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v1.0.0.pdf
+├── changelog_v1.0.0.txt
+└── requirements_v1.0.0.txt
 ```
 
 **RKNN-DRIVER**：
@@ -155,8 +164,8 @@ RKNN API的开发使用在工程目录 external/rknpu2下，用于推理RKNN-Too
 具体使用说明请参考当前 doc/ 的目录文档：
 
 ```
-├── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_CN.pdf
-└── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_EN.pdf
+├── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_CN.pdf
+└── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_EN.pdf
 ```
 
 ### 软件更新记录
@@ -164,7 +173,9 @@ RKNN API的开发使用在工程目录 external/rknpu2下，用于推理RKNN-Too
 软件发布版本升级通过工程 xml 进行查看，具体方法如下：
 
 ```
-.repo/manifests$ ls -l -h rk356x_linux_release.xml
+.repo/manifests$ realpath rk356x_linux_release.xml
+# 例如:打印的版本号为v1.1.0，更新时间为20210520
+# <SDK>/.repo/manifests/rk356x_linux_release_v1.1.0_20210520.xml
 ```
 
 软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
@@ -186,7 +197,7 @@ RKNN API的开发使用在工程目录 external/rknpu2下，用于推理RKNN-Too
 RK3566 EVB 硬件开发指南：
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3566_EVB_User_Guide_V1.0_CN.pdf
+<SDK>/docs/RK356X/Rockchip_RK3566_EVB2_User_Guide_V1.1_CN.pdf
 ```
 
 RK3568 EVB硬件开发指南：
@@ -198,7 +209,17 @@ RK3568 EVB硬件开发指南：
 RK3568 NVR硬件开发指南：
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3568_NVR_User_Guide_V1.0_CN.pdf
+<SDK>/docs/RK356X/Rockchip_RK3568_NVR_DEMO_User_Guide_V1.2_CN.pdf
+```
+
+## IO电源设计注意事项
+
+![](resources/NOTICE-IO-CN.png)
+
+更多信息参考：
+
+```
+<SDK>/docs/RK356X/Rockchip_RK356X_Introduction_IO_Power_Domains_Configuration.pdf
 ```
 
 ## SDK 工程目录介绍
@@ -244,15 +265,24 @@ device-tree-compiler python-pip ncurses-dev pyelftools \
 
 | 板级配置                       | 说明                                               |
 | ----------------------------- | --------------------------------------------------- |
+| BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk |   适用于 RK3566 EVB 搭配 LPDDR4 开发板，运行32位根文件系统  |
 | BoardConfig-rk3566-evb2-lp4x-v10.mk  |   适用于 RK3566 EVB 搭配 LPDDR4 开发板  |
+| BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk|   适用于 RK3568 EVB 搭配 LPDDR4 开发板，运行32位根文件系统  |
 | BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk |  适用于 RK3568 EVB 搭配 DDR4/SPI NOR 开发板  |
 | BoardConfig-rk3568-evb1-ddr4-v10.mk  |  适用于 RK3568 EVB 搭配 DDR4 开发板  |
 | BoardConfig-rk3568-nvr-spi-nand.mk  |  适用于 RK3568 NVR 搭配SPI NAND 开发板 |
 | BoardConfig-rk3568-nvr.mk  |  适用于 RK3568 NVR 开发板 |
+| BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk  |  适用于 RK3568 UVC 开发板 |
 | BoardConfig.mk  |  默认配置 |
 
 方法1
 `./build.sh` 后面加上板级配置文件, 例如：
+
+选择**RK3566 EVB 搭配 LPDDR4 开发板，运行32位根文件系统**的板级配置：
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
+```
 
 选择**RK3566 EVB 搭配 LPDDR4 开发板**的板级配置：
 
@@ -266,9 +296,14 @@ device-tree-compiler python-pip ncurses-dev pyelftools \
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
 ```
 
-选择**RK3568 EVB 搭配 DDR4 开发板**的板级配置：
+选择**RK3568 EVB 搭配 DDR4 开发板，运行32位根文件系统**的板级配置：
 
 ```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
+
+选择**RK3568 EVB 搭配 DDR4 开发板**的板级配置：
+
+​```shell
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk
 ```
 
@@ -284,6 +319,12 @@ device-tree-compiler python-pip ncurses-dev pyelftools \
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr.mk
 ```
 
+选择**RK3568 UVC 开发板**的板级配置：
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk
+```
+
 方法2
 
 ```shell
@@ -294,12 +335,16 @@ You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-rk3566-evb2-lp4x-v10.mk
-2. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
-3. BoardConfig-rk3568-evb1-ddr4-v10.mk
-4. BoardConfig-rk3568-nvr-spi-nand.mk
-5. BoardConfig-rk3568-nvr.mk
-6. BoardConfig.mk
+1. BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
+2. BoardConfig-rk3566-evb2-lp4x-v10.mk
+3. BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
+4. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+5. BoardConfig-rk3568-evb1-ddr4-v10.mk
+6. BoardConfig-rk3568-nvr-spi-nand.mk
+7. BoardConfig-rk3568-nvr.mk
+8. BoardConfig-rk3568-sv21-ddr4-v10.mk
+9. BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk
+10. BoardConfig.mk
 Which would you like? [0]:
 ```
 

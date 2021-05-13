@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-392
 
-Release Version: V1.0.0
+Release Version: V1.1.0
 
-Release Date: 2021-04-10
+Release Date: 2021-05-20
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -64,6 +64,7 @@ Software development engineers
 | 2020-12-11 | V0.0.1 | Caesar Wang | Initial version |
 | 2021-01-18 | V0.1.0 | Caesar Wang | Beta version |
 | 2021-04-10 | V1.0.0 | Caesar Wang | Release version |
+| 2021-05-20 | V1.1.0 | Caesar Wang | Upgrade RKNN to 1.0.0.<br />Update  Hardware/Software Development Guide<br />Add  precaution of GPIO power design |
 
 ---
 
@@ -98,7 +99,7 @@ RK356X_Linux_SDK  download command is as follows：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
-ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b rk356x -m \
+ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \
 rk356x_linux_release.xml
 ```
 
@@ -111,11 +112,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take RK356X_LINUX_SDK_V1.0.0_20210410.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take RK356X_LINUX_SDK_V1.1.0_20210520.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V1.0.0_20210410.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V1.1.0_20210520.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -125,6 +126,14 @@ Developers can update via `.repo/repo/repo sync -c --no-tags` command according 
 
 ## Software Development Guide
 
+### Development Guide
+
+Aiming to help engineers get started with SDK development and debugging faster, We have released “Rockchip_Developer_Guide_Linux_Software_CN.pdf” with the SDK, please refer to the documents under the project's docs/ directory.
+
+### Chip datasheet
+
+Aiming to help engineers get started with RK3566/RK3568 development and debugging faster. We have released "Rockchip_RK3566_Datasheet_V1.1_20210305.pdf" and "Rockchip_RK3568_Datasheet_V1.1_20210305.pdf".
+
 ### NPU Development Tool
 
 The SDK NPU development tool includes following items:
@@ -133,13 +142,13 @@ The SDK NPU development tool includes following items:
 Development tools are in project directory “external/rknn-toolkit2”. Which is used for model conversion, model reasoning, model performance evaluation functions, etc. Please refer to documents in the docs/ directory for details.
 
 ```
-├── RKNNToolKit2_OP_Support-v0.7.0.md
-├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v0.7.0.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v0.7.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v0.7.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v0.7.0.pdf
-├── changelog-v0.7.0.txt
-└── requirements-v0.7.0.txt
+├── RKNNToolKit2_OP_Support_v1.0.0.md
+├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v1.0.0.pdf
+├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v1.0.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v1.0.0.pdf
+├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v1.0.0.pdf
+├── changelog_v1.0.0.txt
+└── requirements_v1.0.0.txt
 ```
 
 **RKNN-DRIVER**:
@@ -150,8 +159,8 @@ RKNN API development materials are in the project directory “external/rknpu2�
 Please refer to documents in the docs/ directory for details.
 
 ```
-├── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_CN.pdf
-└── Rockchip_RK356X_User_Guide_RKNN_API_V0.7_EN.pdf
+├── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_CN.pdf
+└── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_EN.pdf
 ```
 
 ### Software Update History
@@ -159,7 +168,9 @@ Please refer to documents in the docs/ directory for details.
 Software release version upgrade can be checked through project xml file by the following command:
 
 ```shell
-.repo/manifests$ ls -l -h rk356x_linux_release.xml
+.repo/manifests$ realpath rk356x_linux_release.xml
+# e.g.:printf version v1.1.0，update time on 20210520
+# <SDK>/.repo/manifests/rk356x_linux_release_v1.1.0_20210520.xml
 ```
 
 Software release version updated information can be checked through the project text file by the following command:
@@ -181,7 +192,7 @@ Please refer to user guides in the project directory for hardware development:
 RK3566 EVB hardware development guide:
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3566_EVB_User_Guide_V1.0_EN.pdf
+<SDK>/docs/RK356X/Rockchip_RK3566_EVB2_User_Guide_V1.1_EN.pdf
 ```
 
 RK3568 EVB hardware development guide:
@@ -193,8 +204,14 @@ RK3568 EVB hardware development guide:
 RK3568 NVR hardware development guide:
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3568_NVR_User_Guide_V1.0_EN.pdf
+<SDK>/docs/RK356X/Rockchip_RK3568_NVR_DEMO_User_Guide_V1.2_CN.pdf
 ```
+
+## The Precaution of IO Power Design
+
+![](resources/NOTICE-IO-EN.png)
+
+ Please refer to documents in the `<SDK>/docs/RK356X/Rockchip_RK356X_Introduction_IO_Power_Domains_Configuration.pdf` document for details.
 
 ## SDK Project Directory Introduction
 
@@ -241,8 +258,10 @@ Enter the project  SDK/device/rockchip/rk356x directory:
 
 | Board level configuration | Note                                            |
 | ----------------------------- | --------------------------------------------------- |
+| BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk  | Suitable for RK3566 EVB development board with LPDDR4 running on 32bit filesystem  |
 | BoardConfig-rk3566-evb2-lp4x-v10.mk  | Suitable for RK3566 EVB development board with LPDDR4  |
 | BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk    | Suitable for RK3568 development boards with DDR4 and SPI NOR |
+| BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk    | Suitable for RK3568 development boards with DDR4 running on 32bit filesystem  |
 | BoardConfig-rk3568-evb1-ddr4-v10.mk    | Suitable for RK3568 development boards with DDR4 |
 | BoardConfig-rk3568-nvr-spi-nand.mk  | Suitable for RK3568 NVR with SPI NAND development board |
 | BoardConfig-rk3568-nvr.mk  | Suitable for RK3568 NVR development board |
@@ -251,6 +270,12 @@ Enter the project  SDK/device/rockchip/rk356x directory:
 The first way:
 
 Add board configuration file behind `/build.sh` , for example:
+
+Select the board configuration of  **RK3566 EVB development board with running on 32bit filesystem**:
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
+```
 
 Select the board configuration of  **RK3566 EVB development board**:
 
@@ -262,6 +287,12 @@ Select the board configuration of the **RK3568 EVB  with SPI NOR development boa
 
 ```shell
 ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+```
+
+Select the board configuration of the **RK3568 EVB development board with with running on 32bit filesystem**:
+
+```shell
+./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
 ```
 
 Select the board configuration of the **RK3568 EVB development board**:
@@ -292,12 +323,16 @@ You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-rk3566-evb2-lp4x-v10.mk
-2. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
-3. BoardConfig-rk3568-evb1-ddr4-v10.mk
-4. BoardConfig-rk3568-nvr-spi-nand.mk
-5. BoardConfig-rk3568-nvr.mk
-6. BoardConfig.mk
+1. BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
+2. BoardConfig-rk3566-evb2-lp4x-v10.mk
+3. BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
+4. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
+5. BoardConfig-rk3568-evb1-ddr4-v10.mk
+6. BoardConfig-rk3568-nvr-spi-nand.mk
+7. BoardConfig-rk3568-nvr.mk
+8. BoardConfig-rk3568-sv21-ddr4-v10.mk
+9. BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk
+10. BoardConfig.mk
 Which would you like? [0]:
 ```
 

@@ -7,6 +7,45 @@
 [TOC]
 
 ---
+## rk356x_linux_release_v1.1.0_20210520.xml Note
+
+**Buildroot (2018.02-rc3)**:
+
+```
+- Adjust the new buildroot project
+- Support buildroot 32 bits for rk356x
+- Support RKNN SDK 1.0.0 Version
+```
+
+**Debian10 (buster)**:
+
+```
+- Use the new debian project
+```
+
+**Kernel (4.19)**:
+
+```
+- Enable optee by default
+- Update USB/DRM/Wireless/Media/Video/Clock driver
+```
+
+**docs/tools**:
+
+```
+- Use the new docs project
+```
+
+**rkbin**:
+
+```
+- rk3568/rk3566: bl31: update version to v1.22
+- rk3568/rk3566: bl32: update version to v1.05
+- rk3568/rk3566: ddr: update ddr bin to v1.07
+- rk3568/rk3566: spl: update version to v1.11
+- rk356x: loader: update version to v1.08
+```
+
 ## rk356x_linux_release_v1.0.0_20210410.xml Note
 
 **Buildroot (2018.02-rc3)**:
