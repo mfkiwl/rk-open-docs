@@ -917,7 +917,7 @@ Starting kernel ...
 
 ### 具体步骤
 
-用于签名固件的RSA密钥对是：dev.key，dev.pubkey和dev.crt，dev.key作为私钥由远程服务器持有，用户只有公钥dev.pubkey和dev.crt。
+用于签名固件的RSA密钥对是：dev.key、dev.pubkey和dev.crt。dev.key作为私钥由远程服务器持有，用户只有dev.pubkey和dev.crt。
 
 **步骤1：**
 
@@ -946,7 +946,7 @@ fit/boot.itb
 用户把uboot.data2sign发送给远程服务器。假设远程服务器持有的私钥为dev.key，使用如下命令签名并输出签名结果：uboot.sig
 
 ```
-openssl dgst -sha256 -sign dev.key -out  uboot.sig  uboot.data2sign
+openssl dgst -sha256 -sign dev.key -sigopt rsa_padding_mode:pss -out uboot.sig uboot.data2sign
 ```
 
 服务器把签名结果文件uboot.sig返回给用户，用户使用uboot.sig替换uboot.itb中的临时签名：
