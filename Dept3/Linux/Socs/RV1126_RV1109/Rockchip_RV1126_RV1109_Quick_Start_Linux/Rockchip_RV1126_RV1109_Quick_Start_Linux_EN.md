@@ -2,9 +2,9 @@
 
 ID: RK-JC-YF-360
 
-Release Version: V2.2.0
+Release Version: V2.2.1
 
-Release Date: 2021-05-01
+Release Date: 2021-05-14
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -90,6 +90,7 @@ This document (this guide) is mainly intended for:
 | V2.0.1 | CWW | 2021-03-02 | Add the QR code address |
 | V2.1.0 | CWW | 2021-04-27 | 1. Update docs<br>2. Add cross-compile tool<br>3. Add application development suggestions |
 | V2.2.0 | CWW | 2021-05-01 | 1. Update [SDK Download Address](# SDK Download Address)<br>2. Fix typo [Set up an Development Environment](# Set up an Development Environment) |
+| V2.2.1 | CWW | 2021-05-14 | 1. Update [Windows Tools](# Windows Tools) programmer_image_tool |
 
 ---
 
@@ -327,7 +328,7 @@ SecureBootTool        | firmware signing tool
 efuseTool             | efuse flash tool
 RKDevInfoWriteTool    | serial number burning tool
 SDDiskTool            | sd card firmware create tool
-SpiImageTools         | burner upgrade tool for eMMC (The document is in the package of FactoryTool)
+programmer_image_tool  | build manufacture programmer firmware image for SPI NOR/SPI NAND/SLC NAND/eMMC
 DriverAssitant        | rockchip pc driver for upgrade tool
 RKImageMaker          | firmware package tool (generate update.img)
 SpeakerPCBATool       | soundbox PCBA test tool

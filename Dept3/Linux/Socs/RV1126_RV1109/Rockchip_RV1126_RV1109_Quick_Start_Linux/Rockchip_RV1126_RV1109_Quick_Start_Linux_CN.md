@@ -2,9 +2,9 @@
 
 文档标识：RK-JC-YF-360
 
-发布版本：V2.2.0
+发布版本：V2.2.1
 
-日期：2021-05-01
+日期：2021-05-14
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -95,6 +95,7 @@ Rockchip Electronics Co., Ltd.
 | V2.0.1 | CWW | 2021-03-02 | 增加EVB板二维码的网盘地址 |
 | V2.1.0 | CWW | 2021-04-27 | 1. 更新docs目录文档<br>2. 增加交叉编译工具说明<br>3. 增加应用开发建议 |
 | V2.2.0 | CWW | 2021-05-01 | 1. 更新[SDK 下载地址](# SDK下载地址)<br>2. 更新排版 [开发环境搭建](# 开发环境搭建) |
+| V2.2.1 | CWW | 2021-05-14 | 1. 更新[Windows工具](# Windows工具) programmer_image_tool |
 
 ---
 
@@ -329,7 +330,7 @@ SecureBootTool        | 固件签名工具
 efuseTool             | efuse烧写工具
 RKDevInfoWriteTool    | 写号工具
 SDDiskTool            | SD卡镜像制作
-SpiImageTools         | eMMC烧录器固件制作工具（文档在FactoryTool工具里）
+programmer_image_tool | 打包SPI NOR/SPI NAND/SLC NAND/eMMC的烧录器固件
 DriverAssitant        | 驱动安装工具
 RKImageMaker          | 打包工具(打包成updata.img)
 SpeakerPCBATool       | 音箱PCBA测试工具
