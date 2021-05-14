@@ -218,10 +218,10 @@ static const struct uvc_format_mjpeg uvc_format_mjpg_rgb =
 而yuv格式分辨率支持为640x480，对应“uvc_format_yuv_rgb”中的相应参数为：
 
 ```c
-static const struct uvc_format_mjpeg uvc_format_mjpg_rgb =
+static const struct uvc_format_uncompressed uvc_format_yuv_rgb =
 {
     //......
-    3,  /* FrameDescriptor numbers*/
+    1,  /* FrameDescriptor numbers*/
     //......
 };
 ```
@@ -276,7 +276,7 @@ menuconfig 工具的常见操作如下：
 
 - ESC 键：返回上级菜单或退出
 
-- 英文问号：调出帮助菜单（退出帮助菜单，请按回车键）。
+- 英文问号：调出帮助菜单（退出帮助菜单，请按回车键）
 
 - 空格、Y 键``或``N 键：使能/禁用 [*] 配置选项
 
