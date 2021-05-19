@@ -1,28 +1,26 @@
-# **Rockchip Introduction Partition**
+# Rockchip Introduction Partition
 
 ID:  RK-SM-YF-016
 
-Release Version: V1.5.0
+Release Version: V1.5.1
 
 Release Date: 2020-06-16
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
----
-
 **DISCLAIMER**
 
-THIS DOCUMENT IS PROVIDED “AS IS”. FUZHOU ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
+THIS DOCUMENT IS PROVIDED “AS IS”. ROCKCHIP ELECTRONICS CO., LTD.(“ROCKCHIP”)DOES NOT PROVIDE ANY WARRANTY OF ANY KIND, EXPRESSED, IMPLIED OR OTHERWISE, WITH RESPECT TO THE ACCURACY, RELIABILITY, COMPLETENESS,MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE OR NON-INFRINGEMENT OF ANY REPRESENTATION, INFORMATION AND CONTENT IN THIS DOCUMENT. THIS DOCUMENT IS FOR REFERENCE ONLY. THIS DOCUMENT MAY BE UPDATED OR CHANGED WITHOUT ANY NOTICE AT ANY TIME DUE TO THE UPGRADES OF THE PRODUCT OR ANY OTHER REASONS.
 
 **Trademark Statement**
 
 "Rockchip", "瑞芯微", "瑞芯" shall be Rockchip’s registered trademarks and owned by Rockchip. All the other trademarks or registered trademarks mentioned in this document shall be owned by their respective owners.
 
-**All rights reserved. ©2019. Fuzhou Rockchip Electronics Co., Ltd.**
+**All rights reserved. ©2021. Rockchip Electronics Co., Ltd.**
 
 Beyond the scope of fair use, neither any entity nor individual shall extract, copy, or distribute this document in any form in whole or in part without the written approval of Rockchip.
 
-Fuzhou Rockchip Electronics Co., Ltd.
+Rockchip Electronics Co., Ltd.
 
 No.18 Building, A District, No.89, software Boulevard Fuzhou, Fujian,PRC
 
@@ -65,15 +63,18 @@ Software development engineers
 
 | **Version** | **Author** | **Date** | **Change Description** |
 | ---------- | --------| :--------- | ------------ |
-| V1.0.0 | Yifeng.Zhao | 2011-04-11 | parameter instruction |
-| V1.1.0 | Yifeng.Zhao | 2011-09-05 | Complete functional documentation |
-| V1.2.0 | Yifeng.Zhao | 2012-10-16 | Add RK30 and RK292X configurations |
-| V1.3.0 | Yifeng.Zhao | 2013-04-15 | Add GPIO configurations |
-| V1.4.0 | Yifeng.Zhao | 2018-01-23 | Add GPT configurations |
-| V1.4.1 | Yifeng.Zhao | 2020-02-21 | Modify style |
-| V1.5.0 | Jason.Zhu | 2020-06-16 | Add partition definition specification |
+| V1.0.0 | Yifeng Zhao | 2011-04-11 | parameter instruction |
+| V1.1.0 | Yifeng Zhao | 2011-09-05 | Complete functional documentation |
+| V1.2.0 | Yifeng Zhao | 2012-10-16 | Add RK30 and RK292X configurations |
+| V1.3.0 | Yifeng Zhao | 2013-04-15 | Add GPIO configurations |
+| V1.4.0 | Yifeng Zhao | 2018-01-23 | Add GPT configurations |
+| V1.4.1 | Yifeng Zhao | 2020-02-21 | Modify style |
+| V1.5.0 | Jason Zhu | 2020-06-16 | Add partition definition specification |
+| V1.5.1 | Karen Huang | 2021-05-19 | Modify format |
 
 ---
+
+**Contents**
 
 [TOC]
 
