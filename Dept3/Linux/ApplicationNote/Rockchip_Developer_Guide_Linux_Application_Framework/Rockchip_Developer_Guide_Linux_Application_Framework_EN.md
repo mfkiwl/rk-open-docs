@@ -2,9 +2,9 @@
 
 ID: RK-FB-YF-358
 
-Release Version: V1.3.2
+Release Version: V1.3.3
 
-Release Date: 2021-03-15
+Release Date: 2021-05-21
 
 Security Level: □Top-Secret   □Secret   □Internal   ■Public
 
@@ -66,6 +66,7 @@ Software development engineers
 | V1.3.0      | Fenrir Lin | 2020-09-16 | Add dbserver external interface,<br/>update onvif_server development environment |
 | V1.3.1      | Fenrir Lin | 2020-10-15 | Update file path                                             |
 | V1.3.2      | Ruby Zhang | 2021-03-15 | Update product version information                           |
+| V1.3.3      | Fenrir Lin | 2021-05-21 | Delete the onvif_server part                                 |
 
 ---
 
@@ -91,7 +92,6 @@ Applications are mainly located in the app directory of the SDK project, and the
 | mediaserver      | multimedia service                           |
 | dbserver         | database service                             |
 | ispserver        | image signal processing server               |
-| onvif_server     | onvif protocol server                        |
 
 ### Libraries
 
@@ -109,10 +109,9 @@ The Application framework is as follows:
 
 ![Application](resources/Application_EN.png)
 
-Currently, the following two ways are supported:
+Currently, the following way are supported:
 
-1. According to the user's operation, the web front-end calls different interfaces of web back-end in these four ways: GET/PUT/POST/DELETE. In the web back-end, the functions provided by libIPCProtocol are used to communicate between processes through dbus to call the corresponding services.
-2. The onvif client or NVR that supports onvif protocol, can call the interface of onvif_server directly, and use the functions provided by libIPCProtocol to call the corresponding service through onvif standard protocol.
+According to the user's operation, the web front-end calls different interfaces of web back-end in these four ways: GET/PUT/POST/DELETE. In the web back-end, the functions provided by libIPCProtocol are used to communicate between processes through dbus to call the corresponding services.
 
 In a specific service, operations will be done according to the incoming parameters, so that the user's operation will take effect.
 
@@ -858,144 +857,6 @@ For detailed development about image signal processing server, please refer to "
 
 **Build command:**  in the SDK root directory, `make isp2-ipc-dirclean && make isp2-ipc`
 
-## onvif_server
-
-### Development Preparation
-
-onvif protocol server.
-
-**Development language:** C
-
-**Reference documents:**
-
-[WSDL Tutorial](https://www.w3school.com.cn/wsdl/index.asp)
-
-[SOAP Tutorial](https://www.w3school.com.cn/soap/index.asp)
-
-[Web Services Tutorial](https://www.w3school.com.cn/webservices/index.asp)
-
-[onvif specification](https://www.onvif.org/profiles/)
-
-**Code path:** app/onvif_server
-
-**Build command:**  in the SDK root directory, `make onvif_server-dirclean && make onvif_server`
-
-### Development Environment
-
-1. Download gSOAP toolkit, build and install it.
-
-2. Confirm the required wsdl file according to the requirements of each profile on the onvif official website. The typemap.dat file is located in the gsoap folder in the unzipped directory of the gSOAP toolkit. In order to recognize the event notification, you need to add the following content at the end of typemap.dat:
-
-```c
-_wsnt__NotificationMessageHolderType_Message = $ struct _tt__Message* tt__Message;
-```
-
-3. Convert wsdl file to pure C style header file onvif.h by wsdl2h tool.
-
-```shell
-wsdl2h -P -x -c -s -t typemap.dat -o onvif.h http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl http://www.onvif.org/onvif/ver10/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver20/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver10/deviceio.wsdl http://www.onvif.org/onvif/ver10/display.wsdl http://www.onvif.org/onvif/ver20/imaging/wsdl/imaging.wsdl http://www.onvif.org/onvif/ver10/recording.wsdl http://www.onvif.org/onvif/ver10/replay.wsdl http://www.onvif.org/onvif/ver10/search.wsdl http://www.onvif.org/onvif/ver10/receiver.wsdl http://www.onvif.org/onvif/ver20/ptz/wsdl/ptz.wsdl
-```
-
-4. In onvif.h, add `#import“ wsse.h”`, and modify `tev__StringAttrList` to `tt__StringAttrList`.
-
-5. In wsa5.h, modify `SOAP_ENV__Fault` to `SOAP_ENV__Fault_alex`.
-
-6. Generate the .h and .c files needed for server development with the onvif.h header file by soapcpp2 tool.
-
-```shell
-soapcpp2 -s -2 onvif.h -x -I import/ -I .
-```
-
-7. Select the required parts and move to the app/onvif_server directory, taking care not to overwrite the implemented functions.
-
-8. Implement the functions in server_operation.c according to the detailed needs. The structures of input parameters and output parameters have been defined in soapStub.h in details, which can be filled in according to the specifications.
-
-### Debug Environment
-
-1. Make sure that the device running onvif_server is on the same local area network as the NVR or PC that needs to be connected.
-2. Run discovering device on the NVR, or run ONVIF Device Manager, ONVIF Device Test Tool or other tools on the personal computer to discover the device, and then debug.
-3. When debugging specific functions, you can judge whether the corresponding function is called by the printed log.
-4. If you use ONVIF Device Test Tool or other packet capture tools, you will see the following data flow.
-
-Request:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:tds="http://www.onvif.org/ver10/device/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema">
-  <soap:Body>
-    <tds:GetDNS />
-  </soap:Body>
-</soap:Envelope>
-```
-
-Response:
-
-```xml
-HTTP/1.1 200 OK
-Server: gSOAP/2.8
-X-Frame-Options: SAMEORIGIN
-Content-Type: application/soap+xml; charset=utf-8
-Content-Length: 2109
-Connection: close
-
-
-<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope
-    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
-    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-    xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
-    xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
-    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
-    xmlns:xmime="http://tempuri.org/xmime.xsd"
-    xmlns:xop="http://www.w3.org/2004/08/xop/include"
-    xmlns:ns1="http://www.onvif.org/ver20/analytics/humanface"
-    xmlns:ns2="http://www.onvif.org/ver20/analytics/humanbody"
-    xmlns:tt="http://www.onvif.org/ver10/schema"
-    xmlns:wsrfbf="http://docs.oasis-open.org/wsrf/bf-2"
-    xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
-    xmlns:wsrfr="http://docs.oasis-open.org/wsrf/r-2"
-    xmlns:ns3="http://www.onvif.org/ver20/media/wsdl"
-    xmlns:tad="http://www.onvif.org/ver10/analyticsdevice/wsdl"
-    xmlns:tan="http://www.onvif.org/ver20/analytics/wsdl"
-    xmlns:tdn="http://www.onvif.org/ver10/network/wsdl"
-    xmlns:tds="http://www.onvif.org/ver10/device/wsdl"
-    xmlns:tev="http://www.onvif.org/ver10/events/wsdl"
-    xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
-    xmlns:timg="http://www.onvif.org/ver20/imaging/wsdl"
-    xmlns:tls="http://www.onvif.org/ver10/display/wsdl"
-    xmlns:tmd="http://www.onvif.org/ver10/deviceIO/wsdl"
-    xmlns:tptz="http://www.onvif.org/ver20/ptz/wsdl"
-    xmlns:trc="http://www.onvif.org/ver10/recording/wsdl"
-    xmlns:trp="http://www.onvif.org/ver10/replay/wsdl"
-    xmlns:trt="http://www.onvif.org/ver10/media/wsdl"
-    xmlns:trv="http://www.onvif.org/ver10/receiver/wsdl"
-    xmlns:tse="http://www.onvif.org/ver10/search/wsdl">
-    <SOAP-ENV:Body>
-        <tds:GetDNSResponse>
-            <tds:DNSInformation>
-                <tt:FromDHCP>true</tt:FromDHCP>
-                <tt:DNSFromDHCP>
-                    <tt:Type>IPv4</tt:Type>
-                    <tt:IPv4Address>10.10.10.188</tt:IPv4Address>
-                </tt:DNSFromDHCP>
-                <tt:DNSFromDHCP>
-                    <tt:Type>IPv4</tt:Type>
-                    <tt:IPv4Address>58.22.96.66</tt:IPv4Address>
-                </tt:DNSFromDHCP>
-            </tds:DNSInformation>
-        </tds:GetDNSResponse>
-    </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-```
-
-### Notices
-
-1. All pointers need to call soap_malloc directly or indirectly to apply for memory.
-2. After the structure applies for memory, don't forget to call the function at the beginning of soap_default_tt__ to assign a default value, or manually assign a value or NULL to each member. Otherwise, although build successfully and there is no error within the function, but when checking the response structure, it will directly exit and it is difficult to troubleshoot.
-
 ## Application Framework Development Process
 
 **From database to web application development, the bottom-up development process is as follows:**
@@ -1005,14 +866,12 @@ graph LR
 	dbserver --> libIPCProtocol
 	libIPCProtocol --> ipcweb-backend
 	ipcweb-backend --> ipcweb-ng
-	libIPCProtocol --> onvif_server
 ```
 
 1. dbserver: build tables and initialize data.
 2. libIPCProtocol: package the function of reading and writing to this table. For debugging, you can refer to the code in the demo path to write a test program, or you can use the dbus-monitor tool to monitor dbus. When testing, push the built libIPCProtocol.so and the test program to the device.
 3. ipcweb-backend: call the packaged function under the corresponding ApiHandler. Use curl or postman test to get/put  URL normally. During the test, push the entry.cgi generated from building to the device.
 4. ipcweb-ng: develop the corresponding interface and registration callback to ensure that the web front-end can read and write the database normally. During the test, you can directly specify the IP address in the URL as the device's IP address on the PC for debugging, or you can push the built folder to the device and directly access the device's IP address for debugging.
-5. onvif_server: package interface functions conforming to onvif protocol specification for other client devices conforming to the onvif protocol to call.
 
 **Specific applications can be developed in parallel after the completion of the second step above. If you do not need to save the states of operations, you can skip the first step.**
 

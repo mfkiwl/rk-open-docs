@@ -2,9 +2,9 @@
 
 文件标识：RK-FB-YF-358
 
-发布版本：V1.3.2
+发布版本：V1.3.3
 
-日期：2021-03-05
+日期：2021-05-21
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -72,6 +72,7 @@ Rockchip Electronics Co., Ltd.
 | V1.3.0     | Fenrir Lin | 2020-09-16   | 增加dbserver对外接口，更新onvif_server开发环境 |
 | V1.3.1     | Fenrir Lin | 2020-10-15   | 更新文件路径                                   |
 | V1.3.2     | Ruby Zhang | 2021-03-15   | 完善产品版本信息                               |
+| V1.3.3     | Fenrir Lin | 2021-05-21   | 删除onvif_server部分                           |
 
 ---
 
@@ -97,7 +98,6 @@ Rockchip Electronics Co., Ltd.
 | mediaserver     | 多媒体服务             |
 | dbserver        | 数据库服务             |
 | ispserver       | 图像信号处理服务端     |
-| onvif_server    | onvif协议服务端        |
 
 ### 库
 
@@ -115,11 +115,9 @@ Rockchip Electronics Co., Ltd.
 
 ![应用框架](resources/应用框架.png)
 
-目前支持以下两种方式：
+目前支持以下方式：
 
-1. web前端根据用户的操作，使用GET/PUT/POST/DELETE四种方法，调用不同的web后端接口。web后端中，使用libIPCProtocol提供的函数，通过dbus进行跨进程间通信，来调用相应的服务。
-
-2. onvif客户端或支持onvif协议的NVR，通过onvif标准协议，可以直接调用onvif_server的接口，使用libIPCProtocol提供的函数，来调用相应的服务。
+web前端根据用户的操作，使用GET/PUT/POST/DELETE四种方法，调用不同的web后端接口。web后端中，使用libIPCProtocol提供的函数，通过dbus进行跨进程间通信，来调用相应的服务。
 
 具体服务中，会根据传入的参数，进行相应的操作，从而使用户的操作生效。
 
@@ -867,148 +865,6 @@ dbus_method_call(userdata->connection,
 
 **编译命令：** 在SDK根目录下，`make isp2-ipc-dirclean && make isp2-ipc`
 
-## onvif_server
-
-### 开发基础
-
-onvif协议服务端。
-
-**开发语言：** C
-
-**参考文档:**
-
-[WSDL教程](https://www.w3school.com.cn/wsdl/index.asp)
-
-[SOAP教程](https://www.w3school.com.cn/soap/index.asp)
-
-[Web Services教程](https://www.w3school.com.cn/webservices/index.asp)
-
-[onvif规范](https://www.onvif.org/profiles/)
-
-**代码路径：** app/onvif_server
-
-**编译命令：** 在SDK根目录下，`make onvif_server-dirclean && make onvif_server`
-
-### 开发环境
-
-1. 下载gSOAP工具包，并编译安装。
-
-2. 根据onvif官网各个profile的要求，确定所需的wsdl文件。typemap.dat文件位于gSOAP工具包解压目录的gsoap文件夹下。为了识别到事件通知，需要在typemap.dat的末尾添加以下内容：
-
-```c
-_wsnt__NotificationMessageHolderType_Message = $ struct _tt__Message* tt__Message;
-```
-
-3. 使用wsdl2h工具，将wsdl文件转换为纯C风格的头文件onvif.h。
-
-```shell
-wsdl2h -P -x -c -s -t typemap.dat -o onvif.h http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl http://www.onvif.org/onvif/ver10/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver20/media/wsdl/media.wsdl http://www.onvif.org/onvif/ver10/deviceio.wsdl http://www.onvif.org/onvif/ver10/display.wsdl http://www.onvif.org/onvif/ver20/imaging/wsdl/imaging.wsdl http://www.onvif.org/onvif/ver10/recording.wsdl http://www.onvif.org/onvif/ver10/replay.wsdl http://www.onvif.org/onvif/ver10/search.wsdl http://www.onvif.org/onvif/ver10/receiver.wsdl http://www.onvif.org/onvif/ver20/ptz/wsdl/ptz.wsdl
-```
-
-4. 在onvif.h中，增加`#import "wsse.h"`，并修改`tev__StringAttrList`为`tt__StringAttrList`。
-
-5. 在wsa5.h中，修改`SOAP_ENV__Fault`为`SOAP_ENV__Fault_alex`。
-
-6. 使用soapcpp2工具，用onvif.h头文件生成服务端开发需要的.h和.c文件
-
-```shell
-soapcpp2 -s -2 onvif.h -x -I import/ -I .
-```
-
-7. 选取其中需要的部分，移到app/onvif_server的目录下，注意不要覆盖已实现的函数。
-
-8. 根据具体需求，实现server_operation.c中的函数。输入参数和输出参数的结构体已经有详细定义在soapStub.h中，按规范填充实现即可。
-
-### 调试环境
-
-1. 确保运行onvif_server的设备，和需要对接的NVR或个人电脑，位于同一局域网内。
-
-2. 运行NVR的发现设备，或个人电脑上运行ONVIF Device Manager、ONVIF Device Test Tool等工具来发现设备，再进行调试操作。
-
-3. 调试具体功能时，可观看打印log，判断是否调用了相应函数。
-
-4. 如果使用ONVIF Device Test Tool或其他抓包工具，可看到以下样式的数据流。
-
-Request:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:tds="http://www.onvif.org/ver10/device/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema">
-  <soap:Body>
-    <tds:GetDNS />
-  </soap:Body>
-</soap:Envelope>
-```
-
-Response:
-
-```xml
-HTTP/1.1 200 OK
-Server: gSOAP/2.8
-X-Frame-Options: SAMEORIGIN
-Content-Type: application/soap+xml; charset=utf-8
-Content-Length: 2109
-Connection: close
-
-
-<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope
-    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
-    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-    xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
-    xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
-    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
-    xmlns:xmime="http://tempuri.org/xmime.xsd"
-    xmlns:xop="http://www.w3.org/2004/08/xop/include"
-    xmlns:ns1="http://www.onvif.org/ver20/analytics/humanface"
-    xmlns:ns2="http://www.onvif.org/ver20/analytics/humanbody"
-    xmlns:tt="http://www.onvif.org/ver10/schema"
-    xmlns:wsrfbf="http://docs.oasis-open.org/wsrf/bf-2"
-    xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
-    xmlns:wsrfr="http://docs.oasis-open.org/wsrf/r-2"
-    xmlns:ns3="http://www.onvif.org/ver20/media/wsdl"
-    xmlns:tad="http://www.onvif.org/ver10/analyticsdevice/wsdl"
-    xmlns:tan="http://www.onvif.org/ver20/analytics/wsdl"
-    xmlns:tdn="http://www.onvif.org/ver10/network/wsdl"
-    xmlns:tds="http://www.onvif.org/ver10/device/wsdl"
-    xmlns:tev="http://www.onvif.org/ver10/events/wsdl"
-    xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
-    xmlns:timg="http://www.onvif.org/ver20/imaging/wsdl"
-    xmlns:tls="http://www.onvif.org/ver10/display/wsdl"
-    xmlns:tmd="http://www.onvif.org/ver10/deviceIO/wsdl"
-    xmlns:tptz="http://www.onvif.org/ver20/ptz/wsdl"
-    xmlns:trc="http://www.onvif.org/ver10/recording/wsdl"
-    xmlns:trp="http://www.onvif.org/ver10/replay/wsdl"
-    xmlns:trt="http://www.onvif.org/ver10/media/wsdl"
-    xmlns:trv="http://www.onvif.org/ver10/receiver/wsdl"
-    xmlns:tse="http://www.onvif.org/ver10/search/wsdl">
-    <SOAP-ENV:Body>
-        <tds:GetDNSResponse>
-            <tds:DNSInformation>
-                <tt:FromDHCP>true</tt:FromDHCP>
-                <tt:DNSFromDHCP>
-                    <tt:Type>IPv4</tt:Type>
-                    <tt:IPv4Address>10.10.10.188</tt:IPv4Address>
-                </tt:DNSFromDHCP>
-                <tt:DNSFromDHCP>
-                    <tt:Type>IPv4</tt:Type>
-                    <tt:IPv4Address>58.22.96.66</tt:IPv4Address>
-                </tt:DNSFromDHCP>
-            </tds:DNSInformation>
-        </tds:GetDNSResponse>
-    </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>
-```
-
-### 注意事项
-
-1. 所有指针都需要先直接或间接地调用soap_malloc进行申请内存。
-
-2. 结构体在申请内存后，还需要调用soap_default_tt__开头的函数赋默认值，或手动给每一个成员赋值或NULL。注意不要遗漏，否则虽然编译能过，函数内部也不会报错，但是检查response结构体时的时候会直接退出，且难以排查。
-
 ## 应用框架开发流程
 
 **从数据库到web应用的开发，自底向上的开发流程如下：**
@@ -1018,7 +874,6 @@ graph LR
 	dbserver --> libIPCProtocol
 	libIPCProtocol --> ipcweb-backend
 	ipcweb-backend --> ipcweb-ng
-	libIPCProtocol --> onvif_server
 ```
 
 1. dbserver：建表，并对数据进行初始化。
@@ -1028,8 +883,6 @@ graph LR
 3. ipcweb-backend：在相应的ApiHandler下，调用封装好的函数。用curl或postman测试对该URL进行get/put正常。测试时，将编译生成的entry.cgi推送到设备端即可。
 
 4. ipcweb-ng：开发相应界面和注册回调，确保web前端可以正常地读写数据库。测试时，可在PC端直接指定URL中的IP地址为设备端IP地址进行调试，也可以将编译生成的文件夹推送到设备端，直接访问设备端IP地址进行调试。
-
-5. onvif_server：封装符合onvif协议规范的接口函数，供其他符合onvif协议的客户端设备调用。
 
 **具体应用的开发，可以在以上第二步完成后并行开发。如果该操作无需保存状态，可以省去第一步。**
 
