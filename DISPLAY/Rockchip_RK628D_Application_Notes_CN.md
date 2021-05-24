@@ -2,9 +2,9 @@
 
 文件标识：RK-SM-YF-286
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2021-04-06
+日期：2021-05-26
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -44,7 +44,7 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-本文档主要介绍RK628D的使用注意事项和相关限制。
+本文档主要介绍RK628D的使用注意事项和接口特性。
 
 **产品版本**
 
@@ -65,6 +65,7 @@ Rockchip Electronics Co., Ltd.
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | -------- | ------------ | -------------------------------------------- |
 | V1.0.0    | 温定贤 | 2021-04-06 | 初始版本     |
+| V1.1.0 | 温定贤 | 2021-05-26 | 1、增加不支持图像旋转说明；<br>2、删除Audio部分MCLK的使用限制；<br>3、修改GVI/HDMI TX同源说明；<br>3、增加对接第三方MCU说明；<br>4、增加输入输出接口特性说明；<br>5、增加典型应用场景性能说明； |
 
 ---
 
@@ -78,10 +79,38 @@ Rockchip Electronics Co., Ltd.
 
 | **功能模块**     | **注意事项**                                                 |
 | ---------------- | ------------------------------------------------------------ |
-| 所有输入输出接口 | 1、仅支持逐行分辨率，不支持隔行分辨率。                      |
+| 所有输入输出接口 | 1、仅支持逐行分辨率，不支持隔行分辨率。<br>2、不支持图像旋转，如输入横屏转输出竖屏等。（注：HDMI To MIPI CSI应用场景可以在接收图像后在AP内部旋转） |
 | HDMI RX          | 1、HDMI RX支持480P/576P/720P/1080P/4K等CEA标准Timing，如果有特定Timing需求，需要联系RK技术端评估。4K60只支持YUV420格式，其他分辨率无此限制。<br>2、线缆接入HDMI To MIPI CSI应用场景，若需要支持YUV420格式，需要修改代码，当前SDK代码支持YUV422/YUV444/RGB格式，无法支持两者自适应。<br>3、若需要支持HDCP功能，HDCP Key无法固化在RK628上，需要写在外部存储，对接除RKAP外第三方平台时需要注意增加读写HDCP Key的功能支持。 |
-| Audio            | 1、RK628的I2S接口没有提供MCLK，若直接连接到DAC，建议选择无需MCLK的DAC芯片。 |
 | MIPI CSI TX      | 1、MIPI CSI TX的图像格式只支持YUV422 8bit，最大支持分辨率4K30，MIPI bitrate 1.2Gbps/lane，4 lane。 |
-| GVI/HDMI TX      | 1、HDMI RX To GVI/HDMI TX的应用场景，RK628和输入信号（HDMI/RGB IN）的时钟必须同源，即要求AP提供RK628的时钟源，且时钟频率必须为24MHz。 |
+| GVI/HDMI TX      | 1、GVI/HDMI TX的应用场景，RK628和输入信号（HDMI/RGB/BT1120 IN）的时钟必须同源，即要求AP提供RK628的时钟源，且时钟频率必须为24MHz。 |
 | MIPI DSI         | 1、若使用单MIPI屏，必须接在DSI0。                            |
+| 对接第三方MCU    | 1、对接第三方MCU，使用HDMI线缆接入模式，只支持应用场景：HDMI To RGB/LVDS/MIPI DSI/MIPI CSI。 |
 
+## 输入接口特性
+
+| **Input interface** | **Typical Resolution** | **Typical Format**                                           | **Max bit rate per lane** |
+| :------------------ | :--------------------- | :----------------------------------------------------------- | :------------------------ |
+| HDMI                | 4K 60Hz                | YUV420/YUV422/YUV444/RGB888<br>（4K60只支持YUV420格式，其他分辨率无限制） | 3Gbps                     |
+| BT1120              | 1080P 60Hz             | YUV422 8bit                                                  | NA                        |
+| RGB                 | 1080P 60Hz             | RGB888                                                       | NA                        |
+
+## 输出接口特性
+
+| **Input interface** | **Typical Resolution** | **Typical Format** | **Max bit rate per lane** |
+| ------------------- | ---------------------- | ------------------ | ------------------------- |
+| GVI                 | 4K 60Hz                | RGB888             | 3.75Gbps                  |
+| Dual MIPI DSI       | 2.5K 60Hz              | RGB888             | 1.2Gbps                   |
+| MIPI DSI            | 1080P 60Hz             | RGB888             | 1.2Gbps                   |
+| Dual LVDS           | 1080P 60Hz             | RGB888             | 1 Gbps                    |
+| LVDS                | 720P 60Hz              | RGB888             | 1 Gbps                    |
+| MIPI CSI            | 4K 30Hz                | YUV422 8bit        | 1.2Gbps                   |
+| BT1120              | 1080P 60Hz             | RGB888             | NA                        |
+| RGB                 | 1080P 60Hz             | RGB888             | NA                        |
+
+## 典型应用场景性能
+
+| **应用场景**     | **最高性能**                                            |
+| ---------------- | ------------------------------------------------------- |
+| HDMI To GVI      | 4K 60Hz                                                 |
+| HDMI To MIPI CSI | 4K 30Hz                                                 |
+| HDMI To MIPI DSI | Dual MIPI DSI: 2.5K 60Hz<br>Single MIPI DSI: 1080P 60Hz |
