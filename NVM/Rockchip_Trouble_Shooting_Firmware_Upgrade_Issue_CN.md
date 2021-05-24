@@ -1,32 +1,87 @@
 # RK 固件升级失败原因分析
 
-发布版本： 1.2
+文件标识：RK-PC-YF-182
 
-作者邮箱：zyf@rock-chips.com
+发布版本：V1.2.1
 
-发布日期：2017/10/18
+日期：2021-05-24
 
-文件密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
 
-| 版本          | 日期         | 描述          | 作者   | 审核   |
-| ----------- | ---------- | ----------- | ---- | ---- |
-| Version 1.0 | 2010-07-27 | 初版          | 赵仪峰  |      |
-| Version 1.1 | 2012-11-22 | 重新整理并增加更多信息 | 赵仪峰  |      |
-| Version 1.2 | 2017-10-18 | 增加 EMMC 等出错分析 | 赵仪峰  |      |
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有 © 2021 瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
-[TOC]
----
 
-## 概述
+**前言**
+
+**概述**
 
 工厂和工程师经常会遇到固件升级失败的问题，为了方便查找问题，本文档整理了一些常见的问题和分析建议。
 
 由于工具一直在更新，本文档的描述的信息可能和工具提示的信息不会完全一样，不过同一种类型的问题，提示信息应该是相似的。
 
+**产品版本**
+
+| **芯片名称** | **内核版本** |
+| ------------ | ------------ |
+| ALL          | ALL          |
+
+**读者对象**
+
+本文档（本指南）主要适用于以下工程师：
+
+技术支持工程师
+
+软件开发工程师
+
+**修订记录**
+
+| **版本号** | **作者** | **修改日期** | **修改说明**           |
+| ---------- | -------- | ------------ | ---------------------- |
+| V1.0.0     | 赵仪峰   | 2010-07-27   | 初始版本               |
+| V1.1.0     | 赵仪峰   | 2012-11-22   | 重新整理并增加更多信息 |
+| V1.2.0     | 赵仪峰   | 2017-10-18   | 增加 EMMC 等出错分析   |
+| V1.2.1     | 黄莹     | 2021-05-24   | 修改格式               |
+
+---
+
+**目录**
+
+[TOC]
+
+---
+
 ## 常见问题及分析
 
-### **2.1.**Boot Code 下载失败
+### Boot Code 下载失败
 
 量厂工具提示信息：
 
@@ -63,7 +118,7 @@
 7. 使用接外电源或者电池供电。
 8. 启用 secure boot 的机器，需要升级对应签名的固件。
 
-### **2.2.**下载 Boot Code 成功后测试设备失败
+### 下载 Boot Code 成功后测试设备失败
 
 量厂工具提示：
 
@@ -92,10 +147,10 @@
 1. 使用 DDR 测试工具测试 DDR 是否有焊接问题。
 2. 分析 PCB DDR 走线部分，是否有不符合布板规范的走线。
 3. 更换 DDR 颗粒
-4. USB 部分参考 [“2.1.Boot Code 下载失败”处理办法](#_Boot_Code下载失败)。
+4. USB 部分参考“ [1.1 Boot Code 下载失败](#_Boot_Code下载失败)”处理办法。
 5. 接串口分析打印信息，确定 CPU 运行到 DDR 还是 usbplug
 
-### **2.3.**准备 IDB NAND FLASH 或者 EMMC 焊接问题
+### 准备 IDB NAND FLASH 或者 EMMC 焊接问题
 
 量产工具提示准备 IDB 失败：
 
@@ -182,7 +237,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 ![2.3-case-3](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.3-case-3.jpg)
 
-### **2.4.**写入 IDB 失败
+### 写入 IDB 失败
 
 量产工具提示写入 ID_BLOCK 失败：
 
@@ -208,7 +263,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 ![2.4-compare](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.4-compare.jpg)
 
-下面这种情况，只有一个 bits 或者几个 bits 差异的，是 DDR 问题，参考“[2.2.下载 BootCode 成功后测试设备失败](#_下载Boot_Code成功后测试设备失败)”的处理方法。
+下面这种情况，只有一个 bits 或者几个 bits 差异的，是 DDR 问题，参考“[1.2 下载 BootCode 成功后测试设备失败](#_下载Boot_Code成功后测试设备失败)”的处理方法。
 
 ![2.4-differentation-bits](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.4-differentation-bits.png)
 
@@ -218,7 +273,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 ![2.4-differentation-bits2](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.4-differentation-bits2.jpg)
 
-### **2.5.**下载固件失败
+### 下载固件失败
 
 量产工具提示下载固件失败：
 
@@ -230,7 +285,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 量产工具 log 目录下 log 提示 ReadLBA failed,出错代码 (-4)：
 
-![2.5-RK-File-check-file](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.5-RK-File-check-file.jpg)这两种情况，都是 USB 通讯中断了，参考“[2.1.Boot Code 下载失败](#_Boot_Code下载失败)”处理办法。
+![2.5-RK-File-check-file](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.5-RK-File-check-file.jpg)这两种情况，都是 USB 通讯中断了，参考"[1.1 Boot Code 下载失败](#_Boot_Code下载失败)”处理办法。
 
 量产工具 log 目录下 log 提示 RKA_File_Check failed：
 
@@ -242,7 +297,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 用文件内容比较工具比较这两个文件：
 
-下面这种情况，只有一个 bits 或者几个 bits 差异的，是 DDR 问题，参考“[2.2.下载 BootCode 成功后测试设备失败](#_下载Boot_Code成功后测试设备失败)”的处理方法。
+下面这种情况，只有一个 bits 或者几个 bits 差异的，是 DDR 问题，参考“[1.2 下载 BootCode 成功后测试设备失败](#_下载Boot_Code成功后测试设备失败)”的处理方法。
 
 ![2.5-differentation-bits](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/2.5-differentation-bits.jpg)
 
@@ -256,7 +311,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 **开发工具的提示及**log 信息和量产工具的 log 类似，可以参考量产工具的情况处理。
 
-### **2.6.**校验芯片失败
+### 校验芯片失败
 
 量产工具在下载固件时提示校验芯片失败，这种问题一般都是固件选择错了，固件和芯片不匹配。在开发阶段，可能会是打包固件时参数配置错了。
 
@@ -280,7 +335,7 @@ Flash ID 第二个 byte 为容量信息，下表为常用容量的 ID:
 
 ## 其他问题
 
-### **3.1.**升级固件完自动重启后还在升级模式
+### 升级固件完自动重启后还在升级模式
 
 情况一、
 用开发工具升级固件后，不开机，连接 USB 在在升级模式，串口信息提示如下：
@@ -301,7 +356,7 @@ RK3329、RK3368 等平台，没有烧录 trust.img 的话也会出现升级后�
 
 解决办法：升级对应的 trust.img
 
-### **3.2.**使用 EMMC 的机器上电无法开机
+### 使用 EMMC 的机器上电无法开机
 
 这种问题一般出现在 RK3188、PX3、PX2、RK3066 和 RK3168 等平台上面。出现情况一般是升级完 loader 或者欲烧录固件的颗粒贴片后出现上电不开机问题。
 
@@ -336,7 +391,7 @@ EXT CSD 配置情况：
 
 如果是 RK312X、RK3228、RK3366、RK3288、RK3399 等比较新的主控出现升级固件后机器开机还停留在 MASKROM 升级模式，那么问题一般都是 EMMC D0-D7 有个别数据线没有接对。
 
-### **3.3.**使用 EMMC 的机器，复位无法开机问题
+### 使用 EMMC 的机器，复位无法开机问题
 
 解决方法：
 
@@ -344,7 +399,7 @@ l  确认是用主控的 EMMC_PWEN 连到 EMMC 的 RTS_n 脚。
 
 l  欲烧录固件时，主控是 RK3188、PX3、PX2、RK3066 和 RK3168，确认 EXTCSD 162 配置为 0x01。
 
-### **3.4.**使用 EMMC 时开机到运行到 LOADER 很慢的问题
+### 使用 EMMC 时开机到运行到 LOADER 很慢的问题
 
 原因是 BOOTROM 启动时进入 NAND FLASH 探测模式了，大约需要几秒时间。
 
@@ -364,7 +419,7 @@ l  欲烧录固件时，主控是 RK3188、PX3、PX2、RK3066 和 RK3168，确�
 
 ![3.4-oscillograph2](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/3.4-oscillograph2.jpg)
 
-### **3.5.**使用 EMMC 的机器在 Android 运行读写报错问题
+### 使用 EMMC 的机器在 Android 运行读写报错问题
 
 问题的原因：
 
@@ -379,7 +434,7 @@ l  欲烧录固件时，主控是 RK3188、PX3、PX2、RK3066 和 RK3168，确�
 
 ![3.5-oscillograph](Rockchip_Trouble_Shooting_Firmware_Upgrade_Issue/3.5-oscillograph.jpg)
 
-### **3.6.**EMMC 功耗问题
+### EMMC 功耗问题
 
 EMMC 有读写操作时，电流在 100-300mA。 待机时，100-700uA。
 
