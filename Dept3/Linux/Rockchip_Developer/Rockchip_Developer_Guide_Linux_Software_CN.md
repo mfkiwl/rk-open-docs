@@ -2,9 +2,9 @@
 
 文档标识：RK-KF-YF-902
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2021-04-10
+日期：2021-05-20
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -59,12 +59,19 @@ Rockchip Electronics Co., Ltd.
 | **芯片名称** | **Buildroot版本** | **Debian版本** | **Yocto版本** | **Kernel版本** | **SDK版本** |
 | :----------: | :---------------: | :---------: | :-------: | :------------: | :-------------: |
 | RK3566、RK3568       | 2018.02-rc3    | 10         | 3.2      | 4.19          | V1.0.0 |
+| RK3399      | 2018.02-rc3    | 10         | 3.2      | 4.19          | V1.0.0 |
+| RK3326、PX30     | 2018.02-rc3    | 10         | 3.2      | 4.19          | V1.0.0 |
+| RK3288      | 2018.02-rc3    | 10         | 3.2      | 4.19          | V1.0.0 |
+| RK3399      | 2018.02-rc3    | 10         | 3.2      | 4.4          | V2.7.0 |
+| RK3326、PX30     | 2018.02-rc3    | 10         | 3.2      | 4.4          | V1.5.0 |
+| RK3288      | 2018.02-rc3    | 10         | 3.2      | 4.4          | V2.4.0 |
 
 **修订记录**
 
 | **日期**   | **作者** | **版本** | **修改说明** |
 | -----------| :------------- | :-------------- | :---------- |
 | 2021-04-10 | Caesar Wang | V1.0.0 | 初始版本 |
+| 2021-05-20 | Caesar Wang | V1.0.0 | 增加rk3399、rk3288、rk3326/px30的支持 |
 
 ---
 
@@ -82,8 +89,6 @@ Rockchip Linux SDK 支持三个系统, 其中 Buildroot 是基于2018.02-rc3上�
 
 目前支持 VPU 硬解码、GPU 3D、Wayland 显示、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/下文档。
 
-备注：Yocto 在国内开发难度比较大，所以推荐使用Buildroot、Debian去开发，同时大部分 Rockchip Linux 软件工程师是基于 Buildroot 上开发。
-
 ### Rockchip Linux 通用软件包获取方法
 
 #### 通过代码服务器下载
@@ -92,9 +97,17 @@ Rockchip Linux SDK 支持三个系统, 其中 Buildroot 是基于2018.02-rc3上�
 
 Rockchip Linux SDK 下载命令如下：
 
-| **芯片**   | **下载命令** |
-| -----------| :------------- |
-| RK3566、RK3568 | repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b rk356x -m \ <br/>rk356x_linux_release.xml |
+| **芯片**   | **版本** | **下载命令** |
+| -----------| :------------- | :------------- |
+| RK3566、RK3568 | Linux4.19 | repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk356x_linux_release.xml |
+| RK3399 | Linux4.19 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk3399_linux4.19_release.xml |
+| RK3326 | Linux4.19 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk3326_linux4.19_release.xml |
+| PX30 | Linux4.19 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>px30_linux4.19_release.xml |
+| RK3288 | Linux4.19 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk3288_linux4.19_release.xml |
+| RK3399 | Linux4.4 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk3399_linux_release.xml |
+| RK3326 | Linux4.4 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk3326_linux_release.xml |
+| PX30 | Linux4.4 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>px30_linux_release.xml |
+| RK3288 | Linux4.4 |  repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \ <br/>ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \ <br/>rk3288_linux_release.xml |
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
 
@@ -105,11 +118,11 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 RK356X_LINUX_SDK_V1.0.0_20210410.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 RK356X_LINUX_SDK_V1.1_20210520.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
 mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V1.0.0_20210410.tgz -C rk356x
+tar xvf RK356X_LINUX_SDK_V1.1_20210520.tgz -C rk356x
 cd rk356x
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
@@ -119,23 +132,17 @@ cd rk356x
 
 目前Linux发布的SDK初始压缩包如下：
 
-| **芯片名称**   | **压缩包**                                      | **版本** |
-| -------------- | :---------------------------------------------- | :------- |
-| RK3566、RK3568         | RK356X_Linux_SDK_V1.0.0_20210410.tgz              | v1.0.0    |
-| PX3SE          | px3se_linux_beta_v0.2_20180710.tgz              | v1.00    |
-| RV1108         | rv1108_linux_sdk_v2.3.0_20191009.tar.gz         | v2.3.4   |
-| RV1109、RV1126 | rv1126_rv1109_linux_sdk_v1.1.0_20200717.tar.bz2 | v1.1.0   |
-| RK1808、RK1806 | rk1808_linux_v1.1.5_20200320.tgz                | v1.1.5   |
-| RK3036         | rk3036g_linux_echo_v1.0_20170531.tar.bz2        | v1.2     |
-| RK312x         | rk312x_linux_release_v1.1.3_20200317.tgz        | v1.1.3   |
-| RK3229         | RK3229_LINUX_ECHO-SDK_V1.10_20171013.tgz        | v1.1.0   |
-| RK3288         | rk3288_linux_sdk_release_v2.3.0_20201203.tgz    | v2.3.0   |
-| RK3308         | RK3308_Linux_SDK_V1.3.2_20191031.tar.gz         | v1.3.2   |
-| PX30           | px30_linux_sdk_release_v1.3.0_20200224.tar.gz   | v1.4.0   |
-| RK3326         | rk3326_linux_sdk_release_v1.4.0_20201203.tar.gz | v1.4.0   |
-| RK3328         | rk3328_linux_beta_20200402.tgz                  | v1.00    |
-| RK3399         | rk3399_linux_sdk_release_v2.5.1_20201203.tgz    | v2.5.1   |
-| RK3399PRO      | rk3399pro_linux_sdk_release_v1.4.0_20201203.tgz | v1.4.0   |
+| **芯片名称**   | **压缩包**                             | **版本** |
+| -------------- | :------------------------------------- | :------- |
+| RK3566、RK3568 | RK356X_LINUX_SDK_V1.1_20210520.tgz     | v1.1.0   |
+| RK3399         | RK3399_LINUX4.19_SDK_V1.0_20210520.tgz | v1.0.0   |
+| RK3326         | PK3326_LINUX4.19_SDK_V1.0_20210520.tgz | v1.0.0   |
+| PX30           | PX30_LINUX4.19_SDK_V1.0_20210520.tgz   | v1.0.0   |
+| RK3288         | RK3288_LINUX4.19_SDK_V1.0_20210520.tgz | v1.0.0   |
+| RK3399         | RK3399_LINUX_SDK_V2.7_20210520.tgz     | v2.7.0   |
+| RK3326         | RK3326_LINUX_SDK_V1.5_20210520.tgz     | v1.5.0   |
+| PX30           | PX30_LINUX_SDK_V1.5_20210520.tgz       | v1.5.0   |
+| RK3288         | RK3288_LINUX_SDK_V2.4_20210520.tgz     | v2.4.0   |
 
 注意：初始压缩包可能有新版本替换更新！
 
@@ -164,13 +171,44 @@ $export RK_ROOTFS_SYSTEM=debian
 $./build.sh
 ```
 
-硬件列表全自动编译汇总如下：
+硬件列表Buildroot全自动编译汇总如下：
 
-| **芯片**   | **类型** | **板级配置** | **一键编译** | **kernel编译** |**uboot编译** |
+| **芯片**   | **类型** | **版本** | **架构** | **板级配置** | **一键编译**|
 | -----------| :------------- | :------------- | :------------- | :------------- | :------------- |
-| RK3566 | 通用 | BoardConfig-rk3566-evb2-lp4x-v10.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10.mk && ./build.sh | ./build.sh kernel | ./build.sh uboot |
-| RK3568 | 通用 | BoardConfig-rk3568-evb1-ddr4-v10.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk && ./build.sh | ./build.sh kernel | ./build.sh uboot |
-| RK3568 | NVR | BoardConfig-rk3568-nvr.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr.mk && ./build.sh | ./build.sh kernel | ./build.sh uboot |
+| RK3566 | 通用 | Linux4.19 | ARM32 | BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk && ./build.sh |
+| RK3566 | 通用 | Linux4.19 | ARM64 | BoardConfig-rk3566-evb2-lp4x-v10.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10.mk && ./build.sh |
+| RK3568 | 通用 | Linux4.19 | ARM32 | BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk && ./build.sh |
+| RK3568 | 通用 | Linux4.19 | ARM64 | BoardConfig-rk3568-evb1-ddr4-v10.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk && ./build.sh |
+| RK3568 | 通用<br/>SPI Nor | Linux4.19 | ARM64 | BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk && ./build.sh |
+| RK3568 | NVR<br/>SPI Nand  | Linux4.19 | ARM64 |  BoardConfig-rk3568-nvr-spi-nand.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr-spi-nand.mkk && ./build.sh |
+| RK3568 | NVR | Linux4.19 | ARM64 |  BoardConfig-rk3568-nvr.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr.mk && ./build.sh |
+| RK3568 | UVC | Linux4.19 | ARM64 |  BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk | ./build.sh device/rockchip/rk356x/BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk && ./build.sh |
+| RK3399 | 通用 | Linux4.19 | ARM64 |  BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk | ./build.sh device/rockchip/rk3399/BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk && ./build.sh |
+| RK3399 | 通用 | Linux4.19 | ARM64 | BoardConfig-rk3399-firefly-k4.19.mk | ./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly-k4.19.mk && ./build.sh |
+| RK3399 | 通用 | Linux4.19 | ARM64 | BoardConfig-rk3399-sapphire-excavator-k4.19.mk | ./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly-k4.19.mk && ./build.sh |
+| RK3399 | 通用 | Linux4.4 | ARM64 |  BoardConfig-rk3399-evb-ind-lpddr4.mk | ./build.sh device/rockchip/rk3399/BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk && ./build.sh |
+| RK3399 | 开发板 | Linux4.4 | ARM64 | BoardConfig-rk3399-firefly.mk | ./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly-k4.19.mk && ./build.sh |
+| RK3399 | 通用 | Linux4.4 | ARM64 | BoardConfig-rk3399-sapphire-excavator.mk | ./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly-k4.19.mk && ./build.sh |
+| RK3326 | 通用 | Linux4.19 | ARM32 | BoardConfig-rk3326-evb-lp3-v10-32bit-k4.19.mk | ./build.sh device/rockchip/rk3326/BoardConfig-rk3326-evb-lp3-v10-32bit-k4.19.mk && ./build.sh |
+| RK3326 | 通用 | Linux4.19 | ARM64 | BoardConfig-rk3326-evb-lp3-v10-k4.19.mk | ./build.sh device/rockchip/rk3326/BoardConfig-rk3326-evb-lp3-v10-k4.19.mk && ./build.sh |
+| RK3326 | 通用 | Linux4.4 | ARM32 | BoardConfig-rk3326-evb-lp3-v10-32bit.mk | ./build.sh device/rockchip/rk3326/BoardConfig-rk3326-evb-lp3-v10-32bit-k4.19.mk && ./build.sh |
+| RK3326 | 通用 | Linux4.4 | ARM64 | BoardConfig-rk3326-evb-lp3-v10.mk | ./build.sh device/rockchip/rk3326/BoardConfig-rk3326-evb-lp3-v10-k4.19.mk && ./build.sh |
+| RK3326 | 扫地机 | Linux4.4 | ARM64 | BoardConfig-rk3326-robot64.mk | ./build.sh device/rockchip/rk3326/BoardConfig-rk3326-robot64.mk && ./build.sh |
+| RK3326 | 扫地机 | Linux4.4 | ARM64 | BoardConfig-rk3326-robot64_no_gpu.mk| ./build.sh device/rockchip/rk3326/BoardConfig-rk3326-robot64_no_gpu.mk && ./build.sh |
+| PX30 | 通用 | Linux4.19 | ARM64 | BoardConfig-px30-evb-ddr3-v10-k4.19.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v10-k4.19.mk && ./build.sh |
+| PX30 | 通用 | Linux4.19 | ARM64 | BoardConfig-px30-evb-ddr3-v11-k4.19.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v11-k4.19.mk && ./build.sh |
+| PX30 | 通用 | Linux4.4 | ARM32 | BoardConfig-px30-evb-ddr3-v10-32bit.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v10-32bit.mk && ./build.sh |
+| PX30 | 通用 | Linux4.4 | ARM64 | BoardConfig-px30-evb-ddr3-v10.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v10.mk && ./build.sh |
+| PX30 | 通用 | Linux4.4 | ARM32 | BoardConfig-px30-evb-ddr3-v11-32bit.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v11-32bit.mk && ./build.sh |
+| PX30 | 通用 | Linux4.4 | ARM64 | BoardConfig-px30-evb-ddr3-v11.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-evb-ddr3-v11.mk && ./build.sh |
+| PX30 | 扫地机 | Linux4.4 | ARM64 | BoardConfig-px30-robot64.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-robot64.mk && ./build.sh |
+| PX30 | 扫地机 | Linux4.4 | ARM64 | BoardConfig-px30-robot64_no_gpu.mk | ./build.sh device/rockchip/px30/BoardConfig-px30-robot64_no_gpu.mk && ./build.sh |
+| RK3288 | 通用 | Linux4.19 | ARM32 | BoardConfig-rk3288-evb-rk808-k4.19.mk | ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-evb-rk808-k4.19.mk && ./build.sh |
+| RK3288 | 通用 | Linux4.19 | ARM32 | BoardConfig-rk3288-firefly-k4.19.mk | ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-firefly-k4.19.mk && ./build.sh |
+| RK3288 | 通用 | Linux4.19 | ARM32 | BoardConfig_rk3288-evb-act8846-k4.19.mk | ./build.sh device/rockchip/rk3288/BoardConfig_rk3288-evb-act8846-k4.19.mk && ./build.sh |
+| RK3288 | 通用 | Linux4.4 | ARM32 | BoardConfig-rk3288-evb-rk808.mk | ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-evb-rk808.mk && ./build.sh |
+| RK3288 | 开发板 | Linux4.4 | ARM32 | BoardConfig-rk3288-firefly.mk | ./build.sh device/rockchip/rk3288/BoardConfig-rk3288-firefly.mk && ./build.sh |
+| RK3288 | 通用 | Linux4.4| ARM32 | BoardConfig_rk3288-evb-act8846.mk | ./build.sh device/rockchip/rk3288/BoardConfig_rk3288-evb-act8846.mk && ./build.sh |
 
 ## 文档说明
 
@@ -191,7 +229,7 @@ https://redmine.rockchip.com.cn/projects/fae/documents
 
 #### DDR支持列表
 
-Rockchip 平台 DDR 颗粒支持列表，详见 <SDK>/docs/Common/AVL 目录下《Rockchip_Support_List_DDR_V2.46.pdf》，下表中所标示的DDR支持程度表，只建议选用√、T/A标示的颗粒。
+Rockchip 平台 DDR 颗粒支持列表，详见 <SDK>/docs/Common/AVL 目录下《Rockchip_Support_List_DDR_V2.47.pdf》，下表中所标示的DDR支持程度表，只建议选用√、T/A标示的颗粒。
 表 1‑1 Rockchip DDR Support Symbol
 
 | **Symbol** | **Description**                  |
@@ -202,7 +240,7 @@ Rockchip 平台 DDR 颗粒支持列表，详见 <SDK>/docs/Common/AVL 目录下�
 
 #### eMMC支持列表
 
-Rockchip 平台 eMMC 颗粒支持列表，详见  <SDK>/docs/Common/AVL 目录下《RKeMMCSupportList Ver1.56_20210325.pdf》，下表中所标示的EMMC支持程度表，只建议选用√、T/A标示的颗粒。
+Rockchip 平台 eMMC 颗粒支持列表，详见  <SDK>/docs/Common/AVL 目录下《RKeMMCSupportList Ver1.57_20210506.pdf》，下表中所标示的EMMC支持程度表，只建议选用√、T/A标示的颗粒。
 表 1‑2 Rockchip EMMC Support Symbol
 
 | **Symbol** | **Description**                                         |
@@ -223,7 +261,7 @@ Rockchip 平台 eMMC 颗粒支持列表，详见  <SDK>/docs/Common/AVL 目录�
 
 #### SPI Nor及SLC Nand支持列表
 
-Rockchip 平台 SPI Nor 及 SLC Nand 支持列表，详见 <SDK>/docs/Common/AVL 目录下《RK SpiNor and  SLC Nand SupportList Ver1.31_20210303.pdf》，文档中也有标注SPI Nand的型号，可供选型。下表中所标示的Nand支持程度表，只建议选用√、T/A标示的颗粒。
+Rockchip 平台 SPI Nor 及 SLC Nand 支持列表，详见 <SDK>/docs/Common/AVL 目录下《RK SpiNor and  SLC Nand SupportList Ver1.32_20210506.pdf》，文档中也有标注SPI Nand的型号，可供选型。下表中所标示的Nand支持程度表，只建议选用√、T/A标示的颗粒。
 
 表 1‑3 Rockchip SPI Nor and SLC Nand Support Symbol
 
@@ -275,7 +313,6 @@ Rockchip 平台会有对应的硬件参考文档随 SDK 软件包一起发布。
 #### 多媒体编解码支持列表
 
 Rockchip芯片比如RK3399/RK3399Pro 支持强大的多媒体功能：支持 4K VP9 and 4K 10bits H265/H264 视频解码，高达 60fps， 1080P 多格式视频解码 (WMV, MPEG-1/2/4, VP8)， 1080P 视频编码，支持 H.264，VP8 格式，视频后期处理器：反交错、去噪、边缘/细节/色彩优化。
-具体的编解码支持列表,详见 <SDK>/docs/芯片名称/xxxMultimedia Codec Benchmarkxxx.pdf。
 
 注意：这是芯片的支持情况,实际搭配不同系统可能支持格式和性能会有所不同。
 
@@ -292,12 +329,13 @@ Rockchip芯片比如RK3399/RK3399Pro 支持强大的多媒体功能：支持 4K 
 详见 <SDK>/docs/docs_list.txt 文档。
 
 ```
+docs
 ├── Common
 ├── docs_list.txt
 ├── Linux
 ├── Others
-├── RK_Linux_SDK_Supported_System_Kernel_Version_and_ISP_Version_List.png
-└── Socs
+├── Rockchip_Developer_Guide_Linux_Software_CN.pdf
+├── Socs
 ```
 
 ## 工具说明
@@ -309,21 +347,22 @@ Rockchip Linux SDK 中在 tools 目录下附带了linux（Linux操作系统环�
 
 工具说明文档：tools/windows/ToolsRelease.txt
 
-| 工具名称           | 工具用途                             |
-| ------------------ | ------------------------------------ |
-| RKDevTool          | 分立升级固件及整个update升级固件工具 |
-| FactoryTool        | 量产升级工具                         |
-| SecureBootTool     | 固件签名工具                         |
-| efuseTool          | efuse烧写工具                        |
-| RKDevInfoWriteTool | 写号工具                             |
-| SDDiskTool         | SD卡镜像制作                         |
-| SpiImageTools      | 烧录器升级工具                       |
-| DriverAssitant     | 驱动安装工具                         |
-| RKImageMaker       | 打包工具(打包成updata.img)           |
-| SpeakerPCBATool    | 音箱PCBA测试工具                     |
-| RKDevTool_Release  | 固件烧录工具                         |
-| ParameterTool      | 分区表修改工具                       |
-| RK_IPCamera_Tool   | IPC设备搜索工具                      |
+| 工具名称              | 工具用途                             |
+| --------------------- | ------------------------------------ |
+| RKDevTool             | 分立升级固件及整个update升级固件工具 |
+| FactoryTool           | 量产升级工具                         |
+| SecureBootTool        | 固件签名工具                         |
+| efuseTool             | efuse烧写工具                        |
+| RKDevInfoWriteTool    | 写号工具                             |
+| SDDiskTool            | SD卡镜像制作                         |
+| programmer_image_tool | 烧录器升级工具                       |
+| pin_config_tool| IO配置工具                       |
+| DriverAssitant        | 驱动安装工具                         |
+| RKImageMaker          | 打包工具(打包成updata.img)           |
+| SpeakerPCBATool       | 音箱PCBA测试工具                     |
+| RKDevTool_Release     | 固件烧录工具                         |
+| ParameterTool         | 分区表修改工具                       |
+| CameraFactoryTestTool      | 摄像头模组厂测工具                    |
 
 - Linux工具
 
@@ -337,11 +376,11 @@ Rockchip Linux SDK 中在 tools 目录下附带了linux（Linux操作系统环�
 | Linux_TA_Sign_Tool  | loader（miniloader/trust/uboot）签名工具      |
 | Linux_SecurityAVB   | boot/recovery签名工具                         |
 | Linux_SecurityDM    | rootfs签名工具                                |
-| Firmware_Merger     | SPI NOR固件打包工具(生成的固件可以用于烧录器) |
+| programmer_image_tool    | 打包SPI NOR/SPI NAND/SLC NAND/eMMC的烧录器固件 |
 
 ### 驱动安装工具
 
-Rockchip USB 驱动安装助手存放在 <SDK>/tools/windows/DriverAssitant_xxx.zip。支持
+Rockchip USB 驱动安装助手存放在 `<SDK>/tools/windows/DriverAssitant_<版本>.zip`。支持
 xp,win7_32,win7_64, win10_32,win10_64等操作系统。
 
 安装步骤如下：
@@ -354,7 +393,7 @@ xp,win7_32,win7_64, win10_32,win10_64等操作系统。
 
 ### 开发烧写工具
 
-- SDK 提供 Windows 烧写工具(工具版本需要 V2.55 或以上)，工具位于工程根目录：
+- SDK 提供 Windows 烧写工具(工具版本需要 V2.84 或以上)，工具位于工程根目录：
 
 ```shell
 <SDK>/Tools/windows/RKDevTool/
@@ -362,7 +401,7 @@ xp,win7_32,win7_64, win10_32,win10_64等操作系统。
 
 ![Tool](resources/Tool.png)</left>
 
-- SDK 提供 Linux 烧写工具(Linux_Upgrade_Tool 工具版本需要 V1.33 或以上)，工具位于工程根目录：
+- SDK 提供 Linux 烧写工具(Linux_Upgrade_Tool 工具版本需要 V1.65 或以上)，工具位于工程根目录：
 
 ```shell
 <SDK>/Tools/linux/Linux_Upgrade_Tool/
@@ -477,18 +516,26 @@ GH <--bin> <--sha 160|256> [--little] //computing sha of binary file
 用于量产烧录器镜像制作工具，该工具位于：
 
 ```
-<SDK>/tools/windows/SpiImageTools_v1.41.zip
+<SDK>/tools/windows/programmer_image_tool 或 <SDK>/tools/linux/programmer_image_tool
 ```
 
-![spi-image-tool](resources/spi-image-tool.png)</left>
+![programmer_image_tool](resources/programmer_image_tool.png)</left>
 
 烧录器镜像制作步骤:
 
-1. 点击”选择固件”，选取 update.img 升级固件
-2. 勾选”数据区预留”
-3. 空白填充选择 0
-4. 点击”生成文件”,成功时会在工具目录下生成 boot0.bin 和 data.bin。
-5. 将 data.bin 烧录到 emmc user 分区的 0 地址。
+- 烧录镜像到 emmc
+
+```shell
+./programmer_image_tool -i update.img -t emmc
+```
+
+- 烧录镜像到 spi nor
+
+```
+./programmer_image_tool -i update.img -t spinor
+```
+
+更多使用说明参考工具目录 `user_manual.pdf`文档。
 
 ### PCBA测试工具
 
@@ -555,12 +602,12 @@ PCBA工具位于：
 
 ![parameter-tool](resources/parameter-tool.png)</left>
 
-### IPC工具
+### 摄像头模组厂测工具
 
-用于IPC设备搜索工具，该工具位于：
+用于摄像头模组厂测，该工具位于：
 
 ```
-<SDK>/tools/windows/RK_IPCamera_Tool-V1.1.zip
+<SDK>/tools/windows/CameraFactoryTestTool-v2.0.5.1.zip
 ```
 
 ### EQTool工具
@@ -875,13 +922,13 @@ ReleaseNote.txt，该文件会记录每次更新解决的问题，及是否建�
 软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
 
 ```
-.repo/manifests$ cat */芯片型号_Linux_SDK_Release_Note.txt
+.repo/manifests$ cat */芯片型号_Linux_SDK_Note.md
 ```
 
 或者参考工程目录：
 
 ```
-<SDK>/docs/芯片型号/Rockchip_芯片型号_Linux_SDK_Release_Note.txt
+<SDK>/docs/芯片型号/芯片型号_Linux_SDK_Note.md
 ```
 
 ### SDK 更新
@@ -1131,7 +1178,15 @@ Yocto 更多信息请参考 [Rockchip Wiki](<http://opensource.rock-chips.com/wi
 令自动完成所有的编译：
 
 ```shell
-<SDK>$./build.sh all
+./build.sh all # 只编译模块代码（u-Boot，kernel，Rootfs，Recovery）
+               # 需要再执行./mkfirmware.sh 进行固件打包
+
+./build.sh     # 在./build.sh all基础上
+               # 1. 增加固件打包 ./mkfirmware.sh
+               # 2. update.img打包
+               # 3. 复制rockdev目录下的固件到IMAGE/***_RELEASE_TEST/IMAGES目录
+               # 4. 保存各个模块的补丁到IMAGE/***_RELEASE_TEST/PATCHES目录
+               # 注：./build.sh 和 ./build.sh allsave 命令一样
 ```
 
 默认是 Buildroot ，可以通过设置坏境变量 RK_ROOTFS_SYSTEM 指定 rootfs 。
@@ -1139,7 +1194,7 @@ Yocto 更多信息请参考 [Rockchip Wiki](<http://opensource.rock-chips.com/wi
 
 ```shell
 <SDK>$export RK_ROOTFS_SYSTEM=buildroot
-<SDK>$./build.sh all
+<SDK>$./build.sh
 ```
 
 具体参数使用情况，可 help 查询，比如：
@@ -1223,7 +1278,7 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 注：烧写前，需安装最新 USB 驱动，驱动详见：
 
 ```shell
-<SDK>/tools/windows/DriverAssitant_v5.0.zip
+<SDK>/tools/windows/DriverAssitant_v5.11.zip
 ```
 
 #### Linux 刷机说明
@@ -1898,7 +1953,7 @@ make
 
 #### 开发相关模块
 
-相关package的开发，可以参考 <SDK>/buildroot/package/*, 其中package/rockchip是Rockchip开发的相关package.
+相关package的开发，可以参考 `<SDK>/buildroot/package/*`, 其中package/rockchip是Rockchip开发的相关package.
 
 #### 定制相关模块
 
@@ -1928,6 +1983,254 @@ buildroot$ tree configs/rockchip/
 ├── network.config
 ├── ntfs.config
 ...
+```
+
+#### 桌面应用
+
+ Buildroot默认支持 Wayland 桌面环境以及一些 Qt 应用。如下图：
+
+![桌面](resources/Buildroot_Desktop.png)</left>
+
+这些 Qt 应用提供了一些基础功能，如，摄像头预览，文件管理器，多媒体播放器，WiFi 连接等。
+
+##### 多路视频应用
+
+![多路视频](resources/buildroot_multi_video.png)</left>
+
+多路视频播放器用于测试设备的多路视频播放能力、显示能力以及硬解码能力，点击启动应用后会自动循环播放 9 路视频 demo。
+
+双击画面可以全屏播放。
+
+##### 文件浏览应用
+
+qfm 是一个文件浏览应用。
+
+![qfm](resources/buildroot_file_manage.png)</left>
+
+通过 qfm 可以浏览设备文件，点击目录名进入下一级目录，点击左上角返回上一级。
+
+点击文件可以调用系统对应的默认应用打开文件，如点击 mp4 文件将调用 qplayer 应用打开视频。
+
+##### 多功能播放器应用
+
+qplayer 是一个多功能播放器，可以播放视频、音频和浏览图片。点击启动后将自动播放视频 demo。
+
+![qplayer](resources/buildroot_qplayer.png)</left>
+
+也可以通过在 qfm 中点击指定文件来使用 qplyer 打开。
+
+双击画面可以全屏播放。
+
+##### 摄像头应用
+
+qcamera 是一款相机应用，可以进行拍摄和录像。
+
+![qcamera](resources/buildroot_qcamera.png)</left>
+
+设备连接摄像头的情况下启动 qcamera 将自动显示摄像头画面，右侧按钮：
+
+Image Mode: 照相模式，点击可切换为 Video Mode 视频录制模式。
+Capture: 捕捉图像，在 Video Mode 下会变为 Record 录制按钮。
+Exit: 退出。
+
+##### 设置应用
+
+qsetting 是系统设置工具，其中可以设置 WiFi 连接，蓝牙连接，实现恢复出厂设置以及固件升级。
+
+![qsetting](resources/buildroot_setting.png)</left>
+
+#### 用户和密码
+
+用户：root
+密码：rockchip
+
+#### Weston 配置
+
+我们可以通过配置 Weston 对显示进行一些自定义设置，下文对部分设置进行说明。
+
+##### 状态栏设置
+
+Weston 支持在 weston.ini 配置文件的 shell 段设置状态栏的背景色、位置，以及在 launcher 段设置快捷启动程序，如：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[shell]
+# 颜色格式为 ARGB8888
+panel-color=0xff002244
+# top|bottom|left|right|none
+panel-position=bottom
+
+[launcher]
+icon=/usr/share/weston/terminal.png
+path=/usr/bin/weston-terminal
+
+[launcher]
+# 图标路径
+icon=/usr/share/weston/icon_flower.png
+# 快捷启动命令
+path=/usr/bin/qsetting
+```
+
+#####背景设置
+
+Weston 支持在 weston.ini 配置文件的 shell 段设置背景图案、颜色，如：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[shell]
+# 背景图案(壁纸)绝对路径
+background-image=/usr/share/weston/background.png
+# scale|scale-crop|tile
+background-type=scale
+# 颜色格式为 ARGB8888，未设置背景图案时生效
+background-color=0xff002244
+```
+
+##### 待机及锁屏配置
+
+Weston 的超时待机时长可以在启动参数中配置，也可以在 weston.ini 的 core 段配置，如：
+
+```shell
+# /etc/init.d/S50launcher
+    start)
+        ...
+        # 0 为禁止待机，单位为秒
+        weston --tty=2 -B=drm-backend.so --idle-time=0&
+```
+
+或
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[core]
+# 设置 5 秒未操作后进入待机状态
+idle-time=5
+```
+
+##### 显示颜色格式配置
+
+Buildroot SDK 内 Weston 目前默认显示格式为 ARGB8888，对于某些低性能平台，可以在 weston.ini 的 core 段配置为 RGB565，如：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[core]
+# xrgb8888|rgb565|xrgb2101010
+gbm-format=rgb565
+```
+
+也可以在 weston.ini 的 output 段单独配置每个屏幕的显示格式，如：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[output]
+# output 的 name 可以查看 /sys/class/drm/card0-name
+name=LVDS-1
+# xrgb8888|rgb565|xrgb2101010
+gbm-format=rgb565
+```
+
+##### 屏幕方向设置
+
+Weston 的屏幕显示方向可以在 weston.ini 的 output 段配置，如：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[output]
+name=LVDS-1
+# normal|90|180|270|flipped|flipped-90|flipped-180|flipped-270
+transform=180
+```
+
+如果需要动态配置屏幕方向，可以通过动态配置文件，如：
+
+```shell
+echo "output:all:rotate90" > /tmp/.weston_drm.conf # 所有屏幕旋转 90 度
+echo "output:eDP-1:rotate180" > /tmp/.weston_drm.conf # eDP-1 旋转 180 度
+```
+
+##### 分辨率及缩放配置
+
+Weston 的屏幕分辨率及缩放可以在 weston.ini 的 output 段配置，如：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[output]
+name=HDMI-A-1
+# 需为屏幕支持的有效分辨率
+mode=1920x1080
+# 需为整数倍数
+scale=2
+```
+
+如果需要动态配置分辨率及缩放，可以通过动态配置文件，如：
+
+```shell
+echo "output:HDMI-A-1:mode=800x600" > /tmp/.weston_drm.conf # 修改 HDMI-A-1 分辨率为800x600
+```
+
+这种方式缩放时需要依赖 RGA 加速。
+
+##### 冻结屏幕
+
+在启动 Weston 时，开机 logo 到 UI 显示之间存在短暂切换黑屏。如需要防止黑屏，可以通过以下种动态配置文件方式短暂冻结 Weston 屏幕内容：
+
+```shell
+# /etc/init.d/S50launcher
+    start)
+        ...
+        export WESTON_FREEZE_DISPLAY=/tmp/.weston_freeze # 设置特殊配置文件路径
+        touch /tmp/.weston_freeze # 冻结显示
+        weston --tty=2 -B=drm-backend.so --idle-time=0&
+        ...
+        sleep 1 && rm /tmp/.weston_freeze& # 1 秒后解冻
+```
+
+##### 多屏配置
+
+Buildroot SDK 的 Weston 支持多屏同异显及热拔插等功能，不同显示器屏幕的区分根据 drm 的 name (通过 /sys/class/drm/card0-name 获取)，相关配置通过环境变量设置，如：
+
+```shell
+# /etc/init.d/S50launcher
+
+    start)
+        ...
+        export WESTON_DRM_PRIMARY=HDMI-A-1 # 指定主显为 HDMI-A-1
+        export WESTON_DRM_MIRROR=1 # 使用镜像模式(多屏同显)，不设置此环境变量即为异显
+        export WESTON_DRM_KEEP_RATIO=1 # 镜像模式下缩放保持纵横比，不设置此变量即为强制全屏
+        export WESTON_DRM_PREFER_EXTERNAL=1 # 外置显示器连接时自动关闭内置显示器
+        export WESTON_DRM_PREFER_EXTERNAL_DUAL=1 # 外置显示器连接时默认以第一个外显为主显
+        weston --tty=2 -B=drm-backend.so --idle-time=0&
+```
+
+镜像模式缩放显示内容时需要依赖 RGA 加速。
+
+同时也支持在 weston.ini 的 output 段单独禁用指定屏幕：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[output]
+name=LVDS-1
+mode=off
+# off|current|preferred|<WIDTHxHEIGHT@RATE>
+```
+
+##### 输入设备相关配置
+
+Weston 服务默认需要至少一个输入设备，如无输入设备，则需要在 weston.ini 中的 core 段特殊设置：
+
+```ini
+# /etc/xdg/weston/weston.ini
+
+[core]
+require-input=false
 ```
 
 ### Debian 10开发
