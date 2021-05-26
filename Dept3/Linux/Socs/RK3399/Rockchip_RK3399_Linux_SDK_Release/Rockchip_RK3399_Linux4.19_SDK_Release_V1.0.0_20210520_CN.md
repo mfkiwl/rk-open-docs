@@ -1,8 +1,8 @@
-# Rockchip RK356X Linux SDK 发布说明
+# Rockchip RK3399 Linux SDK 发布说明
 
-文档标识：RK-FB-YF-392
+文档标识：RK-FB-CS-002
 
-发布版本：V1.1.0
+发布版本：V1.0.0
 
 日期：2021-05-20
 
@@ -44,7 +44,7 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-文档主要介绍 Rockchip RK3566/RK3568 Linux SDK发布说明，旨在帮助工程师更快上手RK3566/RK3568 Linux SDK开发及相关调试方法。
+文档主要介绍 Rockchip RK3399 Linux SDK发布说明，旨在帮助工程师更快上手RK3399 Linux SDK开发及相关调试方法。
 
 **读者对象**
 
@@ -56,19 +56,15 @@ Rockchip Electronics Co., Ltd.
 
 **各芯片系统支持状态**
 
-| **芯片名称**    | **Buildroot** | **Debian** | **Yocto** |
-| ----------- | :-------------- | :------------- | :---------- |
-| RK3566   | Y               | Y           | Y           |
-| RK3568   | Y               | Y           | Y           |
+| **芯片名称** |  **Buildroot版本** | **Debian版本** | **Yocto版本** | **Kernel版本** |
+| :----------: | :---------------: | :------------: | :-----------: | :------------: |
+|    RK3399    |    2018.02-rc3    |       10       |      3.2      |      4.19      |
 
  **修订记录**
 
 | **日期**   | **版本** | **作者** | **修改说明** |
 | -----------| :-------------- | :------------- | :---------- |
-| 2020-12-11 | V0.0.1 | Caesar Wang | 初始版本。 |
-| 2021-01-18 | V0.1.0 | Caesar Wang | 更新BETA版本。 |
-| 2021-04-10 | V1.0.0 | Caesar Wang | 正式发布版本。 |
-| 2021-05-20 | V1.1.0 | Caesar Wang | 升级RKNN到1.0.0。 <br />开发指南章节增加软件和硬件开发一些说明文档。 <br/>增加IO电源设计注意事项。 |
+| 2021-05-20 | V1.0.0 | Caesar Wang |  正式发布版本 |
 
 ---
 
@@ -80,32 +76,32 @@ Rockchip Electronics Co., Ltd.
 
 ## 概述
 
-本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto 3.2 和 Debian 10 上开发，内核基于 Kernel 4.19，引导基于 U-boot v2017.09，适用于 RK3566/RK3568 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
+本 SDK 支持三个系统分别基于 Buildroot 2018.02-rc3，Yocto 3.2 和 Debian 10 上开发，内核基于 Kernel 4.19，引导基于 U-boot v2017.09，适用于 RK3399 EVB 开发板及基于此开发板进行二次开发的所有 Linux 产品。
 本 SDK 支持  VPU 硬解码、GPU 3D、Wayland/X11 显示、NPU、QT 等功能。具体功能调试和接口说明，请阅读工程目录 docs/ 下文档。
 
 ## 主要支持功能
 
 | **功能**    | **模块名** |
 | ----------- | :-------------- |
-| 数据通信      | Wi-Fi、以太网卡、USB、SD 卡、SATA 、PCI-e 接口 |
+| 数据通信      | Wi-Fi、以太网卡、USB、SD 卡、PCI-e 接口  |
 | 应用程序      | 多媒体播放、设置、浏览器、文件管理       |
 
 ## SDK 获取说明
 
 SDK 通过瑞芯微代码服务器对外发布获取。其编译开发环境，参考第 7 节 [SDK编译说明](# SDK 编译说明)。
 
-### RK356X Linux 通用软件包获取方法
+### RK3399 Linux 通用软件包获取方法
 
 #### 通过代码服务器下载
 
-获取 RK356X Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](# SSH 公钥操作说明)。
+获取 RK3399 Linux 软件包，需要有一个帐户访问 Rockchip 提供的源代码仓库。客户向瑞芯微技术窗口申请 SDK，同步提供 SSH公钥进行服务器认证授权，获得授权后即可同步代码。关于瑞芯微代码服务器 SSH公钥授权，请参考第 10 节  [SSH 公钥操作说明](# SSH 公钥操作说明)。
 
-RK356X_Linux_SDK 下载命令如下：
+RK3399 Linux SDK 下载命令如下：
 
 ```
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
 ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \
-rk356x_linux_release.xml
+rk3399_linux4.19_release.xml
 ```
 
 repo 是 google 用 Python 脚本写的调用 git 的一个脚本，主要是用来下载、管理项目的软件仓库，其下载地址如下：
@@ -117,12 +113,12 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### 通过本地压缩包解压获取
 
 为方便客户快速获取 SDK 源码，瑞芯微技术窗口通常会提供对应版本的 SDK 初始压缩包，开发者可以通过这种方式，获得 SDK 代码的初始压缩包，该压缩包解压得到的源码，进行同步后与通过 repo 下载的源码是一致的。
-以 RK356X_LINUX_SDK_V1.1_20210520.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
+以 RK3399_LINUX4.19_SDK_V1.0.0_20210520.tgz 为例，拷贝到该初始化包后，通过如下命令可检出源码：
 
 ```shell
-mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V1.1_20210520.tgz -C rk356x
-cd rk356x
+mkdir rk3399
+tar xvf RK3399_LINUX4.19_SDK_V1.0.0_20210520.tgz -C rk3399
+cd rk3399
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
 ```
@@ -137,79 +133,44 @@ cd rk356x
 
 ### 芯片资料
 
-为帮助开发工程师更快上手熟悉 RK3566、RK3568 的开发调试工作，随 SDK 发布 《Rockchip_RK3566_Datasheet_V1.1_20210305.pdf》和《Rockchip_RK3568_Datasheet_V1.1_20210305.pdf》芯片手册。
-
-### NPU 开发工具
-
-本 SDK NPU 开发工具如下：
-
-**RKNN-TOOLKIT2** ：
-开发工具在 external/rknn-toolkit2 目录下，主要用来实现模型转换，模型推理，模型性能评估功能等，具体使用说明请参考当前 doc/ 的目录文档：
-
-```
-├── RKNNToolKit2_OP_Support_v1.0.0.md
-├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v1.0.0.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v1.0.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v1.0.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v1.0.0.pdf
-├── changelog_v1.0.0.txt
-└── requirements_v1.0.0.txt
-```
-
-**RKNN-DRIVER**：
-RKNN DRIVER 开发内容在工程目录 external/rknpu/rknnrt/lib/linux-aarch64/driver/ 下。
-
-**RKNN API**：
-RKNN API的开发使用在工程目录 external/rknpu2下，用于推理RKNN-Toolkit2生成的rknn模型。
-具体使用说明请参考当前 doc/ 的目录文档：
-
-```
-├── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_CN.pdf
-└── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_EN.pdf
-```
+为帮助开发工程师更快上手熟悉 RK3399 的开发调试工作，随 SDK 发布 《Rockchip_RK3399_Datasheet_V2.1_20200323.pdff》芯片手册。
 
 ### 软件更新记录
 
 软件发布版本升级通过工程 xml 进行查看，具体方法如下：
 
 ```
-.repo/manifests$ realpath rk356x_linux_release.xml
-# 例如:打印的版本号为v1.1.0，更新时间为20210520
-# <SDK>/.repo/manifests/rk356x_linux_release_v1.1.0_20210520.xml
-```
-
-软件发布版本升级更新内容通过工程文本可以查看，具体方法如下：
-
-```
-.repo/manifests$ cat RK356X_Linux_SDK_Note.md
+.repo/manifests$ realpath rk3399_linux4.19_release.xml
+# 例如:打印的版本号为v1.0.0，更新时间为20210520
+# <SDK>/.repo/manifests/rk3399_linux4.19_release_v1.0.0_20210520.xml
 ```
 
 或者参考工程目录：
 
 ```
-<SDK>/docs/RK356X/RK356X_Linux_SDK_Note.md
+<SDK>/docs/RK3399/RK3399_Linux4.19_SDK_Note.md
 ```
 
 ## 硬件开发指南
 
 硬件相关开发可以参考用户使用指南，在工程目录：
 
-RK3566 EVB 硬件开发指南：
+RK3399 硬件设计指南：
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3566_EVB2_User_Guide_V1.1_CN.pdf
+<SDK>/docs/RK3399/Rockchip_RK3399_Hardware_Design_Guide_V1.3_CN.pdf
 ```
 
-RK3568 EVB硬件开发指南：
+RK3399 挖掘机硬件开发指南：
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3568_EVB_User_Guide_V1.0_CN.pdf
+<SDK>/docs/RK3399/Rockchip_RK3399_User_Manual_Excavator_EVB_V3.0_CN.pdf
 ```
 
-RK3568 NVR硬件开发指南：
+RK3399 IND 行业板硬件开发指南：
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3568_NVR_DEMO_User_Guide_V1.2_CN.pdf
+<SDK>/docs/RK3399/Rockchip_RK3399_User_Manual_IND_EVB_V1.1.pdf
 ```
 
 ## IO电源设计注意事项
@@ -219,7 +180,7 @@ RK3568 NVR硬件开发指南：
 更多信息参考：
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK356X_Introduction_IO_Power_Domains_Configuration.pdf
+<SDK>/docs/RK3399/Rockchip_RK3399_Introduction_IO_Power_Domains_Configuration.pdf
 <SDK>/docs/Common/IO-DOMAIN/Rockchip_Developer_Guide_Linux_IO_DOMAIN_CN.pdf
 ```
 
@@ -240,7 +201,7 @@ SDK目录包含有 buildroot、debian、recovery、app、kernel、u-boot、devic
 - rockdev：存放编译输出固件。
 - tools：存放 Linux 和 Window 操作系统下常用工具。
 - u-boot：存放基于 v2017.09 版本进行开发的 U-Boot 代码。
-- yocto：存放基于 Yocto 3.2 开发的根文件系统。
+- yocto：存放基于 Yocto Gatesgarth 3.2 开发的根文件系统。
 
 ## SDK 编译说明
 
@@ -262,92 +223,54 @@ device-tree-compiler python-pip ncurses-dev pyelftools \
 
 ### SDK板级配置
 
-进入工程<SDK>/device/rockchip/rk356x 目录：
+进入工程<SDK>/device/rockchip/rk3399 目录：
 
 | 板级配置                       | 说明                                               |
 | ----------------------------- | --------------------------------------------------- |
-| BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk |   适用于 RK3566 EVB 搭配 LPDDR4 开发板，运行32位根文件系统  |
-| BoardConfig-rk3566-evb2-lp4x-v10.mk  |   适用于 RK3566 EVB 搭配 LPDDR4 开发板  |
-| BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk|   适用于 RK3568 EVB 搭配 LPDDR4 开发板，运行32位根文件系统  |
-| BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk |  适用于 RK3568 EVB 搭配 DDR4/SPI NOR 开发板  |
-| BoardConfig-rk3568-evb1-ddr4-v10.mk  |  适用于 RK3568 EVB 搭配 DDR4 开发板  |
-| BoardConfig-rk3568-nvr-spi-nand.mk  |  适用于 RK3568 NVR 搭配SPI NAND 开发板 |
-| BoardConfig-rk3568-nvr.mk  |  适用于 RK3568 NVR 开发板 |
-| BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk  |  适用于 RK3568 UVC 开发板 |
-| BoardConfig.mk  |  默认配置 |
+| BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk  |   适用于 RK3399 IND 行业板  |
+| BoardConfig-rk3399-firefly-k4.19.mk    |  适用于 RK3399 Firefly 开发板  |
+| BoardConfig-rk3399-sapphire-excavator-k4.19.mk  |  适用于 RK3399 挖掘机开发板 |
 
 方法1
 `./build.sh` 后面加上板级配置文件, 例如：
 
-选择**RK3566 EVB 搭配 LPDDR4 开发板，运行32位根文件系统**的板级配置：
+选择**RK3399 IND**的板级配置：
 
 ```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
+./build.sh device/rockchip/rk3399/BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk
 ```
 
-选择**RK3566 EVB 搭配 LPDDR4 开发板**的板级配置：
+选择**RK3399 Firefly 开发板**的板级配置：
 
 ```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10.mk
+./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly-k4.19.mk
 ```
 
-选择**RK3568 EVB 搭配 DDR4/SPI NOR 开发板**的板级配置：
+选择**RK3399 挖掘机开发板**的板级配置：
 
 ```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
-```
-
-选择**RK3568 EVB 搭配 DDR4 开发板，运行32位根文件系统**的板级配置：
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
-```
-
-选择**RK3568 EVB 搭配 DDR4 开发板**的板级配置：
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk
-```
-
-选择**RK3568 NVR 搭配SPI NAND 开发板**的板级配置：
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr-spi-nand.mk
-```
-
-选择**RK3568 NVR 开发板**的板级配置：
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr.mk
-```
-
-选择**RK3568 UVC 开发板**的板级配置：
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk
+./build.sh device/rockchip/rk3399/BoardConfig-rk3399-sapphire-excavator-k4.19.mk
 ```
 
 方法2
 
 ```shell
-rk356x$ ./build.sh lunch
+rk3399$ ./build.sh lunch
 processing option: lunch
 
 You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
-2. BoardConfig-rk3566-evb2-lp4x-v10.mk
-3. BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
-4. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
-5. BoardConfig-rk3568-evb1-ddr4-v10.mk
-6. BoardConfig-rk3568-nvr-spi-nand.mk
-7. BoardConfig-rk3568-nvr.mk
-8. BoardConfig-rk3568-sv21-ddr4-v10.mk
-9. BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk
-10. BoardConfig.mk
-Which would you like? [0]:
+1. BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk
+2. BoardConfig-rk3399-evb-ind-lpddr4.mk
+3. BoardConfig-rk3399-firefly-k4.19.mk
+4. BoardConfig-rk3399-firefly.mk
+5. BoardConfig-rk3399-sapphire-excavator-k4.19.mk
+6. BoardConfig-rk3399-sapphire-excavator-lp4.mk
+7. BoardConfig-rk3399-sapphire-excavator.mk
+8. BoardConfig.mk
+
 ```
 
 ### 查看编译命令
@@ -355,7 +278,7 @@ Which would you like? [0]:
 在根目录执行命令：./build.sh -h|help
 
 ```shell
-rk356x$ ./build.sh -h
+rk3399$ ./build.sh -h
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
@@ -371,7 +294,7 @@ buildroot          -build buildroot rootfs
 ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
-debian             -build debian10 buster/x11 rootfs
+debian             -build debian rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
@@ -381,7 +304,6 @@ updateimg          -pack update image
 otapackage         -pack ab update otapackage image
 save               -save images, patches, commands used to debug
 allsave            -build all & firmware & updateimg & save
-check              -check the environment of building
 
 Default option is 'allsave'.
 ```
@@ -389,11 +311,11 @@ Default option is 'allsave'.
 查看部分模块详细编译命令，例如：./build.sh -h kernel
 
 ```shell
-rk356x$ ./build.sh -h kernel
+rk3399$ ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 cd kernel
-make ARCH=arm64 rockchip_linux_defconfig rockchip_linux_bifrost.config
-make ARCH=arm64 rk3568-evb1-ddr4-v10-linux.img -j12
+make ARCH=arm64 rockchip_linux_defconfig
+make ARCH=arm64 rk3399-evb-ind-lpddr4-linux.img -j12
 ```
 
 [^注]: 详细的编译命令以实际对应的SDK版本为准，主要是配置可能会有差异。build.sh编译命令是固定的。
@@ -469,7 +391,7 @@ $./build.sh
 
 #### Buildroot 的交叉编译
 
-若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。比如RK3568,其交叉编译工具位于 buildroot/output/rockchip_rk3368/host/usr 目录下，需要将工具的bin/目录和 aarch64-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
+若需要编译单个模块或者第三方应用，需对交叉编译环境进行配置。交叉编译工具位于 buildroot/output/rockchip_rk3399_4.19/host/usr 目录下，需要将工具的bin/目录和 aarch64-buildroot-linux-gnu/bin/ 目录设为环境变量，在顶层目录执行自动配置环境变量的脚本（只对当前控制台有效）：
 
 ```shell
 source envsetup.sh
@@ -478,7 +400,7 @@ source envsetup.sh
 输入命令查看：
 
 ```shell
-cd buildroot/output/rockchip_rk3568/host/usr/bin
+cd buildroot/output/rockchip_rk3399_4.19/host/usr/bin
 ./aarch64-linux-gcc --version
 ```
 
@@ -509,7 +431,7 @@ SDK$make qplayer-rebuild
 ```
 SDK$make qplayer-dirclean
 或者
-SDK$rm -rf /buildroot/output/rockchip_rk3568/build/qlayer-1.0
+SDK$rm -rf /buildroot/output/rockchip_rk3399_4.19/build/qlayer-1.0
 ```
 
 #### Debian 编译
@@ -600,7 +522,7 @@ VERSION=debug ARCH=arm64 ./mk-rootfs-buster.sh
 #### Yocto 编译
 
 进入工程目录根目录执行以下命令自动完成 Rootfs 的编译及打包：
-RK3566/RK3568 EVB 开发板：
+RK3399 EVB 开发板：
 
 ```shell
 ./build.sh yocto
@@ -640,17 +562,13 @@ Yocto 更多信息请参考 [Rockchip Wiki](http://opensource.rock-chips.com/wik
 
 ## 刷机说明
 
-RK3566 EVB2 接口分布图如下：
+RK3399 挖掘机接口分布图如下：
 
-![RK3566-EVB2](resources/EVB2.png)
+![RK3399-Sapphire](resources/RK3399-Sapphire.png)
 
-RK3568 EVB1 开发板接口分布图如下：
+RK3399 IND 行业板接口分布图如下：
 
-![RK3568-EVB1](resources/EVB1.png)
-
-RK3568 NVR 开发板接口分布图如下：
-
-![RK3568-NVR](resources/NVR.png)
+![RK3399-IND](resources/RK3399-IND.png)
 
 ### Windows 刷机说明
 
@@ -675,12 +593,13 @@ MASKROM 模式，加载编译生成固件的相应路径后，点击“执行”
 
 ### Linux 刷机说明
 
-Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.57 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
+Linux 下的烧写工具位于 tools/linux 目录下(Linux_Upgrade_Tool 工具版本需要 V1.65 或以上)，请确认你的板子连接到 MASKROM/loader rockusb。比如编译生成的固件在 rockdev 目录下，升级命令如下：
 
 ```shell
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
 sudo ./upgrade_tool di -p rockdev/parameter.txt
 sudo ./upgrade_tool di -u rockdev/uboot.img
+sudo ./upgrade_tool di -t rockdev/trust.img
 sudo ./upgrade_tool di -misc rockdev/misc.img
 sudo ./upgrade_tool di -b rockdev/boot.img
 sudo ./upgrade_tool di -recovery rockdev/recovery.img
@@ -704,29 +623,31 @@ sudo ./upgrade_tool uf rockdev/update.img
 
 ### 系统分区说明
 
-默认分区说明 ( 下面是 RK3568 EVB 分区参考）
+默认分区说明 ( 下面是 RK3399 IND 分区参考）
 
 | **Number** | **Start (sector)** | **End (sector)** | **Size** | **Name** |
 | ---------- | ------------------ | --------------- | --------- | --------- |
 | 1      | 16384  | 24575     |  4096K     |uboot     |
-| 2      | 24576  | 32767     |  4096K     |misc     |
-| 3      | 32768  | 98303     |  32M    |boot     |
-| 4      | 98304  | 163839     |  32M     |recovery     |
-| 5      | 163840  | 229375     |  32M     |bakcup     |
-| 6      | 229376  | 12812287     |  6144M     |rootfs     |
-| 7      | 12812288  | 13074431     |  128M     |oem     |
-| 8      | 13074432  | 61071326     |  22.8G     |userdata     |
+| 2      | 24576  | 32767     |  4096K     |trust     |
+| 3      | 32768  | 40959     |  4096K     |misc     |
+| 4      | 40960  | 106495     |  32M     |boot     |
+| 5      | 106496  | 303104     |  32M     |recovery     |
+| 6      | 172032  | 237567     |  32M     |bakcup     |
+| 7      | 237568  | 368639     |  64M     |oem     |
+| 8      | 368640  | 12951551     |  6144M     |rootfs     |
+| 9      | 12951552  | 30535646     |  8585M     |userdata     |
 
 - uboot 分区：供 uboot 编译出来的 uboot.img。
+- trust 分区：供 uboot 编译出来的 trust.img。
 - misc 分区：供 misc.img，给 recovery 使用。
 - boot 分区：供 kernel 编译出来的 boot.img。
 - recovery 分区：供 recovery 编译出的 recovery.img。
 - backup 分区：预留，暂时没有用，后续跟 Android 一样作为 recovery 的 backup 使用。
-- rootfs 分区：供 buildroot、debian 或 yocto 编出来的 rootfs.img。
 - oem 分区：给厂家使用，存放厂家的 APP 或数据。挂载在 /oem 目录。
+- rootfs 分区：供 buildroot、debian 或 yocto 编出来的 rootfs.img。
 - userdata 分区：供 APP 临时生成文件或给最终用户使用，挂载在 /userdata 目录下。
 
-## RK356X SDK 固件
+## RK3399 SDK 固件
 
 - 百度云网盘
 

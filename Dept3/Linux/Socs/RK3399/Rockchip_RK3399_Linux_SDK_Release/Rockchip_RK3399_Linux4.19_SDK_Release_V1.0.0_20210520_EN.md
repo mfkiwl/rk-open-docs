@@ -1,8 +1,8 @@
-# Rockchip RK356X Linux SDK Release Note
+# Rockchip RK3399 Linux4.19 SDK Release Note
 
-ID: RK-FB-YF-392
+ID: RK-FB-CS-002
 
-Release Version: V1.1.0
+Release Version: V1.0.0
 
 Release Date: 2021-05-20
 
@@ -38,7 +38,7 @@ Customer service e-Mail:  [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 **Overview**
 
-The document presents Rockchip RK3566/RK3568 Linux SDK release notes, aiming to help engineers get started with  RK3566/RK3568 Linux SDK development and debugging faster.
+The document presents Rockchip RK3399 Linux4.19 SDK release notes, aiming to help engineers get started with RK3399 Linux SDK development and debugging faster.
 
 **Intended Audience**
 
@@ -50,10 +50,9 @@ Software development engineers
 
 **Chipset and System Support**
 
-| **Chipset** | **Buildroot** | **Debian 10** | **Yocto** |
-| ----------- | :------------ | :------------ | :-------- |
-| RK3566   | Y               | Y           | Y           |
-| RK3568   | Y               | Y           | Y           |
+| **Chipset**  | **Buildroot Version** | **Debian Version** | **Yocto Version** | **Kernel Version** |
+| :---------: | :-------------------: | :----------------: | :---------------: | :---------------: |
+|   RK3399    |      2018.02-rc3      |         10         |        3.2        | 4.19 |
 
 ---
 
@@ -61,10 +60,7 @@ Software development engineers
 
 | **Date** | **Version** | **Author** | **Revision History** |
 | -----------| :-------------- | :------------- | :---------- |
-| 2020-12-11 | V0.0.1 | Caesar Wang | Initial version |
-| 2021-01-18 | V0.1.0 | Caesar Wang | Beta version |
-| 2021-04-10 | V1.0.0 | Caesar Wang | Release version |
-| 2021-05-20 | V1.1.0 | Caesar Wang | Upgrade RKNN to 1.0.0.<br />Update  Hardware/Software Development Guide<br />Add  precaution of GPIO power design |
+| 2021-05-20 | V1.0.0 | Caesar Wang | Initial release version |
 
 ---
 
@@ -76,31 +72,31 @@ Software development engineers
 
 ## Overview
 
-This SDK is based on Buildroot 2018.02-rc3, Yocto 3.2, and Debian 10 or later version with kernel 4.19 and U-boot v2017.09. It is suitable for RK3566/RK3568 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, NPU, QT and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
+This SDK is based on Buildroot 2018.02-rc3, Yocto 3.2, and Debian 10 or later version with kernel 4.19 and U-boot v2017.09. It is suitable for RK3399 EVB development boards and all other Linux products developed based on it. This SDK supports VPU hardware decoding, GPU 3D, Wayland/X11 display, Qt and other function. For detailed functions debugging and interface introductions, please refer to the documents under the project's docs/ directory.
 
 ## Main Functions
 
 | **Functions** | **Module Name** |
 | ----------- | :-------------- |
-| Data Communication | Wi-Fi, Ethernet Card, USB, SDCARD, SATA，PCI-e |
+| Data Communication | Wi-Fi, Ethernet Card, USB, SDCARD, PCI-e |
 | Applications | Multimedia playback, settings, browser, file management |
 
 ## How to Get the SDK
 
 The SDK is released by Rockchip server. Please refer to Chapter 7 [SDK Building Introduction](# SDK Building Introduction) to build a development environment.
 
-### General RK356X Linux SDK Obtain
+### General RK3399 Linux SDK Obtain
 
 #### Get Source Code from Rockchip Code Server
 
-To get RK356X Linux software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window. About Rockchip server SSH public key authorization, please refer to Chapter 10  [SSH  Public Key Operation Introduction](# Public Key Operation Introduction).
+To get RK3399 Linux software package, customers need an account to access the source code repository provided by Rockchip. In order to be able to obtain code synchronization, please provide SSH public key for server authentication and authorization when apply for SDK from Rockchip technical window. About Rockchip server SSH public key authorization, please refer to Chapter 10  [SSH  Public Key Operation Introduction](# Public Key Operation Introduction).
 
-RK356X_Linux_SDK  download command is as follows：
+RK3399_Linux_SDK  download command is as follows：
 
 ```shell
 repo init --repo-url ssh://git@www.rockchip.com.cn/repo/rk/tools/repo -u \
 ssh://git@www.rockchip.com.cn/linux/rockchip/platform/manifests -b linux -m \
-rk356x_linux_release.xml
+rk3399_linux4.19_release.xml
 ```
 
 Repo, a tool built on Python script by Google to help manage git repositories, is mainly used to download and manage software repository of projects. The download address is as follows:
@@ -112,12 +108,12 @@ git clone ssh://git@www.rockchip.com.cn/repo/rk/tools/repo
 #### Get Source Code from Local Compression Package
 
 For quick access to SDK source code, Rockchip Technical Window usually provides corresponding version of SDK initial compression package. In this way, developers can get SDK source code through decompressing the initial compression package, which is the same as the one downloaded by repo.
-Take RK356X_LINUX_SDK_V1.1_20210520.tgz as an example. After geting a initialization package, you can get source code by running the following command:
+Take RK3399_LINUX4.19_SDK_V1.0.0_20210520.tgz as an example. After geting a initialization package, you can get source code by running the following command:
 
 ```shell
-mkdir rk356x
-tar xvf RK356X_LINUX_SDK_V1.1_20210520.tgz -C rk356x
-cd rk356x
+mkdir rk3399
+tar xvf RK3399_LINUX4.19_SDK_V1.0.0_20210520.tgz -C rk3399
+cd rk3399
 .repo/repo/repo sync -l
 .repo/repo/repo sync -c --no-tags
 ```
@@ -132,79 +128,38 @@ Aiming to help engineers get started with SDK development and debugging faster, 
 
 ### Chip datasheet
 
-Aiming to help engineers get started with RK3566/RK3568 development and debugging faster. We have released "Rockchip_RK3566_Datasheet_V1.1_20210305.pdf" and "Rockchip_RK3568_Datasheet_V1.1_20210305.pdf".
-
-### NPU Development Tool
-
-The SDK NPU development tool includes following items:
-
-**RKNN-TOOLKIT2** ：
-Development tools are in project directory “external/rknn-toolkit2”. Which is used for model conversion, model reasoning, model performance evaluation functions, etc. Please refer to documents in the docs/ directory for details.
-
-```
-├── RKNNToolKit2_OP_Support_v1.0.0.md
-├── Rockchip_Quick_Start_RKNN_Toolkit2_CN_v1.0.0.pdf
-├── Rockchip_Quick_Start_RKNN_Toolkit2_EN_v1.0.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_CN_v1.0.0.pdf
-├── Rockchip_User_Guide_RKNN_Toolkit2_EN_v1.0.0.pdf
-├── changelog_v1.0.0.txt
-└── requirements_v1.0.0.txt
-```
-
-**RKNN-DRIVER**:
-RKNN DRIVER development materials are in the project directory “external/rknpu/rknnrt/lib/linux-aarch64/driver/”.
-
-**RKNN API**:
-RKNN API development materials are in the project directory “external/rknpu2”.
-Please refer to documents in the docs/ directory for details.
-
-```
-├── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_CN.pdf
-└── Rockchip_RK356X_User_Guide_RKNN_API_V1.0.0_EN.pdf
-```
+Aiming to help engineers get started with RK3399 development and debugging faster. We have released "Rockchip_RK3399_Datasheet_V2.1_20200323.pdf".
 
 ### Software Update History
 
 Software release version upgrade can be checked through project xml file by the following command:
 
 ```shell
-.repo/manifests$ realpath rk356x_linux_release.xml
-# e.g.:printf version v1.1.0，update time on 20210520
-# <SDK>/.repo/manifests/rk356x_linux_release_v1.1.0_20210520.xml
-```
-
-Software release version updated information can be checked through the project text file by the following command:
-
-```shell
-.repo/manifests$ cat RK356X_Linux_SDK_Note.md
+.repo/manifests$ realpath rk3399_linux_release.xml
+# e.g.:printf version v2.7.0，update time is 20210520
+# <SDK>/.repo/manifests/rk3399_linux_release_v2.7.0_20210520.xml
 ```
 
 Or refer to the project directory:
 
 ```shell
-<SDK>/docs/RK356X/RK356X_Linux_SDK_Note.md
+<SDK>/docs/RK3399/RK3399_Linux_SDK_Note.md
 ```
 
 ## Hardware Development Guide
 
 Please refer to user guides in the project directory for hardware development:
 
-RK3566 EVB hardware development guide:
+RK3399 excavator hardware development guide:
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3566_EVB2_User_Guide_V1.1_EN.pdf
+<SDK>/docs/RK3399/Rockchip_RK3399_User_Manual_Sapphire_EVB_V3.0_CN.pdf
 ```
 
-RK3568 EVB hardware development guide:
+RK3399 IND industry board hardware development guide:
 
 ```
-<SDK>/docs/RK356X/Rockchip_RK3568_EVB_User_Guide_V1.0_EN.pdf
-```
-
-RK3568 NVR hardware development guide:
-
-```
-<SDK>/docs/RK356X/Rockchip_RK3568_NVR_DEMO_User_Guide_V1.2_CN.pdf
+<SDK>/docs/RK3399/Rockchip_RK3399_User_Manual_IND_EVB_V1.1_EN.pdf
 ```
 
 ## The Precaution of IO Power Design
@@ -213,10 +168,12 @@ RK3568 NVR hardware development guide:
 
 Please refer to the following documents for details:
 
- ```
- <SDK>/docs/RK356X/Rockchip_RK356X_Introduction_IO_Power_Domains_Configuration.pdf
- <SDK>/docs/Common/IO-DOMAIN/Rockchip_Developer_Guide_Linux_IO_DOMAIN_CN.pdf
- ```
+```
+<SDK>/docs/RK3399/Rockchip_RK3399_Introduction_IO_Power_Domains_Configuration.pdf
+<SDK>/docs/Common/IO-DOMAIN/Rockchip_Developer_Guide_Linux_IO_DOMAIN_CN.pdf
+```
+
+## SDK Project Directory Introduction
 
 ## SDK Project Directory Introduction
 
@@ -259,86 +216,55 @@ It is recommended to use Ubuntu 18.04 system or higher version for development. 
 
 ### SDK Board Level Configuration
 
-Enter the project  SDK/device/rockchip/rk356x directory:
+Enter the project  SDK/device/rockchip/rk3399 directory:
 
 | Board level configuration | Note                                            |
 | ----------------------------- | --------------------------------------------------- |
-| BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk  | Suitable for RK3566 EVB development board with LPDDR4 running on 32bit filesystem  |
-| BoardConfig-rk3566-evb2-lp4x-v10.mk  | Suitable for RK3566 EVB development board with LPDDR4  |
-| BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk    | Suitable for RK3568 development boards with DDR4 and SPI NOR |
-| BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk    | Suitable for RK3568 development boards with DDR4 running on 32bit filesystem  |
-| BoardConfig-rk3568-evb1-ddr4-v10.mk    | Suitable for RK3568 development boards with DDR4 |
-| BoardConfig-rk3568-nvr-spi-nand.mk  | Suitable for RK3568 NVR with SPI NAND development board |
-| BoardConfig-rk3568-nvr.mk  | Suitable for RK3568 NVR development board |
-| BoardConfig.mk   | Default |
+| BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk  | Suitable for RK3399 industry development board  |
+| BoardConfig-rk3399-firefly-k4.19.mk    | Suitable for RK3399 firefly development boards |
+| BoardConfig-rk3399-sapphire-excavator-k4.19.mk  |  Suitable for RK3399 sapphire excavator development board  |
 
 The first way:
 
 Add board configuration file behind `/build.sh` , for example:
 
-Select the board configuration of  **RK3566 EVB development board with running on 32bit filesystem**:
+Select the board configuration of  **RK3399 industry development board**:
 
 ```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
+./build.sh device/rockchip/rk3399/BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk
 ```
 
-Select the board configuration of  **RK3566 EVB development board**:
+Select the board configuration of the **RK3399 firefly development board**:
 
 ```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3566-evb2-lp4x-v10.mk
+./build.sh device/rockchip/rk3399/BoardConfig-rk3399-firefly-k4.19.mk
 ```
 
-Select the board configuration of the **RK3568 EVB  with SPI NOR development board**:
+Select the board-level configuration of the **RK3399 sapphire excavator development board**:
 
 ```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
-```
-
-Select the board configuration of the **RK3568 EVB development board with with running on 32bit filesystem**:
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
-```
-
-Select the board configuration of the **RK3568 EVB development board**:
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-evb1-ddr4-v10.mk
-```
-
-Select the board-level configuration of the **RK3568 NVR with SPI NAND development board**:
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr-spi-nand.mk
-```
-
-Select the board-level configuration of the **RK3568 NVR development board**:
-
-```shell
-./build.sh device/rockchip/rk356x/BoardConfig-rk3568-nvr.mk
+./build.sh device/rockchip/rk3399/BoardConfig-rk3399-sapphire-excavator-k4.19.mk
 ```
 
 The second way:
 
 ```shell
-rk356x$ ./build.sh lunch
+rk3399$ ./build.sh lunch
 processing option: lunch
 
 You're building on Linux
 Lunch menu...pick a combo:
 
 0. default BoardConfig.mk
-1. BoardConfig-rk3566-evb2-lp4x-v10-32bit.mk
-2. BoardConfig-rk3566-evb2-lp4x-v10.mk
-3. BoardConfig-rk3568-evb1-ddr4-v10-32bit.mk
-4. BoardConfig-rk3568-evb1-ddr4-v10-spi-nor-64M.mk
-5. BoardConfig-rk3568-evb1-ddr4-v10.mk
-6. BoardConfig-rk3568-nvr-spi-nand.mk
-7. BoardConfig-rk3568-nvr.mk
-8. BoardConfig-rk3568-sv21-ddr4-v10.mk
-9. BoardConfig-rk3568-uvc-evb1-ddr4-v10.mk
-10. BoardConfig.mk
-Which would you like? [0]:
+1. BoardConfig-rk3399-evb-ind-lpddr4-k4.19.mk
+2. BoardConfig-rk3399-evb-ind-lpddr4.mk
+3. BoardConfig-rk3399-firefly-k4.19.mk
+4. BoardConfig-rk3399-firefly.mk
+5. BoardConfig-rk3399-sapphire-excavator-k4.19.mk
+6. BoardConfig-rk3399-sapphire-excavator-lp4.mk
+7. BoardConfig-rk3399-sapphire-excavator.mk
+8. BoardConfig.mk
+...
 ```
 
 ### Compilation Commands
@@ -346,7 +272,7 @@ Which would you like? [0]:
 Execute the command in the root directory: `./build.sh -h|help`
 
 ```shell
-rk356x$ ./build.sh -h
+rk3399$ ./build.sh -h
 Usage: build.sh [OPTIONS]
 Available options:
 BoardConfig*.mk    -switch to specified board config
@@ -362,7 +288,7 @@ buildroot          -build buildroot rootfs
 ramboot            -build ramboot image
 multi-npu_boot     -build boot image for multi-npu board
 yocto              -build yocto rootfs
-debian             -build debian10 buster/x11 rootfs
+debian             -build debian rootfs
 pcba               -build pcba
 recovery           -build recovery
 all                -build uboot, kernel, rootfs, recovery image
@@ -372,7 +298,6 @@ updateimg          -pack update image
 otapackage         -pack ab update otapackage image
 save               -save images, patches, commands used to debug
 allsave            -build all & firmware & updateimg & save
-check              -check the environment of building
 
 Default option is 'allsave'.
 ```
@@ -380,11 +305,11 @@ Default option is 'allsave'.
 View detailed build commands for some modules, for example: `./build.sh -h kernel`
 
 ```shell
-rk356x$ ./build.sh -h kernel
+rk3399$ ./build.sh -h kernel
 ###Current SDK Default [ kernel ] Build Command###
 cd kernel
-make ARCH=arm64 rockchip_linux_defconfig rockchip_linux_bifrost.config
-make ARCH=arm64 rk3568-evb1-ddr4-v10-linux.img -j12
+make ARCH=arm64 rockchip_linux_defconfig
+make ARCH=arm64 rk3399-evb-ind-lpddr4-linux.img -j12
 ```
 
 [^note]: The detailed compilation commands should depending on corresponding SDK version, and there may be some differences between configurations. But the build.sh build command is fixed.
@@ -460,7 +385,7 @@ After build, rootfs.ext4 is generated in Buildroot directory “output/rockchip_
 
 ##### Buildroot Cross Compilation
 
-If you need to build a single module or a third-party application, you need to setup the cross compilation environment. Says RK3568 EVB, Cross compilation tool is located in “buildroot/output/rockchip_rk3568/host/usr” directory. You need to set bin/ directory of tools and aarch64-buildroot-linux-gnu/bin/ directory to environment variables, and execute auto-configuration environment variable script in the top-level directory (only valid for current console):
+If you need to build a single module or a third-party application, you need to setup the cross compilation environment. Cross compilation tool is located in “buildroot/output/rockchip_rk3399_4.19/host/usr” directory. You need to set bin/ directory of tools and aarch64-buildroot-linux-gnu/bin/ directory to environment variables, and execute auto-configuration environment variable script in the top-level directory (only valid for current console):
 
 ```shell
 source envsetup.sh
@@ -469,7 +394,7 @@ source envsetup.sh
 Enter the command to check:
 
 ```shell
-cd buildroot/output/rockchip_rk3568/host/usr/bin
+cd buildroot/output/rockchip_rk3399_4.19/host/usr/bin
 ./aarch64-linux-gcc --version
 ```
 
@@ -500,7 +425,7 @@ SDK$make qplayer-rebuild
 ```
 SDK$make qplayer-dirclean
 or
-SDK$rm -rf /buildroot/output/rockchip_rk356*/build/qlayer-1.0
+SDK$rm -rf /buildroot/output/rockchip_rk3399_4.19/build/qlayer-1.0
 ```
 
 #### Debian Building
@@ -592,7 +517,7 @@ The linaro-rootfs.img will be generated.
 
 Enter project root directory and execute the following commands to automatically complete compiling and packaging Rootfs.
 
-RK3566/RK3568 EVB boards：
+RK3399 EVB boards：
 
 ```shell
 ./build.sh yocto
@@ -621,7 +546,7 @@ Or refer to[setup-locale-python3]( https://webkul.com/blog/setup-locale-python3)
 
 Please refer to  [Rockchip Wiki](http://opensource.rock-chips.com/wiki_Yocto) for more detailed information of Yocto.
 
-#### Firmware Package
+##### Firmware Package
 
 After compiling various parts of Kernel/U-Boot/Recovery/Rootfs above, enter root directory of project directory and run the following command to automatically complete all firmware packaged into rockdev directory:
 
@@ -633,19 +558,15 @@ Firmware generation:
 
 ## Upgrade Introduciton
 
- Interfaces layout of RK3566 EVB board are showed as follows:
+ Interfaces layout of RK3399 excavator are showed as follows:
 
-![RK3566-EVB2](resources/EVB2.png)
+![RK3399-Sapphire](resources/RK3399-SapphireEN.png)
 
-Interfaces layout of RK3568 EVB board are showed as follows:
+Interfaces layout of RK3399 IND industry board are showed as follows:
 
-![RK3568-EVB1](resources/EVB1.png)
+![RK3399-INDEN](resources/RK3399-INDEN.png)
 
-Interfaces layout of RK3568 EVB board are showed as follows:
-
-![RK3568-NVR](resources/NVR.png)
-
-### Windows Upgrade Introduction
+### Windows  Upgrade Introduction
 
 SDK provides windows upgrade tool (this tool should be V2.84 or later version) which is located in project root directory:
 
@@ -672,6 +593,7 @@ The Linux upgrade tool (Linux_Upgrade_Tool should be v1.65 or later versions) is
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
 sudo ./upgrade_tool di -p rockdev/parameter.txt
 sudo ./upgrade_tool di -u rockdev/uboot.img
+sudo ./upgrade_tool di -t rockdev/trust.img
 sudo ./upgrade_tool di -misc rockdev/misc.img
 sudo ./upgrade_tool di -b rockdev/boot.img
 sudo ./upgrade_tool di -recovery rockdev/recovery.img
@@ -695,20 +617,22 @@ Or in root directory, run the following command on the machine to upgrade in MAS
 
 ### System Partition Introduction
 
-Default partition introduction (below is RK3568 EVB reference partition):
+Default partition introduction (below is RK3399 IND reference partition):
 
 | **Number** | **Start (sector)** | **End (sector)** | **Size** | **Name** |
 | ---------- | ------------------ | --------------- | --------- | --------- |
 | 1      | 16384  | 24575     |  4096K     |uboot     |
-| 2      | 24576  | 32767     |  4096K     |misc     |
-| 3      | 32768  | 98303     |  32M    |boot     |
-| 4      | 98304  | 163839     |  32M     |recovery     |
-| 5      | 163840  | 229375     |  32M     |bakcup     |
-| 6      | 229376  | 12812287     |  6144M     |rootfs     |
-| 7      | 12812288  | 13074431     |  128M     |oem     |
-| 8      | 13074432  | 61071326     |  22.8G     |userdata     |
+| 2      | 24576  | 32767     |  4096K     |trust     |
+| 3      | 32768  | 40959     |  4096K     |misc     |
+| 4      | 40960  | 106495     |  32M     |boot     |
+| 5      | 106496  | 303104     |  32M     |recovery     |
+| 6      | 172032  | 237567     |  32M     |bakcup     |
+| 7      | 237568  | 368639     |  64M     |oem     |
+| 8      | 368640  | 12951551     |  6144M     |rootfs     |
+| 9      | 12951552  | 30535646     |  8585M     |userdata     |
 
 - uboot partition: for uboot.img built from uboot．
+- trust partition: for trust.img built from uboot．
 - misc partition: for misc.img built from recovery．
 - boot partition: for boot.img built from kernel．
 - recovery partition: for recovery.img built from recovery．
@@ -717,7 +641,7 @@ Default partition introduction (below is RK3568 EVB reference partition):
 - rootfs partition: store rootfs.img built from buildroot or debian.
 - userdata partition: store files temporarily generated by APP or for users, mounted in /userdata directory
 
-## RK356X SDK Firmware
+## RK3399 SDK Firmware
 
 - Baidu Cloud Disk
 
