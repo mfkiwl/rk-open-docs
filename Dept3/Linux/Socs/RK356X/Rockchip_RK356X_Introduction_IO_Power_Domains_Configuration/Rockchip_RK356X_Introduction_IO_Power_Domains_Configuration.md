@@ -2,9 +2,9 @@
 
 文档标识：RK-SM-YF-905
 
-发布版本：V1.0.0
+发布版本：V1.0.1
 
-日期：2021-05-15
+日期：2021-05-27
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -46,6 +46,26 @@ Rockchip Electronics Co., Ltd.
 
 主控电源域的IO电平要与对接外设芯片的IO电平保持一致,还要注意软件的电压配置要跟硬件的电压一致，否则，最坏的情况可能会导致IO的损坏。
 
+RK3566/RK3568共有10个独立的IO电源域，分别为PMUIO[0:2]和VCCIO[1:7]。其中:
+
+- PMUIO0、 PMUIO1为固定电平电源域，不可配置，其余IO domain均可进行配置；
+
+- PMUIO2和VCCIO1,VCCIO[3:7]电源域均要求硬件供电电压与软件的配置相匹配:
+
+  1) 当硬件IO电平接1.8V，软件电压配置也要相应配成1.8V;
+  2) 当硬件IO电平接3.3V，软件电压配置也要相应配成3.3V
+
+- VCCIO2电源域的供电与FLASH_VOL_SEL状态关系必须保持一致:
+
+  1) 当VCCIO2供电是1.8V，则FLASH_VOL_SEL管脚必须保持为高电平；
+  2) 当VCCIO2供电是3.3V，则FLASH_VOL_SEL管脚必须保持为低电平;
+
+[^注]: 否则：
+
+- 软件配置为1.8V，硬件供电3.3V，会使得IO处于过压状态，长期工作IO会损坏；
+
+- 软件配置为3.3V，硬件供电1.8V，IO功能会异常；
+
 本文主要描述了RK3566、RK3568平台Linux SDK配置IO电源域的方法，旨在帮助开发者正确配置IO的电源域。
 
 **产品版本**
@@ -62,11 +82,14 @@ Rockchip Electronics Co., Ltd.
 
 - 软件开发工程师
 
+- 硬件开发工程师
+
 **修订记录**
 
 | **版本号** | **作者** | **修改日期** | **修改说明** |
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0 | Caesar Wang | 2021-05-15 | 初始版本     |
+| V1.0.1 | Caesar Wang | 2021-05-27 | 更新IO电源域相关说明     |
 
 ---
 
@@ -86,32 +109,46 @@ Rockchip Electronics Co., Ltd.
 
 ## 第二步：查找对应的内核dts配置文件
 
-由第一步可知，该EVB板的硬件电源设计是带PMU方案的，对应的内核dts配置文件位于：arch/arm64/boot/dts/rockchip/rk3568-evb.dtsi （本文讨论的方案）
+由第一步可知，该EVB板的硬件电源设计是带PMU方案的，对应的内核dts配置文件位于：
+
+`<SDK>/kernel/arch/arm64/boot/dts/rockchip/rk3568-evb.dtsi` （本文讨论的方案）
 
 ## 第三步：修改内核dts的电源域配置节点pmu_io_domains
 
-```c
-&pmu_io_domains {
-        status = "okay";
-        pmuio1-supply = <&vcc3v3_pmu>;
-        pmuio2-supply = <&vcc3v3_pmu>;
-        vccio1-supply = <&vccio_acodec>;
-        vccio3-supply = <&vccio_sd>;
-        vccio4-supply = <&vcc_1v8>;
-        vccio5-supply = <&vcc_3v3>;
-        vccio6-supply = <&vcc_1v8>;
-        vccio7-supply = <&vcc_3v3>;
-};
+Kernel 第一次编译会强制去检查IO电源域的配置，代码实现在 `<SDK>/kernel/scripts/io-domain.sh`。检查项如下图
+
+![](resources/Domain-check.png)
+
+默认SDK对IO电源域配置是3.3V，正确检查步骤：
 
 ```
+查看硬件实际链接 -> 配置DTS -> 选择DTS对应的电源域电压
+```
 
-以**pmuio1-supply**为例，首先查看硬件原理图确认pmuio1电源域（PMUIO1）的配置如图所示。
+默认SDK选3.3V才可以编译通过。SDK对应内核dts的电源域配置如下：
 
-**PMUIO1** 配置的电源域为VCC3V3_PMU（即3.3v）。
+```c
+<SDK>/kernel/arch/arm64/boot/dts/rockchip/rk3568-evb.dtsi
 
-![](resources/PMUIO0_VDD_01.png)
+&pmu_io_domains {
+    status = "okay";
+    pmuio2-supply = <&vcc_3v3>;
+    vccio1-supply = <&vcc_3v3>;
+    vccio3-supply = <&vcc_3v3>;
+    vccio4-supply = <&vcc_3v3>;
+    vccio5-supply = <&vcc_3v3>;
+    vccio6-supply = <&vcc_3v3>;
+    vccio7-supply = <&vcc_3v3>;
+};
+```
 
-[注] 软件不配置vccio2_vdd，硬件根据实际存储接口IO电源域电平配置。
+以**pmuio2-supply**为例，首先查看硬件原理图确认pmuio2电源域（PMUIO2）的配置如图所示。
+
+**PMUIO2** 配置的电源域为VCC3V3_PMU（即3.3v）。
+
+![](resources/PMUIO2_VDD_01.png)
+
+[注] 软件不配置pmuio0,pmuio1和vccio2，硬件根据实际存储接口IO电源域电平配置。
 
 ## 第四步：SDK查看当前固件电源域配置
 
@@ -131,10 +168,10 @@ Rockchip Electronics Co., Ltd.
 
 ```shell
 # io -4 -r 0xFDC20140
-fdc20140:  00000050
+fdc20140:  00000000
 
 #  io -4 -r 0xFDC20144
-fdc20144:  000000af
+fdc20144:  000000ff
 
 # io -4 -r 0xFDC20148
 fdc20148:  00000030
