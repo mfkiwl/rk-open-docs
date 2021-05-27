@@ -1,12 +1,42 @@
-# **IO-Domain 开发指南**
+# IO-Domain 开发指南
 
-发布版本: 1.0
+文件标识：RK-KF-YF-085
 
-作者邮箱: david.wu@rock-chips.com
+发布版本：V1.0.1
 
-日期: 2019.01
+日期：2021-05-28
 
-文档密级：公开资料
+文件密级：□绝密   □秘密   □内部资料   ■公开
+
+**免责声明**
+
+本文档按“现状”提供，瑞芯微电子股份有限公司（“本公司”，下同）不对本文档的任何陈述、信息和内容的准确性、可靠性、完整性、适销性、特定目的性和非侵权性提供任何明示或暗示的声明或保证。本文档仅作为使用指导的参考。
+
+由于产品版本升级或其他原因，本文档将可能在未经任何通知的情况下，不定期进行更新或修改。
+
+**商标声明**
+
+“Rockchip”、“瑞芯微”、“瑞芯”均为本公司的注册商标，归本公司所有。
+
+本文档可能提及的其他所有注册商标或商标，由其各自拥有者所有。
+
+**版权所有 © 2021 瑞芯微电子股份有限公司**
+
+超越合理使用范畴，非经本公司书面许可，任何单位和个人不得擅自摘抄、复制本文档内容的部分或全部，并不得以任何形式传播。
+
+瑞芯微电子股份有限公司
+
+Rockchip Electronics Co., Ltd.
+
+地址：     福建省福州市铜盘路软件园A区18号
+
+网址：     [www.rock-chips.com](http://www.rock-chips.com)
+
+客户服务电话： +86-4007-700-590
+
+客户服务传真： +86-591-83951833
+
+客户服务邮箱： [fae@rock-chips.com](mailto:fae@rock-chips.com)
 
 ---
 
@@ -17,22 +47,22 @@
 **产品版本**
 
 | **芯片名称** | **内核版本** |
-| ------------ | ------------ | -------------------- |
-| RK3188       | 4.4          | rockchip-io-domain.c |
-| RK3288       | 4.4          | rockchip-io-domain.c |
-| RK3036       | 4.4          | rockchip-io-domain.c |
-| RK312x       | 4.4          | rockchip-io-domain.c |
-| RK322x       | 4.4          | rockchip-io-domain.c |
-| RK3368       | 3.10         | rockchip-io-domain.c |
-| RK3368       | 4.4          | rockchip-io-domain.c |
-| RK3366       | 4.4          | rockchip-io-domain.c |
-| RK3399       | 4.4          | rockchip-io-domain.c |
-| RV1108       | 3.10         | rockchip-io-domain.c |
-| RV1108       | 4.4          | rockchip-io-domain.c |
-| RK3228H      | 3.10         | rockchip-io-domain.c |
-| RK3328       | 4.4          | rockchip-io-domain.c |
-| RK3326/PX30  | 4.4          | rockchip-io-domain.c |
-| RK3308       | 4.4          | rockchip-io-domain.c |
+| ------------ | ------------ |
+| RK3188       | 4.4          |
+| RK3288       | 4.4          |
+| RK3036       | 4.4          |
+| RK312x       | 4.4          |
+| RK322x       | 4.4          |
+| RK3368       | 3.10         |
+| RK3368       | 4.4          |
+| RK3366       | 4.4          |
+| RK3399       | 4.4          |
+| RV1108       | 3.10         |
+| RV1108       | 4.4          |
+| RK3228H      | 3.10         |
+| RK3328       | 4.4          |
+| RK3326/PX30  | 4.4          |
+| RK3308       | 4.4          |
 
 **读者对象**
 本文档（本指南）主要适用于以下工程师：
@@ -41,12 +71,17 @@
 
 **修订记录**
 
-| **日期**   | **版本** | **作者** | **修改说明** |
-| ---------- | -------- | -------- | ------------ |
-| 2019.01.28 | V1.0     | 吴达超   |              |
+| **版本号** | **作者** | **修改日期** | **修改说明**           |
+| ---------- | -------- | ------------ | ---------------------- |
+| V1.0.0     | 吴达超   | 2019-01-28   | 初始版本               |
+| V1.0.1     | 黄莹     | 2021-05-28   | 修改格式，增加版权信息 |
 
 ---
+
+**目录**
+
 [TOC]
+
 ---
 
 ## 驱动文件与 DTS 节点
@@ -54,7 +89,7 @@
 ### 驱动文件
 
 驱动文件所在位置：
-drivers/power/avs/rockchip-io-domain.c
+`drivers/power/avs/rockchip-io-domain.c`
 
 ### DTS 节点
 
@@ -112,7 +147,6 @@ io-domains {
 
 具体电压范围要以实际芯片的 Datasheet 为准。
 
----
 ## 驱动软件流程
 
 下面是 rockchip-io-domain.c 驱动的软件流程图，主要分为两个方面：
@@ -141,8 +175,6 @@ cond0(no)->e
 ### 动态配置
 
 在初始化的过程中，会绑定 regulator，通过注册 notify 的方式，一旦这个 regulator 的电压发生变化，就会通知 io-domain 驱动更新成对应的寄存器，做到动态更新寄存器的效果。
-
----
 
 ## 如何配置 io-domain
 
@@ -177,8 +209,6 @@ Possible supplies for rk3399 pmu-domains:
 
 以上两步做完后，得到了配置的名称和供电源头，在 DTS 里面找到对应的 regulator:  vcc1v8_dvp，就可以在 rk3399-evb.dtsi 配置上 “bt656-supply = <&vcc1v8_dvp>;”，其他的电源域配置类似。
 
----
-
 ## 通过硬件 Pin 脚控制的电源域一般不做配置
 
 在 RK Soc 中的一些 IO 电源域在硬件上已经通过某个 Pin 脚来控制的，这种情况下我们 kernel 的 DTS 一般不去配置，不破坏当前的硬件状态，像 flash 和 emmc 这些模块的 IO 电源域一般都是 Pin 脚来控制的。
@@ -198,8 +228,6 @@ Possible supplies for rk3399 pmu-domains:
 ![io-domain-5-rk3368-APIO4-hardware](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-5-rk3368-APIO4-hardware.png)
 
 ![io-domain-6-rk3368-APIO4-flash-io-sel](Rockchip_Developer_Guide_Linux_IO_DOMAIN\io-domain-6-rk3368-APIO4-flash-io-sel.png)
-
----
 
 ## DTS 中无定义 Regulator 情况处理
 
@@ -240,8 +268,6 @@ Possible supplies for rk3399 pmu-domains:
 
 ```
 
----
-
 ## 常见问题
 
 ### 如何确定某个 Pin 脚所在的电源域寄存器是否配置正确
@@ -264,12 +290,8 @@ Possible supplies for rk3399 pmu-domains:
 
 ### io-domain 的寄存器不正确
 
-常见的寄存器不对，可能是以下几个问题
+常见的寄存器错误，可能是以下几个问题
 
 - 所配置的 regulator 电压不对；
 - 未配置 Regulator 或 Regulator 未使能；
 - Regulator 比 io-domain 驱动加载更慢，获取 regulator 失败。
-
-
-
-
