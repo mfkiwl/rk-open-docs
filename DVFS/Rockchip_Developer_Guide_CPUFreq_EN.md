@@ -62,7 +62,7 @@ Software development engineers
 | ----------- | ----------- | :--------- | --------------------------- |
 | V1.0.0      | Finley Xiao | 2018-12-04 | Initial version             |
 | V1.1.0      | Finley Xiao | 2019-11-14 | Add content about Linux4.19 |
-| V1.1.0      | Karen Huang | 2021-01-21 | Modify format               |
+| V1.1.1      | Karen Huang | 2021-02-25 | Modify format               |
 
 ---
 
