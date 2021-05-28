@@ -2,9 +2,9 @@
 
 文件标识：RK-YH-YF-287
 
-发布版本：V1.0.0
+发布版本：V1.1.0
 
-日期：2021-04-06
+日期：2021-05-28
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -54,9 +54,10 @@ Rockchip Electronics Co., Ltd.
 
 **修订记录**
 
-| **版本号** | **作者** | **修改日期** | **修改说明**             |
-| ---------- | -------- | ------------ | ------------------------ |
-| V1.0.0     | 黄国椿   | 2021-04-06   | 初始发布                 |
+| **版本号** | **作者** | **修改日期** | **修改说明** |
+| ---------- | -------- | ------------ | ------------ |
+| V1.0.0     | 黄国椿   | 2021-04-06   | 初始发布     |
+| V1.1.0     | 陈顺庆   | 2021-05-28   | 增加HDMI输入 |
 
 ---
 
@@ -77,16 +78,16 @@ Rockchip Electronics Co., Ltd.
 ```
 
 ├── Include
-│   ├── panel.h
-│   ├── rk628_combtxphy.h
-│   ├── rk628_config.h
-│   ├── rk628_cru.h
-│   ├── rk628_dsi.h
-│   ├── rk628.h
-│   ├── rk628_lvds.h
-│   ├── rk628_post_process.h
-│   ├── rk628_registers_dump.h
-│   └── rk628_rgb.h
+│   ├── panel.h
+│   ├── rk628_combtxphy.h
+│   ├── rk628_config.h
+│   ├── rk628_cru.h
+│   ├── rk628_dsi.h
+│   ├── rk628.h
+│   ├── rk628_lvds.h
+│   ├── rk628_post_process.h
+│   ├── rk628_registers_dump.h
+│   └── rk628_rgb.h
 └── Source
 	├── panel.c
 	├── rk628.c
@@ -168,6 +169,73 @@ void mdelay(unsigned long msec)
 ...
 
 ```
+
+### main函数
+
+```c
+int main(void)
+{
+	...
+	while (1)
+	{
+		if (!init) {
+			//set reset
+			gpio_bit_reset(GPIOA, GPIO_PIN_9);
+			delay_1ms(6);
+			gpio_bit_set(GPIOA, GPIO_PIN_9);
+
+			delay_1ms(1000);
+			fwdgt_counter_reload();
+			init = 1;
+		}
+
+		rk628_init();
+
+		delay_1ms(1000);
+	}
+}
+```
+
+1、reset脚只需要拉一次就可以，所以在初始化之后不需要再拉reset脚。
+
+2、rk628_init()需要循环调用，因为如果是HDMIIN的话，需要检测HDMI的状态和分辨率等的变化。
+
+### 输入输出配置
+
+```c
+#define RK628_HDMI_IN
+#undef  RK628_RGB_IN
+
+#undef  RK628_RGB_OUT
+#define RK628_LVDS_OUT
+#undef  RK628_DSI_OUT
+```
+
+目前输入有HDMI IN和RGB IN, 输出有RGB,  LVDS,  DSI, CSI, 所以需要配置对应的输入输出，如上配置的是HDMI IN+LVDS OUT.
+
+```c
+void rk628_init(void)
+{
+	static int init = 0;
+
+	if (!init) {
+		rk628_grf_init();
+		rk628_cru_init();
+		rk628_display_enable();
+
+#ifdef RK628_REG_DUMP
+		rk628_registers_dump();
+#endif
+		init = 1;
+	}
+
+	rk628_display_work();
+}
+```
+
+如上代码，如果是RGB IN的话只需要初始调用一次，因为RGB输入源是固定的，在rk628_display_enable()会打显示通路，rk628_display_work()对于除了HDMI IN之外的输入是个空函数。
+
+如果是HDMI IN的话，需要循环调用，因为需要检测状态与分辨率等的变化，所以rk628_display_work()会轮询变化HDMI IN状态的变化。
 
 ## Panel 端配置
 
@@ -435,3 +503,36 @@ uint32_t rk628_lvds_get_link_type(void)
 ```
 
 注：根据硬件设计可以选择配置双通道 LVDS 的左右输出。
+
+### HDMI输入
+
+#### 配置HDMI输入
+
+```c
+#define RK628_HDMI_IN
+```
+
+#### HDMI检测脚配置
+
+```c
+#define HDMIRX_DET_PORT			GPIOA
+#define HDMIRX_DET_PIN			GPIO_PIN_8
+```
+
+#### HPD输出配置
+
+因为硬件的设计问题，有些硬件HDP需要低有效，所以如果是低有效的话，需要定义下面的宏：
+
+```c
+#define HDMIRX_HPD_INVERTED
+```
+
+#### 注意事项
+
+1. HDMIRX对时钟率点有要求，目前只支持下面这些率点：
+
+   ```c
+   27M, 64M, 74.25M, 148.5M, 297M, 594M
+   ```
+
+2. 因为HDMI输入的分辨率、颜色格式等是可能被切换的，因为率点参数计数比较耗时，所以切分辨率过程时间可能会比较长，大概需要几秒钟。
