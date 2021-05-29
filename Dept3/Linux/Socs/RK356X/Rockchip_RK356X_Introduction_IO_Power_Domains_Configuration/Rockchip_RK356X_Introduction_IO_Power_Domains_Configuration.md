@@ -1,10 +1,10 @@
-# RK356X IO 电源域配置说明
+# RK3566 RK3568 IO 电源域配置指南
 
 文档标识：RK-SM-YF-905
 
-发布版本：V1.0.1
+发布版本：V1.0.2
 
-日期：2021-05-27
+日期：2021-06-02
 
 文件密级：□绝密   □秘密   □内部资料   ■公开
 
@@ -44,35 +44,36 @@ Rockchip Electronics Co., Ltd.
 
 **概述**
 
-主控电源域的IO电平要与对接外设芯片的IO电平保持一致,还要注意软件的电压配置要跟硬件的电压一致，否则，最坏的情况可能会导致IO的损坏。
+主控电源域的IO电平要与对接外设芯片的IO电平匹配，还要注意软件的电压配置要跟硬件的电压一致，否则，最坏的情况可能会导致IO的损坏。
 
-RK3566/RK3568共有10个独立的IO电源域，分别为PMUIO[0:2]和VCCIO[1:7]。其中:
+RK3566/RK3568共有10个独立的IO电源域，分别为PMUIO[0:2]和VCCIO[1:7]。其中：
 
-- PMUIO0、 PMUIO1为固定电平电源域，不可配置，其余IO domain均可进行配置；
+- PMUIO0、 PMUIO1为固定电平电源域，不可配置；
 
-- PMUIO2和VCCIO1,VCCIO[3:7]电源域均要求硬件供电电压与软件的配置相匹配:
+- PMUIO2和VCCIO1，VCCIO[3:7]电源域均要求硬件供电电压与软件的配置相匹配:
 
-  1) 当硬件IO电平接1.8V，软件电压配置也要相应配成1.8V;
-  2) 当硬件IO电平接3.3V，软件电压配置也要相应配成3.3V
+  1) 当硬件IO电平接1.8V，软件电压配置也要相应配成1.8V；
+  2) 当硬件IO电平接3.3V，软件电压配置也要相应配成3.3V；
 
-- VCCIO2电源域的供电与FLASH_VOL_SEL状态关系必须保持一致:
+- VCCIO2电源域软件不需要配置，但是其硬件供电电压与FLASH_VOL_SEL状态需保持一致:
 
   1) 当VCCIO2供电是1.8V，则FLASH_VOL_SEL管脚必须保持为高电平；
-  2) 当VCCIO2供电是3.3V，则FLASH_VOL_SEL管脚必须保持为低电平;
+  2) 当VCCIO2供电是3.3V，则FLASH_VOL_SEL管脚必须保持为低电平；
 
-[^注]: 否则：
+否则：
 
-- 软件配置为1.8V，硬件供电3.3V，会使得IO处于过压状态，长期工作IO会损坏；
+- 当软件配置为1.8V，硬件供电3.3V，会使得IO处于过压状态，长期工作IO会损坏；
 
-- 软件配置为3.3V，硬件供电1.8V，IO功能会异常；
+- 当软件配置为3.3V，硬件供电1.8V，IO功能会异常；
 
-本文主要描述了RK3566、RK3568平台Linux SDK配置IO电源域的方法，旨在帮助开发者正确配置IO的电源域。
+本文主要描述了RK3566、RK3568平台SDK配置IO电源域的方法，旨在帮助开发者正确配置IO的电源域。
 
 **产品版本**
 
-| **芯片名称** | **内核版本** |
-| ------------ | ------------ |
-| RK3566、RK3568 | Linux 4.19 |
+| **芯片名称** | **系统版本** | **内核版本** |
+| ------------ | ------------ | ------------ |
+| RK3566、RK3568 | Linux 4.19 | Kernel 4.19 |
+| RK3566、RK3568 | Android 11.0 | Kernel 4.19 |
 
 **读者对象**
 
@@ -90,6 +91,7 @@ RK3566/RK3568共有10个独立的IO电源域，分别为PMUIO[0:2]和VCCIO[1:7]�
 | ---------- | --------| :--------- | ------------ |
 | V1.0.0 | Caesar Wang | 2021-05-15 | 初始版本     |
 | V1.0.1 | Caesar Wang | 2021-05-27 | 更新IO电源域相关说明     |
+| V1.0.2 | Caesar Wang | 2021-06-02 | 增加Android和更详细的寄存器介绍    |
 
 ---
 
@@ -115,17 +117,7 @@ RK3566/RK3568共有10个独立的IO电源域，分别为PMUIO[0:2]和VCCIO[1:7]�
 
 ## 第三步：修改内核dts的电源域配置节点pmu_io_domains
 
-Kernel 第一次编译会强制去检查IO电源域的配置，代码实现在 `<SDK>/kernel/scripts/io-domain.sh`。检查项如下图
-
-![](resources/Domain-check.png)
-
-默认SDK对IO电源域配置是3.3V，正确检查步骤：
-
-```
-查看硬件实际链接 -> 配置DTS -> 选择DTS对应的电源域电压
-```
-
-默认SDK选3.3V才可以编译通过。SDK对应内核dts的电源域配置如下：
+SDK默认的内核dts的电源域配置如下：
 
 ```c
 <SDK>/kernel/arch/arm64/boot/dts/rockchip/rk3568-evb.dtsi
@@ -142,37 +134,111 @@ Kernel 第一次编译会强制去检查IO电源域的配置，代码实现在 `
 };
 ```
 
-以**pmuio2-supply**为例，首先查看硬件原理图确认pmuio2电源域（PMUIO2）的配置如图所示。
+本文以vccio1-supply为例进行介绍。首先查看硬件原理图确认vccio1电源域（VCCIO1）的配置如图所示。
 
-**PMUIO2** 配置的电源域为VCC3V3_PMU（即3.3v）。
+![](resources/io_power_domain_map.png)
 
-![](resources/PMUIO2_VDD_01.png)
+在硬件原理图上面搜索`VCCIO1`，如下：
 
-[注] 软件不配置pmuio0,pmuio1和vccio2，硬件根据实际存储接口IO电源域电平配置。
+![](resources/vccio1.png)
+
+从上图找到`VCCIO1`的电源是`vccio_acodec`。
+在原理图上搜索`vccio_acodec`，可以找到如下图。
+
+![](resources/pmic_ldo_vccio_acodec.png)
+
+从上图找到`vccio_acodec`是由RK809的LDO4供电。
+从软件的dts里面找到LDO_REG4（LDO4）的配置信息，如下：
+
+```c
+vccio_acodec: LDO_REG4 {
+        regulator-always-on;
+        regulator-boot-on;
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        regulator-name = "vccio_acodec";
+        regulator-state-mem {
+                regulator-off-in-suspend;
+        };
+};
+```
+
+将上面的vccio_acodec配置到pmu_io_domains节点中的vccio1-supply = <&vcc_3v3>;；即可完成vccio1的电压配置:
+
+```c
+&pmu_io_domains {
+        status = "okay";
+        pmuio2-supply = <&vcc_3v3>;
+        vccio1-supply = <&vccio_acodec>;
+        vccio3-supply = <&vcc_3v3>;
+        vccio4-supply = <&vcc_3v3>;
+        vccio5-supply = <&vcc_3v3>;
+        vccio6-supply = <&vcc_3v3>;
+        vccio7-supply = <&vcc_3v3>;
+};
+```
+
+**注意：**
+
+- pmuio0、pmuio1为固定电平电源域，软件不可配置；
+- vccio2软件不需要配置，但是其硬件供电电压与FLASH_VOL_SEL状态需保持一致：当VCCIO2供电是1.8V，则FLASH_VOL_SEL管脚必须保持为高电平；当VCCIO2供电是3.3V，则FLASH_VOL_SEL管脚必须保持为低电平；
+- 其他几路电源域（pmuio2和VCCIO[3:7]），参考上述VCCIO1的方式配置即可；
+
+**RK356X kernel编译弹出IO-Domain确认对话框:**
+
+![](resources/io-domain.png)
+
+弹出这个对话框目的是检查实际硬件原理图和软件dts的IO电压是否匹配，客户需要根据各自项目的硬件原理图的实际设计电压来选择（对话框中选择的值不会保存到dts中，dts需要手动去修改），如果您是软件工程师请与贵司的硬件工程师一起核对确认，**这个很重要，请务必确认！**如果IO电压配置不正确，将会导致芯片IO烧坏。
+当你确认IO电压后这个对话框就不会再弹出（输入值和dts配置的值相同），如果dts名字或者dts里面的io-domian发生变化，则会继续弹出重新进行确认。
 
 ## 第四步：SDK查看当前固件电源域配置
 
-命令：`./build.sh info`
+编译Kernel后, Linux SDK 查看当前电源域配置方法如下：
+
+`./build.sh info`
 
 ![](resources/SDK_BUILD_INFO.png)
+
+Android 11.0 SDK 查看的方法如下（此方法也适用于Linux SDK)：
+
+```
+cat <SDK>/kernel/arch/arm64/boot/dts/rockchip/.rk3568-evb1-ddr4-v10-linux.dtb.dts.tmp.domain
+
+PMUIO2 Supply Power Voltage1:3300000
+VCCIO1 Supply Power Voltage1:3300000
+VCCIO3 Supply Power Voltage1:3300000
+VCCIO4 Supply Power Voltage1:3300000
+VCCIO5 Supply Power Voltage1:3300000
+VCCIO6 Supply Power Voltage1:3300000
+VCCIO7 Supply Power Voltage1:3300000
+```
 
 ## 第五步：烧录固件后确认寄存器值是否正确
 
 以**RK356X**芯片为例，根据手册获取PMU_GRF_IO_VSEL0~PMU_GRF_IO_VSEL2寄存器（基地址：0xFDC20140~0xFDC20148）说明如下：
 
-![](resources/PMUGRF_IO_VSEL0_RK356X.png)
+![](resources/PMUGRF_IO_VSEL0_RK356X_0.png)
 
-![](resources/PMUGRF_IO_VSEL1_RK356X.png)
+![](resources/PMUGRF_IO_VSEL0_RK356X_1.png)
+
+![](resources/PMUGRF_IO_VSEL1_RK356X_0.png)
+
+![](resources/PMUGRF_IO_VSEL1_RK356X_1.png)
 
 ![](resources/PMUGRF_IO_VSEL2_RK356X.png)
 
-```shell
-# io -4 -r 0xFDC20140
-fdc20140:  00000000
+为了保证对外客户使用的安全性，目前SDK对外配置都是3.3V, 寄存器的值如下表所示，但会存在部分功能缺失的情况。
 
-#  io -4 -r 0xFDC20144
-fdc20144:  000000ff
+| **寄存器** | **地址** | **读取命令** | **值** |
+| ---------- | --------| :--------- | :--------- |
+| PMU_GRF_IO_VSEL0 | 0xFDC20140 | io -4 -r 0xFDC20140 | 0x00000000|
+| PMU_GRF_IO_VSEL1 | 0xFDC20144 | io -4 -r 0xFDC20144 | 0x000000ff |
+| PMU_GRF_IO_VSEL2 | 0xFDC20148 | io -4 -r 0xFDC20148 | 0x00000030 |
 
-# io -4 -r 0xFDC20148
-fdc20148:  00000030
+若需要恢复SDK EVB功能配置，需要revert Kernel这个提交 (git revert e18c51f465dd0dd0185f5 )。但是请注意，此EVB的dts配置仅仅只适用于我们的EVB，不能随意用于客户的项目，客户需要根据各自项目的实际硬件供电电压来修改对应的dts配置。
+
+```
+commit e18c51f465dd0dd0185f5f80a72699fca0a68adc
+Author: Wu Liangqing <wlq@rock-chips.com>
+Date:   Mon May 24 09:31:10 2021 +0800
 ```
